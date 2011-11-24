@@ -505,7 +505,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1, Iterator<? extends GEntry> iterator2) {
+	static public final <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1, final Iterator<? extends GEntry> iterator2) {
 		return Iterators.chainedIterator(Arrays.asList(iterator1, iterator2));
 	}
 

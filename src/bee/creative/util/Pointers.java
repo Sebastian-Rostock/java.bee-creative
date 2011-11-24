@@ -220,9 +220,8 @@ public final class Pointers {
 				return Pointers.weakPointer(data);
 			case SOFT:
 				return Pointers.softPointer(data);
-			default:
-				throw new IllegalArgumentException();
 		}
+		throw new IllegalArgumentException();
 	}
 
 	/**
@@ -237,7 +236,8 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link HardPointer harten Verweis} auf den gegebenen Datensatz und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link HardPointer harten Verweis} auf den gegebenen Datensatz und gibt ihn zurück. Ein
+	 * solcher Verweis wird nicht automatisch aufgelöst.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -249,6 +249,7 @@ public final class Pointers {
 
 	/**
 	 * Diese Methode erzeugt einen {@link WeakPointer schwachen Verweis} auf den gegebenen Datensatz und gibt ihn zurück.
+	 * Ein solcher Verweis wird dann aufgelöst, wenn der Datensatz nur noch {@link WeakReference schwach} erreichbar ist.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -260,6 +261,7 @@ public final class Pointers {
 
 	/**
 	 * Diese Methode erzeugt einen {@link SoftPointer weichen Verweis} auf den gegebenen Datensatz und gibt ihn zurück.
+	 * Ein solcher Verweis wird bei Speichermangel aufgelöst.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.

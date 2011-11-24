@@ -293,7 +293,7 @@ public final class Strings {
 		final StringBuilder builder = new StringBuilder();
 		int last = 0;
 		while(matcher.find()){
-			int from = matcher.start(index);
+			final int from = matcher.start(index);
 			builder.append(sequence.subSequence(last, from)).append(prefix).append(Strings.encodeIndex(matches.size())).append(suffix);
 			last = matcher.end(index);
 			matches.add(sequence.subSequence(from, last).toString());
