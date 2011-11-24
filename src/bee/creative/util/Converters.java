@@ -7,12 +7,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import bee.creative.util.Conversions.DynamicConversion;
+import bee.creative.util.Conversions.StaticConversion;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Converter
  * Convertern}.
+ * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Converters {
@@ -20,6 +22,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen delegierenden {@link Converter Converter}, der seine Berechnungen an einen
 	 * gegebenen {@link Converter Converter} delegiert.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -35,11 +38,12 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 		 */
 		public BaseConverter(final Converter<? super GInput2, ? extends GOutput2> converter) {
-			if (converter == null) throw new NullPointerException();
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -56,7 +60,7 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseConverter<?, ?, ?, ?> data = (BaseConverter<?, ?, ?, ?>) object;
+			final BaseConverter<?, ?, ?, ?> data = (BaseConverter<?, ?, ?, ?>)object;
 			return this.converter.equals(data.converter);
 		}
 
@@ -64,6 +68,7 @@ public final class Converters {
 
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter} mit Name.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -77,11 +82,12 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Namen.
+		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
 		 */
 		public NamedConverter(final String name) throws NullPointerException {
-			if (name == null) throw new NullPointerException();
+			if(name == null) throw new NullPointerException();
 			this.name = name;
 		}
 
@@ -98,7 +104,7 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final NamedConverter<?, ?> data = (NamedConverter<?, ?>) object;
+			final NamedConverter<?, ?> data = (NamedConverter<?, ?>)object;
 			return this.name.equals(data.name);
 		}
 
@@ -107,6 +113,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, dessen Ausgabe durch das Lesen eines gegebenen
 	 * {@link Field Fields} an der Eingabe ermittelt wird.
+	 * 
 	 * @see Field#get(Object)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -121,23 +128,24 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Field Feld}.
+		 * 
 		 * @param field {@link Field Feld}.
 		 * @throws NullPointerException Wenn das gegebene {@link Field Feld} <code>null</code> ist.
 		 */
 		public FixedFieldConverter(final Field field) throws NullPointerException {
-			if (field == null) throw new NullPointerException();
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			try {
-				return (GOutput) this.field.get(input);
-			} catch (final IllegalAccessException e) {
+			try{
+				return (GOutput)this.field.get(input);
+			}catch(final IllegalAccessException e){
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -147,9 +155,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FixedFieldConverter<?, ?>)) return false;
-			final FixedFieldConverter<?, ?> data = (FixedFieldConverter<?, ?>) object;
+			if(object == this) return true;
+			if(!(object instanceof FixedFieldConverter<?, ?>)) return false;
+			final FixedFieldConverter<?, ?> data = (FixedFieldConverter<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
 
@@ -166,6 +174,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, dessen Ausgabe durch das Aufrufen einer gegebenen
 	 * {@link Method Methode} an der Eingabe ermittelt wird.
+	 * 
 	 * @see Method#invoke(Object, Object...)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -180,25 +189,26 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Method Methode}.
+		 * 
 		 * @param method {@link Method Methode}.
 		 * @throws NullPointerException Wenn die gegebene {@link Method Methode} <code>null</code> ist.
 		 */
 		public FixedMethodConverter(final Method method) throws NullPointerException {
-			if (method == null) throw new NullPointerException();
+			if(method == null) throw new NullPointerException();
 			this.method = method;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			try {
-				return (GOutput) this.method.invoke(input);
-			} catch (final InvocationTargetException e) {
+			try{
+				return (GOutput)this.method.invoke(input);
+			}catch(final InvocationTargetException e){
 				throw new IllegalArgumentException(e);
-			} catch (final IllegalAccessException e) {
+			}catch(final IllegalAccessException e){
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -208,9 +218,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FixedMethodConverter<?, ?>)) return false;
-			final FixedMethodConverter<?, ?> data = (FixedMethodConverter<?, ?>) object;
+			if(object == this) return true;
+			if(!(object instanceof FixedMethodConverter<?, ?>)) return false;
+			final FixedMethodConverter<?, ?> data = (FixedMethodConverter<?, ?>)object;
 			return Objects.equals(this.method, data.method);
 		}
 
@@ -227,6 +237,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, dessen Ausgabe durch das Lesen eines durch einen
 	 * Namen gegebenen {@link Field Fields} an der Eingabe ermittelt wird.
+	 * 
 	 * @see Field#get(Object)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -236,6 +247,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Namen.
+		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
 		 */
@@ -246,17 +258,17 @@ public final class Converters {
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if (input == null) throw new NullPointerException();
-			try {
-				return (GOutput) input.getClass().getField(this.name).get(input);
-			} catch (final IllegalAccessException e) {
+			if(input == null) throw new NullPointerException();
+			try{
+				return (GOutput)input.getClass().getField(this.name).get(input);
+			}catch(final IllegalAccessException e){
 				throw new IllegalArgumentException(e);
-			} catch (final NoSuchFieldException e) {
+			}catch(final NoSuchFieldException e){
 				throw new IllegalArgumentException(e);
-			} catch (final SecurityException e) {
+			}catch(final SecurityException e){
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -282,6 +294,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, dessen Ausgabe durch das Aufrufen einer durch einen
 	 * Namen gegebenen {@link Method Methode} an der Eingabe ermittelt wird.
+	 * 
 	 * @see Method#invoke(Object, Object...)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -291,6 +304,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Namen.
+		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
 		 */
@@ -301,19 +315,19 @@ public final class Converters {
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if (input == null) throw new NullPointerException();
-			try {
-				return (GOutput) input.getClass().getMethod(this.name).invoke(input);
-			} catch (final InvocationTargetException e) {
+			if(input == null) throw new NullPointerException();
+			try{
+				return (GOutput)input.getClass().getMethod(this.name).invoke(input);
+			}catch(final InvocationTargetException e){
 				throw new IllegalArgumentException(e);
-			} catch (final IllegalAccessException e) {
+			}catch(final IllegalAccessException e){
 				throw new IllegalArgumentException(e);
-			} catch (final NoSuchMethodException e) {
+			}catch(final NoSuchMethodException e){
 				throw new IllegalArgumentException(e);
-			} catch (final SecurityException e) {
+			}catch(final SecurityException e){
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -339,6 +353,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, der für jede Eingabe immer die gleiche
 	 * Standardausgabe liefert.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -352,6 +367,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Standardausgabe.
+		 * 
 		 * @param output Standardausgabe.
 		 */
 		public DefaultConverter(final GOutput output) {
@@ -379,9 +395,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof DefaultConverter<?, ?>)) return false;
-			final DefaultConverter<?, ?> data = (DefaultConverter<?, ?>) object;
+			if(object == this) return true;
+			if(!(object instanceof DefaultConverter<?, ?>)) return false;
+			final DefaultConverter<?, ?> data = (DefaultConverter<?, ?>)object;
 			return Objects.equals(this.output, data.output);
 		}
 
@@ -398,6 +414,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.
@@ -407,6 +424,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
 		 * @param converter {@link Converter Converter.}
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 		 */
@@ -443,6 +461,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#convertedIterable(Converter, Iterable)} in seine Ausgabe überführt.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.
@@ -454,6 +473,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
 		 * @param converter {@link Converter Converter.}
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 		 */
@@ -488,11 +508,12 @@ public final class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter}, der über die Weiterleitug der Eingabe mit Hilfe
-	 * eines einen {@link Filter Filters} entscheiden. Wenn der gegebene {@link Filter Filter} eine Eingabe akzeptiert,
-	 * liefert der {@link Converter Converter} dafür die Ausgabe des gegebenen {@link Converter Accept-Converters}. Die
-	 * Ausgabe des gegebenen {@link Converter Reject-Converters} liefert er dagegen für eine vom gegebenen
-	 * {@link Filter Filter} abgelehnten Eingabe.
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines
+	 * einen {@link Filter Filters} entscheiden. Wenn der gegebene {@link Filter Filter} eine Eingabe akzeptiert, liefert
+	 * der {@link Converter Converter} dafür die Ausgabe des gegebenen {@link Converter Accept-Converters}. Die Ausgabe
+	 * des gegebenen {@link Converter Reject-Converters} liefert er dagegen für eine vom gegebenen {@link Filter Filter}
+	 * abgelehnten Eingabe.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -516,14 +537,15 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter Filter} und {@link Converter Converter}.
+		 * 
 		 * @param filter {@link Filter Filter}.
 		 * @param accept {@link Converter Accept-Converter}.
 		 * @param reject {@link Converter Reject-Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder einer der gegebenen
-		 * {@link Converter Converter} <code>null</code> sind.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder einer der gegebenen {@link Converter
+		 *         Converter} <code>null</code> sind.
 		 */
 		public FilteredConverter(final Filter<? super GInput> filter, final Converter<? super GInput, ? extends GOutput> accept, final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-			if ((filter == null) || (accept == null) || (reject == null)) throw new NullPointerException();
+			if((filter == null) || (accept == null) || (reject == null)) throw new NullPointerException();
 			this.filter = filter;
 			this.accept = accept;
 			this.reject = reject;
@@ -534,7 +556,7 @@ public final class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			return (GOutput) (this.filter.accept(input) ? this.accept.convert(input) : this.reject.convert(input));
+			return (this.filter.accept(input) ? this.accept.convert(input) : this.reject.convert(input));
 		}
 
 		/**
@@ -550,9 +572,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FilteredConverter<?, ?>)) return false;
-			final FilteredConverter<?, ?> data = (FilteredConverter<?, ?>) object;
+			if(object == this) return true;
+			if(!(object instanceof FilteredConverter<?, ?>)) return false;
+			final FilteredConverter<?, ?> data = (FilteredConverter<?, ?>)object;
 			return this.filter.equals(data.filter) && this.accept.equals(data.accept) && this.reject.equals(data.reject);
 		}
 
@@ -569,8 +591,9 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen gepufferten {@link Converter Converter}. Ein gepufferter {@link Converter
 	 * Converter} verwaltet die vom einem gegebenen {@link Converter Converter} erzeugten Ausgaben in einer {@link Map
-	 * Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Verweise} auf Eingaben und
-	 * die Werte als {@link Pointer Verweise} auf die Ausgaben des gegebenen {@link Converter Converters} realisiert.
+	 * Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Verweise} auf Eingaben und die
+	 * Werte als {@link Pointer Verweise} auf die Ausgaben des gegebenen {@link Converter Converters} realisiert.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
@@ -578,8 +601,8 @@ public final class Converters {
 	static public final class CachedConverter<GInput, GOutput> extends BaseConverter<GInput, GOutput, GInput, GOutput> {
 
 		/**
-		 * Dieses Feld speichert die {@link Map Abbildung} von Schlüsseln ({@link Pointer Verweise} auf Eingaben) auf
-		 * Werte ( {@link Pointer Verweise} auf die Ausgaben).
+		 * Dieses Feld speichert die {@link Map Abbildung} von Schlüsseln ({@link Pointer Verweise} auf Eingaben) auf Werte
+		 * ( {@link Pointer Verweise} auf die Ausgaben).
 		 */
 		final Map<Pointer<? extends GInput>, Pointer<? extends GOutput>> map;
 
@@ -589,27 +612,30 @@ public final class Converters {
 		final int limit;
 
 		/**
-		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die
-		 * Schlüssel der Abbildung erzeugt werden.
+		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel
+		 * der Abbildung erzeugt werden.
+		 * 
 		 * @see Pointers#pointer(int, Object)
 		 */
 		final int inputMode;
 
 		/**
-		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte
-		 * der Abbildung erzeugt werden.
+		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
+		 * Abbildung erzeugt werden.
+		 * 
 		 * @see Pointers#pointer(int, Object)
 		 */
 		final int outputMode;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den gepuferten {@link Converter Converter}.
+		 * 
 		 * @see Pointers#pointer(int, Object)
 		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
 		 * @param inputMode Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel der
-		 * Abbildung erzeugt werden.
+		 *        Abbildung erzeugt werden.
 		 * @param outputMode Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
-		 * Abbildung erzeugt werden.
+		 *        Abbildung erzeugt werden.
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 		 * @throws IllegalArgumentException Wenn einer der gegebenen Modi ungültig ist.
@@ -637,21 +663,21 @@ public final class Converters {
 		@Override
 		public GOutput convert(final GInput input) {
 			final Pointer<? extends GOutput> data = this.map.get(Pointers.hardPointer(input));
-			if (data != null) {
-				if (data == Pointers.NULL_POINTER) return null;
+			if(data != null){
+				if(data == Pointers.NULL_POINTER) return null;
 				final GOutput output = data.data();
-				if (output != null) return output;
+				if(output != null) return output;
 				int valid = this.limit - 1;
-				for (final Iterator<Entry<Pointer<? extends GInput>, Pointer<? extends GOutput>>> iterator = this.map.entrySet().iterator(); iterator.hasNext();) {
+				for(final Iterator<Entry<Pointer<? extends GInput>, Pointer<? extends GOutput>>> iterator = this.map.entrySet().iterator(); iterator.hasNext();){
 					final Entry<Pointer<? extends GInput>, Pointer<? extends GOutput>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
-					if (valid != 0) {
-						if (((key != Pointers.NULL_POINTER) && (key.data() == null)) || ((value != Pointers.NULL_POINTER) && (value.data() == null))) {
+					if(valid != 0){
+						if(((key != Pointers.NULL_POINTER) && (key.data() == null)) || ((value != Pointers.NULL_POINTER) && (value.data() == null))){
 							iterator.remove();
-						} else {
+						}else{
 							valid--;
 						}
-					} else {
+					}else{
 						iterator.remove();
 					}
 				}
@@ -681,12 +707,13 @@ public final class Converters {
 
 	/**
 	 * Diese Klasse implementiert einen verketteten {@link Converter Converter}, der seine Eingabe an einen ersten
-	 * {@link Converter Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter Converter} übergibt
-	 * und dessen Ausgabe liefert.
+	 * {@link Converter Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter Converter} übergibt und
+	 * dessen Ausgabe liefert.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 */
 	static public final class ChainedConverter<GInput, GValue, GOutput> implements Converter<GInput, GOutput> {
@@ -703,12 +730,13 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Converter Converter}.
+		 * 
 		 * @param converter1 erster {@link Converter Converter}.
 		 * @param converter2 zweiter {@link Converter Converter.}
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1, final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
-			if ((converter1 == null) || (converter2 == null)) throw new NullPointerException();
+			if((converter1 == null) || (converter2 == null)) throw new NullPointerException();
 			this.converter1 = converter1;
 			this.converter2 = converter2;
 		}
@@ -734,9 +762,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ChainedConverter<?, ?, ?>)) return false;
-			final ChainedConverter<?, ?, ?> data = (ChainedConverter<?, ?, ?>) object;
+			if(object == this) return true;
+			if(!(object instanceof ChainedConverter<?, ?, ?>)) return false;
+			final ChainedConverter<?, ?, ?> data = (ChainedConverter<?, ?, ?>)object;
 			return this.converter1.equals(data.converter1) && this.converter2.equals(data.converter2);
 		}
 
@@ -753,6 +781,7 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen {@link Converter Converter}, der den gegebenen {@link Converter Converter}
 	 * synchronisiert.
+	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -761,6 +790,7 @@ public final class Converters {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 		 */
@@ -773,7 +803,7 @@ public final class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			synchronized (this.converter) {
+			synchronized(this.converter){
 				return this.converter.convert(input);
 			}
 		}
@@ -797,6 +827,101 @@ public final class Converters {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit dem gegebenen {@link Converter
+	 * Converter} in ein {@link Conversions#staticConversion(Object, Object) statisches Eingabe-Ausgabe-Paar} umwandelt.
+	 * 
+	 * @see Conversions#staticConversion(Object, Object)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ des Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static public final class StaticConversionConverter<GInput, GOutput> extends BaseConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public StaticConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+			super(converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Conversion<GInput, GOutput> convert(final GInput input) {
+			return Conversions.<GInput, GOutput>staticConversion(input, this.converter.convert(input));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || ((object instanceof StaticConversionConverter<?, ?>) && super.equals(object));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("staticConversionConverter", this.converter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit dem gegebenen {@link Converter
+	 * Converter} in ein {@link Conversions#dynamicConversion(Object, Converter) dynamisches Eingabe-Ausgabe-Paar}
+	 * umwandelt.
+	 * 
+	 * @see Conversions#dynamicConversion(Object, Converter)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ des Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static public final class DynamicConversionConverter<GInput, GOutput> extends BaseConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public DynamicConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+			super(converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Conversion<GInput, GOutput> convert(final GInput input) {
+			return Conversions.<GInput, GOutput>dynamicConversion(input, this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || ((object instanceof DynamicConversionConverter<?, ?>) && super.equals(object));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("dynamicConversionConverter", this.converter);
+		}
+
+	}
+
+	/**
 	 * Dieses Feld speichert den leeren {@link Converter Converter}.
 	 */
 	static final Converter<?, ?> VOID_CONVERTER = new Converter<Object, Object>() {
@@ -814,8 +939,79 @@ public final class Converters {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der ein {@link Iterable Iterable} in einen
-	 * {@link Iterator Iterator} umwandelt.
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via {@link Pointers#hardPointer}
+	 * konvertiert.
+	 */
+	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Object>() {
+
+		@Override
+		public Object convert(final Object input) {
+			return Pointers.hardPointer(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("hardPointerConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via {@link Pointers#weakPointer}
+	 * konvertiert.
+	 */
+	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Object>() {
+
+		@Override
+		public Object convert(final Object input) {
+			return Pointers.weakPointer(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("weakPointerConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via {@link Pointers#softPointer}
+	 * konvertiert.
+	 */
+	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Object>() {
+
+		@Override
+		public Object convert(final Object input) {
+			return Pointers.softPointer(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("softPointerConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der den Datensatz eines {@link Pointer Verweises} ermittelt.
+	 */
+	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
+
+		@Override
+		public Object convert(final Pointer<?> input) {
+			return input.data();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("pointerDataConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der ein {@link Iterable Iterable} in einen {@link Iterator
+	 * Iterator} umwandelt.
 	 */
 	static final Converter<?, ?> ITERABLE_ITERATOR_CONVERTER = new Converter<Iterable<?>, Iterator<?>>() {
 
@@ -868,18 +1064,56 @@ public final class Converters {
 	};
 
 	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der die Eingabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 */
+	static final Converter<?, ?> CONVERSION_INPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
+
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.input();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("conversionInputConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der die Ausgabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 */
+	static final Converter<?, ?> CONVERSION_OUTPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
+
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.output();
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("conversionOutputConverter");
+		}
+
+	};
+
+	/**
 	 * Diese Methode gibt den leeren {@link Converter Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
+	 * 
 	 * @param <GInput> Typ der Eingabe sowie der Ausgabe.
 	 * @return <code>Void</code>-{@link Converter Converter}.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ("unchecked")
 	static public final <GInput> Converter<GInput, GInput> voidConverter() {
-		return (Converter<GInput, GInput>) Converters.VOID_CONVERTER;
+		return (Converter<GInput, GInput>)Converters.VOID_CONVERTER;
 	}
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Lesen des durch seinen Namen
 	 * gegebenen {@link Field Fields} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -895,6 +1129,7 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Lesen des durch einen Namen und
 	 * eine {@link Class Klasse} gegebenen {@link Field Fields} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -904,7 +1139,7 @@ public final class Converters {
 	 * @return {@link FixedFieldConverter Fixed-Field-Converter}.
 	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} <code>null</code> ist.
 	 * @throws NoSuchFieldException Wenn an der gegebenen {@link Class Klasse} kein {@link Field Feld} mit dem gegebenen
-	 * Namen existiert.
+	 *         Namen existiert.
 	 * @throws SecurityException Wenn auf das {@link Field Feld} nicht zugegriffen werden darf.
 	 */
 	static public final <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final String name, final Class<? extends GInput> clazz) throws NullPointerException, NoSuchFieldException, SecurityException {
@@ -912,8 +1147,9 @@ public final class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Lesen des gegebenen
-	 * {@link Field Fields} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Lesen des gegebenen {@link Field
+	 * Fields} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -929,6 +1165,7 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Aufrufen der durch ihren Namen
 	 * gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -943,8 +1180,8 @@ public final class Converters {
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Aufrufen der durch einen Namen
-	 * und eine {@link Class Klasse} gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und gibt ihn
-	 * zurück.
+	 * und eine {@link Class Klasse} gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -954,7 +1191,7 @@ public final class Converters {
 	 * @return {@link FixedMethodConverter Fixed-Method-Converter}.
 	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} <code>null</code> ist.
 	 * @throws NoSuchMethodException Wenn an der gegebenen {@link Class Klasse} keine {@link Method Methode} mit dem
-	 * gegebenen Namen existiert.
+	 *         gegebenen Namen existiert.
 	 * @throws SecurityException Wenn auf die {@link Method Methode} nicht zugegriffen werden darf.
 	 */
 	static public final <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final String name, final Class<? extends GInput> clazz) throws NullPointerException, NoSuchMethodException, SecurityException {
@@ -964,6 +1201,7 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, dessen Ausgabe durch das Aufrufen der gegebenen
 	 * {@link Method Methode} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -979,6 +1217,7 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der für jede Eingabe immer die gleiche Standardausgabe
 	 * liefert, und gibt ihn zurück.
+	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param output Standardausgabe.
@@ -990,10 +1229,11 @@ public final class Converters {
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines
-	 * einen {@link Filter Filters} entscheiden, und gibt ihn zurück. Wenn der gegebene {@link Filter Filter} eine
-	 * Eingabe akzeptiert, liefert der erzeugte {@link Converter Converter} dafür die Ausgabe des gegebenen
-	 * {@link Converter Accept-Converters}. Die Ausgabe des gegebenen {@link Converter Reject-Converters} liefert er
-	 * dagegen für eine vom gegebenen {@link Filter Filter} abgelehnten Eingabe.
+	 * einen {@link Filter Filters} entscheiden, und gibt ihn zurück. Wenn der gegebene {@link Filter Filter} eine Eingabe
+	 * akzeptiert, liefert der erzeugte {@link Converter Converter} dafür die Ausgabe des gegebenen {@link Converter
+	 * Accept-Converters}. Die Ausgabe des gegebenen {@link Converter Reject-Converters} liefert er dagegen für eine vom
+	 * gegebenen {@link Filter Filter} abgelehnten Eingabe.
+	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param filter {@link Filter Filter}.
@@ -1001,21 +1241,21 @@ public final class Converters {
 	 * @param reject {@link Converter Reject-Converter}.
 	 * @return {@link FilteredConverter Filtered-Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder einer der gegebenen {@link Converter
-	 * Converter} <code>null</code> sind.
+	 *         Converter} <code>null</code> sind.
 	 */
 	static public final <GInput, GOutput> Converter<GInput, GOutput> filteredConverter(final Filter<? super GInput> filter, final Converter<? super GInput, ? extends GOutput> accept,
-			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
+		final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
 		return new FilteredConverter<GInput, GOutput>(filter, accept, reject);
 	}
 
 	/**
 	 * Diese Methode erzeugt einen gepufferten {@link Converter Converter} und gibt ihn zurück. Der erzeugte
 	 * {@link Converter Converter} verwaltet die vom gegebenen {@link Converter Converter} erzeugten Ausgaben in einer
-	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer weiche
-	 * Verweise} auf Eingaben und die Werte als {@link SoftPointer weiche Verweise} auf die Ausgaben des gegebenen
-	 * {@link Converter Converters} realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht
-	 * beschränkt. Der erzeute {@link Converter Converter} realisiert damit einen speichersensitiven, assoziativen
-	 * Cache.
+	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer weiche Verweise}
+	 * auf Eingaben und die Werte als {@link SoftPointer weiche Verweise} auf die Ausgaben des gegebenen {@link Converter
+	 * Converters} realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute
+	 * {@link Converter Converter} realisiert damit einen speichersensitiven, assoziativen Cache.
+	 * 
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param converter {@link Converter Converter}.
@@ -1032,30 +1272,32 @@ public final class Converters {
 	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Verweise} auf
 	 * Eingaben und die Werte als {@link Pointer Verweise} auf die Ausgaben des gegebenen {@link Converter Converters}
 	 * realisiert.
+	 * 
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
 	 * @param inputMode Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel der
-	 * {@link Map Abbildung} erzeugt werden.
+	 *        {@link Map Abbildung} erzeugt werden.
 	 * @param outputMode Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
-	 * {@link Map Abbildung} erzeugt werden.
+	 *        {@link Map Abbildung} erzeugt werden.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link CachedConverter Cached-Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
 	 * @throws IllegalArgumentException Wenn einer der gegebenen Modi ungültig ist.
 	 */
 	static public final <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(final int limit, final int inputMode, final int outputMode, final Converter<? super GInput, ? extends GOutput> converter)
-			throws NullPointerException, IllegalArgumentException {
+		throws NullPointerException, IllegalArgumentException {
 		return new CachedConverter<GInput, GOutput>(limit, inputMode, outputMode, converter);
 	}
 
 	/**
 	 * Diese Methode erzeugt einen verketteten {@link Converter Converter}, der seine Eingabe an einen ersten
-	 * {@link Converter Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter Converter} übergibt
-	 * und dessen Ausgabe liefert, und gibt ihn zurück.
+	 * {@link Converter Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter Converter} übergibt und
+	 * dessen Ausgabe liefert, und gibt ihn zurück.
+	 * 
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter.}
@@ -1063,17 +1305,18 @@ public final class Converters {
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */
 	static public final <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(final Converter<? super GInput, ? extends GValue> converter1, final Converter<? super GValue, ? extends GOutput> converter2)
-			throws NullPointerException {
+		throws NullPointerException {
 		return new ChainedConverter<GInput, GValue, GOutput>(converter1, converter2);
 	}
 
 	/**
 	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
 	 * @see Converters#chainedConverter(Converter, Converter)
 	 * @see Converters#iteratorConverter(Converter)
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter.}
@@ -1081,18 +1324,19 @@ public final class Converters {
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */
 	static public final <GInput, GValue, GOutput> Converter<GInput, Iterator<GOutput>> chainedIteratorConverter(final Converter<? super GInput, ? extends Iterator<GValue>> converter1,
-			final Converter<? super GValue, ? extends GOutput> converter2) {
-		return Converters.<GInput, Iterator<GValue>, Iterator<GOutput>> chainedConverter(converter1, Converters.<Iterator<GValue>, GValue, GOutput> iteratorConverter(converter2));
+		final Converter<? super GValue, ? extends GOutput> converter2) {
+		return Converters.<GInput, Iterator<GValue>, Iterator<GOutput>>chainedConverter(converter1, Converters.<Iterator<GValue>, GValue, GOutput>iteratorConverter(converter2));
 	}
 
 	/**
 	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
 	 * @see Converters#chainedConverter(Converter, Converter)
 	 * @see Converters#chainedIteratorConverter(Converter, Converter)
 	 * @see Converters#iteratorIteratorIteratorConverter()
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter.}
@@ -1100,17 +1344,18 @@ public final class Converters {
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */
 	static public final <GInput, GValue, GOutput> Converter<GInput, Iterator<GOutput>> chainedIteratorIteratorConverter(final Converter<? super GInput, ? extends Iterator<GValue>> converter1,
-			final Converter<? super GValue, ? extends Iterator<GOutput>> converter2) {
-		return Converters.chainedConverter(Converters.chainedIteratorConverter(converter1, converter2), Converters.<GOutput> iteratorIteratorIteratorConverter());
+		final Converter<? super GValue, ? extends Iterator<GOutput>> converter2) {
+		return Converters.chainedConverter(Converters.chainedIteratorConverter(converter1, converter2), Converters.<GOutput>iteratorIteratorIteratorConverter());
 	}
 
 	/**
 	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
 	 * @see Converters#chainedConverter(Converter, Converter)
 	 * @see Converters#iterableConverter(Converter)
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter.}
@@ -1118,18 +1363,19 @@ public final class Converters {
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */
 	static public final <GInput, GValue, GOutput> Converter<GInput, Iterable<GOutput>> chainedIterableConverter(final Converter<? super GInput, ? extends Iterable<GValue>> converter1,
-			final Converter<? super GValue, ? extends GOutput> converter2) {
-		return Converters.<GInput, Iterable<GValue>, Iterable<GOutput>> chainedConverter(converter1, Converters.<Iterable<GValue>, GValue, GOutput> iterableConverter(converter2));
+		final Converter<? super GValue, ? extends GOutput> converter2) {
+		return Converters.<GInput, Iterable<GValue>, Iterable<GOutput>>chainedConverter(converter1, Converters.<Iterable<GValue>, GValue, GOutput>iterableConverter(converter2));
 	}
 
 	/**
 	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
 	 * @see Converters#chainedConverter(Converter, Converter)
 	 * @see Converters#chainedIterableConverter(Converter, Converter)
 	 * @see Converters#iterableIterableIterableConverter()
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
-	 * {@link Converter Converters}.
+	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter.}
@@ -1137,13 +1383,14 @@ public final class Converters {
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */
 	static public final <GInput, GValue, GOutput> Converter<GInput, Iterable<GOutput>> chainedIterableIterableConverter(final Converter<? super GInput, ? extends Iterable<GValue>> converter1,
-			final Converter<? super GValue, ? extends Iterable<GOutput>> converter2) {
-		return Converters.chainedConverter(Converters.chainedIterableConverter(converter1, converter2), Converters.<GOutput> iterableIterableIterableConverter());
+		final Converter<? super GValue, ? extends Iterable<GOutput>> converter2) {
+		return Converters.chainedConverter(Converters.chainedIterableConverter(converter1, converter2), Converters.<GOutput>iterableIterableIterableConverter());
 	}
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -1158,18 +1405,20 @@ public final class Converters {
 	/**
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#chainedIterator(Iterator)} in seine Ausgabe überführt.
+	 * 
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterators#chainedIterator(Iterator) Iterator}-{@link Converter Converter}.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ("unchecked")
 	static public final <GEntry> Converter<Iterator<? extends Iterator<? extends GEntry>>, Iterator<GEntry>> iteratorIteratorIteratorConverter() {
-		return (Converter<Iterator<? extends Iterator<? extends GEntry>>, Iterator<GEntry>>) Converters.ITERATOR_ITERATOR_ITERATOR_CONVERTER;
+		return (Converter<Iterator<? extends Iterator<? extends GEntry>>, Iterator<GEntry>>)Converters.ITERATOR_ITERATOR_ITERATOR_CONVERTER;
 	}
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#convertedIterable(Converter, Iterable)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -1184,30 +1433,33 @@ public final class Converters {
 	/**
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der ein {@link Iterable Iterable} in einen
 	 * {@link Iterator Iterator} umwandelt.
+	 * 
 	 * @see Iterable#iterator()
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterable Iterable}-{@link Iterator Iterator}-{@link Converter Converter}.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ("unchecked")
 	static public final <GEntry> Converter<Iterable<? extends GEntry>, Iterator<GEntry>> iterableIteratorConverter() {
-		return (Converter<Iterable<? extends GEntry>, Iterator<GEntry>>) Converters.ITERABLE_ITERATOR_CONVERTER;
+		return (Converter<Iterable<? extends GEntry>, Iterator<GEntry>>)Converters.ITERABLE_ITERATOR_CONVERTER;
 	}
 
 	/**
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#chainedIterable(Iterable)} in seine Ausgabe überführt.
+	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterables#chainedIterable(Iterable) Iterable}-{@link Converter Converter}.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ("unchecked")
 	static public final <GEntry> Converter<Iterable<? extends Iterable<? extends GEntry>>, Iterable<GEntry>> iterableIterableIterableConverter() {
-		return (Converter<Iterable<? extends Iterable<? extends GEntry>>, Iterable<GEntry>>) Converters.ITERABLE_ITERABLE_ITERABLE_CONVERTER;
+		return (Converter<Iterable<? extends Iterable<? extends GEntry>>, Iterable<GEntry>>)Converters.ITERABLE_ITERABLE_ITERABLE_CONVERTER;
 	}
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der den gegebenen {@link Converter Converter}
 	 * synchronisiert, und gibt ihn zurück.
+	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter Converter}.
@@ -1219,8 +1471,129 @@ public final class Converters {
 	}
 
 	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit dem gegebenen {@link Converter
+	 * Converter} in ein {@link StaticConversion statisches Eingabe-Ausgabe-Paar} umwandelt, und gibt ihh zurück.
+	 * 
+	 * @see Conversions#staticConversion(Object, Object)
+	 * @param <GInput> Typ des Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param converter {@link Converter Converter}.
+	 * @return {@link StaticConversionConverter statisches Eingabe-Ausgabe-Paar-Converter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 */
+	static public final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+		return new StaticConversionConverter<GInput, GOutput>(converter);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit dem gegebenen {@link Converter
+	 * Converter} in ein {@link DynamicConversion dynamisches Eingabe-Ausgabe-Paar} umwandelt, und gibt ihh zurück.
+	 * 
+	 * @see Conversions#dynamicConversion(Object, Converter)
+	 * @param <GInput> Typ des Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param converter {@link Converter Converter}.
+	 * @return {@link DynamicConversionConverter dynamisches Eingabe-Ausgabe-Paar-Converter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 */
+	static public final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+		return new DynamicConversionConverter<GInput, GOutput>(converter);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Converter Converter} zurück, der die Eingabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 * 
+	 * @return {@link Conversion Eingabe-Ausgabe-Paar}-Eingabe-{@link Converter Converter}.
+	 */
+	static public final Converter<?, ?> conversionInputConverter() {
+		return Converters.CONVERSION_INPUT_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Converter Converter} zurück, der die Ausgabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 * 
+	 * @return {@link Conversion Eingabe-Ausgabe-Paar}-Ausgabe-{@link Converter Converter}.
+	 */
+	static public final Converter<?, ?> conversionOutputConverter() {
+		return Converters.CONVERSION_OUTPUT_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den den {@link Converter Converter} zurück, der seine Eingabe analog zu
+	 * {@link Pointers#pointer(int, Object)} konvertiert. Erlaubte Modi sind {@link Pointers#HARD}, {@link Pointers#WEAK}
+	 * und {@link Pointers#SOFT}.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @param mode Modus.
+	 * @return {@link Pointers#pointer(int, Object) Pointer}-{@link Converter Converter}.
+	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
+	 */
+	static public final <GData> Converter<GData, Pointer<GData>> pointerConverter(final int mode) throws IllegalArgumentException {
+		switch(mode){
+			case Pointers.HARD:
+				return Converters.hardPointerConverter();
+			case Pointers.WEAK:
+				return Converters.weakPointerConverter();
+			case Pointers.SOFT:
+				return Converters.softPointerConverter();
+		}
+		throw new IllegalArgumentException();
+	}
+
+	/**
+	 * Diese Methode gibt den den {@link Converter Converter} zurück, der seine Eingabe via
+	 * {@link Pointers#hardPointer(Object)} konvertiert.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @return {@link Pointers#hardPointer(Object) hardPointer}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	static public final <GData> Converter<GData, Pointer<GData>> hardPointerConverter() {
+		return (Converter<GData, Pointer<GData>>)Converters.HARD_POINTER_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den den {@link Converter Converter} zurück, der seine Eingabe via
+	 * {@link Pointers#weakPointer(Object)} konvertiert.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @return {@link Pointers#weakPointer(Object) weakPointer}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	static public final <GData> Converter<GData, Pointer<GData>> weakPointerConverter() {
+		return (Converter<GData, Pointer<GData>>)Converters.WEAK_POINTER_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den den {@link Converter Converter} zurück, der seine Eingabe via
+	 * {@link Pointers#softPointer(Object)} konvertiert.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @return {@link Pointers#softPointer(Object) softPointer}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	static public final <GData> Converter<GData, Pointer<GData>> softPointerConverter() {
+		return (Converter<GData, Pointer<GData>>)Converters.SOFT_POINTER_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den den {@link Converter Converter} zurück, der den {@link Pointer#data() Datensatz} eines
+	 * {@link Pointer Verweises} ermittelt.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @return {@link Pointer Pointer}-{@link Pointer#data() Datensatz}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	static public final <GData> Converter<Pointer<GData>, GData> pointerDataConverter() {
+		return (Converter<Pointer<GData>, GData>)Converters.POINTER_DATA_CONVERTER;
+	}
+
+	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
-	Converters() {}
+	Converters() {
+	}
 
 }
