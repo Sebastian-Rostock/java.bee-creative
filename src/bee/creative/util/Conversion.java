@@ -24,4 +24,16 @@ public interface Conversion<GInput, GOutput> {
 	 */
 	public GOutput output();
 
+	/**
+	 * {@inheritDoc} Der Streuwert entspricht dem der Ausgabe.
+	 */
+	@Override
+	public int hashCode();
+
+	/**
+	 * {@inheritDoc} Die Äquivalenz dieses und des gegebenen Objekts basiert auf der der Ausgabe.
+	 */
+	@Override
+	public boolean equals(Object obj);
+
 }
