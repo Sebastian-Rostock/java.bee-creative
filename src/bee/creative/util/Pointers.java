@@ -6,15 +6,14 @@ import java.lang.ref.WeakReference;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer
- * Verweisen}.
+ * Pointern}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Pointers {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Verweis auf eien Datensatz. Nachfahren dieser Klasse nutzen hierfür
-	 * unterschiedlich starke Referenzen zu dem Datenzatz.
+	 * Diese Klasse implementiert einen abstrakten {@link Pointer Pointer}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -40,13 +39,13 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen harten Verweis auf einen Datensatz. Ein solcher Verweis wird nicht automatisch
-	 * aufgelöst.
+	 * Diese Klasse implementiert einen harten {@link Pointer Pointer} auf einen Datensatz. Die Referenz auf den Datensatz
+	 * eines solcher {@link Pointer Pointers} wird nicht automatisch aufgelöst.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	static public final class HardPointer<GData> extends BasePointer<GData> {
+	public static final class HardPointer<GData> extends BasePointer<GData> {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
@@ -81,13 +80,15 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link WeakReference schwachen} Verweis auf einen Datensatz. Ein solcher Verweis
-	 * wird dann aufgelöst, wenn der Datensatz nur noch {@link WeakReference schwach} erreichbar ist.
+	 * Diese Klasse implementiert einen {@link WeakReference schwachen} {@link Pointer Pointer} auf einen Datensatz. Die
+	 * Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur dann automatisch aufgelöst, wenn der
+	 * Datensatz nur noch über {@link WeakReference WeakReferences} erreichbar ist.
 	 * 
+	 * @see WeakReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	static public final class WeakPointer<GData> extends BasePointer<GData> {
+	public static final class WeakPointer<GData> extends BasePointer<GData> {
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den Datensatz.
@@ -116,19 +117,22 @@ public final class Pointers {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("weakPointer", this.data.get());
+			return Objects.toStringCall("weakPointer", this.data());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link SoftReference weichen} Verweis auf einen Datensatz. Ein solcher Verweis
-	 * wird bei Speichermangel aufgelöst.
+	 * Diese Klasse implementiert einen {@link SoftReference weichen} {@link Pointer Pointer} auf einen Datensatz. Die
+	 * Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur dann automatisch aufgelöst, wenn der
+	 * Datensatz nur noch über {@link SoftReference SoftReferences} erreichbar ist und der Garbage Collector dies
+	 * entscheidet.
 	 * 
+	 * @see SoftReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	static public final class SoftPointer<GData> extends BasePointer<GData> {
+	public static final class SoftPointer<GData> extends BasePointer<GData> {
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den Datensatz.
@@ -157,13 +161,13 @@ public final class Pointers {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("softPointer", this.data.get());
+			return Objects.toStringCall("softPointer", this.data());
 		}
 
 	}
 
 	/**
-	 * Dieses Feld speichert den Verweis auf <code>null</code>.
+	 * Dieses Feld speichert den {@link Pointer Pointer} auf <code>null</code>.
 	 */
 	static final BasePointer<?> NULL_POINTER = new BasePointer<Object>() {
 
@@ -172,9 +176,6 @@ public final class Pointers {
 			return null;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String toString() {
 			return Objects.toStringCall("nullPointer");
@@ -183,36 +184,47 @@ public final class Pointers {
 	};
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)}, in welchem {@link HardPointer
-	 * harte Verweise} auf Datensätze erzeugt bzw. genutzt werden. Ein solcher Verweis wird nicht automatisch aufgelöst.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines harten
+	 * {@link Pointer Pointers}.
 	 */
-	static public final int HARD = 0;
+	public static final int HARD = 0;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)}, in welchem {@link WeakPointer
-	 * schwache Verweise} auf Datensätze erzeugt bzw. genutzt werden. Ein solcher Verweis wird dann aufgelöst, wenn der
-	 * Datensatz nur noch {@link WeakReference schwach} erreichbar ist.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines
+	 * {@link WeakReference schwachen} {@link Pointer Pointers}.
 	 */
-	static public final int WEAK = 1;
+	public static final int WEAK = 1;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)}, in welchem {@link SoftPointer
-	 * weich Verweise} auf Datensätze erzeugt bzw. genutzt werden. Ein solcher Verweis wird dann aufgelöst, wenn der
-	 * Datensatz nur noch {@link WeakReference weich} erreichbar ist.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines
+	 * {@link SoftReference weichen} {@link Pointer Pointers}.
 	 */
-	static public final int SOFT = 2;
+	public static final int SOFT = 2;
 
 	/**
-	 * Diese Methode erzeugt einen {@link Pointer Verweis} auf den gegebenen Datensatz im gegebenen Modus ung gibt ihn
+	 * Diese Methode gibt den gegebenen {@link Pointer Pointer} oder den {@link Pointer Pointer} auf <code>null</code>
+	 * zurück.
+	 * 
+	 * @see Pointers#nullPointer()
+	 * @param <GData> Typ des Datensatzes.
+	 * @param pointer {@link Pointer Pointer}
+	 * @return gegebener {@link Pointer Pointer} oder {@link Pointer Pointer} auf <code>null</code>.
+	 */
+	public static <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
+		return ((pointer == null) ? Pointers.<GData>nullPointer() : pointer);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Pointer Pointer} auf den gegebenen Datensatz im gegebenen Modus ung gibt ihn
 	 * zurück. Erlaubte Modi sind {@link Pointers#HARD}, {@link Pointers#WEAK} und {@link Pointers#SOFT}.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param mode Modus.
 	 * @param data Datensatz.
-	 * @return {@link Pointer Verweis} auf den Datensatz.
+	 * @return {@link Pointer Pointer} auf den Datensatz.
 	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
 	 */
-	static public final <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
+	public static <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
 		switch(mode){
 			case HARD:
 				return Pointers.hardPointer(data);
@@ -225,49 +237,52 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Pointer Verweis} auf <code>null</code> zurück.
+	 * Diese Methode gibt den {@link Pointer Pointer} auf <code>null</code> zurück.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @return <code>null</code>-{@link Pointer Verweis}.
+	 * @return <code>null</code>-{@link Pointer Pointer}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GData> Pointer<GData> nullPointer() {
+	public static <GData> Pointer<GData> nullPointer() {
 		return (Pointer<GData>)Pointers.NULL_POINTER;
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link HardPointer harten Verweis} auf den gegebenen Datensatz und gibt ihn zurück. Ein
-	 * solcher Verweis wird nicht automatisch aufgelöst.
+	 * Diese Methode erzeugt einen harten {@link Pointer Pointer} auf den gegebenen Datensatz und gibt ihn zurück. Die
+	 * Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nicht automatisch aufgelöst.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link HardPointer harter Verweis}.
+	 * @return {@link HardPointer Hard-Pointer}.
 	 */
-	static public final <GData> Pointer<GData> hardPointer(final GData data) {
+	public static <GData> Pointer<GData> hardPointer(final GData data) {
 		return ((data == null) ? Pointers.<GData>nullPointer() : new HardPointer<GData>(data));
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link WeakPointer schwachen Verweis} auf den gegebenen Datensatz und gibt ihn zurück.
-	 * Ein solcher Verweis wird dann aufgelöst, wenn der Datensatz nur noch {@link WeakReference schwach} erreichbar ist.
+	 * Diese Methode erzeugt einen {@link WeakReference schwachen} {@link Pointer Pointer} auf den gegebenen Datensatz und
+	 * gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur dann automatisch
+	 * aufgelöst, wenn der Datensatz nur noch über {@link WeakReference WeakReferences} erreichbar ist.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link WeakPointer schwachen Verweis}.
+	 * @return {@link WeakPointer Weak-Pointer}.
 	 */
-	static public final <GData> Pointer<GData> weakPointer(final GData data) {
+	public static <GData> Pointer<GData> weakPointer(final GData data) {
 		return ((data == null) ? Pointers.<GData>nullPointer() : new WeakPointer<GData>(data));
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link SoftPointer weichen Verweis} auf den gegebenen Datensatz und gibt ihn zurück.
-	 * Ein solcher Verweis wird bei Speichermangel aufgelöst.
+	 * Diese Methode erzeugt einen {@link SoftReference weichen} {@link Pointer Pointer} auf den gegebenen Datensatz und
+	 * gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur dann automatisch
+	 * aufgelöst, wenn der Datensatz nur noch über {@link SoftReference SoftReferences} erreichbar ist und der Garbage
+	 * Collector dies entscheidet.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link SoftPointer weicher Verweis}.
+	 * @return {@link SoftPointer Soft-Pointer}.
 	 */
-	static public final <GData> Pointer<GData> softPointer(final GData data) {
+	public static <GData> Pointer<GData> softPointer(final GData data) {
 		return ((data == null) ? Pointers.<GData>nullPointer() : new SoftPointer<GData>(data));
 	}
 

@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Schnittstelle definiert einen Verweis auf einen Datensatz.
+ * Diese Schnittstelle definiert einen Zeiger bzw. Verweis auf einen Datensatz.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GData> Typ des Datensatzes.
@@ -16,7 +16,8 @@ public interface Pointer<GData> {
 	public GData data();
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des Datensatzes zurück.
+	 * Diese Methode gibt den via {@link Objects#hash(Object)} berechneten {@link Object#hashCode() Streuwert} des
+	 * Datensatzes zurück.
 	 * 
 	 * @return {@link Object#hashCode() Streuwert} des Datensatzes.
 	 */
@@ -24,13 +25,13 @@ public interface Pointer<GData> {
 	public int hashCode();
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} dieses und des des gegebenene Verweises zurück.
-	 * Verweise sind äquivalent, wenn ihre Datensätze {@link Object#equals(Object) äquivalent} sind.
+	 * Diese Methode gibt die via {@link Objects#equals(Object, Object)} berechnete {@link Object#equals(Object)
+	 * Äquivalenz} der Datensätze dieses und des gegebenenen {@link Pointer Pointers} zurück.
 	 * 
-	 * @param obj Objekt.
-	 * @return {@link Object#equals(Object) Äquivalenz}.
+	 * @param object {@link Pointer Pointer}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der Datensätze.
 	 */
 	@Override
-	public boolean equals(Object obj);
+	public boolean equals(Object object);
 
 }
