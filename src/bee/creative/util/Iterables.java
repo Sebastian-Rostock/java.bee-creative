@@ -40,12 +40,48 @@ public final class Iterables {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen filternden {@link Iterable Iterable}, der nur die vom gegebenen {@link Filter
+	 * Filter} akzeptierten Elemente des gegebenen {@link Iterable Iterables} liefert.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static abstract class BaseIterable<GEntry> implements Iterable<GEntry>, UseToString {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieses Feld speichert den {@link Iterable Iterable}.
+		 */
+		final Iterable<? extends GEntry> iterable;
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Filter Filter} und {@link Iterable Iterable}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @param iterable {@link Iterable Iterable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
+		 *         <code>null</code> ist.
+		 */
+		public BaseIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
+			throws NullPointerException {
+			if((filter == null) || (iterable == null)) throw new NullPointerException();
+			this.filter = filter;
+			this.iterable = iterable;
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert einen {@link Iterable Iterable} über ein gegebenes Element.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ des Elements.
 	 */
-	static public final class EntryIterable<GEntry> implements Iterable<GEntry>, UseToString {
+	public static final class EntryIterable<GEntry> implements Iterable<GEntry>, UseToString {
 
 		/**
 		 * Dieses Feld speichert das Element.
@@ -86,17 +122,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static public final class LimitedIterable<GEntry> implements Iterable<GEntry>, UseToString {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GEntry> filter;
-
-		/**
-		 * Dieses Feld speichert den {@link Iterable Iterable}.
-		 */
-		final Iterable<? extends GEntry> iterable;
+	public static final class LimitedIterable<GEntry> extends BaseIterable<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Filter Filter} und {@link Iterable Iterable}.
@@ -106,10 +132,9 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
 		 *         <code>null</code> ist.
 		 */
-		public LimitedIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
-			if((filter == null) || (iterable == null)) throw new NullPointerException();
-			this.filter = filter;
-			this.iterable = iterable;
+		public LimitedIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
+			throws NullPointerException {
+			super(filter, iterable);
 		}
 
 		/**
@@ -138,17 +163,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static public final class FilteredIterable<GEntry> implements Iterable<GEntry>, UseToString {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GEntry> filter;
-
-		/**
-		 * Dieses Feld speichert den {@link Iterable Iterable}.
-		 */
-		final Iterable<? extends GEntry> iterable;
+	public static final class FilteredIterable<GEntry> extends BaseIterable<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Filter Filter} und {@link Iterable Iterable}.
@@ -158,10 +173,9 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
 		 *         <code>null</code> ist.
 		 */
-		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
-			if((filter == null) || (iterable == null)) throw new NullPointerException();
-			this.filter = filter;
-			this.iterable = iterable;
+		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
+			throws NullPointerException {
+			super(filter, iterable);
 		}
 
 		/**
@@ -189,7 +203,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static public final class ChainedIterable<GEntry> implements Iterable<GEntry>, UseToString {
+	public static final class ChainedIterable<GEntry> implements Iterable<GEntry>, UseToString {
 
 		/**
 		 * Dieses Feld speichert das {@link Iterable Iterable} über die verketteten {@link Iterable Iterable}.
@@ -213,7 +227,8 @@ public final class Iterables {
 		 */
 		@Override
 		public final Iterator<GEntry> iterator() {
-			return Iterators.chainedIterator(Iterators.convertedIterator(Converters.<GEntry>iterableIteratorConverter(), this.iterables.iterator()));
+			return Iterators.chainedIterator(Iterators.convertedIterator(Converters.<GEntry>iterableIteratorConverter(),
+				this.iterables.iterator()));
 		}
 
 		/**
@@ -235,7 +250,7 @@ public final class Iterables {
 	 *        {@link Iterable Iterables}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Elemente.
 	 */
-	static public final class ConvertedIterable<GInput, GOutput> implements Iterable<GOutput>, UseToString {
+	public static final class ConvertedIterable<GInput, GOutput> implements Iterable<GOutput>, UseToString {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -255,7 +270,8 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Iterable
 		 *         Iterable} <code>null</code> ist.
 		 */
-		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable) throws NullPointerException {
+		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
+			final Iterable<? extends GInput> iterable) throws NullPointerException {
 			if((converter == null) || (iterable == null)) throw new NullPointerException();
 			this.converter = converter;
 			this.iterable = iterable;
@@ -292,7 +308,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @return {@link Iterable Iterable} oder <code>Void</code>-{@link Iterable Iterable}.
 	 */
-	static public final <GEntry> Iterable<GEntry> iterable(final Iterable<GEntry> iterable) {
+	public static <GEntry> Iterable<GEntry> iterable(final Iterable<GEntry> iterable) {
 		return ((iterable == null) ? Iterables.<GEntry>voidIterable() : iterable);
 	}
 
@@ -304,7 +320,7 @@ public final class Iterables {
 	 * @return <code>Void</code>- {@link Iterable Iterable}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GEntry> Iterable<GEntry> voidIterable() {
+	public static <GEntry> Iterable<GEntry> voidIterable() {
 		return (Iterable<GEntry>)Iterables.VOID_ITERABLE;
 	}
 
@@ -316,7 +332,7 @@ public final class Iterables {
 	 * @param entry Element.
 	 * @return {@link EntryIterable Entry-Iterable}
 	 */
-	static public final <GEntry> Iterable<GEntry> entryIterable(final GEntry entry) {
+	public static <GEntry> Iterable<GEntry> entryIterable(final GEntry entry) {
 		return new EntryIterable<GEntry>(entry);
 	}
 
@@ -331,7 +347,8 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
 	 *         <code>null</code> ist.
 	 */
-	static public final <GEntry> Iterable<GEntry> limitedIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
+	public static <GEntry> Iterable<GEntry> limitedIterable(final Filter<? super GEntry> filter,
+		final Iterable<? extends GEntry> iterable) throws NullPointerException {
 		return new LimitedIterable<GEntry>(filter, iterable);
 	}
 
@@ -347,7 +364,8 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
 	 *         <code>null</code> ist.
 	 */
-	static public final <GEntry> Iterable<GEntry> filteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
+	public static <GEntry> Iterable<GEntry> filteredIterable(final Filter<? super GEntry> filter,
+		final Iterable<? extends GEntry> iterable) throws NullPointerException {
 		return new FilteredIterable<GEntry>(filter, iterable);
 	}
 
@@ -362,7 +380,8 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Iterable Iterable}
 	 *         <code>null</code> ist.
 	 */
-	static public final <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables) throws NullPointerException {
+	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables)
+		throws NullPointerException {
 		return new ChainedIterable<GEntry>(iterables);
 	}
 
@@ -376,7 +395,8 @@ public final class Iterables {
 	 * @return {@link ChainedIterator Chained-Iterable}.
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Array Array} <code>null</code> ist.
 	 */
-	static public final <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables) throws NullPointerException {
+	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
+		throws NullPointerException {
 		if(iterables == null) throw new NullPointerException();
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
@@ -392,7 +412,8 @@ public final class Iterables {
 	 * @return {@link ChainedIterator Chained-Iterable}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry> iterable1, final Iterable<? extends GEntry> iterable2) {
+	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry> iterable1,
+		final Iterable<? extends GEntry> iterable2) {
 		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
@@ -411,7 +432,9 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Iterable
 	 *         Iterable} <code>null</code> ist.
 	 */
-	static public final <GInput, GOutput> Iterable<GOutput> convertedIterable(final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable) throws NullPointerException {
+	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(
+		final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable)
+		throws NullPointerException {
 		return new ConvertedIterable<GInput, GOutput>(converter, iterable);
 	}
 

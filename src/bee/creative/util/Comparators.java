@@ -67,7 +67,7 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	static public final class NullComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
+	public static final class NullComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
@@ -112,7 +112,7 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	static public final class ReverseComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
+	public static final class ReverseComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
@@ -159,7 +159,8 @@ public final class Comparators {
 	 * @param <GValue> Typ der in den {@link Iterable Iterable} enthaltenen Werte sowie der vom gegebenen
 	 *        {@link Comparator Comparator} zu verglichenen Objekte.
 	 */
-	static public final class IterableComparator<GEntry extends Iterable<? extends GValue>, GValue> extends BaseComparator<GEntry, GValue> {
+	public static final class IterableComparator<GEntry extends Iterable<? extends GValue>, GValue> extends
+		BaseComparator<GEntry, GValue> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
@@ -213,7 +214,7 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	static public final class ChainedComparator<GEntry> implements Comparator<GEntry> {
+	public static final class ChainedComparator<GEntry> implements Comparator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert den ersten {@link Comparator Comparator}.
@@ -232,7 +233,8 @@ public final class Comparators {
 		 * @param comparator2 zweiter {@link Comparator Comparator}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} <code>null</code> ist.
 		 */
-		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2) throws NullPointerException {
+		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2)
+			throws NullPointerException {
 			if((comparator1 == null) || (comparator2 == null)) throw new NullPointerException();
 			this.comparator1 = comparator1;
 			this.comparator2 = comparator2;
@@ -287,7 +289,7 @@ public final class Comparators {
 	 * @param <GValue> Typ der Ausgabe des {@link Converter Converters} sowie der vom gegebenen {@link Comparator
 	 *        Comparator} zu vergleichenden Objekte.
 	 */
-	static public final class ConvertedComparator<GEntry, GValue> extends BaseComparator<GEntry, GValue> {
+	public static final class ConvertedComparator<GEntry, GValue> extends BaseComparator<GEntry, GValue> {
 
 		/**
 		 * Dieses Feld speichert das {@link Converter Converter}.
@@ -302,7 +304,8 @@ public final class Comparators {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} oder der gegebene {@link Converter
 		 *         Converter} <code>null</code> sind.
 		 */
-		public ConvertedComparator(final Comparator<? super GValue> comparator, final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
+		public ConvertedComparator(final Comparator<? super GValue> comparator,
+			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
 			super(comparator);
 			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
@@ -578,7 +581,8 @@ public final class Comparators {
 	 * @return {@link NullComparator Default-Comparator}
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
 	 */
-	static public final <GEntry> Comparator<GEntry> nullComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
+	public static <GEntry> Comparator<GEntry> nullComparator(final Comparator<? super GEntry> comparator)
+		throws NullPointerException {
 		return new NullComparator<GEntry>(comparator);
 	}
 
@@ -589,7 +593,7 @@ public final class Comparators {
 	 * @return {@link Comparable Comparable}-{@link Comparator Comparator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GEntry extends Comparable<?>> Comparator<GEntry> naturalComparator() {
+	public static <GEntry extends Comparable<?>> Comparator<GEntry> naturalComparator() {
 		return (Comparator<GEntry>)Comparators.NATURAL_COMPARATOR;
 	}
 
@@ -602,7 +606,8 @@ public final class Comparators {
 	 * @return {@link ReverseComparator Reverse-Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
 	 */
-	static public final <GEntry> Comparator<GEntry> reverseComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
+	public static <GEntry> Comparator<GEntry> reverseComparator(final Comparator<? super GEntry> comparator)
+		throws NullPointerException {
 		return new ReverseComparator<GEntry>(comparator);
 	}
 
@@ -617,7 +622,8 @@ public final class Comparators {
 	 * @return {@link IterableComparator Iterable-Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
 	 */
-	static public final <GEntry extends Iterable<? extends GValue>, GValue> Comparator<GEntry> iterableComparator(final Comparator<? super GValue> comparator) throws NullPointerException {
+	public static <GEntry extends Iterable<? extends GValue>, GValue> Comparator<GEntry> iterableComparator(
+		final Comparator<? super GValue> comparator) throws NullPointerException {
 		return new IterableComparator<GEntry, GValue>(comparator);
 	}
 
@@ -633,7 +639,8 @@ public final class Comparators {
 	 * @return {@link ChainedComparator Chained-Comparator}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} <code>null</code> ist.
 	 */
-	static public final <GEntry> Comparator<GEntry> chainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2) throws NullPointerException {
+	public static <GEntry> Comparator<GEntry> chainedComparator(final Comparator<? super GEntry> comparator1,
+		final Comparator<? super GEntry> comparator2) throws NullPointerException {
 		return new ChainedComparator<GEntry>(comparator1, comparator2);
 	}
 
@@ -652,7 +659,9 @@ public final class Comparators {
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} oder der gegebene {@link Converter
 	 *         Converter} <code>null</code> sind.
 	 */
-	static public final <GEntry, GValue> Comparator<GEntry> convertedComparator(final Converter<? super GEntry, ? extends GValue> converter, final Comparator<? super GValue> comparator) throws NullPointerException {
+	public static <GEntry, GValue> Comparator<GEntry> convertedComparator(
+		final Converter<? super GEntry, ? extends GValue> converter, final Comparator<? super GValue> comparator)
+		throws NullPointerException {
 		return new ConvertedComparator<GEntry, GValue>(comparator, converter);
 	}
 
@@ -662,7 +671,7 @@ public final class Comparators {
 	 * 
 	 * @return Numerischer {@link String String}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<String> stringNumericalComparator() {
+	public static Comparator<String> stringNumericalComparator() {
 		return Comparators.STRING_NUMERICAL_COMPARATOR;
 	}
 
@@ -672,7 +681,7 @@ public final class Comparators {
 	 * 
 	 * @return Alphabetischer {@link String String}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<String> stringAlphabeticalComparator() {
+	public static Comparator<String> stringAlphabeticalComparator() {
 		return Comparators.STRING_ALPHABETICAL_COMPARATOR;
 	}
 
@@ -682,7 +691,7 @@ public final class Comparators {
 	 * 
 	 * @return Alphanumerischer {@link String String}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<String> stringAlphanumericalComparator() {
+	public static Comparator<String> stringAlphanumericalComparator() {
 		return Comparators.STRING_ALPHANUMERICAL_COMPARATOR;
 	}
 
@@ -692,7 +701,7 @@ public final class Comparators {
 	 * 
 	 * @return {@link Long Long}-{@link Number Number}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<Number> numberLongComparator() {
+	public static Comparator<Number> numberLongComparator() {
 		return Comparators.NUMBER_LONG_COMPARATOR;
 	}
 
@@ -702,7 +711,7 @@ public final class Comparators {
 	 * 
 	 * @return {@link Float Float}-{@link Number Number}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<Number> numberFloatComparator() {
+	public static Comparator<Number> numberFloatComparator() {
 		return Comparators.NUMBER_FLOAT_COMPARATOR;
 	}
 
@@ -712,7 +721,7 @@ public final class Comparators {
 	 * 
 	 * @return {@link Integer Integer}-{@link Number Number}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<Number> numberIntegerComparator() {
+	public static Comparator<Number> numberIntegerComparator() {
 		return Comparators.NUMBER_INTEGER_COMPARATOR;
 	}
 
@@ -722,7 +731,7 @@ public final class Comparators {
 	 * 
 	 * @return {@link Double Double}-{@link Number Number}-{@link Comparator Comparator}.
 	 */
-	static public final Comparator<Number> numberDoubleComparator() {
+	public static Comparator<Number> numberDoubleComparator() {
 		return Comparators.NUMBER_DOUBLE_COMPARATOR;
 	}
 

@@ -33,7 +33,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GEntry> Typ der Einträge.
 	 */
-	static public final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
+	public static final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert die Abbildung.
@@ -69,7 +69,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		 * Diese Methode sucht den nächsten Eintrag.
 		 */
 		@SuppressWarnings ({"unchecked"})
-		private final void seek() {
+		final void seek() {
 			final GEntry[] table = (GEntry[])this.hash.table;
 			for(int index = this.index, length = table.length; index < length; index++){
 				final GEntry next = table[index];

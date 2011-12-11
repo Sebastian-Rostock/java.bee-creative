@@ -119,7 +119,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class InvertFilter<GInput> extends BaseFilter1<GInput, GInput> {
+	public static final class InvertFilter<GInput> extends BaseFilter1<GInput, GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -166,7 +166,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class DisjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class DisjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -214,7 +214,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class ConjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class ConjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -262,7 +262,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class EquivalenceFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class EquivalenceFilter<GInput> extends BaseFilter2<GInput, GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -311,7 +311,8 @@ public final class Filters {
 	 * @see Converters#cachedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class CachedFilter<GInput> extends BaseFilter1<GInput, GInput> implements Converter<GInput, Boolean> {
+	public static final class CachedFilter<GInput> extends BaseFilter1<GInput, GInput> implements
+		Converter<GInput, Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -363,7 +364,8 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.filter.equals(object) || ((object instanceof CachedFilter<?>) && super.equals(object));
+			return (object == this) || this.filter.equals(object)
+				|| ((object instanceof CachedFilter<?>) && super.equals(object));
 		}
 
 		/**
@@ -377,7 +379,7 @@ public final class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter Filter}, dessen konvertierte Eingabe vo einem gegebenen
+	 * Diese Klasse implementiert einen {@link Filter Filter}, dessen konvertierte Eingabe von einem gegebenen
 	 * {@link Filter Filter} bewertet wird. Der {@link Filter Filter} konvertiert seine Eingabe mit einem gegebenen
 	 * {@link Converter Converter} zur Eingabe eines gegebenen {@link Filter Filters}. Der {@link Filter Filter}
 	 * akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe akzeptiert und
@@ -388,7 +390,7 @@ public final class Filters {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
 	 *        {@link Filter Filters}.
 	 */
-	static public final class ConvertedFilter<GInput, GOutput> extends BaseFilter1<GInput, GOutput> {
+	public static final class ConvertedFilter<GInput, GOutput> extends BaseFilter1<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -403,7 +405,8 @@ public final class Filters {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter
 		 *         Converter} <code>null</code> ist.
 		 */
-		public ConvertedFilter(final Filter<? super GOutput> filter, final Converter<? super GInput, ? extends GOutput> converter) {
+		public ConvertedFilter(final Filter<? super GOutput> filter,
+			final Converter<? super GInput, ? extends GOutput> converter) {
 			super(filter);
 			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
@@ -453,7 +456,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static public final class SynchronizedFilter<GInput> extends BaseFilter1<GInput, GInput> {
+	public static final class SynchronizedFilter<GInput> extends BaseFilter1<GInput, GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -480,7 +483,8 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.filter.equals(object) || ((object instanceof SynchronizedFilter<?>) && super.equals(object));
+			return (object == this) || this.filter.equals(object)
+				|| ((object instanceof SynchronizedFilter<?>) && super.equals(object));
 		}
 
 		/**
@@ -554,7 +558,7 @@ public final class Filters {
 	 * @return {@link Filter Filter}, der nur <code>null</code>-Eingaben ablehnt.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GInput> Filter<GInput> nullFilter() {
+	public static <GInput> Filter<GInput> nullFilter() {
 		return (Filter<GInput>)Filters.NULL_FILTER;
 	}
 
@@ -569,7 +573,7 @@ public final class Filters {
 	 * @return Standatd-{@link Filter Filter}.
 	 */
 	@SuppressWarnings ("unchecked")
-	static public final <GInput> Filter<GInput> defaultFilter(final boolean accept) {
+	public static <GInput> Filter<GInput> defaultFilter(final boolean accept) {
 		return (Filter<GInput>)(accept ? Filters.DEFAULT_TRUE_FILTER : Filters.DEFAULT_FALSE_FILTER);
 	}
 
@@ -584,7 +588,7 @@ public final class Filters {
 	 * @return Inversion-{@link Filter Filter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
 	 */
-	static public final <GInput> Filter<GInput> invertFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static <GInput> Filter<GInput> invertFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		return new InvertFilter<GInput>(filter);
 	}
 
@@ -600,7 +604,8 @@ public final class Filters {
 	 * @return {@link DisjunctionFilter Disjunction-Filter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 	 */
-	static public final <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) throws NullPointerException {
+	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1,
+		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new DisjunctionFilter<GInput>(filter1, filter2);
 	}
 
@@ -616,7 +621,8 @@ public final class Filters {
 	 * @return {@link ConjunctionFilter Conjunction-Filter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 	 */
-	static public final <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) throws NullPointerException {
+	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1,
+		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new ConjunctionFilter<GInput>(filter1, filter2);
 	}
 
@@ -632,7 +638,8 @@ public final class Filters {
 	 * @return {@link EquivalenceFilter Equivalence-Filter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 	 */
-	static public final <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) throws NullPointerException {
+	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1,
+		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new EquivalenceFilter<GInput>(filter1, filter2);
 	}
 
@@ -652,7 +659,7 @@ public final class Filters {
 	 * @throws NullPointerException Wenn der {@link Filter Filter} <code>null</code> ist.
 	 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
 	 */
-	static public final <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		return Filters.cachedFilter(-1, Pointers.WEAK, filter);
 	}
 
@@ -672,7 +679,8 @@ public final class Filters {
 	 * @throws NullPointerException Wenn der {@link Filter Filter} <code>null</code> ist.
 	 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
 	 */
-	static public final <GInput> Filter<GInput> cachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException {
+	public static <GInput> Filter<GInput> cachedFilter(final int limit, final int mode,
+		final Filter<? super GInput> filter) throws NullPointerException {
 		return new CachedFilter<GInput>(limit, mode, filter);
 	}
 
@@ -692,7 +700,8 @@ public final class Filters {
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter Converter}
 	 *         <code>null</code> ist.
 	 */
-	static public final <GInput, GOutput> Filter<GInput> convertedFilter(final Filter<? super GOutput> filter, final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Filter<? super GOutput> filter,
+		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		return new ConvertedFilter<GInput, GOutput>(filter, converter);
 	}
 
@@ -706,7 +715,8 @@ public final class Filters {
 	 * @return <code>Synchronized</code>-{@link Filter Filter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
 	 */
-	static public final <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter)
+		throws NullPointerException {
 		return new SynchronizedFilter<GInput>(filter);
 	}
 
