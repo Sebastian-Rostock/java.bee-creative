@@ -64,19 +64,18 @@ public final class Filters {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ der Eingabe der gegebenen {@link Filter Filter}.
 	 */
-	static abstract class BaseFilter2<GInput, GInput2> implements Filter<GInput> {
+	static abstract class BaseFilter2<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Filter Filter} 1.
 		 */
-		final Filter<? super GInput2> filter1;
+		final Filter<? super GInput> filter1;
 
 		/**
 		 * Dieses Feld speichert den {@link Filter Filter} 2.
 		 */
-		final Filter<? super GInput2> filter2;
+		final Filter<? super GInput> filter2;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -85,7 +84,7 @@ public final class Filters {
 		 * @param filter2 {@link Filter Filter} 2.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
-		public BaseFilter2(final Filter<? super GInput2> filter1, final Filter<? super GInput2> filter2) {
+		public BaseFilter2(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
 			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
 			this.filter1 = filter1;
 			this.filter2 = filter2;
@@ -104,7 +103,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseFilter2<?, ?> data = (BaseFilter2<?, ?>)object;
+			final BaseFilter2<?> data = (BaseFilter2<?>)object;
 			return this.filter1.equals(data.filter1) && this.filter2.equals(data.filter2);
 		}
 
@@ -166,7 +165,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class DisjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class DisjunctionFilter<GInput> extends BaseFilter2<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -214,7 +213,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class ConjunctionFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class ConjunctionFilter<GInput> extends BaseFilter2<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -262,7 +261,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class EquivalenceFilter<GInput> extends BaseFilter2<GInput, GInput> {
+	public static final class EquivalenceFilter<GInput> extends BaseFilter2<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
