@@ -496,7 +496,7 @@ public final class Objects {
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder <code>null</code>.
-	 * @return {@link Object#toString() Textdarstelung}-Objekt.
+	 * @return {@link Objects#toString(boolean, Object)}-Objekt.
 	 */
 	public static Object toStringObject(final boolean format, final Object object) {
 		return ((object == null) ? "null" : (format ? new FormatObject(object) : new NormalObject(object)));

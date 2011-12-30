@@ -257,20 +257,24 @@ public final class Pointers {
 	};
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines harten
-	 * {@link Pointer Pointers}.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines
+	 * {@link HardPointer Hard-Pointers}. Die Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nicht
+	 * automatisch aufgelöst.
 	 */
 	public static final int HARD = 0;
 
 	/**
 	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines
-	 * {@link WeakReference schwachen} {@link Pointer Pointers}.
+	 * {@link WeakPointer Weak-Pointers}. Die Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur
+	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference WeakReferences} erreichbar ist.
 	 */
 	public static final int WEAK = 1;
 
 	/**
 	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines
-	 * {@link SoftReference weichen} {@link Pointer Pointers}.
+	 * {@link SoftPointer Soft-Pointers}. Die Referenz auf den Datensatz eines solcher {@link Pointer Pointers} wird nur
+	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference SoftReferences} erreichbar ist
+	 * und der Garbage Collector dies entscheidet.
 	 */
 	public static final int SOFT = 2;
 

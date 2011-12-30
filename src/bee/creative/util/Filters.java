@@ -14,63 +14,13 @@ import bee.creative.util.Pointers.SoftPointer;
 public final class Filters {
 
 	/**
-	 * Diese Klasse implementiert einen delegierenden {@link Filter Filter}, der seine Berechnungen an einen gegebenen
-	 * {@link Filter Filter} delegiert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ der Eingabe des gegebenen {@link Filter Filters}.
-	 */
-	static abstract class BaseFilter1<GInput, GInput2> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GInput2> filter;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
-		 * 
-		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
-		 */
-		public BaseFilter1(final Filter<? super GInput2> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return this.filter.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			final BaseFilter1<?, ?> data = (BaseFilter1<?, ?>)object;
-			return this.filter.equals(data.filter);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert einen delegierenden {@link Filter Filter}, der seine Berechnungen an zwei gegebene
 	 * {@link Filter Filter} delegiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static abstract class BaseFilter2<GInput> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter} 1.
-		 */
-		final Filter<? super GInput> filter1;
+	static abstract class JunctionFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Filter Filter} 2.
@@ -84,9 +34,9 @@ public final class Filters {
 		 * @param filter2 {@link Filter Filter} 2.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
-		public BaseFilter2(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
-			this.filter1 = filter1;
+		public JunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
+			super(filter1);
+			if(filter2 == null) throw new NullPointerException();
 			this.filter2 = filter2;
 		}
 
@@ -95,7 +45,7 @@ public final class Filters {
 		 */
 		@Override
 		public int hashCode() {
-			return this.filter1.hashCode() + (31 * this.filter2.hashCode());
+			return Objects.hash(this.filter, this.filter2);
 		}
 
 		/**
@@ -103,8 +53,8 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseFilter2<?> data = (BaseFilter2<?>)object;
-			return this.filter1.equals(data.filter1) && this.filter2.equals(data.filter2);
+			final JunctionFilter<?> data = (JunctionFilter<?>)object;
+			return super.equals(object) && Objects.equals(this.filter2, data.filter2);
 		}
 
 	}
@@ -118,7 +68,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class InvertFilter<GInput> extends BaseFilter1<GInput, GInput> {
+	public static final class InvertFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -143,7 +93,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof InvertFilter<?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof InvertFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -165,7 +117,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class DisjunctionFilter<GInput> extends BaseFilter2<GInput> {
+	public static final class DisjunctionFilter<GInput> extends JunctionFilter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -183,7 +135,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) || this.filter2.accept(input);
+			return this.filter.accept(input) || this.filter2.accept(input);
 		}
 
 		/**
@@ -191,7 +143,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof DisjunctionFilter<?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof DisjunctionFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -199,7 +153,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("disjunctionFilter", this.filter1, this.filter2);
+			return Objects.toStringCall("disjunctionFilter", this.filter, this.filter2);
 		}
 
 	}
@@ -213,7 +167,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class ConjunctionFilter<GInput> extends BaseFilter2<GInput> {
+	public static final class ConjunctionFilter<GInput> extends JunctionFilter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -231,7 +185,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) && this.filter2.accept(input);
+			return this.filter.accept(input) && this.filter2.accept(input);
 		}
 
 		/**
@@ -239,7 +193,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof ConjunctionFilter<?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof ConjunctionFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -247,7 +203,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("conjunctionFilter", this.filter1, this.filter2);
+			return Objects.toStringCall("conjunctionFilter", this.filter, this.filter2);
 		}
 
 	}
@@ -261,7 +217,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class EquivalenceFilter<GInput> extends BaseFilter2<GInput> {
+	public static final class EquivalenceFilter<GInput> extends JunctionFilter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
@@ -279,7 +235,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) == this.filter2.accept(input);
+			return this.filter.accept(input) == this.filter2.accept(input);
 		}
 
 		/**
@@ -287,7 +243,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof EquivalenceFilter<?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof EquivalenceFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -295,7 +253,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("equivalenceFilter", this.filter1, this.filter2);
+			return Objects.toStringCall("equivalenceFilter", this.filter, this.filter2);
 		}
 
 	}
@@ -303,14 +261,14 @@ public final class Filters {
 	/**
 	 * Diese Klasse implementiert einen gepufferten {@link Filter Filter}, der die von einem gegebene {@link Filter
 	 * Filter} erzeugten Ausgaben in einer {@link Map Abbildung} von Schlüsseln auf Werte verwaltet. Die Schlüssel werden
-	 * dabei über {@link HardPointer harte Verweise} auf Eingaben und die Werte als {@link Pointer Verweise} auf die
+	 * dabei über {@link HardPointer Hard-Pointers} auf Eingaben und die Werte als {@link Pointer Verweise} auf die
 	 * Ausgaben des gegebenen {@link Filter Filters} realisiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Converters#cachedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class CachedFilter<GInput> extends BaseFilter1<GInput, GInput> implements
+	public static final class CachedFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput>,
 		Converter<GInput, Boolean> {
 
 		/**
@@ -363,8 +321,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.filter.equals(object)
-				|| ((object instanceof CachedFilter<?>) && super.equals(object));
+			if((object == this) || Objects.equals(object, this.filter)) return true;
+			if(!(object instanceof CachedFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -389,7 +348,8 @@ public final class Filters {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
 	 *        {@link Filter Filters}.
 	 */
-	public static final class ConvertedFilter<GInput, GOutput> extends BaseFilter1<GInput, GOutput> {
+	public static final class ConvertedFilter<GInput, GOutput> extends Filters.FilterLink<GOutput> implements
+		Filter<GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -424,7 +384,7 @@ public final class Filters {
 		 */
 		@Override
 		public int hashCode() {
-			return this.filter.hashCode() + (31 * this.converter.hashCode());
+			return Objects.hash(this.filter, this.converter);
 		}
 
 		/**
@@ -435,7 +395,7 @@ public final class Filters {
 			if(object == this) return true;
 			if(!(object instanceof ConvertedFilter<?, ?>)) return false;
 			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
-			return this.filter.equals(data.filter) && this.converter.equals(data.converter);
+			return super.equals(object) && Objects.equals(this.converter, data.converter);
 		}
 
 		/**
@@ -455,7 +415,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class SynchronizedFilter<GInput> extends BaseFilter1<GInput, GInput> {
+	public static final class SynchronizedFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -482,8 +442,9 @@ public final class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.filter.equals(object)
-				|| ((object instanceof SynchronizedFilter<?>) && super.equals(object));
+			if((object == this) || Objects.equals(object, this.filter)) return true;
+			if(!(object instanceof SynchronizedFilter<?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -492,6 +453,49 @@ public final class Filters {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("synchronizedFilter", this.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Filter Filter} verweist.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Filter Filters}.
+	 */
+	static abstract class FilterLink<GInput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter Filter}.
+		 */
+		final Filter<? super GInput> filter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
+		 */
+		public FilterLink(final Filter<? super GInput> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException();
+			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final FilterLink<?> data = (FilterLink<?>)object;
+			return Objects.equals(this.filter, data.filter);
 		}
 
 	}
@@ -646,9 +650,9 @@ public final class Filters {
 	 * Diese Methode erzeugt einen gepufferten {@link Filter Filter} und gibt ihn zurück. Der erzeugte {@link Filter
 	 * Filter} verwaltet die vom gegebenen {@link Filter Filter} erzeugten Ausgaben in einer {@link Map Abbildung} von
 	 * Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link HardPointer harte Verweise} auf Eingaben und die Werte
-	 * als {@link SoftPointer weiche Verweise} auf die Ausgaben des gegebenen {@link Filter Filters} realisiert. Die
-	 * Anzahl der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute {@link Filter Filter} verwendet
-	 * damit einen speichersensitiven, assoziativen Cache.
+	 * als {@link SoftPointer Soft-Pointers} auf die Ausgaben des gegebenen {@link Filter Filters} realisiert. Die Anzahl
+	 * der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute {@link Filter Filter} verwendet damit
+	 * einen speichersensitiven, assoziativen Cache.
 	 * 
 	 * @see Filters#cachedFilter(int, int, Filter)
 	 * @see Converters#cachedConverter(int, int, int, Converter)
@@ -659,7 +663,7 @@ public final class Filters {
 	 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
 	 */
 	public static <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return Filters.cachedFilter(-1, Pointers.WEAK, filter);
+		return Filters.cachedFilter(-1, Pointers.SOFT, filter);
 	}
 
 	/**

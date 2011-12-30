@@ -63,7 +63,7 @@ public final class Strings {
 			if(object == this) return true;
 			if(!(object instanceof JoinConverter)) return false;
 			final JoinConverter data = (JoinConverter)object;
-			return this.space.equals(data.space);
+			return Objects.equals(this.space, data.space);
 		}
 
 		/**
@@ -121,7 +121,7 @@ public final class Strings {
 		@Override
 		public boolean equals(final Object object) {
 			final BaseConverter<?> data = (BaseConverter<?>)object;
-			return (this.split == data.split) && (this.match == data.match) && this.pattern.equals(data.pattern);
+			return (this.split == data.split) && (this.match == data.match) && Objects.equals(this.pattern, data.pattern);
 		}
 
 	}
@@ -180,7 +180,7 @@ public final class Strings {
 			if(object == this) return true;
 			if(!(object instanceof ApplyConverter)) return false;
 			final ApplyConverter data = (ApplyConverter)object;
-			return (this.index == data.index) && super.equals(object);
+			return super.equals(object) && (this.index == data.index);
 		}
 
 	}

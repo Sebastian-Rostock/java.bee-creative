@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import bee.creative.util.Filters.FilterLink;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
@@ -18,54 +19,7 @@ import bee.creative.util.Pointers.SoftPointer;
 public final class Converters {
 
 	/**
-	 * Diese Klasse implementiert einen delegierenden {@link Converter Converter}, der seine Berechnungen an einen
-	 * gegebenen {@link Converter Converter} delegiert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param <GInput2> Typ der Eingabe des gegebenen {@link Converter Converters}.
-	 * @param <GOutput2> Typ der Ausgabe des gegebenen {@link Converter Converters}.
-	 */
-	static abstract class BaseConverter<GInput, GOutput, GInput2, GOutput2> implements Converter<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
-		 */
-		final Converter<? super GInput2, ? extends GOutput2> converter;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
-		 * 
-		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
-		 */
-		public BaseConverter(final Converter<? super GInput2, ? extends GOutput2> converter) {
-			if(converter == null) throw new NullPointerException();
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return this.converter.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			final BaseConverter<?, ?, ?, ?> data = (BaseConverter<?, ?, ?, ?>)object;
-			return this.converter.equals(data.converter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} mit Name.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} mit Name.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -94,7 +48,7 @@ public final class Converters {
 		 */
 		@Override
 		public int hashCode() {
-			return this.name.hashCode();
+			return Objects.hash(this.name);
 		}
 
 		/**
@@ -103,7 +57,7 @@ public final class Converters {
 		@Override
 		public boolean equals(final Object object) {
 			final NamedConverter<?, ?> data = (NamedConverter<?, ?>)object;
-			return this.name.equals(data.name);
+			return Objects.equals(this.name, data.name);
 		}
 
 	}
@@ -146,6 +100,14 @@ public final class Converters {
 			}catch(final IllegalAccessException e){
 				throw new IllegalArgumentException(e);
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.field);
 		}
 
 		/**
@@ -215,6 +177,14 @@ public final class Converters {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return Objects.hash(this.method);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof FixedMethodConverter<?, ?>)) return false;
@@ -276,7 +246,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof NamedFieldConverter<?, ?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof NamedFieldConverter<?, ?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -335,7 +307,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof NamedMethodConverter<?, ?>) && super.equals(object));
+			if(object == this) return true;
+			if(!(object instanceof NamedMethodConverter<?, ?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -420,12 +394,8 @@ public final class Converters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static final class FilteredConverter<GInput, GOutput> implements Converter<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GInput> filter;
+	public static final class FilteredConverter<GInput, GOutput> extends FilterLink<GInput> implements
+		Converter<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Accept-Converter}.
@@ -449,8 +419,8 @@ public final class Converters {
 		public FilteredConverter(final Filter<? super GInput> filter,
 			final Converter<? super GInput, ? extends GOutput> accept,
 			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-			if((filter == null) || (accept == null) || (reject == null)) throw new NullPointerException();
-			this.filter = filter;
+			super(filter);
+			if((accept == null) || (reject == null)) throw new NullPointerException();
 			this.accept = accept;
 			this.reject = reject;
 		}
@@ -468,7 +438,7 @@ public final class Converters {
 		 */
 		@Override
 		public int hashCode() {
-			return this.filter.hashCode() + (31 * (this.accept.hashCode() + (31 * this.reject.hashCode())));
+			return Objects.hash(this.filter, this.accept, this.reject);
 		}
 
 		/**
@@ -479,7 +449,7 @@ public final class Converters {
 			if(object == this) return true;
 			if(!(object instanceof FilteredConverter<?, ?>)) return false;
 			final FilteredConverter<?, ?> data = (FilteredConverter<?, ?>)object;
-			return this.filter.equals(data.filter) && this.accept.equals(data.accept) && this.reject.equals(data.reject);
+			return super.equals(object) && Objects.equals(this.accept, data.accept, this.reject, data.reject);
 		}
 
 		/**
@@ -502,7 +472,8 @@ public final class Converters {
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 */
-	public static final class CachedConverter<GInput, GOutput> extends BaseConverter<GInput, GOutput, GInput, GOutput> {
+	public static final class CachedConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
+		implements Converter<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert die {@link Map Abbildung} von Schlüsseln ({@link Pointer Verweise} auf Eingaben) auf Werte
@@ -600,8 +571,10 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.converter.equals(object)
-				|| ((object instanceof CachedConverter<?, ?>) && super.equals(object));
+			if((object == this) || Objects.equals(this.converter, object)) return true;
+			if(!(object instanceof CachedConverter<?, ?>)) return false;
+			final CachedConverter<?, ?> data = (CachedConverter<?, ?>)object;
+			return super.equals(object);
 		}
 
 		/**
@@ -641,7 +614,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert die {@link Converter Converter}.
 		 * 
 		 * @param converter1 erster {@link Converter Converter}.
-		 * @param converter2 zweiter {@link Converter Converter.}
+		 * @param converter2 zweiter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
@@ -696,8 +669,8 @@ public final class Converters {
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static final class SynchronizedConverter<GInput, GOutput> extends
-		BaseConverter<GInput, GOutput, GInput, GOutput> {
+	public static final class SynchronizedConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
+		implements Converter<GInput, GOutput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
@@ -725,8 +698,9 @@ public final class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || this.converter.equals(object)
-				|| ((object instanceof SynchronizedConverter<?, ?>) && super.equals(object));
+			if((object == this) || Objects.equals(object, this.converter)) return true;
+			if(!(object instanceof SynchronizedConverter<?, ?>)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -735,6 +709,50 @@ public final class Converters {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("synchronizedConverter", this.converter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Converter Converter} verweist.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters}.
+	 */
+	static abstract class ConverterLink<GInput, GOutput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public ConverterLink(final Converter<? super GInput, ? extends GOutput> converter) {
+			if(converter == null) throw new NullPointerException();
+			this.converter = converter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final ConverterLink<?, ?> data = (ConverterLink<?, ?>)object;
+			return this.converter.equals(data.converter);
 		}
 
 	}
@@ -966,7 +984,7 @@ public final class Converters {
 	 *        {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
 	 * @param converter1 erster {@link Converter Converter}.
-	 * @param converter2 zweiter {@link Converter Converter.}
+	 * @param converter2 zweiter {@link Converter Converter}.
 	 * @return {@link ChainedConverter Chained-Converter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 	 */

@@ -1,6 +1,6 @@
 package bee.creative.util;
 
-import bee.creative.util.Converters.BaseConverter;
+import bee.creative.util.Converters.ConverterLink;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion von {@link Conversion
@@ -219,8 +219,8 @@ public final class Conversions {
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static final class StaticConversionConverter<GInput, GOutput> extends
-		BaseConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
+	public static final class StaticConversionConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput> implements
+		Converter<GInput, Conversion<GInput, GOutput>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
@@ -268,8 +268,8 @@ public final class Conversions {
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static final class DynamicConversionConverter<GInput, GOutput> extends
-		BaseConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
+	public static final class DynamicConversionConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
+		implements Converter<GInput, Conversion<GInput, GOutput>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
@@ -314,17 +314,17 @@ public final class Conversions {
 	 */
 	static final Converter<?, ?> INVERSE_CONVERSION_CONVERTER =
 		new Converter<Conversion<Object, Object>, Conversion<Object, Object>>() {
-	
+
 			@Override
 			public Conversion<Object, Object> convert(final Conversion<Object, Object> input) {
 				return Conversions.inverseConversion(input);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toStringCall("inverseConversionConverter");
 			}
-	
+
 		};
 
 	/**
@@ -332,17 +332,17 @@ public final class Conversions {
 	 * Eingabe-Ausgabe-Paars} ermittelt.
 	 */
 	static final Converter<?, ?> CONVERSION_INPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
-	
+
 		@Override
 		public Object convert(final Conversion<?, ?> input) {
 			return input.input();
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toStringCall("conversionInputConverter");
 		}
-	
+
 	};
 
 	/**
@@ -350,17 +350,17 @@ public final class Conversions {
 	 * Eingabe-Ausgabe-Paars} ermittelt.
 	 */
 	static final Converter<?, ?> CONVERSION_OUTPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
-	
+
 		@Override
 		public Object convert(final Conversion<?, ?> input) {
 			return input.output();
 		}
-	
+
 		@Override
 		public String toString() {
 			return Objects.toStringCall("conversionOutputConverter");
 		}
-	
+
 	};
 
 	/**
