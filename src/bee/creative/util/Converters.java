@@ -14,9 +14,57 @@ import bee.creative.util.Pointers.SoftPointer;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Converter
  * Convertern}.
  * 
+ * @see Converter
+ * @see Converters
+ * @see Conversion
+ * @see Conversions
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Converters {
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Converter Converter} verweist.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters}.
+	 */
+	static abstract class ConverterLink<GInput, GOutput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public ConverterLink(final Converter<? super GInput, ? extends GOutput> converter) {
+			if(converter == null) throw new NullPointerException();
+			this.converter = converter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final ConverterLink<?, ?> data = (ConverterLink<?, ?>)object;
+			return this.converter.equals(data.converter);
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} mit Name.
@@ -573,7 +621,6 @@ public final class Converters {
 		public boolean equals(final Object object) {
 			if((object == this) || Objects.equals(this.converter, object)) return true;
 			if(!(object instanceof CachedConverter<?, ?>)) return false;
-			final CachedConverter<?, ?> data = (CachedConverter<?, ?>)object;
 			return super.equals(object);
 		}
 
@@ -709,50 +756,6 @@ public final class Converters {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("synchronizedConverter", this.converter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Converter Converter} verweist.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters}.
-	 */
-	static abstract class ConverterLink<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
-		 * 
-		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
-		 */
-		public ConverterLink(final Converter<? super GInput, ? extends GOutput> converter) {
-			if(converter == null) throw new NullPointerException();
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			final ConverterLink<?, ?> data = (ConverterLink<?, ?>)object;
-			return this.converter.equals(data.converter);
 		}
 
 	}
@@ -915,6 +918,7 @@ public final class Converters {
 	 * Accept-Converters}. Die Ausgabe des gegebenen {@link Converter Reject-Converters} liefert er dagegen für eine vom
 	 * gegebenen {@link Filter Filter} abgelehnten Eingabe.
 	 * 
+	 * @see Filter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param filter {@link Filter Filter}.

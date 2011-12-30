@@ -33,7 +33,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GEntry> Typ der Einträge.
 	 */
-	public static final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
+	protected static final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert die Abbildung.
@@ -136,7 +136,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @return {@link Object#hashCode() Streuwert} des Schlüssels.
 	 */
 	protected int getKeyHash(final GKey key) {
-		return Objects.hash(key);
+		int hash = Objects.hash(key);
+		hash ^= (hash >>> 20) ^ (hash >>> 12);
+		return hash ^ (hash >>> 7) ^ (hash >>> 4);
 	}
 
 	/**
@@ -215,6 +217,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @return neue Größe der Tabelle.
 	 */
 	protected int getLength(final int size, int length) {
+		// wenn 75% der Plätze vergeben sind
 		if(size == 0) return 0;
 		if(size > length){
 			for(length = 1; length < size; length <<= 1){}

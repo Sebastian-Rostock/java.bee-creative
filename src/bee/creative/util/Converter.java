@@ -5,6 +5,10 @@ package bee.creative.util;
  * vom Typ <code>GOutput</code> umwandelt. Bei der Konvertierung kann es sich um eine Navigation in einem Objektgraphen
  * oder auch das Parsen bzw. Formatieren eines Objektes handel.
  * 
+ * @see Converter
+ * @see Converters
+ * @see Conversion
+ * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des Eingabe.
  * @param <GOutput> Typ der Ausgabe.

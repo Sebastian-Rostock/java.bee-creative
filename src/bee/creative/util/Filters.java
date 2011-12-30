@@ -9,9 +9,53 @@ import bee.creative.util.Pointers.SoftPointer;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Filter
  * Filtern}.
  * 
+ * @see Filter
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Filters {
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Filter Filter} verweist.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Filter Filters}.
+	 */
+	static abstract class FilterLink<GInput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter Filter}.
+		 */
+		final Filter<? super GInput> filter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
+		 */
+		public FilterLink(final Filter<? super GInput> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException();
+			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final FilterLink<?> data = (FilterLink<?>)object;
+			return Objects.equals(this.filter, data.filter);
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert einen delegierenden {@link Filter Filter}, der seine Berechnungen an zwei gegebene
@@ -458,49 +502,6 @@ public final class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Filter Filter} verweist.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Filter Filters}.
-	 */
-	static abstract class FilterLink<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GInput> filter;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
-		 * 
-		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} <code>null</code> ist.
-		 */
-		public FilterLink(final Filter<? super GInput> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			final FilterLink<?> data = (FilterLink<?>)object;
-			return Objects.equals(this.filter, data.filter);
-		}
-
-	}
-
-	/**
 	 * Dieses Feld speichert den {@link Filter Filter}, der von {@link Filters#nullFilter()} zurück gegeben wird.
 	 */
 	static final Filter<?> NULL_FILTER = new Filter<Object>() {
@@ -694,6 +695,7 @@ public final class Filters {
 	 * Filter} akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe
 	 * akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe ablehnt.
 	 * 
+	 * @see Converter
 	 * @param <GInput> Typ der Eingabe des {@link Filter Filters} sowie des gegebenen {@link Converter Converters}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
 	 *        {@link Filter Filters}.

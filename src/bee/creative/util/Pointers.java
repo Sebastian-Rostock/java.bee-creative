@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer
  * Pointern}.
  * 
+ * @see Pointer
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Pointers {
@@ -317,6 +318,7 @@ public final class Pointers {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
 	 * {@link Pointers#pointer(int, Object)} in einen {@link Pointer Pointer} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Pointers#pointer(int, Object)
 	 * @see Pointers#hardPointerConverter()
 	 * @see Pointers#weakPointerConverter()
@@ -342,6 +344,7 @@ public final class Pointers {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der den Datensatz eines {@link Pointer Pointers}
 	 * ermitelt.
 	 * 
+	 * @see Converter
 	 * @see Pointer#data()
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link Pointer#data()}-{@link Converter Converter}.
@@ -378,6 +381,7 @@ public final class Pointers {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
 	 * {@link Pointers#hardPointer(Object)} in einen {@link HardPointer Hard-Pointer} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Pointers#hardPointer(Object)
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link Pointers#hardPointer(Object)}-{@link Converter Converter}.
@@ -404,6 +408,7 @@ public final class Pointers {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
 	 * {@link Pointers#weakPointer(Object)} in einen {@link WeakPointer Weak-Pointer} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Pointers#weakPointer(Object)
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link Pointers#weakPointer(Object)}-{@link Converter Converter}.
@@ -431,6 +436,7 @@ public final class Pointers {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
 	 * {@link Pointers#softPointer(Object)} in einen {@link SoftPointer Soft-Pointer} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Pointers#softPointer(Object)
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link Pointers#softPointer(Object)}-{@link Converter Converter}.

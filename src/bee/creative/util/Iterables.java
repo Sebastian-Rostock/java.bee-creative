@@ -10,6 +10,10 @@ import bee.creative.util.Objects.UseToString;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterable
  * Iterablen}.
  * 
+ * @see Iterator
+ * @see Iterators
+ * @see Iterable
+ * @see Iterables
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Iterables {
@@ -467,8 +471,8 @@ public final class Iterables {
 	 *        {@link Iterable Iterables}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Elemente.
 	 */
-	public static final class ConvertedIterable<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput> implements
-		Iterable<GOutput>, UseToString {
+	public static final class ConvertedIterable<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
+		implements Iterable<GOutput>, UseToString {
 
 		/**
 		 * Dieses Feld speichert den {@link Iterable Iterable}.
@@ -620,6 +624,7 @@ public final class Iterables {
 	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#iterable(Iterable)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Iterables#iterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterables#iterable(Iterable)}-{@link Converter Converter}.
@@ -633,6 +638,7 @@ public final class Iterables {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der ein {@link Iterable Iterable} in einen
 	 * {@link Iterator Iterator} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Iterable#iterator()
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterable#iterator()}-{@link Converter Converter}.
@@ -670,6 +676,7 @@ public final class Iterables {
 	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#entryIterable(Object)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Iterables#entryIterable(Object)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterables#entryIterable(Object)}-{@link Converter Converter}.
@@ -683,6 +690,7 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen filternden {@link Iterable Iterable}, der nur die vom gegebenen {@link Filter Filter}
 	 * akzeptierten Elemente des gegebenen {@link Iterable Iterables} liefert, und gibt ihn zurück.
 	 * 
+	 * @see Filter
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
 	 * @param iterable {@link Iterable Iterable}.
@@ -699,6 +707,8 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#limitedIterable(Filter, Iterable)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Filter
+	 * @see Converter
 	 * @see Iterables#limitedIterable(Filter, Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
@@ -714,6 +724,7 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen filternden {@link Iterable Iterable}, der nur die vom gegebenen {@link Filter Filter}
 	 * akzeptierten Elemente des gegebenen {@link Iterable Iterables} liefert, und gibt ihn zurück.
 	 * 
+	 * @see Filter
 	 * @see Iterators#filteredIterator(Filter, Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
@@ -731,6 +742,8 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#filteredIterable(Filter, Iterable)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Filter
+	 * @see Converter
 	 * @see Iterables#filteredIterable(Filter, Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
@@ -794,6 +807,7 @@ public final class Iterables {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#chainedIterable(Iterable)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterables#chainedIterable(Iterable)}-{@link Converter Converter}.
@@ -828,6 +842,7 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterables#convertedIterable(Converter, Iterable)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Converter
 	 * @see Iterables#convertedIterable(Converter, Iterable)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.

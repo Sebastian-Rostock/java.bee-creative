@@ -9,9 +9,12 @@ import java.util.NoSuchElementException;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterator
  * Iteratoren}.
  * 
+ * @see Iterator
+ * @see Iterators
+ * @see Iterable
+ * @see Iterables
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-
 public final class Iterators {
 
 	/**
@@ -450,8 +453,8 @@ public final class Iterators {
 	 *        {@link Iterable Iterables}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Elemente.
 	 */
-	public static final class ConvertedIterator<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput> implements
-		Iterator<GOutput> {
+	public static final class ConvertedIterator<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
+		implements Iterator<GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Iterator Iterator};
@@ -627,7 +630,8 @@ public final class Iterators {
 	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#iterator(Iterator)} in seine Ausgabe überführt.
 	 * 
-	 * @see Iterators#voidIterator()
+	 * @see Converter
+	 * @see Iterators#iterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterators#iterator(Iterator)}-{@link Converter Converter}.
 	 */
@@ -662,6 +666,7 @@ public final class Iterators {
 	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#entryIterator(Object)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Iterators#entryIterator(Object)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterators#entryIterator(Object)}-{@link Converter Converter}.
@@ -676,6 +681,7 @@ public final class Iterators {
 	 * Filter} akzeptierten Elemente des gegebenen {@link Iterator Iterators} liefert sowie die Iteration beim ersten
 	 * abgelehnten Element abbricht, und gibt ihn zurück.
 	 * 
+	 * @see Filter
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator Iterator}.
 	 * @param filter {@link Filter Filter}.
@@ -691,6 +697,8 @@ public final class Iterators {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#limitedIterator(Filter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Filter
+	 * @see Converter
 	 * @see Iterators#limitedIterator(Filter, Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
@@ -706,6 +714,7 @@ public final class Iterators {
 	 * Diese Methode erzeugt einen filternden {@link Iterator Iterator}, der nur die vom gegebenen {@link Filter Filter}
 	 * akzeptierten Elemente des gegebenen {@link Iterator Iterators} liefert, und gibt ihn zurück.
 	 * 
+	 * @see Filter
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator Iterator}.
 	 * @param filter {@link Filter Filter}.
@@ -721,6 +730,8 @@ public final class Iterators {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#filteredIterator(Filter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Filter
+	 * @see Converter
 	 * @see Iterators#filteredIterator(Filter, Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
@@ -800,6 +811,7 @@ public final class Iterators {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#chainedIterator(Iterator)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Iterators#chainedIterator(Iterator)}-{@link Converter Converter}.
@@ -813,6 +825,7 @@ public final class Iterators {
 	 * Diese Methode erzeugt einen konvertierenden {@link Iterator Iterator}, der die vom gegebenen {@link Converter
 	 * Converter} konvertierten Elemente des gegebenen {@link Iterator Iterators} liefert, und gibt ihn zurück.
 	 * 
+	 * @see Converter
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters} sowie der Elemente des gegebenen
 	 *        {@link Iterator Iterators}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Elemente des erzeugten
@@ -833,6 +846,7 @@ public final class Iterators {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
 	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
 	 * 
+	 * @see Converter
 	 * @see Iterators#convertedIterator(Converter, Iterator)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ der Elemente.

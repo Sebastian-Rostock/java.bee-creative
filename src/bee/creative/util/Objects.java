@@ -10,6 +10,9 @@ import java.util.Map.Entry;
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten},
  * {@link Object#equals(Object) Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
  * 
+ * @see Object#hashCode()
+ * @see Object#equals(Object)
+ * @see Object#toString()
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Objects {
@@ -506,6 +509,7 @@ public final class Objects {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
 	 * {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
 	 * 
+	 * @see Converter
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Objects#toString(boolean, Object)}-{@link Converter Converter}.

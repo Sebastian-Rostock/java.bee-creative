@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
  * Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken mit Zeichenketten zur
  * Verfügung.
  * 
+ * @see Pattern
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Strings {
@@ -697,6 +698,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#join(String, Iterable)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#join(String, Iterable)
 	 * @param space Trennzeichen.
 	 * @return {@link Strings#join(String, Iterable)}-{@link Converter Converter}.
@@ -784,6 +786,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#split(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -837,6 +840,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splitAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#splitAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#splitAll(Pattern, CharSequence)}-{@link Converter Converter}.
@@ -926,6 +930,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#match(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -979,6 +984,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#matchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#matchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#matchAll(Pattern, CharSequence)}-{@link Converter Converter}.
@@ -1071,6 +1077,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatch(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#splatch(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -1125,6 +1132,7 @@ public final class Strings {
 	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
+	 * @see Converter
 	 * @see Strings#splatchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#splatchAll(Pattern, CharSequence)}-{@link Converter Converter}.
@@ -1139,6 +1147,7 @@ public final class Strings {
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe via {@link Pattern#compile(String, int)}
 	 * in einen kompilierten regulären Ausdruck umwandelt, und gibt ihn zurück.
 	 * 
+	 * @see Converter
 	 * @see Pattern#compile(String, int)
 	 * @param flags Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
 	 *        {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL},

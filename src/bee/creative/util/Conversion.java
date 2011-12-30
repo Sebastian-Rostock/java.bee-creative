@@ -4,6 +4,9 @@ package bee.creative.util;
  * Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter Converters}.
  * 
  * @see Converter
+ * @see Converters
+ * @see Conversion
+ * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des Eingabe.
  * @param <GOutput> Typ der Ausgabe.
@@ -31,7 +34,8 @@ public interface Conversion<GInput, GOutput> {
 	public int hashCode();
 
 	/**
-	 * Die Äquivalenz dieses und des gegebenen Objekts basiert auf der der Ausgabe. {@inheritDoc}
+	 * Die Äquivalenz dieses und der gegebenen {@link Conversion Conversion} basiert auf der Äquivalenz ihrer Ausgaben.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object obj);
