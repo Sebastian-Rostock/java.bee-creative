@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import bee.creative.util.Converters.BaseConverter;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterator
@@ -15,7 +16,7 @@ import java.util.NoSuchElementException;
 public final class Iterators {
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator Iterator} mit {@link Filter Filter}.
+	 * Diese Klasse implementiert einen abstrakten {@link Iterator Iterator} mit {@link Filter Filter}.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
@@ -47,7 +48,8 @@ public final class Iterators {
 		 * 
 		 * @param filter {@link Filter Filter}.
 		 * @param iterator {@link Iterator Iterator}.
-		 * @throws NullPointerException Wenn {@link Filter Filter} oder {@link Iterator Iterator} <code>null</code> sind.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebenen {@link Iterator Iterator}
+		 *         <code>null</code> ist.
 		 */
 		public BaseIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
 			throws NullPointerException {
@@ -60,7 +62,7 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GEntry next() {
+		public final GEntry next() {
 			if(!this.hasNext()) throw new NoSuchElementException();
 			this.hasNext = null;
 			return this.entry;
@@ -70,7 +72,7 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void remove() {
+		public final void remove() {
 			if(this.hasNext != null) throw new IllegalStateException();
 			this.iterator.remove();
 		}
@@ -78,7 +80,8 @@ public final class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator Iterator} mit {@link Filter Filter}.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} mit {@link Filter Filter} auf
+	 * {@link Iterator Iteratoren}.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
@@ -100,6 +103,167 @@ public final class Iterators {
 		public BaseIteratorConverter(final Filter<? super GEntry> filter) throws NullPointerException {
 			if(filter == null) throw new NullPointerException();
 			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.filter.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final BaseIteratorConverter<?> data = (BaseIteratorConverter<?>)object;
+			return this.filter.equals(data.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#limitedIterator(Filter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static final class LimitedIteratorConverter<GEntry> extends BaseIteratorConverter<GEntry> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+		 */
+		public LimitedIteratorConverter(final Filter<? super GEntry> filter) throws NullPointerException {
+			super(filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> convert(final Iterator<? extends GEntry> input) {
+			return Iterators.limitedIterator(this.filter, input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof LimitedIteratorConverter<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("limitedIteratorConverter", this.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#filteredIterator(Filter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static final class FilteredIteratorConverter<GEntry> extends BaseIteratorConverter<GEntry> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+		 */
+		public FilteredIteratorConverter(final Filter<? super GEntry> filter) throws NullPointerException {
+			super(filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> convert(final Iterator<? extends GEntry> input) {
+			return Iterators.filteredIterator(this.filter, input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof FilteredIteratorConverter<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("filteredIteratorConverter", this.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ der Elemente.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> extends
+		BaseConverter<GInput, Iterator<GOutput>, GValue, GOutput> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter.}
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public ConvertedIteratorConverter(final Converter<? super GValue, ? extends GOutput> converter) {
+			super(converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GOutput> convert(final GInput input) {
+			return Iterators.convertedIterator(this.converter, input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ConvertedIteratorConverter<?, ?, ?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("convertedIteratorConverter", this.converter);
 		}
 
 	}
@@ -397,57 +561,9 @@ public final class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
-	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ der Elemente.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> extends
-		Converters.BaseConverter<GInput, Iterator<GOutput>, GValue, GOutput> {
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
-		 * 
-		 * @param converter {@link Converter Converter.}
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
-		 */
-		public ConvertedIteratorConverter(final Converter<? super GValue, ? extends GOutput> converter) {
-			super(converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<GOutput> convert(final GInput input) {
-			return Iterators.convertedIterator(this.converter, input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || ((object instanceof ConvertedIteratorConverter<?, ?, ?>) && super.equals(object));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("iteratorConverter", this.converter);
-		}
-
-	}
-
-	/**
 	 * Dieses Feld speichert den leeren {@link Iterator Iterator}.
 	 */
-	static final Iterator<?> VOID_ITERATOR = new Iterator<Object>() {
+	static final Iterator<Object> VOID_ITERATOR = new Iterator<Object>() {
 
 		@Override
 		public boolean hasNext() {
@@ -509,7 +625,7 @@ public final class Iterators {
 
 	/**
 	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
-	 * {@link Iterators#chainedIterator} in seine Ausgabe überführt.
+	 * {@link Iterators#chainedIterator(Iterator)} in seine Ausgabe überführt.
 	 */
 	static final Converter<?, ?> CHAINED_ITERATOR_CONVERTER = new Converter<Iterator<Iterator<?>>, Iterator<?>>() {
 
@@ -526,6 +642,28 @@ public final class Iterators {
 	};
 
 	/**
+	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator Iterator} zu überspringen und
+	 * gibt die Anzahl der noch zu überspringenden Elemente zurück. Diese Anzahl ist dann größer als <code>0</code>, wenn
+	 * der gegebene {@link Iterator Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine weiteren Elemente mehr
+	 * liefern kann.
+	 * 
+	 * @param iterator {@link Iterator Iterator}.
+	 * @param count Anzahl der zu überspringenden Elemente.
+	 * @return Anzahl der noch zu überspringenden Elemente.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator Iterator} <code>null</code> ist.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+	 */
+	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException, IllegalArgumentException {
+		if(iterator == null) throw new NullPointerException();
+		if(count < 0) throw new IllegalArgumentException();
+		while((count > 0) && iterator.hasNext()){
+			count--;
+			iterator.next();
+		}
+		return count;
+	}
+
+	/**
 	 * Diese Methode gibt den gegebenen {@link Iterator Iterator} oder den leeren {@link Iterator Iterator} zurück.
 	 * 
 	 * @see Iterators#voidIterator()
@@ -533,7 +671,7 @@ public final class Iterators {
 	 * @param iterator {@link Iterator Iterator}.
 	 * @return {@link Iterator Iterator} oder <code>Void</code>-{@link Iterator Iterator}.
 	 */
-	public static final <GEntry> Iterator<GEntry> iterator(final Iterator<GEntry> iterator) {
+	public static <GEntry> Iterator<GEntry> iterator(final Iterator<GEntry> iterator) {
 		return ((iterator == null) ? Iterators.<GEntry>voidIterator() : iterator);
 	}
 
@@ -556,7 +694,7 @@ public final class Iterators {
 	 * @return <code>Void</code>-{@link Iterator Iterator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static final <GEntry> Iterator<GEntry> voidIterator() {
+	public static <GEntry> Iterator<GEntry> voidIterator() {
 		return (Iterator<GEntry>)Iterators.VOID_ITERATOR;
 	}
 
@@ -567,7 +705,7 @@ public final class Iterators {
 	 * @param entry Element.
 	 * @return Element-{@link Iterator Iterator}
 	 */
-	public static final <GEntry> Iterator<GEntry> entryIterator(final GEntry entry) {
+	public static <GEntry> Iterator<GEntry> entryIterator(final GEntry entry) {
 		return new EntryIterator<GEntry>(entry);
 	}
 
@@ -594,9 +732,23 @@ public final class Iterators {
 	 * @return {@link LimitedIterator Limited-Iterator}.
 	 * @throws NullPointerException Wenn {@link Filter Filter} oder {@link Iterator Iterator} <code>null</code> sind.
 	 */
-	public static final <GEntry> Iterator<GEntry> limitedIterator(final Filter<? super GEntry> filter,
+	public static <GEntry> Iterator<GEntry> limitedIterator(final Filter<? super GEntry> filter,
 		final Iterator<? extends GEntry> iterator) throws NullPointerException {
 		return new LimitedIterator<GEntry>(filter, iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#limitedIterator(Filter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param filter {@link Filter Filter}.
+	 * @return {@link Iterators#limitedIterator(Filter, Iterator)}-{@link Converter Converter}.
+	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+	 */
+	public static <GEntry> Converter<Iterator<? extends GEntry>, Iterator<GEntry>> limitedIteratorConverter(
+		final Filter<? super GEntry> filter) throws NullPointerException {
+		return new LimitedIteratorConverter<GEntry>(filter);
 	}
 
 	/**
@@ -609,9 +761,23 @@ public final class Iterators {
 	 * @return {@link FilteredIterator Filtered-Iterator}.
 	 * @throws NullPointerException Wenn {@link Filter Filter} oder {@link Iterator Iterator} <code>null</code> sind.
 	 */
-	public static final <GEntry> Iterator<GEntry> filteredIterator(final Filter<? super GEntry> filter,
+	public static <GEntry> Iterator<GEntry> filteredIterator(final Filter<? super GEntry> filter,
 		final Iterator<? extends GEntry> iterator) throws NullPointerException {
 		return new FilteredIterator<GEntry>(filter, iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#filteredIterator(Filter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param filter {@link Filter Filter}.
+	 * @return {@link Iterators#filteredIterator(Filter, Iterator)}-{@link Converter Converter}.
+	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+	 */
+	public static <GEntry> Converter<Iterator<? extends GEntry>, Iterator<GEntry>> filteredIteratorConverter(
+		final Filter<? super GEntry> filter) throws NullPointerException {
+		return new FilteredIteratorConverter<GEntry>(filter);
 	}
 
 	/**
@@ -626,7 +792,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Iterator Iteratoren} <code>null</code> sind.
 	 */
-	public static final <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
 		throws NullPointerException {
 		if(iterators == null) throw new NullPointerException();
 		return Iterators.chainedIterator(Arrays.asList(iterators));
@@ -645,7 +811,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static final <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1,
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1,
 		final Iterator<? extends GEntry> iterator2) {
 		return Iterators.chainedIterator(Arrays.asList(iterator1, iterator2));
 	}
@@ -660,8 +826,8 @@ public final class Iterators {
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 * @throws NullPointerException Wenn de rgegebene {@link Iterator Iterator} <code>null</code> ist.
 	 */
-	public static final <GEntry> Iterator<GEntry> chainedIterator(
-		final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators)
+		throws NullPointerException {
 		return new ChainedIterator<GEntry>(iterators);
 	}
 
@@ -675,8 +841,7 @@ public final class Iterators {
 	 * @param iterators {@link Iterable Iterable} über die {@link Iterator Iteratoren}.
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 */
-	public static final <GEntry> Iterator<GEntry> chainedIterator(
-		final Iterable<? extends Iterator<? extends GEntry>> iterators) {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) {
 		if(iterators == null) throw new NullPointerException();
 		return Iterators.chainedIterator(iterators.iterator());
 	}
@@ -751,7 +916,7 @@ public final class Iterators {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Iterable
 	 *         Iterable} <code>null</code> ist.
 	 */
-	public static final <GInput, GOutput> Iterator<GOutput> convertedIterator(
+	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(
 		final Converter<? super GInput, ? extends GOutput> converter, final Iterator<? extends GInput> iterator)
 		throws NullPointerException {
 		return new ConvertedIterator<GInput, GOutput>(converter, iterator);

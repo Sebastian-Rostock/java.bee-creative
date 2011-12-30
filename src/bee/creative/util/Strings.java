@@ -77,8 +77,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe eines kompilierten
-	 * regulären Ausdrucks in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter}, der seine Eingabe mit Hilfe eines
+	 * kompilierten regulären Ausdrucks in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOutput> Typ der Ausgabe.
@@ -126,10 +126,9 @@ public final class Strings {
 
 	}
 
-	// fffff sdfgg erz zre zretzrtzrtz
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
-	 * {@link Strings#apply(Pattern, CharSequence, int, boolean, boolean)} in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der
+	 * Methode {@link Strings#apply(Pattern, CharSequence, int, boolean, boolean)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -187,8 +186,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
-	 * {@link Strings#applyAll(Pattern, CharSequence, boolean, boolean)} in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der
+	 * Methode {@link Strings#applyAll(Pattern, CharSequence, boolean, boolean)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */

@@ -15,9 +15,9 @@ import java.util.Map.Entry;
 public final class Objects {
 
 	/**
-	 * Diese Klasse implementiert ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via
+	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via
 	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen
-	 * Objekts entspricht, und gibt es zurück.
+	 * Objekts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -35,6 +35,23 @@ public final class Objects {
 		 */
 		public BaseObject(final Object object) {
 			this.object = object;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final BaseObject data = (BaseObject)object;
+			return Objects.equals(this.object, data.object);
 		}
 
 	}
@@ -55,6 +72,16 @@ public final class Objects {
 		 */
 		public NormalObject(final Object object) {
 			super(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof NormalObject)) return false;
+			return super.equals(object);
 		}
 
 		/**
@@ -89,6 +116,16 @@ public final class Objects {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof FormatObject)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return Objects.toString(true, this.object);
 		}
@@ -97,8 +134,8 @@ public final class Objects {
 
 	/**
 	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)},
-	 * sodass diese für Objekte mit dieser Schnittstelle den Rückgabewert derer {@link Object#toString() toString()}
-	 * -Methode verwendet.
+	 * sodass diese für Objekte mit dieser Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode
+	 * verwendet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */

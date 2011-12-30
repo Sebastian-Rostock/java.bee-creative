@@ -31,8 +31,11 @@ public final class Pointers {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean equals(final Object obj) {
-			return (obj == this) || ((obj instanceof Pointer<?>) && Objects.equals(this.data(), ((Pointer<?>)obj).data()));
+		public final boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof Pointer<?>)) return false;
+			final Pointer<?> data = (Pointer<?>)object;
+			return Objects.equals(this.data(), data.data());
 		}
 
 	}
@@ -341,7 +344,7 @@ public final class Pointers {
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GData> Converter<Pointer<GData>, GData> pointerDataConverter() {
-		return (Converter<Pointer<GData>, GData>)POINTER_DATA_CONVERTER;
+		return (Converter<Pointer<GData>, GData>)Pointers.POINTER_DATA_CONVERTER;
 	}
 
 	/**
