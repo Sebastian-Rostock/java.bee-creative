@@ -60,16 +60,6 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean hasNext() {
-			if(this.hasNext != null) return this.hasNext.booleanValue();
-			if(!this.iterator.hasNext()) return (this.hasNext = Boolean.FALSE).booleanValue();
-			return (this.hasNext = Boolean.valueOf(this.filter.accept(this.entry = this.iterator.next()))).booleanValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public GEntry next() {
 			if(!this.hasNext()) throw new NoSuchElementException();
 			this.hasNext = null;
@@ -83,6 +73,33 @@ public final class Iterators {
 		public void remove() {
 			if(this.hasNext != null) throw new IllegalStateException();
 			this.iterator.remove();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Iterator Iterator} mit {@link Filter Filter}.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static abstract class BaseIteratorConverter<GEntry> implements
+		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+		 */
+		public BaseIteratorConverter(final Filter<? super GEntry> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException();
+			this.filter = filter;
 		}
 
 	}
@@ -380,6 +397,54 @@ public final class Iterators {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ der Elemente.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> extends
+		Converters.BaseConverter<GInput, Iterator<GOutput>, GValue, GOutput> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter.}
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 */
+		public ConvertedIteratorConverter(final Converter<? super GValue, ? extends GOutput> converter) {
+			super(converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GOutput> convert(final GInput input) {
+			return Iterators.convertedIterator(this.converter, input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || ((object instanceof ConvertedIteratorConverter<?, ?, ?>) && super.equals(object));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("iteratorConverter", this.converter);
+		}
+
+	}
+
+	/**
 	 * Dieses Feld speichert den leeren {@link Iterator Iterator}.
 	 */
 	static final Iterator<?> VOID_ITERATOR = new Iterator<Object>() {
@@ -407,6 +472,60 @@ public final class Iterators {
 	};
 
 	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#iterator(Iterator)} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> ITERATOR_CONVERTER = new Converter<Iterator<?>, Iterator<?>>() {
+
+		@Override
+		public Iterator<?> convert(final Iterator<?> input) {
+			return Iterators.iterator(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("iteratorConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#entryIterator(Object)} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> ENTRY_ITERATOR_CONVERTER = new Converter<Object, Iterator<?>>() {
+
+		@Override
+		public Iterator<?> convert(final Object input) {
+			return Iterators.entryIterator(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("entryIteratorConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#chainedIterator} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> CHAINED_ITERATOR_CONVERTER = new Converter<Iterator<Iterator<?>>, Iterator<?>>() {
+
+		@Override
+		public Iterator<?> convert(final Iterator<Iterator<?>> input) {
+			return Iterators.chainedIterator(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("chainedIteratorConverter");
+		}
+
+	};
+
+	/**
 	 * Diese Methode gibt den gegebenen {@link Iterator Iterator} oder den leeren {@link Iterator Iterator} zurück.
 	 * 
 	 * @see Iterators#voidIterator()
@@ -416,6 +535,18 @@ public final class Iterators {
 	 */
 	public static final <GEntry> Iterator<GEntry> iterator(final Iterator<GEntry> iterator) {
 		return ((iterator == null) ? Iterators.<GEntry>voidIterator() : iterator);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#iterator(Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link Iterators#iterator(Iterator)}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Converter<Iterator<GEntry>, Iterator<GEntry>> iteratorConverter() {
+		return (Converter<Iterator<GEntry>, Iterator<GEntry>>)Iterators.ITERATOR_CONVERTER;
 	}
 
 	/**
@@ -438,6 +569,18 @@ public final class Iterators {
 	 */
 	public static final <GEntry> Iterator<GEntry> entryIterator(final GEntry entry) {
 		return new EntryIterator<GEntry>(entry);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#entryIterator(Object)} in seine Ausgabe überführt.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link Iterators#entryIterator(Object)}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Converter<GEntry, Iterator<GEntry>> entryIteratorConverter() {
+		return (Converter<GEntry, Iterator<GEntry>>)Iterators.ENTRY_ITERATOR_CONVERTER;
 	}
 
 	/**
@@ -539,6 +682,62 @@ public final class Iterators {
 	}
 
 	/**
+	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#chainedIterator(Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @see Iterators#chainedIterator(Iterator)
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link Iterators#chainedIterator(Iterator) Iterator}-{@link Converter Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Converter<Iterator<? extends Iterator<? extends GEntry>>, Iterator<GEntry>> chainedIteratorConverter() {
+		return (Converter<Iterator<? extends Iterator<? extends GEntry>>, Iterator<GEntry>>)Iterators.CHAINED_ITERATOR_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
+	 * @see Converters#chainedConverter(Converter, Converter)
+	 * @see Iterators#convertedIteratorConverter(Converter)
+	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
+	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
+	 *        {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
+	 * @param converter1 erster {@link Converter Converter}.
+	 * @param converter2 zweiter {@link Converter Converter.}
+	 * @return {@link Converters.ChainedConverter Chained-Converter}.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
+	 */
+	public static <GInput, GValue, GOutput> Converter<GInput, Iterator<GOutput>> chainedIteratorConverter(
+		final Converter<? super GInput, ? extends Iterator<GValue>> converter1,
+		final Converter<? super GValue, ? extends GOutput> converter2) {
+		return Converters.<GInput, Iterator<GValue>, Iterator<GOutput>>chainedConverter(converter1,
+			Iterators.<Iterator<GValue>, GValue, GOutput>convertedIteratorConverter(converter2));
+	}
+
+	/**
+	 * Diese Methode erzeugt einen verketteten {@link Converter Converter} und gibt ihn zurück.
+	 * 
+	 * @see Converters#chainedConverter(Converter, Converter)
+	 * @see Iterators#chainedIteratorConverter(Converter, Converter)
+	 * @see Iterators#chainedIteratorConverter()
+	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter Converters}.
+	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter Converters} sowie der Eingabe des zweiten
+	 *        {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter Converters}.
+	 * @param converter1 erster {@link Converter Converter}.
+	 * @param converter2 zweiter {@link Converter Converter.}
+	 * @return {@link Converters.ChainedConverter Chained-Converter}.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
+	 */
+	public static <GInput, GValue, GOutput> Converter<GInput, Iterator<GOutput>> chainedIteratorIteratorConverter(
+		final Converter<? super GInput, ? extends Iterator<GValue>> converter1,
+		final Converter<? super GValue, ? extends Iterator<GOutput>> converter2) {
+		return Converters.chainedConverter(Iterators.chainedIteratorConverter(converter1, converter2),
+			Iterators.<GOutput>chainedIteratorConverter());
+	}
+
+	/**
 	 * Diese Methode erzeugt einen konvertierenden {@link Iterator Iterator}, der die vom gegebenen {@link Converter
 	 * Converter} konvertierten Elemente des gegebenen {@link Iterator Iterators} liefert, und gibt ihn zurück.
 	 * 
@@ -556,6 +755,22 @@ public final class Iterators {
 		final Converter<? super GInput, ? extends GOutput> converter, final Iterator<? extends GInput> iterator)
 		throws NullPointerException {
 		return new ConvertedIterator<GInput, GOutput>(converter, iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#convertedIterator(Converter, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ der Elemente.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param converter {@link Converter Converter.}
+	 * @return {@link ConvertedIteratorConverter Iterator-Converter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 */
+	public static <GInput extends Iterator<? extends GValue>, GValue, GOutput> Converter<GInput, Iterator<GOutput>> convertedIteratorConverter(
+		final Converter<? super GValue, ? extends GOutput> converter) {
+		return new ConvertedIteratorConverter<GInput, GValue, GOutput>(converter);
 	}
 
 	/**

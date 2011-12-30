@@ -309,6 +309,61 @@ public final class Conversions {
 	}
 
 	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Conversions#inverseConversion(Conversion)} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> INVERSE_CONVERSION_CONVERTER =
+		new Converter<Conversion<Object, Object>, Conversion<Object, Object>>() {
+	
+			@Override
+			public Conversion<Object, Object> convert(final Conversion<Object, Object> input) {
+				return Conversions.inverseConversion(input);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toStringCall("inverseConversionConverter");
+			}
+	
+		};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der die Eingabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 */
+	static final Converter<?, ?> CONVERSION_INPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
+	
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.input();
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toStringCall("conversionInputConverter");
+		}
+	
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der die Ausgabe eines {@link Conversion
+	 * Eingabe-Ausgabe-Paars} ermittelt.
+	 */
+	static final Converter<?, ?> CONVERSION_OUTPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
+	
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.output();
+		}
+	
+		@Override
+		public String toString() {
+			return Objects.toStringCall("conversionOutputConverter");
+		}
+	
+	};
+
+	/**
 	 * Diese Methode erzeugt ein statisches {@link Conversion Eingabe-Ausgabe-Paar}, dessen Eingabe und Ausgabe konstant
 	 * sind, und gibt es zurück.
 	 * 
@@ -353,61 +408,6 @@ public final class Conversions {
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		return new DynamicConversion<GInput, GOutput>(input, converter);
 	}
-
-	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe mit Hilfe der Methode
-	 * {@link Conversions#inverseConversion(Conversion)} in seine Ausgabe überführt.
-	 */
-	static final Converter<?, ?> INVERSE_CONVERSION_CONVERTER =
-		new Converter<Conversion<Object, Object>, Conversion<Object, Object>>() {
-
-			@Override
-			public Conversion<Object, Object> convert(final Conversion<Object, Object> input) {
-				return Conversions.inverseConversion(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("inverseConversionConverter");
-			}
-
-		};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der die Eingabe eines {@link Conversion
-	 * Eingabe-Ausgabe-Paars} ermittelt.
-	 */
-	static final Converter<?, ?> CONVERSION_INPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
-
-		@Override
-		public Object convert(final Conversion<?, ?> input) {
-			return input.input();
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("conversionInputConverter");
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der die Ausgabe eines {@link Conversion
-	 * Eingabe-Ausgabe-Paars} ermittelt.
-	 */
-	static final Converter<?, ?> CONVERSION_OUTPUT_CONVERTER = new Converter<Conversion<?, ?>, Object>() {
-
-		@Override
-		public Object convert(final Conversion<?, ?> input) {
-			return input.output();
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("conversionOutputConverter");
-		}
-
-	};
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit dem gegebenen {@link Converter

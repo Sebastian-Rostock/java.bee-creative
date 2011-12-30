@@ -15,6 +15,87 @@ import java.util.Map.Entry;
 public final class Objects {
 
 	/**
+	 * Diese Klasse implementiert ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via
+	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen
+	 * Objekts entspricht, und gibt es zurück.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static abstract class BaseObject {
+
+		/**
+		 * Dieses Feld speichert das Objekt.
+		 */
+		final Object object;
+
+		/**
+		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * 
+		 * @param object Objekt.
+		 */
+		public BaseObject(final Object object) {
+			this.object = object;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via
+	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} eines gegebenen
+	 * Objekts entspricht.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class NormalObject extends BaseObject {
+
+		/**
+		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * 
+		 * @param object Objekt.
+		 */
+		public NormalObject(final Object object) {
+			super(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toString(false, this.object);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via
+	 * {@link Objects#toString(boolean, Object)} ermittelten formatierten {@link Object#toString() Textdarstelung} eines
+	 * gegebenen Objekts entspricht.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class FormatObject extends BaseObject {
+
+		/**
+		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * 
+		 * @param object Objekt.
+		 */
+		public FormatObject(final Object object) {
+			super(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toString(true, this.object);
+		}
+
+	}
+
+	/**
 	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)},
 	 * sodass diese für Objekte mit dieser Schnittstelle den Rückgabewert derer {@link Object#toString() toString()}
 	 * -Methode verwendet.
@@ -23,6 +104,42 @@ public final class Objects {
 	 */
 	public static interface UseToString {
 	}
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via
+	 * {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
+	 */
+	static final Converter<Object, String> NORMAL_STRING_CONVERTER = new Converter<Object, String>() {
+
+		@Override
+		public String convert(final Object input) {
+			return Objects.toString(false, input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("toStringConverter", false);
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via
+	 * {@link Objects#toString(boolean, Object)} in eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
+	 */
+	static final Converter<Object, String> FORMAT_STRING_CONVERTER = new Converter<Object, String>() {
+
+		@Override
+		public String convert(final Object input) {
+			return Objects.toString(false, input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("toStringConverter", true);
+		}
+
+	};
 
 	/**
 	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von
@@ -242,9 +359,7 @@ public final class Objects {
 	 * <code>null</code>-Eingaben und {@link Array Arrays}. Wenn beide Objekte keine {@link Array Arrays} sind, entspricht
 	 * der Rückgabewert:
 	 * 
-	 * <pre>
-	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
-	 * </pre>
+	 * <pre>(object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))</pre>
 	 * 
 	 * @see Arrays#equals(int[], int[])
 	 * @see Arrays#equals(long[], long[])
@@ -283,12 +398,13 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * <code>null</code>-Eingaben.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen {@link Array Arrays} zurück und
+	 * tolleriert dabei <code>null</code>-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der
+	 * {@link Array Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
 	 * 
 	 * @see Objects#equals(Object, Object)
-	 * @param objects1 Objekte 1 oder <code>null</code>.
-	 * @param objects2 Objekte 2 oder <code>null</code>.
+	 * @param objects1 {@link Array Array} 1 oder <code>null</code>.
+	 * @param objects2 {@link Array Array} 2 oder <code>null</code>.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object[] objects1, final Object[] objects2) {
@@ -333,6 +449,32 @@ public final class Objects {
 	 */
 	public static String toString(final boolean format, final Object object) {
 		return Objects.toString(format, false, object);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via
+	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen
+	 * Objekts entspricht, und gibt es zurück.
+	 * 
+	 * @see Objects#toString(boolean, Object)
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @param object Objekt oder <code>null</code>.
+	 * @return {@link Object#toString() Textdarstelung}-Objekt.
+	 */
+	public static Object toStringObject(final boolean format, final Object object) {
+		return ((object == null) ? "null" : (format ? new FormatObject(object) : new NormalObject(object)));
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
+	 * {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
+	 * 
+	 * @see Objects#toString(boolean, Object)
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @return {@link Objects#toString(boolean, Object)}-{@link Converter Converter}.
+	 */
+	public static Converter<Object, String> toStringConverter(final boolean format) {
+		return (format ? Objects.FORMAT_STRING_CONVERTER : Objects.NORMAL_STRING_CONVERTER);
 	}
 
 	/**
