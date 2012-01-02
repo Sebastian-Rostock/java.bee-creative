@@ -200,6 +200,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * Index gibt die Position in der Tabelle an, unter der eine einfach verkettete Liste verwaltet wird, deren Einträge
 	 * einen Schlüssel mit diesem {@link Object#hashCode() Streuwert} besitzen können.
 	 * 
+	 * @see Hash#getLength(int, int)
 	 * @param hash {@link Object#hashCode() Streuwert} eines Schlüssels.
 	 * @param length Größe der Tabelle.
 	 * @return Index.
@@ -209,18 +210,35 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
+	 * Diese Methode gibt die Größe der Tabelle zurück, in der die Kopfelemente der einfach verketteten Listen der
+	 * Einträge hinterlegt werden.
+	 * 
+	 * @return Größe der Tabelle.
+	 */
+	protected final int getLength() {
+		return this.table.length;
+	}
+
+	/**
 	 * Diese Methode soll die neue Größe der Tabelle zurück geben, in der die Kopfelemente der einfach verketteten Listen
 	 * der Einträge hinterlegt werden.
 	 * 
+	 * @see Hash#getIndex(int, int)
 	 * @param size Anzahl der Einträge
 	 * @param length aktuelle Größe der Tabelle.
 	 * @return neue Größe der Tabelle.
 	 */
-	protected int getLength(final int size, int length) {
-		// wenn 75% der Plätze vergeben sind
+	protected int getLength(int size, int length) {
 		if(size == 0) return 0;
-		if(size > length){
-			for(length = 1; length < size; length <<= 1){}
+		if(length == 0){
+			length = 1;
+		}
+		while(length < size){
+			length *= 2;
+		}
+		size *= 2;
+		while(length > size){
+			length /= 2;
 		}
 		return length;
 	}
@@ -257,10 +275,11 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
 	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein
-	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder <code>null</code> zurück. Wenn die Abbildung leer
-	 * ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen aufgerufen. Wenn die
-	 * Tabellgrößenenprüfung <code>true</code> und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die
-	 * Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
+	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder <code>null</code> zurück. Wenn die Größe der
+	 * Tabelle <code>0</code> ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen
+	 * aufgerufen. Wenn die Tabellgrößenenprüfung <code>true</code> und unter dem gegebenen Schlüssel kein Eintrag
+	 * registriert sind, wird die Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag
+	 * aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
@@ -271,14 +290,13 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	@SuppressWarnings ("unchecked")
 	protected final GEntry appendEntry(final GKey key, final GValue value, final boolean verifyLength) {
 		final int hash = this.getKeyHash(key);
-		if(this.size == 0){
-			this.size = 1;
-			this.verifyLength();
-			final GEntry[] table = (GEntry[])this.table;
-			table[this.getIndex(hash, table.length)] = this.createEntry(key, value, null, hash);
+		final GEntry[] table = (GEntry[])this.table;
+		if(table.length == 0){
+			this.verifyLength(1);
+			this.size++;
+			this.table[0] = this.createEntry(key, value, null, hash);
 			return null;
 		}
-		final GEntry[] table = (GEntry[])this.table;
 		final int index = this.getIndex(hash, table.length);
 		for(GEntry last = null, item = table[index], next; item != null; last = item, item = next){
 			next = this.getEntryNext(item);
