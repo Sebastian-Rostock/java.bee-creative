@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Map;
 import bee.creative.util.Converters.CachedConverter;
+import bee.creative.util.Converters.ConverterLink;
 import bee.creative.util.Pointers.HardPointer;
 import bee.creative.util.Pointers.SoftPointer;
 
@@ -424,12 +425,13 @@ public final class Filters {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
 	 *        {@link Filter Filters}.
 	 */
-	public static final class ConvertedFilter<GInput, GOutput> extends FilterLink<GOutput> implements Filter<GInput> {
+	public static final class ConvertedFilter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Filter<GInput> {
 
 		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
+		 * Dieses Feld speichert den {@link Filter Filter}.
 		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
+		final Filter<? super GOutput> filter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter Filter} und {@link Converter Converter}.
@@ -441,9 +443,9 @@ public final class Filters {
 		 */
 		public ConvertedFilter(final Filter<? super GOutput> filter,
 			final Converter<? super GInput, ? extends GOutput> converter) {
-			super(filter);
-			if(converter == null) throw new NullPointerException();
-			this.converter = converter;
+			super(converter);
+			if(filter == null) throw new NullPointerException();
+			this.filter = filter;
 		}
 
 		/**
@@ -455,12 +457,12 @@ public final class Filters {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * Diese Methode gibt den {@link Filter Filter} zurück.
 		 * 
-		 * @return {@link Converter Converter}.
+		 * @return {@link Filter Filter}.
 		 */
-		public Converter<? super GInput, ? extends GOutput> converter() {
-			return this.converter;
+		public Filter<? super GOutput> filter() {
+			return this.filter;
 		}
 
 		/**
@@ -479,7 +481,7 @@ public final class Filters {
 			if(object == this) return true;
 			if(!(object instanceof ConvertedFilter<?, ?>)) return false;
 			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
-			return super.equals(object) && Objects.equals(this.converter, data.converter);
+			return super.equals(object) && Objects.equals(this.filter, data.filter);
 		}
 
 		/**
@@ -487,7 +489,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("convertedFilter", this.filter, this.converter);
+			return Objects.toStringCall("convertedFilter", this.converter, this.filter);
 		}
 
 	}

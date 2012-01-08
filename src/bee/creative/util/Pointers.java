@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import bee.creative.util.Converters.ConverterLink;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer
@@ -223,17 +224,13 @@ public final class Pointers {
 	 *        {@link Pointer Pointers}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie des Datensatzes.
 	 */
-	public static final class ConvertedPointer<GInput, GOutput> extends BasePointer<GOutput> {
+	public static final class ConvertedPointer<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Pointer<GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Pointer Pointer}.
 		 */
 		final Pointer<? extends GInput> pointer;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Pointer Pointer} und {@link Converter Converter}.
@@ -245,9 +242,9 @@ public final class Pointers {
 		 */
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
 			final Pointer<? extends GInput> pointer) throws NullPointerException {
-			if((pointer == null) || (converter == null)) throw new NullPointerException();
+			super(converter);
+			if(pointer == null) throw new NullPointerException();
 			this.pointer = pointer;
-			this.converter = converter;
 		}
 
 		/**
@@ -257,15 +254,6 @@ public final class Pointers {
 		 */
 		public Pointer<? extends GInput> pointer() {
 			return this.pointer;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Converter Converter} zurück.
-		 * 
-		 * @return {@link Converter Converter}.
-		 */
-		public Converter<? super GInput, ? extends GOutput> converter() {
-			return this.converter;
 		}
 
 		/**
@@ -280,8 +268,24 @@ public final class Pointers {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return BasePointer.hashCode(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return BasePointer.equals(this, object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
-			return Objects.toStringCall("convertedPointer", this.pointer, this.converter);
+			return Objects.toStringCall("convertedPointer", this.converter, this.pointer);
 		}
 
 	}

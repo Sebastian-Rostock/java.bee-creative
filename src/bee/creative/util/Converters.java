@@ -70,7 +70,7 @@ public final class Converters {
 		@Override
 		public boolean equals(final Object object) {
 			final ConverterLink<?, ?> data = (ConverterLink<?, ?>)object;
-			return this.converter.equals(data.converter);
+			return Objects.equals(this.converter, data.converter);
 		}
 
 	}
