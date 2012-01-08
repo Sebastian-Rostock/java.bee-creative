@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import bee.creative.util.Converters.ConverterLink;
+import bee.creative.util.Filters.FilterLink;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterator
@@ -18,12 +20,62 @@ import java.util.NoSuchElementException;
 public final class Iterators {
 
 	/**
+	 * Diese Klasse implementiert ein Objekt mit Element.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ des Elementes.
+	 */
+	static class EntryLink<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das Element.
+		 */
+		final GEntry entry;
+
+		/**
+		 * Dieser Konstrukteur initialisiert das Element.
+		 * 
+		 * @param entry Element
+		 */
+		public EntryLink(final GEntry entry) {
+			this.entry = entry;
+		}
+
+		/**
+		 * Diese Methode gibt das Element zurück.
+		 * 
+		 * @return Element.
+		 */
+		public GEntry entry() {
+			return this.entry;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.entry);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final EntryLink<?> data = (EntryLink<?>)object;
+			return Objects.equals(this.entry, data.entry);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert einen abstrakten {@link Iterator Iterator} mit {@link Filter Filter}.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static abstract class BaseIterator<GEntry> extends Filters.FilterLink<GEntry> implements Iterator<GEntry> {
+	static abstract class BaseIterator<GEntry> extends FilterLink<GEntry> implements Iterator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert <code>true</code>, wenn ein nächstes Element existiert.
@@ -74,6 +126,14 @@ public final class Iterators {
 			this.iterator.remove();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return object == this;
+		}
+
 	}
 
 	/**
@@ -83,7 +143,7 @@ public final class Iterators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class LimitedIteratorConverter<GEntry> extends Filters.FilterLink<GEntry> implements
+	static final class LimitedIteratorConverter<GEntry> extends FilterLink<GEntry> implements
 		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
 
 		/**
@@ -131,7 +191,7 @@ public final class Iterators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class FilteredIteratorConverter<GEntry> extends Filters.FilterLink<GEntry> implements
+	static final class FilteredIteratorConverter<GEntry> extends FilterLink<GEntry> implements
 		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
 
 		/**
@@ -228,17 +288,12 @@ public final class Iterators {
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ des Elementes.
 	 */
-	public static final class EntryIterator<GEntry> implements Iterator<GEntry> {
+	public static final class EntryIterator<GEntry> extends EntryLink<GEntry> implements Iterator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert den Zustand.
 		 */
-		boolean hasNext;
-
-		/**
-		 * Dieses Feld speichert das Element.
-		 */
-		final GEntry entry;
+		boolean hasNext = false;
 
 		/**
 		 * Dieser Konstrukteur initialisiert das Element.
@@ -246,8 +301,7 @@ public final class Iterators {
 		 * @param entry Element
 		 */
 		public EntryIterator(final GEntry entry) {
-			this.entry = entry;
-			this.hasNext = true;
+			super(entry);
 		}
 
 		/**
@@ -274,6 +328,14 @@ public final class Iterators {
 		@Override
 		public void remove() {
 			throw (this.hasNext ? new IllegalStateException() : new UnsupportedOperationException());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return object == this;
 		}
 
 		/**
@@ -438,6 +500,14 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public boolean equals(final Object object) {
+			return object == this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return Objects.toStringCall("chainedIterator", this.iterators);
 		}
@@ -453,8 +523,8 @@ public final class Iterators {
 	 *        {@link Iterable Iterables}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Elemente.
 	 */
-	public static final class ConvertedIterator<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
-		implements Iterator<GOutput> {
+	public static final class ConvertedIterator<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Iterator<GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Iterator Iterator};
@@ -498,6 +568,14 @@ public final class Iterators {
 		@Override
 		public void remove() {
 			this.iterator.remove();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return object == this;
 		}
 
 		/**

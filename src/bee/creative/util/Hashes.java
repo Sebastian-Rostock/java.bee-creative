@@ -8,6 +8,12 @@ import java.util.Map;
 
 public class Hashes {
 
+	
+	public static void main(String[] args) {
+		StringBuilder d;
+	}
+
+	
 	static void test() {
 		Hashes.test(new Runnable() {
 
@@ -22,7 +28,7 @@ public class Hashes {
 		System.out.println(new Test(runnable));
 	}
 
-	public static void main(final String[] args) {
+	public static void main_(final String[] args) {
 		final Map<Object, Object> map1 = new HashMap<Object, Object>(0);
 		final HashMap2<Object, Object> map2 = new HashMap2<Object, Object>();
 		final int count = 1024 * 1024 * 1;

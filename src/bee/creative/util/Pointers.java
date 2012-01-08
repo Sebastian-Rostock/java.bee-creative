@@ -21,22 +21,45 @@ public final class Pointers {
 	static abstract class BasePointer<GData> implements Pointer<GData> {
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer Pointers} zurück.
+		 * 
+		 * @see Pointers#hashCode()
+		 * @param pointer {@link Pointer Pointer}.
+		 * @return {@link Object#hashCode() Streuwert}.
 		 */
-		@Override
-		public final int hashCode() {
-			return Objects.hash(this.data());
+		static public int hashCode(final Pointer<?> pointer) {
+			return Objects.hash(pointer.data());
+		}
+
+		/**
+		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
+		 * 
+		 * @see Pointers#equals(Object)
+		 * @param pointer {@link Pointer Pointer}.
+		 * @param object Objekt.
+		 * @return {@link Object#equals(Object) Äquivalenz}.
+		 */
+		static public boolean equals(final Pointer<?> pointer, final Object object) {
+			if(object == pointer) return true;
+			if(!(object instanceof Pointer<?>)) return false;
+			final Pointer<?> data = (Pointer<?>)object;
+			return Objects.equals(pointer.data(), data.data());
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Pointer<?>)) return false;
-			final Pointer<?> data = (Pointer<?>)object;
-			return Objects.equals(this.data(), data.data());
+		public int hashCode() {
+			return BasePointer.hashCode(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return BasePointer.equals(this, object);
 		}
 
 	}
@@ -91,12 +114,7 @@ public final class Pointers {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static final class WeakPointer<GData> extends BasePointer<GData> {
-
-		/**
-		 * Dieses Feld speichert die Referenz auf den Datensatz.
-		 */
-		final WeakReference<GData> data;
+	public static final class WeakPointer<GData> extends WeakReference<GData> implements Pointer<GData> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -104,7 +122,7 @@ public final class Pointers {
 		 * @param data Datensatz.
 		 */
 		public WeakPointer(final GData data) {
-			this.data = new WeakReference<GData>(data);
+			super(data);
 		}
 
 		/**
@@ -112,7 +130,23 @@ public final class Pointers {
 		 */
 		@Override
 		public GData data() {
-			return this.data.get();
+			return this.get();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return BasePointer.hashCode(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return BasePointer.equals(this, object);
 		}
 
 		/**
@@ -135,12 +169,7 @@ public final class Pointers {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static final class SoftPointer<GData> extends BasePointer<GData> {
-
-		/**
-		 * Dieses Feld speichert die Referenz auf den Datensatz.
-		 */
-		final SoftReference<GData> data;
+	public static final class SoftPointer<GData> extends SoftReference<GData> implements Pointer<GData> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -148,7 +177,7 @@ public final class Pointers {
 		 * @param data Datensatz.
 		 */
 		public SoftPointer(final GData data) {
-			this.data = new SoftReference<GData>(data);
+			super(data);
 		}
 
 		/**
@@ -156,7 +185,23 @@ public final class Pointers {
 		 */
 		@Override
 		public GData data() {
-			return this.data.get();
+			return this.get();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return BasePointer.hashCode(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return BasePointer.equals(this, object);
 		}
 
 		/**
@@ -165,6 +210,78 @@ public final class Pointers {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("softPointer", this.data());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Pointer Pointer}, dessen Datensatz mit Hilfe eines {@link Converter
+	 * Converters} aus einem gegebenen {@link Pointer Pointer} ermittelt wird.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters} sowie des Datensatzes des gegebenen
+	 *        {@link Pointer Pointers}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie des Datensatzes.
+	 */
+	public static final class ConvertedPointer<GInput, GOutput> extends BasePointer<GOutput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Pointer Pointer}.
+		 */
+		final Pointer<? extends GInput> pointer;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert {@link Pointer Pointer} und {@link Converter Converter}.
+		 * 
+		 * @param converter {@link Converter Converter}.
+		 * @param pointer {@link Pointer Pointer}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} bzw. der gegebenen {@link Converter
+		 *         Converter} <code>null</code> ist.
+		 */
+		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
+			final Pointer<? extends GInput> pointer) throws NullPointerException {
+			if((pointer == null) || (converter == null)) throw new NullPointerException();
+			this.pointer = pointer;
+			this.converter = converter;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Pointer Pointer} zurück.
+		 * 
+		 * @return {@link Pointer Pointer}.
+		 */
+		public Pointer<? extends GInput> pointer() {
+			return this.pointer;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * 
+		 * @return {@link Converter Converter}.
+		 */
+		public Converter<? super GInput, ? extends GOutput> converter() {
+			return this.converter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GOutput data() {
+			return this.converter.convert(this.pointer.data());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("convertedPointer", this.pointer, this.converter);
 		}
 
 	}
@@ -278,6 +395,19 @@ public final class Pointers {
 	 * und der Garbage Collector dies entscheidet.
 	 */
 	public static final int SOFT = 2;
+
+	/**
+	 * Diese Methode gibt nur dann <code>true</code> zurück, wenn der gegebene {@link Pointer Pointer} gleich dem
+	 * <code>null</code>-{@link Pointer Pointer} oder sein Datensatz nicht <code>null</code> ist.
+	 * 
+	 * @param pointer {@link Pointer Pointer}.
+	 * @return {@link Pointer Pointer}-Validität.
+	 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} <code>null</code> ist.
+	 */
+	public static boolean valid(final Pointer<?> pointer) throws NullPointerException {
+		if(pointer == null) throw new NullPointerException();
+		return (pointer == Pointers.NULL_POINTER) || (pointer.data() != null);
+	}
 
 	/**
 	 * Diese Methode gibt den gegebenen {@link Pointer Pointer} oder den {@link Pointer Pointer} auf <code>null</code>
@@ -444,6 +574,26 @@ public final class Pointers {
 	@SuppressWarnings ("unchecked")
 	public static <GData> Converter<GData, Pointer<GData>> softPointerConverter() {
 		return (Converter<GData, Pointer<GData>>)Pointers.SOFT_POINTER_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode erzeugt {@link Pointer Pointer}, dessen Datensatz mit Hilfe eines {@link Converter Converters} aus
+	 * einem gegebenen {@link Pointer Pointer} ermittelt wird, und gibt ihn zurück.
+	 * 
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter Converters} sowie des Datensatzes des gegebenen
+	 *        {@link Pointer Pointers}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie des Datensatzes.
+	 * @param converter {@link Converter Converter}.
+	 * @param pointer {@link Pointer Pointer}.
+	 * @return {@link ConvertedPointer Converted-Pointer}.
+	 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} bzw. der gegebenen {@link Converter
+	 *         Converter} <code>null</code> ist.
+	 */
+	public static <GInput, GOutput> Pointer<GOutput> convertedPointer(
+		final Converter<? super GInput, ? extends GOutput> converter, final Pointer<? extends GInput> pointer)
+		throws NullPointerException {
+		return new ConvertedPointer<GInput, GOutput>(converter, pointer);
+
 	}
 
 	/**

@@ -39,6 +39,15 @@ public final class Filters {
 		}
 
 		/**
+		 * Diese Methode gibt den {@link Filter Filter} zurück.
+		 * 
+		 * @return {@link Filter Filter}.
+		 */
+		public Filter<? super GInput> filter() {
+			return this.filter;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -64,24 +73,47 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	static abstract class JunctionFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
+	static abstract class JunctionFilter<GInput> implements Filter<GInput> {
 
 		/**
-		 * Dieses Feld speichert den {@link Filter Filter} 2.
+		 * Dieses Feld speichert den primären {@link Filter Filter}.
+		 */
+		final Filter<? super GInput> filter1;
+
+		/**
+		 * Dieses Feld speichert den sekundären {@link Filter Filter}.
 		 */
 		final Filter<? super GInput> filter2;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
 		 * 
-		 * @param filter1 {@link Filter Filter} 1.
-		 * @param filter2 {@link Filter Filter} 2.
+		 * @param filter1 primärer {@link Filter Filter}.
+		 * @param filter2 sekundärer {@link Filter Filter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
 		public JunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			super(filter1);
-			if(filter2 == null) throw new NullPointerException();
+			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
+			this.filter1 = filter1;
 			this.filter2 = filter2;
+		}
+
+		/**
+		 * Diese Methode gibt den primären {@link Filter Filter} zurück.
+		 * 
+		 * @return primärer {@link Filter Filter}.
+		 */
+		public Filter<? super GInput> filter1() {
+			return this.filter1;
+		}
+
+		/**
+		 * Diese Methode gibt den sekundären {@link Filter Filter} zurück.
+		 * 
+		 * @return sekundärer {@link Filter Filter}.
+		 */
+		public Filter<? super GInput> filter2() {
+			return this.filter2;
 		}
 
 		/**
@@ -89,7 +121,7 @@ public final class Filters {
 		 */
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.filter, this.filter2);
+			return Objects.hash(this.filter1, this.filter2);
 		}
 
 		/**
@@ -98,7 +130,7 @@ public final class Filters {
 		@Override
 		public boolean equals(final Object object) {
 			final JunctionFilter<?> data = (JunctionFilter<?>)object;
-			return super.equals(object) && Objects.equals(this.filter2, data.filter2);
+			return Objects.equals(this.filter1, data.filter1, this.filter2, data.filter2);
 		}
 
 	}
@@ -112,7 +144,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class InvertFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
+	public static final class InvertFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -166,8 +198,8 @@ public final class Filters {
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
 		 * 
-		 * @param filter1 {@link Filter Filter} 1.
-		 * @param filter2 {@link Filter Filter} 2.
+		 * @param filter1 primärer {@link Filter Filter}.
+		 * @param filter2 sekundärer {@link Filter Filter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
 		public DisjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
@@ -179,7 +211,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter.accept(input) || this.filter2.accept(input);
+			return this.filter1.accept(input) || this.filter2.accept(input);
 		}
 
 		/**
@@ -197,7 +229,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("disjunctionFilter", this.filter, this.filter2);
+			return Objects.toStringCall("disjunctionFilter", this.filter1, this.filter2);
 		}
 
 	}
@@ -216,8 +248,8 @@ public final class Filters {
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
 		 * 
-		 * @param filter1 {@link Filter Filter} 1.
-		 * @param filter2 {@link Filter Filter} 2.
+		 * @param filter1 primärer {@link Filter Filter}.
+		 * @param filter2 sekundärer {@link Filter Filter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
 		public ConjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
@@ -229,7 +261,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter.accept(input) && this.filter2.accept(input);
+			return this.filter1.accept(input) && this.filter2.accept(input);
 		}
 
 		/**
@@ -247,7 +279,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("conjunctionFilter", this.filter, this.filter2);
+			return Objects.toStringCall("conjunctionFilter", this.filter1, this.filter2);
 		}
 
 	}
@@ -266,8 +298,8 @@ public final class Filters {
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Filter Filter}.
 		 * 
-		 * @param filter1 {@link Filter Filter} 1.
-		 * @param filter2 {@link Filter Filter} 2.
+		 * @param filter1 primärer {@link Filter Filter}.
+		 * @param filter2 sekundärer {@link Filter Filter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} <code>null</code> ist.
 		 */
 		public EquivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
@@ -279,7 +311,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.filter.accept(input) == this.filter2.accept(input);
+			return this.filter1.accept(input) == this.filter2.accept(input);
 		}
 
 		/**
@@ -297,7 +329,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("equivalenceFilter", this.filter, this.filter2);
+			return Objects.toStringCall("equivalenceFilter", this.filter1, this.filter2);
 		}
 
 	}
@@ -312,13 +344,13 @@ public final class Filters {
 	 * @see Converters#cachedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class CachedFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput>,
+	public static final class CachedFilter<GInput> extends FilterLink<GInput> implements Filter<GInput>,
 		Converter<GInput, Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
 		 */
-		final CachedConverter<GInput, Boolean> converter;
+		final CachedConverter<GInput, Boolean> cache;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den gepuferten {@link Filter Filter}.
@@ -332,7 +364,7 @@ public final class Filters {
 		 */
 		public CachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) {
 			super(filter);
-			this.converter = new CachedConverter<GInput, Boolean>(limit, mode, Pointers.HARD, this);
+			this.cache = new CachedConverter<GInput, Boolean>(limit, mode, Pointers.HARD, this);
 		}
 
 		/**
@@ -341,7 +373,7 @@ public final class Filters {
 		 * @see CachedConverter#clear()
 		 */
 		public void clear() {
-			this.converter.clear();
+			this.cache.clear();
 		}
 
 		/**
@@ -357,7 +389,7 @@ public final class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			return this.converter.convert(input).booleanValue();
+			return this.cache.convert(input).booleanValue();
 		}
 
 		/**
@@ -375,7 +407,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("cachedFilter", this.filter, this.converter);
+			return Objects.toStringCall("cachedFilter", this.filter);
 		}
 
 	}
@@ -392,8 +424,7 @@ public final class Filters {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
 	 *        {@link Filter Filters}.
 	 */
-	public static final class ConvertedFilter<GInput, GOutput> extends Filters.FilterLink<GOutput> implements
-		Filter<GInput> {
+	public static final class ConvertedFilter<GInput, GOutput> extends FilterLink<GOutput> implements Filter<GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -421,6 +452,15 @@ public final class Filters {
 		@Override
 		public boolean accept(final GInput input) {
 			return this.filter.accept(this.converter.convert(input));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * 
+		 * @return {@link Converter Converter}.
+		 */
+		public Converter<? super GInput, ? extends GOutput> converter() {
+			return this.converter;
 		}
 
 		/**
@@ -459,7 +499,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class SynchronizedFilter<GInput> extends Filters.FilterLink<GInput> implements Filter<GInput> {
+	public static final class SynchronizedFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.

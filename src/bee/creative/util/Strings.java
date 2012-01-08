@@ -41,6 +41,15 @@ public final class Strings {
 		}
 
 		/**
+		 * Diese Methode gibt das Trennzeichen zurück.
+		 * 
+		 * @return Trennzeichen.
+		 */
+		public String space() {
+			return this.space;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -117,6 +126,15 @@ public final class Strings {
 		}
 
 		/**
+		 * Diese Methode gibt den kompilierten regulären Ausdruck zurück.
+		 * 
+		 * @return kompilierter regulärer Ausdruck.
+		 */
+		public Pattern pattern() {
+			return this.pattern;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -155,6 +173,15 @@ public final class Strings {
 			super(pattern, split, match);
 			if((index < 0) || (index > pattern.matcher("").groupCount())) throw new IllegalArgumentException();
 			this.index = index;
+		}
+
+		/**
+		 * Diese Methode gibt den Index zurück.
+		 * 
+		 * @return Index.
+		 */
+		public int index() {
+			return this.index;
 		}
 
 		/**
@@ -435,6 +462,17 @@ public final class Strings {
 		 */
 		public PatternConverter(final int flags) {
 			this.flags = flags;
+		}
+
+		/**
+		 * Diese Methode gibt die Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
+		 * {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES},
+		 * {@link Pattern#LITERAL}, {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS}) zurück.
+		 * 
+		 * @return Bitmaske.
+		 */
+		public int flags() {
+			return this.flags;
 		}
 
 		/**

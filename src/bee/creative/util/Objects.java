@@ -41,6 +41,15 @@ public final class Objects {
 		}
 
 		/**
+		 * Diese Methode gibt das Objekt zurück.
+		 * 
+		 * @return Objekt.
+		 */
+		public Object object() {
+			return this.object;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override

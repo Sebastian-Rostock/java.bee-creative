@@ -38,6 +38,15 @@ public final class Comparators {
 		}
 
 		/**
+		 * Diese Methode gibt den {@link Comparator Comparator} zurück.
+		 * 
+		 * @return {@link Comparator Comparator}.
+		 */
+		public Comparator<? super GEntry2> comparator() {
+			return this.comparator;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -221,25 +230,48 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	public static final class ChainedComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
+	public static final class ChainedComparator<GEntry> implements Comparator<GEntry> {
 
 		/**
-		 * Dieses Feld speichert den zweiten {@link Comparator Comparator}.
+		 * Dieses Feld speichert den {@link Comparator Comparator}.
+		 */
+		final Comparator<? super GEntry> comparator1;
+
+		/**
+		 * Dieses Feld speichert den sekundären {@link Comparator Comparator}.
 		 */
 		final Comparator<? super GEntry> comparator2;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Comparator Comparatoren}.
 		 * 
-		 * @param comparator1 erster {@link Comparator Comparator}.
-		 * @param comparator2 zweiter {@link Comparator Comparator}.
+		 * @param comparator1 primärer {@link Comparator Comparator}.
+		 * @param comparator2 sekundärer {@link Comparator Comparator}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} <code>null</code> ist.
 		 */
 		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2)
 			throws NullPointerException {
-			super(comparator1);
-			if(comparator2 == null) throw new NullPointerException();
+			if((comparator1 == null) || (comparator2 == null)) throw new NullPointerException();
+			this.comparator1 = comparator1;
 			this.comparator2 = comparator2;
+		}
+
+		/**
+		 * Diese Methode gibt den primären {@link Comparator Comparator} zurück.
+		 * 
+		 * @return primärer {@link Comparator Comparator}.
+		 */
+		public Comparator<? super GEntry> comparator1() {
+			return this.comparator1;
+		}
+
+		/**
+		 * Diese Methode gibt den sekundären {@link Comparator Comparator} zurück.
+		 * 
+		 * @return sekundärer {@link Comparator Comparator}.
+		 */
+		public Comparator<? super GEntry> comparator2() {
+			return this.comparator2;
 		}
 
 		/**
@@ -247,7 +279,7 @@ public final class Comparators {
 		 */
 		@Override
 		public int compare(final GEntry o1, final GEntry o2) {
-			final int comp = this.comparator.compare(o1, o2);
+			final int comp = this.comparator1.compare(o1, o2);
 			return ((comp != 0) ? comp : this.comparator2.compare(o1, o2));
 		}
 
@@ -256,7 +288,7 @@ public final class Comparators {
 		 */
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.comparator, this.comparator2);
+			return Objects.hash(this.comparator1, this.comparator2);
 		}
 
 		/**
@@ -267,7 +299,7 @@ public final class Comparators {
 			if(object == this) return true;
 			if(!(object instanceof ChainedComparator<?>)) return false;
 			final ChainedComparator<?> data = (ChainedComparator<?>)object;
-			return super.equals(object) && Objects.equals(this.comparator2, data.comparator2);
+			return Objects.equals(this.comparator1, data.comparator1, this.comparator2, data.comparator2);
 		}
 
 		/**
@@ -275,7 +307,7 @@ public final class Comparators {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("chainedComparator", this.comparator, this.comparator2);
+			return Objects.toStringCall("chainedComparator", this.comparator1, this.comparator2);
 		}
 
 	}
@@ -294,7 +326,7 @@ public final class Comparators {
 	public static final class ConvertedComparator<GEntry, GValue> extends BaseComparator<GEntry, GValue> {
 
 		/**
-		 * Dieses Feld speichert das {@link Converter Converter}.
+		 * Dieses Feld speichert den {@link Converter Converter}.
 		 */
 		final Converter<? super GEntry, ? extends GValue> converter;
 
@@ -303,14 +335,23 @@ public final class Comparators {
 		 * 
 		 * @param comparator {@link Comparator Comparator}.
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} oder der gegebene {@link Converter
-		 *         Converter} <code>null</code> sind.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} bzw. der gegebene {@link Converter
+		 *         Converter} <code>null</code> ist.
 		 */
 		public ConvertedComparator(final Comparator<? super GValue> comparator,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
 			super(comparator);
 			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * 
+		 * @return den {@link Converter Converter}.
+		 */
+		public Converter<? super GEntry, ? extends GValue> converter() {
+			return this.converter;
 		}
 
 		/**

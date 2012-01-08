@@ -48,6 +48,15 @@ public final class Converters {
 		}
 
 		/**
+		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * 
+		 * @return {@link Converter Converter}.
+		 */
+		public Converter<? super GInput, ? extends GOutput> converter() {
+			return this.converter;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -89,6 +98,15 @@ public final class Converters {
 		public NamedConverter(final String name) throws NullPointerException {
 			if(name == null) throw new NullPointerException();
 			this.name = name;
+		}
+
+		/**
+		 * Diese Methode gibt den Namen zurück.
+		 * 
+		 * @return Name.
+		 */
+		public String name() {
+			return this.name;
 		}
 
 		/**
@@ -135,6 +153,15 @@ public final class Converters {
 		public FixedFieldConverter(final Field field) throws NullPointerException {
 			if(field == null) throw new NullPointerException();
 			this.field = field;
+		}
+
+		/**
+		 * Diese Methode gibt das {@link Field Feld} zurück.
+		 * 
+		 * @return {@link Field Feld}.
+		 */
+		public Field field() {
+			return this.field;
 		}
 
 		/**
@@ -204,6 +231,15 @@ public final class Converters {
 		public FixedMethodConverter(final Method method) throws NullPointerException {
 			if(method == null) throw new NullPointerException();
 			this.method = method;
+		}
+
+		/**
+		 * Diese Methode gibt die {@link Method Methode} zurück.
+		 * 
+		 * @return {@link Method Methode}.
+		 */
+		public Method method() {
+			return this.method;
 		}
 
 		/**
@@ -395,6 +431,15 @@ public final class Converters {
 		}
 
 		/**
+		 * Diese Methode gibt die Standardausgabe zurück.
+		 * 
+		 * @return Standardausgabe.
+		 */
+		public GOutput output() {
+			return this.output;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -474,6 +519,24 @@ public final class Converters {
 		}
 
 		/**
+		 * Diese Methode gibt den {@link Converter Accept-Converter} zurück.
+		 * 
+		 * @return {@link Converter Accept-Converter}.
+		 */
+		public Converter<? super GInput, ? extends GOutput> accept() {
+			return this.accept;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Converter Reject-Converter} zurück.
+		 * 
+		 * @return {@link Converter Reject-Converter}.
+		 */
+		public Converter<? super GInput, ? extends GOutput> reject() {
+			return this.reject;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -513,19 +576,19 @@ public final class Converters {
 	/**
 	 * Diese Klasse implementiert einen gepufferten {@link Converter Converter}. Ein gepufferter {@link Converter
 	 * Converter} verwaltet die vom einem gegebenen {@link Converter Converter} erzeugten Ausgaben in einer {@link Map
-	 * Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Verweise} auf Eingaben und die
-	 * Werte als {@link Pointer Verweise} auf die Ausgaben des gegebenen {@link Converter Converters} realisiert.
+	 * Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Pointer} auf Eingaben und die
+	 * Werte als {@link Pointer Pointer} auf die Ausgaben des gegebenen {@link Converter Converters} realisiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 */
-	public static final class CachedConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
-		implements Converter<GInput, GOutput> {
+	public static final class CachedConverter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Converter<GInput, GOutput> {
 
 		/**
-		 * Dieses Feld speichert die {@link Map Abbildung} von Schlüsseln ({@link Pointer Verweise} auf Eingaben) auf Werte
-		 * ( {@link Pointer Verweise} auf die Ausgaben).
+		 * Dieses Feld speichert die {@link Map Abbildung} von Schlüsseln ({@link Pointer Pointer} auf Eingaben) auf Werte (
+		 * {@link Pointer Pointer} auf die Ausgaben).
 		 */
 		final Map<Pointer<GInput>, Pointer<GOutput>> map;
 
@@ -535,7 +598,7 @@ public final class Converters {
 		final int limit;
 
 		/**
-		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel
+		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel
 		 * der Abbildung erzeugt werden.
 		 * 
 		 * @see Pointers#pointer(int, Object)
@@ -543,7 +606,7 @@ public final class Converters {
 		final int inputMode;
 
 		/**
-		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
+		 * Dieses Feld speichert den Modus, in dem die {@link Pointer Pointer} auf die Ausgabe-Datensätze für die Werte der
 		 * Abbildung erzeugt werden.
 		 * 
 		 * @see Pointers#pointer(int, Object)
@@ -555,9 +618,9 @@ public final class Converters {
 		 * 
 		 * @see Pointers#pointer(int, Object)
 		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
-		 * @param inputMode Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel der
+		 * @param inputMode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der
 		 *        Abbildung erzeugt werden.
-		 * @param outputMode Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
+		 * @param outputMode Modus, in dem die {@link Pointer Pointer} auf die Ausgabe-Datensätze für die Werte der
 		 *        Abbildung erzeugt werden.
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
@@ -576,6 +639,37 @@ public final class Converters {
 		}
 
 		/**
+		 * Diese Methode gibt das Maximum für die Anzahl der Einträge in der {@link Map Abbildung} zurück.
+		 * 
+		 * @return Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
+		 */
+		public int limit() {
+			return this.limit;
+		}
+
+		/**
+		 * Diese Methode gibt den Modus zurück, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die
+		 * Schlüssel der Abbildung erzeugt werden.
+		 * 
+		 * @see Pointers#pointer(int, Object)
+		 * @return Input-{@link Pointer Pointer}-Modus.
+		 */
+		public int inputMode() {
+			return this.inputMode;
+		}
+
+		/**
+		 * Diese Methode gibt den Modus zurück, in dem die {@link Pointer Pointer} auf die Ausgabe-Datensätze für die Werte
+		 * der Abbildung erzeugt werden.
+		 * 
+		 * @see Pointers#pointer(int, Object)
+		 * @return Output-{@link Pointer Pointer}-Modus.
+		 */
+		public int outputMode() {
+			return this.outputMode;
+		}
+
+		/**
 		 * Diese Methode leert die Abbildung.
 		 */
 		public void clear() {
@@ -587,10 +681,10 @@ public final class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			final Pointer<? extends GOutput> data = this.map.get(Pointers.hardPointer(input));
-			if(data != null){
-				if(data == Pointers.NULL_POINTER) return null;
-				final GOutput output = data.data();
+			final Pointer<GOutput> pointer = this.map.get(Pointers.hardPointer(input));
+			if(pointer != null){
+				if(pointer == Pointers.NULL_POINTER) return null;
+				final GOutput output = pointer.data();
 				if(output != null) return output;
 				int valid = this.limit - 1;
 				for(final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = this.map.entrySet().iterator(); iterator
@@ -598,8 +692,7 @@ public final class Converters {
 					final Entry<Pointer<GInput>, Pointer<GOutput>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
 					if(valid != 0){
-						if(((key != Pointers.NULL_POINTER) && (key.data() == null))
-							|| ((value != Pointers.NULL_POINTER) && (value.data() == null))){
+						if(!Pointers.valid(key) || !Pointers.valid(value)){
 							iterator.remove();
 						}else{
 							valid--;
@@ -648,20 +741,20 @@ public final class Converters {
 	public static final class ChainedConverter<GInput, GValue, GOutput> implements Converter<GInput, GOutput> {
 
 		/**
-		 * Dieses Feld speichert den ersten {@link Converter Converter}.
+		 * Dieses Feld speichert den primären {@link Converter Converter}.
 		 */
 		final Converter<? super GInput, ? extends GValue> converter1;
 
 		/**
-		 * Dieses Feld speichert den zweiten {@link Converter Converter}.
+		 * Dieses Feld speichert den sekundären {@link Converter Converter}.
 		 */
 		final Converter<? super GValue, ? extends GOutput> converter2;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Converter Converter}.
 		 * 
-		 * @param converter1 erster {@link Converter Converter}.
-		 * @param converter2 zweiter {@link Converter Converter}.
+		 * @param converter1 primärer {@link Converter Converter}.
+		 * @param converter2 sekundärer {@link Converter Converter}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
@@ -669,6 +762,24 @@ public final class Converters {
 			if((converter1 == null) || (converter2 == null)) throw new NullPointerException();
 			this.converter1 = converter1;
 			this.converter2 = converter2;
+		}
+
+		/**
+		 * Diese Methode gibt den primären {@link Converter Converter} zurück.
+		 * 
+		 * @return primärer {@link Converter Converter}.
+		 */
+		public Converter<? super GInput, ? extends GValue> converter1() {
+			return this.converter1;
+		}
+
+		/**
+		 * Diese Methode gibt den sekundären {@link Converter Converter} zurück.
+		 * 
+		 * @return sekundärer {@link Converter Converter}.
+		 */
+		public Converter<? super GValue, ? extends GOutput> converter2() {
+			return this.converter2;
 		}
 
 		/**
@@ -716,8 +827,8 @@ public final class Converters {
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static final class SynchronizedConverter<GInput, GOutput> extends Converters.ConverterLink<GInput, GOutput>
-		implements Converter<GInput, GOutput> {
+	public static final class SynchronizedConverter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Converter<GInput, GOutput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
