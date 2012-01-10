@@ -1,0 +1,89 @@
+package bee.creative.util;
+
+
+/**
+ * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von eienr
+ * Testmethode ({@link Runnable Runnables}) benötigt werden.
+ * 
+ * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ */
+public final class Tester {
+
+	/**
+	 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
+	 * 
+	 * @see System#nanoTime()
+	 */
+	public final long usedTime;
+
+	/**
+	 * Dieses Feld speichert die Speicherbelegung in Byte, die von der Testmethode benötigt wurde.
+	 * 
+	 * @see Runtime#freeMemory()
+	 * @see Runtime#totalMemory()
+	 */
+	public final long usedMemory;
+
+	/**
+	 * Dieses Feld speichert den Zeitpunkt in Nanosekunden, an dem die Testmethode betreten wurde.
+	 * 
+	 * @see System#nanoTime()
+	 */
+	public final long enterTime;
+
+	/**
+	 * Dieses Feld speichert den Speicherstand in Byte, bevor die Testmethode betreten wurde.
+	 * 
+	 * @see Runtime#freeMemory()
+	 * @see Runtime#totalMemory()
+	 */
+	public final long enterMemory;
+
+	/**
+	 * Dieses Feld speichert den Zeitpunkt in Nanosekunden, an dem die Testmethode verlassen wurde.
+	 * 
+	 * @see System#nanoTime()
+	 */
+	public final long leaveTime;
+
+	/**
+	 * Dieses Feld speichert den Speicherstand in Byte, nachdem die Testmethode verlassen wurde.
+	 * 
+	 * @see Runtime#freeMemory()
+	 * @see Runtime#totalMemory()
+	 */
+	public final long leaveMemory;
+
+	/**
+	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Zur Ermittlung der
+	 * Speicherstände vor und nach dem Aufruf der Testmethode wird {@link Runtime#gc()} aufgerufen.
+	 * 
+	 * @param method Testmethode.
+	 * @throws NullPointerException Wenn die gegebene Testmethode <code>null</code> ist.
+	 */
+	public Tester(final Runnable method) throws NullPointerException {
+		if(method == null) throw new NullPointerException();
+		final Runtime runtime = Runtime.getRuntime();
+		runtime.gc();
+		this.enterMemory = runtime.totalMemory() - runtime.freeMemory();
+		this.enterTime = System.nanoTime();
+		method.run();
+		this.leaveTime = System.nanoTime();
+		runtime.gc();
+		this.leaveMemory = runtime.totalMemory() - runtime.freeMemory();
+		this.usedTime = this.leaveTime - this.enterTime;
+		this.usedMemory = this.leaveMemory - this.enterMemory;
+		method.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Objects.toStringCall(false, true, "TestRun", "usedTime", this.usedTime, "usedMemory", this.usedMemory,
+			"enterTime", this.enterTime, "leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory",
+			this.leaveMemory);
+	}
+
+}

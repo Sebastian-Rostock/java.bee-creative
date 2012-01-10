@@ -358,15 +358,16 @@ public final class Objects {
 	 */
 	public static int hash(final Object object) {
 		if(object == null) return 0;
-		if(!object.getClass().isArray()) return object.hashCode();
-		if(object instanceof int[]) return Arrays.hashCode((int[])object);
-		if(object instanceof long[]) return Arrays.hashCode((long[])object);
-		if(object instanceof byte[]) return Arrays.hashCode((byte[])object);
-		if(object instanceof char[]) return Arrays.hashCode((char[])object);
-		if(object instanceof short[]) return Arrays.hashCode((short[])object);
-		if(object instanceof float[]) return Arrays.hashCode((float[])object);
-		if(object instanceof double[]) return Arrays.hashCode((double[])object);
-		if(object instanceof boolean[]) return Arrays.hashCode((boolean[])object);
+		final Class<?> clazz = object.getClass();
+		if(!clazz.isArray()) return object.hashCode();
+		if(clazz == int[].class) return Arrays.hashCode((int[])object);
+		if(clazz == long[].class) return Arrays.hashCode((long[])object);
+		if(clazz == byte[].class) return Arrays.hashCode((byte[])object);
+		if(clazz == char[].class) return Arrays.hashCode((char[])object);
+		if(clazz == short[].class) return Arrays.hashCode((short[])object);
+		if(clazz == float[].class) return Arrays.hashCode((float[])object);
+		if(clazz == double[].class) return Arrays.hashCode((double[])object);
+		if(clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
 		return Objects.hash((Object[])object);
 	}
 
@@ -426,23 +427,18 @@ public final class Objects {
 	public static boolean equals(final Object object1, final Object object2) {
 		if(object1 == object2) return true;
 		if((object1 == null) || (object2 == null)) return false;
-		if(!object1.getClass().isArray()) return !object2.getClass().isArray() && object1.equals(object2);
-		if(!object2.getClass().isArray()) return false;
-		if(object1 instanceof int[]) return (object2 instanceof int[]) && Arrays.equals((int[])object1, (int[])object2);
-		if(object1 instanceof long[])
-			return (object2 instanceof long[]) && Arrays.equals((long[])object1, (long[])object2);
-		if(object1 instanceof byte[])
-			return (object2 instanceof byte[]) && Arrays.equals((byte[])object1, (byte[])object2);
-		if(object1 instanceof char[])
-			return (object2 instanceof char[]) && Arrays.equals((char[])object1, (char[])object2);
-		if(object1 instanceof short[])
-			return (object2 instanceof short[]) && Arrays.equals((short[])object1, (short[])object2);
-		if(object1 instanceof float[])
-			return (object2 instanceof float[]) && Arrays.equals((float[])object1, (float[])object2);
-		if(object1 instanceof double[])
-			return (object2 instanceof double[]) && Arrays.equals((double[])object1, (double[])object2);
-		if(object1 instanceof boolean[])
-			return (object2 instanceof boolean[]) && Arrays.equals((boolean[])object1, (boolean[])object2);
+		final Class<?> c1 = object1.getClass();
+		if(!c1.isArray()) return !object2.getClass().isArray() && object1.equals(object2);
+		final Class<?> c2 = object2.getClass();
+		if(!c2.isArray()) return false;
+		if(c1 == int[].class) return (c2 == int[].class) && Arrays.equals((int[])object1, (int[])object2);
+		if(c1 == long[].class) return (c2 == long[].class) && Arrays.equals((long[])object1, (long[])object2);
+		if(c1 == byte[].class) return (c2 == byte[].class) && Arrays.equals((byte[])object1, (byte[])object2);
+		if(c1 == char[].class) return (c2 == char[].class) && Arrays.equals((char[])object1, (char[])object2);
+		if(c1 == short[].class) return (c2 == short[].class) && Arrays.equals((short[])object1, (short[])object2);
+		if(c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
+		if(c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
+		if(c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
 		return Objects.equals((Object[])object1, (Object[])object2);
 	}
 

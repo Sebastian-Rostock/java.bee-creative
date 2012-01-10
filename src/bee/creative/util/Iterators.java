@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import bee.creative.util.Converters.ConverterLink;
@@ -690,6 +691,44 @@ public final class Iterators {
 			iterator.next();
 		}
 		return count;
+	}
+
+	/**
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator Iterators} in die gegebene {@link Collection
+	 * Collection} ein.
+	 * 
+	 * @see Collection#add(Object)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterator {@link Iterator Iterator}.
+	 * @param collection {@link Collection Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator Iterator} bzw. die gegebene {@link Collection
+	 *         Collection} <code>null</code> ist.
+	 */
+	public static <GEntry> void appendAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
+		throws NullPointerException {
+		if((iterator == null) || (collection == null)) throw new NullPointerException();
+		while(iterator.hasNext()){
+			collection.add(iterator.next());
+		}
+	}
+
+	/**
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator Iterators} aus der gegebenen {@link Collection
+	 * Collection}.
+	 * 
+	 * @see Collection#remove(Object)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterator {@link Iterator Iterator}.
+	 * @param collection {@link Collection Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator Iterator} bzw. die gegebene {@link Collection
+	 *         Collection} <code>null</code> ist.
+	 */
+	public static <GEntry> void removeAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
+		throws NullPointerException {
+		if((iterator == null) || (collection == null)) throw new NullPointerException();
+		while(iterator.hasNext()){
+			collection.remove(iterator.next());
+		}
 	}
 
 	/**

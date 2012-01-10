@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Converters.ConverterLink;
 import bee.creative.util.Filters.FilterLink;
@@ -621,6 +622,42 @@ public final class Iterables {
 		}
 
 	};
+
+	/**
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterable Iterables} in die gegebene {@link Collection
+	 * Collection} ein.
+	 * 
+	 * @see Iterable#iterator()
+	 * @see Iterators#appendAll(Iterator, Collection)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable {@link Iterable Iterable}.
+	 * @param collection {@link Collection Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. die gegebene {@link Collection
+	 *         Collection} <code>null</code> ist.
+	 */
+	public static <GEntry> void appendAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
+		throws NullPointerException {
+		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		Iterators.appendAll(iterable.iterator(), collection);
+	}
+
+	/**
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable Iterables} aus der gegebenen {@link Collection
+	 * Collection}.
+	 * 
+	 * @see Iterable#iterator()
+	 * @see Iterators#removeAll(Iterator, Collection)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable {@link Iterable Iterable}.
+	 * @param collection {@link Collection Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. die gegebene {@link Collection
+	 *         Collection} <code>null</code> ist.
+	 */
+	public static <GEntry> void removeAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
+		throws NullPointerException {
+		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		Iterators.removeAll(iterable.iterator(), collection);
+	}
 
 	/**
 	 * Diese Methode gibt den gegebenen {@link Iterable Iterable} oder den leeren {@link Iterable Iterable} zurück.

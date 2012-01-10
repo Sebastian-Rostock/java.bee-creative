@@ -1,7 +1,28 @@
 package bee.creative.util;
 
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter Converters}.
+ * <p>
+ * Im nachfolgenden Beispiel wird aus den gegebenen Elementen <code>entries</code> mit Hilfe des {@link Converter
+ * Converters} <code>converter</code> eine {@link List List} aus {@link Conversion Conversions} erzeugt. Diese
+ * {@link Conversion Conversions} werden anschließend bezüglich ihrer Ausgabe ( {@link Conversion#output()}) gemäß dem
+ * {@link Comparator Comparator} <code>comparator</code> sortiert. Abschließend werden je ein {@link Iterable Iterable}
+ * für die Eingabe ({@link Conversion#input()}) und die Ausgabe ({@link Conversion#output()}) der {@link Conversion
+ * Conversions} erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig
+ * ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen.
+ * 
+ * <pre>Iterable&lt;I&gt; entries = // ...
+Converter&lt;I, O&gt; converter = // ...
+Comparator&lt;O&gt; comparator = // ...
+List&lt;Conversion&lt;I, O&gt;&gt; conversions = new ArrayList&lt;Conversion&lt;I, O&gt;&gt;();
+Iterables.appendAll(Iterables.convertedIterable(Conversions.staticConversionConverter(converter), entries), conversions);
+Collections.sort(conversions, Comparators.convertedComparator(Conversions.&lt;O&gt;conversionOutputConverter(), comparator));
+Iterable&lt;I&gt; inputs = Iterables.convertedIterable(Conversions.&lt;I&gt;conversionInputConverter(), conversions);
+Iterable&lt;O&gt; outputs = Iterables.convertedIterable(Conversions.&lt;O&gt;conversionOutputConverter(), conversions);
+</pre>
  * 
  * @see Converter
  * @see Converters
