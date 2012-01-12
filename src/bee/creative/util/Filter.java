@@ -11,7 +11,7 @@ package bee.creative.util;
 public interface Filter<GInput> {
 
 	/**
-	 * Diese Methode gibt nur dann <code>true</code> zurück, wenn die Eingabe akzeptiert wird.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die Eingabe akzeptiert wird.
 	 * 
 	 * @param input Eingabe.
 	 * @return Eingabeakzeptanz.

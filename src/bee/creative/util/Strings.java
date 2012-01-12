@@ -33,7 +33,7 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert das Trennzeichen.
 		 * 
 		 * @param space Trennzeichen.
-		 * @throws NullPointerException Wenn das gegebene Trennzeichen <code>null</code> ist.
+		 * @throws NullPointerException Wenn das gegebene Trennzeichen {@code null} ist.
 		 */
 		public JoinConverter(final String space) throws NullPointerException {
 			if(space == null) throw new NullPointerException();
@@ -101,12 +101,12 @@ public final class Strings {
 		final Pattern pattern;
 
 		/**
-		 * Dieses Feld speichert <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+		 * Dieses Feld speichert {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
 		 */
 		final boolean split;
 
 		/**
-		 * Dieses Feld speichert <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+		 * Dieses Feld speichert {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 		 */
 		final boolean match;
 
@@ -114,9 +114,9 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
-		 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-		 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+		 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 */
 		public BaseConverter(final Pattern pattern, final boolean split, final boolean match) throws NullPointerException {
 			if(pattern == null) throw new NullPointerException();
@@ -163,9 +163,9 @@ public final class Strings {
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
 		 * @param index Index.
-		 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-		 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+		 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 		 */
 		public ApplyConverter(final Pattern pattern, final int index, final boolean split, final boolean match)
@@ -225,9 +225,9 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
-		 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-		 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+		 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 		 */
 		public ApplyAllConverter(final Pattern pattern, final boolean split, final boolean match)
@@ -276,7 +276,7 @@ public final class Strings {
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
 		 * @param index Index.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 		 */
 		public SplitConverter(final Pattern pattern, final int index) throws NullPointerException, IllegalArgumentException {
@@ -305,7 +305,7 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 */
 		public SplitAllConverter(final Pattern pattern) throws NullPointerException {
 			super(pattern, true, false);
@@ -334,7 +334,7 @@ public final class Strings {
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
 		 * @param index Index.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 		 */
 		public MatchConverter(final Pattern pattern, final int index) throws NullPointerException, IllegalArgumentException {
@@ -363,7 +363,7 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 */
 		public MatchAllConverter(final Pattern pattern) throws NullPointerException {
 			super(pattern, false, true);
@@ -392,7 +392,7 @@ public final class Strings {
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
 		 * @param index Index.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 		 */
 		public SplatchConverter(final Pattern pattern, final int index) throws NullPointerException,
@@ -422,7 +422,7 @@ public final class Strings {
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
 		 * 
 		 * @param pattern kompilierter regulärer Ausdruck.
-		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 */
 		public SplatchAllConverter(final Pattern pattern) throws NullPointerException {
 			super(pattern, true, true);
@@ -514,18 +514,17 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von
-	 * Zeichenketten zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die von der <code>index</code> -ten
+	 * Zeichenketten zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten
 	 * Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in diese Liste eingetragen werden
 	 * sollen.
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param index Index.
-	 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split,
@@ -537,18 +536,18 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine
-	 * Liste von Zeichenketten zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die von der
-	 * <code>index</code>-ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in diese
-	 * Liste eingetragen werden sollen.
+	 * Liste von Zeichenketten zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die von der {@code index}
+	 * -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in diese Liste eingetragen
+	 * werden sollen.
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param index Index.
-	 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split,
@@ -586,11 +585,10 @@ public final class Strings {
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
-	 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split,
 		final boolean match) throws NullPointerException {
@@ -606,11 +604,11 @@ public final class Strings {
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
-	 * @param split <code>true</code>, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
-	 * @param match <code>true</code>, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
+	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split,
 		final boolean match) throws NullPointerException {
@@ -664,7 +662,7 @@ public final class Strings {
 	 * @see Strings#join(String, Object...)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} <code>null</code> ist.
+	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
 		if(items == null) throw new NullPointerException();
@@ -680,8 +678,8 @@ public final class Strings {
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} bzw. das gegebene Trennzeichen
-	 *         <code>null</code> ist.
+	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} bzw. das gegebene Trennzeichen {@code null}
+	 *         ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
 		if((space == null) || (items == null)) throw new NullPointerException();
@@ -697,7 +695,7 @@ public final class Strings {
 	 * @see Strings#join(String, Iterable)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} {@code null} ist.
 	 */
 	public static String join(final Iterable<?> items) {
 		if(items == null) throw new NullPointerException();
@@ -713,7 +711,7 @@ public final class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. das gegebene Trennzeichen
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static String join(final String space, final Iterable<?> items) {
 		if((space == null) || (items == null)) throw new NullPointerException();
@@ -755,8 +753,7 @@ public final class Strings {
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<String> split(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings.apply(regex, string, 0, true, false);
@@ -764,8 +761,8 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
-	 * Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks nicht getroffen wurden.
-	 * Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am Komma hinter einer Ziffer:
+	 * Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das
+	 * folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am Komma hinter einer Ziffer:
 	 * 
 	 * <pre>Strings.split(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]</pre>
 	 * 
@@ -774,8 +771,7 @@ public final class Strings {
 	 * @param index Index.
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> split(final String regex, final CharSequence string, final int index)
@@ -794,7 +790,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<String> split(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings.apply(pattern, string, 0, true, false);
@@ -802,7 +798,7 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
-	 * Liste der Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks nicht getroffen
+	 * Liste der Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen
 	 * wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am Komma hinter einer Ziffer:
 	 * 
 	 * <pre>Strings.split(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]</pre>
@@ -812,7 +808,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> split(final Pattern pattern, final CharSequence string, final int index)
@@ -829,7 +825,7 @@ public final class Strings {
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @return {@link Strings#split(Pattern, CharSequence, int)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static Converter<CharSequence, List<String>> splitConverter(final Pattern pattern, final int index)
@@ -840,7 +836,7 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks nicht getroffen wurden. Für eine Guppe
-	 * ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
+	 * ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
 	 * Zeichenkette:
 	 * 
 	 * <pre>Strings.splitAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
@@ -848,8 +844,7 @@ public final class Strings {
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<List<String>> splitAll(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings.applyAll(regex, string, true, false);
@@ -858,8 +853,8 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
 	 * Liste der Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks nicht getroffen wurden. Für
-	 * eine Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende Beispiel zeigt die
-	 * Analyse einer Zeichenkette:
+	 * eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse
+	 * einer Zeichenkette:
 	 * 
 	 * <pre>Strings.splitAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
 	 * 
@@ -867,7 +862,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<List<String>> splitAll(final Pattern pattern, final CharSequence string)
 		throws NullPointerException {
@@ -882,7 +877,7 @@ public final class Strings {
 	 * @see Strings#splitAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#splitAll(Pattern, CharSequence)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> splitAllConverter(final Pattern pattern)
 		throws NullPointerException {
@@ -899,8 +894,7 @@ public final class Strings {
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<String> match(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings.apply(regex, string, 0, false, true);
@@ -908,8 +902,8 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
-	 * Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks getroffen wurden. Das
-	 * folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
+	 * Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das folgende
+	 * Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
 	 * 
 	 * <pre>Strings.match(&quot;(\\d+)€&quot;, &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]</pre>
 	 * 
@@ -918,8 +912,7 @@ public final class Strings {
 	 * @param index Index.
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> match(final String regex, final CharSequence string, final int index)
@@ -938,7 +931,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<String> match(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings.apply(pattern, string, 0, false, true);
@@ -946,8 +939,8 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
-	 * Liste der Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks getroffen
-	 * wurden. Das folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
+	 * Liste der Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das
+	 * folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
 	 * 
 	 * <pre>Strings.match(Pattern.compile(&quot;(\\d+)€&quot;), &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]</pre>
 	 * 
@@ -956,7 +949,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> match(final Pattern pattern, final CharSequence string, final int index)
@@ -973,7 +966,7 @@ public final class Strings {
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @return {@link Strings#match(Pattern, CharSequence, int)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static Converter<CharSequence, List<String>> matchConverter(final Pattern pattern, final int index)
@@ -984,7 +977,7 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks getroffen wurden. Für eine Guppe ohne
-	 * Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
+	 * Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
 	 * Zeichenkette:
 	 * 
 	 * <pre>Strings.matchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]</pre>
@@ -992,8 +985,7 @@ public final class Strings {
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<List<String>> matchAll(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings.applyAll(regex, string, false, true);
@@ -1002,8 +994,8 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
 	 * Liste der Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks getroffen wurden. Für eine
-	 * Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse
-	 * einer Zeichenkette:
+	 * Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
+	 * Zeichenkette:
 	 * 
 	 * <pre>Strings.matchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]</pre>
 	 * 
@@ -1011,7 +1003,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<List<String>> matchAll(final Pattern pattern, final CharSequence string)
 		throws NullPointerException {
@@ -1026,7 +1018,7 @@ public final class Strings {
 	 * @see Strings#matchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#matchAll(Pattern, CharSequence)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> matchAllConverter(final Pattern pattern)
 		throws NullPointerException {
@@ -1044,8 +1036,7 @@ public final class Strings {
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<String> splatch(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings.apply(regex, string, 0, true, true);
@@ -1053,8 +1044,8 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
-	 * Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks getroffen bzw. nicht
-	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende
+	 * Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen bzw. nicht
+	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
 	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
 	 * <pre>Strings.splatch(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]</pre>
@@ -1063,8 +1054,7 @@ public final class Strings {
 	 * @param index Index.
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> splatch(final String regex, final CharSequence string, final int index)
@@ -1084,7 +1074,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<String> splatch(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings.apply(pattern, string, 0, true, true);
@@ -1092,9 +1082,9 @@ public final class Strings {
 
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
-	 * Liste der Zeichenketten zurück, die von der <code>index</code>-ten Gruppen des regulären Ausdrucks getroffen bzw.
-	 * nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das
-	 * folgende Beispiel zeigt die Analyse einer Zeichenkette:
+	 * Liste der Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen bzw. nicht
+	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
+	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
 	 * <pre>Strings.splatch(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]</pre>
 	 * 
@@ -1103,7 +1093,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static List<String> splatch(final Pattern pattern, final CharSequence string, final int index)
@@ -1120,7 +1110,7 @@ public final class Strings {
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @return {@link Strings#splatch(Pattern, CharSequence, int)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	public static Converter<CharSequence, List<String>> splatchConverter(final Pattern pattern, final int index)
@@ -1131,16 +1121,15 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen
-	 * wurden. Für eine Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende Beispiel
-	 * zeigt die Analyse einer Zeichenkette:
+	 * wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt
+	 * die Analyse einer Zeichenkette:
 	 * 
 	 * <pre>Strings.splatchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	public static List<List<String>> splatchAll(final String regex, final CharSequence string)
 		throws NullPointerException {
@@ -1150,7 +1139,7 @@ public final class Strings {
 	/**
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
 	 * Liste der Listen von Zeichenketten zurück, die von den Gruppen des regulären Ausdrucks getroffen bzw. nicht
-	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei <code>null</code> in die Liste eingetragen. Das folgende
+	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
 	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
 	 * <pre>Strings.splatchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
@@ -1159,7 +1148,7 @@ public final class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static List<List<String>> splatchAll(final Pattern pattern, final CharSequence string)
 		throws NullPointerException {
@@ -1174,7 +1163,7 @@ public final class Strings {
 	 * @see Strings#splatchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @return {@link Strings#splatchAll(Pattern, CharSequence)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> splatchAllConverter(final Pattern pattern)
 		throws NullPointerException {

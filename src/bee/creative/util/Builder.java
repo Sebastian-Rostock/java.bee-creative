@@ -2,7 +2,7 @@ package bee.creative.util;
 
 /**
  * Diese Schnittstelle definiert eine Methode zur Erzeugung bzw. Bereitstellung eines (neuen) Datensatzes vom Typ
- * <code>GData</code>.
+ * {@code GData}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GData> Typ des Datensatzes.

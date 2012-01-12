@@ -30,7 +30,7 @@ public final class Comparators {
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
 		 * 
 		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 		 */
 		public BaseComparator(final Comparator<? super GEntry2> comparator) throws NullPointerException {
 			if(comparator == null) throw new NullPointerException();
@@ -66,9 +66,9 @@ public final class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparator Comparator}, der <code>null</code>-Eingaben vergleicht und alle
+	 * Diese Klasse implementiert einen {@link Comparator Comparator}, der {@code null}-Eingaben vergleicht und alle
 	 * anderen Eingaben an einen gegebenen {@link Comparator Comparator} weiterleitet. Der {@link Comparator Comparator}
-	 * berechnet den Vergleichswert zweier Objekte <code>o1</code> und <code>o2</code> via:
+	 * berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
 	 * 
 	 * <pre>
 	 * ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)));
@@ -83,7 +83,7 @@ public final class Comparators {
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
 		 * 
 		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 		 */
 		public NullComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
 			super(comparator);
@@ -130,7 +130,7 @@ public final class Comparators {
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
 		 * 
 		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 		 */
 		public ReverseComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
 			super(comparator);
@@ -180,7 +180,7 @@ public final class Comparators {
 		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
 		 * 
 		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 		 */
 		public IterableComparator(final Comparator<? super GValue> comparator) throws NullPointerException {
 			super(comparator);
@@ -247,7 +247,7 @@ public final class Comparators {
 		 * 
 		 * @param comparator1 primärer {@link Comparator Comparator}.
 		 * @param comparator2 sekundärer {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} <code>null</code> ist.
+		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} {@code null} ist.
 		 */
 		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2)
 			throws NullPointerException {
@@ -336,7 +336,7 @@ public final class Comparators {
 		 * @param comparator {@link Comparator Comparator}.
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} bzw. der gegebene {@link Converter
-		 *         Converter} <code>null</code> ist.
+		 *         Converter} {@code null} ist.
 		 */
 		public ConvertedComparator(final Comparator<? super GValue> comparator,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
@@ -617,16 +617,16 @@ public final class Comparators {
 	};
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparator Comparator}, der <code>null</code>-Eingaben vergleicht sowie alle
+	 * Diese Methode erzeugt einen {@link Comparator Comparator}, der {@code null}-Eingaben vergleicht sowie alle
 	 * anderen Eingaben an einen gegebenen {@link Comparator Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte
-	 * {@link Comparator Comparator} berechnet den Vergleichswert zweier Objekte <code>o1</code> und <code>o2</code> via:
+	 * {@link Comparator Comparator} berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
 	 * 
 	 * <pre>((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)))</pre>
 	 * 
 	 * @param <GEntry> Typ der Objekte.
 	 * @param comparator {@link Comparator Comparator}
 	 * @return {@link NullComparator Null-Comparator}
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 	 */
 	public static <GEntry> Comparator<GEntry> nullComparator(final Comparator<? super GEntry> comparator)
 		throws NullPointerException {
@@ -652,7 +652,7 @@ public final class Comparators {
 	 * @param <GEntry> Typ der Objekte.
 	 * @param comparator {@link Comparator Comparator}.
 	 * @return {@link ReverseComparator Reverse-Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 	 */
 	public static <GEntry> Comparator<GEntry> reverseComparator(final Comparator<? super GEntry> comparator)
 		throws NullPointerException {
@@ -669,7 +669,7 @@ public final class Comparators {
 	 *        {@link Comparator Comparator} zu verglichenen Objekte.
 	 * @param comparator {@link Comparator Comparator}.
 	 * @return {@link IterableComparator Iterable-Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 	 */
 	public static <GEntry extends Iterable<? extends GValue>, GValue> Comparator<GEntry> iterableComparator(
 		final Comparator<? super GValue> comparator) throws NullPointerException {
@@ -680,13 +680,13 @@ public final class Comparators {
 	 * Diese Methode erzeugt einen verketteten {@link Comparator Comparator} und gibt ihn zurück. Der erzeugte
 	 * {@link Comparator Comparator} vergleicht seine beiden Eingaben zuerst über den ersten {@link Comparator Comparator}
 	 * und verwendet den zweiten {@link Comparator Comparator} nur dann, wenn der erste {@link Comparator Comparator} mit
-	 * dem Vergleichswert <code>0</code> die Gleichheit der beiden Objekte anzeigt.
+	 * dem Vergleichswert {@code 0} die Gleichheit der beiden Objekte anzeigt.
 	 * 
 	 * @param <GEntry> Typ der Objekte.
 	 * @param comparator1 erster {@link Comparator Comparator}.
 	 * @param comparator2 zweiter {@link Comparator Comparator}.
 	 * @return {@link ChainedComparator Chained-Comparator}.
-	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} <code>null</code> ist.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} {@code null} ist.
 	 */
 	public static <GEntry> Comparator<GEntry> chainedComparator(final Comparator<? super GEntry> comparator1,
 		final Comparator<? super GEntry> comparator2) throws NullPointerException {
@@ -707,7 +707,7 @@ public final class Comparators {
 	 * @param comparator {@link Comparator Comparator}.
 	 * @return {@link ConvertedComparator Converted-Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} oder der gegebene {@link Converter
-	 *         Converter} <code>null</code> sind.
+	 *         Converter} {@code null} sind.
 	 */
 	public static <GEntry, GValue> Comparator<GEntry> convertedComparator(
 		final Converter<? super GEntry, ? extends GValue> converter, final Comparator<? super GValue> comparator)

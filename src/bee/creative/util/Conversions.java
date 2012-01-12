@@ -8,7 +8,6 @@ import bee.creative.util.Converters.ConverterLink;
  * @see Converter
  * @see Converters
  * @see Conversion
- * @see Conversions
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Conversions {
@@ -59,7 +58,7 @@ public final class Conversions {
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
 		 * 
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
 		public StaticConversionConverter(final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
@@ -110,7 +109,7 @@ public final class Conversions {
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
 		 * 
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
 		public DynamicConversionConverter(final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
@@ -220,7 +219,7 @@ public final class Conversions {
 		 * Dieser Konstrukteur initialisiert die {@link Conversion Conversion}.
 		 * 
 		 * @param conversion {@link Conversion Conversion}.
-		 * @throws NullPointerException Wenn die gegebene {@link Conversion Conversion} <code>null</code> ist.
+		 * @throws NullPointerException Wenn die gegebene {@link Conversion Conversion} {@code null} ist.
 		 */
 		public InverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion)
 			throws NullPointerException {
@@ -279,7 +278,7 @@ public final class Conversions {
 		 * 
 		 * @param input Eingabe.
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebenen {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen {@link Converter Converter} {@code null} ist.
 		 */
 		public DynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
@@ -392,7 +391,7 @@ public final class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link Conversions#staticConversion(Object, Object)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversionConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
@@ -407,7 +406,7 @@ public final class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion Conversion}.
 	 * @return {@link InverseConversion Inverse-Conversion}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Conversion Conversion} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen {@link Conversion Conversion} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(
 		final Conversion<? extends GOutput, ? extends GInput> conversion) {
@@ -437,7 +436,7 @@ public final class Conversions {
 	 * @param input Eingabe.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link DynamicConversion Dynamic-Conversion}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
@@ -453,7 +452,7 @@ public final class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link Conversions#dynamicConversion(Object, Converter)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversionConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {

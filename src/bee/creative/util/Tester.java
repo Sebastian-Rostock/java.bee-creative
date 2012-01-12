@@ -1,9 +1,19 @@
 package bee.creative.util;
 
-
 /**
  * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von eienr
  * Testmethode ({@link Runnable Runnables}) benötigt werden.
+ * <p>
+ * Im nachfolgenden Beispiel wird ein anonymes {@link Runnable Runnable} als Testmethode initialisiert und gleich
+ * vermessen:
+ * 
+ * <pre>
+ * Tester result = new Tester(new Runnable() {
+ *   public void run() {
+ *     // ...
+ *   }
+ * });
+ * </pre>
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -59,7 +69,7 @@ public final class Tester {
 	 * Speicherstände vor und nach dem Aufruf der Testmethode wird {@link Runtime#gc()} aufgerufen.
 	 * 
 	 * @param method Testmethode.
-	 * @throws NullPointerException Wenn die gegebene Testmethode <code>null</code> ist.
+	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
 	 */
 	public Tester(final Runnable method) throws NullPointerException {
 		if(method == null) throw new NullPointerException();
@@ -81,7 +91,7 @@ public final class Tester {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(false, true, "TestRun", "usedTime", this.usedTime, "usedMemory", this.usedMemory,
+		return Objects.toStringCall(false, true, "Tester", "usedTime", this.usedTime, "usedMemory", this.usedMemory,
 			"enterTime", this.enterTime, "leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory",
 			this.leaveMemory);
 	}

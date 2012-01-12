@@ -6,10 +6,10 @@ import java.util.List;
 /**
  * Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter Converters}.
  * <p>
- * Im nachfolgenden Beispiel wird aus den gegebenen Elementen <code>entries</code> mit Hilfe des {@link Converter
- * Converters} <code>converter</code> eine {@link List List} aus {@link Conversion Conversions} erzeugt. Diese
+ * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Converter
+ * Converters} {@code converter} eine {@link List List} aus {@link Conversion Conversions} erzeugt. Diese
  * {@link Conversion Conversions} werden anschließend bezüglich ihrer Ausgabe ( {@link Conversion#output()}) gemäß dem
- * {@link Comparator Comparator} <code>comparator</code> sortiert. Abschließend werden je ein {@link Iterable Iterable}
+ * {@link Comparator Comparator} {@code comparator} sortiert. Abschließend werden je ein {@link Iterable Iterable}
  * für die Eingabe ({@link Conversion#input()}) und die Ausgabe ({@link Conversion#output()}) der {@link Conversion
  * Conversions} erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig
  * ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen.
@@ -26,7 +26,6 @@ Iterable&lt;O&gt; outputs = Iterables.convertedIterable(Conversions.&lt;O&gt;con
  * 
  * @see Converter
  * @see Converters
- * @see Conversion
  * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des Eingabe.

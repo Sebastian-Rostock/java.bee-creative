@@ -1,11 +1,10 @@
 package bee.creative.util;
 
 /**
- * Diese Schnittstelle definiert eine Konvertierungsmethode, die gegebene Objekte vom Typ <code>GInput</code> in Objekte
- * vom Typ <code>GOutput</code> umwandelt. Bei der Konvertierung kann es sich um eine Navigation in einem Objektgraphen
+ * Diese Schnittstelle definiert eine Konvertierungsmethode, die gegebene Objekte vom Typ {@code GInput} in Objekte
+ * vom Typ {@code GOutput} umwandelt. Bei der Konvertierung kann es sich um eine Navigation in einem Objektgraphen
  * oder auch das Parsen bzw. Formatieren eines Objektes handel.
  * 
- * @see Converter
  * @see Converters
  * @see Conversion
  * @see Conversions

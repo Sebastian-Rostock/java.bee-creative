@@ -153,7 +153,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * Diese Methode soll den nächsten Eintrag des gegebenen Eintrags zurück geben.
 	 * 
 	 * @param entry Eintrag.
-	 * @return nächster Eintrag des Eintrags oder <code>null</code>.
+	 * @return nächster Eintrag des Eintrags oder {@code null}.
 	 */
 	protected abstract GEntry getEntryNext(GEntry entry);
 
@@ -174,13 +174,13 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract GValue getEntryValue(GEntry entry);
 
 	/**
-	 * Diese Methode soll nur dann <code>true</code> zurück geben, wenn der Schlüssel des gegebenen Eintrags gleich dem
+	 * Diese Methode soll nur dann {@code true} zurück geben, wenn der Schlüssel des gegebenen Eintrags gleich dem
 	 * gegebenen Schlüssel ist.
 	 * 
 	 * @param entry Eintrag.
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return <code>true</code>, wenn der Schlüssel des gegebenen Eintrags gleich dem gegebenen Schlüssel ist.
+	 * @return {@code true}, wenn der Schlüssel des gegebenen Eintrags gleich dem gegebenen Schlüssel ist.
 	 */
 	protected boolean getEntryEquals(final GEntry entry, final GKey key, final int hash) {
 		return Objects.equals(key, this.getEntryKey(entry));
@@ -244,10 +244,10 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode gibt den Eintrag mit dem gegebenen Schlüssel oder <code>null</code> zurück.
+	 * Diese Methode gibt den Eintrag mit dem gegebenen Schlüssel oder {@code null} zurück.
 	 * 
 	 * @param key Schlüssel.
-	 * @return Eintrag mit dem gegebenen Schlüssel oder <code>null</code>.
+	 * @return Eintrag mit dem gegebenen Schlüssel oder {@code null}.
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final GEntry findEntry(final GKey key) {
@@ -275,9 +275,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
 	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein
-	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder <code>null</code> zurück. Wenn die Größe der
-	 * Tabelle <code>0</code> ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen
-	 * aufgerufen. Wenn die Tabellgrößenenprüfung <code>true</code> und unter dem gegebenen Schlüssel kein Eintrag
+	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der
+	 * Tabelle {@code 0} ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen
+	 * aufgerufen. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag
 	 * registriert sind, wird die Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag
 	 * aufgerufen.
 	 * 
@@ -285,7 +285,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param key Schlüssel.
 	 * @param value Wert.
 	 * @param verifyLength Tabellgrößenenprüfung.
-	 * @return alter Eintrag oder <code>null</code>.
+	 * @return alter Eintrag oder {@code null}.
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final GEntry appendEntry(final GKey key, final GValue value, final boolean verifyLength) {
@@ -318,13 +318,13 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
 	 * Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die
-	 * Tabellgrößenenprüfung <code>true</code> und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die
+	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die
 	 * Methode {@link Hash#verifyLength() verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
 	 * @param verifyLength Tabellgrößenenprüfung.
-	 * @return Eintrag oder <code>null</code>.
+	 * @return Eintrag oder {@code null}.
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final GEntry removeEntry(final GKey key, final boolean verifyLength) {

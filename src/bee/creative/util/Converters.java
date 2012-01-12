@@ -13,9 +13,35 @@ import bee.creative.util.Pointers.SoftPointer;
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Converter
  * Convertern}.
+ * <p>
+ * Im nachfolgenden Beispiel wird ein gepufferter {@link Converter Converter} zur realisierung eines statischen Caches
+ * für Instanzen der exemplarischen Klasse {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread
+ * Thread} erzeugt wird:
+ * 
+ * <pre>
+ * public final class Helper {
+ * 
+ *   static final {@literal Converter<Thread, Helper>} CACHE = Converters.synchronizedConverter(Converters.cachedConverter(new Converter<Thread, Helper>() {
+ *   
+ *     public Helper convert(Thread value) {
+ *       return new Helper(value);
+ *     }
+ *     
+ *   }));
+ *   
+ *   public static Helper get() {
+ *     return Helper.CACHE.convert(Thread.currentThread());
+ *   }
+ *   
+ *   protected Helper(Thread value) {
+ *     ...
+ *   }
+ *   
+ *   ...
+ *   
+ * }</pre>
  * 
  * @see Converter
- * @see Converters
  * @see Conversion
  * @see Conversions
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -40,7 +66,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
 		 * 
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
 		public ConverterLink(final Converter<? super GInput, ? extends GOutput> converter) {
 			if(converter == null) throw new NullPointerException();
@@ -93,7 +119,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert den Namen.
 		 * 
 		 * @param name Name.
-		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public NamedConverter(final String name) throws NullPointerException {
 			if(name == null) throw new NullPointerException();
@@ -148,7 +174,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert das {@link Field Feld}.
 		 * 
 		 * @param field {@link Field Feld}.
-		 * @throws NullPointerException Wenn das gegebene {@link Field Feld} <code>null</code> ist.
+		 * @throws NullPointerException Wenn das gegebene {@link Field Feld} {@code null} ist.
 		 */
 		public FixedFieldConverter(final Field field) throws NullPointerException {
 			if(field == null) throw new NullPointerException();
@@ -226,7 +252,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert die {@link Method Methode}.
 		 * 
 		 * @param method {@link Method Methode}.
-		 * @throws NullPointerException Wenn die gegebene {@link Method Methode} <code>null</code> ist.
+		 * @throws NullPointerException Wenn die gegebene {@link Method Methode} {@code null} ist.
 		 */
 		public FixedMethodConverter(final Method method) throws NullPointerException {
 			if(method == null) throw new NullPointerException();
@@ -301,7 +327,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert den Namen.
 		 * 
 		 * @param name Name.
-		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public NamedFieldConverter(final String name) throws NullPointerException {
 			super(name);
@@ -360,7 +386,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert den Namen.
 		 * 
 		 * @param name Name.
-		 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public NamedMethodConverter(final String name) throws NullPointerException {
 			super(name);
@@ -507,7 +533,7 @@ public final class Converters {
 		 * @param accept {@link Converter Accept-Converter}.
 		 * @param reject {@link Converter Reject-Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder einer der gegebenen {@link Converter
-		 *         Converter} <code>null</code> sind.
+		 *         Converter} {@code null} sind.
 		 */
 		public FilteredConverter(final Filter<? super GInput> filter,
 			final Converter<? super GInput, ? extends GOutput> accept,
@@ -623,7 +649,7 @@ public final class Converters {
 		 * @param outputMode Modus, in dem die {@link Pointer Pointer} auf die Ausgabe-Datensätze für die Werte der
 		 *        Abbildung erzeugt werden.
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn einer der gegebenen Modi ungültig ist.
 		 */
 		public CachedConverter(final int limit, final int inputMode, final int outputMode,
@@ -755,7 +781,7 @@ public final class Converters {
 		 * 
 		 * @param converter1 primärer {@link Converter Converter}.
 		 * @param converter2 sekundärer {@link Converter Converter}.
-		 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} {@code null} ist.
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
 			final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
@@ -834,7 +860,7 @@ public final class Converters {
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
 		 * 
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
 		public SynchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
@@ -892,7 +918,7 @@ public final class Converters {
 	 * Diese Methode gibt den leeren {@link Converter Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
 	 * 
 	 * @param <GInput> Typ der Eingabe sowie der Ausgabe.
-	 * @return <code>Void</code>-{@link Converter Converter}.
+	 * @return {@code Void}-{@link Converter Converter}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Converter<GInput, GInput> voidConverter() {
@@ -909,7 +935,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param name Name.
 	 * @return {@link NamedFieldConverter Named-Field-Converter}.
-	 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final String name)
 		throws NullPointerException {
@@ -927,7 +953,7 @@ public final class Converters {
 	 * @param name Name.
 	 * @param clazz {@link Class Klasse}.
 	 * @return {@link FixedFieldConverter Fixed-Field-Converter}.
-	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} {@code null} ist.
 	 * @throws NoSuchFieldException Wenn an der gegebenen {@link Class Klasse} kein {@link Field Feld} mit dem gegebenen
 	 *         Namen existiert.
 	 * @throws SecurityException Wenn auf das {@link Field Feld} nicht zugegriffen werden darf.
@@ -947,7 +973,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param field {@link Field Feld}.
 	 * @return {@link FixedFieldConverter Fixed-Field-Converter}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field Feld} <code>null</code> ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Field Feld} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final Field field)
 		throws NullPointerException {
@@ -964,7 +990,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param name Name.
 	 * @return {@link NamedMethodConverter Named-Method-Converter}.
-	 * @throws NullPointerException Wenn der gegebene Name <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final String name)
 		throws NullPointerException {
@@ -982,7 +1008,7 @@ public final class Converters {
 	 * @param name Name.
 	 * @param clazz {@link Class Klasse}.
 	 * @return {@link FixedMethodConverter Fixed-Method-Converter}.
-	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class Klasse} {@code null} ist.
 	 * @throws NoSuchMethodException Wenn an der gegebenen {@link Class Klasse} keine {@link Method Methode} mit dem
 	 *         gegebenen Namen existiert.
 	 * @throws SecurityException Wenn auf die {@link Method Methode} nicht zugegriffen werden darf.
@@ -1002,7 +1028,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param method {@link Method Methode}.
 	 * @return {@link FixedMethodConverter Fixed-Method-Converter}.
-	 * @throws NullPointerException Wenn die gegebene {@link Method Methode} <code>null</code> ist.
+	 * @throws NullPointerException Wenn die gegebene {@link Method Methode} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final Method method)
 		throws NullPointerException {
@@ -1037,7 +1063,7 @@ public final class Converters {
 	 * @param reject {@link Converter Reject-Converter}.
 	 * @return {@link FilteredConverter Filtered-Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder einer der gegebenen {@link Converter
-	 *         Converter} <code>null</code> sind.
+	 *         Converter} {@code null} sind.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> filteredConverter(final Filter<? super GInput> filter,
 		final Converter<? super GInput, ? extends GOutput> accept, final Converter<? super GInput, ? extends GOutput> reject)
@@ -1048,8 +1074,8 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen gepufferten {@link Converter Converter} und gibt ihn zurück. Der erzeugte
 	 * {@link Converter Converter} verwaltet die vom gegebenen {@link Converter Converter} erzeugten Ausgaben in einer
-	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer weiche Verweise}
-	 * auf Eingaben und die Werte als {@link SoftPointer weiche Verweise} auf die Ausgaben des gegebenen {@link Converter
+	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer Soft-Pointer}
+	 * auf Eingaben und die Werte als {@link SoftPointer Soft-Pointer} auf die Ausgaben des gegebenen {@link Converter
 	 * Converters} realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute
 	 * {@link Converter Converter} realisiert damit einen speichersensitiven, assoziativen Cache.
 	 * 
@@ -1057,7 +1083,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link CachedConverter Cached-Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
@@ -1067,20 +1093,20 @@ public final class Converters {
 	/**
 	 * Diese Methode erzeugt einen gepufferten {@link Converter Converter} und gibt ihn zurück. Der erzeugte
 	 * {@link Converter Converter} verwaltet die vom gegebenen {@link Converter Converter} erzeugten Ausgaben in einer
-	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Verweise} auf
-	 * Eingaben und die Werte als {@link Pointer Verweise} auf die Ausgaben des gegebenen {@link Converter Converters}
+	 * {@link Map Abbildung} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer Pointer} auf
+	 * Eingaben und die Werte als {@link Pointer Pointer} auf die Ausgaben des gegebenen {@link Converter Converters}
 	 * realisiert.
 	 * 
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
-	 * @param inputMode Modus, in dem die {@link Pointer Verweise} auf die Eingabe-Datensätze für die Schlüssel der
+	 * @param inputMode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der
 	 *        {@link Map Abbildung} erzeugt werden.
-	 * @param outputMode Modus, in dem die {@link Pointer Verweise} auf die Ausgabe-Datensätze für die Werte der
+	 * @param outputMode Modus, in dem die {@link Pointer Pointer} auf die Ausgabe-Datensätze für die Werte der
 	 *        {@link Map Abbildung} erzeugt werden.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link CachedConverter Cached-Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn einer der gegebenen Modi ungültig ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(final int limit, final int inputMode,
@@ -1101,7 +1127,7 @@ public final class Converters {
 	 * @param converter1 erster {@link Converter Converter}.
 	 * @param converter2 zweiter {@link Converter Converter}.
 	 * @return {@link ChainedConverter Chained-Converter}.
-	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(
 		final Converter<? super GInput, ? extends GValue> converter1,
@@ -1117,7 +1143,7 @@ public final class Converters {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link SynchronizedConverter Synchronized-Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Converter<GInput, GOutput> synchronizedConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {

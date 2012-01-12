@@ -192,7 +192,7 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von
-	 * <code>"\n"</code> durch <code>"\n&nbsp;&nbsp;"</code> ersetzt.
+	 * {@code "\n"} durch {@code "\n&nbsp;&nbsp;"} ersetzt.
 	 * 
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug.
@@ -216,7 +216,7 @@ public final class Objects {
 	 * sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString UseToString}
 	 * sein, wird das ergenis {@link Object#toString() toString()}-Methode zurück gegeben.
 	 * 
-	 * @param object Objekt oder <code>null</code>.
+	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}.
@@ -245,7 +245,7 @@ public final class Objects {
 	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object {@link Map Map} oder <code>null</code>.
+	 * @param object {@link Map Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String mapToString(final boolean format, final Map<?, ?> object) {
@@ -266,7 +266,7 @@ public final class Objects {
 	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
 	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
-	 * @param object Objekt oder <code>null</code>.
+	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein {@link Array Array} ist.
@@ -289,7 +289,7 @@ public final class Objects {
 	 * Diese Methode gibt den gegebenen {@link String String} als {@link Object#toString() Textdarstelung} zurück. Für
 	 * eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
-	 * @param object {@link String String} oder <code>null</code>.
+	 * @param object {@link String String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
@@ -324,7 +324,7 @@ public final class Objects {
 	 * eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object {@link Iterable Iterable} oder <code>null</code>.
+	 * @param object {@link Iterable Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String iterableToString(final boolean format, final Iterable<?> object) {
@@ -342,7 +342,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder <code>0</code> zurück.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück.
 	 * 
 	 * @see Arrays#hashCode(int[])
 	 * @see Arrays#hashCode(long[])
@@ -353,8 +353,8 @@ public final class Objects {
 	 * @see Arrays#hashCode(double[])
 	 * @see Arrays#hashCode(boolean[])
 	 * @see Objects#hash(Object...)
-	 * @param object Objekt oder <code>null</code>.
-	 * @return {@link Object#hashCode() Streuwert} oder <code>0</code>.
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object) {
 		if(object == null) return 0;
@@ -372,11 +372,11 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder <code>0</code> zurück.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
 	 * 
 	 * @see Objects#hash(Object)
-	 * @param objects Objekte oder <code>null</code>.
-	 * @return {@link Object#hashCode() Streuwert} oder <code>0</code>.
+	 * @param objects Objekte oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object... objects) {
 		if(objects == null) return 0;
@@ -389,11 +389,11 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei <code>null</code>-Eingaben. Verglichen werden jeweils die Objekte <code>objects[i]</code> und
-	 * <code>objects[i+1]</code> der geraden Positionen <code>i</code> via {@link Objects#equals(Object, Object)}.
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
 	 * 
 	 * @see Objects#equals(Object, Object)
-	 * @param objects Objekte oder <code>null</code>.
+	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equals(final Object... objects) {
@@ -406,8 +406,8 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * <code>null</code>-Eingaben und {@link Array Arrays}. Wenn beide Objekte keine {@link Array Arrays} sind, entspricht
-	 * der Rückgabewert:
+	 * {@code null}-Eingaben und {@link Array Arrays}. Wenn beide Objekte keine {@link Array Arrays} sind, entspricht der
+	 * Rückgabewert:
 	 * 
 	 * <pre>(object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))</pre>
 	 * 
@@ -420,8 +420,8 @@ public final class Objects {
 	 * @see Arrays#equals(double[], double[])
 	 * @see Arrays#equals(boolean[], boolean[])
 	 * @see Objects#equals(Object[], Object[])
-	 * @param object1 Objekt 1 oder <code>null</code>.
-	 * @param object2 Objekt 2 oder <code>null</code>.
+	 * @param object1 Objekt 1 oder {@code null}.
+	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object object1, final Object object2) {
@@ -444,12 +444,12 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen {@link Array Arrays} zurück und
-	 * tolleriert dabei <code>null</code>-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der
-	 * {@link Array Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
+	 * tolleriert dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array
+	 * Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
 	 * 
 	 * @see Objects#equals(Object, Object)
-	 * @param objects1 {@link Array Array} 1 oder <code>null</code>.
-	 * @param objects2 {@link Array Array} 2 oder <code>null</code>.
+	 * @param objects1 {@link Array Array} 1 oder {@code null}.
+	 * @param objects2 {@link Array Array} 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object[] objects1, final Object[] objects2) {
@@ -473,7 +473,7 @@ public final class Objects {
 	 * </pre>
 	 * 
 	 * @see Objects#toString(boolean, Object)
-	 * @param object Objekt oder <code>null</code>.
+	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	public static String toString(final Object object) {
@@ -489,7 +489,7 @@ public final class Objects {
 	 * 
 	 * @see Objects#toString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object Objekt oder <code>null</code>.
+	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	public static String toString(final boolean format, final Object object) {
@@ -503,7 +503,7 @@ public final class Objects {
 	 * 
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object Objekt oder <code>null</code>.
+	 * @param object Objekt oder {@code null}.
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt.
 	 */
 	public static Object toStringObject(final boolean format, final Object object) {
@@ -533,8 +533,7 @@ public final class Objects {
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
 	public static String toStringCall(final String name, final Object... args) throws NullPointerException {
 		return Objects.toStringCall(false, name, args);
@@ -551,8 +550,7 @@ public final class Objects {
 	 * @param format Formatiermodus.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array <code>null</code>
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
 	public static String toStringCall(final boolean format, final String name, final Object... args)
 		throws NullPointerException {
@@ -563,8 +561,7 @@ public final class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
 	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung
 	 * aktiviert wird, werden die Argumente beschriftete Parameter interpretiert. Ein beschrifteter Parameter besteht
-	 * hierbei aus einem Namen <code>args[i]</code> und einem Wert <code>args[i+1]</code> für jede gerade Position
-	 * <code>i</code>.
+	 * hierbei aus einem Namen {@code args[i]} und einem Wert {@code args[i+1]} für jede gerade Position {@code i}.
 	 * 
 	 * <pre>TODO beeispiele</pre>
 	 * 
@@ -574,7 +571,7 @@ public final class Objects {
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args)
 		throws NullPointerException {

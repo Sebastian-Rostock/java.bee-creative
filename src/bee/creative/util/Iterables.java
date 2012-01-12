@@ -67,7 +67,7 @@ public final class Iterables {
 		 * @param filter {@link Filter Filter}.
 		 * @param iterable {@link Iterable Iterable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
-		 *         <code>null</code> ist.
+		 *         {@code null} ist.
 		 */
 		public BaseIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 			throws NullPointerException {
@@ -118,7 +118,7 @@ public final class Iterables {
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
 		 * 
 		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} {@code null} ist.
 		 */
 		public LimitedIterableConverter(final Filter<? super GEntry> filter) throws NullPointerException {
 			super(filter);
@@ -166,7 +166,7 @@ public final class Iterables {
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
 		 * 
 		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} {@code null} ist.
 		 */
 		public FilteredIterableConverter(final Filter<? super GEntry> filter) throws NullPointerException {
 			super(filter);
@@ -216,7 +216,7 @@ public final class Iterables {
 		 * Dieser Konstrukteur initialisiert den {@link Converter Converter}.
 		 * 
 		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
 		public ConvertedIterableConverter(final Converter<? super GValue, ? extends GOutput> converter) {
 			super(converter);
@@ -310,7 +310,7 @@ public final class Iterables {
 		 * @param filter {@link Filter Filter}.
 		 * @param iterable {@link Iterable Iterable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
-		 *         <code>null</code> ist.
+		 *         {@code null} ist.
 		 */
 		public LimitedIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 			throws NullPointerException {
@@ -361,7 +361,7 @@ public final class Iterables {
 		 * @param filter {@link Filter Filter}.
 		 * @param iterable {@link Iterable Iterable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
-		 *         <code>null</code> ist.
+		 *         {@code null} ist.
 		 */
 		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 			throws NullPointerException {
@@ -414,7 +414,7 @@ public final class Iterables {
 		 * Dieser Konstrukteur initialisiert die {@link Iterable Iterable}.
 		 * 
 		 * @param iterables {@link Iterable Iterable}-{@link Iterable Iterable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} <code>null</code> ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} {@code null} ist.
 		 */
 		public ChainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables) throws NullPointerException {
 			if(iterables == null) throw new NullPointerException();
@@ -491,7 +491,7 @@ public final class Iterables {
 		 * @param converter {@link Converter Converter}.
 		 * @param iterable {@link Iterable Iterable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Iterable
-		 *         Iterable} <code>null</code> ist.
+		 *         Iterable} {@code null} ist.
 		 */
 		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterable<? extends GInput> iterable) throws NullPointerException {
@@ -633,7 +633,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @param collection {@link Collection Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. die gegebene {@link Collection
-	 *         Collection} <code>null</code> ist.
+	 *         Collection} {@code null} ist.
 	 */
 	public static <GEntry> void appendAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
 		throws NullPointerException {
@@ -651,7 +651,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @param collection {@link Collection Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. die gegebene {@link Collection
-	 *         Collection} <code>null</code> ist.
+	 *         Collection} {@code null} ist.
 	 */
 	public static <GEntry> void removeAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
 		throws NullPointerException {
@@ -665,7 +665,7 @@ public final class Iterables {
 	 * @see Iterables#voidIterable()
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable Iterable}.
-	 * @return {@link Iterable Iterable} oder <code>Void</code>-{@link Iterable Iterable}.
+	 * @return {@link Iterable Iterable} oder {@code Void}-{@link Iterable Iterable}.
 	 */
 	public static <GEntry> Iterable<GEntry> iterable(final Iterable<GEntry> iterable) {
 		return ((iterable == null) ? Iterables.<GEntry>voidIterable() : iterable);
@@ -704,7 +704,7 @@ public final class Iterables {
 	 * 
 	 * @see Iterators#voidIterator()
 	 * @param <GEntry> Typ der Elemente.
-	 * @return <code>Void</code>- {@link Iterable Iterable}.
+	 * @return {@code Void}- {@link Iterable Iterable}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GEntry> Iterable<GEntry> voidIterable() {
@@ -747,7 +747,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @return {@link LimitedIterable Limited-Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static <GEntry> Iterable<GEntry> limitedIterable(final Filter<? super GEntry> filter,
 		final Iterable<? extends GEntry> iterable) throws NullPointerException {
@@ -764,7 +764,7 @@ public final class Iterables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
 	 * @return {@link Iterables#limitedIterable(Filter, Iterable)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} {@code null} ist.
 	 */
 	public static <GEntry> Converter<Iterable<? extends GEntry>, Iterable<GEntry>> limitedIterableConverter(
 		final Filter<? super GEntry> filter) throws NullPointerException {
@@ -782,7 +782,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @return {@link FilteredIterable Filtered-Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} bzw. der gegebene {@link Iterable Iterable}
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static <GEntry> Iterable<GEntry> filteredIterable(final Filter<? super GEntry> filter,
 		final Iterable<? extends GEntry> iterable) throws NullPointerException {
@@ -799,7 +799,7 @@ public final class Iterables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter Filter}.
 	 * @return {@link Iterables#filteredIterable(Filter, Iterable)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen {@link Filter Filter} {@code null} ist.
 	 */
 	public static <GEntry> Converter<Iterable<? extends GEntry>, Iterable<GEntry>> filteredIterableConverter(
 		final Filter<? super GEntry> filter) throws NullPointerException {
@@ -815,7 +815,7 @@ public final class Iterables {
 	 * @param iterables {@link Iterable Iterable}-{@link Iterable Iterable}.
 	 * @return {@link ChainedIterator Chained-Iterable}.
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Iterable Iterable}
-	 *         <code>null</code> ist.
+	 *         {@code null} ist.
 	 */
 	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables)
 		throws NullPointerException {
@@ -830,7 +830,7 @@ public final class Iterables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable Iterable}-{@link Array Array}.
 	 * @return {@link ChainedIterator Chained-Iterable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Array Array} <code>null</code> ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Array Array} {@code null} ist.
 	 */
 	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
 		throws NullPointerException {
@@ -881,7 +881,7 @@ public final class Iterables {
 	 * @param iterable {@link Iterable Iterable}.
 	 * @return {@link ConvertedIterable Converted-Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Iterable
-	 *         Iterable} <code>null</code> ist.
+	 *         Iterable} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(
 		final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable)
@@ -900,7 +900,7 @@ public final class Iterables {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter Converter}.
 	 * @return {@link Iterables#convertedIterable(Converter, Iterable)}-{@link Converter Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 	 */
 	public static <GInput extends Iterable<? extends GValue>, GValue, GOutput> Converter<GInput, Iterable<GOutput>> convertedIterableConverter(
 		final Converter<? super GValue, ? extends GOutput> converter) {

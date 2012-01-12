@@ -238,7 +238,7 @@ public final class Pointers {
 		 * @param converter {@link Converter Converter}.
 		 * @param pointer {@link Pointer Pointer}.
 		 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} bzw. der gegebenen {@link Converter
-		 *         Converter} <code>null</code> ist.
+		 *         Converter} {@code null} ist.
 		 */
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
 			final Pointer<? extends GInput> pointer) throws NullPointerException {
@@ -291,7 +291,7 @@ public final class Pointers {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Pointer Pointer} auf <code>null</code>.
+	 * Dieses Feld speichert den {@link Pointer Pointer} auf {@code null}.
 	 */
 	static final Pointer<?> NULL_POINTER = new BasePointer<Object>() {
 
@@ -401,12 +401,12 @@ public final class Pointers {
 	public static final int SOFT = 2;
 
 	/**
-	 * Diese Methode gibt nur dann <code>true</code> zurück, wenn der gegebene {@link Pointer Pointer} gleich dem
-	 * <code>null</code>-{@link Pointer Pointer} oder sein Datensatz nicht <code>null</code> ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer Pointer} gleich dem {@code null}-
+	 * {@link Pointer Pointer} oder sein Datensatz nicht {@code null} ist.
 	 * 
 	 * @param pointer {@link Pointer Pointer}.
 	 * @return {@link Pointer Pointer}-Validität.
-	 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} <code>null</code> ist.
+	 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} {@code null} ist.
 	 */
 	public static boolean valid(final Pointer<?> pointer) throws NullPointerException {
 		if(pointer == null) throw new NullPointerException();
@@ -414,13 +414,12 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link Pointer Pointer} oder den {@link Pointer Pointer} auf <code>null</code>
-	 * zurück.
+	 * Diese Methode gibt den gegebenen {@link Pointer Pointer} oder den {@link Pointer Pointer} auf {@code null} zurück.
 	 * 
 	 * @see Pointers#nullPointer()
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer Pointer}
-	 * @return gegebener {@link Pointer Pointer} oder {@link Pointer Pointer} auf <code>null</code>.
+	 * @return gegebener {@link Pointer Pointer} oder {@link Pointer Pointer} auf {@code null}.
 	 */
 	public static <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
 		return ((pointer == null) ? Pointers.<GData>nullPointer() : pointer);
@@ -489,10 +488,10 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Pointer Pointer} auf <code>null</code> zurück.
+	 * Diese Methode gibt den {@link Pointer Pointer} auf {@code null} zurück.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @return <code>null</code>-{@link Pointer Pointer}.
+	 * @return {@code null}-{@link Pointer Pointer}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GData> Pointer<GData> nullPointer() {
@@ -591,7 +590,7 @@ public final class Pointers {
 	 * @param pointer {@link Pointer Pointer}.
 	 * @return {@link ConvertedPointer Converted-Pointer}.
 	 * @throws NullPointerException Wenn der gegebenen {@link Pointer Pointer} bzw. der gegebenen {@link Converter
-	 *         Converter} <code>null</code> ist.
+	 *         Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> Pointer<GOutput> convertedPointer(
 		final Converter<? super GInput, ? extends GOutput> converter, final Pointer<? extends GInput> pointer)
