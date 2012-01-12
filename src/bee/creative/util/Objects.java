@@ -380,11 +380,70 @@ public final class Objects {
 	 */
 	public static int hash(final Object... objects) {
 		if(objects == null) return 0;
-		int hash = 1;
+		int hash = 0;
 		for(final Object object: objects){
 			hash = (31 * hash) + Objects.hash(object);
 		}
 		return hash;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * 
+	 * @see Objects#hash(Object)
+	 * @see Objects#hash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hash(final Object object1, final Object object2) {
+		return (Objects.hash(object1) * 31) + Objects.hash(object2);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * 
+	 * @see Objects#hash(Object)
+	 * @see Objects#hash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hash(final Object object1, final Object object2, final Object object3) {
+		return (Objects.hash(object1, object2) * 31) + Objects.hash(object3);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * 
+	 * @see Objects#hash(Object)
+	 * @see Objects#hash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @param object4 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hash(final Object object1, final Object object2, final Object object3, final Object object4) {
+		return (Objects.hash(object1, object2, object3) * 31) + Objects.hash(object4);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * 
+	 * @see Objects#hash(Object)
+	 * @see Objects#hash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @param object4 Objekt oder {@code null}.
+	 * @param object5 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hash(final Object object1, final Object object2, final Object object3, final Object object4,
+		final Object object5) {
+		return (Objects.hash(object1, object2, object3, object4) * 31) + Objects.hash(object5);
 	}
 
 	/**
@@ -461,6 +520,65 @@ public final class Objects {
 			if(!Objects.equals(objects1[i], objects2[i])) return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * 
+	 * @see Objects#equals(Object, Object)
+	 * @see Objects#equals(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @param object4 Objekt oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
+	 */
+	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4) {
+		return Objects.equals(object1, object2) && Objects.equals(object3, object4);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * 
+	 * @see Objects#equals(Object, Object)
+	 * @see Objects#equals(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @param object4 Objekt oder {@code null}.
+	 * @param object5 Objekt oder {@code null}.
+	 * @param object6 Objekt oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
+	 */
+	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
+		final Object object5, final Object object6) {
+		return Objects.equals(object1, object2, object3, object4) && Objects.equals(object5, object6);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * 
+	 * @see Objects#equals(Object, Object)
+	 * @see Objects#equals(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @param object4 Objekt oder {@code null}.
+	 * @param object5 Objekt oder {@code null}.
+	 * @param object6 Objekt oder {@code null}.
+	 * @param object7 Objekt oder {@code null}.
+	 * @param object8 Objekt oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
+	 */
+	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
+		final Object object5, final Object object6, final Object object7, final Object object8) {
+		return Objects.equals(object1, object2, object3, object4, object5, object6) && Objects.equals(object7, object8);
 	}
 
 	/**
