@@ -380,7 +380,7 @@ public final class Objects {
 	 */
 	public static int hash(final Object... objects) {
 		if(objects == null) return 0;
-		int hash = 0;
+		int hash = 1;
 		for(final Object object: objects){
 			hash = (31 * hash) + Objects.hash(object);
 		}
@@ -397,7 +397,7 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object1, final Object object2) {
-		return (Objects.hash(object1) * 31) + Objects.hash(object2);
+		return ((31 + Objects.hash(object1)) * 31) + Objects.hash(object2);
 	}
 
 	/**

@@ -567,7 +567,7 @@ public final class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			return (this.filter.accept(input) ? this.accept.convert(input) : this.reject.convert(input));
+			return (GOutput)(this.filter.accept(input) ? this.accept.convert(input) : this.reject.convert(input));
 		}
 
 		/**
