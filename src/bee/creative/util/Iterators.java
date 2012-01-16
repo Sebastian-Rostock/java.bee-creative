@@ -294,7 +294,7 @@ public final class Iterators {
 		/**
 		 * Dieses Feld speichert den Zustand.
 		 */
-		boolean hasNext = false;
+		boolean hasNext = true;
 
 		/**
 		 * Dieser Konstrukteur initialisiert das Element.
