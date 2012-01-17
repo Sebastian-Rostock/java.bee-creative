@@ -4,7 +4,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 /**
- * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von Comparatoren.
+ * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von
+ * {@link Comparator Comparatoren}.
  * 
  * @see Comparator
  * @author Sebastian Rostock 2011.
@@ -233,7 +234,7 @@ public final class Comparators {
 	public static final class ChainedComparator<GEntry> implements Comparator<GEntry> {
 
 		/**
-		 * Dieses Feld speichert den {@link Comparator Comparator}.
+		 * Dieses Feld speichert den primären {@link Comparator Comparator}.
 		 */
 		final Comparator<? super GEntry> comparator1;
 
@@ -617,8 +618,8 @@ public final class Comparators {
 	};
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparator Comparator}, der {@code null}-Eingaben vergleicht sowie alle
-	 * anderen Eingaben an einen gegebenen {@link Comparator Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte
+	 * Diese Methode erzeugt einen {@link Comparator Comparator}, der {@code null}-Eingaben vergleicht sowie alle anderen
+	 * Eingaben an einen gegebenen {@link Comparator Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte
 	 * {@link Comparator Comparator} berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
 	 * 
 	 * <pre>((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)))</pre>

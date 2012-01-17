@@ -68,6 +68,53 @@ public final class Filters {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe eines gegebenen
+	 * {@link Filter Filters} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 */
+	static final class FilterConverter<GInput> extends FilterLink<GInput> implements Converter<GInput, Boolean> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
+		 */
+		public FilterConverter(final Filter<? super GInput> filter) throws NullPointerException {
+			super(filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Boolean convert(final GInput input) {
+			return Boolean.valueOf(this.filter.accept(input));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof FilterConverter<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("filterConverter", this.filter);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert einen delegierenden {@link Filter Filter}, der seine Berechnungen an zwei gegebene
 	 * {@link Filter Filter} delegiert.
 	 * 
@@ -345,8 +392,7 @@ public final class Filters {
 	 * @see Converters#cachedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class CachedFilter<GInput> extends FilterLink<GInput> implements Filter<GInput>,
-		Converter<GInput, Boolean> {
+	public static final class CachedFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter Converter}.
@@ -365,7 +411,7 @@ public final class Filters {
 		 */
 		public CachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) {
 			super(filter);
-			this.cache = new CachedConverter<GInput, Boolean>(limit, mode, Pointers.HARD, this);
+			this.cache = new CachedConverter<GInput, Boolean>(limit, mode, Pointers.HARD, Filters.filterConverter(filter));
 		}
 
 		/**
@@ -375,14 +421,6 @@ public final class Filters {
 		 */
 		public void clear() {
 			this.cache.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Boolean convert(final GInput input) {
-			return Boolean.valueOf(this.filter.accept(input));
 		}
 
 		/**
@@ -764,6 +802,21 @@ public final class Filters {
 	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter)
 		throws NullPointerException {
 		return new SynchronizedFilter<GInput>(filter);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe des gegebenen {@link Filter
+	 * Filters} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @param <GInput> Typ der Eingabe.
+	 * @param filter {@link Filter Filter}.
+	 * @return {@link FilterConverter Filter-Converter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
+	 */
+	public static <GInput> Converter<GInput, Boolean> filterConverter(final Filter<? super GInput> filter)
+		throws NullPointerException {
+		return new FilterConverter<GInput>(filter);
 	}
 
 	/**

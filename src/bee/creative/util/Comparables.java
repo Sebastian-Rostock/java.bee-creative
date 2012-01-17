@@ -1,0 +1,695 @@
+package bee.creative.util;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.RandomAccess;
+import bee.creative.util.Converters.CachedConverter;
+import bee.creative.util.Pointers.HardPointer;
+
+/**
+ * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von
+ * {@link Comparable Comparables}.
+ * 
+ * @see Comparable
+ * @author Sebastian Rostock 2011.
+ */
+public class Comparables {
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Comparable Comparable} verweist.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Comparable Comparables}.
+	 */
+	static abstract class ComparableLink<GInput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Comparable Comparable}.
+		 */
+		final Comparable<? super GInput> comparable;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * 
+		 * @param filter {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 */
+		public ComparableLink(final Comparable<? super GInput> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException();
+			this.comparable = filter;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Comparable Comparable} zurück.
+		 * 
+		 * @return {@link Comparable Comparable}.
+		 */
+		public Comparable<? super GInput> comparable() {
+			return this.comparable;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.comparable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final ComparableLink<?> data = (ComparableLink<?>)object;
+			return Objects.equals(this.comparable, data.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe eines gegebenen
+	 * {@link Comparable Comparables} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 */
+	static final class ComparableConverter<GInput> extends ComparableLink<GInput> implements Converter<GInput, Integer> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * 
+		 * @param filter {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 */
+		public ComparableConverter(final Comparable<? super GInput> filter) throws NullPointerException {
+			super(filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Integer convert(final GInput input) {
+			return Integer.valueOf(this.comparable.compareTo(input));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ComparableConverter<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("comparableConverter", this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Comparable Comparable}, der {@code null}-Eingaben vergleicht und alle
+	 * anderen Eingaben an einen gegebenen {@link Comparable Comparable} weiterleitet. Der {@link Comparable Comparable}
+	 * berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
+	 * 
+	 * <pre>
+	 * ((o == null) ? -1 : comparable.compareTo(o));
+	 * </pre>
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Objekte.
+	 */
+	public static final class NullComparable<GEntry> extends ComparableLink<GEntry> implements Comparable<GEntry> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * 
+		 * @param comparable {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 */
+		public NullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+			super(comparable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry o) {
+			return ((o == null) ? -1 : this.comparable.compareTo(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof NullComparable<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("nullComparable", this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Comparable Comparable}, der den Vergleichswert eines gegebenen
+	 * {@link Comparable Comparables} umkehrt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Objekte.
+	 */
+	public static final class ReverseComparable<GEntry> extends ComparableLink<GEntry> implements Comparable<GEntry> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * 
+		 * @param comparable {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 */
+		public ReverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+			super(comparable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry o) {
+			return -this.comparable.compareTo(o);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ReverseComparable<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("reverseComparable", this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen gepufferten {@link Comparable Comparable}, der die von einem gegebene
+	 * {@link Comparable Comparable} erzeugten Ausgaben in einer {@link Map Abbildung} von Schlüsseln auf Werte verwaltet.
+	 * Die Schlüssel werden dabei über {@link HardPointer Hard-Pointers} auf Eingaben und die Werte als {@link Pointer
+	 * Pointer} auf die Ausgaben des gegebenen {@link Comparable Comparables} realisiert.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see Converters#cachedConverter(int, int, int, Converter)
+	 * @param <GInput> Typ der Eingabe.
+	 */
+	public static final class CachedComparable<GInput> extends ComparableLink<GInput> implements Comparable<GInput> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter Converter}.
+		 */
+		final CachedConverter<GInput, Integer> cache;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den gepuferten {@link Comparable Comparable}.
+		 * 
+		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
+		 * @param mode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der
+		 *        {@link Map Abbildung} erzeugt werden.
+		 * @param comparable {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn der {@link Comparable Comparable} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
+		 */
+		public CachedComparable(final int limit, final int mode, final Comparable<? super GInput> comparable) {
+			super(comparable);
+			this.cache =
+				new CachedConverter<GInput, Integer>(limit, mode, Pointers.HARD, Comparables.comparableConverter(comparable));
+		}
+
+		/**
+		 * Diese Methode leert die Abbildung.
+		 * 
+		 * @see CachedConverter#clear()
+		 */
+		public void clear() {
+			this.cache.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GInput input) {
+			return this.cache.convert(input).intValue();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if((object == this) || Objects.equals(object, this.comparable)) return true;
+			if(!(object instanceof CachedComparable<?>)) return false;
+			return super.equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("cachedComparable", this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen verketteten {@link Comparable Comparable}, der die beiden Objekte in seiner
+	 * Eingabe zuerst über einen ersten {@link Comparable Comparable} vergleicht und einen zweiten {@link Comparable
+	 * Comparable} nur dann verwendet, wenn der erste {@link Comparable Comparable} die Gleichheit der beiden Objekte
+	 * anzeigt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Objekte.
+	 */
+	public static final class ChainedComparable<GEntry> implements Comparable<GEntry> {
+
+		/**
+		 * Dieses Feld speichert den primären {@link Comparable Comparable}.
+		 */
+		final Comparable<? super GEntry> comparable1;
+
+		/**
+		 * Dieses Feld speichert den sekundären {@link Comparable Comparable}.
+		 */
+		final Comparable<? super GEntry> comparable2;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Comparable Comparableen}.
+		 * 
+		 * @param comparable1 primärer {@link Comparable Comparable}.
+		 * @param comparable2 sekundärer {@link Comparable Comparable}.
+		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable Comparableen} {@code null} ist.
+		 */
+		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
+			throws NullPointerException {
+			if((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
+			this.comparable1 = comparable1;
+			this.comparable2 = comparable2;
+		}
+
+		/**
+		 * Diese Methode gibt den primären {@link Comparable Comparable} zurück.
+		 * 
+		 * @return primärer {@link Comparable Comparable}.
+		 */
+		public Comparable<? super GEntry> comparable1() {
+			return this.comparable1;
+		}
+
+		/**
+		 * Diese Methode gibt den sekundären {@link Comparable Comparable} zurück.
+		 * 
+		 * @return sekundärer {@link Comparable Comparable}.
+		 */
+		public Comparable<? super GEntry> comparable2() {
+			return this.comparable2;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry o) {
+			final int comp = this.comparable1.compareTo(o);
+			return ((comp != 0) ? comp : this.comparable2.compareTo(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.comparable1, this.comparable2);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ChainedComparable<?>)) return false;
+			final ChainedComparable<?> data = (ChainedComparable<?>)object;
+			return Objects.equals(this.comparable1, data.comparable1, this.comparable2, data.comparable2);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("chainedComparable", this.comparable1, this.comparable2);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen konvertierenden {@link Comparable Comparable}, der die mit einem gegebenen
+	 * {@link Converter Converter} konvertierten Objekte zum Vergleich an einen gegebenen {@link Comparable Comparable}
+	 * delegiert.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Eingabe des {@link Converter Converters} sowie der vom {@link Comparable Comparable} zu
+	 *        vergleichenden Objekte.
+	 * @param <GValue> Typ der Ausgabe des {@link Converter Converters} sowie der vom gegebenen {@link Comparable
+	 *        Comparable} zu vergleichenden Objekte.
+	 */
+	public static final class ConvertedComparable<GEntry, GValue> extends ComparableLink<GValue> implements
+		Comparable<GEntry> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter Converter}.
+		 */
+		final Converter<? super GEntry, ? extends GValue> converter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert {@link Comparable Comparable} und {@link Converter Converter}.
+		 * 
+		 * @param comparable {@link Comparable Comparable}.
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} bzw. der gegebene {@link Converter
+		 *         Converter} {@code null} ist.
+		 */
+		public ConvertedComparable(final Comparable<? super GValue> comparable,
+			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
+			super(comparable);
+			if(converter == null) throw new NullPointerException();
+			this.converter = converter;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * 
+		 * @return den {@link Converter Converter}.
+		 */
+		public Converter<? super GEntry, ? extends GValue> converter() {
+			return this.converter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry o) {
+			return this.comparable.compareTo(this.converter.convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.comparable, this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ConvertedComparable<?, ?>)) return false;
+			final ConvertedComparable<?, ?> data = (ConvertedComparable<?, ?>)object;
+			return super.equals(object) && Objects.equals(this.converter, data.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("convertedComparable", this.converter, this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Methode führt die Bereichs- und Lageprüfung der gegebenen Indices aus und löst bei Fehlern entsprechende
+	 * {@link RuntimeException Runtime-Exceptions} aus.
+	 * 
+	 * @param length Größe des Bereiches.
+	 * @param fromIndex Beginn-Index (inklusiv).
+	 * @param toIndex End-Index (exklusiv).
+	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
+	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
+	 */
+	static void rangeCheck(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException,
+		IndexOutOfBoundsException {
+		if(fromIndex > toIndex) throw new IllegalArgumentException();
+		if(fromIndex < 0) throw new IndexOutOfBoundsException();
+		if(toIndex > length) throw new IndexOutOfBoundsException();
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Comparable Comparable}, der {@code null}-Eingaben vergleicht sowie alle anderen
+	 * Eingaben an einen gegebenen {@link Comparable Comparable} weiterleitet, und gibt ihn zurück. Der erzeugte
+	 * {@link Comparable Comparable} berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
+	 * 
+	 * <pre>((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparable.compare(o1, o2)))</pre>
+	 * 
+	 * @param <GEntry> Typ der Objekte.
+	 * @param comparable {@link Comparable Comparable}
+	 * @return {@link NullComparable Null-Comparable}
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+	 */
+	public static <GEntry> Comparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable)
+		throws NullPointerException {
+		return new NullComparable<GEntry>(comparable);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Comparable Comparable}, der den Vergleichswert des gegebenen {@link Comparable
+	 * Comparables} umkehrt, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Objekte.
+	 * @param comparable {@link Comparable Comparable}.
+	 * @return {@link ReverseComparable Reverse-Comparable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+	 */
+	public static <GEntry> Comparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable)
+		throws NullPointerException {
+		return new ReverseComparable<GEntry>(comparable);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen verketteten {@link Comparable Comparable} und gibt ihn zurück. Der erzeugte
+	 * {@link Comparable Comparable} vergleicht seine beiden Eingaben zuerst über den ersten {@link Comparable Comparable}
+	 * und verwendet den zweiten {@link Comparable Comparable} nur dann, wenn der erste {@link Comparable Comparable} mit
+	 * dem Vergleichswert {@code 0} die Gleichheit der beiden Objekte anzeigt.
+	 * 
+	 * @param <GEntry> Typ der Objekte.
+	 * @param comparable1 erster {@link Comparable Comparable}.
+	 * @param comparable2 zweiter {@link Comparable Comparable}.
+	 * @return {@link ChainedComparable Chained-Comparable}.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable Comparableen} {@code null} ist.
+	 */
+	public static <GEntry> Comparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1,
+		final Comparable<? super GEntry> comparable2) throws NullPointerException {
+		return new ChainedComparable<GEntry>(comparable1, comparable2);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen konvertierenden {@link Comparable Comparable}, der die mit dem gegebenen
+	 * {@link Converter Converter} konvertierten Objekte zum Vergleich an den gegebenen {@link Comparable Comparable}
+	 * delegiert, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @param <GEntry> Typ der Eingabe des {@link Converter Converter} sowie der vom konvertierender {@link Comparable
+	 *        Comparable} zu vergleichenden Objekte.
+	 * @param <GValue> Typ der Ausgabe des {@link Converter Converter} sowie der vom gegebenen {@link Comparable
+	 *        Comparable} zu vergleichenden Objekte.
+	 * @param converter {@link Converter Converter}.
+	 * @param comparable {@link Comparable Comparable}.
+	 * @return {@link ConvertedComparable Converted-Comparable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} oder der gegebene {@link Converter
+	 *         Converter} {@code null} sind.
+	 */
+	public static <GEntry, GValue> Comparable<GEntry> convertedComparable(
+		final Converter<? super GEntry, ? extends GValue> converter, final Comparable<? super GValue> comparable)
+		throws NullPointerException {
+		return new ConvertedComparable<GEntry, GValue>(comparable, converter);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe des gegebenen
+	 * {@link Comparable Comparables} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable Comparable}.
+	 * @return {@link ComparableConverter Comparable-Converter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+	 */
+	public static <GInput> Converter<GInput, Integer> comparableConverter(final Comparable<? super GInput> comparable)
+		throws NullPointerException {
+		return new ComparableConverter<GInput>(comparable);
+	}
+
+	/**
+	 * Diese Methode gibt das zurück.
+	 * 
+	 * @see Arrays#asList(Object...)
+	 * @see Comparables#binarySearch(List, Comparable)
+	 * @param <GItem>
+	 * @param list
+	 * @param comparable
+	 * @return
+	 */
+	public static <GItem> int binarySearch(final GItem[] list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearch(Arrays.asList(list), comparable);
+	}
+
+	/**
+	 * Diese Methode gibt das zurück.
+	 * 
+	 * @see Arrays#asList(Object...)
+	 * @see Comparables#binarySearch(List, Comparable, int, int)
+	 * @param <GItem>
+	 * @param list
+	 * @param comparable
+	 * @param fromIndex
+	 * @param toIndex
+	 * @return
+	 */
+	public static <GItem> int binarySearch(final GItem[] list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		return Comparables.binarySearch(Arrays.asList(list), comparable, fromIndex, toIndex);
+	}
+
+	public static <GItem> int binarySearch(final List<GItem> list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearch(list, comparable, 0, list.size());
+	}
+
+	/**
+	 * Searches the specified list for the specified object using the binary search algorithm. The list must be sorted
+	 * into ascending order according to the {@linkplain Comparable natural ordering} of its elements (as by the
+	 * {@link #sort(List)} method) prior to making this call. If it is not sorted, the results are undefined. If the list
+	 * contains multiple elements equal to the specified object, there is no guarantee which one will be found.
+	 * <p>
+	 * This method runs in log(n) time for a "random access" list (which provides near-constant-time positional access).
+	 * If the specified list does not implement the {@link RandomAccess} interface and is large, this method will do an
+	 * iterator-based binary search that performs O(n) link traversals and O(log n) element comparisons.
+	 * 
+	 * @param <GItem>
+	 * @param list the array to be searched
+	 * @param fromIndex the index of the first element (inclusive) to be searched
+	 * @param toIndex the index of the last element (exclusive) to be searched
+	 * @param comparable the value to be searched for
+	 * @return the index of the search key, if it is contained in the list; otherwise,
+	 *         <tt>(-(<i>insertion point</i>) - 1)</tt>. The <i>insertion point</i> is defined as the point at which the
+	 *         key would be inserted into the list: the index of the first element greater than the key, or
+	 *         <tt>list.size()</tt> if all elements in the list are less than the specified key. Note that this guarantees
+	 *         that the return value will be &gt;= 0 if and only if the key is found.
+	 * @throws ClassCastException Wenn das gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
+	 *         gegebenen {@link List List} ist.
+	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
+	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
+	 */
+	public static <GItem> int binarySearch(final List<GItem> list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		int from = fromIndex, last = toIndex;
+		while(from < last){
+			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));
+			if(comp < 0){
+				last = next;
+			}else if(comp > 0){
+				from = next + 1;
+			}else return next;
+		}
+		return -(from + 1);
+	}
+
+	public static <GItem> int binarySearchFirst(final GItem[] list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearchFirst(Arrays.asList(list), comparable);
+	}
+
+	public static <GItem> int binarySearchFirst(final GItem[] list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		return Comparables.binarySearchFirst(Arrays.asList(list), comparable, fromIndex, toIndex);
+	}
+
+	public static <GItem> int binarySearchFirst(final List<GItem> list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearchFirst(list, comparable, 0, list.size());
+	}
+
+	public static <GItem> int binarySearchFirst(final List<GItem> list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		int from = fromIndex, last = toIndex;
+		while(from < last){
+			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));
+			if(comp <= 0){
+				last = next;
+			}else{
+				from = next + 1;
+			}
+		}
+		if((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(list.get(from)) == 0)) return from;
+		return -(from + 1);
+	}
+
+	public static <GItem> int binarySearchLast(final GItem[] list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearchLast(Arrays.asList(list), comparable);
+	}
+
+	public static <GItem> int binarySearchLast(final GItem[] list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		return Comparables.binarySearchLast(Arrays.asList(list), comparable, fromIndex, toIndex);
+	}
+
+	public static <GItem> int binarySearchLast(final List<GItem> list, final Comparable<? super GItem> comparable) {
+		return Comparables.binarySearchLast(list, comparable, 0, list.size());
+	}
+
+	public static <GItem> int binarySearchLast(final List<GItem> list, final Comparable<? super GItem> comparable,
+		final int fromIndex, final int toIndex) {
+		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		int from = fromIndex, last = toIndex;
+		while(from < last){
+			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));
+			if(comp < 0){
+				last = next;
+			}else{
+				from = next + 1;
+			}
+		}
+		from--;
+		if((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(list.get(from)) == 0)) return from;
+		return -(from + 1);
+	}
+
+}
