@@ -1,10 +1,6 @@
 package bee.creative.util;
 
-import java.util.Map;
-import bee.creative.util.Converters.CachedConverter;
 import bee.creative.util.Converters.ConverterLink;
-import bee.creative.util.Pointers.HardPointer;
-import bee.creative.util.Pointers.SoftPointer;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Filter
@@ -63,53 +59,6 @@ public final class Filters {
 		public boolean equals(final Object object) {
 			final FilterLink<?> data = (FilterLink<?>)object;
 			return Objects.equals(this.filter, data.filter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe eines gegebenen
-	 * {@link Filter Filters} in seine Ausgabe überführt.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	static final class FilterConverter<GInput> extends FilterLink<GInput> implements Converter<GInput, Boolean> {
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
-		 * 
-		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
-		 */
-		public FilterConverter(final Filter<? super GInput> filter) throws NullPointerException {
-			super(filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Boolean convert(final GInput input) {
-			return Boolean.valueOf(this.filter.accept(input));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FilterConverter<?>)) return false;
-			return super.equals(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("filterConverter", this.filter);
 		}
 
 	}
@@ -230,6 +179,87 @@ public final class Filters {
 			return Objects.toStringCall("invertFilter", this.filter);
 		}
 
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Filter Filter}, dessen konvertierte Eingabe von einem gegebenen
+	 * {@link Filter Filter} bewertet wird. Der {@link Filter Filter} konvertiert seine Eingabe mit einem gegebenen
+	 * {@link Converter Converter} zur Eingabe eines gegebenen {@link Filter Filters}. Der {@link Filter Filter}
+	 * akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe akzeptiert und
+	 * er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe ablehnt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe des {@link Filter Filters} sowie des gegebenen {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
+	 *        {@link Filter Filters}.
+	 */
+	public static final class ConvertedFilter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
+		Filter<GInput> {
+	
+		/**
+		 * Dieses Feld speichert den {@link Filter Filter}.
+		 */
+		final Filter<? super GOutput> filter;
+	
+		/**
+		 * Dieser Konstrukteur initialisiert {@link Filter Filter} und {@link Converter Converter}.
+		 * 
+		 * @param filter {@link Filter Filter}.
+		 * @param converter {@link Converter Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter
+		 *         Converter} {@code null} ist.
+		 */
+		public ConvertedFilter(final Filter<? super GOutput> filter,
+			final Converter<? super GInput, ? extends GOutput> converter) {
+			super(converter);
+			if(filter == null) throw new NullPointerException();
+			this.filter = filter;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean accept(final GInput input) {
+			return this.filter.accept(this.converter.convert(input));
+		}
+	
+		/**
+		 * Diese Methode gibt den {@link Filter Filter} zurück.
+		 * 
+		 * @return {@link Filter Filter}.
+		 */
+		public Filter<? super GOutput> filter() {
+			return this.filter;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter, this.converter);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ConvertedFilter<?, ?>)) return false;
+			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
+			return super.equals(object) && Objects.equals(this.filter, data.filter);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("convertedFilter", this.converter, this.filter);
+		}
+	
 	}
 
 	/**
@@ -383,156 +413,6 @@ public final class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Filter Filter}, der die von einem gegebene {@link Filter
-	 * Filter} erzeugten Ausgaben in einer {@link Map Abbildung} von Schlüsseln auf Werte verwaltet. Die Schlüssel werden
-	 * dabei über {@link HardPointer Hard-Pointers} auf Eingaben und die Werte als {@link Pointer Pointer} auf die
-	 * Ausgaben des gegebenen {@link Filter Filters} realisiert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see Converters#cachedConverter(int, int, int, Converter)
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class CachedFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
-		 */
-		final CachedConverter<GInput, Boolean> cache;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den gepuferten {@link Filter Filter}.
-		 * 
-		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
-		 * @param mode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der
-		 *        {@link Map Abbildung} erzeugt werden.
-		 * @param filter {@link Filter Filter}.
-		 * @throws NullPointerException Wenn der {@link Filter Filter} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
-		 */
-		public CachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) {
-			super(filter);
-			this.cache = new CachedConverter<GInput, Boolean>(limit, mode, Pointers.HARD, Filters.filterConverter(filter));
-		}
-
-		/**
-		 * Diese Methode leert die Abbildung.
-		 * 
-		 * @see CachedConverter#clear()
-		 */
-		public void clear() {
-			this.cache.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.cache.convert(input).booleanValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if((object == this) || Objects.equals(object, this.filter)) return true;
-			if(!(object instanceof CachedFilter<?>)) return false;
-			return super.equals(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("cachedFilter", this.filter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter Filter}, dessen konvertierte Eingabe von einem gegebenen
-	 * {@link Filter Filter} bewertet wird. Der {@link Filter Filter} konvertiert seine Eingabe mit einem gegebenen
-	 * {@link Converter Converter} zur Eingabe eines gegebenen {@link Filter Filters}. Der {@link Filter Filter}
-	 * akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe akzeptiert und
-	 * er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe ablehnt.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des {@link Filter Filters} sowie des gegebenen {@link Converter Converters}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
-	 *        {@link Filter Filters}.
-	 */
-	public static final class ConvertedFilter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
-		Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter Filter}.
-		 */
-		final Filter<? super GOutput> filter;
-
-		/**
-		 * Dieser Konstrukteur initialisiert {@link Filter Filter} und {@link Converter Converter}.
-		 * 
-		 * @param filter {@link Filter Filter}.
-		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter
-		 *         Converter} {@code null} ist.
-		 */
-		public ConvertedFilter(final Filter<? super GOutput> filter,
-			final Converter<? super GInput, ? extends GOutput> converter) {
-			super(converter);
-			if(filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.filter.accept(this.converter.convert(input));
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Filter Filter} zurück.
-		 * 
-		 * @return {@link Filter Filter}.
-		 */
-		public Filter<? super GOutput> filter() {
-			return this.filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter, this.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConvertedFilter<?, ?>)) return false;
-			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
-			return super.equals(object) && Objects.equals(this.filter, data.filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("convertedFilter", this.converter, this.filter);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert einen {@link Filter Filter}, der einen gegebenen {@link Filter Filter} synchronisiert.
 	 * Die Synchronisation erfolgt via {@code synchronized(filter)} auf dem gegebenen {@link Filter Filter}.
 	 * 
@@ -646,6 +526,21 @@ public final class Filters {
 	}
 
 	/**
+	 * Diese Methode erzeugt einen {@link Filter Filter}, der die Inversion ({@code !}-Operator) des gegebenen
+	 * {@link Filter Filters} berechnet, und gibt diesen zurück. Der erzeugte {@link Filter Filter} akzeptiert eine
+	 * Eingabe nur dann, wenn der gegebene {@link Filter Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann
+	 * ab, wenn der gegebene {@link Filter Filter} die Eingabe akzeptiert.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param filter {@link Filter Filter}.
+	 * @return Inversion-{@link Filter Filter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> invertFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		return new InvertFilter<GInput>(filter);
+	}
+
+	/**
 	 * Diese Methode gibt einen {@link Filter Filter} zurück, dessen {@link Filter#accept(Object) Akzeptanzmethode} für
 	 * jede Eingabe den gegebenen Akzeptanzmodus liefert. Wenn der Akzeptanzmodus {@code true} ist, akzeptiert der
 	 * {@link Filter Filter} jede Eingabe und wenn der Akzeptanzmodus {@code false} ist, lehnt der {@link Filter Filter}
@@ -661,18 +556,25 @@ public final class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter Filter}, der die Inversion ({@code !}-Operator) des gegebenen
-	 * {@link Filter Filters} berechnet, und gibt diesen zurück. Der erzeugte {@link Filter Filter} akzeptiert eine
-	 * Eingabe nur dann, wenn der gegebene {@link Filter Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann
-	 * ab, wenn der gegebene {@link Filter Filter} die Eingabe akzeptiert.
+	 * Diese Methode erzeugt einen {@link Filter Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter Filter}
+	 * bewertet wird, und gibt diesen zurück. Der erzeugte {@link Filter Filter} konvertiert seine Eingabe mit dem
+	 * gegebenen {@link Converter Converter} zur Eingabe des gegebenen {@link Filter Filters}. Der erzeugte {@link Filter
+	 * Filter} akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe
+	 * akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe ablehnt.
 	 * 
-	 * @param <GInput> Typ der Eingabe.
+	 * @see Converter
+	 * @param <GInput> Typ der Eingabe des {@link Filter Filters} sowie des gegebenen {@link Converter Converters}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
+	 *        {@link Filter Filters}.
 	 * @param filter {@link Filter Filter}.
-	 * @return Inversion-{@link Filter Filter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
+	 * @param converter {@link Converter Converter}.
+	 * @return {@link ConvertedFilter Converted-Filter}.
+	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter Converter}
+	 *         {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> invertFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return new InvertFilter<GInput>(filter);
+	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Filter<? super GOutput> filter,
+		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+		return new ConvertedFilter<GInput, GOutput>(filter, converter);
 	}
 
 	/**
@@ -727,69 +629,6 @@ public final class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Filter Filter} und gibt ihn zurück. Der erzeugte {@link Filter
-	 * Filter} verwaltet die vom gegebenen {@link Filter Filter} erzeugten Ausgaben in einer {@link Map Abbildung} von
-	 * Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link HardPointer Hard-Pointer} auf Eingaben und die Werte
-	 * als {@link SoftPointer Soft-Pointers} auf die Ausgaben des gegebenen {@link Filter Filters} realisiert. Die Anzahl
-	 * der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute {@link Filter Filter} verwendet damit
-	 * einen speichersensitiven, assoziativen Cache.
-	 * 
-	 * @see Filters#cachedFilter(int, int, Filter)
-	 * @see Converters#cachedConverter(int, int, int, Converter)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param filter {@link Filter Filter}.
-	 * @return {@link CachedFilter Cached-Filter}.
-	 * @throws NullPointerException Wenn der {@link Filter Filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
-	 */
-	public static <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return Filters.cachedFilter(-1, Pointers.SOFT, filter);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Filter Filter} und gibt ihn zurück. Der erzeugte {@link Filter
-	 * Filter} verwaltet die vom gegebenen {@link Filter Filter} erzeugten Ausgaben in einer {@link Map Abbildung} von
-	 * Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link HardPointer Hard-Pointer} auf Eingaben und die Werte
-	 * als {@link Pointer Pointer} auf die Ausgaben des gegebenen {@link Filter Filters} realisiert.
-	 * 
-	 * @see Converters#cachedConverter(int, int, int, Converter)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
-	 * @param mode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map
-	 *        Abbildung} erzeugt werden.
-	 * @param filter {@link Filter Filter}.
-	 * @return {@link CachedFilter Cached-Filter}.
-	 * @throws NullPointerException Wenn der {@link Filter Filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
-	 */
-	public static <GInput> Filter<GInput> cachedFilter(final int limit, final int mode,
-		final Filter<? super GInput> filter) throws NullPointerException {
-		return new CachedFilter<GInput>(limit, mode, filter);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Filter Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter Filter}
-	 * bewertet wird, und gibt diesen zurück. Der erzeugte {@link Filter Filter} konvertiert seine Eingabe mit dem
-	 * gegebenen {@link Converter Converter} zur Eingabe des gegebenen {@link Filter Filters}. Der erzeugte {@link Filter
-	 * Filter} akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe
-	 * akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter Filter} die konvertierte Eingabe ablehnt.
-	 * 
-	 * @see Converter
-	 * @param <GInput> Typ der Eingabe des {@link Filter Filters} sowie des gegebenen {@link Converter Converters}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie der Eingabe des gegebenen
-	 *        {@link Filter Filters}.
-	 * @param filter {@link Filter Filter}.
-	 * @param converter {@link Converter Converter}.
-	 * @return {@link ConvertedFilter Converted-Filter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} oder der gegebene {@link Converter Converter}
-	 *         {@code null} ist.
-	 */
-	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Filter<? super GOutput> filter,
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-		return new ConvertedFilter<GInput, GOutput>(filter, converter);
-	}
-
-	/**
 	 * Diese Methode erzeugt einen {@link Filter Filter}, der den gegebenen {@link Filter Filter} synchronisiert, und gibt
 	 * diesen zurück. Die Synchronisation erfolgt via {@code synchronized(filter)} auf dem gegebenen {@link Filter Filter}
 	 * .
@@ -802,21 +641,6 @@ public final class Filters {
 	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter)
 		throws NullPointerException {
 		return new SynchronizedFilter<GInput>(filter);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe des gegebenen {@link Filter
-	 * Filters} in seine Ausgabe überführt, und gibt ihn zurück.
-	 * 
-	 * @see Converter
-	 * @param <GInput> Typ der Eingabe.
-	 * @param filter {@link Filter Filter}.
-	 * @return {@link FilterConverter Filter-Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
-	 */
-	public static <GInput> Converter<GInput, Boolean> filterConverter(final Filter<? super GInput> filter)
-		throws NullPointerException {
-		return new FilterConverter<GInput>(filter);
 	}
 
 	/**

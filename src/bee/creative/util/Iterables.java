@@ -17,7 +17,6 @@ import bee.creative.util.Objects.UseToString;
  * @see Iterator
  * @see Iterators
  * @see Iterable
- * @see Iterables
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Iterables {

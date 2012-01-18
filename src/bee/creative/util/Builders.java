@@ -39,12 +39,12 @@ import bee.creative.util.Pointers.SoftPointer;
 public class Builders {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Builder Builder} mit {@link Builder Builder}.
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Builder Builder} verweist.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	static abstract class BaseBuilder<GData> implements Builder<GData> {
+	static abstract class BuilderLink<GData> {
 
 		/**
 		 * Dieses Feld speichert den {@link Builder Builder}.
@@ -57,7 +57,7 @@ public class Builders {
 		 * @param builder {@link Builder Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
 		 */
-		public BaseBuilder(final Builder<? extends GData> builder) throws NullPointerException {
+		public BuilderLink(final Builder<? extends GData> builder) throws NullPointerException {
 			if(builder == null) throw new NullPointerException();
 			this.builder = builder;
 		}
@@ -84,7 +84,7 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseBuilder<?> data = (BaseBuilder<?>)object;
+			final BuilderLink<?> data = (BuilderLink<?>)object;
 			return Objects.equals(this.builder, data.builder);
 		}
 
@@ -98,7 +98,7 @@ public class Builders {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static final class CachedBuilder<GData> extends BaseBuilder<GData> {
+	public static final class CachedBuilder<GData> extends BuilderLink<GData> implements Builder<GData> {
 
 		/**
 		 * Dieses Feld speichert den Modus.
@@ -256,7 +256,7 @@ public class Builders {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static final class SynchronizedBuilder<GData> extends BaseBuilder<GData> {
+	public static final class SynchronizedBuilder<GData> extends BuilderLink<GData> implements Builder<GData> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Builder Builder}.

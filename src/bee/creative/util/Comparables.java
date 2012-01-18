@@ -1,12 +1,8 @@
 package bee.creative.util;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.RandomAccess;
-import bee.creative.util.Converters.CachedConverter;
-import bee.creative.util.Pointers.HardPointer;
 
 /**
  * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von
@@ -33,12 +29,12 @@ public class Comparables {
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
 		 * 
-		 * @param filter {@link Comparable Comparable}.
+		 * @param comparable {@link Comparable Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
 		 */
-		public ComparableLink(final Comparable<? super GInput> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException();
-			this.comparable = filter;
+		public ComparableLink(final Comparable<? super GInput> comparable) throws NullPointerException {
+			if(comparable == null) throw new NullPointerException();
+			this.comparable = comparable;
 		}
 
 		/**
@@ -65,53 +61,6 @@ public class Comparables {
 		public boolean equals(final Object object) {
 			final ComparableLink<?> data = (ComparableLink<?>)object;
 			return Objects.equals(this.comparable, data.comparable);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe mit Hilfe eines gegebenen
-	 * {@link Comparable Comparables} in seine Ausgabe überführt.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	static final class ComparableConverter<GInput> extends ComparableLink<GInput> implements Converter<GInput, Integer> {
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
-		 * 
-		 * @param filter {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
-		 */
-		public ComparableConverter(final Comparable<? super GInput> filter) throws NullPointerException {
-			super(filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Integer convert(final GInput input) {
-			return Integer.valueOf(this.comparable.compareTo(input));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ComparableConverter<?>)) return false;
-			return super.equals(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("comparableConverter", this.comparable);
 		}
 
 	}
@@ -211,76 +160,6 @@ public class Comparables {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("reverseComparable", this.comparable);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Comparable Comparable}, der die von einem gegebene
-	 * {@link Comparable Comparable} erzeugten Ausgaben in einer {@link Map Abbildung} von Schlüsseln auf Werte verwaltet.
-	 * Die Schlüssel werden dabei über {@link HardPointer Hard-Pointers} auf Eingaben und die Werte als {@link Pointer
-	 * Pointer} auf die Ausgaben des gegebenen {@link Comparable Comparables} realisiert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see Converters#cachedConverter(int, int, int, Converter)
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class CachedComparable<GInput> extends ComparableLink<GInput> implements Comparable<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
-		 */
-		final CachedConverter<GInput, Integer> cache;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den gepuferten {@link Comparable Comparable}.
-		 * 
-		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map Abbildung}.
-		 * @param mode Modus, in dem die {@link Pointer Pointer} auf die Eingabe-Datensätze für die Schlüssel der
-		 *        {@link Map Abbildung} erzeugt werden.
-		 * @param comparable {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn der {@link Comparable Comparable} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der gegebene Modi ungültig ist.
-		 */
-		public CachedComparable(final int limit, final int mode, final Comparable<? super GInput> comparable) {
-			super(comparable);
-			this.cache =
-				new CachedConverter<GInput, Integer>(limit, mode, Pointers.HARD, Comparables.comparableConverter(comparable));
-		}
-
-		/**
-		 * Diese Methode leert die Abbildung.
-		 * 
-		 * @see CachedConverter#clear()
-		 */
-		public void clear() {
-			this.cache.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GInput input) {
-			return this.cache.convert(input).intValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if((object == this) || Objects.equals(object, this.comparable)) return true;
-			if(!(object instanceof CachedComparable<?>)) return false;
-			return super.equals(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("cachedComparable", this.comparable);
 		}
 
 	}
@@ -541,21 +420,6 @@ public class Comparables {
 		final Converter<? super GEntry, ? extends GValue> converter, final Comparable<? super GValue> comparable)
 		throws NullPointerException {
 		return new ConvertedComparable<GEntry, GValue>(comparable, converter);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe mit Hilfe des gegebenen
-	 * {@link Comparable Comparables} in seine Ausgabe überführt, und gibt ihn zurück.
-	 * 
-	 * @see Converter
-	 * @param <GInput> Typ der Eingabe.
-	 * @param comparable {@link Comparable Comparable}.
-	 * @return {@link ComparableConverter Comparable-Converter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
-	 */
-	public static <GInput> Converter<GInput, Integer> comparableConverter(final Comparable<? super GInput> comparable)
-		throws NullPointerException {
-		return new ComparableConverter<GInput>(comparable);
 	}
 
 	/**
