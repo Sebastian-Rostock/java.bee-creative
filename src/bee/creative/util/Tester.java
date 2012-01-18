@@ -72,7 +72,7 @@ public final class Tester {
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
 	 */
 	public Tester(final Runnable method) throws NullPointerException {
-		if(method == null) throw new NullPointerException();
+		if(method == null) throw new NullPointerException("Method is null");
 		final Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		this.enterMemory = runtime.totalMemory() - runtime.freeMemory();

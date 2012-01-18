@@ -693,7 +693,8 @@ public final class Objects {
 	 */
 	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args)
 		throws NullPointerException {
-		if((name == null) || (args == null)) throw new NullPointerException();
+		if(name == null) throw new NullPointerException("Name is null");
+		if(args == null) throw new NullPointerException("Args is null");
 		final StringBuilder output = new StringBuilder(name);
 		if(args.length != 0){
 			String join = (format ? "(\n  " : "( ");

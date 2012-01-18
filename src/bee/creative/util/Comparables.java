@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.RandomAccess;
 
 /**
  * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von
@@ -33,7 +32,7 @@ public class Comparables {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
 		 */
 		public ComparableLink(final Comparable<? super GInput> comparable) throws NullPointerException {
-			if(comparable == null) throw new NullPointerException();
+			if(comparable == null) throw new NullPointerException("Comparable is null");
 			this.comparable = comparable;
 		}
 
@@ -194,7 +193,8 @@ public class Comparables {
 		 */
 		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 			throws NullPointerException {
-			if((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
+			if(comparable1 == null) throw new NullPointerException("Comparable1 is null");
+			if(comparable2 == null) throw new NullPointerException("Comparable2 is null");
 			this.comparable1 = comparable1;
 			this.comparable2 = comparable2;
 		}
@@ -285,7 +285,7 @@ public class Comparables {
 		public ConvertedComparable(final Comparable<? super GValue> comparable,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
 			super(comparable);
-			if(converter == null) throw new NullPointerException();
+			if(converter == null) throw new NullPointerException("Converter is null");
 			this.converter = converter;
 		}
 
@@ -345,11 +345,42 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
-	static void rangeCheck(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException,
+	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException,
 		IndexOutOfBoundsException {
-		if(fromIndex > toIndex) throw new IllegalArgumentException();
-		if(fromIndex < 0) throw new IndexOutOfBoundsException();
-		if(toIndex > length) throw new IndexOutOfBoundsException();
+		if(fromIndex > toIndex) throw new IllegalArgumentException("FromIndex > ToIndex");
+		if(fromIndex < 0) throw new IndexOutOfBoundsException("FromIndex out of range: " + fromIndex);
+		if(toIndex > length) throw new IndexOutOfBoundsException("ToIndex out of range: " + toIndex);
+	}
+
+	static void check(final Object list, final Object comparable) throws NullPointerException {
+		if(list == null) throw new NullPointerException("List is null");
+		if(comparable == null) throw new NullPointerException("Comparable is null");
+	}
+
+	static void check(final Object[] list, final Comparable<?> comparable, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
+		Comparables.check(list, comparable);
+		Comparables.check(list.length, fromIndex, toIndex);
+	}
+
+	static void check(final List<?> list, final Comparable<?> comparable, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException, IndexOutOfBoundsException {
+		Comparables.check(list, comparable);
+		Comparables.check(list.size(), fromIndex, toIndex);
+	}
+
+	static <GItem> int search(final GItem[] list, final Comparable<? super GItem> comparable, final int fromIndex,
+		final int toIndex) {
+		int from = fromIndex, last = toIndex;
+		while(from < last){
+			final int next = (from + last) >>> 1, comp = comparable.compareTo(list[next]);
+			if(comp < 0){
+				last = next;
+			}else if(comp > 0){
+				from = next + 1;
+			}else return next;
+		}
+		return -(from + 1);
 	}
 
 	/**
@@ -433,7 +464,8 @@ public class Comparables {
 	 * @return
 	 */
 	public static <GItem> int binarySearch(final GItem[] list, final Comparable<? super GItem> comparable) {
-		return Comparables.binarySearch(Arrays.asList(list), comparable);
+		Comparables.check(list, comparable);
+		return Comparables.search(list, comparable, 0, list.length);
 	}
 
 	/**
@@ -450,7 +482,8 @@ public class Comparables {
 	 */
 	public static <GItem> int binarySearch(final GItem[] list, final Comparable<? super GItem> comparable,
 		final int fromIndex, final int toIndex) {
-		return Comparables.binarySearch(Arrays.asList(list), comparable, fromIndex, toIndex);
+		Comparables.check(list, comparable);
+		return Comparables.search(list, comparable, fromIndex, toIndex);
 	}
 
 	public static <GItem> int binarySearch(final List<GItem> list, final Comparable<? super GItem> comparable) {
@@ -458,33 +491,34 @@ public class Comparables {
 	}
 
 	/**
-	 * Searches the specified list for the specified object using the binary search algorithm. The list must be sorted
-	 * into ascending order according to the {@linkplain Comparable natural ordering} of its elements (as by the
-	 * {@link #sort(List)} method) prior to making this call. If it is not sorted, the results are undefined. If the list
-	 * contains multiple elements equal to the specified object, there is no guarantee which one will be found.
-	 * <p>
-	 * This method runs in log(n) time for a "random access" list (which provides near-constant-time positional access).
-	 * If the specified list does not implement the {@link RandomAccess} interface and is large, this method will do an
-	 * iterator-based binary search that performs O(n) link traversals and O(log n) element comparisons.
+	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
+	 * Comparable} durch und gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
+	 * Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
+	 * aufsteigend sortiert sein. Wenn die Liste mehrere Elemente enthällt, die zum gegebenen {@link Comparable
+	 * Comparable} gleich sind, wird der Index eines beliebigen dieser Elemente zurück gegeben. Ein Element
+	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} {@code comparable} gleich, wenn
+	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
+	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste, um die Ordnung zu
+	 * erhalten.
 	 * 
-	 * @param <GItem>
-	 * @param list the array to be searched
-	 * @param fromIndex the index of the first element (inclusive) to be searched
-	 * @param toIndex the index of the last element (exclusive) to be searched
-	 * @param comparable the value to be searched for
-	 * @return the index of the search key, if it is contained in the list; otherwise,
-	 *         <tt>(-(<i>insertion point</i>) - 1)</tt>. The <i>insertion point</i> is defined as the point at which the
-	 *         key would be inserted into the list: the index of the first element greater than the key, or
-	 *         <tt>list.size()</tt> if all elements in the list are less than the specified key. Note that this guarantees
-	 *         that the return value will be &gt;= 0 if and only if the key is found.
+	 * @see Arrays#binarySearch(Object[], Object)
+	 * @param <GItem> Typ der Elemente.
+	 * @param list {@link List List} als Suchraum.
+	 * @param fromIndex Anfang des Suchraums (inklusiv).
+	 * @param toIndex Ende des Suchraums (exklusiv).
+	 * @param comparable {@link Comparable comparable}.
+	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
+	 *         {@code null} ist.
 	 * @throws ClassCastException Wenn das gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
 	 *         gegebenen {@link List List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
 	public static <GItem> int binarySearch(final List<GItem> list, final Comparable<? super GItem> comparable,
-		final int fromIndex, final int toIndex) {
-		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		final int fromIndex, final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException,
+		ArrayIndexOutOfBoundsException {
+		Comparables.check(list, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while(from < last){
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));
@@ -512,7 +546,7 @@ public class Comparables {
 
 	public static <GItem> int binarySearchFirst(final List<GItem> list, final Comparable<? super GItem> comparable,
 		final int fromIndex, final int toIndex) {
-		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		Comparables.check(list, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while(from < last){
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));
@@ -541,7 +575,7 @@ public class Comparables {
 
 	public static <GItem> int binarySearchLast(final List<GItem> list, final Comparable<? super GItem> comparable,
 		final int fromIndex, final int toIndex) {
-		Comparables.rangeCheck(list.size(), fromIndex, toIndex);
+		Comparables.check(list, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while(from < last){
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(list.get(next));

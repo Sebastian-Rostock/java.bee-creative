@@ -223,7 +223,7 @@ public final class Conversions {
 		 */
 		public InverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion)
 			throws NullPointerException {
-			if(conversion == null) throw new NullPointerException();
+			if(conversion == null) throw new NullPointerException("Conversion is null");
 			this.conversion = conversion;
 		}
 
@@ -282,7 +282,7 @@ public final class Conversions {
 		 */
 		public DynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
-			if(converter == null) throw new NullPointerException();
+			if(converter == null) throw new NullPointerException("Converter is null");
 			this.input = input;
 			this.converter = converter;
 		}

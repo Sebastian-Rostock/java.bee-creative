@@ -6,13 +6,13 @@ import java.util.List;
 /**
  * Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter Converters}.
  * <p>
- * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Converter
- * Converters} {@code converter} eine {@link List List} aus {@link Conversion Conversions} erzeugt. Diese
- * {@link Conversion Conversions} werden anschließend bezüglich ihrer Ausgabe ( {@link Conversion#output()}) gemäß dem
- * {@link Comparator Comparator} {@code comparator} sortiert. Abschließend werden je ein {@link Iterable Iterable}
- * für die Eingabe ({@link Conversion#input()}) und die Ausgabe ({@link Conversion#output()}) der {@link Conversion
- * Conversions} erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig
- * ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen.
+ * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Converter Converters}
+ * {@code converter} eine {@link List List} aus {@link Conversion Conversions} erzeugt. Diese {@link Conversion
+ * Conversions} werden anschließend bezüglich ihrer Ausgabe ( {@link Conversion#output()}) gemäß dem {@link Comparator
+ * Comparator} {@code comparator} sortiert. Abschließend werden je ein {@link Iterable Iterable} für die Eingabe (
+ * {@link Conversion#input()}) und die Ausgabe ({@link Conversion#output()}) der {@link Conversion Conversions} erzeugt.
+ * Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig ist, kann diese Form
+ * des Pufferns zu einer verringerung der Rechenzeit führen.
  * 
  * <pre>Iterable&lt;I&gt; entries = // ...
 Converter&lt;I, O&gt; converter = // ...

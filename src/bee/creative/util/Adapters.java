@@ -117,7 +117,7 @@ public class Adapters {
 		 * @param builder {@link Builder Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
 		 */
-		public BuilderIterableAdapter(Builder<? extends Iterator<GEntry>> builder) throws NullPointerException {
+		public BuilderIterableAdapter(final Builder<? extends Iterator<GEntry>> builder) throws NullPointerException {
 			super(builder);
 		}
 
@@ -162,7 +162,7 @@ public class Adapters {
 		 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} {@code null} ist.
 		 */
 		public IterableBuilderAdapter(final Iterable<GEntry> iterable) throws NullPointerException {
-			if(iterable == null) throw new NullPointerException();
+			if(iterable == null) throw new NullPointerException("Iterable is null");
 			this.iterable = iterable;
 		}
 
@@ -213,7 +213,7 @@ public class Adapters {
 		 * @param converter {@link Converter Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} {@code null} ist.
 		 */
-		public ConverterComparableAdapter(Converter<? super GInput, ? extends Number> converter) {
+		public ConverterComparableAdapter(final Converter<? super GInput, ? extends Number> converter) {
 			super(converter);
 		}
 

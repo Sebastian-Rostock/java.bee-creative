@@ -275,11 +275,10 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
 	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein
-	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der
-	 * Tabelle {@code 0} ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen
-	 * aufgerufen. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag
-	 * registriert sind, wird die Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag
-	 * aufgerufen.
+	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der Tabelle
+	 * {@code 0} ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen aufgerufen. Wenn die
+	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die
+	 * Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
@@ -318,8 +317,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
 	 * Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die
-	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die
-	 * Methode {@link Hash#verifyLength() verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
+	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode
+	 * {@link Hash#verifyLength() verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.

@@ -34,7 +34,7 @@ public final class Comparators {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
 		 */
 		public BaseComparator(final Comparator<? super GEntry2> comparator) throws NullPointerException {
-			if(comparator == null) throw new NullPointerException();
+			if(comparator == null) throw new NullPointerException("Comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -252,7 +252,8 @@ public final class Comparators {
 		 */
 		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2)
 			throws NullPointerException {
-			if((comparator1 == null) || (comparator2 == null)) throw new NullPointerException();
+			if(comparator1 == null) throw new NullPointerException("Comparator1 is null");
+			if(comparator2 == null) throw new NullPointerException("Comparator2 is null");
 			this.comparator1 = comparator1;
 			this.comparator2 = comparator2;
 		}
@@ -342,7 +343,7 @@ public final class Comparators {
 		public ConvertedComparator(final Comparator<? super GValue> comparator,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
 			super(comparator);
-			if(converter == null) throw new NullPointerException();
+			if(converter == null) throw new NullPointerException("Converter is null");
 			this.converter = converter;
 		}
 

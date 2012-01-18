@@ -71,7 +71,7 @@ public final class Iterables {
 		public BaseIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 			throws NullPointerException {
 			super(filter);
-			if(iterable == null) throw new NullPointerException();
+			if(iterable == null) throw new NullPointerException("Iterable is null");
 			this.iterable = iterable;
 		}
 
@@ -416,7 +416,7 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} {@code null} ist.
 		 */
 		public ChainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables) throws NullPointerException {
-			if(iterables == null) throw new NullPointerException();
+			if(iterables == null) throw new NullPointerException("Iterables is null");
 			this.iterables = iterables;
 		}
 
@@ -495,7 +495,7 @@ public final class Iterables {
 		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterable<? extends GInput> iterable) throws NullPointerException {
 			super(converter);
-			if(iterable == null) throw new NullPointerException();
+			if(iterable == null) throw new NullPointerException("Iterable is null");
 			this.iterable = iterable;
 		}
 
@@ -636,7 +636,8 @@ public final class Iterables {
 	 */
 	public static <GEntry> void appendAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
 		throws NullPointerException {
-		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		if(iterable == null) throw new NullPointerException("Iterable is null");
+		if(collection == null) throw new NullPointerException("Collection is null");
 		Iterators.appendAll(iterable.iterator(), collection);
 	}
 
@@ -654,7 +655,8 @@ public final class Iterables {
 	 */
 	public static <GEntry> void removeAll(final Iterable<? extends GEntry> iterable, final Collection<GEntry> collection)
 		throws NullPointerException {
-		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		if(iterable == null) throw new NullPointerException("Iterable is null");
+		if(collection == null) throw new NullPointerException("Collection is null");
 		Iterators.removeAll(iterable.iterator(), collection);
 	}
 
@@ -813,8 +815,8 @@ public final class Iterables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable Iterable}-{@link Iterable Iterable}.
 	 * @return {@link ChainedIterator Chained-Iterable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Iterable Iterable}
-	 *         {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Iterable Iterable}-{@link Iterable Iterable} {@code null}
+	 *         ist.
 	 */
 	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables)
 		throws NullPointerException {
@@ -833,7 +835,7 @@ public final class Iterables {
 	 */
 	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
 		throws NullPointerException {
-		if(iterables == null) throw new NullPointerException();
+		if(iterables == null) throw new NullPointerException("Iterables is null");
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
 

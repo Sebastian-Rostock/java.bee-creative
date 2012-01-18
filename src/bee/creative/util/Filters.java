@@ -31,7 +31,7 @@ public final class Filters {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
 		 */
 		public FilterLink(final Filter<? super GInput> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException();
+			if(filter == null) throw new NullPointerException("Filter is null");
 			this.filter = filter;
 		}
 
@@ -90,7 +90,8 @@ public final class Filters {
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter Filter} {@code null} ist.
 		 */
 		public JunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
+			if(filter1 == null) throw new NullPointerException("Filter1 is null");
+			if(filter2 == null) throw new NullPointerException("Filter2 is null");
 			this.filter1 = filter1;
 			this.filter2 = filter2;
 		}
@@ -195,12 +196,12 @@ public final class Filters {
 	 */
 	public static final class ConvertedFilter<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
 		Filter<GInput> {
-	
+
 		/**
 		 * Dieses Feld speichert den {@link Filter Filter}.
 		 */
 		final Filter<? super GOutput> filter;
-	
+
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter Filter} und {@link Converter Converter}.
 		 * 
@@ -212,10 +213,10 @@ public final class Filters {
 		public ConvertedFilter(final Filter<? super GOutput> filter,
 			final Converter<? super GInput, ? extends GOutput> converter) {
 			super(converter);
-			if(filter == null) throw new NullPointerException();
+			if(filter == null) throw new NullPointerException("Filter is null");
 			this.filter = filter;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -223,7 +224,7 @@ public final class Filters {
 		public boolean accept(final GInput input) {
 			return this.filter.accept(this.converter.convert(input));
 		}
-	
+
 		/**
 		 * Diese Methode gibt den {@link Filter Filter} zurück.
 		 * 
@@ -232,7 +233,7 @@ public final class Filters {
 		public Filter<? super GOutput> filter() {
 			return this.filter;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -240,7 +241,7 @@ public final class Filters {
 		public int hashCode() {
 			return Objects.hash(this.filter, this.converter);
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -251,7 +252,7 @@ public final class Filters {
 			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
 			return super.equals(object) && Objects.equals(this.filter, data.filter);
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -259,7 +260,7 @@ public final class Filters {
 		public String toString() {
 			return Objects.toStringCall("convertedFilter", this.converter, this.filter);
 		}
-	
+
 	}
 
 	/**

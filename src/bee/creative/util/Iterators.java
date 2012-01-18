@@ -103,7 +103,7 @@ public final class Iterators {
 		public BaseIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
 			throws NullPointerException {
 			super(filter);
-			if(iterator == null) throw new NullPointerException();
+			if(iterator == null) throw new NullPointerException("Iterator is null");
 			this.iterator = iterator;
 		}
 
@@ -459,7 +459,7 @@ public final class Iterators {
 		 * @throws NullPointerException Wenn der gegebene {@link Iterator Iterator} {@code null} ist.
 		 */
 		public ChainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
-			if(iterators == null) throw new NullPointerException();
+			if(iterators == null) throw new NullPointerException("Iterators is null");
 			this.iterators = iterators;
 		}
 
@@ -542,7 +542,7 @@ public final class Iterators {
 		public ConvertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterator<? extends GInput> iterator) throws NullPointerException {
 			super(converter);
-			if(iterator == null) throw new NullPointerException();
+			if(iterator == null) throw new NullPointerException("Iterator is null");
 			this.iterator = iterator;
 		}
 
@@ -671,21 +671,22 @@ public final class Iterators {
 
 	/**
 	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator Iterator} zu überspringen und
-	 * gibt die Anzahl der noch zu überspringenden Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn
-	 * der gegebene {@link Iterator Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine weiteren Elemente mehr
-	 * liefern kann.
+	 * gibt die Anzahl der noch zu überspringenden Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der
+	 * gegebene {@link Iterator Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine weiteren Elemente mehr
+	 * liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der
+	 * Elemente des gegebenen {@link Iterator Iterators} zurück gegeben. Damit bestimmt
+	 * {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des {@link Iterator Iterators} {@code iterator}
+	 * .
 	 * 
 	 * @see Iterator#hasNext()
 	 * @param iterator {@link Iterator Iterator}.
 	 * @param count Anzahl der zu überspringenden Elemente.
 	 * @return Anzahl der noch zu überspringenden Elemente.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator Iterator} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
 	 */
-	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException, IllegalArgumentException {
-		if(iterator == null) throw new NullPointerException();
-		if(count < 0) throw new IllegalArgumentException();
-		while((count > 0) && iterator.hasNext()){
+	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("Iterator is null");
+		while((count != 0) && iterator.hasNext()){
 			count--;
 			iterator.next();
 		}
@@ -705,7 +706,8 @@ public final class Iterators {
 	 */
 	public static <GEntry> void appendAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
 		throws NullPointerException {
-		if((iterator == null) || (collection == null)) throw new NullPointerException();
+		if(iterator == null) throw new NullPointerException("Iterator is null");
+		if(collection == null) throw new NullPointerException("Collection is null");
 		while(iterator.hasNext()){
 			collection.add(iterator.next());
 		}
@@ -724,7 +726,8 @@ public final class Iterators {
 	 */
 	public static <GEntry> void removeAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
 		throws NullPointerException {
-		if((iterator == null) || (collection == null)) throw new NullPointerException();
+		if(iterator == null) throw new NullPointerException("Iterator is null");
+		if(collection == null) throw new NullPointerException("Collection is null");
 		while(iterator.hasNext()){
 			collection.remove(iterator.next());
 		}
@@ -872,7 +875,7 @@ public final class Iterators {
 	 */
 	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
 		throws NullPointerException {
-		if(iterators == null) throw new NullPointerException();
+		if(iterators == null) throw new NullPointerException("Iterators is null");
 		return Iterators.chainedIterator(Arrays.asList(iterators));
 	}
 
@@ -919,7 +922,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator Chained-Iterator}.
 	 */
 	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) {
-		if(iterators == null) throw new NullPointerException();
+		if(iterators == null) throw new NullPointerException("Iterators is null");
 		return Iterators.chainedIterator(iterators.iterator());
 	}
 
