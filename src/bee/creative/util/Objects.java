@@ -578,7 +578,7 @@ public final class Objects {
 	 */
 	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
 		final Object object5, final Object object6, final Object object7, final Object object8) {
-		return Objects.equals(object1, object2, object3, object4, object5, object6) && Objects.equals(object7, object8);
+		return Objects.equals(object1, object2, object3, object4) && Objects.equals(object5, object6, object7, object8);
 	}
 
 	/**
