@@ -536,8 +536,7 @@ public final class Comparators {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
-			final long v1 = o1.longValue(), v2 = o2.longValue();
-			return ((v1 == v2) ? 0 : ((v1 < v2) ? -1 : 1));
+			return Long.compare(o1.longValue(), o2.longValue());
 		}
 
 		@Override
@@ -573,7 +572,7 @@ public final class Comparators {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
-			return o1.intValue() - o2.intValue();
+			return Integer.compare(o1.intValue(), o2.intValue());
 		}
 
 		@Override
