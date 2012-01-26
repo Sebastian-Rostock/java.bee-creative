@@ -16,35 +16,142 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 public final class Compact {
+
+	static void run(final String name, final Runnable runnable) {
+		// runnable.run();
+		System.out.print(name);
+		System.out.print(": ");
+		System.out.println(new Tester(runnable));
+	}
+
+	public static void main(final String[] args) {
+
+		final List<Object> c = new ArrayList<Object>();
+		c.addAll(Arrays.asList(Hash.class.getFields()));
+		c.addAll(Arrays.asList(Hash.class.getMethods()));
+		c.addAll(Arrays.asList(Arrays.class.getFields()));
+		c.addAll(Arrays.asList(Arrays.class.getMethods()));
+		c.addAll(Arrays.asList(CompactBase.class.getFields()));
+		c.addAll(Arrays.asList(CompactBase.class.getMethods()));
+
+		final HashSet<Object> oldSet = new HashSet<Object>();
+		final CompactHashSet<Object> newSet = new CompactHashSet<Object>();
+
+		Compact.run("old.addAll()", new Runnable() {
+
+			@Override
+			public void run() {
+				oldSet.addAll(c);
+			}
+
+		});
+		Compact.run("new.addAll()", new Runnable() {
+
+			@Override
+			public void run() {
+				newSet.addAll(c);
+			}
+
+		});
+
+		Compact.run("old.iterator()", new Runnable() {
+
+			@Override
+			public void run() {
+				Iterators.skip(oldSet.iterator(), -1);
+			}
+
+		});
+		Compact.run("new.iterator()", new Runnable() {
+
+			@Override
+			public void run() {
+				Iterators.skip(newSet.iterator(), -1);
+			}
+
+		});
+
+		Compact.run("old.addAll()", new Runnable() {
+
+			@Override
+			public void run() {
+				oldSet.addAll(c);
+			}
+
+		});
+		Compact.run("new.addAll()", new Runnable() {
+
+			@Override
+			public void run() {
+				newSet.addAll(c);
+			}
+
+		});
+		Compact.run("old.clear()", new Runnable() {
+
+			@Override
+			public void run() {
+				oldSet.clear();
+			}
+
+		});
+		Compact.run("new.clear()", new Runnable() {
+
+			@Override
+			public void run() {
+				newSet.clear();
+			}
+
+		});
+
+	}
 
 	/**
 	 * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem sortierten {@link Array Array}
 	 * verwaltet werden.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class CompactList {
+	public static abstract class CompactBase {
 
 		/**
-		 * Diese Klasse implementiert den {@link Iterator} der Elemente.
+		 * Diese Klasse implementiert einen abstrakten {@link Iterator Iterator}.
 		 * 
-		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		protected abstract class CompactItemIterator<GItem> implements Iterator<GItem> {
+		protected static abstract class CompactIterator<GItem> implements Iterator<GItem> {
 
 			/**
-			 * Dieses Feld speichert den Index des nächsten Elements.
+			 * Dieses Feld speichert den Index des ersten Elements (inklusiv).
 			 */
-			private int next = 0;
+			protected int from;
 
 			/**
-			 * Dieses Feld speichert den Index des letzten Elements.
+			 * Dieses Feld speichert den Index des aktuellen Elements.
 			 */
-			private int last = -1;
+			protected int item;
+
+			/**
+			 * Dieses Feld speichert den Index des letztem Elements (exklusiv).
+			 */
+			protected int last;
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactIterator(final int from, final int last) {
+				this.from = from;
+				this.item = -1;
+				this.last = last;
+			}
 
 			/**
 			 * Diese Methode gibt das {@code index}-te Element zurück.
@@ -55,41 +162,334 @@ public final class Compact {
 			protected abstract GItem next(int index);
 
 			/**
+			 * Diese Methode entfernt das {@code index}-te Element.
+			 * 
+			 * @param index Index.
+			 */
+			protected abstract void remove(int index);
+
+			/**
 			 * {@inheritDoc}
 			 */
 			@Override
-			public final boolean hasNext() {
-				return this.next < CompactList.this.size;
+			public boolean hasNext() {
+				return this.from < this.last;
 			}
 
 			/**
 			 * {@inheritDoc}
 			 */
 			@Override
-			public final GItem next() {
-				final int next = this.next;
-				this.last = next;
-				final GItem item = this.next(next);
-				this.next = next + 1;
-				return item;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final void remove() {
-				if(this.last < 0) throw new IllegalStateException();
-				CompactList.this.removeItems(this.last, 1);
-				this.last = -1;
+			public void remove() {
+				final int item = this.item;
+				if(item < 0) throw new IllegalStateException();
+				this.remove(item);
+				this.item = -1;
 			}
 
 		}
 
 		/**
+		 * Diese Klasse implementiert einen abstrakten aufsteigenden {@link Iterator Iterator}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GItem> Typ der Elemente.
+		 */
+		protected static abstract class CompactAscendingIterator<GItem> extends CompactIterator<GItem> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactAscendingIterator(final int from, final int last) {
+				super(from - 1, last - 1);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public GItem next() {
+				return this.next(this.item = (this.from = this.from + 1));
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert einen abstrakten absteigenden {@link Iterator Iterator}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GItem> Typ der Elemente.
+		 */
+		protected static abstract class CompactDescendingIterator<GItem> extends CompactIterator<GItem> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactDescendingIterator(final int from, final int last) {
+				super(from, last);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public GItem next() {
+				return this.next(this.item = (this.last = this.last - 1));
+			}
+
+		}
+
+		protected abstract class CompactSubBase {
+
+			protected Object fromItem;
+
+			protected boolean fromInclusive;
+
+			protected Object lastItem;
+
+			protected boolean lastInclusive;
+
+			public CompactSubBase(final Object fromItem, final boolean fromInclusive, final Object lastItem,
+				final boolean lastInclusive) {
+				if(fromItem != CompactBase.OPEN){
+					if(lastItem != CompactBase.OPEN){
+						if(CompactBase.this.compare(fromItem, 0, lastItem) > 0)
+							throw new IllegalArgumentException("FromItem > FastItem");
+					}else{
+						CompactBase.this.compare(fromItem, 0, fromItem);
+					}
+				}else if(lastItem != CompactBase.OPEN){
+					CompactBase.this.compare(lastItem, 0, lastItem);
+				}
+				this.fromItem = fromItem;
+				this.fromInclusive = fromInclusive;
+				this.lastItem = lastItem;
+				this.lastInclusive = lastInclusive;
+			}
+
+			protected final boolean isTooLow(final Object key) {
+				final Object item = this.fromItem;
+				if(item == CompactBase.OPEN) return false;
+				final int comp = CompactBase.this.compare(key, 0, item);
+				return ((comp < 0) || ((comp == 0) && !this.fromInclusive));
+			}
+
+			protected final boolean isTooHigh(final Object key) {
+				final Object item = this.lastItem;
+				if(item == CompactBase.OPEN) return false;
+				final int comp = CompactBase.this.compare(key, 0, item);
+				return ((comp > 0) || ((comp == 0) && !this.lastInclusive));
+			}
+
+			protected final boolean isInRange(final Object key) {
+				return !this.isTooLow(key) && !this.isTooHigh(key);
+			}
+
+			protected final boolean isInRange(final Object key, final boolean inclusive) {
+				return inclusive ? this.isInRange(key) : this.isInClosedRange(key);
+			}
+
+			protected final boolean isInClosedRange(final Object key) {
+				final Object fromItem = this.fromItem, lastItem = this.lastItem;
+				return ((fromItem == CompactBase.OPEN) || (CompactBase.this.compare(key, 0, fromItem) >= 0))
+					&& ((lastItem == CompactBase.OPEN) || (CompactBase.this.compare(lastItem, 0, key) >= 0));
+			}
+
+			/**
+			 * Diese Methode gibt den Index des ersten Elements zurück.
+			 * 
+			 * @see NavigableSet#first()
+			 * @return Index des ersten Elements.
+			 */
+			protected final int firstIndex() {
+				final Object item = this.fromItem;
+				if(item == CompactBase.OPEN) return CompactBase.this.firstIndex();
+				if(this.fromInclusive) return CompactBase.this.ceilingIndex(item);
+				return CompactBase.this.higherIndex(item);
+			}
+
+			/**
+			 * Diese Methode gibt den Index des letzten Elements zurück.
+			 * 
+			 * @see NavigableSet#last()
+			 * @return Index des letzten Elements.
+			 */
+			protected final int lastIndex() {
+				final Object item = this.lastItem;
+				if(item == CompactBase.OPEN) return CompactBase.this.lastIndex();
+				if(this.lastInclusive) return CompactBase.this.floorIndex(item);
+				return CompactBase.this.lowerIndex(item);
+			}
+
+			protected final int lowestIndex() {
+				final int index = this.firstIndex();
+				if((index >= CompactBase.this.size) || this.isTooHigh(CompactBase.this.items[index])) return -index - 1;
+				return index;
+			}
+
+			protected final int highestIndex() {
+				final int index = this.lastIndex();
+				if((index < 0) || this.isTooLow(CompactBase.this.items[index])) return -index - 1;
+				return index;
+			}
+
+			protected final int lowerIndex(final Object item) {
+				if(this.isTooHigh(item)) return this.highestIndex();
+				final int index = CompactBase.this.lowerIndex(item);
+				if(index < 0) return index;
+				if(this.isTooLow(item)) return -index - 1;
+				return index;
+			}
+
+			protected final int floorIndex(final Object item) {
+				if(this.isTooHigh(item)) return this.highestIndex();
+				final int index = CompactBase.this.floorIndex(item);
+				if(index < 0) return index;
+				if(this.isTooLow(item)) return -index - 1;
+				return index;
+			}
+
+			protected final int ceilingIndex(final Object item) {
+				if(this.isTooLow(item)) return this.lowestIndex();
+				final int index = CompactBase.this.ceilingIndex(item);
+				if(index < 0) return index;
+				if(this.isTooHigh(item)) return -index - 1;
+				return index;
+			}
+
+			protected final int higherIndex(final Object item) {
+				if(this.isTooLow(item)) return this.lowestIndex();
+				final int index = CompactBase.this.higherIndex(item);
+				if(index < 0) return index;
+				if(this.isTooHigh(item)) return -index - 1;
+				return index;
+			}
+
+			protected final void clearItems() {
+				final int fromIndex = this.firstIndex(), lastIndex = this.lastIndex();
+				if(fromIndex > lastIndex) return;
+				CompactBase.this.removeItems(fromIndex, (lastIndex - fromIndex) + 1);
+			}
+
+			protected final int countItems() {
+				return (this.lastIndex() - this.firstIndex()) + 1;
+			}
+
+		}
+
+		/**
+		 * Dieses Feld speichert das Objekt zur offenen Begrenzung sortierter Listen.
+		 */
+		protected static final Object OPEN = new Object();
+
+		/**
 		 * Dieses Feld speichert das leere {@link Array Array} der Elemente.
 		 */
 		protected static final Object[] ITEMS = new Object[0];
+
+		/**
+		 * Diese Methode setzt die Länge des gegebenen {@link Array Array} mit der gegebenen Belegung auf die gegebene Länge
+		 * und gibt es zurück. Wenn die gegebene Länge {@code 0} ist, wird {@link CompactBase#ITEMS} zurück gegeben. Wenn
+		 * die Länge des gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues {@link Array
+		 * Array} mit der gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in das neue
+		 * {@link Array Array} kopiert und das neue {@link Array Array} zurück gegeben.
+		 * 
+		 * @param items {@link Array Array}.
+		 * @param size Anzahl der belegten Elemente.
+		 * @param length Länge bzw. Kapazität.
+		 * @return {@link Array Array} der gegebenen Länge.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Belegung bzw. die gegebene Länge ungültig ist.
+		 */
+		public static Object[] resizeItems(final Object[] items, final int size, final int length)
+			throws NullPointerException, IllegalArgumentException {
+			if(items == null) throw new NullPointerException("Items is null");
+			if(length < size) throw new IllegalArgumentException("Length < Size");
+			if(length == items.length) return items;
+			if(length == 0) return CompactBase.ITEMS;
+			final Object[] objects = new Object[length];
+			System.arraycopy(items, 0, objects, 0, size);
+			return objects;
+		}
+
+		/**
+		 * Diese Methode fügt in das gegebenen {@link Array Array} mit der gegebenen Belegung an der gegebenen Position die
+		 * gegebene Anzahl an Elementen ein, setzt die Länge des {@link Array Array} auf die gegebene Länge und gibt es
+		 * zurück. Wenn die Länge des gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues
+		 * {@link Array Array} mit der gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in
+		 * das neue {@link Array Array} kopiert und das neue {@link Array Array} zurück gegeben.
+		 * 
+		 * @param items {@link Array Array}.
+		 * @param size Anzahl der belegten Elemente.
+		 * @param length Länge bzw. Kapazität.
+		 * @param index Index bzw. Position.
+		 * @param count Anzahl.
+		 * @return {@link Array Array} der gegebenen Länge.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Belegung, die gegebene Länge, der gegebene Index bzw. die
+		 *         gegebene Anzah ungültig ist.
+		 */
+		public static Object[] insertItems(final Object[] items, final int size, final int length, final int index,
+			final int count) throws NullPointerException, IllegalArgumentException {
+			if(items == null) throw new NullPointerException("Items is null");
+			if(length < size) throw new IllegalArgumentException("Length < Size");
+			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
+			if(count < 0) throw new IllegalArgumentException("Count out of range: " + count);
+			if(count == 0) return items;
+			if(length != items.length){
+				final Object[] objects = new Object[length];
+				System.arraycopy(items, 0, objects, 0, index);
+				System.arraycopy(items, index, objects, index + count, size - index);
+				return objects;
+			}else{
+				System.arraycopy(items, index, items, index + count, size - index);
+			}
+			return items;
+		}
+
+		/**
+		 * Diese Methode fügt in das gegebenen {@link Array Array} mit der gegebenen Belegung an der gegebenen Position die
+		 * gegebene Anzahl an Elementen ein, setzt die Länge des {@link Array Array} auf die gegebene Länge und gibt es
+		 * zurück. Wenn die gegebene Länge {@code 0} ist, wird {@link CompactBase#ITEMS} zurück gegeben. Wenn die Länge des
+		 * gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues {@link Array Array} mit der
+		 * gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in das neue {@link Array Array}
+		 * kopiert und das neue {@link Array Array} zurück gegeben.
+		 * 
+		 * @param items {@link Array Array}.
+		 * @param size Anzahl der belegten Elemente.
+		 * @param length Länge bzw. Kapazität.
+		 * @return {@link Array Array} der gegebenen Länge.
+		 * @param index Index bzw. Position.
+		 * @param count Anzahl.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Belegung, die gegebene Länge, der gegebene Index bzw. die
+		 *         gegebene Anzah ungültig ist.
+		 */
+		public static Object[] removeItems(final Object[] items, final int size, final int length, final int index,
+			final int count) throws NullPointerException, IllegalArgumentException {
+			if(items == null) throw new NullPointerException("Items is null");
+			if(length < size) throw new IllegalArgumentException("Length < Size");
+			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
+			if((count < 0) || (count > size)) throw new IllegalArgumentException("Count out of range: " + count);
+			if(count == 0) return items;
+			if(length != items.length){
+				if(length != 0){
+					final Object[] objects = new Object[length];
+					System.arraycopy(items, 0, objects, 0, index);
+					System.arraycopy(items, index + count, objects, index, size - count - index);
+					return objects;
+				}else return CompactBase.ITEMS;
+			}else{
+				System.arraycopy(items, index + count, items, index, size - count - index);
+			}
+			return items;
+		}
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Elemente.
@@ -99,7 +499,91 @@ public final class Compact {
 		/**
 		 * Dieses Feld speichert die Elemente.
 		 */
-		protected Object[] items = CompactList.ITEMS;
+		protected Object[] items = CompactBase.ITEMS;
+
+		/**
+		 * Diese Methode gibt den Index des ersten Elements zurück.
+		 * 
+		 * @see NavigableSet#first()
+		 * @return Index des ersten Elements.
+		 */
+		protected final int firstIndex() {
+			return 0;
+		}
+
+		/**
+		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist.
+		 * 
+		 * @see NavigableSet#lower(Object)
+		 * @param item Element.
+		 * @return Index des größten Elements, dass kleiner dem gegebenen ist.
+		 */
+		protected final int lowerIndex(final Object item) {
+			final int index = this.itemIndex(item);
+			if(index < 0) return -index - 2;
+			return index - 1;
+		}
+
+		/**
+		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebene ist.
+		 * 
+		 * @see NavigableSet#floor(Object)
+		 * @param item Element.
+		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist.
+		 */
+		protected final int floorIndex(final Object item) {
+			final int index = this.itemIndex(item);
+			if(index < 0) return -index - 2;
+			return index;
+		}
+
+		/**
+		 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer oder gleich dem gegebene ist.
+		 * 
+		 * @see NavigableSet#ceiling(Object)
+		 * @param item Element.
+		 * @return Index des kleinsten Elements, dass größer oder gleich dem gegebenen ist.
+		 */
+		protected final int ceilingIndex(final Object item) {
+			final int index = this.itemIndex(item);
+			if(index < 0) return -index - 1;
+			return index;
+		}
+
+		/**
+		 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer dem gegebene ist.
+		 * 
+		 * @see NavigableSet#higher(Object)
+		 * @param item Element.
+		 * @return Index des kleinsten Elements, dass größer dem gegebenen ist.
+		 */
+		protected final int higherIndex(final Object item) {
+			final int index = this.itemIndex(item);
+			if(index < 0) return -index - 1;
+			return index + 1;
+		}
+
+		/**
+		 * Diese Methode gibt den Index des letzten Elements zurück.
+		 * 
+		 * @see NavigableSet#last()
+		 * @return Index des letzten Elements.
+		 */
+		protected final int lastIndex() {
+			return this.size - 1;
+		}
+
+		/**
+		 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder
+		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der
+		 * Eintrag eingefügt werden müsste.
+		 * 
+		 * @see CompactBase#equalsIndex(Object, int)
+		 * @see CompactBase#compareIndex(Object, int)
+		 * @param item Objekt.
+		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 */
+		protected abstract int itemIndex(final Object item);
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object)
@@ -123,14 +607,14 @@ public final class Compact {
 		 * ist dann zum gegebenen Schlüssel gleich, wenn
 		 * {@code (itemCompare(key, hash, element) == 0) && itemEquals(key, hash, element)}.
 		 * 
-		 * @see CompactList#equals(Object, int, Object)
+		 * @see CompactBase#equals(Object, int, Object)
 		 * @param key Schlüssel.
 		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
 		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected int equalsSearch(final Object key, final int hash) {
+		protected final int equalsIndex(final Object key, final int hash) {
 			Object item;
-			final int index = this.compareSearch(key, hash);
+			final int index = this.compareIndex(key, hash);
 			if(index < 0) return index;
 			final Object[] items = this.items;
 			if(this.equals(key, hash, items[index])) return index;
@@ -161,12 +645,12 @@ public final class Compact {
 		 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
 		 * der Eintrag eingefügt werden müsste.
 		 * 
-		 * @see CompactList#compare(Object, int, Object)
+		 * @see CompactBase#compare(Object, int, Object)
 		 * @param key Schlüssel.
 		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
 		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected int compareSearch(final Object key, final int hash) {
+		protected final int compareIndex(final Object key, final int hash) {
 			int from = 0, last = this.size;
 			final Object[] items = this.items;
 			while(from < last){
@@ -184,60 +668,29 @@ public final class Compact {
 		/**
 		 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das {@link Array Array} ein.
 		 * 
-		 * @see CompactList#validInsertLength(int)
+		 * @see CompactBase#validInsertLength(int)
 		 * @param index Index.
 		 * @param count Anzahl.
 		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 		 */
 		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
-			final int size = this.size;
-			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
-			if(count < 0) throw new IllegalArgumentException("Count out of range: " + count);
-			if(count == 0) return;
-			final Object[] oldItems = this.items;
-			final int oldLength = oldItems.length;
-			final int newLength = this.validInsertLength(size + count);
-			if(oldLength != newLength){
-				final Object[] newItems = new Object[newLength];
-				System.arraycopy(oldItems, 0, newItems, 0, index);
-				System.arraycopy(oldItems, index, newItems, index + count, size - index);
-				this.items = newItems;
-			}else{
-				System.arraycopy(oldItems, index, oldItems, index + count, size - index);
-			}
-			this.size = size + count;
+			final int oldSize = this.size, newSize = oldSize + count;
+			this.items = CompactBase.insertItems(this.items, oldSize, this.validInsertLength(newSize), index, count);
+			this.size = newSize;
 		}
 
 		/**
 		 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem {@link Array Array} mit
 		 * der gegebenen Länge der Belegung.
 		 * 
-		 * @see CompactList#validRemoveLength(int)
+		 * @see CompactBase#validRemoveLength(int)
 		 * @param index Index.
 		 * @param count Anzahl.
 		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 		 */
 		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
-			final int size = this.size;
-			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
-			if((count < 0) || (count > size)) throw new IllegalArgumentException("Count out of range: " + count);
-			if(count == 0) return;
-			final Object[] oldItems = this.items;
-			final int newSize = size - count;
-			final int oldLength = oldItems.length;
-			final int newLength = this.validRemoveLength(newSize);
-			if(oldLength != newLength){
-				if(newLength != 0){
-					final Object[] newItems = new Object[newLength];
-					System.arraycopy(oldItems, 0, newItems, 0, index);
-					System.arraycopy(oldItems, index + count, newItems, index, newSize - index);
-					this.items = newItems;
-				}else{
-					this.items = CompactList.ITEMS;
-				}
-			}else{
-				System.arraycopy(oldItems, index + count, oldItems, index, newSize - index);
-			}
+			final int oldSize = this.size, newSize = oldSize - count;
+			this.items = CompactBase.removeItems(this.items, oldSize, this.validRemoveLength(newSize), index, count);
 			this.size = newSize;
 		}
 
@@ -245,36 +698,20 @@ public final class Compact {
 		 * Diese Methode vergrößert die Kapazität des {@link Array Arrays} der Elemente, sodass dieses die gegebene Anzahl
 		 * an Elementen verwalten kann.
 		 * 
-		 * @see CompactList#validAllocateLength(int)
+		 * @see CompactBase#validAllocateLength(int)
 		 * @param count Anzahl.
 		 */
 		protected void allocateItems(final int count) {
-			final Object[] items = this.items;
-			final int oldLength = items.length;
-			final int newLength = this.validAllocateLength(count);
-			if(oldLength == newLength) return;
-			if(newLength != 0){
-				System.arraycopy(items, 0, this.items = new Object[newLength], 0, this.size);
-			}else{
-				this.items = CompactList.ITEMS;
-			}
+			this.items = CompactBase.resizeItems(this.items, this.size, this.validAllocateLength(count));
 		}
 
 		/**
 		 * Diese Methode verkleinert die Kapazität des {@link Array Arrays} der Elemente auf das Minimum.
 		 * 
-		 * @see CompactList#validCompactLength()
+		 * @see CompactBase#validCompactLength()
 		 */
 		protected void compactItems() {
-			final Object[] items = this.items;
-			final int oldLength = items.length;
-			final int newLength = this.validCompactLength();
-			if(oldLength == newLength) return;
-			if(newLength != 0){
-				System.arraycopy(items, 0, this.items = new Object[newLength], 0, newLength);
-			}else{
-				this.items = CompactList.ITEMS;
-			}
+			this.items = CompactBase.resizeItems(this.items, this.size, this.validCompactLength());
 		}
 
 		/**
@@ -296,7 +733,7 @@ public final class Compact {
 		 * Diese Methode gibt die neue Länge für das {@link Array Array} der Elemente zurück, um darin die gegebene Anzahl
 		 * an Elementen verwalten zu können. Sie wird beim Einfügen von Elementen aufgerufen.
 		 * 
-		 * @see CompactList#insertItems(int, int)
+		 * @see CompactBase#insertItems(int, int)
 		 * @param count Anzahl.
 		 * @return Länge.
 		 */
@@ -308,7 +745,7 @@ public final class Compact {
 		 * Diese Methode gibt die neue Länge für das {@link Array Array} der Elemente zurück, um darin die gegebene Anzahl
 		 * an Elementen verwalten zu können. Sie wird beim Entfernen von Elementen aufgerufen.
 		 * 
-		 * @see CompactList#removeItems(int, int)
+		 * @see CompactBase#removeItems(int, int)
 		 * @param count Anzahl.
 		 * @return Länge.
 		 */
@@ -320,8 +757,8 @@ public final class Compact {
 		 * Diese Methode gibt die neue Länge für das {@link Array Array} der Elemente zurück, um darin alle vorhandenen
 		 * Elemente verwalten zu können. Sie wird beim Kompaktieren aufgerufen.
 		 * 
-		 * @see CompactList#size
-		 * @see CompactList#compactItems()
+		 * @see CompactBase#size
+		 * @see CompactBase#compactItems()
 		 * @return Länge.
 		 */
 		protected int validCompactLength() {
@@ -332,7 +769,7 @@ public final class Compact {
 		 * Diese Methode gibt die neue Länge für das {@link Array Array} der Elemente zurück, um darin die gegebene Anzahl
 		 * an Elementen verwalten zu können. Sie wird beim Reservieren von Elementen aufgerufen.
 		 * 
-		 * @see CompactList#allocateItems(int)
+		 * @see CompactBase#allocateItems(int)
 		 * @param count Anzahl.
 		 * @return Länge.
 		 */
@@ -358,106 +795,121 @@ public final class Compact {
 
 	}
 
-	public static void main(final String[] args) {
-
-		final List<Object> c = new ArrayList<Object>();
-		c.addAll(Arrays.asList(Hash.class.getFields()));
-		c.addAll(Arrays.asList(Hash.class.getMethods()));
-		c.addAll(Arrays.asList(Arrays.class.getFields()));
-		c.addAll(Arrays.asList(Arrays.class.getMethods()));
-
-		final Set<Object> set1 = new CompactHashSetEx<Object>();
-		final Set<Object> set2 = new HashSet<Object>();
-
-		final Runnable runnable1 = new Runnable() {
-
-			@Override
-			public void run() {
-				set1.addAll(c);
-			}
-
-		};
-		final Runnable runnable2 = new Runnable() {
-
-			@Override
-			public void run() {
-				set2.addAll(c);
-			}
-
-		};
-
-		runnable1.run();
-		runnable2.run();
-
-		set1.clear();
-		set2.clear();
-
-		System.out.println(new Tester(runnable1));
-		System.out.println(new Tester(runnable2));
-
-		final List l1 = new ArrayList(set1);
-		final List l2 = new ArrayList(set2);
-		System.out.println(l1.size());
-		System.out.println(l2.size());
-
-		for(final Object i: l2){
-			l1.remove(i);
-		}
-
-		System.out.println(l1);
-		System.out.println(l1.size());
-
-		System.out.println(set1.containsAll(set2));
-		System.out.println(set2.containsAll(set1));
-
-		System.out.println(Objects.toString(c.size()));
-		System.out.println(Objects.toString(set1.size()));
-		System.out.println(Objects.toString(set2.size()));
-
-	}
-
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link Set Set}, dessen Daten von einem {@link Array Array} verwaltet
+	 * Diese Klasse implementiert ein abstraktes {@link Set Set}, dessen Daten in einem {@link Array Array} verwaltet
 	 * werden.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <E> Typ der Elemente.
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
 	 */
-	public static abstract class CompactSet<E> extends CompactList implements Set<E> {
+	public static abstract class CompactSet<GItem> extends CompactBase implements Set<GItem> {
 
 		/**
-		 * Diese Klasse implementiert den {@link Iterator Iterator}.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} für {@link CompactSet Compact-Sets}.
 		 * 
-		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected class CompactSetItemIterator extends CompactItemIterator<E> {
+		protected final class CompactAscendingSetIterator extends CompactAscendingIterator<GItem> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactAscendingSetIterator(final int from, final int last) {
+				super(from, last);
+			}
 
 			/**
 			 * {@inheritDoc}
 			 */
-			@SuppressWarnings ("unchecked")
 			@Override
-			protected E next(final int index) {
-				return (E)CompactSet.this.items[index];
+			protected GItem next(final int index) {
+				return CompactSet.this.item(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected void remove(final int index) {
+				CompactSet.this.removeItems(index, 1);
 			}
 
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set}.
+		 * Diese Klasse implementiert den absteigenden {@link Iterator Iterator} für {@link CompactSet Compact-Sets}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected final class CompactDescentingSetIterator extends CompactDescendingIterator<GItem> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactDescentingSetIterator(final int from, final int last) {
+				super(from, last);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected GItem next(final int index) {
+				return CompactSet.this.item(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected void remove(final int index) {
+				CompactSet.this.removeItems(index, 1);
+			}
+
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set Set}.
 		 */
 		public CompactSet() {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactSet(final int capacity) {
+			this.allocate(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit den gegebenen Elementen.
 		 * 
 		 * @see Set#addAll(Collection)
 		 * @param collection Elemente.
 		 */
-		public CompactSet(final Collection<? extends E> collection) {
+		public CompactSet(final Collection<? extends GItem> collection) {
 			this.allocate(collection.size());
 			this.addAll(collection);
+		}
+
+		/**
+		 * Diese Methode gibt das {@code index}-te Element zurück.
+		 * 
+		 * @param index Index.
+		 * @return {@code index}-tes Element.
+		 */
+		@SuppressWarnings ("unchecked")
+		protected final GItem item(final int index) {
+			return (GItem)this.items[index];
 		}
 
 		/**
@@ -466,11 +918,11 @@ public final class Compact {
 		 * @see AbstractSet
 		 * @return {@link Set Set}.
 		 */
-		protected final Set<E> itemSet() {
-			return new AbstractSet<E>() {
+		protected final Set<GItem> itemSet() {
+			return new AbstractSet<GItem>() {
 
 				@Override
-				public Iterator<E> iterator() {
+				public Iterator<GItem> iterator() {
 					return CompactSet.this.iterator();
 				}
 
@@ -481,17 +933,6 @@ public final class Compact {
 
 			};
 		}
-
-		/**
-		 * Diese Methode sucht nach dem gegebenen Schlüssel und gibt dessen Index oder
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-		 * 
-		 * @see CompactList#equalsSearch(Object, int)
-		 * @see CompactList#compareSearch(Object, int)
-		 * @param key Schlüssel.
-		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-		 */
-		protected abstract int itemSearch(final Object key);
 
 		/**
 		 * {@inheritDoc}
@@ -507,15 +948,14 @@ public final class Compact {
 		@Override
 		public void clear() {
 			this.removeItems(0, this.size);
-			this.compact();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<E> iterator() {
-			return new CompactSetItemIterator();
+		public Iterator<GItem> iterator() {
+			return new CompactAscendingSetIterator(0, this.size);
 		}
 
 		/**
@@ -530,8 +970,8 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean add(final E item) {
-			int index = this.itemSearch(item);
+		public boolean add(final GItem item) {
+			int index = this.itemIndex(item);
 			if(index >= 0) return false;
 			index = -index - 1;
 			this.insertItems(index, 1);
@@ -543,9 +983,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean addAll(final Collection<? extends E> collection) {
+		public boolean addAll(final Collection<? extends GItem> collection) {
 			boolean modified = false;
-			for(final E item: collection)
+			for(final GItem item: collection)
 				if(this.add(item)){
 					modified = true;
 				}
@@ -557,7 +997,7 @@ public final class Compact {
 		 */
 		@Override
 		public boolean remove(final Object item) {
-			final int index = this.itemSearch(item);
+			final int index = this.itemIndex(item);
 			if(index < 0) return false;
 			this.removeItems(index, 1);
 			return true;
@@ -598,7 +1038,7 @@ public final class Compact {
 		 */
 		@Override
 		public boolean contains(final Object key) {
-			return this.itemSearch(key) >= 0;
+			return this.itemIndex(key) >= 0;
 		}
 
 		/**
@@ -656,29 +1096,39 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}. Diese
+	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <E> Typ der Elemente.
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
 	 */
-	public static class CompactHashSet<E> extends CompactSet<E> {
+	public static class CompactHashSet<GItem> extends CompactSet<GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set}.
+		 * Dieser Konstrukteur initialisiert das {@link Set Set}.
 		 */
 		public CompactHashSet() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactHashSet(final int capacity) {
+			super(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit den gegebenen Elementen.
 		 * 
 		 * @see Set#addAll(Collection)
 		 * @param collection Elemente.
 		 */
-		public CompactHashSet(final Collection<? extends E> collection) {
+		public CompactHashSet(final Collection<? extends GItem> collection) {
 			super(collection);
 		}
 
@@ -686,9 +1136,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemSearch(final Object key) {
-			if(key == null) return this.equalsSearch(null, 0);
-			return this.equalsSearch(key, key.hashCode());
+		protected int itemIndex(final Object key) {
+			if(key == null) return this.equalsIndex(null, 0);
+			return this.equalsIndex(key, key.hashCode());
 		}
 
 		/**
@@ -711,42 +1161,437 @@ public final class Compact {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}. Das
-	 * Verhalten dieser Implementation weicht von dem eines {@link HashSet Hash-Sets} ab, wenn {@link Array Arrays} als
-	 * Elemente verwendet werden, da deren {@link Object#hashCode() Streuwerte} und {@link Object#equals(Object)
-	 * Äquivalenzen} anders ermittelt werden, als in einem {@link HashSet Hash-Set}.
-	 * 
-	 * @see Objects#hash(Object)
-	 * @see Objects#equals(Object, Object)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <E> Typ der Elemente.
-	 */
-	public static class CompactHashSetEx<E> extends CompactSet<E> {
+	public static class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
 
-		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set}.
-		 */
-		public CompactHashSetEx() {
-			super();
+		protected abstract class CompactNavigableSubSet extends CompactSubBase implements NavigableSet<GItem> {
+
+			public CompactNavigableSubSet(final Object fromItem, final boolean fromInclusive, final Object lastItem,
+				final boolean lastInclusive) {
+				super(fromItem, fromInclusive, lastItem, lastInclusive);
+			}
+
+			/**
+			 * Diese Methode gibt ein neues {@link Set Set} zurück, das aus dem {@link Iterator Iterator} erzeugt wird.
+			 * 
+			 * @see AbstractSet
+			 * @return {@link Set Set}.
+			 */
+			protected final Set<GItem> itemSet() {
+				return new AbstractSet<GItem>() {
+
+					@Override
+					public Iterator<GItem> iterator() {
+						return CompactNavigableSubSet.this.iterator();
+					}
+
+					@Override
+					public int size() {
+						return CompactNavigableSubSet.this.size();
+					}
+
+				};
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int size() {
+				return this.countItems();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean isEmpty() {
+				return this.countItems() == 0;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public NavigableSet<GItem> subSet(final GItem fromElement, final GItem toElement) {
+				return this.subSet(fromElement, true, toElement, false);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public NavigableSet<GItem> headSet(final GItem toElement) {
+				return this.headSet(toElement, false);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public NavigableSet<GItem> tailSet(final GItem fromElement) {
+				return this.tailSet(fromElement, true);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Object[] toArray() {
+				return this.itemSet().toArray();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public <T> T[] toArray(final T[] a) {
+				return this.itemSet().toArray(a);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int hashCode() {
+				return this.itemSet().hashCode();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean equals(final Object object) {
+				if(object == this) return true;
+				if(!(object instanceof Set<?>)) return false;
+				return this.itemSet().equals(object);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return this.itemSet().toString();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean contains(final Object o) {
+				return this.isInRange(o) && CompactNavigableSet.this.contains(o);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean add(final GItem entry) {
+				if(!this.isInRange(entry)) throw new IllegalArgumentException("Entry out of range");
+				return CompactNavigableSet.this.add(entry);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean remove(final Object entry) {
+				if(!this.isInRange(entry)) return false;
+				return CompactNavigableSet.this.remove(entry);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean containsAll(final Collection<?> c) {
+				for(final Object entry: c)
+					if(!this.contains(entry)) return false;
+				return true;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean addAll(final Collection<? extends GItem> c) {
+				boolean modified = false;
+				for(final GItem entry: c)
+					if(this.add(entry)){
+						modified = true;
+					}
+				return modified;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean retainAll(final Collection<?> c) {
+				boolean modified = false;
+				final Iterator<GItem> iterator = this.iterator();
+				while(iterator.hasNext()){
+					if(!c.contains(iterator.next())){
+						iterator.remove();
+						modified = true;
+					}
+				}
+				return modified;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean removeAll(final Collection<?> c) {
+				boolean modified = false;
+				final Iterator<?> iterator = this.iterator();
+				while(iterator.hasNext()){
+					if(c.contains(iterator.next())){
+						iterator.remove();
+						modified = true;
+					}
+				}
+				return modified;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void clear() {
+				this.clearItems();
+			}
+
+		}
+
+		protected class CompactAscendingSubSet extends CompactNavigableSubSet {
+
+			public CompactAscendingSubSet(final Object fromItem, final boolean fromInclusive, final Object lastItem,
+				final boolean lastInclusive) {
+				super(fromItem, fromInclusive, lastItem, lastInclusive);
+
+			}
+
+			@Override
+			public Comparator<? super GItem> comparator() {
+				return null;
+			}
+
+			@Override
+			public GItem first() {
+				return CompactNavigableSet.this.itemOrException(this.lowestIndex());
+			}
+
+			@Override
+			public GItem last() {
+				return CompactNavigableSet.this.itemOrException(this.highestIndex());
+			}
+
+			@Override
+			public GItem lower(final GItem entry) {
+				return CompactNavigableSet.this.itemOrNull(this.lowerIndex(entry));
+			}
+
+			@Override
+			public GItem floor(final GItem entry) {
+				return CompactNavigableSet.this.itemOrNull(this.floorIndex(entry));
+			}
+
+			@Override
+			public GItem ceiling(final GItem entry) {
+				return CompactNavigableSet.this.itemOrNull(this.ceilingIndex(entry));
+			}
+
+			@Override
+			public GItem higher(final GItem entry) {
+
+				return CompactNavigableSet.this.itemOrNull(this.higherIndex(entry));
+			}
+
+			@Override
+			public GItem pollFirst() {
+				return null;
+			}
+
+			@Override
+			public GItem pollLast() {
+				return null;
+			}
+
+			@Override
+			public Iterator<GItem> iterator() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> descendingSet() {
+				return null;
+			}
+
+			@Override
+			public Iterator<GItem> descendingIterator() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
+				final boolean toInclusive) {
+				if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
+				if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toKey out of range");
+				return new CompactAscendingSubSet(fromElement, fromInclusive, toElement, toInclusive);
+			}
+
+			@Override
+			public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
+				return null;
+			}
+
+		}
+
+		protected class CompactDescendingSubSet extends CompactNavigableSubSet {
+
+			public CompactDescendingSubSet(final Object fromItem, final boolean fromInclusive, final Object lastItem,
+				final boolean lastInclusive) {
+				super(fromItem, fromInclusive, lastItem, lastInclusive);
+
+			}
+
+			@Override
+			public Comparator<? super GItem> comparator() {
+				return null;
+			}
+
+			@Override
+			public GItem first() {
+				return null;
+			}
+
+			@Override
+			public GItem last() {
+				return null;
+			}
+
+			@Override
+			public GItem lower(final GItem e) {
+				return null;
+			}
+
+			@Override
+			public GItem floor(final GItem e) {
+				return null;
+			}
+
+			@Override
+			public GItem ceiling(final GItem e) {
+				return null;
+			}
+
+			@Override
+			public GItem higher(final GItem e) {
+				return null;
+			}
+
+			@Override
+			public GItem pollFirst() {
+				return null;
+			}
+
+			@Override
+			public GItem pollLast() {
+				return null;
+			}
+
+			@Override
+			public Iterator<GItem> iterator() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> descendingSet() {
+				return null;
+			}
+
+			@Override
+			public Iterator<GItem> descendingIterator() {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
+				final boolean toInclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
+				return null;
+			}
+
+			@Override
+			public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
+				return null;
+			}
+
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
-		 * 
-		 * @see Set#addAll(Collection)
-		 * @param collection Elemente.
+		 * Dieses Feld speichert den {@link Comparator Comparator}.
 		 */
-		public CompactHashSetEx(final Collection<? extends E> collection) {
+		protected final Comparator<? super GItem> comparator;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
+		 * 
+		 * @param comparator {@link Comparator Comparator}.
+		 */
+		public CompactNavigableSet(final Comparator<? super GItem> comparator) {
+			super();
+			if(comparator == null) throw new NullPointerException("Comparator is null");
+			this.comparator = comparator;
+		}
+
+		public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator) {
 			super(collection);
+			if(comparator == null) throw new NullPointerException("Comparator is null");
+			this.comparator = comparator;
+		}
+
+		/**
+		 * Diese Methode löscht das {@code index}-te Element und gibt es zurück. Wenn das {@link CompactSet Compact-Set}
+		 * leer ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @param index Index.
+		 * @return {@code index}-te Element oder {@code null}.
+		 */
+		protected final GItem poll(final int index) {
+			if(this.size == 0) return null;
+			final GItem item = this.item(index);
+			this.removeItems(index, 1);
+			return item;
+		}
+
+		protected final GItem itemOrNull(final int index) {
+			if((index < 0) || (index >= this.size)) return null;
+			return this.item(index);
+		}
+
+		protected final GItem itemOrException(final int index) {
+			if((index < 0) || (index >= this.size)) throw new NoSuchElementException();
+			return this.item(index);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemSearch(final Object key) {
-			return this.equalsSearch(key, Objects.hash(key));
+		protected int itemIndex(final Object key) {
+			return this.compareIndex(key, 0);
 		}
 
 		/**
@@ -754,84 +1599,345 @@ public final class Compact {
 		 */
 		@Override
 		protected boolean equals(final Object key, final int hash, final Object item) {
-			return Objects.equals(key, item);
+			return false;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		protected int compare(final Object key, final int hash, final Object item) {
+			return this.comparator.compare((GItem)key, (GItem)item);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
-			return Integer.compare(hash, Objects.hash(item));
+		public Comparator<? super GItem> comparator() {
+			return this.comparator;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		public GItem first() {
+			return this.itemOrException(this.firstIndex());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem lower(final GItem item) {
+			return this.itemOrNull(this.lowerIndex(item));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem floor(final GItem item) {
+			return this.itemOrNull(this.floorIndex(item));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem ceiling(final GItem item) {
+			return this.itemOrNull(this.ceilingIndex(item));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem higher(final GItem item) {
+			return this.itemOrNull(this.higherIndex(item));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem last() {
+			return this.itemOrException(this.lastIndex());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem pollFirst() {
+			return this.poll(this.firstIndex());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GItem pollLast() {
+			return this.poll(this.lastIndex());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public SortedSet<GItem> subSet(final GItem fromElement, final GItem toElement) {
+			return this.subSet(fromElement, true, toElement, false);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
+			final boolean toInclusive) {
+			return new CompactAscendingSubSet(fromElement, fromInclusive, toElement, toInclusive);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public SortedSet<GItem> headSet(final GItem toElement) {
+			return this.headSet(toElement, false);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
+			return new CompactAscendingSubSet(CompactBase.OPEN, true, toElement, inclusive);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public SortedSet<GItem> tailSet(final GItem fromElement) {
+			return this.tailSet(fromElement, true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
+			return new CompactAscendingSubSet(fromElement, inclusive, CompactBase.OPEN, true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NavigableSet<GItem> descendingSet() {
+			return new CompactDescendingSubSet(CompactBase.OPEN, true, CompactBase.OPEN, true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GItem> descendingIterator() {
+			return new CompactDescentingSetIterator(0, this.size);
 		}
 
 	}
 
-	public abstract static class CompactMap<K, V> extends CompactList implements Map<K, V> {
+	/**
+	 * Diese Klasse implementiert eine abstrakte {@link Map Map}, deren Daten in einem {@link Array Array} verwaltet
+	 * werden.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <K> Typ der Schlüssel.
+	 * @param <V> Typ der Werte.
+	 */
+	public abstract static class CompactMap<K, V> extends CompactBase implements Map<K, V> {
 
 		/**
-		 * Diese Klasse implementiert den {@link Iterator Iterator} der Schlüssel.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} der Schlüssel.
 		 * 
-		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected class CompactMapKeyIterator extends CompactItemIterator<K> {
+		protected class CompactAscendingMapKeyIterator extends CompactAscendingIterator<K> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactAscendingMapKeyIterator(final int from, final int last) {
+				super(from, last);
+			}
 
 			/**
 			 * {@inheritDoc}
 			 */
-			@SuppressWarnings ("unchecked")
 			@Override
 			protected K next(final int index) {
 				return CompactMap.this.getKey(index);
 			}
 
-		}
-
-		/**
-		 * Diese Klasse implementiert den {@link Iterator Iterator} der Werte.
-		 * 
-		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected class CompactMapValueIterator extends CompactItemIterator<V> {
-
 			/**
 			 * {@inheritDoc}
 			 */
-			@SuppressWarnings ("unchecked")
 			@Override
-			protected V next(final int index) {
-				return CompactMap.this.getValue(index);
+			protected void remove(final int index) {
+				CompactMap.this.removeItems(index, 1);
 			}
 
 		}
 
 		/**
-		 * Diese Klasse implementiert den {@link Iterator Iterator} der {@link Entry Entries}.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} der Werte.
 		 * 
-		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected class CompactMapEntryIterator extends CompactItemIterator<Entry<K, V>> {
+		protected class CompactAscendingMapValueIterator extends CompactAscendingIterator<V> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactAscendingMapValueIterator(final int from, final int last) {
+				super(from, last);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected V next(final int index) {
+				return CompactMap.this.getValue(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected void remove(final int index) {
+				CompactMap.this.removeItems(index, 1);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert den {@link Iterator Iterator} der {@link java.util.Map.Entry Entries}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected class CompactAscendingMapEntryIterator extends CompactAscendingIterator<Entry<K, V>> {
+
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param from Index des ersten Elements (inklusiv).
+			 * @param last Index des letzten Elements (exklusiv).
+			 */
+			public CompactAscendingMapEntryIterator(final int from, final int last) {
+				super(from, last);
+			}
 
 			/**
 			 * {@inheritDoc}
 			 */
 			@Override
 			protected Entry<K, V> next(final int index) {
-				return new SimpleEntry<K, V>(CompactMap.this.getKey(index), CompactMap.this.getValue(index)) {
+				return CompactMap.this.getEntry(index);
+			}
 
-					private static final long serialVersionUID = -2184170070616433736L;
-
-					@Override
-					public V setValue(final V value) {
-						final V v = super.setValue(value);
-						CompactMap.this.setValue(index, value);
-						return v;
-					}
-
-				};
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected void remove(final int index) {
+				CompactMap.this.removeItems(index, 1);
 			}
 
 		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 */
+		public CompactMap() {
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactMap(final int capacity) {
+			this.allocate(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * 
+		 * @see Map#putAll(Map)
+		 * @param map Elemente.
+		 */
+		public CompactMap(final Map<? extends K, ? extends V> map) {
+			this.allocate(map.size());
+			this.putAll(map);
+		}
+
+		/**
+		 * Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
+		 * 
+		 * @param index Index.
+		 * @return Schlüssel des {@code index}-ten Elements.
+		 */
+		protected abstract K getKey(int index);
+
+		/**
+		 * Diese Methode gibt den Wert des {@code index}-ten Elements zurück.
+		 * 
+		 * @param index Index.
+		 * @return Wert des {@code index}-ten Elements.
+		 */
+		protected abstract V getValue(int index);
+
+		/**
+		 * Diese Methode gibt das {@code index}-te Element zurück.
+		 * 
+		 * @param index Index.
+		 * @return {@code index}-tes Element
+		 */
+		protected final Entry<K, V> getEntry(final int index) {
+			return new SimpleEntry<K, V>(this.getKey(index), this.getValue(index)) {
+
+				private static final long serialVersionUID = -2184170070616433736L;
+
+				@Override
+				public V setValue(final V value) {
+					final V v = super.setValue(value);
+					CompactMap.this.setEntry(index, this.getKey(), value);
+					return v;
+				}
+
+			};
+		}
+
+		/**
+		 * Diese Methode setzt Schlüssel und Wert des {@code index}-ten Elements.
+		 * 
+		 * @param index Index.
+		 * @param key Schlüssel.
+		 * @param value Wert.
+		 */
+		protected abstract void setEntry(int index, K key, V value);
 
 		/**
 		 * Diese Methode gibt ein neues {@link Set Set} zurück, das aus dem {@link Iterator Iterator} erzeugt wird.
@@ -842,23 +1948,26 @@ public final class Compact {
 		protected final Map<K, V> itemMap() {
 			return new AbstractMap<K, V>() {
 
-				Set<Entry<K, V>> entrySet = CompactMap.this.entrySet();
-
 				@Override
 				public Set<Entry<K, V>> entrySet() {
-					return this.entrySet;
+					return CompactMap.this.entrySet();
 				}
 
 			};
 		}
 
-		protected abstract int itemSearch(final Object key);
-
-		protected abstract K getKey(int index);
-
-		protected abstract V getValue(int index);
-
-		protected abstract void setValue(int index, V value);
+		/**
+		 * Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den
+		 * Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist
+		 * der Index, bei dem der Eintrag eingefügt werden müsste.
+		 * 
+		 * @see CompactBase#equalsIndex(Object, int)
+		 * @see CompactBase#compareIndex(Object, int)
+		 * @param key Syhlüssel.
+		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 */
+		@Override
+		protected abstract int itemIndex(final Object key);
 
 		/**
 		 * {@inheritDoc}
@@ -891,7 +2000,7 @@ public final class Compact {
 
 				@Override
 				public Iterator<V> iterator() {
-					return new CompactMapValueIterator();
+					return new CompactAscendingMapValueIterator(0, CompactMap.this.size);
 				}
 
 			};
@@ -911,27 +2020,7 @@ public final class Compact {
 
 				@Override
 				public Iterator<K> iterator() {
-					return new CompactMapKeyIterator();
-				}
-
-			};
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Set<Entry<K, V>> entrySet() {
-			return new AbstractSet<Entry<K, V>>() {
-
-				@Override
-				public int size() {
-					return CompactMap.this.size;
-				}
-
-				@Override
-				public Iterator<Entry<K, V>> iterator() {
-					return new CompactMapEntryIterator();
+					return new CompactAscendingMapKeyIterator(0, CompactMap.this.size);
 				}
 
 			};
@@ -950,7 +2039,7 @@ public final class Compact {
 		 */
 		@Override
 		public boolean containsKey(final Object key) {
-			return this.itemSearch(key) >= 0;
+			return this.itemIndex(key) >= 0;
 		}
 
 		/**
@@ -958,7 +2047,7 @@ public final class Compact {
 		 */
 		@Override
 		public V get(final Object key) {
-			final int index = this.itemSearch(key);
+			final int index = this.itemIndex(key);
 			if(index < 0) return null;
 			return this.getValue(index);
 		}
@@ -968,15 +2057,15 @@ public final class Compact {
 		 */
 		@Override
 		public V put(final K key, final V value) {
-			int index = this.itemSearch(key);
+			int index = this.itemIndex(key);
 			if(index >= 0){
 				final V item = this.getValue(index);
-				this.setValue(index, value);
+				this.setEntry(index, this.getKey(index), value);
 				return item;
 			}
 			index = -index - 1;
 			this.insertItems(index, 1);
-			this.setValue(index, value);
+			this.setEntry(index, key, value);
 			return null;
 		}
 
@@ -995,7 +2084,7 @@ public final class Compact {
 		 */
 		@Override
 		public V remove(final Object key) {
-			final int index = this.itemSearch(key);
+			final int index = this.itemIndex(key);
 			if(index < 0) return null;
 			final V item = this.getValue(index);
 			this.removeItems(index, 1);
@@ -1028,89 +2117,245 @@ public final class Compact {
 			return this.itemMap().toString();
 		}
 
-	}
-
-	public static abstract class CompactSetMap<K, V> extends CompactMap<K, V> {
-
-		
-		
-	}
-
-	public static abstract class CompactValueMap<K, V> extends CompactMap<K, V> {
-
-		protected Object[] values = CompactList.ITEMS;
-
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
-			final int size = this.size;
-			super.insertItems(index, count);
-			final Object[] oldValues = this.values;
-			final int oldLength = oldValues.length;
-			final int newLength = this.items.length;
-			if(oldLength != newLength){
-				final Object[] newValues = new Object[newLength];
-				System.arraycopy(oldValues, 0, newValues, 0, index);
-				System.arraycopy(oldValues, index, newValues, index + count, size - index);
-				this.values = newValues;
-			}else{
-				System.arraycopy(oldValues, index, oldValues, index + count, size - index);
-			}
-		}
+		public Set<Entry<K, V>> entrySet() {
+			return new AbstractSet<Entry<K, V>>() {
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
-			super.removeItems(index, count);
-			final int size = this.size;
-			final Object[] oldValues = this.values;
-			final int oldLength = oldValues.length;
-			final int newLength = this.items.length;
-			if(oldLength != newLength){
-				if(newLength != 0){
-					final Object[] newValues = new Object[newLength];
-					System.arraycopy(oldValues, 0, newValues, 0, index);
-					System.arraycopy(oldValues, index + count, newValues, index, size - index);
-					this.values = newValues;
-				}else{
-					this.values = CompactList.ITEMS;
+				@Override
+				public int size() {
+					return CompactMap.this.size;
 				}
-			}else{
-				System.arraycopy(oldValues, index + count, oldValues, index, size - index);
-			}
+
+				@Override
+				public Iterator<Entry<K, V>> iterator() {
+					return new CompactAscendingMapEntryIterator(0, CompactMap.this.size);
+				}
+
+			};
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine abstrakte {@link CompactMap Compact-Map}, deren Werte in einem {@link Array Array}
+	 * verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht
+	 * als Wert.
+	 * 
+	 * @see CompactItemMap#getKey(Object)
+	 * @see CompactItemMap#setKey(Object, Object)
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <K> Typ der Schlüssel.
+	 * @param <V> Typ der Werte.
+	 */
+	public static abstract class CompactItemMap<K, V> extends CompactMap<K, V> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 */
+		public CompactItemMap() {
+			super();
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactItemMap(final int capacity) {
+			super(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * 
+		 * @see Map#putAll(Map)
+		 * @param map Elemente.
+		 */
+		public CompactItemMap(final Map<? extends K, ? extends V> map) {
+			super(map);
+		}
+
+		/**
+		 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
+		 * 
+		 * @param value Wert.
+		 * @return Schlüssel.
+		 */
+		protected abstract K getKey(final V value);
+
+		/**
+		 * Diese Methode setzt den Schlüssel des gegebenen Werts.
+		 * 
+		 * @param key Schlüssel.
+		 * @param value Wert.
+		 */
+		protected abstract void setKey(K key, final V value);
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final K getKey(final int index) {
+			return this.getKey(this.getValue(index));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		protected final V getValue(final int index) {
+			return (V)this.items[index];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void allocateItems(final int count) {
-			super.allocateItems(count);
-			this.resizeValues();
+		protected final void setEntry(final int index, final K key, final V value) {
+			if(value == null) throw new NullPointerException();
+			this.items[index] = value;
+			this.setKey(key, value);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void compactItems() {
-			super.compactItems();
-			this.resizeValues();
+		public V put(final K key, final V value) {
+			if(value == null) throw new NullPointerException();
+			return super.put(key, value);
 		}
 
-		protected void resizeValues() {
-			final int length = this.items.length;
-			final Object[] values = this.values;
-			if(values.length == length) return;
-			if(length != 0){
-				System.arraycopy(values, 0, this.values = new Object[length], 0, this.size);
-			}else{
-				this.values = CompactList.ITEMS;
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean containsValue(final Object value) {
+			if(value == null) return false;
+			for(int i = 0, size = this.size; i < size; i++){
+				if(value.equals(this.items[i])) return true;
 			}
+			return false;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap
+	 * Compact-Item-Map}.
+	 * 
+	 * @see Object#hashCode()
+	 * @see Object#equals(Object)
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <K> Typ der Schlüssel.
+	 * @param <V> Typ der Werte.
+	 */
+	public static abstract class CompactItemHashMap<K, V> extends CompactItemMap<K, V> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 */
+		public CompactItemHashMap() {
+			super();
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactItemHashMap(final int capacity) {
+			super(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * 
+		 * @see Map#putAll(Map)
+		 * @param map Elemente.
+		 */
+		public CompactItemHashMap(final Map<? extends K, ? extends V> map) {
+			super(map);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int itemIndex(final Object key) {
+			if(key == null) return this.equalsIndex(null, 0);
+			return this.equalsIndex(key, key.hashCode());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		protected boolean equals(final Object key, final int hash, final Object item) {
+			if(key == null) return this.getKey((V)item) == null;
+			return key.equals(this.getKey((V)item));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		protected int compare(final Object key, final int hash, final Object item) {
+			final Object value = this.getKey((V)item);
+			if(value == null) return hash;
+			return Integer.compare(hash, value.hashCode());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine abstrakte {@link Map Map}, deren Schlüssel und Werte in je einem {@link Array
+	 * Array} verwaltet werden.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <K> Typ der Schlüssel.
+	 * @param <V> Typ der Werte.
+	 */
+	public static abstract class CompactEntryMap<K, V> extends CompactMap<K, V> {
+
+		/**
+		 * Dieses Feld speichert die Werte.
+		 */
+		protected Object[] values = CompactBase.ITEMS;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 */
+		public CompactEntryMap() {
+			super();
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactEntryMap(final int capacity) {
+			super(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * 
+		 * @see Map#putAll(Map)
+		 * @param map Elemente.
+		 */
+		public CompactEntryMap(final Map<? extends K, ? extends V> map) {
+			super(map);
 		}
 
 		/**
@@ -1135,95 +2380,114 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void setValue(final int index, final V value) {
+		protected void setEntry(final int index, final K key, final V value) {
+			this.items[index] = key;
 			this.values[index] = value;
-		}
-
-	}
-
-	static class CompactSortedSet<E> extends CompactSet<E> implements NavigableSet<E> {
-
-		protected class CompactSortedSubSet extends AbstractSet<E> implements SortedSet<E> {
-
-			Object fromItem;
-
-			Object lastItem;
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public Comparator<? super E> comparator() {
-				return CompactSortedSet.this.comparator;
-			}
-
-			@Override
-			public SortedSet<E> subSet(final E fromElement, final E toElement) {
-				return null;
-			}
-
-			@Override
-			public SortedSet<E> headSet(final E toElement) {
-
-				return null;
-			}
-
-			@Override
-			public SortedSet<E> tailSet(final E fromElement) {
-				return null;
-			}
-
-			@Override
-			public E first() {
-
-				return null;
-			}
-
-			@Override
-			public E last() {
-				return null;
-			}
-
-			@Override
-			public Iterator<E> iterator() {
-				return null;
-			}
-
-			@Override
-			public int size() {
-				return 0;
-			}
-
-		}
-
-		/**
-		 * Dieses Feld speichert den {@link Comparator Comparator}.
-		 */
-		protected final Comparator<? super E> comparator;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
-		 * 
-		 * @param comparator {@link Comparator Comparator}.
-		 */
-		public CompactSortedSet(final Comparator<? super E> comparator) {
-			super();
-			if(comparator == null) throw new NullPointerException("Comparator is null");
-			this.comparator = comparator;
-		}
-
-		public CompactSortedSet(final Collection<? extends E> collection, final Comparator<? super E> comparator) {
-			super(collection);
-			if(comparator == null) throw new NullPointerException("Comparator is null");
-			this.comparator = comparator;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemSearch(final Object key) {
-			return this.compareSearch(key, 0);
+		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
+			final int size = this.size;
+			super.insertItems(index, count);
+			this.values = CompactBase.insertItems(this.values, size, this.items.length, index, count);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
+			final int size = this.size;
+			super.removeItems(index, count);
+			this.values = CompactBase.removeItems(this.values, size, this.items.length, index, count);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void allocateItems(final int count) {
+			super.allocateItems(count);
+			this.values = CompactBase.resizeItems(this.values, this.size, this.items.length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void compactItems() {
+			super.compactItems();
+			this.values = CompactBase.resizeItems(this.values, this.size, this.items.length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean containsValue(final Object value) {
+			if(value == null){
+				for(int i = 0, size = this.size; i < size; i++){
+					if(this.values[i] == null) return true;
+				}
+			}else{
+				for(int i = 0, size = this.size; i < size; i++){
+					if(value.equals(this.values[i])) return true;
+				}
+			}
+			return false;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap
+	 * Compact-Entry-Map}.
+	 * 
+	 * @see Object#hashCode()
+	 * @see Object#equals(Object)
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <K> Typ der Schlüssel.
+	 * @param <V> Typ der Werte.
+	 */
+	public static class CompactEntryHashMap<K, V> extends CompactEntryMap<K, V> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 */
+		public CompactEntryHashMap() {
+			super();
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactBase#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactEntryHashMap(final int capacity) {
+			super(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * 
+		 * @see Map#putAll(Map)
+		 * @param map Elemente.
+		 */
+		public CompactEntryHashMap(final Map<? extends K, ? extends V> map) {
+			super(map);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int itemIndex(final Object key) {
+			if(key == null) return this.equalsIndex(null, 0);
+			return this.equalsIndex(key, key.hashCode());
 		}
 
 		/**
@@ -1231,133 +2495,82 @@ public final class Compact {
 		 */
 		@Override
 		protected boolean equals(final Object key, final int hash, final Object item) {
-			return false;
+			if(key == null) return item == null;
+			return key.equals(item);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings ("unchecked")
 		@Override
 		protected int compare(final Object key, final int hash, final Object item) {
-			return this.comparator.compare((E)key, (E)item);
+			if(item == null) return hash;
+			return Integer.compare(hash, item.hashCode());
 		}
 
+	}
+
+	static abstract class CompactSortedMap<K, V> extends CompactMap<K, V> implements SortedMap<K, V> {
+	
+		/**
+		 * Dieses Feld speichert den {@link Comparator Comparator}.
+		 */
+		protected final Comparator<? super K> comparator;
+	
+		public CompactSortedMap(final Comparator<? super K> comparator) {
+			super();
+			this.comparator = comparator;
+		}
+	
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Comparator<? super E> comparator() {
-			return this.comparator;
+		protected int itemIndex(final Object key) {
+			return this.compareIndex(key, 0);
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings ("unchecked")
 		@Override
-		public E first() {
+		protected boolean equals(final Object key, final int hash, final Object item) {
+			return false;
+		}
+	
+		@Override
+		public Comparator<? super K> comparator() {
+			return null;
+		}
+	
+		@Override
+		public K firstKey() {
 			if(this.size == 0) throw new NoSuchElementException();
-			return (E)this.items[0];
+			return this.getKey(0);
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
+	
 		@Override
-		public E last() {
+		public K lastKey() {
 			final int size = this.size;
 			if(size == 0) throw new NoSuchElementException();
-			return (E)this.items[size - 1];
+			return this.getKey(size - 1);
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
+	
 		@Override
-		public SortedSet<E> subSet(final E fromElement, final E toElement) {
-			return this.subSet(fromElement, true, toElement, false);
-		}
-
-		@Override
-		public NavigableSet<E> subSet(final E fromElement, final boolean fromInclusive, final E toElement,
-			final boolean toInclusive) {
+		public SortedMap<K, V> subMap(final K fromKey, final K toKey) {
 			return null;
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
+	
 		@Override
-		public SortedSet<E> headSet(final E toElement) {
-			return this.headSet(toElement, false);
-		}
-
-		@Override
-		public NavigableSet<E> headSet(final E toElement, final boolean inclusive) {
+		public SortedMap<K, V> headMap(final K toKey) {
 			return null;
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
+	
 		@Override
-		public SortedSet<E> tailSet(final E fromElement) {
-			return this.tailSet(fromElement, true);
-		}
-
-		@Override
-		public NavigableSet<E> tailSet(final E fromElement, final boolean inclusive) {
+		public SortedMap<K, V> tailMap(final K fromKey) {
 			return null;
 		}
-
-		@Override
-		public E lower(final E e) {
-			return null;
-		}
-
-		@Override
-		public E floor(final E e) {
-			return null;
-		}
-
-		@Override
-		public E ceiling(final E e) {
-			return null;
-		}
-
-		@Override
-		public E higher(final E e) {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public E pollFirst() {
-			if(this.size == 0) return null;
-			final Object item = this.items[0];
-			this.removeItems(0, 1);
-			return (E)item;
-		}
-
-		@Override
-		public E pollLast() {
-			return null;
-		}
-
-		@Override
-		public NavigableSet<E> descendingSet() {
-			return null;
-		}
-
-		@Override
-		public Iterator<E> descendingIterator() {
-			return null;
-		}
-
+	
 	}
 
 }
