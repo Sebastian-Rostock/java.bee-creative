@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public final class Compact {
 
@@ -1078,7 +1080,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		protected static final class CompactAscendingSetIterator<GItem> extends
+		protected static final class CompactSetAscendingIterator<GItem> extends
 			CompactAscendingIterator<GItem, CompactSet<GItem>> {
 
 			/**
@@ -1088,7 +1090,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingSetIterator(final CompactSet<GItem> set, final int from, final int last) {
+			public CompactSetAscendingIterator(final CompactSet<GItem> set, final int from, final int last) {
 				super(set, from, last);
 			}
 
@@ -1108,7 +1110,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		protected static final class CompactDescendingSetIterator<GItem> extends
+		protected static final class CompactSetDescendingIterator<GItem> extends
 			CompactDescendingIterator<GItem, CompactSet<GItem>> {
 
 			/**
@@ -1118,7 +1120,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactDescendingSetIterator(final CompactSet<GItem> set, final int from, final int last) {
+			public CompactSetDescendingIterator(final CompactSet<GItem> set, final int from, final int last) {
 				super(set, from, last);
 			}
 
@@ -1225,7 +1227,7 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new CompactAscendingSetIterator<GItem>(this, 0, this.size);
+			return new CompactSetAscendingIterator<GItem>(this, 0, this.size);
 		}
 
 		/**
@@ -1759,7 +1761,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> iterator() {
-				return new CompactAscendingSetIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactSetAscendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -1776,7 +1778,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> descendingIterator() {
-				return new CompactDescendingSetIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactSetDescendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -1912,7 +1914,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> iterator() {
-				return new CompactDescendingSetIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactSetDescendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -1929,7 +1931,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> descendingIterator() {
-				return new CompactAscendingSetIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactSetAscendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -2208,7 +2210,7 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> descendingIterator() {
-			return new CompactDescendingSetIterator<GItem>(this, 0, this.size);
+			return new CompactSetDescendingIterator<GItem>(this, 0, this.size);
 		}
 
 	}
@@ -2229,7 +2231,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <K> Typ der Schlüssel.
 		 */
-		protected static class CompactAscendingMapKeyIterator<K> extends CompactAscendingIterator<K, CompactMap<K, ?>> {
+		protected static class CompactMapKeyAscendingIterator<K> extends CompactAscendingIterator<K, CompactMap<K, ?>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
@@ -2238,7 +2240,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingMapKeyIterator(final CompactMap<K, ?> map, final int from, final int last) {
+			public CompactMapKeyAscendingIterator(final CompactMap<K, ?> map, final int from, final int last) {
 				super(map, from, last);
 			}
 
@@ -2258,7 +2260,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <K> Typ der Schlüssel.
 		 */
-		protected static class CompactDescendingMapKeyIterator<K> extends CompactDescendingIterator<K, CompactMap<K, ?>> {
+		protected static class CompactMapKeyDescendingIterator<K> extends CompactDescendingIterator<K, CompactMap<K, ?>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
@@ -2267,7 +2269,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactDescendingMapKeyIterator(final CompactMap<K, ?> map, final int from, final int last) {
+			public CompactMapKeyDescendingIterator(final CompactMap<K, ?> map, final int from, final int last) {
 				super(map, from, last);
 			}
 
@@ -2287,7 +2289,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <V> Typ der Werte.
 		 */
-		protected static class CompactAscendingMapValueIterator<V> extends CompactAscendingIterator<V, CompactMap<?, V>> {
+		protected static class CompactMapValueIterator<V> extends CompactAscendingIterator<V, CompactMap<?, V>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
@@ -2296,36 +2298,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingMapValueIterator(final CompactMap<?, V> map, final int from, final int last) {
-				super(map, from, last);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected V next(final int index) {
-				return this.data.getValue(index);
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert den absteigenden {@link Iterator Iterator} der Werte.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <V> Typ der Werte.
-		 */
-		protected static class CompactDescendingMapValueIterator<V> extends CompactDescendingIterator<V, CompactMap<?, V>> {
-
-			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
-			 * 
-			 * @param map {@link CompactMap Compact-Map}.
-			 * @param from Index des ersten Elements (inklusiv).
-			 * @param last Index des letzten Elements (exklusiv).
-			 */
-			public CompactDescendingMapValueIterator(final CompactMap<?, V> map, final int from, final int last) {
+			public CompactMapValueIterator(final CompactMap<?, V> map, final int from, final int last) {
 				super(map, from, last);
 			}
 
@@ -2346,7 +2319,7 @@ public final class Compact {
 		 * @param <K> Typ der Schlüssel.
 		 * @param <V> Typ der Werte.
 		 */
-		protected static class CompactAscendingMapEntryIterator<K, V> extends
+		protected static class CompactMapEntryIterator<K, V> extends
 			CompactAscendingIterator<Entry<K, V>, CompactMap<K, V>> {
 
 			/**
@@ -2356,38 +2329,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingMapEntryIterator(final CompactMap<K, V> map, final int from, final int last) {
-				super(map, from, last);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected Entry<K, V> next(final int index) {
-				return this.data.getEntry(index);
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert den absteigenden {@link Iterator Iterator} der {@link java.util.Map.Entry Entries}.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <K> Typ der Schlüssel.
-		 * @param <V> Typ der Werte.
-		 */
-		protected static class CompactDescendingMapEntryIterator<K, V> extends
-			CompactDescendingIterator<Entry<K, V>, CompactMap<K, V>> {
-
-			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
-			 * 
-			 * @param map {@link CompactMap Compact-Map}.
-			 * @param from Index des ersten Elements (inklusiv).
-			 * @param last Index des letzten Elements (exklusiv).
-			 */
-			public CompactDescendingMapEntryIterator(final CompactMap<K, V> map, final int from, final int last) {
+			public CompactMapEntryIterator(final CompactMap<K, V> map, final int from, final int last) {
 				super(map, from, last);
 			}
 
@@ -2427,6 +2369,22 @@ public final class Compact {
 			this.allocate(map.size());
 			this.putAll(map);
 		}
+
+		/**
+		 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
+		 * 
+		 * @param value Wert.
+		 * @return Schlüssel.
+		 */
+		protected abstract K getKey(final V value);
+
+		/**
+		 * Diese Methode setzt den Schlüssel des gegebenen Werts.
+		 * 
+		 * @param key Schlüssel.
+		 * @param value Wert.
+		 */
+		protected abstract void setKey(K key, final V value);
 
 		/**
 		 * Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
@@ -2535,7 +2493,7 @@ public final class Compact {
 
 				@Override
 				public Iterator<V> iterator() {
-					return new CompactAscendingMapValueIterator<V>(CompactMap.this, 0, CompactMap.this.size);
+					return new CompactMapValueIterator<V>(CompactMap.this, 0, CompactMap.this.size);
 				}
 
 			};
@@ -2555,7 +2513,7 @@ public final class Compact {
 
 				@Override
 				public Iterator<K> iterator() {
-					return new CompactAscendingMapKeyIterator<K>(CompactMap.this, 0, CompactMap.this.size);
+					return new CompactMapKeyAscendingIterator<K>(CompactMap.this, 0, CompactMap.this.size);
 				}
 
 			};
@@ -2575,7 +2533,7 @@ public final class Compact {
 
 				@Override
 				public Iterator<Entry<K, V>> iterator() {
-					return new CompactAscendingMapEntryIterator<K, V>(CompactMap.this, 0, CompactMap.this.size);
+					return new CompactMapEntryIterator<K, V>(CompactMap.this, 0, CompactMap.this.size);
 				}
 
 			};
@@ -2703,22 +2661,6 @@ public final class Compact {
 		public CompactItemMap(final int capacity) {
 			super(capacity);
 		}
-
-		/**
-		 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
-		 * 
-		 * @param value Wert.
-		 * @return Schlüssel.
-		 */
-		protected abstract K getKey(final V value);
-
-		/**
-		 * Diese Methode setzt den Schlüssel des gegebenen Werts.
-		 * 
-		 * @param key Schlüssel.
-		 * @param value Wert.
-		 */
-		protected abstract void setKey(K key, final V value);
 
 		/**
 		 * {@inheritDoc}
@@ -2868,6 +2810,22 @@ public final class Compact {
 		 */
 		public CompactEntryMap(final Map<? extends K, ? extends V> map) {
 			super(map);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final K getKey(final V value) {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final void setKey(final K key, final V value) {
+			throw new UnsupportedOperationException();
 		}
 
 		/**
@@ -3221,7 +3179,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<K> iterator() {
-				return new CompactAscendingMapKeyIterator<K>(this.map.data, this.map.firstIndex(), this.map.lastIndex() + 1);
+				return new CompactMapKeyAscendingIterator<K>(this.map.data, this.map.firstIndex(), this.map.lastIndex() + 1);
 			}
 
 		}
@@ -3237,7 +3195,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<K> iterator() {
-				return new CompactDescendingMapKeyIterator<K>(this.map.data, this.map.firstIndex(), this.map.lastIndex() + 1);
+				return new CompactMapKeyDescendingIterator<K>(this.map.data, this.map.firstIndex(), this.map.lastIndex() + 1);
 			}
 
 		}
@@ -3407,7 +3365,7 @@ public final class Compact {
 
 					@Override
 					public Iterator<V> iterator() {
-						return new CompactAscendingMapValueIterator<V>(CompactNavigableSubMap.this.data,
+						return new CompactMapValueIterator<V>(CompactNavigableSubMap.this.data,
 							CompactNavigableSubMap.this.firstIndex(), CompactNavigableSubMap.this.lastIndex() + 1);
 					}
 
@@ -3428,7 +3386,7 @@ public final class Compact {
 
 					@Override
 					public Iterator<Entry<K, V>> iterator() {
-						return new CompactAscendingMapEntryIterator<K, V>(CompactNavigableSubMap.this.data,
+						return new CompactMapEntryIterator<K, V>(CompactNavigableSubMap.this.data,
 							CompactNavigableSubMap.this.firstIndex(), CompactNavigableSubMap.this.lastIndex() - 1);
 					}
 
@@ -4076,6 +4034,22 @@ public final class Compact {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
+		protected final K getKey(final V value) {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final void setKey(final K key, final V value) {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
 		@SuppressWarnings ("unchecked")
 		@Override
 		protected K getKey(final int index) {
@@ -4161,22 +4135,6 @@ public final class Compact {
 		public CompactNavigableItemMap(final Comparator<? super K> comparator) {
 			super(comparator);
 		}
-
-		/**
-		 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
-		 * 
-		 * @param value Wert.
-		 * @return Schlüssel.
-		 */
-		protected abstract K getKey(final V value);
-
-		/**
-		 * Diese Methode setzt den Schlüssel des gegebenen Werts.
-		 * 
-		 * @param key Schlüssel.
-		 * @param value Wert.
-		 */
-		protected abstract void setKey(K key, final V value);
 
 		/**
 		 * {@inheritDoc}
