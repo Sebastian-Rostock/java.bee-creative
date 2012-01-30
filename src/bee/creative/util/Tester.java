@@ -8,7 +8,7 @@ package bee.creative.util;
  * vermessen:
  * 
  * <pre>
- * Tester result = new Tester() {
+ * Tester result = new Tester(new Runnable() {
  *   public void run() {
  *     // ...
  *   }
@@ -17,7 +17,7 @@ package bee.creative.util;
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Tester implements Runnable {
+public class Tester {
 
 	/**
 	 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
@@ -65,21 +65,24 @@ public abstract class Tester implements Runnable {
 	public final long leaveMemory;
 
 	/**
-	 * Dieser Konstrukteur ruft die Testmethode {@link Tester#run()} auf und ermittelt die Messwerte. Zur Ermittlung der
+	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Zur Ermittlung der
 	 * Speicherstände vor und nach dem Aufruf der Testmethode wird {@link Runtime#gc()} aufgerufen.
+	 * 
+	 * @param method Testmethode.
+	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
 	 */
-	public Tester() {
+	public Tester(final Runnable method) throws NullPointerException {
+		if(method == null) throw new NullPointerException("Method is null");
 		final Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		this.enterMemory = runtime.totalMemory() - runtime.freeMemory();
 		this.enterTime = System.nanoTime();
-		run();
+		method.run();
 		this.leaveTime = System.nanoTime();
 		runtime.gc();
 		this.leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 		this.usedTime = this.leaveTime - this.enterTime;
 		this.usedMemory = this.leaveMemory - this.enterMemory;
-
 	}
 
 	/**

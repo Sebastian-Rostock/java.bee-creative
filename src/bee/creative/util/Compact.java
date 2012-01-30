@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -26,45 +25,6 @@ import java.util.SortedSet;
  * @author Sebastian Rostock 2012.
  */
 public final class Compact {
-
-	public static void main(final String[] args) {
-		abstract class TC extends Tester {
-
-			String name;
-
-			public TC(final String name) {
-				super();
-				this.name = name;
-			}
-
-			@Override
-			public String toString() {
-				return this.name + ": " + super.toString();
-			}
-
-		}
-
-		final HashSet<Object> oldSet = new HashSet<Object>();
-		final CompactHashSet<Object> newSet = new CompactHashSet<Object>();
-
-		System.out.println(new TC("old.clear()") {
-
-			@Override
-			public void run() {
-				oldSet.clear();
-			}
-
-		});
-		System.out.println(new TC("new.clear()") {
-
-			@Override
-			public void run() {
-				newSet.clear();
-			}
-
-		});
-
-	}
 
 	/**
 	 * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem sortierten {@link Array Array}
