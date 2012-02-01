@@ -474,7 +474,7 @@ public final class Filters {
 
 		@Override
 		public String toString() {
-			return Objects.toStringCall("voidFilter");
+			return Objects.toStringCall("nullFilter");
 		}
 
 	};
