@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -17,6 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Diese Klasse implementiert Hilfsklassen zur Verwaltung von Elemente in {@link Set Sets}, {@link NavigableSet
@@ -1298,7 +1300,15 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}.
+	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}. Der
+	 * Speicherverbrauch eines {@link CompactHashSet Compact-Hash-Sets} liegt bei ca. {@code 13%} des Speicherverbrauchs
+	 * eines {@link HashSet Hash-Sets}. Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl
+	 * der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 245%}. Bei
+	 * einer Anzahl von ca. {@code 100} Elementen benötigen Beide {@link Set Sets} dafür in etwa die gleichen
+	 * Rechenzeiten. Bei weniger Elementen ist das {@link CompactHashSet Compact-Hash-Set} schneller, bei mehr Elementen
+	 * ist das {@link HashSet Hash-Set} schneller. Für das Finden von Elementen und das Iterieren über die Elemente
+	 * benötigt das {@link CompactHashSet Compact-Hash-Set} im Mittel nur noch {@code 75%} der Rechenzeit des
+	 * {@link HashSet Hash-Sets}, unabhängig von der Anzahl der Elemente.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
@@ -1366,7 +1376,15 @@ public final class Compact {
 
 	/**
 	 * Diese Klasse implementiert ein {@link NavigableSet Navigable-Set}, dessen Daten in einem {@link Array Array}
-	 * verwaltet werden.
+	 * verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet Compact-Navigable-Sets} liegt bei ca.
+	 * {@code 13%} des Speicherverbrauchs eines {@link TreeSet Tree-Sets}. Die Rechenzeiten beim Hinzufügen und Entfernen
+	 * von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im
+	 * Mittel auf ca. {@code 208%}. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide {@link NavigableSet
+	 * Navigable-Sets} dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet
+	 * Compact-Navigable-Set} schneller, bei mehr Elementen ist das {@link TreeSet Tree-Set} schneller. Für das Finden von
+	 * Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet Compact-Navigable-Set} im
+	 * Mittel nur noch {@code 25%} bzw. {@code 75%} der Rechenzeit des {@link TreeSet Tree-Sets}, unabhängig von der
+	 * Anzahl der Elemente.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.

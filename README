@@ -1,4 +1,109 @@
 bee-creative.util - [cc-by] Sebastian Rostock
 Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:  [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
 
-Diese Bibliothek beinhaltet Hilfsklassen und Hilfsmethoden zur Verarbeitung von Strings, Comparatoren, Iterablen sowie Iteratoren und definiert dazu noch Filter, Converter, Conversionen, Tester und Builder.
+Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden:
+
+- Comparables
+	- null
+	- reverse
+	- chained
+	- converted
+	- binarySearch
+	- binarySearchFirst
+	- binarySearchLast
+
+- Comparators
+	- null
+	- natural
+	- reverse
+	- iterable
+	- chained
+	- converted
+	- numerical
+	- alphabetical
+	- alphanumerical
+	- long
+	- float
+	- integer
+	- double
+
+- Iterables
+	- void
+	- append
+	- remove
+	- entry
+	- limited
+	- filtered
+	- chained
+	- converted
+
+- Iterators
+	- void
+	- skip
+	- append
+	- remove
+	- entry
+	- limited
+	- filtered
+	- chained
+	- converted
+
+- Builders
+	- null
+	- cached
+	- cached
+	- converted
+	- synchronized
+
+- Compact
+	- CompactHashSet
+	- CompactNavigableSet
+	- CompactItemHashMap
+	- CompactEntryHashMap
+	- CompactNavigableItemMap
+	- CompactNavigableEntryMap
+
+- Conversions
+	- static
+	- dynamic
+	- inverse
+
+- Converters
+	- void
+	- field
+	- method
+	- cached
+	- default
+	- chained
+	- filtered
+	- synchronized
+
+- Filters
+	- null
+	- default
+	- inverse
+	- disjunction
+	- conjunction
+	- equivalence
+	- synchronized
+
+- Pointers
+	- null
+	- hart
+	- weak
+	- soft
+	- converted
+
+- Strings
+	- join
+	- split
+	- match
+	- splatch
+
+- Objects
+	- hash
+	- equals
+	- toString
+
+- Hash
+- Tester

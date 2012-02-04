@@ -142,7 +142,7 @@ public final class Filters {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 */
-	public static final class InvertFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
+	public static final class InverseFilter<GInput> extends FilterLink<GInput> implements Filter<GInput> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter Filter}.
@@ -150,7 +150,7 @@ public final class Filters {
 		 * @param filter {@link Filter Filter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
 		 */
-		public InvertFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		public InverseFilter(final Filter<? super GInput> filter) throws NullPointerException {
 			super(filter);
 		}
 
@@ -168,7 +168,7 @@ public final class Filters {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof InvertFilter<?>)) return false;
+			if(!(object instanceof InverseFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -534,11 +534,11 @@ public final class Filters {
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter Filter}.
-	 * @return Inversion-{@link Filter Filter}.
+	 * @return {@link InverseFilter Inverse-Filter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> invertFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return new InvertFilter<GInput>(filter);
+	public static <GInput> Filter<GInput> inverseFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		return new InverseFilter<GInput>(filter);
 	}
 
 	/**
