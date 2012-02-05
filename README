@@ -3,107 +3,264 @@ Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizen
 
 Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden:
 
-- Comparables
-	- null
-	- reverse
-	- chained
-	- converted
-	- binarySearch
-	- binarySearchFirst
-	- binarySearchLast
+Iterators {
+	classes {
+		EntryIterator
+		LimitedIterator
+		FilteredIterator
+		ChainedIterator
+		ConvertedIterator
+	}
+	methods {
+		skip(Iterator, int)
+		appendAll(Iterator, Collection)
+		removeAll(Iterator, Collection)
+		iterator(Iterator)
+		iteratorConverter()
+		voidIterator()
+		entryIterator(GEntry)
+		entryIteratorConverter()
+		limitedIterator(Filter, Iterator)
+		limitedIteratorConverter(Filter)
+		filteredIterator(Filter, Iterator)
+		filteredIteratorConverter(Filter)
+		chainedIterator(Iterator...)
+		chainedIterator(Iterator, Iterator)
+		chainedIterator(Iterator>)
+		chainedIterator(Iterable>)
+		chainedIteratorConverter()
+		convertedIterator(Converter, Iterator)
+		convertedIteratorConverter(Converter)
+	}
+}
 
-- Comparators
-	- null
-	- natural
-	- reverse
-	- iterable
-	- chained
-	- converted
-	- numerical
-	- alphabetical
-	- alphanumerical
-	- long
-	- float
-	- integer
-	- double
+Iterables {
+	classes {
+		EntryIterable
+		LimitedIterable
+		FilteredIterable
+		ChainedIterable
+		ConvertedIterable
+	}
+	methods {
+		appendAll(Iterable, Collection)
+		removeAll(Iterable, Collection)
+		iterable(Iterable)
+		iterableConverter()
+		iterableIteratorConverter()
+		voidIterable()
+		entryIterable(GEntry)
+		entryIteratorConverter()
+		limitedIterable(Filter, Iterable)
+		limitedIterableConverter(Filter)
+		filteredIterable(Filter, Iterable)
+		filteredIterableConverter(Filter)
+		chainedIterable(Iterable)
+		chainedIterableConverter()
+		convertedIterable(Converter, Iterable)
+		convertedIterableConverter(Converter)
+	}
+}
 
-- Iterables
-	- void
-	- append
-	- remove
-	- entry
-	- limited
-	- filtered
-	- chained
-	- converted
+Comparators {
+	classes {
+		NullComparator
+		ReverseComparator
+		IterableComparator
+		ChainedComparator
+		ConvertedComparator
+	}
+	methods {
+		nullComparator(Comparator)
+		naturalComparator()
+		reverseComparator(Comparator)
+		iterableComparator(Comparator)
+		chainedComparator(Comparator, Comparator)
+		convertedComparator(Converter, Comparator)
+		stringNumericalComparator()
+		stringAlphabeticalComparator()
+		stringAlphanumericalComparator()
+		numberLongComparator()
+		numberFloatComparator()
+		numberIntegerComparator()
+		numberDoubleComparator()
+	}
+}
 
-- Iterators
-	- void
-	- skip
-	- append
-	- remove
-	- entry
-	- limited
-	- filtered
-	- chained
-	- converted
+Comparables {
+	classes {
+		NullComparable
+		ReverseComparable
+		ChainedComparable
+		ConvertedComparable
+	}
+	methods {
+		nullComparable(Comparable)
+		reverseComparable(Comparable)
+		chainedComparable(Comparable, Comparable)
+		convertedComparable(Converter, Comparable)
+		binarySearch(List, Comparable, int, int)
+		binarySearchFirst(List, Comparable, int, int)
+		binarySearchLast(List, Comparable, int, int)
+	}
+}
 
-- Builders
-	- null
-	- cached
-	- cached
-	- converted
-	- synchronized
+Strings {
+	methods {
+		join(String, Iterable)
+		joinConverter(String)
+		split(Pattern, CharSequence, int)
+		splitConverter(Pattern, int)
+		splitAll(Pattern, CharSequence)
+		splitAllConverter(Pattern)
+		match(Pattern, CharSequence, int)
+		matchConverter(Pattern, int)
+		matchAll(Pattern, CharSequence)
+		matchAllConverter(Pattern)
+		splatch(Pattern, CharSequence, int)
+		splatchConverter(Pattern, int)
+		splatchAll(Pattern, CharSequence)
+		splatchAllConverter(Pattern)
+		patternConverter(int)
+	}
+}
 
-- Compact
-	- CompactHashSet
-	- CompactNavigableSet
-	- CompactItemHashMap
-	- CompactEntryHashMap
-	- CompactNavigableItemMap
-	- CompactNavigableEntryMap
+Objects {
+	classes {
+		UseToString
+	}
+	methods {
+		hash(Object...)
+		equals(Object...)
+		toString(boolean, Object)
+		toStringCall(boolean, boolean, String, Object...)
+		toStringObject(boolean, Object)
+		toStringConverter(boolean)
+	}
+}
 
-- Conversions
-	- static
-	- dynamic
-	- inverse
+Filters {
+	classes {
+		InverseFilter
+		ConvertedFilter
+		DisjunctionFilter
+		ConjunctionFilter
+		EquivalenceFilter
+		SynchronizedFilter
+	}
+	methods {
+		nullFilter()
+		inverseFilter(Filter)
+		defaultFilter(boolean)
+		convertedFilter(Filter, Converter)
+		disjunctionFilter(Filter, Filter)
+		conjunctionFilter(Filter, Filter)
+		equivalenceFilter(Filter, Filter)
+		synchronizedFilter(Filter)
+	}
+}
 
-- Converters
-	- void
-	- field
-	- method
-	- cached
-	- default
-	- chained
-	- filtered
-	- synchronized
+Converters {
+	classes {
+		FixedFieldConverter
+		FixedMethodConverter
+		NamedFieldConverter
+		NamedMethodConverter
+		DefaultConverter
+		FilteredConverter
+		CachedConverter
+		ChainedConverter
+		SynchronizedConverter
+	}
+	methods {
+		voidConverter()
+		fieldConverter(String)
+		fieldConverter(Field)
+		methodConverter(String)
+		methodConverter(Method)
+		defaultConverter(Object)
+		cachedConverter(int, int, int, Converter)
+		chainedConverter(Converter, Converter)
+		filteredConverter(Filter, Converter, Converter)
+		synchronizedConverter(Converter)
+	}
+}
 
-- Filters
-	- null
-	- default
-	- inverse
-	- disjunction
-	- conjunction
-	- equivalence
-	- synchronized
+Conversions {
+	classes {
+		StaticConversion
+		InverseConversion
+		DynamicConversion
+	}
+	methods {
+		staticConversion(Object, Object)
+		staticConversionConverter(Converter)
+		inverseConversion(Conversion)
+		inverseConversionConverter()
+		dynamicConversion(Object, Converter)
+		dynamicConversionConverter(Converter)
+		conversionInputConverter()
+		conversionOutputConverter()
+	}
+}
 
-- Pointers
-	- null
-	- hart
-	- weak
-	- soft
-	- converted
+Builders {
+	classes {
+		CachedBuilder
+		ConvertedBuilder
+		SynchronizedBuilder
+	}
+	methods {
+		nullBuilder()
+		cachedBuilder(int, Builder)
+		convertedBuilder(Converter, Builder)
+		synchronizedBuilder(Builder)
+	}
+}
 
-- Strings
-	- join
-	- split
-	- match
-	- splatch
+Pointers {
+	classes {
+		HardPointer
+		WeakPointer
+		SoftPointer
+		ConvertedPointer
+	}
+	methods {
+		valid(Pointer)
+		pointer(Pointer)
+		pointer(int, Object)
+		pointerConverter(int)
+		pointerDataConverter()
+		nullPointer()
+		hardPointer(Object)
+		hardPointerConverter()
+		weakPointer(Object)
+		weakPointerConverter()
+		softPointer(Object)
+		softPointerConverter()
+		convertedPointer(Converter, Pointer)
+	}
+}
 
-- Objects
-	- hash
-	- equals
-	- toString
+Hash {
+}
 
-- Hash
-- Tester
+Tester {
+}
+
+Compact {
+	classes {
+		CompactData
+		CompactSet
+		CompactHashSet
+		CompactNavigableSet
+		CompactMap
+		CompactItemMap
+		CompactItemHashMap
+		CompactEntryMap
+		CompactEntryHashMap
+		CompactNavigableMap
+		CompactNavigableItemMap
+		CompactNavigableEntryMap
+	}
+}

@@ -177,7 +177,7 @@ public final class Filters {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("invertFilter", this.filter);
+			return Objects.toStringCall("inverseFilter", this.filter);
 		}
 
 	}
