@@ -17,7 +17,7 @@ package bee.creative.util;
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Tester {
+public class Tester {
 
 	/**
 	 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
@@ -83,7 +83,6 @@ public final class Tester {
 		this.leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 		this.usedTime = this.leaveTime - this.enterTime;
 		this.usedMemory = this.leaveMemory - this.enterMemory;
-		method.hashCode();
 	}
 
 	/**
