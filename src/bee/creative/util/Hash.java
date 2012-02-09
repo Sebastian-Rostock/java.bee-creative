@@ -7,17 +7,16 @@ import java.util.NoSuchElementException;
  * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von
  * Schlüsseln auf Werte. Die Einträge der Abbildung besitzen einen nächsten Eintrag, sodass einfach verkettete Listen
  * von Einträgen erzeugt werden können. Der nächste Eintrag eines Eintrags muss dazü mit
- * {@link Hash#getEntryNext(Object) getEntryNext()} gelesen und mit {@link Hash#setEntryNext(Object, Object)
- * setEntryNext()} geschrieben werden können. Als Schlüssel und Werte sind beliebige Objekte zulässig. Insbesondere ist
- * es möglich, die Werte der Abbildung als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten
- * Element verfügen. Es ist auch möglich für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
+ * {@link Hash#getEntryNext(Object)} gelesen und mit {@link Hash#setEntryNext(Object, Object)} geschrieben werden
+ * können. Als Schlüssel und Werte sind beliebige Objekte zulässig. Insbesondere ist es möglich, die Werte der Abbildung
+ * als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten Element verfügen. Es ist auch möglich
+ * für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
  * <p>
  * Die Einträge werden in einfach verketteten Listen verwaltet, deren Kopfelemente bzw. Einträge in einer Tabelle
- * hinterlegt werden. Die Methoden {@link Hash#getKeyHash(Object) getKeyHash()} muss zu einem gegebenen Schlüssel den
- * {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link Hash#getIndex(int, int) getIndex()} muss zu
- * einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen
- * einfach verketteter Liste sich der Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert}
- * befindet.
+ * hinterlegt werden. Die Methoden {@link Hash#getKeyHash(Object)} muss zu einem gegebenen Schlüssel den
+ * {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link Hash#getIndex(int, int)} muss zu einem
+ * gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach
+ * verketteter Liste sich der Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -27,7 +26,7 @@ import java.util.NoSuchElementException;
 public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
-	 * Diese Klasse implementiert den {@link Iterator Iterator} über die Einträge der Abbildung.
+	 * Diese Klasse implementiert den {@link Iterator} über die Einträge der Abbildung.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -41,12 +40,12 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		final Hash<GKey, ?, GEntry> hash;
 
 		/**
-		 * Dieses Feld speichert den nächsten Eintrag, der von {@link Hash.HashIterator#next() next()} zurück gegeben wird.
+		 * Dieses Feld speichert den nächsten Eintrag, der von {@link Hash.HashIterator#next()} zurück gegeben wird.
 		 */
 		GEntry next;
 
 		/**
-		 * Dieses Feld speichert den letzten Eintrag, der von {@link Hash.HashIterator#next() next()} zurück gegeben wurde.
+		 * Dieses Feld speichert den letzten Eintrag, der von {@link Hash.HashIterator#next()} zurück gegeben wurde.
 		 */
 		GEntry last;
 
@@ -276,9 +275,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	/**
 	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein
 	 * und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der Tabelle
-	 * {@code 0} ist, wird die Methode {@link Hash#verifyLength() verifyLength()} vor dem Einfügen aufgerufen. Wenn die
+	 * {@code 0} ist, wird die Methode {@link Hash#verifyLength()} vor dem Einfügen aufgerufen. Wenn die
 	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die
-	 * Methode {@link Hash#verifyLength() verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
+	 * Methode {@link Hash#verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
@@ -318,7 +317,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	/**
 	 * Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die
 	 * Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode
-	 * {@link Hash#verifyLength() verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
+	 * {@link Hash#verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
@@ -350,8 +349,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int) getLength()}
-	 * berechneten.
+	 * Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int)} berechneten.
 	 * 
 	 * @see Hash#verifyLength(int)
 	 */
@@ -385,9 +383,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Iterator Iterator} über die Einträge zurück.
+	 * Diese Methode gibt einen {@link Iterator} über die Einträge zurück.
 	 * 
-	 * @return {@link Iterator Iterator} über die Einträge.
+	 * @return {@link Iterator} über die Einträge.
 	 */
 	protected final Iterator<GEntry> getEntries() {
 		return ((this.size == 0) ? Iterators.<GEntry>voidIterator() : new HashIterator<GKey, GEntry>(this));

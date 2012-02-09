@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public final class Strings {
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#join(String, Iterable)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -87,8 +87,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter}, der seine Eingabe mit Hilfe eines
-	 * kompilierten regulären Ausdrucks in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter}, der seine Eingabe mit Hilfe eines kompilierten
+	 * regulären Ausdrucks in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOutput> Typ der Ausgabe.
@@ -146,8 +146,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der
-	 * Methode {@link Strings#apply(Pattern, CharSequence, int, boolean, boolean)} in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * {@link Strings#apply(Pattern, CharSequence, int, boolean, boolean)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -215,8 +215,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der
-	 * Methode {@link Strings#applyAll(Pattern, CharSequence, boolean, boolean)} in seine Ausgabe überführt.
+	 * Diese Klasse implementiert einen abstrakten {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * {@link Strings#applyAll(Pattern, CharSequence, boolean, boolean)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -265,7 +265,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#split(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -295,7 +295,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splitAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -323,7 +323,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#match(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -353,7 +353,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#matchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -381,7 +381,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatch(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -412,7 +412,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Klasse implementiert einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -440,8 +440,8 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter Converter}, der seine Eingabe via
-	 * {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck umwandelt.
+	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe via {@link Pattern#compile(String, int)} in
+	 * einen kompilierten regulären Ausdruck umwandelt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -514,7 +514,7 @@ public final class Strings {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter Converter} zur Kompilation der {@link Pattern Pattern}.
+	 * Dieses Feld speichert den {@link Converter} zur Kompilation der {@link Pattern Pattern}.
 	 */
 	static final Converter<String, Pattern> CACHED_PATTERN_CONVERTER = Converters.synchronizedConverter(Converters
 		.cachedConverter(Strings.patternConverter(0)));
@@ -668,12 +668,14 @@ public final class Strings {
 	 * Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte zurück. Der
 	 * Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.join(&quot;&quot;, items);</pre>
+	 * <pre>
+	 * Strings.join(&quot;&quot;, items);
+	 * </pre>
 	 * 
 	 * @see Strings#join(String, Object...)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebenen {@link Array} {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
 		if(items == null) throw new NullPointerException("Items is null");
@@ -689,8 +691,7 @@ public final class Strings {
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array Array} bzw. das gegebene Trennzeichen {@code null}
-	 *         ist.
+	 * @throws NullPointerException Wenn das gegebenen {@link Array} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
 		if(space == null) throw new NullPointerException("Space is null");
@@ -702,12 +703,14 @@ public final class Strings {
 	 * Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte zurück. Der
 	 * Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.join(&quot;&quot;, items);</pre>
+	 * <pre>
+	 * Strings.join(&quot;&quot;, items);
+	 * </pre>
 	 * 
 	 * @see Strings#join(String, Iterable)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
 	public static String join(final Iterable<?> items) {
 		if(items == null) throw new NullPointerException("Items is null");
@@ -722,8 +725,7 @@ public final class Strings {
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterable Iterable} bzw. das gegebene Trennzeichen
-	 *         {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Iterable<?> items) {
 		if(space == null) throw new NullPointerException("Space is null");
@@ -744,13 +746,13 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#join(String, Iterable)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#join(String, Iterable)
 	 * @param space Trennzeichen.
-	 * @return {@link Strings#join(String, Iterable)}-{@link Converter Converter}.
+	 * @return {@link Strings#join(String, Iterable)}-{@link Converter}.
 	 */
 	public static Converter<Iterable<?>, String> joinConverter(final String space) {
 		return new JoinConverter(space);
@@ -760,7 +762,9 @@ public final class Strings {
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Zeichenketten zurück, die vom regulären Ausdruck nicht getroffen wurden. Der Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.split(regex, string, 0);</pre>
+	 * <pre>
+	 * Strings.split(regex, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#split(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
@@ -777,7 +781,9 @@ public final class Strings {
 	 * Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das
 	 * folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am Komma hinter einer Ziffer:
 	 * 
-	 * <pre>Strings.split(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]</pre>
+	 * <pre>
+	 * Strings.split(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]
+	 * </pre>
 	 * 
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
@@ -796,7 +802,9 @@ public final class Strings {
 	 * Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die
 	 * Liste der Zeichenketten zurück, die vom regulären Ausdruck nicht getroffen wurden. Der Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.split(pattern, string, 0);</pre>
+	 * <pre>
+	 * Strings.split(pattern, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
@@ -814,7 +822,9 @@ public final class Strings {
 	 * Liste der Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen
 	 * wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am Komma hinter einer Ziffer:
 	 * 
-	 * <pre>Strings.split(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]</pre>
+	 * <pre>
+	 * Strings.split(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;3x,56&quot; ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -830,14 +840,14 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#split(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
-	 * @return {@link Strings#split(Pattern, CharSequence, int)}-{@link Converter Converter}.
+	 * @return {@link Strings#split(Pattern, CharSequence, int)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
@@ -852,7 +862,9 @@ public final class Strings {
 	 * ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
 	 * Zeichenkette:
 	 * 
-	 * <pre>Strings.splitAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
+	 * <pre>
+	 * Strings.splitAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]
+	 * </pre>
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -869,7 +881,9 @@ public final class Strings {
 	 * eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse
 	 * einer Zeichenkette:
 	 * 
-	 * <pre>Strings.splitAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
+	 * <pre>
+	 * Strings.splitAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -883,13 +897,13 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splitAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#splitAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
-	 * @return {@link Strings#splitAll(Pattern, CharSequence)}-{@link Converter Converter}.
+	 * @return {@link Strings#splitAll(Pattern, CharSequence)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> splitAllConverter(final Pattern pattern)
@@ -901,7 +915,9 @@ public final class Strings {
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Zeichenketten zurück, die vom regulären Ausdruck getroffen wurden. Der Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.match(regex, string, 0);</pre>
+	 * <pre>
+	 * Strings.match(regex, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#match(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
@@ -918,7 +934,9 @@ public final class Strings {
 	 * Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das folgende
 	 * Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
 	 * 
-	 * <pre>Strings.match(&quot;(\\d+)€&quot;, &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]</pre>
+	 * <pre>
+	 * Strings.match(&quot;(\\d+)€&quot;, &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]
+	 * </pre>
 	 * 
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
@@ -937,7 +955,9 @@ public final class Strings {
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der
 	 * Zeichenketten zurück, die vom regulären Ausdruck getroffen wurden. Der Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.match(pattern, string, 0);</pre>
+	 * <pre>
+	 * Strings.match(pattern, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
@@ -955,7 +975,9 @@ public final class Strings {
 	 * Liste der Zeichenketten zurück, die von der {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das
 	 * folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
 	 * 
-	 * <pre>Strings.match(Pattern.compile(&quot;(\\d+)€&quot;), &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]</pre>
+	 * <pre>
+	 * Strings.match(Pattern.compile(&quot;(\\d+)€&quot;), &quot;..nur 12€!&quot;, 1); // [ &quot;12&quot; ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -971,14 +993,14 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#match(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
-	 * @return {@link Strings#match(Pattern, CharSequence, int)}-{@link Converter Converter}.
+	 * @return {@link Strings#match(Pattern, CharSequence, int)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
@@ -993,7 +1015,9 @@ public final class Strings {
 	 * Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
 	 * Zeichenkette:
 	 * 
-	 * <pre>Strings.matchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]</pre>
+	 * <pre>
+	 * Strings.matchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]
+	 * </pre>
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -1010,7 +1034,9 @@ public final class Strings {
 	 * Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer
 	 * Zeichenkette:
 	 * 
-	 * <pre>Strings.matchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]</pre>
+	 * <pre>
+	 * Strings.matchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x12-3&quot;, &quot;12&quot;, &quot;3&quot;  ], [ &quot;4-&quot;, &quot;4&quot;, null ] ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -1024,13 +1050,13 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#matchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#matchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
-	 * @return {@link Strings#matchAll(Pattern, CharSequence)}-{@link Converter Converter}.
+	 * @return {@link Strings#matchAll(Pattern, CharSequence)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> matchAllConverter(final Pattern pattern)
@@ -1043,7 +1069,9 @@ public final class Strings {
 	 * Zeichenketten zurück, die vom regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Der Rückgabewert
 	 * entspricht:
 	 * 
-	 * <pre>Strings.splatch(regex, string, 0);</pre>
+	 * <pre>
+	 * Strings.splatch(regex, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#splatch(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
@@ -1061,7 +1089,9 @@ public final class Strings {
 	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
 	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
-	 * <pre>Strings.splatch(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]</pre>
+	 * <pre>
+	 * Strings.splatch(&quot;\\d(,)&quot;, &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]
+	 * </pre>
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param index Index.
@@ -1080,7 +1110,9 @@ public final class Strings {
 	 * Liste der Zeichenketten zurück, die vom regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Der
 	 * Rückgabewert entspricht:
 	 * 
-	 * <pre>Strings.splatch(pattern, string, 0);</pre>
+	 * <pre>
+	 * Strings.splatch(pattern, string, 0);
+	 * </pre>
 	 * 
 	 * @see Strings#splatch(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
@@ -1099,7 +1131,9 @@ public final class Strings {
 	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
 	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
-	 * <pre>Strings.splatch(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]</pre>
+	 * <pre>
+	 * Strings.splatch(Pattern.compile(&quot;\\d(,)&quot;), &quot;12,3x,56&quot;, 1); // [ &quot;12&quot;, &quot;,&quot;, &quot;3x,56&quot; ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
@@ -1115,14 +1149,14 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatch(Pattern, CharSequence, int)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#splatch(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
-	 * @return {@link Strings#splatch(Pattern, CharSequence, int)}-{@link Converter Converter}.
+	 * @return {@link Strings#splatch(Pattern, CharSequence, int)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
@@ -1137,7 +1171,9 @@ public final class Strings {
 	 * wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt
 	 * die Analyse einer Zeichenkette:
 	 * 
-	 * <pre>Strings.splatchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
+	 * <pre>
+	 * Strings.splatchAll(&quot;(\\d+)-(\\d+)?&quot;, &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]
+	 * </pre>
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -1155,7 +1191,9 @@ public final class Strings {
 	 * getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
 	 * Beispiel zeigt die Analyse einer Zeichenkette:
 	 * 
-	 * <pre>Strings.splatchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]</pre>
+	 * <pre>
+	 * Strings.splatchAll(Pattern.compile(&quot;(\\d+)-(\\d+)?&quot;), &quot;x12-3, x4-yz&quot;); // [ [ &quot;x&quot;, &quot;x&quot;, &quot;x12-&quot; ], [ &quot;12-3&quot;, &quot;12&quot;, &quot;3&quot; ], [ &quot;, x&quot;, &quot;-3, x&quot; ], [ &quot;4-&quot;, &quot;4&quot;, null ], [ &quot;yz&quot;, &quot;-yz&quot;, &quot;, x4-yz&quot; ] ]
+	 * </pre>
 	 * 
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -1169,13 +1207,13 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe mit Hilfe der Methode
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit Hilfe der Methode
 	 * {@link Strings#splatchAll(Pattern, CharSequence)} in seine Ausgabe überführt.
 	 * 
 	 * @see Converter
 	 * @see Strings#splatchAll(Pattern, CharSequence)
 	 * @param pattern kompilierter regulärer Ausdruck.
-	 * @return {@link Strings#splatchAll(Pattern, CharSequence)}-{@link Converter Converter}.
+	 * @return {@link Strings#splatchAll(Pattern, CharSequence)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 	 */
 	public static Converter<CharSequence, List<List<String>>> splatchAllConverter(final Pattern pattern)
@@ -1184,15 +1222,15 @@ public final class Strings {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter Converter}, der seine Eingabe via {@link Pattern#compile(String, int)}
-	 * in einen kompilierten regulären Ausdruck umwandelt, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe via {@link Pattern#compile(String, int)} in einen
+	 * kompilierten regulären Ausdruck umwandelt, und gibt ihn zurück.
 	 * 
 	 * @see Converter
 	 * @see Pattern#compile(String, int)
 	 * @param flags Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
 	 *        {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL},
 	 *        {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS})
-	 * @return {@link Pattern#compile(String, int)}-{@link Converter Converter}.
+	 * @return {@link Pattern#compile(String, int)}-{@link Converter}.
 	 */
 	public static Converter<String, Pattern> patternConverter(final int flags) {
 		return new PatternConverter(flags);

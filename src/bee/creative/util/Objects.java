@@ -155,8 +155,8 @@ public final class Objects {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via
-	 * {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in
+	 * eine {@link Object#toString() Textdarstelung} umwandelt.
 	 */
 	static final Converter<Object, String> NORMAL_STRING_CONVERTER = new Converter<Object, String>() {
 
@@ -173,8 +173,8 @@ public final class Objects {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Converter Converter}, der seine Eingabe via
-	 * {@link Objects#toString(boolean, Object)} in eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in
+	 * eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
 	 */
 	static final Converter<Object, String> FORMAT_STRING_CONVERTER = new Converter<Object, String>() {
 
@@ -192,7 +192,7 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von
-	 * {@code "\n"} durch {@code "\n&nbsp;&nbsp;"} ersetzt.
+	 * {@code "\n"} durch {@code "\n  "} ersetzt.
 	 * 
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug.
@@ -211,10 +211,10 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map Maps}, {@link Array Arrays}, {@link String Strings} und {@link Iterable Iterables} je eine einene eigene
-	 * Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren hierarchische Formatierung
-	 * sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString UseToString}
-	 * sein, wird das ergenis {@link Object#toString() toString()}-Methode zurück gegeben.
+	 * {@link Map}s, {@link Array}s, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform
+	 * verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren hierarchische Formatierung sowie die Erhöhung
+	 * des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
+	 * {@link Object#toString()}-Methode zurück gegeben.
 	 * 
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -241,11 +241,11 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene {@link Map Map} als {@link Object#toString() Textdarstelung} zurück. Für eine
-	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
+	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object {@link Map Map} oder {@code null}.
+	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String mapToString(final boolean format, final Map<?, ?> object) {
@@ -269,7 +269,7 @@ public final class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein {@link Array Array} ist.
+	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein {@link Array} ist.
 	 */
 	static String arrayToString(final boolean format, final Object object) throws IllegalArgumentException {
 		if(object == null) return "null";
@@ -286,10 +286,10 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link String String} als {@link Object#toString() Textdarstelung} zurück. Für
-	 * eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt den gegebenen {@link String} als {@link Object#toString() Textdarstelung} zurück. Für eine
+	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
-	 * @param object {@link String String} oder {@code null}.
+	 * @param object {@link String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
@@ -320,11 +320,11 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene {@link Iterable Iterable} als {@link Object#toString() Textdarstelung} zurück. Für
-	 * eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt das gegebene {@link Iterable} als {@link Object#toString() Textdarstelung} zurück. Für eine
+	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param object {@link Iterable Iterable} oder {@code null}.
+	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String iterableToString(final boolean format, final Iterable<?> object) {
@@ -465,10 +465,12 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * {@code null}-Eingaben und {@link Array Arrays}. Wenn beide Objekte keine {@link Array Arrays} sind, entspricht der
+	 * {@code null}-Eingaben und {@link Array}s. Wenn beide Objekte keine {@link Array}s sind, entspricht der
 	 * Rückgabewert:
 	 * 
-	 * <pre>(object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))</pre>
+	 * <pre>
+	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
+	 * </pre>
 	 * 
 	 * @see Arrays#equals(int[], int[])
 	 * @see Arrays#equals(long[], long[])
@@ -502,13 +504,13 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen {@link Array Arrays} zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array
-	 * Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen {@link Array}s zurück und tolleriert
+	 * dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays}
+	 * wird via {@link Objects#equals(Object, Object)} ermittelt.
 	 * 
 	 * @see Objects#equals(Object, Object)
-	 * @param objects1 {@link Array Array} 1 oder {@code null}.
-	 * @param objects2 {@link Array Array} 2 oder {@code null}.
+	 * @param objects1 {@link Array} 1 oder {@code null}.
+	 * @param objects2 {@link Array} 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object[] objects1, final Object[] objects2) {
@@ -529,10 +531,10 @@ public final class Objects {
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @see Objects#equals(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @param object3 Objekt oder {@code null}.
-	 * @param object4 Objekt oder {@code null}.
+	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
+	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
+	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
+	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4) {
@@ -546,12 +548,12 @@ public final class Objects {
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @see Objects#equals(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @param object3 Objekt oder {@code null}.
-	 * @param object4 Objekt oder {@code null}.
-	 * @param object5 Objekt oder {@code null}.
-	 * @param object6 Objekt oder {@code null}.
+	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
+	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
+	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
+	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
+	 * @param object5 {@code 4}-tes Objekt oder {@code null}.
+	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
@@ -566,14 +568,14 @@ public final class Objects {
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @see Objects#equals(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @param object3 Objekt oder {@code null}.
-	 * @param object4 Objekt oder {@code null}.
-	 * @param object5 Objekt oder {@code null}.
-	 * @param object6 Objekt oder {@code null}.
-	 * @param object7 Objekt oder {@code null}.
-	 * @param object8 Objekt oder {@code null}.
+	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
+	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
+	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
+	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
+	 * @param object5 {@code 4}-tes Objekt oder {@code null}.
+	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
+	 * @param object7 {@code 6}-tes Objekt oder {@code null}.
+	 * @param object8 {@code 7}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
@@ -583,8 +585,8 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map Maps}, {@link Array Arrays}, {@link String Strings} und {@link Iterable Iterables} je eine einene eigene
-	 * Darstellungsform verwendet. Der Rückgabewert entspricht:
+	 * {@link Map}s, {@link Array}s, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform
+	 * verwendet. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * Objects.toString(false, object)
@@ -600,10 +602,10 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map Maps}, {@link Array Arrays}, {@link String Strings} und {@link Iterable Iterables} je eine einene eigene
-	 * Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung
-	 * aktiviert werden. Sollte das gegebene Objekt eine Instanz von {@link UseToString UseToString} sein, wird das
-	 * Ergebnis seiner {@link Object#toString() toString()}-Methode zurück gegeben.
+	 * {@link Map}s, {@link Array}s, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform
+	 * verwendet. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner
+	 * {@link Object#toString() toString()}-Methode zurück gegeben.
 	 * 
 	 * @see Objects#toString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -629,13 +631,13 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter Converter} zurück, der seine Eingabe via
-	 * {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Objects#toString(boolean, Object)}
+	 * in eine {@link Object#toString() Textdarstelung} umwandelt.
 	 * 
 	 * @see Converter
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @return {@link Objects#toString(boolean, Object)}-{@link Converter Converter}.
+	 * @return {@link Objects#toString(boolean, Object)}-{@link Converter}.
 	 */
 	public static Converter<Object, String> toStringConverter(final boolean format) {
 		return (format ? Objects.FORMAT_STRING_CONVERTER : Objects.NORMAL_STRING_CONVERTER);
@@ -645,7 +647,9 @@ public final class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert
 	 * entspricht:
 	 * 
-	 * <pre>Objects.toStringCall(false, name, args)</pre>
+	 * <pre>
+	 * Objects.toStringCall(false, name, args)
+	 * </pre>
 	 * 
 	 * @see Objects#toStringCall(boolean, String, Object...)
 	 * @param name Funktionsname.
@@ -661,7 +665,9 @@ public final class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
 	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Der Rückgabewert entspricht:
 	 * 
-	 * <pre>Objects.toStringCall(format, false, name, args)</pre>
+	 * <pre>
+	 * Objects.toStringCall(format, false, name, args)
+	 * </pre>
 	 * 
 	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
@@ -680,8 +686,6 @@ public final class Objects {
 	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung
 	 * aktiviert wird, werden die Argumente beschriftete Parameter interpretiert. Ein beschrifteter Parameter besteht
 	 * hierbei aus einem Namen {@code args[i]} und einem Wert {@code args[i+1]} für jede gerade Position {@code i}.
-	 * 
-	 * <pre>TODO beeispiele</pre>
 	 * 
 	 * @param name Funktionsname.
 	 * @param format Formatiermodus.

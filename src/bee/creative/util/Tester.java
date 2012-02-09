@@ -2,16 +2,15 @@ package bee.creative.util;
 
 /**
  * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von eienr
- * Testmethode ({@link Runnable Runnables}) benötigt werden.
+ * Testmethode ({@link Runnable}) benötigt werden.
  * <p>
- * Im nachfolgenden Beispiel wird ein anonymes {@link Runnable Runnable} als Testmethode initialisiert und gleich
- * vermessen:
+ * Im nachfolgenden Beispiel wird ein anonymes {@link Runnable} als Testmethode initialisiert und gleich vermessen:
  * 
  * <pre>
  * Tester result = new Tester(new Runnable() {
- *   public void run() {
- *     // ...
- *   }
+ * 	public void run() {
+ * 	// ...
+ * 	}
  * });
  * </pre>
  * 

@@ -27,9 +27,9 @@ public interface Pointer<GData> {
 
 	/**
 	 * Diese Methode gibt die via {@link Objects#equals(Object, Object)} berechnete {@link Object#equals(Object)
-	 * Äquivalenz} der Datensätze dieses und des gegebenenen {@link Pointer Pointers} zurück.
+	 * Äquivalenz} der Datensätze dieses und des gegebenenen {@link Pointer}s zurück.
 	 * 
-	 * @param object {@link Pointer Pointer}.
+	 * @param object {@link Pointer}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der Datensätze.
 	 */
 	@Override

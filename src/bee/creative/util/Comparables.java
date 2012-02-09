@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von
- * {@link Comparable Comparables}.
+ * {@link Comparable}s.
  * 
  * @see Comparable
  * @author Sebastian Rostock 2011.
@@ -13,23 +13,23 @@ import java.util.List;
 public class Comparables {
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Comparable Comparable} verweist.
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Comparable} verweist.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Comparable Comparables}.
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Comparable}s.
 	 */
 	static abstract class ComparableLink<GInput> {
 
 		/**
-		 * Dieses Feld speichert den {@link Comparable Comparable}.
+		 * Dieses Feld speichert den {@link Comparable}.
 		 */
 		final Comparable<? super GInput> comparable;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
 		 * 
-		 * @param comparable {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 * @param comparable {@link Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public ComparableLink(final Comparable<? super GInput> comparable) throws NullPointerException {
 			if(comparable == null) throw new NullPointerException("Comparable is null");
@@ -37,9 +37,9 @@ public class Comparables {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Comparable Comparable} zurück.
+		 * Diese Methode gibt den {@link Comparable} zurück.
 		 * 
-		 * @return {@link Comparable Comparable}.
+		 * @return {@link Comparable}.
 		 */
 		public Comparable<? super GInput> comparable() {
 			return this.comparable;
@@ -65,9 +65,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparable Comparable}, der {@code null}-Eingaben vergleicht und alle
-	 * anderen Eingaben an einen gegebenen {@link Comparable Comparable} weiterleitet. Der {@link Comparable Comparable}
-	 * berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
+	 * Diese Klasse implementiert einen {@link Comparable}, der {@code null}-Eingaben vergleicht und alle anderen Eingaben
+	 * an einen gegebenen {@link Comparable} weiterleitet. Der {@link Comparable} berechnet den Vergleichswert zweier
+	 * Objekte {@code o1} und {@code o2} via:
 	 * 
 	 * <pre>
 	 * ((o == null) ? -1 : comparable.compareTo(o));
@@ -79,10 +79,10 @@ public class Comparables {
 	public static final class NullComparable<GEntry> extends ComparableLink<GEntry> implements Comparable<GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
 		 * 
-		 * @param comparable {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 * @param comparable {@link Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public NullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
 			super(comparable);
@@ -117,8 +117,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparable Comparable}, der den Vergleichswert eines gegebenen
-	 * {@link Comparable Comparables} umkehrt.
+	 * Diese Klasse implementiert einen {@link Comparable}, der den Vergleichswert eines gegebenen {@link Comparable}s
+	 * umkehrt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
@@ -126,10 +126,10 @@ public class Comparables {
 	public static final class ReverseComparable<GEntry> extends ComparableLink<GEntry> implements Comparable<GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable Comparable}.
+		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
 		 * 
-		 * @param comparable {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+		 * @param comparable {@link Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public ReverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
 			super(comparable);
@@ -164,10 +164,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen verketteten {@link Comparable Comparable}, der die beiden Objekte in seiner
-	 * Eingabe zuerst über einen ersten {@link Comparable Comparable} vergleicht und einen zweiten {@link Comparable
-	 * Comparable} nur dann verwendet, wenn der erste {@link Comparable Comparable} die Gleichheit der beiden Objekte
-	 * anzeigt.
+	 * Diese Klasse implementiert einen verketteten {@link Comparable}, der die beiden Objekte in seiner Eingabe zuerst
+	 * über einen ersten {@link Comparable} vergleicht und einen zweiten {@link Comparable} nur dann verwendet, wenn der
+	 * erste {@link Comparable} die Gleichheit der beiden Objekte anzeigt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
@@ -175,21 +174,21 @@ public class Comparables {
 	public static final class ChainedComparable<GEntry> implements Comparable<GEntry> {
 
 		/**
-		 * Dieses Feld speichert den primären {@link Comparable Comparable}.
+		 * Dieses Feld speichert den primären {@link Comparable}.
 		 */
 		final Comparable<? super GEntry> comparable1;
 
 		/**
-		 * Dieses Feld speichert den sekundären {@link Comparable Comparable}.
+		 * Dieses Feld speichert den sekundären {@link Comparable}.
 		 */
 		final Comparable<? super GEntry> comparable2;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Comparable Comparableen}.
+		 * Dieser Konstrukteur initialisiert die {@link Comparable}.
 		 * 
-		 * @param comparable1 primärer {@link Comparable Comparable}.
-		 * @param comparable2 sekundärer {@link Comparable Comparable}.
-		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable Comparableen} {@code null} ist.
+		 * @param comparable1 primärer {@link Comparable}.
+		 * @param comparable2 sekundärer {@link Comparable}.
+		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable} {@code null} ist.
 		 */
 		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 			throws NullPointerException {
@@ -200,18 +199,18 @@ public class Comparables {
 		}
 
 		/**
-		 * Diese Methode gibt den primären {@link Comparable Comparable} zurück.
+		 * Diese Methode gibt den primären {@link Comparable} zurück.
 		 * 
-		 * @return primärer {@link Comparable Comparable}.
+		 * @return primärer {@link Comparable}.
 		 */
 		public Comparable<? super GEntry> comparable1() {
 			return this.comparable1;
 		}
 
 		/**
-		 * Diese Methode gibt den sekundären {@link Comparable Comparable} zurück.
+		 * Diese Methode gibt den sekundären {@link Comparable} zurück.
 		 * 
-		 * @return sekundärer {@link Comparable Comparable}.
+		 * @return sekundärer {@link Comparable}.
 		 */
 		public Comparable<? super GEntry> comparable2() {
 			return this.comparable2;
@@ -256,31 +255,29 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen konvertierenden {@link Comparable Comparable}, der die mit einem gegebenen
-	 * {@link Converter Converter} konvertierten Objekte zum Vergleich an einen gegebenen {@link Comparable Comparable}
-	 * delegiert.
+	 * Diese Klasse implementiert einen konvertierenden {@link Comparable}, der die mit einem gegebenen {@link Converter}
+	 * konvertierten Objekte zum Vergleich an einen gegebenen {@link Comparable} delegiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Eingabe des {@link Converter Converters} sowie der vom {@link Comparable Comparable} zu
-	 *        vergleichenden Objekte.
-	 * @param <GValue> Typ der Ausgabe des {@link Converter Converters} sowie der vom gegebenen {@link Comparable
-	 *        Comparable} zu vergleichenden Objekte.
+	 * @param <GEntry> Typ der Eingabe des {@link Converter}s sowie der vom {@link Comparable} zu vergleichenden Objekte.
+	 * @param <GValue> Typ der Ausgabe des {@link Converter}s sowie der vom gegebenen {@link Comparable} zu vergleichenden
+	 *        Objekte.
 	 */
 	public static final class ConvertedComparable<GEntry, GValue> extends ComparableLink<GValue> implements
 		Comparable<GEntry> {
 
 		/**
-		 * Dieses Feld speichert den {@link Converter Converter}.
+		 * Dieses Feld speichert den {@link Converter}.
 		 */
 		final Converter<? super GEntry, ? extends GValue> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Comparable Comparable} und {@link Converter Converter}.
+		 * Dieser Konstrukteur initialisiert {@link Comparable} und {@link Converter}.
 		 * 
-		 * @param comparable {@link Comparable Comparable}.
-		 * @param converter {@link Converter Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} bzw. der gegebene {@link Converter
-		 *         Converter} {@code null} ist.
+		 * @param comparable {@link Comparable}.
+		 * @param converter {@link Converter}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable} bzw. der gegebene {@link Converter}
+		 *         {@code null} ist.
 		 */
 		public ConvertedComparable(final Comparable<? super GValue> comparable,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
@@ -290,9 +287,9 @@ public class Comparables {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Converter Converter} zurück.
+		 * Diese Methode gibt den {@link Converter} zurück.
 		 * 
-		 * @return den {@link Converter Converter}.
+		 * @return den {@link Converter}.
 		 */
 		public Converter<? super GEntry, ? extends GValue> converter() {
 			return this.converter;
@@ -357,9 +354,8 @@ public class Comparables {
 	 * aus.
 	 * 
 	 * @param list Suchraum.
-	 * @param comparable {@link Comparable comparable}.
-	 * @throws NullPointerException Wenn der gegebene Suchraum bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
+	 * @param comparable {@link Comparable}.
+	 * @throws NullPointerException Wenn der gegebene Suchraum bzw. der gegebene {@link Comparable} {@code null} ist.
 	 */
 	static void check(final Object list, final Object comparable) throws NullPointerException {
 		if(list == null) throw new NullPointerException("List is null");
@@ -370,12 +366,11 @@ public class Comparables {
 	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException Runtime-Exceptions}
 	 * aus.
 	 * 
-	 * @param array {@link Array Array} als Suchraum.
+	 * @param array {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
+	 * @param comparable {@link Comparable}.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > array.length}.
 	 */
@@ -389,12 +384,11 @@ public class Comparables {
 	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException Runtime-Exceptions}
 	 * aus.
 	 * 
-	 * @param list {@link List List} als Suchraum.
+	 * @param list {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
+	 * @param comparable {@link Comparable}.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
@@ -405,16 +399,18 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable Comparable}, der {@code null}-Eingaben vergleicht sowie alle anderen
-	 * Eingaben an einen gegebenen {@link Comparable Comparable} weiterleitet, und gibt ihn zurück. Der erzeugte
-	 * {@link Comparable Comparable} berechnet den Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
+	 * Diese Methode erzeugt einen {@link Comparable}, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an
+	 * einen gegebenen {@link Comparable} weiterleitet, und gibt ihn zurück. Der erzeugte {@link Comparable} berechnet den
+	 * Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
 	 * 
-	 * <pre>((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparable.compare(o1, o2)))</pre>
+	 * <pre>
+	 * ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparable.compare(o1, o2)))
+	 * </pre>
 	 * 
 	 * @param <GEntry> Typ der Objekte.
-	 * @param comparable {@link Comparable Comparable}
-	 * @return {@link NullComparable Null-Comparable}
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+	 * @param comparable {@link Comparable}
+	 * @return {@link NullComparable}
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable)
 		throws NullPointerException {
@@ -422,13 +418,13 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable Comparable}, der den Vergleichswert des gegebenen {@link Comparable
-	 * Comparables} umkehrt, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Comparable}, der den Vergleichswert des gegebenen {@link Comparable Comparables}
+	 * umkehrt, und gibt ihn zurück.
 	 * 
 	 * @param <GEntry> Typ der Objekte.
-	 * @param comparable {@link Comparable Comparable}.
-	 * @return {@link ReverseComparable Reverse-Comparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} {@code null} ist.
+	 * @param comparable {@link Comparable}.
+	 * @return {@link ReverseComparable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable)
 		throws NullPointerException {
@@ -436,16 +432,16 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Comparable Comparable} und gibt ihn zurück. Der erzeugte
-	 * {@link Comparable Comparable} vergleicht seine beiden Eingaben zuerst über den ersten {@link Comparable Comparable}
-	 * und verwendet den zweiten {@link Comparable Comparable} nur dann, wenn der erste {@link Comparable Comparable} mit
-	 * dem Vergleichswert {@code 0} die Gleichheit der beiden Objekte anzeigt.
+	 * Diese Methode erzeugt einen verketteten {@link Comparable} und gibt ihn zurück. Der erzeugte {@link Comparable}
+	 * vergleicht seine beiden Eingaben zuerst über den ersten {@link Comparable} und verwendet den zweiten
+	 * {@link Comparable} nur dann, wenn der erste {@link Comparable} mit dem Vergleichswert {@code 0} die Gleichheit der
+	 * beiden Objekte anzeigt.
 	 * 
 	 * @param <GEntry> Typ der Objekte.
-	 * @param comparable1 erster {@link Comparable Comparable}.
-	 * @param comparable2 zweiter {@link Comparable Comparable}.
-	 * @return {@link ChainedComparable Chained-Comparable}.
-	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable Comparableen} {@code null} ist.
+	 * @param comparable1 erster {@link Comparable}.
+	 * @param comparable2 zweiter {@link Comparable}.
+	 * @return {@link ChainedComparable}.
+	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1,
 		final Comparable<? super GEntry> comparable2) throws NullPointerException {
@@ -453,20 +449,19 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Comparable Comparable}, der die mit dem gegebenen
-	 * {@link Converter Converter} konvertierten Objekte zum Vergleich an den gegebenen {@link Comparable Comparable}
-	 * delegiert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen konvertierenden {@link Comparable}, der die mit dem gegebenen {@link Converter}
+	 * konvertierten Objekte zum Vergleich an den gegebenen {@link Comparable} delegiert, und gibt ihn zurück.
 	 * 
 	 * @see Converter
-	 * @param <GEntry> Typ der Eingabe des {@link Converter Converter} sowie der vom konvertierender {@link Comparable
-	 *        Comparable} zu vergleichenden Objekte.
-	 * @param <GValue> Typ der Ausgabe des {@link Converter Converter} sowie der vom gegebenen {@link Comparable
-	 *        Comparable} zu vergleichenden Objekte.
-	 * @param converter {@link Converter Converter}.
-	 * @param comparable {@link Comparable Comparable}.
-	 * @return {@link ConvertedComparable Converted-Comparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable Comparable} oder der gegebene {@link Converter
-	 *         Converter} {@code null} sind.
+	 * @param <GEntry> Typ der Eingabe des {@link Converter} sowie der vom konvertierender {@link Comparable} zu
+	 *        vergleichenden Objekte.
+	 * @param <GValue> Typ der Ausgabe des {@link Converter} sowie der vom gegebenen {@link Comparable} zu vergleichenden
+	 *        Objekte.
+	 * @param converter {@link Converter}.
+	 * @param comparable {@link Comparable}.
+	 * @return {@link ConvertedComparable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparable} oder der gegebene {@link Converter} {@code null}
+	 *         sind.
 	 */
 	public static <GEntry, GValue> Comparable<GEntry> convertedComparable(
 		final Converter<? super GEntry, ? extends GValue> converter, final Comparable<? super GValue> comparable)
@@ -475,24 +470,22 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der Index eines beliebigen dieser Elemente zurück gegeben. Ein
-	 * Element {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
-	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der Index eines
+	 * beliebigen dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable}
+	 * gleich, wenn {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum
+	 * gegebenen {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @see Comparables#binarySearch(Object[], Comparable, int, int)
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param array {@link Array} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 */
 	public static <GItem> int binarySearch(final GItem[] array, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -500,25 +493,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der Index eines beliebigen dieser Elemente zurück gegeben. Ein
-	 * Element {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
-	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der Index eines
+	 * beliebigen dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable}
+	 * gleich, wenn {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum
+	 * gegebenen {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
+	 * @param array {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
@@ -539,24 +530,22 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der Index eines beliebigen dieser Elemente zurück gegeben. Ein
-	 * Element {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
-	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der Index eines
+	 * beliebigen dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable}
+	 * gleich, wenn {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum
+	 * gegebenen {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @see Comparables#binarySearch(List, Comparable, int, int)
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param list {@link List} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 */
 	public static <GItem> int binarySearch(final List<GItem> list, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -564,25 +553,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der Index eines beliebigen dieser Elemente zurück gegeben. Ein
-	 * Element {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
-	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der Index eines
+	 * beliebigen dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable}
+	 * gleich, wenn {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum
+	 * gegebenen {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
+	 * @param list {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return Index des ersten Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
@@ -603,23 +590,21 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>
-	 * zurück. Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable
-	 * Comparables} aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der kleinste Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der kleinste Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param array {@link Array} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return kleinster Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 */
 	public static <GItem> int binarySearchFirst(final GItem[] array, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -627,25 +612,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>
-	 * zurück. Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable
-	 * Comparables} aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der kleinste Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable }s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der kleinste Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
+	 * @param array {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return kleinster Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
@@ -667,23 +650,21 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>
-	 * zurück. Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der kleinste Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der kleinste Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param list {@link List} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return kleinster Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 */
 	public static <GItem> int binarySearchFirst(final List<GItem> list, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -691,25 +672,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>
-	 * zurück. Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der kleinste Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den kleinsten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der kleinste Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
+	 * @param list {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return kleinster Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
@@ -731,23 +710,21 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der größte Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der größte Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param array {@link Array} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return größter Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 */
 	public static <GItem> int binarySearchLast(final GItem[] array, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -755,25 +732,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Array Array} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Das gegebene {@link Array Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn das {@link Array Array} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der größte Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf dem gegebenen {@link Array} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Das gegebene
+	 * {@link Array} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn das
+	 * {@link Array} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der größte Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in das {@link Array Array} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in das {@link Array} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param array {@link Array Array} als Suchraum.
+	 * @param array {@link Array} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return größter Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn das gegebene {@link Array Array} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen des
-	 *         gegebenen {@link Array Arrays} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Array} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen
+	 *         {@link Array}s ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
@@ -796,23 +771,21 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der größte Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der größte Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
-	 * @param comparable {@link Comparable comparable}.
+	 * @param list {@link List} als Suchraum.
+	 * @param comparable {@link Comparable}.
 	 * @return größter Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 */
 	public static <GItem> int binarySearchLast(final List<GItem> list, final Comparable<? super GItem> comparable)
 		throws NullPointerException, ClassCastException {
@@ -820,25 +793,23 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List List} eine binäre Suche mit dem gegebenen {@link Comparable
-	 * Comparable} aus und gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
-	 * Die gegebene {@link List List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable Comparables}
-	 * aufsteigend sortiert sein. Wenn die {@link List List} mehrere Elemente enthällt, die zum gegebenen
-	 * {@link Comparable Comparable} gleich sind, wird der größte Index dieser Elemente zurück gegeben. Ein Element
-	 * {@code element} ist dann zum gegebenen {@link Comparable Comparable} gleich, wenn
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} aus und
+	 * gibt den größten Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die gegebene
+	 * {@link List} muss dazu bezüglich der Ordnung des gegebenen {@link Comparable}s aufsteigend sortiert sein. Wenn die
+	 * {@link List} mehrere Elemente enthällt, die zum gegebenen {@link Comparable} gleich sind, wird der größte Index
+	 * dieser Elemente zurück gegeben. Ein Element {@code element} ist dann zum gegebenen {@link Comparable} gleich, wenn
 	 * {@code comparable.compareTo(element) == 0}. Die <i>Einfügeposition</i> ist der Index, bei dem ein zum gegebenen
-	 * {@link Comparable Comparable} gleiches Element in die {@link List List} eingefügt werden müsste.
+	 * {@link Comparable} gleiches Element in die {@link List} eingefügt werden müsste.
 	 * 
 	 * @param <GItem> Typ der Elemente.
-	 * @param list {@link List List} als Suchraum.
+	 * @param list {@link List} als Suchraum.
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable comparable}.
+	 * @param comparable {@link Comparable}.
 	 * @return größter Index eines Treffers oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 * @throws NullPointerException Wenn die gegebene {@link List List} bzw. der gegebene {@link Comparable Comparable}
-	 *         {@code null} ist.
-	 * @throws ClassCastException Wenn der gegebene {@link Comparable Comparable} inkompatibel mit den Elementen der
-	 *         gegebenen {@link List List} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
+	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen
+	 *         {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws ArrayIndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */

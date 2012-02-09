@@ -4,11 +4,10 @@ import bee.creative.util.Converters.ConverterLink;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Builder
- * Buildern}.
+ * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Builder}n.
  * <p>
- * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder Builder} zur realisierung eines statischen Caches für
- * Instanzen der exemplarischen Klasse {@code Helper} verwendet:
+ * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder} zur realisierung eines statischen Caches für Instanzen
+ * der exemplarischen Klasse {@code Helper} verwendet:
  * 
  * <pre>
  * public final class Helper {
@@ -31,7 +30,8 @@ import bee.creative.util.Pointers.SoftPointer;
  *   
  *   ...
  *   
- * }</pre>
+ * }
+ * </pre>
  * 
  * @see Builder
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -39,7 +39,7 @@ import bee.creative.util.Pointers.SoftPointer;
 public class Builders {
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Builder Builder} verweist.
+	 * Diese Klasse implementiert ein abstraktes Objekt, dass auf einen {@link Builder} verweist.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -47,15 +47,15 @@ public class Builders {
 	static abstract class BuilderLink<GData> {
 
 		/**
-		 * Dieses Feld speichert den {@link Builder Builder}.
+		 * Dieses Feld speichert den {@link Builder}.
 		 */
 		final Builder<? extends GData> builder;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder Builder}.
+		 * Dieser Konstrukteur initialisiert den {@link Builder}.
 		 * 
-		 * @param builder {@link Builder Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
+		 * @param builder {@link Builder}.
+		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
 		public BuilderLink(final Builder<? extends GData> builder) throws NullPointerException {
 			if(builder == null) throw new NullPointerException("Builder is null");
@@ -63,9 +63,9 @@ public class Builders {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Builder Builder} zurück.
+		 * Diese Methode gibt den {@link Builder} zurück.
 		 * 
-		 * @return {@link Builder Builder}.
+		 * @return {@link Builder}.
 		 */
 		public Builder<? extends GData> builder() {
 			return this.builder;
@@ -91,9 +91,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Builder Builder}. Ein gepufferter {@link Builder Builder}
-	 * verwaltet den vom einem gegebenen {@link Builder Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer
-	 * Pointers}.
+	 * Diese Klasse implementiert einen gepufferten {@link Builder}. Ein gepufferter {@link Builder} verwaltet den vom
+	 * einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -101,35 +100,35 @@ public class Builders {
 	public static final class CachedBuilder<GData> extends BuilderLink<GData> implements Builder<GData> {
 
 		/**
-		 * Dieses Feld speichert den Modus.
+		 * Dieses Feld speichert den {@link Pointer}-Modus.
 		 */
 		final int mode;
 
 		/**
-		 * Dieses Feld speichert das {@link Pointer Pointer}.
+		 * Dieses Feld speichert das {@link Pointer}.
 		 */
 		Pointer<GData> pointer;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Modus und {@link Builder Builder}.
+		 * Dieser Konstrukteur initialisiert Modus und {@link Builder}.
 		 * 
-		 * @param mode Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
-		 * @param builder {@link Builder Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
+		 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
+		 * @param builder {@link Builder}.
+		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn der gegebenen {@link Pointer}-Modus ungültig ist.
 		 */
 		public CachedBuilder(final int mode, final Builder<? extends GData> builder) throws NullPointerException,
 			IllegalArgumentException {
 			super(builder);
-			Pointers.pointer(mode, null);
+			Pointers.pointerConverter(mode);
 			this.mode = mode;
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Pointer Pointer}-Modus zurück.
+		 * Diese Methode gibt den {@link Pointer}-Modus zurück.
 		 * 
 		 * @see Pointers#pointer(int, Object)
-		 * @return {@link Pointer Pointer}-Modus.
+		 * @return {@link Pointer}-Modus.
 		 */
 		public int mode() {
 			return this.mode;
@@ -171,29 +170,29 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder Builder}, dessen Datensatz mit Hilfe eines gegebenen
-	 * {@link Converter Converters} aus dem Datensatz eines gegebenen {@link Builder Builders} ermittelt wird.
+	 * Diese Klasse implementiert einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus
+	 * dem Datensatz eines gegebenen {@link Builder}s ermittelt wird.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder Builders} sowie der Eingabe des gegebenen
-	 *        {@link Converter Converters}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie des Datensatzes.
+	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen
+	 *        {@link Converter}s.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 */
 	public static final class ConvertedBuilder<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
 		Builder<GOutput> {
 
 		/**
-		 * Dieses Feld speichert den {@link Builder Builder}.
+		 * Dieses Feld speichert den {@link Builder}.
 		 */
 		final Builder<? extends GInput> builder;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Builder Builder} und {@link Converter Converter}.
+		 * Dieser Konstrukteur initialisiert {@link Builder} und {@link Converter}.
 		 * 
-		 * @param converter {@link Converter Converter}.
-		 * @param builder {@link Builder Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Builder
-		 *         Builder} {@code null} ist.
+		 * @param converter {@link Converter}.
+		 * @param builder {@link Builder}.
+		 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Builder} {@code null}
+		 *         ist.
 		 */
 		public ConvertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 			final Builder<? extends GInput> builder) throws NullPointerException {
@@ -211,9 +210,9 @@ public class Builders {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Builder Builder} zurück.
+		 * Diese Methode gibt den {@link Builder} zurück.
 		 * 
-		 * @return {@link Builder Builder}.
+		 * @return {@link Builder}.
 		 */
 		public Builder<? extends GInput> builder() {
 			return this.builder;
@@ -249,9 +248,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder Builder}, der einen gegebenen {@link Builder Builder}
-	 * synchronisiert. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder
-	 * Builder}.
+	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die
+	 * Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -259,10 +257,10 @@ public class Builders {
 	public static final class SynchronizedBuilder<GData> extends BuilderLink<GData> implements Builder<GData> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder Builder}.
+		 * Dieser Konstrukteur initialisiert den {@link Builder}.
 		 * 
-		 * @param builder {@link Builder Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
+		 * @param builder {@link Builder}.
+		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
 		public SynchronizedBuilder(final Builder<? extends GData> builder) {
 			super(builder);
@@ -299,7 +297,7 @@ public class Builders {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Builder Builder} zurück, der immer {@code null} liefert.
+	 * Dieses Feld speichert den {@link Builder}, der immer {@code null} liefert.
 	 */
 	static final Builder<?> NULL_BUILDER = new Builder<Object>() {
 
@@ -316,10 +314,10 @@ public class Builders {
 	};
 
 	/**
-	 * Diese Methode gibt den {@link Builder Builder} zurück, der immer {@code null} liefert.
+	 * Diese Methode gibt den {@link Builder} zurück, der immer {@code null} liefert.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @return {@code null}-{@link Builder Builder}.
+	 * @return {@code null}-{@link Builder}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GData> Builder<GData> nullBuilder() {
@@ -327,14 +325,13 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder Builder} und gibt ihn zurück. Der erzeugte {@link Builder
-	 * Builder} verwaltet den vom gegebenen {@link Builder Builder} erzeugten Datensatz mit Hilfe eines
-	 * {@link SoftPointer Soft-Pointers}.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder} und gibt ihn zurück. Der erzeugte {@link Builder} verwaltet
+	 * den vom gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link SoftPointer}s.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @param builder {@link Builder Builder}.
-	 * @return {@link CachedBuilder Cached-Builder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
+	 * @param builder {@link Builder}.
+	 * @return {@link CachedBuilder}.
+	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
 	public static <GData> Builder<GData> cachedBuilder(final Builder<? extends GData> builder)
 		throws NullPointerException {
@@ -342,16 +339,15 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder Builder} und gibt ihn zurück. Der erzeugte {@link Builder
-	 * Builder} verwaltet den vom gegebenen {@link Builder Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer
-	 * Pointers}.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder} und gibt ihn zurück. Der erzeugte {@link Builder} verwaltet
+	 * den vom gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @param mode Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
-	 * @param builder {@link Builder Builder}.
-	 * @return {@link CachedBuilder Cached-Builder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
+	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
+	 * @param builder {@link Builder}.
+	 * @return {@link CachedBuilder}.
+	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der gegebenen {@link Pointer}-Modus ungültig ist.
 	 */
 	public static <GData> Builder<GData> cachedBuilder(final int mode, final Builder<? extends GData> builder)
 		throws NullPointerException, IllegalArgumentException {
@@ -359,17 +355,17 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Builder Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter
-	 * Converters} aus dem Datensatz eines gegebenen {@link Builder Builders} ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem
+	 * Datensatz eines gegebenen {@link Builder}s ermittelt wird, und gibt ihn zurück.
 	 * 
-	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder Builders} sowie der Eingabe des gegebenen
-	 *        {@link Converter Converters}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter Converters} sowie des Datensatzes.
-	 * @param converter {@link Converter Converter}.
-	 * @param builder {@link Builder Builder}.
-	 * @return {@link ConvertedBuilder Converted-Builder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter Converter} bzw. der gegebene {@link Builder
-	 *         Builder} {@code null} ist.
+	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen
+	 *        {@link Converter}s.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
+	 * @param converter {@link Converter}.
+	 * @param builder {@link Builder}.
+	 * @return {@link ConvertedBuilder}.
+	 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Builder} {@code null}
+	 *         ist.
 	 */
 	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(
 		final Converter<? super GInput, ? extends GOutput> converter, final Builder<? extends GInput> builder)
@@ -378,14 +374,13 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt erzeugt einen {@link Builder Builder}, der einen gegebenen {@link Builder Builder}
-	 * synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem
-	 * gegebenen {@link Builder Builder}.
+	 * Diese Methode gibt erzeugt einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn
+	 * zurück. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @param builder {@link Builder Builder}.
-	 * @return {@link SynchronizedBuilder Synchronized-Builder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Builder Builder} {@code null} ist.
+	 * @param builder {@link Builder}.
+	 * @return {@link SynchronizedBuilder}.
+	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
 	public static <GData> Builder<GData> synchronizedBuilder(final Builder<? extends GData> builder)
 		throws NullPointerException {

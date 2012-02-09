@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -23,38 +24,38 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * Diese Klasse implementiert Hilfsklassen zur Verwaltung von Elemente in {@link Set Sets}, {@link NavigableSet
- * Navigable-Sets}, {@link Map Maps} und {@link NavigableMap Navigable-Maps} mit minimalem Speicherverbrauch.
+ * Diese Klasse implementiert Hilfsklassen zur Verwaltung von Elemente in {@link Set}s, {@link NavigableSet}s,
+ * {@link Map}s und {@link NavigableMap}s mit minimalem Speicherverbrauch.
  * 
  * @author Sebastian Rostock 2012.
  */
 public final class Compact {
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem sortierten {@link Array Array}
-	 * verwaltet werden.
+	 * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem sortierten {@link Array} verwaltet
+	 * werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class CompactData {
 
 		/**
-		 * Diese Klasse implementiert ein abstraktes Objekt mit {@link CompactData Compact-Data}.
+		 * Diese Klasse implementiert ein abstraktes Objekt mit {@link CompactData}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GData> Typ des {@link CompactData Compact-Datas}.
+		 * @param <GData> Typ des {@link CompactData}s.
 		 */
 		protected static abstract class CompactLink<GData extends CompactData> {
 
 			/**
-			 * Dieses Feld speichert das {@link CompactData Compact-Data}.
+			 * Dieses Feld speichert die {@link CompactData}.
 			 */
 			protected final GData data;
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactData Compact-Data}.
+			 * Dieser Konstrukteur initialisiert die {@link CompactData}.
 			 * 
-			 * @param data {@link CompactData Compact-Data}.
+			 * @param data {@link CompactData}.
 			 */
 			public CompactLink(final GData data) {
 				if(data == null) throw new NullPointerException("Data is null");
@@ -64,11 +65,11 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert einen abstrakten {@link CompactData Compact-Data}-{@link Iterator Iterator}.
+		 * Diese Klasse implementiert einen abstrakten {@link CompactData}-{@link Iterator}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
-		 * @param <GData> Typ des {@link CompactData Compact-Datas}.
+		 * @param <GData> Typ des {@link CompactData}s.
 		 */
 		protected static abstract class CompactIterator<GItem, GData extends CompactData> extends CompactLink<GData>
 			implements Iterator<GItem> {
@@ -89,9 +90,9 @@ public final class Compact {
 			protected int last;
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactData Compact-Data} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
 			 * 
-			 * @param data {@link CompactData Compact-Data}.
+			 * @param data {@link CompactData}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -132,20 +133,19 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert einen abstrakten aufsteigenden {@link CompactData Compact-Data}-{@link Iterator
-		 * Iterator}.
+		 * Diese Klasse implementiert einen abstrakten aufsteigenden {@link CompactData}-{@link Iterator}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
-		 * @param <GData> Typ des {@link CompactData Compact-Datas}.
+		 * @param <GData> Typ des {@link CompactData}s.
 		 */
 		protected static abstract class CompactAscendingIterator<GItem, GData extends CompactData> extends
 			CompactIterator<GItem, GData> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactData Compact-Data} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
 			 * 
-			 * @param data {@link CompactData Compact-Data}.
+			 * @param data {@link CompactData}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -174,20 +174,19 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert einen abstrakten absteigenden {@link CompactData Compact-Data}-{@link Iterator
-		 * Iterator}.
+		 * Diese Klasse implementiert einen abstrakten absteigenden {@link CompactData}-{@link Iterator}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
-		 * @param <GData> Typ des {@link CompactData Compact-Datas}.
+		 * @param <GData> Typ des {@link CompactData}s.
 		 */
 		protected static abstract class CompactDescendingIterator<GItem, GData extends CompactData> extends
 			CompactIterator<GItem, GData> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactData Compact-Data} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
 			 * 
-			 * @param array {@link CompactData Compact-Data}.
+			 * @param array {@link CompactData}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -206,15 +205,15 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData Compact-Datas}.
+		 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GData> Typ des {@link CompactData Compact-Datas}.
+		 * @param <GData> Typ des {@link CompactData}s.
 		 */
 		protected static abstract class CompactSubData<GData extends CompactData> extends CompactLink<GData> {
 
 			/**
-			 * Dieses Feld speichert das Objekt zur offenen Begrenzung sortierter Teilmenge.
+			 * Dieses Feld speichert das Objekt zur offenen Begrenzung sortierter Teilmengen.
 			 */
 			protected static final Object OPEN = new Object();
 
@@ -239,9 +238,9 @@ public final class Compact {
 			protected final boolean lastInclusive;
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactData Compact-Data} und die Grenzen und deren Inklusion.
+			 * Dieser Konstrukteur initialisiert das {@link CompactData} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param data {@link CompactData Compact-Data}.
+			 * @param data {@link CompactData}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -507,22 +506,22 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieses Feld speichert das leere {@link Array Array} der Elemente.
+		 * Dieses Feld speichert das leere {@link Array} der Elemente.
 		 */
 		protected static final Object[] ITEMS = new Object[0];
 
 		/**
-		 * Diese Methode setzt die Länge des gegebenen {@link Array Array} mit der gegebenen Belegung auf die gegebene Länge
-		 * und gibt es zurück. Wenn die gegebene Länge {@code 0} ist, wird {@link CompactData#ITEMS} zurück gegeben. Wenn
-		 * die Länge des gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues {@link Array
-		 * Array} mit der gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in das neue
-		 * {@link Array Array} kopiert und das neue {@link Array Array} zurück gegeben.
+		 * Diese Methode setzt die Länge des gegebenen {@link Array} mit der gegebenen Belegung auf die gegebene Länge und
+		 * gibt es zurück. Wenn die gegebene Länge {@code 0} ist, wird {@link CompactData#ITEMS} zurück gegeben. Wenn die
+		 * Länge des gegebenen {@link Array}s von der gegebenen Länge abweicht, werden ein neues {@link Array} mit der
+		 * gegebenen Länge erzeugt, die im gegebenen {@link Array} belegten Einträge in das neue {@link Array} kopiert und
+		 * das neue {@link Array} zurück gegeben.
 		 * 
-		 * @param items {@link Array Array}.
+		 * @param items {@link Array}.
 		 * @param size Anzahl der belegten Elemente.
 		 * @param length Länge bzw. Kapazität.
-		 * @return {@link Array Array} der gegebenen Länge.
-		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @return {@link Array} der gegebenen Länge.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Belegung bzw. die gegebene Länge ungültig ist.
 		 */
 		public static Object[] resizeItems(final Object[] items, final int size, final int length)
@@ -537,19 +536,19 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode fügt in das gegebenen {@link Array Array} mit der gegebenen Belegung an der gegebenen Position die
-		 * gegebene Anzahl an Elementen ein, setzt die Länge des {@link Array Array} auf die gegebene Länge und gibt es
-		 * zurück. Wenn die Länge des gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues
-		 * {@link Array Array} mit der gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in
-		 * das neue {@link Array Array} kopiert und das neue {@link Array Array} zurück gegeben.
+		 * Diese Methode fügt in das gegebenen {@link Array} mit der gegebenen Belegung an der gegebenen Position die
+		 * gegebene Anzahl an Elementen ein, setzt die Länge des {@link Array} auf die gegebene Länge und gibt es zurück.
+		 * Wenn die Länge des gegebenen {@link Array}s von der gegebenen Länge abweicht, werden ein neues {@link Array} mit
+		 * der gegebenen Länge erzeugt, die im gegebenen {@link Array} belegten Einträge in das neue {@link Array} kopiert
+		 * und das neue {@link Array} zurück gegeben.
 		 * 
-		 * @param items {@link Array Array}.
+		 * @param items {@link Array}.
 		 * @param size Anzahl der belegten Elemente.
 		 * @param length Länge bzw. Kapazität.
 		 * @param index Index bzw. Position.
 		 * @param count Anzahl.
-		 * @return {@link Array Array} der gegebenen Länge.
-		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @return {@link Array} der gegebenen Länge.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Belegung, die gegebene Länge, der gegebene Index bzw. die
 		 *         gegebene Anzah ungültig ist.
 		 */
@@ -572,20 +571,20 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode entferntim gegebenen {@link Array Array} mit der gegebenen Belegung an der gegebenen Position die
-		 * gegebene Anzahl an Elementen, setzt die Länge des {@link Array Array} auf die gegebene Länge und gibt es zurück.
-		 * Wenn die gegebene Länge {@code 0} ist, wird {@link CompactData#ITEMS} zurück gegeben. Wenn die Länge des
-		 * gegebenen {@link Array Arrays} von der gegebenen Länge abweicht, werden ein neues {@link Array Array} mit der
-		 * gegebenen Länge erzeugt, die im gegebenen {@link Array Array} belegten Einträge in das neue {@link Array Array}
-		 * kopiert und das neue {@link Array Array} zurück gegeben.
+		 * Diese Methode entfernt im gegebenen {@link Array} mit der gegebenen Belegung an der gegebenen Position die
+		 * gegebene Anzahl an Elementen, setzt die Länge des {@link Array} auf die gegebene Länge und gibt es zurück. Wenn
+		 * die gegebene Länge {@code 0} ist, wird {@link CompactData#ITEMS} zurück gegeben. Wenn die Länge des gegebenen
+		 * {@link Array}s von der gegebenen Länge abweicht, werden ein neues {@link Array} mit der gegebenen Länge erzeugt,
+		 * die im gegebenen {@link Array} belegten Einträge in das neue {@link Array} kopiert und das neue {@link Array}
+		 * zurück gegeben.
 		 * 
-		 * @param items {@link Array Array}.
+		 * @param items {@link Array}.
 		 * @param size Anzahl der belegten Elemente.
 		 * @param length Länge bzw. Kapazität.
-		 * @return {@link Array Array} der gegebenen Länge.
+		 * @return {@link Array} der gegebenen Länge.
 		 * @param index Index bzw. Position.
 		 * @param count Anzahl.
-		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Belegung, die gegebene Länge, der gegebene Index bzw. die
 		 *         gegebene Anzah ungültig ist.
 		 */
@@ -612,14 +611,14 @@ public final class Compact {
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element in der Belegung des gegebenen
-		 * {@link Array Arrays} enthalten ist.
+		 * {@link Array}s enthalten ist.
 		 * 
 		 * @see Object#equals(Object)
-		 * @param items {@link Array Array}.
+		 * @param items {@link Array}.
 		 * @param size Anzahl der belegten Elemente.
 		 * @param value Element.
 		 * @return {@code true}, wenn das gegebene Element in der Belegung enthalten ist.
-		 * @throws NullPointerException Wenn des gegebenen {@link Array Array} {@code null} ist.
+		 * @throws NullPointerException Wenn des gegebenen {@link Array} {@code null} ist.
 		 */
 		public static boolean containsItem(final Object[] items, final int size, final Object value)
 			throws NullPointerException {
@@ -751,8 +750,8 @@ public final class Compact {
 		 * Diese Methode sucht zuerst binär und danach linear nach einem Eintrag, dessen Schlüssel gleich dem gegebenen
 		 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
 		 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element}
-		 * ist dann zum gegebenen Schlüssel gleich, wenn
-		 * {@code (compare(key, hash, element) == 0) && equals(key, hash, element)}.
+		 * ist dann zum gegebenen Schlüssel gleich, wenn {@code (compare(key, hash, element) == 0) &&
+		 * equals(key, hash, element)}.
 		 * 
 		 * @see CompactData#equals(Object, int, Object)
 		 * @see CompactData#compare(Object, int, Object)
@@ -815,7 +814,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das {@link Array Array} ein.
+		 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das {@link Array} ein.
 		 * 
 		 * @see CompactData#validInsertLength(int)
 		 * @param index Index.
@@ -829,8 +828,8 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem {@link Array Array} mit
-		 * der gegebenen Länge der Belegung.
+		 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem {@link Array} mit der
+		 * gegebenen Länge der Belegung.
 		 * 
 		 * @see CompactData#validRemoveLength(int)
 		 * @param index Index.
@@ -844,7 +843,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode vergrößert die Kapazität des {@link Array Arrays}, sodass dieses die gegebene Anzahl an Elementen
+		 * Diese Methode vergrößert die Kapazität des {@link Array}s, sodass dieses die gegebene Anzahl an Elementen
 		 * verwalten kann.
 		 * 
 		 * @see CompactData#validAllocateLength(int)
@@ -855,7 +854,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode verkleinert die Kapazität des {@link Array Arrays} auf das Minimum für seine Belegung.
+		 * Diese Methode verkleinert die Kapazität des {@link Array}s auf das Minimum für seine Belegung.
 		 * 
 		 * @see CompactData#validCompactLength()
 		 */
@@ -864,7 +863,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt die neue Länge für das {@link Array Array} zurück, um darin die gegebene Anzahl an Elementen
+		 * Diese Methode gibt die neue Länge für das {@link Array} zurück, um darin die gegebene Anzahl an Elementen
 		 * verwalten zu können.
 		 * 
 		 * @param count Anzahl.
@@ -879,7 +878,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt die neue Länge für das {@link Array Array} zurück, um darin die gegebene Anzahl an Elementen
+		 * Diese Methode gibt die neue Länge für das {@link Array} zurück, um darin die gegebene Anzahl an Elementen
 		 * verwalten zu können. Sie wird beim Einfügen von Elementen aufgerufen.
 		 * 
 		 * @see CompactData#validLength(int)
@@ -892,7 +891,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt die neue Länge für das {@link Array Array} zurück, um darin die gegebene Anzahl an Elementen
+		 * Diese Methode gibt die neue Länge für das {@link Array} zurück, um darin die gegebene Anzahl an Elementen
 		 * verwalten zu können. Sie wird beim Entfernen von Elementen aufgerufen.
 		 * 
 		 * @see CompactData#removeItems(int, int)
@@ -904,8 +903,8 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt die neue Länge für das {@link Array Array} zurück, um darin alle vorhandenen Elemente
-		 * (Belegung) verwalten zu können. Sie wird beim Kompaktieren aufgerufen.
+		 * Diese Methode gibt die neue Länge für das {@link Array} zurück, um darin alle vorhandenen Elemente (Belegung)
+		 * verwalten zu können. Sie wird beim Kompaktieren aufgerufen.
 		 * 
 		 * @see CompactData#size
 		 * @see CompactData#compactItems()
@@ -916,7 +915,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt die neue Länge für das {@link Array Array} zurück, um darin die gegebene Anzahl an Elementen
+		 * Diese Methode gibt die neue Länge für das {@link Array} zurück, um darin die gegebene Anzahl an Elementen
 		 * verwalten zu können. Sie wird beim Reservieren von Elementen aufgerufen.
 		 * 
 		 * @see CompactData#validLength(int)
@@ -947,8 +946,7 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link Set Set}, dessen Daten in einem {@link Array Array} verwaltet
-	 * werden.
+	 * Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem {@link Array} verwaltet werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
@@ -956,7 +954,7 @@ public final class Compact {
 	public static abstract class CompactSet<GItem> extends CompactData implements Set<GItem> {
 
 		/**
-		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} für {@link CompactSet Compact-Sets}.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactSet}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
@@ -965,9 +963,9 @@ public final class Compact {
 			CompactAscendingIterator<GItem, CompactSet<GItem>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactSet Compact-Set} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactSet} und Indizes.
 			 * 
-			 * @param set {@link CompactSet Compact-Set}.
+			 * @param set {@link CompactSet}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -986,7 +984,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert den absteigenden {@link Iterator Iterator} für {@link CompactSet Compact-Sets}.
+		 * Diese Klasse implementiert den absteigenden {@link Iterator} für {@link CompactSet}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
@@ -995,9 +993,9 @@ public final class Compact {
 			CompactDescendingIterator<GItem, CompactSet<GItem>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactSet Compact-Set} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactSet} und Indizes.
 			 * 
-			 * @param set {@link CompactSet Compact-Set}.
+			 * @param set {@link CompactSet}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -1016,42 +1014,12 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set}.
-		 */
-		public CompactSet() {
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit der gegebenen Kapazität.
-		 * 
-		 * @see CompactData#allocate(int)
-		 * @param capacity Kapazität.
-		 */
-		public CompactSet(final int capacity) {
-			this.allocate(capacity);
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit den gegebenen Elementen.
-		 * 
-		 * @see Set#addAll(Collection)
-		 * @see CompactData#allocate(int)
-		 * @param collection Elemente.
-		 * @throws NullPointerException Wenn die gegebene {@link Collection Collection} {@code null} ist.
-		 */
-		public CompactSet(final Collection<? extends GItem> collection) {
-			if(collection == null) throw new NullPointerException("Collection is null");
-			this.allocate(collection.size());
-			this.addAll(collection);
-		}
-
-		/**
 		 * Diese Methode implementiert {@link Set#addAll(Collection)}.
 		 * 
 		 * @see Set#addAll(Collection)
 		 * @param <GItem> Typ der Elemente.
-		 * @param set {@link Set Set}.
-		 * @param collection {@link Collection Collection}.
+		 * @param set {@link Set}.
+		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
 		public static <GItem> boolean addAll(final Set<GItem> set, final Collection<? extends GItem> collection) {
@@ -1068,8 +1036,8 @@ public final class Compact {
 		 * 
 		 * @see Set#retainAll(Collection)
 		 * @param <GItem> Typ der Elemente.
-		 * @param set {@link Set Set}.
-		 * @param collection {@link Collection Collection}.
+		 * @param set {@link Set}.
+		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
 		public static <GItem> boolean retainAll(final Set<GItem> set, final Collection<?> collection) {
@@ -1088,8 +1056,8 @@ public final class Compact {
 		 * 
 		 * @see Set#removeAll(Collection)
 		 * @param <GItem> Typ der Elemente.
-		 * @param set {@link Set Set}.
-		 * @param collection {@link Collection Collection}.
+		 * @param set {@link Set}.
+		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
 		public static <GItem> boolean removeAll(final Set<GItem> set, final Collection<?> collection) {
@@ -1108,14 +1076,44 @@ public final class Compact {
 		 * 
 		 * @see Set#containsAll(Collection)
 		 * @param <GItem> Typ der Elemente.
-		 * @param set {@link Set Set}.
-		 * @param collection {@link Collection Collection}.
+		 * @param set {@link Set}.
+		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Vollständigkeit.
 		 */
 		public static <GItem> boolean containsAll(final Set<GItem> set, final Collection<?> collection) {
 			for(final Object item: collection)
 				if(!set.contains(item)) return false;
 			return true;
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set}.
+		 */
+		public CompactSet() {
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität.
+		 * 
+		 * @see CompactData#allocate(int)
+		 * @param capacity Kapazität.
+		 */
+		public CompactSet(final int capacity) {
+			this.allocate(capacity);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
+		 * 
+		 * @see Set#addAll(Collection)
+		 * @see CompactData#allocate(int)
+		 * @param collection Elemente.
+		 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+		 */
+		public CompactSet(final Collection<? extends GItem> collection) {
+			if(collection == null) throw new NullPointerException("Collection is null");
+			this.allocate(collection.size());
+			this.addAll(collection);
 		}
 
 		/**
@@ -1140,10 +1138,10 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode gibt ein neues {@link Set Set} zurück, das aus dem {@link Iterator Iterator} erzeugt wird.
+		 * Diese Methode gibt ein neues {@link Set} zurück, das aus dem {@link Iterator} erzeugt wird.
 		 * 
 		 * @see AbstractSet
-		 * @return {@link Set Set}.
+		 * @return {@link Set}.
 		 */
 		protected final Set<GItem> getItemSet() {
 			return new AbstractSet<GItem>() {
@@ -1302,21 +1300,20 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet Compact-Set}.
+	 * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet}.
 	 * <p>
-	 * Der Speicherverbrauch eines {@link CompactHashSet Compact-Hash-Sets} liegt bei ca. {@code 13%} des
-	 * Speicherverbrauchs eines {@link HashSet Hash-Sets}. Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen
-	 * sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca.
-	 * {@code 245%} der Rechenzeit, die ein {@link HashSet Hash-Set} dazu benötigen würde. Bei einer Anzahl von ca.
-	 * {@code 100} Elementen benötigen Beide {@link Set Sets} dafür in etwa die gleichen Rechenzeiten. Bei weniger
-	 * Elementen ist das {@link CompactHashSet Compact-Hash-Set} schneller, bei mehr Elementen ist das {@link HashSet
-	 * Hash-Set} schneller. Für das Finden von Elementen und das Iterieren über die Elemente benötigt das
-	 * {@link CompactHashSet Compact-Hash-Set} im Mittel nur noch {@code 75%} der Rechenzeit des {@link HashSet Hash-Sets}
-	 * , unabhängig von der Anzahl der Elemente.
+	 * Der Speicherverbrauch eines {@link CompactHashSet}s liegt bei ca. {@code 13%} des Speicherverbrauchs eines
+	 * {@link HashSet}s. Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente
+	 * abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 245%} der Rechenzeit, die
+	 * ein {@link HashSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 100} Elementen benötigen Beide
+	 * {@link Set}s dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactHashSet}
+	 * schneller, bei mehr Elementen ist das {@link HashSet} schneller. Für das Finden von Elementen und das Iterieren
+	 * über die Elemente benötigt das {@link CompactHashSet} im Mittel nur noch {@code 75%} der Rechenzeit des
+	 * {@link HashSet}s, unabhängig von der Anzahl der Elemente.
 	 * <p>
 	 * Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit
-	 * beim Hinzufügen und Entfernen von Elementen in einem {@link CompactHashSet Compact-Hash-Set} auf {@code 8827%} der
-	 * Rechenzeit, die ein {@link HashSet Hash-Set} hierfür benötigen würde.
+	 * beim Hinzufügen und Entfernen von Elementen in einem {@link CompactHashSet} auf {@code 8827%} der Rechenzeit, die
+	 * ein {@link HashSet} hierfür benötigen würde.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
@@ -1326,14 +1323,14 @@ public final class Compact {
 	public static class CompactHashSet<GItem> extends CompactSet<GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set}.
+		 * Dieser Konstrukteur initialisiert das {@link Set}.
 		 */
 		public CompactHashSet() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -1343,7 +1340,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @see Set#addAll(Collection)
@@ -1377,26 +1374,25 @@ public final class Compact {
 		@Override
 		protected int compare(final Object key, final int hash, final Object item) {
 			if(item == null) return hash;
-			return Integer.compare(hash, item.hashCode());
+			return Comparators.compare(hash, item.hashCode());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link NavigableSet Navigable-Set}, dessen Daten in einem {@link Array Array}
-	 * verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet Compact-Navigable-Sets} liegt bei ca.
-	 * {@code 13%} des Speicherverbrauchs eines {@link TreeSet Tree-Sets}. Die Rechenzeiten beim Hinzufügen und Entfernen
-	 * von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im
-	 * Mittel auf ca. {@code 208%} der Rechenzeit, die ein {@link TreeSet Tree-Set} dazu benötigen würde. Bei einer Anzahl
-	 * von ca. {@code 8000} Elementen benötigen Beide {@link NavigableSet Navigable-Sets} dafür in etwa die gleichen
-	 * Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet Compact-Navigable-Set} schneller, bei mehr
-	 * Elementen ist das {@link TreeSet Tree-Set} schneller. Für das Finden von Elementen und das Iterieren über die
-	 * Elemente benötigt das {@link CompactNavigableSet Compact-Navigable-Set} im Mittel nur noch {@code 25%} bzw.
-	 * {@code 75%} der Rechenzeit des {@link TreeSet Tree-Sets}, unabhängig von der Anzahl der Elemente.
+	 * Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem {@link Array} verwaltet werden. Der
+	 * Speicherverbrauch eines {@link CompactNavigableSet} liegt bei ca. {@code 13%} des Speicherverbrauchs eines
+	 * {@link TreeSet}s. Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente
+	 * abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 208%} der Rechenzeit, die
+	 * ein {@link TreeSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide
+	 * {@link NavigableSet} dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das
+	 * {@link CompactNavigableSet} schneller, bei mehr Elementen ist das {@link TreeSet} schneller. Für das Finden von
+	 * Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel nur noch
+	 * {@code 25%} bzw. {@code 75%} der Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
 	 * <p>
 	 * Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit
-	 * beim Hinzufügen und Entfernen von Elementen in einem {@link CompactNavigableSet Compact-Navigable-Set} auf ca.
-	 * {@code 3900%} der Rechenzeit, die ein {@link TreeSet Tree-Set} hierfür benötigen würde.
+	 * beim Hinzufügen und Entfernen von Elementen in einem {@link CompactNavigableSet} auf ca. {@code 3900%} der
+	 * Rechenzeit, die ein {@link TreeSet} hierfür benötigen würde.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
@@ -1404,7 +1400,7 @@ public final class Compact {
 	public static class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
 
 		/**
-		 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactNavigableSet Compact-Navigable-Sets}.
+		 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactNavigableSet}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
@@ -1413,10 +1409,9 @@ public final class Compact {
 			implements NavigableSet<GItem> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet Compact-Navigable-Set} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param set {@link CompactNavigableSet Compact-Navigable-Set}.
+			 * @param set {@link CompactNavigableSet}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -1430,10 +1425,10 @@ public final class Compact {
 			}
 
 			/**
-			 * Diese Methode gibt ein neues {@link Set Set} zurück, das aus dem {@link Iterator Iterator} erzeugt wird.
+			 * Diese Methode gibt ein neues {@link Set} zurück, das aus dem {@link Iterator} erzeugt wird.
 			 * 
 			 * @see AbstractSet
-			 * @return {@link Set Set}.
+			 * @return {@link Set}.
 			 */
 			protected final Set<GItem> getItemSet() {
 				return new AbstractSet<GItem>() {
@@ -1602,7 +1597,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die aufsteigende Teilmenge eines {@link CompactNavigableSet Compact-Navigable-Sets}.
+		 * Diese Klasse implementiert die aufsteigende Teilmenge eines {@link CompactNavigableSet}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
@@ -1610,10 +1605,9 @@ public final class Compact {
 		protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet Compact-Navigable-Set} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param array {@link CompactNavigableSet Compact-Navigable-Set}.
+			 * @param array {@link CompactNavigableSet}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -1755,7 +1749,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die absteigende Teilmenge eines {@link CompactNavigableSet Compact-Navigable-Sets}.
+		 * Diese Klasse implementiert die absteigende Teilmenge eines {@link CompactNavigableSet}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
@@ -1763,10 +1757,9 @@ public final class Compact {
 		protected static final class CompactDescendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet Compact-Navigable-Set} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param array {@link CompactNavigableSet Compact-Navigable-Set}.
+			 * @param array {@link CompactNavigableSet}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -1908,15 +1901,15 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link Comparator Comparator}.
+		 * Dieses Feld speichert den {@link Comparator}.
 		 */
 		protected final Comparator<? super GItem> comparator;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
 		 * 
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 			super();
@@ -1925,14 +1918,14 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit den gegebenen Elementen und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see Set#addAll(Collection)
-		 * @param collection {@link Collection Collection}.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn die gegebene {@link Collection Collection} bzw. der gegebene {@link Comparator
-		 *         Comparator} {@code null} ist.
+		 * @param collection {@link Collection}.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn die gegebene {@link Collection} bzw. der gegebene {@link Comparator}
+		 *         {@code null} ist.
 		 */
 		public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator)
 			throws NullPointerException {
@@ -1942,13 +1935,13 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set Set} mit der gegebenen Kapazität und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator)
 			throws NullPointerException {
@@ -2158,8 +2151,7 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link Map Map}, deren Daten in einem {@link Array Array} verwaltet
-	 * werden.
+	 * Diese Klasse implementiert eine abstrakte {@link Map}, deren Daten in einem {@link Array} verwaltet werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -2168,7 +2160,7 @@ public final class Compact {
 	public abstract static class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
 		/**
-		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} der Schlüssel.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der Schlüssel.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -2177,9 +2169,9 @@ public final class Compact {
 			CompactAscendingIterator<GKey, CompactMap<GKey, ?>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
 			 * 
-			 * @param map {@link CompactMap Compact-Map}.
+			 * @param map {@link CompactMap}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -2198,7 +2190,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert den absteigenden {@link Iterator Iterator} der Schlüssel.
+		 * Diese Klasse implementiert den absteigenden {@link Iterator} der Schlüssel.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -2207,9 +2199,9 @@ public final class Compact {
 			CompactDescendingIterator<GKey, CompactMap<GKey, ?>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
 			 * 
-			 * @param map {@link CompactMap Compact-Map}.
+			 * @param map {@link CompactMap}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -2228,7 +2220,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} der Werte.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der Werte.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <V> Typ der Werte.
@@ -2236,9 +2228,9 @@ public final class Compact {
 		protected static final class CompactMapValueIterator<V> extends CompactAscendingIterator<V, CompactMap<?, V>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
 			 * 
-			 * @param map {@link CompactMap Compact-Map}.
+			 * @param map {@link CompactMap}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -2257,7 +2249,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert den aufsteigenden {@link Iterator Iterator} der {@link java.util.Map.Entry Entries}.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link Entry}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -2267,9 +2259,9 @@ public final class Compact {
 			CompactAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link CompactMap Compact-Map} und Indizes.
+			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
 			 * 
-			 * @param map {@link CompactMap Compact-Map}.
+			 * @param map {@link CompactMap}.
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
@@ -2288,13 +2280,13 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
 		 */
 		public CompactMap() {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -2304,7 +2296,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @see Map#putAll(Map)
@@ -2378,10 +2370,10 @@ public final class Compact {
 		protected abstract void setEntry(int index, GKey key, GValue value);
 
 		/**
-		 * Diese Methode gibt ein neues {@link Set Set} zurück, das aus dem {@link Iterator Iterator} erzeugt wird.
+		 * Diese Methode gibt ein neues {@link Set} zurück, das aus dem {@link Iterator} erzeugt wird.
 		 * 
 		 * @see AbstractSet
-		 * @return {@link Set Set}.
+		 * @return {@link Set}.
 		 */
 		protected final Map<GKey, GValue> getItemMap() {
 			return new AbstractMap<GKey, GValue>() {
@@ -2592,9 +2584,8 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link CompactMap Compact-Map}, deren Werte in einem {@link Array Array}
-	 * verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht
-	 * als Wert.
+	 * Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem {@link Array} verwaltet werden
+	 * und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
 	 * 
 	 * @see CompactMap#getKey(Object)
 	 * @see CompactMap#setKey(Object, Object)
@@ -2605,14 +2596,14 @@ public final class Compact {
 	public static abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
 		 */
 		public CompactItemMap() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -2669,8 +2660,7 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap
-	 * Compact-Item-Map}.
+	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap}.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
@@ -2681,14 +2671,14 @@ public final class Compact {
 	public static abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GKey, GValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
 		 */
 		public CompactItemHashMap() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -2724,14 +2714,14 @@ public final class Compact {
 		protected int compare(final Object key, final int hash, final Object item) {
 			final Object value = this.getKey((GValue)item);
 			if(value == null) return hash;
-			return Integer.compare(hash, value.hashCode());
+			return Comparators.compare(hash, value.hashCode());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link Map Map}, deren Schlüssel und Werte in je einem {@link Array
-	 * Array} verwaltet werden.
+	 * Diese Klasse implementiert eine abstrakte {@link Map}, deren Schlüssel und Werte in je einem {@link Array Array}
+	 * verwaltet werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -2745,14 +2735,14 @@ public final class Compact {
 		protected Object[] values = CompactData.ITEMS;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
 		 */
 		public CompactEntryMap() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -2762,7 +2752,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
 		 * 
 		 * @see Map#putAll(Map)
 		 * @param map Elemente.
@@ -2863,20 +2853,20 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap
-	 * Compact-Entry-Map}. Der Speicherverbrauch einer {@link CompactEntryHashMap Compact-Entry-Hash-Map} liegt bei ca.
-	 * {@code 28%} des Speicherverbrauchs eines {@link HashMap Hash-Map}.
+	 * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der
+	 * Speicherverbrauch einer {@link CompactEntryHashMap} liegt bei ca. {@code 28%} des Speicherverbrauchs eines
+	 * {@link HashMap}.
 	 * <p>
-	 * Eine {@link HashMap HashMap} ist immer schneller als eine {@link CompactEntryHashMap Compact-Entry-Hash-Map}.
+	 * Eine {@link HashMap} ist immer schneller als eine {@link CompactEntryHashMap}.
 	 * <p>
 	 * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen
 	 * sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 150%}. Bei der erhöhung der Anzahl der Elemente
 	 * auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von
-	 * Elementen in einer {@link CompactEntryHashMap Compact-Entry-Hash-Map} auf {@code 760%} der Rechenzeit, die eine
-	 * {@link HashMap Hash-Map} hierfür benötigen würde.
+	 * Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür
+	 * benötigen würde.
 	 * <p>
-	 * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map Maps} in etwa die
-	 * gleichen Rechenzeiten, unabhängig von der Anzahl der Elemente.
+	 * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map} in etwa die gleichen
+	 * Rechenzeiten, unabhängig von der Anzahl der Elemente.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
@@ -2887,14 +2877,14 @@ public final class Compact {
 	public static class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map}.
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
 		 */
 		public CompactEntryHashMap() {
 			super();
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
@@ -2904,7 +2894,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
 		 * 
 		 * @see Map#putAll(Map)
 		 * @param map Elemente.
@@ -2937,14 +2927,14 @@ public final class Compact {
 		@Override
 		protected int compare(final Object key, final int hash, final Object item) {
 			if(item == null) return hash;
-			return Integer.compare(hash, item.hashCode());
+			return Comparators.compare(hash, item.hashCode());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link NavigableMap Navigable-Map}, deren Daten in einem {@link Array
-	 * Array} verwaltet werden.
+	 * Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem {@link Array} verwaltet
+	 * werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -2954,25 +2944,25 @@ public final class Compact {
 		NavigableMap<GKey, GValue> {
 
 		/**
-		 * Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap Navigable-Map}.
+		 * Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
-		 * @param <GData> Typ der {@link NavigableMap Navigable-Map}.
+		 * @param <GData> Typ der {@link NavigableMap}.
 		 */
 		protected static abstract class CompactNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends
 			AbstractSet<GKey> implements NavigableSet<GKey> {
 
 			/**
-			 * Dieses Feld speichert die {@link NavigableMap Navigable-Map}.
+			 * Dieses Feld speichert die {@link NavigableMap}.
 			 */
 			protected final GData data;
 
 			/**
-			 * Dieser Konstrukteur initialisiert die {@link NavigableMap Navigable-Map}.
+			 * Dieser Konstrukteur initialisiert die {@link NavigableMap}.
 			 * 
-			 * @param data {@link NavigableMap Navigable-Map}.
-			 * @throws NullPointerException Wenn die gegebene {@link NavigableMap Navigable-Map} {@code null} ist.
+			 * @param data {@link NavigableMap}.
+			 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist.
 			 */
 			public CompactNavigableKeySet(final GData data) throws NullPointerException {
 				if(data == null) throw new NullPointerException("Data is null");
@@ -2980,9 +2970,9 @@ public final class Compact {
 			}
 
 			/**
-			 * Diese Methode gibt den Schlüssel des gegebenen {@link java.util.Map.Entry Entries} oder {@code null} zurück.
+			 * Diese Methode gibt den Schlüssel des gegebenen {@link Entry}s oder {@code null} zurück.
 			 * 
-			 * @param entry {@link java.util.Map.Entry Entry}.
+			 * @param entry {@link Entry}.
 			 * @return Schlüssel oder {@code null}.
 			 */
 			protected final GKey getKeyOrNull(final Entry<GKey, ?> entry) {
@@ -3172,8 +3162,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap
-		 * Compact-Ascending-Sub-Map}.
+		 * Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -3182,11 +3171,10 @@ public final class Compact {
 			CompactNavigableKeySet<GKey, CompactAscendingSubMap<GKey, ?>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert die {@link CompactAscendingSubMap Compact-Ascending-Sub-Map}.
+			 * Dieser Konstrukteur initialisiert die {@link CompactAscendingSubMap}.
 			 * 
-			 * @param data {@link CompactAscendingSubMap Compact-Ascending-Sub-Map}.
-			 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap Compact-Ascending-Sub-Map}
-			 *         {@code null} ist.
+			 * @param data {@link CompactAscendingSubMap}.
+			 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist.
 			 */
 			public CompactAscendingKeySet(final CompactAscendingSubMap<GKey, ?> data) throws NullPointerException {
 				super(data);
@@ -3204,8 +3192,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap
-		 * Compact-Descending-Sub-Map}.
+		 * Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -3214,11 +3201,10 @@ public final class Compact {
 			CompactNavigableKeySet<GKey, CompactDescendingSubMap<GKey, ?>> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert die {@link CompactDescendingSubMap Compact-Descending-Sub-Map}.
+			 * Dieser Konstrukteur initialisiert die {@link CompactDescendingSubMap}.
 			 * 
-			 * @param data {@link CompactDescendingSubMap Compact-Descending-Sub-Map}.
-			 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap Compact-Descending-Sub-Map}
-			 *         {@code null} ist.
+			 * @param data {@link CompactDescendingSubMap}.
+			 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist.
 			 */
 			public CompactDescendingKeySet(final CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
 				super(data);
@@ -3236,7 +3222,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert eine abstrakte Teilmenge einer {@link CompactNavigableMap Compact-Navigable-Map}.
+		 * Diese Klasse implementiert eine abstrakte Teilmenge einer {@link CompactNavigableMap}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -3246,10 +3232,9 @@ public final class Compact {
 			CompactSubData<CompactNavigableMap<GKey, GValue>> implements NavigableMap<GKey, GValue> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap Compact-Navigable-Map} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param map {@link CompactNavigableMap Compact-Navigable-Map}.
+			 * @param map {@link CompactNavigableMap}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -3262,10 +3247,10 @@ public final class Compact {
 			}
 
 			/**
-			 * Diese Methode gibt eine neue {@link Map Map} zurück, das aus dem Einträgen erzeugt wird.
+			 * Diese Methode gibt eine neue {@link Map} zurück, das aus dem Einträgen erzeugt wird.
 			 * 
 			 * @see AbstractMap
-			 * @return {@link Map Map}.
+			 * @return {@link Map}.
 			 */
 			protected final Map<GKey, GValue> getItemMap() {
 				return new AbstractMap<GKey, GValue>() {
@@ -3466,7 +3451,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die aufsteigende Teilmenge einer {@link CompactNavigableMap Compact-Navigable-Map}.
+		 * Diese Klasse implementiert die aufsteigende Teilmenge einer {@link CompactNavigableMap} .
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -3475,10 +3460,9 @@ public final class Compact {
 		protected static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap Compact-Navigable-Map} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param map {@link CompactNavigableMap Compact-Navigable-Map}.
+			 * @param map {@link CompactNavigableMap}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -3661,7 +3645,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert die absteigende Teilmenge einer {@link CompactNavigableMap Compact-Navigable-Map}.
+		 * Diese Klasse implementiert die absteigende Teilmenge einer {@link CompactNavigableMap}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -3670,10 +3654,9 @@ public final class Compact {
 		protected static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
 
 			/**
-			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet Compact-Navigable-Set} und die Grenzen und
-			 * deren Inklusion.
+			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 			 * 
-			 * @param map {@link CompactNavigableSet Compact-Navigable-Set}.
+			 * @param map {@link CompactNavigableSet}.
 			 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
 			 * @param fromInclusive Inklusivität des ersten Elements.
 			 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
@@ -3858,15 +3841,15 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link Comparator Comparator}.
+		 * Dieses Feld speichert den {@link Comparator}.
 		 */
 		protected final Comparator<? super GKey> comparator;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit dem gegebenen {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 		 * 
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
 			if(comparator == null) throw new NullPointerException("Comparator is null");
@@ -3874,13 +3857,13 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator)
 			throws NullPointerException {
@@ -3890,14 +3873,14 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @see Map#putAll(Map)
 		 * @param map Elemente.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map,
 			final Comparator<? super GKey> comparator) throws NullPointerException {
@@ -4193,9 +4176,8 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap Compact-Navigable-Map}, deren Daten in einem
-	 * {@link Array Array} verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb
-	 * {@code null} nicht als Wert.
+	 * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem {@link Array} verwaltet
+	 * werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
 	 * 
 	 * @see CompactMap#getKey(Object)
 	 * @see CompactMap#setKey(Object, Object)
@@ -4206,23 +4188,23 @@ public final class Compact {
 	public static abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit dem gegebenen {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 		 * 
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableItemMap(final Comparator<? super GKey> comparator) throws NullPointerException {
 			super(comparator);
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableItemMap(final int capacity, final Comparator<? super GKey> comparator)
 			throws NullPointerException {
@@ -4230,14 +4212,14 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @see Map#putAll(Map)
 		 * @param map Elemente.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableItemMap(final Map<? extends GKey, ? extends GValue> map,
 			final Comparator<? super GKey> comparator) throws NullPointerException {
@@ -4301,22 +4283,20 @@ public final class Compact {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap Compact-Navigable-Map}, deren Schlüssel und
-	 * Werte in je einem {@link Array Array} verwaltet werden. Der Speicherverbrauch einer
-	 * {@link CompactNavigableEntryMap Compact-Navigable-Entry-Map} liegt bei ca. {@code 28%} des Speicherverbrauchs eines
-	 * {@link TreeMap Tree-Map}.
+	 * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Schlüssel und Werte in je einem
+	 * {@link Array} verwaltet werden. Der Speicherverbrauch einer {@link CompactNavigableEntryMap} liegt bei ca.
+	 * {@code 28%} des Speicherverbrauchs einer {@link TreeMap}.
 	 * <p>
-	 * Eine {@link TreeMap TreeMap} ist immer schneller als eine {@link CompactNavigableEntryMap}.
+	 * Eine {@link TreeMap} ist immer schneller als eine {@link CompactNavigableEntryMap}.
 	 * <p>
 	 * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen
-	 * sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 160%} der Rechenzeit, die eine {@link TreeMap
-	 * Tree-Map} dazu benötigen würde. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5}
-	 * Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einer
-	 * {@link CompactNavigableEntryMap Compact-Navigable-Entry-Map} auf ca. {@code 1050%} der Rechenzeit, die eine
-	 * {@link TreeMap Tree-Map} hierfür benötigen würde.
+	 * sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 160%} der Rechenzeit, die eine {@link TreeMap}
+	 * dazu benötigen würde. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen)
+	 * steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einer {@link CompactNavigableEntryMap} auf ca.
+	 * {@code 1050%} der Rechenzeit, die eine {@link TreeMap} hierfür benötigen würde.
 	 * <p>
-	 * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map Maps} in etwa die
-	 * gleichen Rechenzeiten, unabhängig von der Anzahl der Elemente.
+	 * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen
+	 * Rechenzeiten, unabhängig von der Anzahl der Elemente.
 	 * 
 	 * @see CompactMap#getKey(Object)
 	 * @see CompactMap#setKey(Object, Object)
@@ -4332,23 +4312,23 @@ public final class Compact {
 		protected Object[] values = CompactData.ITEMS;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit dem gegebenen {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 		 * 
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableEntryMap(final Comparator<? super GKey> comparator) throws NullPointerException {
 			super(comparator);
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit der gegebenen Kapazität und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @param capacity Kapazität.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableEntryMap(final int capacity, final Comparator<? super GKey> comparator)
 			throws NullPointerException {
@@ -4356,14 +4336,14 @@ public final class Compact {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map Map} mit den gegebenen Elementen und dem gegebenen
-		 * {@link Comparator Comparator}.
+		 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen
+		 * {@link Comparator}.
 		 * 
 		 * @see CompactData#allocate(int)
 		 * @see Map#putAll(Map)
 		 * @param map Elemente.
-		 * @param comparator {@link Comparator Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator Comparator} {@code null} ist.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableEntryMap(final Map<? extends GKey, ? extends GValue> map,
 			final Comparator<? super GKey> comparator) throws NullPointerException {
