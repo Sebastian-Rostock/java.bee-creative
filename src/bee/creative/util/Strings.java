@@ -36,7 +36,7 @@ public final class Strings {
 		 * @throws NullPointerException Wenn das gegebene Trennzeichen {@code null} ist.
 		 */
 		public JoinConverter(final String space) throws NullPointerException {
-			if(space == null) throw new NullPointerException("Space is null");
+			if(space == null) throw new NullPointerException("space is null");
 			this.space = space;
 		}
 
@@ -119,7 +119,7 @@ public final class Strings {
 		 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck {@code null} ist.
 		 */
 		public BaseConverter(final Pattern pattern, final boolean split, final boolean match) throws NullPointerException {
-			if(pattern == null) throw new NullPointerException("Pattern is null");
+			if(pattern == null) throw new NullPointerException("pattern is null");
 			this.pattern = pattern;
 			this.split = split;
 			this.match = match;
@@ -172,7 +172,7 @@ public final class Strings {
 			throws NullPointerException, IllegalArgumentException {
 			super(pattern, split, match);
 			if((index < 0) || (index > pattern.matcher("").groupCount()))
-				throw new IllegalArgumentException("Index out of range: " + index);
+				throw new IllegalArgumentException("index out of range: " + index);
 			this.index = index;
 		}
 
@@ -536,9 +536,9 @@ public final class Strings {
 	 */
 	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split,
 		final boolean match) throws NullPointerException, IllegalArgumentException {
-		if(regex == null) throw new NullPointerException("Regex is null");
-		if(string == null) throw new NullPointerException("String is null");
-		if(index < 0) throw new IllegalArgumentException("Index out of range: " + index);
+		if(regex == null) throw new NullPointerException("regex is null");
+		if(string == null) throw new NullPointerException("string is null");
+		if(index < 0) throw new IllegalArgumentException("index out of range: " + index);
 		return Strings.apply(Strings.CACHED_PATTERN_CONVERTER.convert(regex), string, index, split, match);
 	}
 
@@ -560,11 +560,11 @@ public final class Strings {
 	 */
 	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split,
 		final boolean match) throws NullPointerException, IllegalArgumentException {
-		if(pattern == null) throw new NullPointerException("Pattern is null");
-		if(string == null) throw new NullPointerException("String is null");
-		if(index < 0) throw new IllegalArgumentException("Index out of range: " + index);
+		if(pattern == null) throw new NullPointerException("pattern is null");
+		if(string == null) throw new NullPointerException("string is null");
+		if(index < 0) throw new IllegalArgumentException("index out of range: " + index);
 		final Matcher matcher = pattern.matcher(string);
-		if(index > matcher.groupCount()) throw new IllegalArgumentException("Index out of range: " + index);
+		if(index > matcher.groupCount()) throw new IllegalArgumentException("index out of range: " + index);
 		final List<String> stringList = new ArrayList<String>();
 		int cursor = 0;
 		while(matcher.find()){
@@ -601,8 +601,8 @@ public final class Strings {
 	 */
 	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split,
 		final boolean match) throws NullPointerException {
-		if(regex == null) throw new NullPointerException("Regex is null");
-		if(string == null) throw new NullPointerException("String is null");
+		if(regex == null) throw new NullPointerException("regex is null");
+		if(string == null) throw new NullPointerException("string is null");
 		return Strings.applyAll(Strings.CACHED_PATTERN_CONVERTER.convert(regex), string, split, match);
 	}
 
@@ -622,8 +622,8 @@ public final class Strings {
 	 */
 	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split,
 		final boolean match) throws NullPointerException {
-		if(pattern == null) throw new NullPointerException("Pattern is null");
-		if(string == null) throw new NullPointerException("String is null");
+		if(pattern == null) throw new NullPointerException("pattern is null");
+		if(string == null) throw new NullPointerException("string is null");
 		final Matcher matcher = pattern.matcher(string);
 		final int count = matcher.groupCount() + 1;
 		final List<List<String>> stringListList = new ArrayList<List<String>>();
@@ -678,7 +678,7 @@ public final class Strings {
 	 * @throws NullPointerException Wenn das gegebenen {@link Array} {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
-		if(items == null) throw new NullPointerException("Items is null");
+		if(items == null) throw new NullPointerException("items is null");
 		return Strings.join("", items);
 	}
 
@@ -694,8 +694,8 @@ public final class Strings {
 	 * @throws NullPointerException Wenn das gegebenen {@link Array} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
-		if(space == null) throw new NullPointerException("Space is null");
-		if(items == null) throw new NullPointerException("Items is null");
+		if(space == null) throw new NullPointerException("space is null");
+		if(items == null) throw new NullPointerException("items is null");
 		return Strings.join(space, Arrays.asList(items));
 	}
 
@@ -713,7 +713,7 @@ public final class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
 	public static String join(final Iterable<?> items) {
-		if(items == null) throw new NullPointerException("Items is null");
+		if(items == null) throw new NullPointerException("items is null");
 		return Strings.join("", items);
 	}
 
@@ -728,8 +728,8 @@ public final class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Iterable<?> items) {
-		if(space == null) throw new NullPointerException("Space is null");
-		if(items == null) throw new NullPointerException("Items is null");
+		if(space == null) throw new NullPointerException("space is null");
+		if(items == null) throw new NullPointerException("items is null");
 		final StringBuilder builder = new StringBuilder();
 		if(!space.isEmpty()){
 			String join = "";

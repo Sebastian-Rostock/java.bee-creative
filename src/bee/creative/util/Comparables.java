@@ -32,7 +32,7 @@ public class Comparables {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public ComparableLink(final Comparable<? super GInput> comparable) throws NullPointerException {
-			if(comparable == null) throw new NullPointerException("Comparable is null");
+			if(comparable == null) throw new NullPointerException("comparable is null");
 			this.comparable = comparable;
 		}
 
@@ -192,8 +192,8 @@ public class Comparables {
 		 */
 		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 			throws NullPointerException {
-			if(comparable1 == null) throw new NullPointerException("Comparable1 is null");
-			if(comparable2 == null) throw new NullPointerException("Comparable2 is null");
+			if(comparable1 == null) throw new NullPointerException("comparable1 is null");
+			if(comparable2 == null) throw new NullPointerException("comparable2 is null");
 			this.comparable1 = comparable1;
 			this.comparable2 = comparable2;
 		}
@@ -282,7 +282,7 @@ public class Comparables {
 		public ConvertedComparable(final Comparable<? super GValue> comparable,
 			final Converter<? super GEntry, ? extends GValue> converter) throws NullPointerException {
 			super(comparable);
-			if(converter == null) throw new NullPointerException("Converter is null");
+			if(converter == null) throw new NullPointerException("converter is null");
 			this.converter = converter;
 		}
 
@@ -344,9 +344,9 @@ public class Comparables {
 	 */
 	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException,
 		IndexOutOfBoundsException {
-		if(fromIndex > toIndex) throw new IllegalArgumentException("FromIndex > ToIndex");
-		if(fromIndex < 0) throw new IndexOutOfBoundsException("FromIndex out of range: " + fromIndex);
-		if(toIndex > length) throw new IndexOutOfBoundsException("ToIndex out of range: " + toIndex);
+		if(fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
+		if(fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex out of range: " + fromIndex);
+		if(toIndex > length) throw new IndexOutOfBoundsException("toIndex out of range: " + toIndex);
 	}
 
 	/**
@@ -358,8 +358,8 @@ public class Comparables {
 	 * @throws NullPointerException Wenn der gegebene Suchraum bzw. der gegebene {@link Comparable} {@code null} ist.
 	 */
 	static void check(final Object list, final Object comparable) throws NullPointerException {
-		if(list == null) throw new NullPointerException("List is null");
-		if(comparable == null) throw new NullPointerException("Comparable is null");
+		if(list == null) throw new NullPointerException("list is null");
+		if(comparable == null) throw new NullPointerException("comparable is null");
 	}
 
 	/**

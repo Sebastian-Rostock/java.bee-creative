@@ -1,9 +1,11 @@
 package bee.creative.util;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import bee.creative.util.Converters.ConverterLink;
 import bee.creative.util.Filters.FilterLink;
@@ -102,7 +104,7 @@ public final class Iterators {
 		public BaseIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
 			throws NullPointerException {
 			super(filter);
-			if(iterator == null) throw new NullPointerException("Iterator is null");
+			if(iterator == null) throw new NullPointerException("iterator is null");
 			this.iterator = iterator;
 		}
 
@@ -458,7 +460,7 @@ public final class Iterators {
 		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
 		 */
 		public ChainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
-			if(iterators == null) throw new NullPointerException("Iterators is null");
+			if(iterators == null) throw new NullPointerException("iterators is null");
 			this.iterators = iterators;
 		}
 
@@ -541,7 +543,7 @@ public final class Iterators {
 		public ConvertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterator<? extends GInput> iterator) throws NullPointerException {
 			super(converter);
-			if(iterator == null) throw new NullPointerException("Iterator is null");
+			if(iterator == null) throw new NullPointerException("iterator is null");
 			this.iterator = iterator;
 		}
 
@@ -683,7 +685,7 @@ public final class Iterators {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
 	 */
 	public static int skip(final Iterator<?> iterator, int count) throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("Iterator is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
 		while((count != 0) && iterator.hasNext()){
 			count--;
 			iterator.next();
@@ -692,41 +694,117 @@ public final class Iterators {
 	}
 
 	/**
-	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein.
+	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator}
+	 * vorkommen, und gibt nur bei Veränderung der {@link Collection} {@code true} zurück.
 	 * 
-	 * @see Collection#add(Object)
-	 * @param <GEntry> Typ der Elemente.
-	 * @param iterator {@link Iterator}.
+	 * @see Collection#retainAll(Collection)
 	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
 	 *         ist.
 	 */
-	public static <GEntry> void appendAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
+	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator)
 		throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("Iterator is null");
-		if(collection == null) throw new NullPointerException("Collection is null");
-		while(iterator.hasNext()){
-			collection.add(iterator.next());
-		}
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		final List<Object> list = new ArrayList<Object>();
+		Iterators.appendAll(list, iterator);
+		return collection.retainAll(list);
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s aus der gegebenen {@link Collection}.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die nicht in der gegebenen {@link Collection}
+	 * vorkommen, und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
 	 * 
-	 * @see Collection#remove(Object)
-	 * @param <GEntry> Typ der Elemente.
+	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
 	 * @param collection {@link Collection}.
+	 * @return {@code true} bei Veränderungen am {@link Iterator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
 	 *         ist.
 	 */
-	public static <GEntry> void removeAll(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
+	public static boolean retainAll(final Iterator<?> iterator, final Collection<?> collection)
 		throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("Iterator is null");
-		if(collection == null) throw new NullPointerException("Collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		boolean modified = false;
 		while(iterator.hasNext()){
-			collection.remove(iterator.next());
+			if(!collection.contains(iterator.next())){
+				iterator.remove();
+				modified = true;
+			}
 		}
+		return modified;
+	}
+
+	/**
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein und gibt
+	 * nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * 
+	 * @see Collection#addAll(Collection)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
+	 *         ist.
+	 */
+	public static <GEntry> boolean appendAll(final Collection<GEntry> collection,
+		final Iterator<? extends GEntry> iterator) throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		boolean modified = false;
+		while(iterator.hasNext()){
+			if(collection.add(iterator.next())){
+				modified = true;
+			}
+		}
+		return modified;
+	}
+
+	/**
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s aus der gegebenen {@link Collection} und gibt
+	 * nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * 
+	 * @see Collection#removeAll(Collection)
+	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
+	 *         ist.
+	 */
+	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator)
+		throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		boolean modified = false;
+		while(iterator.hasNext()){
+			if(collection.remove(iterator.next())){
+				modified = true;
+			}
+		}
+		return modified;
+	}
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterator}s in der
+	 * gegebenen {@link Collection} enthalten sind.
+	 * 
+	 * @see Collection#containsAll(Collection)
+	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei vollständiger Inklusion.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
+	 *         ist.
+	 */
+	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator)
+		throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		while(iterator.hasNext())
+			if(!collection.contains(iterator.next())) return false;
+		return true;
 	}
 
 	/**
@@ -871,7 +949,7 @@ public final class Iterators {
 	 */
 	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
 		throws NullPointerException {
-		if(iterators == null) throw new NullPointerException("Iterators is null");
+		if(iterators == null) throw new NullPointerException("iterators is null");
 		return Iterators.chainedIterator(Arrays.asList(iterators));
 	}
 
@@ -918,7 +996,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator}.
 	 */
 	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) {
-		if(iterators == null) throw new NullPointerException("Iterators is null");
+		if(iterators == null) throw new NullPointerException("iterators is null");
 		return Iterators.chainedIterator(iterators.iterator());
 	}
 

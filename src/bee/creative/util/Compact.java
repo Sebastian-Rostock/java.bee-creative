@@ -58,7 +58,7 @@ public final class Compact {
 			 * @param data {@link CompactData}.
 			 */
 			public CompactLink(final GData data) {
-				if(data == null) throw new NullPointerException("Data is null");
+				if(data == null) throw new NullPointerException("data is null");
 				this.data = data;
 			}
 
@@ -252,7 +252,7 @@ public final class Compact {
 				super(data);
 				if(fromItem != CompactSubData.OPEN){
 					if(lastItem != CompactSubData.OPEN){
-						if(data.compare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("FromItem > FastItem");
+						if(data.compare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > FastItem");
 					}else{
 						data.compare(fromItem, 0, fromItem);
 					}
@@ -526,8 +526,8 @@ public final class Compact {
 		 */
 		public static Object[] resizeItems(final Object[] items, final int size, final int length)
 			throws NullPointerException, IllegalArgumentException {
-			if(items == null) throw new NullPointerException("Items is null");
-			if(length < size) throw new IllegalArgumentException("Length < Size");
+			if(items == null) throw new NullPointerException("items is null");
+			if(length < size) throw new IllegalArgumentException("length < Size");
 			if(length == items.length) return items;
 			if(length == 0) return CompactData.ITEMS;
 			final Object[] objects = new Object[length];
@@ -554,10 +554,10 @@ public final class Compact {
 		 */
 		public static Object[] insertItems(final Object[] items, final int size, final int length, final int index,
 			final int count) throws NullPointerException, IllegalArgumentException {
-			if(items == null) throw new NullPointerException("Items is null");
-			if(length < size) throw new IllegalArgumentException("Length < Size");
-			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
-			if(count < 0) throw new IllegalArgumentException("Count out of range: " + count);
+			if(items == null) throw new NullPointerException("items is null");
+			if(length < size) throw new IllegalArgumentException("length < Size");
+			if((index < 0) || (index > size)) throw new IllegalArgumentException("index out of range: " + index);
+			if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
 			if(count == 0) return items;
 			if(length != items.length){
 				final Object[] objects = new Object[length];
@@ -590,10 +590,10 @@ public final class Compact {
 		 */
 		public static Object[] removeItems(final Object[] items, final int size, final int length, final int index,
 			final int count) throws NullPointerException, IllegalArgumentException {
-			if(items == null) throw new NullPointerException("Items is null");
-			if(length < size) throw new IllegalArgumentException("Length < Size");
-			if((index < 0) || (index > size)) throw new IllegalArgumentException("Index out of range: " + index);
-			if((count < 0) || (count > size)) throw new IllegalArgumentException("Count out of range: " + count);
+			if(items == null) throw new NullPointerException("items is null");
+			if(length < size) throw new IllegalArgumentException("length < Size");
+			if((index < 0) || (index > size)) throw new IllegalArgumentException("index out of range: " + index);
+			if((count < 0) || (count > size)) throw new IllegalArgumentException("count out of range: " + count);
 			if(count == 0) return items;
 			if(length != items.length){
 				if(length != 0){
@@ -622,7 +622,7 @@ public final class Compact {
 		 */
 		public static boolean containsItem(final Object[] items, final int size, final Object value)
 			throws NullPointerException {
-			if(items == null) throw new NullPointerException("Items is null");
+			if(items == null) throw new NullPointerException("items is null");
 			if(value == null){
 				for(int i = 0; i < size; i++){
 					if(items[i] == null) return true;
@@ -1022,13 +1022,8 @@ public final class Compact {
 		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
-		public static <GItem> boolean addAll(final Set<GItem> set, final Collection<? extends GItem> collection) {
-			boolean modified = false;
-			for(final GItem item: collection)
-				if(set.add(item)){
-					modified = true;
-				}
-			return modified;
+		public static <GItem> boolean addAll(final Collection<GItem> set, final Collection<? extends GItem> collection) {
+			return Iterables.appendAll(set,collection);
 		}
 
 		/**
@@ -1040,15 +1035,8 @@ public final class Compact {
 		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
-		public static <GItem> boolean retainAll(final Set<GItem> set, final Collection<?> collection) {
-			boolean modified = false;
-			for(final Iterator<?> iterator = set.iterator(); iterator.hasNext();){
-				if(!collection.contains(iterator.next())){
-					iterator.remove();
-					modified = true;
-				}
-			}
-			return modified;
+		public static <GItem> boolean retainAll(final Collection<GItem> set, final Collection<?> collection) {
+			return Iterables.retainAll((Iterable<?>)set,collection);
 		}
 
 		/**
@@ -1060,15 +1048,8 @@ public final class Compact {
 		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Veränderungen.
 		 */
-		public static <GItem> boolean removeAll(final Set<GItem> set, final Collection<?> collection) {
-			boolean modified = false;
-			for(final Iterator<?> iterator = set.iterator(); iterator.hasNext();){
-				if(collection.contains(iterator.next())){
-					iterator.remove();
-					modified = true;
-				}
-			}
-			return modified;
+		public static <GItem> boolean removeAll(final Collection<GItem> set, final Collection<?> collection) {
+			return Iterables.removeAll(set,collection);
 		}
 
 		/**
@@ -1080,10 +1061,8 @@ public final class Compact {
 		 * @param collection {@link Collection}.
 		 * @return {@code true} bei Vollständigkeit.
 		 */
-		public static <GItem> boolean containsAll(final Set<GItem> set, final Collection<?> collection) {
-			for(final Object item: collection)
-				if(!set.contains(item)) return false;
-			return true;
+		public static <GItem> boolean containsAll(final Collection<GItem> set, final Collection<?> collection) {
+			return Iterables.containsAll(set,collection);
 		}
 
 		/**
@@ -1111,7 +1090,7 @@ public final class Compact {
 		 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
 		 */
 		public CompactSet(final Collection<? extends GItem> collection) {
-			if(collection == null) throw new NullPointerException("Collection is null");
+			if(collection == null) throw new NullPointerException("collection is null");
 			this.allocate(collection.size());
 			this.addAll(collection);
 		}
@@ -1499,7 +1478,7 @@ public final class Compact {
 			 */
 			@Override
 			public boolean add(final GItem item) {
-				if(!this.isInRange(item)) throw new IllegalArgumentException("Entry out of range");
+				if(!this.isInRange(item)) throw new IllegalArgumentException("entry out of range");
 				return this.data.add(item);
 			}
 
@@ -1723,8 +1702,8 @@ public final class Compact {
 			@Override
 			public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
 				final boolean toInclusive) {
-				if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("FromElement out of range");
-				if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+				if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactAscendingSubSet<GItem>(this.data, fromElement, fromInclusive, toElement, toInclusive);
 			}
 
@@ -1733,7 +1712,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
-				if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, toElement, inclusive);
 			}
 
@@ -1742,7 +1721,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-				if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("FromElement out of range");
+				if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 				return new CompactAscendingSubSet<GItem>(this.data, fromElement, inclusive, this.lastItem, this.lastInclusive);
 			}
 
@@ -1875,8 +1854,8 @@ public final class Compact {
 			@Override
 			public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
 				final boolean toInclusive) {
-				if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("FromElement out of range");
-				if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+				if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactDescendingSubSet<GItem>(this.data, toElement, toInclusive, fromElement, fromInclusive);
 			}
 
@@ -1885,7 +1864,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
-				if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactDescendingSubSet<GItem>(this.data, toElement, inclusive, this.lastItem, this.lastInclusive);
 			}
 
@@ -1894,7 +1873,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-				if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("FromElement out of range");
+				if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 				return new CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, fromElement, inclusive);
 			}
 
@@ -1913,7 +1892,7 @@ public final class Compact {
 		 */
 		public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 			super();
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -1930,7 +1909,7 @@ public final class Compact {
 		public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator)
 			throws NullPointerException {
 			super(collection);
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -1946,7 +1925,7 @@ public final class Compact {
 		public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator)
 			throws NullPointerException {
 			super(capacity);
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -2965,7 +2944,7 @@ public final class Compact {
 			 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist.
 			 */
 			public CompactNavigableKeySet(final GData data) throws NullPointerException {
-				if(data == null) throw new NullPointerException("Data is null");
+				if(data == null) throw new NullPointerException("data is null");
 				this.data = data;
 			}
 
@@ -3618,8 +3597,8 @@ public final class Compact {
 			@Override
 			public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey,
 				final boolean toInclusive) {
-				if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("FromElement out of range");
-				if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+				if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, fromInclusive, toKey, toInclusive);
 			}
 
@@ -3628,7 +3607,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-				if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, toKey, inclusive);
 			}
 
@@ -3637,7 +3616,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-				if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("FromElement out of range");
+				if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 				return new CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, inclusive, this.lastItem,
 					this.lastInclusive);
 			}
@@ -3814,8 +3793,8 @@ public final class Compact {
 			@Override
 			public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey,
 				final boolean toInclusive) {
-				if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("FromElement out of range");
-				if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+				if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactDescendingSubMap<GKey, GValue>(this.data, toKey, toInclusive, fromKey, fromInclusive);
 			}
 
@@ -3824,7 +3803,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-				if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("ToElement out of range");
+				if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
 				return new CompactDescendingSubMap<GKey, GValue>(this.data, toKey, inclusive, this.fromItem, this.fromInclusive);
 			}
 
@@ -3833,7 +3812,7 @@ public final class Compact {
 			 */
 			@Override
 			public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-				if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("FromElement out of range");
+				if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 				return new CompactDescendingSubMap<GKey, GValue>(this.data, this.lastItem, this.lastInclusive, fromKey,
 					inclusive);
 			}
@@ -3852,7 +3831,7 @@ public final class Compact {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -3868,7 +3847,7 @@ public final class Compact {
 		public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator)
 			throws NullPointerException {
 			super(capacity);
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 		}
 
@@ -3885,7 +3864,7 @@ public final class Compact {
 		public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map,
 			final Comparator<? super GKey> comparator) throws NullPointerException {
 			super(map);
-			if(comparator == null) throw new NullPointerException("Comparator is null");
+			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
 
 		}

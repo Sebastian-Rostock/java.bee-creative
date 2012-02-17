@@ -69,7 +69,7 @@ public final class Converters {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
 		public ConverterLink(final Converter<? super GInput, ? extends GOutput> converter) {
-			if(converter == null) throw new NullPointerException("Converter is null");
+			if(converter == null) throw new NullPointerException("converter is null");
 			this.converter = converter;
 		}
 
@@ -122,7 +122,7 @@ public final class Converters {
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public NamedConverter(final String name) throws NullPointerException {
-			if(name == null) throw new NullPointerException("Name is null");
+			if(name == null) throw new NullPointerException("name is null");
 			this.name = name;
 		}
 
@@ -177,7 +177,7 @@ public final class Converters {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
 		public FixedFieldConverter(final Field field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("Field is null");
+			if(field == null) throw new NullPointerException("field is null");
 			this.field = field;
 		}
 
@@ -255,7 +255,7 @@ public final class Converters {
 		 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
 		 */
 		public FixedMethodConverter(final Method method) throws NullPointerException {
-			if(method == null) throw new NullPointerException("Method is null");
+			if(method == null) throw new NullPointerException("method is null");
 			this.method = method;
 		}
 
@@ -339,7 +339,7 @@ public final class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException("Input is null");
+			if(input == null) throw new NullPointerException("input is null");
 			try{
 				return (GOutput)input.getClass().getField(this.name).get(input);
 			}catch(final IllegalAccessException e){
@@ -398,7 +398,7 @@ public final class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException("Input is null");
+			if(input == null) throw new NullPointerException("input is null");
 			try{
 				return (GOutput)input.getClass().getMethod(this.name).invoke(input);
 			}catch(final InvocationTargetException e){
@@ -539,7 +539,7 @@ public final class Converters {
 			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
 			super(filter);
 			if(accept == null) throw new NullPointerException("Accept is null");
-			if(reject == null) throw new NullPointerException("Reject is null");
+			if(reject == null) throw new NullPointerException("reject is null");
 			this.accept = accept;
 			this.reject = reject;
 		}
@@ -784,8 +784,8 @@ public final class Converters {
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
 			final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
-			if(converter1 == null) throw new NullPointerException("Converter1 is null");
-			if(converter2 == null) throw new NullPointerException("Converter2 is null");
+			if(converter1 == null) throw new NullPointerException("converter1 is null");
+			if(converter2 == null) throw new NullPointerException("converter2 is null");
 			this.converter1 = converter1;
 			this.converter2 = converter2;
 		}

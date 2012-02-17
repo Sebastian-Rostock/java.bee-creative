@@ -30,7 +30,7 @@ public final class Filters {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
 		 */
 		public FilterLink(final Filter<? super GInput> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException("Filter is null");
+			if(filter == null) throw new NullPointerException("filter is null");
 			this.filter = filter;
 		}
 
@@ -89,8 +89,8 @@ public final class Filters {
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Filter} {@code null} ist.
 		 */
 		public JunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if(filter1 == null) throw new NullPointerException("Filter1 is null");
-			if(filter2 == null) throw new NullPointerException("Filter2 is null");
+			if(filter1 == null) throw new NullPointerException("filter1 is null");
+			if(filter2 == null) throw new NullPointerException("filter2 is null");
 			this.filter1 = filter1;
 			this.filter2 = filter2;
 		}
@@ -210,7 +210,7 @@ public final class Filters {
 		public ConvertedFilter(final Filter<? super GOutput> filter,
 			final Converter<? super GInput, ? extends GOutput> converter) {
 			super(converter);
-			if(filter == null) throw new NullPointerException("Filter is null");
+			if(filter == null) throw new NullPointerException("filter is null");
 			this.filter = filter;
 		}
 

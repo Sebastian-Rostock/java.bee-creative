@@ -241,7 +241,7 @@ public final class Pointers {
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
 			final Pointer<? extends GInput> pointer) throws NullPointerException {
 			super(converter);
-			if(pointer == null) throw new NullPointerException("Pointer is null");
+			if(pointer == null) throw new NullPointerException("pointer is null");
 			this.pointer = pointer;
 		}
 
@@ -407,7 +407,7 @@ public final class Pointers {
 	 * @throws NullPointerException Wenn der gegebenen {@link Pointer} {@code null} ist.
 	 */
 	public static boolean valid(final Pointer<?> pointer) throws NullPointerException {
-		if(pointer == null) throw new NullPointerException("Pointer is null");
+		if(pointer == null) throw new NullPointerException("pointer is null");
 		return (pointer == Pointers.NULL_POINTER) || (pointer.data() != null);
 	}
 
@@ -441,7 +441,7 @@ public final class Pointers {
 			case SOFT:
 				return Pointers.softPointer(data);
 		}
-		throw new IllegalArgumentException("Mode out of range: " + mode);
+		throw new IllegalArgumentException("mode out of range: " + mode);
 	}
 
 	/**
@@ -467,7 +467,7 @@ public final class Pointers {
 			case SOFT:
 				return Pointers.softPointerConverter();
 		}
-		throw new IllegalArgumentException("Mode out of range: " + mode);
+		throw new IllegalArgumentException("mode out of range: " + mode);
 	}
 
 	/**

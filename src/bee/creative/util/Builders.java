@@ -58,7 +58,7 @@ public class Builders {
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
 		public BuilderLink(final Builder<? extends GData> builder) throws NullPointerException {
-			if(builder == null) throw new NullPointerException("Builder is null");
+			if(builder == null) throw new NullPointerException("builder is null");
 			this.builder = builder;
 		}
 
@@ -197,7 +197,7 @@ public class Builders {
 		public ConvertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 			final Builder<? extends GInput> builder) throws NullPointerException {
 			super(converter);
-			if(builder == null) throw new NullPointerException("Builder is null");
+			if(builder == null) throw new NullPointerException("builder is null");
 			this.builder = builder;
 		}
 
