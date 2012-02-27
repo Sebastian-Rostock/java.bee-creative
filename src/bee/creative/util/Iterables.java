@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Converters.ConverterLink;
 import bee.creative.util.Filters.FilterLink;
-import bee.creative.util.Iterators.ChainedIterator;
 import bee.creative.util.Iterators.EntryLink;
 import bee.creative.util.Objects.UseToString;
 
@@ -770,7 +769,7 @@ public final class Iterables {
 	 * @param entry Element.
 	 * @return {@link EntryIterable}
 	 */
-	public static <GEntry> Iterable<GEntry> entryIterable(final GEntry entry) {
+	public static <GEntry> EntryIterable<GEntry> entryIterable(final GEntry entry) {
 		return new EntryIterable<GEntry>(entry);
 	}
 
@@ -799,7 +798,7 @@ public final class Iterables {
 	 * @return {@link LimitedIterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} bzw. der gegebene {@link Iterable} {@code null} ist.
 	 */
-	public static <GEntry> Iterable<GEntry> limitedIterable(final Filter<? super GEntry> filter,
+	public static <GEntry> LimitedIterable<GEntry> limitedIterable(final Filter<? super GEntry> filter,
 		final Iterable<? extends GEntry> iterable) throws NullPointerException {
 		return new LimitedIterable<GEntry>(filter, iterable);
 	}
@@ -833,7 +832,7 @@ public final class Iterables {
 	 * @return {@link FilteredIterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} bzw. der gegebene {@link Iterable} {@code null} ist.
 	 */
-	public static <GEntry> Iterable<GEntry> filteredIterable(final Filter<? super GEntry> filter,
+	public static <GEntry> FilteredIterable<GEntry> filteredIterable(final Filter<? super GEntry> filter,
 		final Iterable<? extends GEntry> iterable) throws NullPointerException {
 		return new FilteredIterable<GEntry>(filter, iterable);
 	}
@@ -862,11 +861,11 @@ public final class Iterables {
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable}-{@link Iterable}.
-	 * @return {@link ChainedIterator}.
+	 * @return {@link ChainedIterable}.
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-{@link Iterable} {@code null} ist.
 	 */
-	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterables)
-		throws NullPointerException {
+	public static <GEntry> ChainedIterable<GEntry> chainedIterable(
+		final Iterable<? extends Iterable<? extends GEntry>> iterables) throws NullPointerException {
 		return new ChainedIterable<GEntry>(iterables);
 	}
 
@@ -877,10 +876,10 @@ public final class Iterables {
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable}-{@link Array}.
-	 * @return {@link ChainedIterator}.
+	 * @return {@link ChainedIterable}.
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-{@link Array} {@code null} ist.
 	 */
-	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
+	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
 		throws NullPointerException {
 		if(iterables == null) throw new NullPointerException("iterables is null");
 		return Iterables.chainedIterable(Arrays.asList(iterables));
@@ -894,10 +893,10 @@ public final class Iterables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable1 {@link Iterable} 1.
 	 * @param iterable2 {@link Iterable} 2.
-	 * @return {@link ChainedIterator}.
+	 * @return {@link ChainedIterable}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry> Iterable<GEntry> chainedIterable(final Iterable<? extends GEntry> iterable1,
+	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry> iterable1,
 		final Iterable<? extends GEntry> iterable2) {
 		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
@@ -931,7 +930,7 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Iterable} {@code null}
 	 *         ist.
 	 */
-	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(
+	public static <GInput, GOutput> ConvertedIterable<GInput, GOutput> convertedIterable(
 		final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable)
 		throws NullPointerException {
 		return new ConvertedIterable<GInput, GOutput>(converter, iterable);

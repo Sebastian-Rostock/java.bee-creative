@@ -426,7 +426,7 @@ public class Comparables {
 	 * @return {@link ReverseComparable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 	 */
-	public static <GEntry> Comparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable)
+	public static <GEntry> ReverseComparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable)
 		throws NullPointerException {
 		return new ReverseComparable<GEntry>(comparable);
 	}
@@ -443,7 +443,7 @@ public class Comparables {
 	 * @return {@link ChainedComparable}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable} {@code null} ist.
 	 */
-	public static <GEntry> Comparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1,
+	public static <GEntry> ChainedComparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1,
 		final Comparable<? super GEntry> comparable2) throws NullPointerException {
 		return new ChainedComparable<GEntry>(comparable1, comparable2);
 	}
@@ -463,7 +463,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn der gegebene {@link Comparable} oder der gegebene {@link Converter} {@code null}
 	 *         sind.
 	 */
-	public static <GEntry, GValue> Comparable<GEntry> convertedComparable(
+	public static <GEntry, GValue> ConvertedComparable<GEntry, GValue> convertedComparable(
 		final Converter<? super GEntry, ? extends GValue> converter, final Comparable<? super GValue> comparable)
 		throws NullPointerException {
 		return new ConvertedComparable<GEntry, GValue>(comparable, converter);

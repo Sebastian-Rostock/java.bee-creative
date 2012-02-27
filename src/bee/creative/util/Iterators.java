@@ -84,12 +84,12 @@ public final class Iterators {
 		Boolean hasNext;
 
 		/**
-		 * Dieses Feld speichert das nächste Element;
+		 * Dieses Feld speichert das nächste Element.
 		 */
 		GEntry entry;
 
 		/**
-		 * Dieses Feld speichert den {@link Iterator};
+		 * Dieses Feld speichert den {@link Iterator}.
 		 */
 		final Iterator<? extends GEntry> iterator;
 
@@ -133,6 +133,68 @@ public final class Iterators {
 		@Override
 		public boolean equals(final Object object) {
 			return object == this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#limitedIterator(Filter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static final class CountIteratorConverter<GEntry> implements Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
+
+		/**
+		 * Dieses Feld speichert die maximale Anzahl der verbleibenden Elementen.
+		 */
+		final int count;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die Anzahl.
+		 * 
+		 * @param count Anzahl der maximal gelieferten Elemente.
+		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+		 */
+		public CountIteratorConverter(final int count) throws IllegalArgumentException {
+			if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
+			this.count = count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> convert(final Iterator<? extends GEntry> input) {
+			return Iterators.countIterator(this.count, input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof CountIteratorConverter<?>)) return false;
+			final CountIteratorConverter<?> data = (CountIteratorConverter<?>)object;
+			return this.count == data.count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("countIteratorConverter", this.count);
 		}
 
 	}
@@ -345,6 +407,77 @@ public final class Iterators {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("entryIterator", this.entry);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Iterator}, der eine begrenzte Anzahl der Elemente eines gegebenen
+	 * {@link Iterator}s liefert.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class CountIterator<GEntry> implements Iterator<GEntry> {
+
+		/**
+		 * Dieses Feld speichert die maximale Anzahl der verbleibenden Elementen.
+		 */
+		int count;
+
+		/**
+		 * Dieses Feld speichert den {@link Iterator}.
+		 */
+		final Iterator<? extends GEntry> iterator;
+
+		/**
+		 * Dieser Konstrukteur initialisiert Anzahl und {@link Iterator}.
+		 * 
+		 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
+		 * @param iterator {@link Iterator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+		 */
+		public CountIterator(final int count, final Iterator<? extends GEntry> iterator) throws NullPointerException,
+			IllegalArgumentException {
+			if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
+			this.count = count;
+			if(iterator == null) throw new NullPointerException("iterator is null");
+			this.iterator = iterator;
+		}
+
+		/**
+		 * Diese Methode gibt die maximale Anzahl der verbleibenden Elementen zurück.
+		 * 
+		 * @return maximal verbleibende Anzahl.
+		 */
+		public int count() {
+			return this.count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasNext() {
+			return (this.count > 0) && this.iterator.hasNext();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GEntry next() {
+			this.count--;
+			return this.iterator.next();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final void remove() {
+			this.iterator.remove();
 		}
 
 	}
@@ -671,6 +804,25 @@ public final class Iterators {
 	};
 
 	/**
+	 * Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator}s zurück.
+	 * 
+	 * @param <GItem> Typ des Elements.
+	 * @see Iterators#skip(Iterator, int)
+	 * @param iterator {@link Iterator}.
+	 * @param index Index.
+	 * @return {@code index}-tes Element.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 * @throws NoSuchElementException Wenn kein {@code index}-tes Element existiert.
+	 */
+	public static <GItem> GItem get(final Iterator<? extends GItem> iterator, final int index)
+		throws NullPointerException, NoSuchElementException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if((index < 0) || (Iterators.skip(iterator, index) != 0) || !iterator.hasNext())
+			throw new NoSuchElementException();
+		return iterator.next();
+	}
+
+	/**
 	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator} zu überspringen und gibt die
 	 * Anzahl der noch zu überspringenden Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene
 	 * {@link Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine weiteren Elemente mehr liefern kann. Wenn
@@ -851,7 +1003,7 @@ public final class Iterators {
 	 * @param entry Element.
 	 * @return {@link EntryIterator}
 	 */
-	public static <GEntry> Iterator<GEntry> entryIterator(final GEntry entry) {
+	public static <GEntry> EntryIterator<GEntry> entryIterator(final GEntry entry) {
 		return new EntryIterator<GEntry>(entry);
 	}
 
@@ -870,6 +1022,39 @@ public final class Iterators {
 	}
 
 	/**
+	 * Diese Methode erzeugt einen einen {@link Iterator}, der die gegebene maximale Anzahl der Elemente des gegebenen
+	 * {@link Iterator}s liefert, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
+	 * @param iterator {@link Iterator}.
+	 * @return {@link CountIterator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+	 */
+	public static <GEntry> CountIterator<GEntry> countIterator(final int count, final Iterator<? extends GEntry> iterator)
+		throws NullPointerException, IllegalArgumentException {
+		return new CountIterator<GEntry>(count, iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#countIterator(int, Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @see Filter
+	 * @see Converter
+	 * @see Iterators#countIterator(int, Iterator)
+	 * @param <GEntry> Typ der Elemente.
+	 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
+	 * @return {@link Iterators#countIterator(int, Iterator)}-{@link Converter}.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+	 */
+	public static <GEntry> Converter<Iterator<? extends GEntry>, Iterator<GEntry>> countIteratorConverter(final int count)
+		throws IllegalArgumentException {
+		return new CountIteratorConverter<GEntry>(count);
+	}
+
+	/**
 	 * Diese Methode erzeugt einen begrenzten {@link Iterator}, der nur die ersten vom gegebenen {@link Filter}
 	 * akzeptierten Elemente des gegebenen {@link Iterator}s liefert sowie die Iteration beim ersten abgelehnten Element
 	 * abbricht, und gibt ihn zurück.
@@ -881,7 +1066,7 @@ public final class Iterators {
 	 * @return {@link LimitedIterator}.
 	 * @throws NullPointerException Wenn {@link Filter} oder {@link Iterator} {@code null} sind.
 	 */
-	public static <GEntry> Iterator<GEntry> limitedIterator(final Filter<? super GEntry> filter,
+	public static <GEntry> LimitedIterator<GEntry> limitedIterator(final Filter<? super GEntry> filter,
 		final Iterator<? extends GEntry> iterator) throws NullPointerException {
 		return new LimitedIterator<GEntry>(filter, iterator);
 	}
@@ -914,7 +1099,7 @@ public final class Iterators {
 	 * @return {@link FilteredIterator}.
 	 * @throws NullPointerException Wenn {@link Filter} oder {@link Iterator} {@code null} sind.
 	 */
-	public static <GEntry> Iterator<GEntry> filteredIterator(final Filter<? super GEntry> filter,
+	public static <GEntry> FilteredIterator<GEntry> filteredIterator(final Filter<? super GEntry> filter,
 		final Iterator<? extends GEntry> iterator) throws NullPointerException {
 		return new FilteredIterator<GEntry>(filter, iterator);
 	}
@@ -947,7 +1132,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Iterator}en {@code null} sind.
 	 */
-	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
+	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators)
 		throws NullPointerException {
 		if(iterators == null) throw new NullPointerException("iterators is null");
 		return Iterators.chainedIterator(Arrays.asList(iterators));
@@ -965,7 +1150,7 @@ public final class Iterators {
 	 * @return {@link ChainedIterator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1,
+	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1,
 		final Iterator<? extends GEntry> iterator2) {
 		return Iterators.chainedIterator(Arrays.asList(iterator1, iterator2));
 	}
@@ -980,8 +1165,8 @@ public final class Iterators {
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn de rgegebene {@link Iterator} {@code null} ist.
 	 */
-	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators)
-		throws NullPointerException {
+	public static <GEntry> ChainedIterator<GEntry> chainedIterator(
+		final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
 		return new ChainedIterator<GEntry>(iterators);
 	}
 
@@ -995,7 +1180,8 @@ public final class Iterators {
 	 * @param iterators {@link Iterable} über die {@link Iterator}en.
 	 * @return {@link ChainedIterator}.
 	 */
-	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) {
+	public static <GEntry> ChainedIterator<GEntry> chainedIterator(
+		final Iterable<? extends Iterator<? extends GEntry>> iterators) {
 		if(iterators == null) throw new NullPointerException("iterators is null");
 		return Iterators.chainedIterator(iterators.iterator());
 	}
@@ -1029,7 +1215,7 @@ public final class Iterators {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Iterator} {@code null}
 	 *         ist.
 	 */
-	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(
+	public static <GInput, GOutput> ConvertedIterator<GInput, GOutput> convertedIterator(
 		final Converter<? super GInput, ? extends GOutput> converter, final Iterator<? extends GInput> iterator)
 		throws NullPointerException {
 		return new ConvertedIterator<GInput, GOutput>(converter, iterator);

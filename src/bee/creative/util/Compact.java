@@ -130,7 +130,11 @@ public final class Compact {
 			public void remove() {
 				final int item = this.item;
 				if(item < 0) throw new IllegalStateException();
-				this.data.removeItems(item, 1);
+				int move = this.data.from;
+				this.data.customRemove(item, 1);
+				move = this.data.from - move;
+				this.from += move;
+				this.last += move;
 				this.item = -1;
 			}
 
@@ -256,12 +260,13 @@ public final class Compact {
 				super(data);
 				if(fromItem != CompactSubData.OPEN){
 					if(lastItem != CompactSubData.OPEN){
-						if(data.compare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
+						if(data.customItemCompare(fromItem, 0, lastItem) > 0)
+							throw new IllegalArgumentException("fromItem > lastItem");
 					}else{
-						data.compare(fromItem, 0, fromItem);
+						data.customItemCompare(fromItem, 0, fromItem);
 					}
 				}else if(lastItem != CompactSubData.OPEN){
-					data.compare(lastItem, 0, lastItem);
+					data.customItemCompare(lastItem, 0, lastItem);
 				}
 				this.fromItem = fromItem;
 				this.fromInclusive = fromInclusive;
@@ -288,7 +293,7 @@ public final class Compact {
 			 * zu klein, wenn es entweder kleiner als das erste Element ist oder wenn das erste Element exklusiv ist und das
 			 * gegebene Element gleich dem ersten Element ist.
 			 * 
-			 * @see CompactData#compare(Object, int, Object)
+			 * @see CompactData#customItemCompare(Object, int, Object)
 			 * @see CompactSubData#fromItem
 			 * @see CompactSubData#fromInclusive
 			 * @param key Element.
@@ -297,7 +302,7 @@ public final class Compact {
 			protected final boolean isTooLow(final Object key) {
 				final Object fromItem = this.fromItem;
 				if(fromItem == CompactSubData.OPEN) return false;
-				final int comp = this.data.compare(key, 0, fromItem);
+				final int comp = this.data.customItemCompare(key, 0, fromItem);
 				return ((comp < 0) || ((comp == 0) && !this.fromInclusive));
 			}
 
@@ -320,7 +325,7 @@ public final class Compact {
 			 * groß, wenn es entweder größer als das letzte Element ist oder wenn das letzte Element exklusiv ist und das
 			 * gegebene Element gleich dem letzten Element ist.
 			 * 
-			 * @see CompactData#compare(Object, int, Object)
+			 * @see CompactData#customItemCompare(Object, int, Object)
 			 * @see CompactSubData#lastItem
 			 * @see CompactSubData#lastInclusive
 			 * @param key Element.
@@ -329,7 +334,7 @@ public final class Compact {
 			protected final boolean isTooHigh(final Object key) {
 				final Object lastItem = this.lastItem;
 				if(lastItem == CompactSubData.OPEN) return false;
-				final int comp = this.data.compare(key, 0, lastItem);
+				final int comp = this.data.customItemCompare(key, 0, lastItem);
 				return ((comp > 0) || ((comp == 0) && !this.lastInclusive));
 			}
 
@@ -364,15 +369,15 @@ public final class Compact {
 			 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich oder auf dessen
 			 * Grenzen liegt. Die Inklusitivität des ersten bzw. letzten Elements ignoriert.
 			 * 
-			 * @see CompactData#compare(Object, int, Object)
+			 * @see CompactData#customItemCompare(Object, int, Object)
 			 * @param key Element.
 			 * @return {@code true}, wenn das gegebene Element im gültigen Bereich oder auf dessen Grenzen liegt.
 			 */
 			protected final boolean isInClosedRange(final Object key) {
 				final GData data = this.data;
 				final Object fromItem = this.fromItem, lastItem = this.lastItem;
-				return ((fromItem == CompactSubData.OPEN) || (data.compare(key, 0, fromItem) >= 0))
-					&& ((lastItem == CompactSubData.OPEN) || (data.compare(key, 0, lastItem) <= 0));
+				return ((fromItem == CompactSubData.OPEN) || (data.customItemCompare(key, 0, fromItem) >= 0))
+					&& ((lastItem == CompactSubData.OPEN) || (data.customItemCompare(key, 0, lastItem) <= 0));
 			}
 
 			/**
@@ -495,7 +500,7 @@ public final class Compact {
 			protected final void clearItems() {
 				final int fromIndex = this.firstIndex(), lastIndex = this.lastIndex();
 				if(fromIndex > lastIndex) return;
-				this.data.removeItems(fromIndex, (lastIndex - fromIndex) + 1);
+				this.data.customRemove(fromIndex, (lastIndex - fromIndex) + 1);
 			}
 
 			/**
@@ -541,7 +546,7 @@ public final class Compact {
 		 * @param count Anzahl.
 		 * @return Länge.
 		 */
-		protected final int length(final Object[] list, final int count) {
+		protected final int defaultLength(final Object[] list, final int count) {
 			final int oldLength = list.length;
 			if(oldLength >= count) return oldLength;
 			final int newLength = oldLength + (oldLength >> 1);
@@ -560,7 +565,7 @@ public final class Compact {
 		 * @return (neues) {@link Array}.
 		 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des {@link Array}s führen würden.
 		 */
-		protected final Object[] resize(final Object[] list, final int length) throws IllegalArgumentException {
+		protected final Object[] defaultResize(final Object[] list, final int length) throws IllegalArgumentException {
 			final int size = this.size;
 			if(size > length) throw new IllegalArgumentException("size > length");
 			if(length == 0) return CompactData.VOID;
@@ -580,16 +585,16 @@ public final class Compact {
 		 * mittig im gegebenen {@link Array} ausgerichtet. Wenn die Größe des gegebenen {@link Array}s dagegen angepasst
 		 * werden muss, werden ein neues {@link Array} mit passender Größe erzeugt und die Elemente des gegebenen
 		 * {@link Array}s mittig in das neue {@link Array} kopiert. Die benötigte Größe wird via
-		 * {@link CompactData#length(Object[], int)} ermittelt.
+		 * {@link CompactData#defaultLength(Object[], int)} ermittelt.
 		 * 
-		 * @see CompactData#length(Object[], int)
+		 * @see CompactData#defaultLength(Object[], int)
 		 * @param list {@link Array}.
 		 * @param index Index des ersten neuen Elements.
 		 * @param count Anzahl der neuen Elemente.
 		 * @return (neues) {@link Array}.
 		 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des {@link Array}s führen würden.
 		 */
-		protected final Object[] insert(final Object[] list, final int index, final int count)
+		protected final Object[] defaultInsert(final Object[] list, final int index, final int count)
 			throws IllegalArgumentException {
 			final int from = this.from;
 			final int size = this.size;
@@ -598,7 +603,7 @@ public final class Compact {
 			if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
 			if(count == 0) return list;
 			final int size2 = size + count;
-			final int length = this.length(list, size2);
+			final int length = this.defaultLength(list, size2);
 			this.size = size2;
 			if(length != list.length){
 				final Object[] list2 = new Object[length];
@@ -645,10 +650,10 @@ public final class Compact {
 		 * @param list {@link Array}.
 		 * @param index Index des ersten entfallenden Elements.
 		 * @param count Anzahl der entfallende Elemente.
-		 * @return neue {@link Region}.
+		 * @return (neues) {@link Array}.
 		 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des {@link Array}s führen würden.
 		 */
-		protected final Object[] remove(final Object[] list, final int index, final int count)
+		protected final Object[] defaultRemove(final Object[] list, final int index, final int count)
 			throws IllegalArgumentException {
 			final int from = this.from;
 			final int size = this.size;
@@ -657,8 +662,12 @@ public final class Compact {
 			final int size2 = size - count;
 			if((count < 0) || (size2 < 0)) throw new IllegalArgumentException("count out of range: " + count);
 			if(count == 0) return list;
-			if(size == count) return CompactData.VOID;
 			this.size = size2;
+			if(size2 == 0){
+				this.from = list.length / 2;
+				Arrays.fill(list, from, from + size, null);
+				return list;
+			}
 			if(index2 > (size2 / 2)){
 				System.arraycopy(list, index + count, list, index, size2 - index2);
 				Arrays.fill(list, from + size2, from + size, null);
@@ -669,6 +678,145 @@ public final class Compact {
 			System.arraycopy(list, from, list, from2, index2);
 			Arrays.fill(list, from, from2, null);
 			return list;
+		}
+
+		/**
+		 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das {@link Array} ein.
+		 * 
+		 * @see CompactData#defaultInsert(Object[], int, int)
+		 * @param index Index.
+		 * @param count Anzahl.
+		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
+		 */
+		protected void customInsert(final int index, final int count) throws IllegalArgumentException {
+			this.list = this.defaultInsert(this.list, index, count);
+		}
+
+		/**
+		 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem {@link Array} mit der
+		 * gegebenen Länge der Belegung.
+		 * 
+		 * @see CompactData#defaultRemove(Object[], int, int)
+		 * @param index Index.
+		 * @param count Anzahl.
+		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
+		 */
+		protected void customRemove(final int index, final int count) throws IllegalArgumentException {
+			this.list = this.defaultRemove(this.list, index, count);
+		}
+
+		/**
+		 * Diese Methode vergrößert die Kapazität des {@link Array}s, sodass dieses die gegebene Anzahl an Elementen
+		 * verwalten kann.
+		 * 
+		 * @see CompactData#defaultResize(Object[], int)
+		 * @param count Anzahl.
+		 */
+		protected void customAllocate(final int count) {
+			this.list = this.defaultResize(this.list, this.defaultLength(this.list, count));
+		}
+
+		/**
+		 * Diese Methode verkleinert die Kapazität des {@link Array}s auf das Minimum für seine Belegung.
+		 * 
+		 * @see CompactData#defaultResize(Object[], int)
+		 */
+		protected void customCompact() {
+			this.list = this.defaultResize(this.list, this.size);
+		}
+
+		/**
+		 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder
+		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der
+		 * Eintrag eingefügt werden müsste.
+		 * 
+		 * @see CompactData#equalsIndex(Object, int)
+		 * @see CompactData#compareIndex(Object, int)
+		 * @param item Objekt.
+		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 */
+		protected abstract int customItemIndex(final Object item);
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object)
+		 * äquivalent} dem Schlüssel des gegebenen Elements ist.
+		 * 
+		 * @see Object#hashCode()
+		 * @see Object#equals(Object)
+		 * @param key Schlüssel.
+		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels oder {@code 0}.
+		 * @param item Element.
+		 * @return {@link Object#equals(Object) Äquivalenz} der Schlüssel.
+		 */
+		protected abstract boolean customItemEquals(Object key, int hash, Object item);
+
+		/**
+		 * Diese Methode sucht zuerst binär und danach linear nach einem Eintrag, dessen Schlüssel gleich dem gegebenen
+		 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
+		 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element}
+		 * ist dann zum gegebenen Schlüssel gleich, wenn {@code (compare(key, hash, element) == 0) &&
+		 * equals(key, hash, element)}.
+		 * 
+		 * @see CompactData#customItemEquals(Object, int, Object)
+		 * @see CompactData#customItemCompare(Object, int, Object)
+		 * @see CompactData#compareIndex(Object, int)
+		 * @param key Schlüssel.
+		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 */
+		protected final int equalsIndex(final Object key, final int hash) {
+			Object item;
+			final int index = this.compareIndex(key, hash);
+			if(index < 0) return index;
+			final Object[] list = this.list;
+			if(this.customItemEquals(key, hash, list[index])) return index;
+			for(int next = index + 1, last = this.from + this.size; (next < last)
+				&& (this.customItemCompare(key, hash, item = list[next]) == 0); next++){
+				if(this.customItemEquals(key, hash, item)) return next;
+			}
+			for(int next = index - 1, from = this.from; (from <= next)
+				&& (this.customItemCompare(key, hash, item = list[next]) == 0); next--){
+				if(this.customItemEquals(key, hash, item)) return next;
+			}
+			return -(index + 1);
+		}
+
+		/**
+		 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel
+		 * kleiner, gleich bzw. größer als der Schlüssel des gegebenen Elements ist. Die Berechnung kann auf den Schlüsseln
+		 * selbst oder ihren {@link Object#hashCode() Streuwerten} beruhen.
+		 * 
+		 * @see Comparator#compare(Object, Object)
+		 * @param key Schlüssel.
+		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+		 * @param item Element.
+		 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der der Schlüssel.
+		 */
+		protected abstract int customItemCompare(Object key, int hash, Object item);
+
+		/**
+		 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen
+		 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
+		 * der Eintrag eingefügt werden müsste.
+		 * 
+		 * @see CompactData#customItemCompare(Object, int, Object)
+		 * @param key Schlüssel.
+		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 */
+		protected final int compareIndex(final Object key, final int hash) {
+			int from = this.from, last = from + this.size;
+			final Object[] list = this.list;
+			while(from < last){
+				final int next = (from + last) >>> 1;
+				final int comp = this.customItemCompare(key, hash, list[next]);
+				if(comp < 0){
+					last = next;
+				}else if(comp > 0){
+					from = next + 1;
+				}else return next;
+			}
+			return -(from + 1);
 		}
 
 		/**
@@ -690,7 +838,7 @@ public final class Compact {
 		 * @return Index des größten Elements, dass kleiner dem gegebenen ist.
 		 */
 		protected final int lowerIndex(final Object item) {
-			final int index = this.itemIndex(item);
+			final int index = this.customItemIndex(item);
 			if(index < 0) return -index - 2;
 			return index - 1;
 		}
@@ -704,7 +852,7 @@ public final class Compact {
 		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist.
 		 */
 		protected final int floorIndex(final Object item) {
-			final int index = this.itemIndex(item);
+			final int index = this.customItemIndex(item);
 			if(index < 0) return -index - 2;
 			return index;
 		}
@@ -718,7 +866,7 @@ public final class Compact {
 		 * @return Index des kleinsten Elements, dass größer oder gleich dem gegebenen ist.
 		 */
 		protected final int ceilingIndex(final Object item) {
-			final int index = this.itemIndex(item);
+			final int index = this.customItemIndex(item);
 			if(index < 0) return -index - 1;
 			return index;
 		}
@@ -732,7 +880,7 @@ public final class Compact {
 		 * @return Index des kleinsten Elements, dass größer dem gegebenen ist.
 		 */
 		protected final int higherIndex(final Object item) {
-			final int index = this.itemIndex(item);
+			final int index = this.customItemIndex(item);
 			if(index < 0) return -index - 1;
 			return index + 1;
 		}
@@ -748,157 +896,19 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der
-		 * Eintrag eingefügt werden müsste.
-		 * 
-		 * @see CompactData#equalsIndex(Object, int)
-		 * @see CompactData#compareIndex(Object, int)
-		 * @param item Objekt.
-		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-		 */
-		protected abstract int itemIndex(final Object item);
-
-		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object)
-		 * äquivalent} dem Schlüssel des gegebenen Elements ist.
-		 * 
-		 * @see Object#hashCode()
-		 * @see Object#equals(Object)
-		 * @param key Schlüssel.
-		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels oder {@code 0}.
-		 * @param item Element.
-		 * @return {@link Object#equals(Object) Äquivalenz} der Schlüssel.
-		 */
-		protected abstract boolean equals(Object key, int hash, Object item);
-
-		/**
-		 * Diese Methode sucht zuerst binär und danach linear nach einem Eintrag, dessen Schlüssel gleich dem gegebenen
-		 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
-		 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element}
-		 * ist dann zum gegebenen Schlüssel gleich, wenn {@code (compare(key, hash, element) == 0) &&
-		 * equals(key, hash, element)}.
-		 * 
-		 * @see CompactData#equals(Object, int, Object)
-		 * @see CompactData#compare(Object, int, Object)
-		 * @see CompactData#compareIndex(Object, int)
-		 * @param key Schlüssel.
-		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-		 */
-		protected final int equalsIndex(final Object key, final int hash) {
-			Object item;
-			final int index = this.compareIndex(key, hash);
-			if(index < 0) return index;
-			final Object[] list = this.list;
-			if(this.equals(key, hash, list[index])) return index;
-			for(int next = index + 1, last = this.from + this.size; (next < last)
-				&& (this.compare(key, hash, item = list[next]) == 0); next++){
-				if(this.equals(key, hash, item)) return next;
-			}
-			for(int next = index - 1, from = this.from; (from <= next) && (this.compare(key, hash, item = list[next]) == 0); next--){
-				if(this.equals(key, hash, item)) return next;
-			}
-			return -(index + 1);
-		}
-
-		/**
-		 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel
-		 * kleiner, gleich bzw. größer als der Schlüssel des gegebenen Elements ist. Die Berechnung kann auf den Schlüsseln
-		 * selbst oder ihren {@link Object#hashCode() Streuwerten} beruhen.
-		 * 
-		 * @see Comparator#compare(Object, Object)
-		 * @param key Schlüssel.
-		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-		 * @param item Element.
-		 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der der Schlüssel.
-		 */
-		protected abstract int compare(Object key, int hash, Object item);
-
-		/**
-		 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen
-		 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
-		 * der Eintrag eingefügt werden müsste.
-		 * 
-		 * @see CompactData#compare(Object, int, Object)
-		 * @param key Schlüssel.
-		 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-		 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-		 */
-		protected final int compareIndex(final Object key, final int hash) {
-			int from = this.from, last = from + this.size;
-			final Object[] list = this.list;
-			while(from < last){
-				final int next = (from + last) >>> 1;
-				final int comp = this.compare(key, hash, list[next]);
-				if(comp < 0){
-					last = next;
-				}else if(comp > 0){
-					from = next + 1;
-				}else return next;
-			}
-			return -(from + 1);
-		}
-
-		/**
-		 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das {@link Array} ein.
-		 * 
-		 * @see CompactData#insert(Object[], int, int)
-		 * @param index Index.
-		 * @param count Anzahl.
-		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
-		 */
-		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
-			this.list = this.insert(this.list, index, count);
-		}
-
-		/**
-		 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem {@link Array} mit der
-		 * gegebenen Länge der Belegung.
-		 * 
-		 * @see CompactData#remove(Object[], int, int)
-		 * @param index Index.
-		 * @param count Anzahl.
-		 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
-		 */
-		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
-			this.list = this.remove(this.list, index, count);
-		}
-
-		/**
-		 * Diese Methode vergrößert die Kapazität des {@link Array}s, sodass dieses die gegebene Anzahl an Elementen
-		 * verwalten kann.
-		 * 
-		 * @see CompactData#resize(Object[], int)
-		 * @param count Anzahl.
-		 */
-		protected void allocateItems(final int count) {
-			this.list = this.resize(this.list, this.length(this.list, count));
-		}
-
-		/**
-		 * Diese Methode verkleinert die Kapazität des {@link Array}s auf das Minimum für seine Belegung.
-		 * 
-		 * @see CompactData#resize(Object[], int)
-		 */
-		protected void compactItems() {
-			this.list = this.resize(this.list, this.size);
-		}
-
-		/**
 		 * Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwalten kann.
 		 * 
 		 * @param count Anzahl.
 		 */
 		public final void allocate(final int count) {
-			this.allocateItems(count);
+			this.customAllocate(count);
 		}
 
 		/**
 		 * Diese Methode verkleinert die Kapazität auf das Minimum.
 		 */
 		public final void compact() {
-			this.compactItems();
+			this.customCompact();
 		}
 
 	}
@@ -1027,7 +1037,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int size() {
+		public int size() {
 			return this.size;
 		}
 
@@ -1035,15 +1045,15 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void clear() {
-			this.removeItems(this.from, this.size);
+		public void clear() {
+			this.customRemove(this.from, this.size);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean isEmpty() {
+		public boolean isEmpty() {
 			return this.size == 0;
 		}
 
@@ -1051,10 +1061,10 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean remove(final Object item) {
-			final int index = this.itemIndex(item);
+		public boolean remove(final Object item) {
+			final int index = this.customItemIndex(item);
 			if(index < 0) return false;
-			this.removeItems(index, 1);
+			this.customRemove(index, 1);
 			return true;
 		}
 
@@ -1062,15 +1072,15 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean contains(final Object key) {
-			return this.itemIndex(key) >= 0;
+		public boolean contains(final Object key) {
+			return this.customItemIndex(key) >= 0;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean retainAll(final Collection<?> collection) {
+		public boolean retainAll(final Collection<?> collection) {
 			return Iterables.retainAll((Iterable<?>)this, collection);
 		}
 
@@ -1078,7 +1088,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean removeAll(final Collection<?> collection) {
+		public boolean removeAll(final Collection<?> collection) {
 			return Iterables.removeAll(this, collection);
 		}
 
@@ -1086,7 +1096,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean containsAll(final Collection<?> collection) {
+		public boolean containsAll(final Collection<?> collection) {
 			return Iterables.containsAll(this, collection);
 		}
 
@@ -1097,7 +1107,7 @@ public final class Compact {
 	 * <p>
 	 * Der Speicherverbrauch einer {@link CompactList} liegt bei ca. {@code 100%} des Speicherverbrauchs einer
 	 * {@link ArrayList}. Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente
-	 * abhängig liegen im Mittel bei {@code 52%} der Rechenzeit, die ein {@link ArrayList} dazu benötigen würde.
+	 * abhängig liegen im Mittel bei {@code 50%} der Rechenzeit, die eine {@link ArrayList} dazu benötigen würde.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
@@ -1111,12 +1121,12 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class ItemList<GItem> extends AbstractList<GItem> implements RandomAccess {
+		protected static final class ItemList<GItem> extends AbstractList<GItem> implements RandomAccess {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactList}.
 			 */
-			final CompactList<GItem> data;
+			protected final CompactList<GItem> data;
 
 			/**
 			 * Dieser Konstrukteur initialisiert die {@link CompactList}.
@@ -1148,7 +1158,7 @@ public final class Compact {
 			 */
 			@Override
 			protected void removeRange(final int fromIndex, final int toIndex) {
-				this.data.removeItems(this.data.from + fromIndex, toIndex - fromIndex);
+				this.data.customRemove(this.data.from + fromIndex, toIndex - fromIndex);
 			}
 
 		}
@@ -1157,7 +1167,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object item) {
+		protected int customItemIndex(final Object item) {
 			return this.indexOf(item);
 		}
 
@@ -1165,7 +1175,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 			return false;
 		}
 
@@ -1173,7 +1183,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			return 0;
 		}
 
@@ -1224,7 +1234,7 @@ public final class Compact {
 			if(collection == null) throw new NullPointerException();
 			final int count = collection.size();
 			if(count == 0) return false;
-			this.insertItems(this.from + index, count);
+			this.customInsert(this.from + index, count);
 			final Iterator<? extends GItem> iterator = collection.iterator();
 			int from = this.from + index;
 			final int last = from + count;
@@ -1243,7 +1253,7 @@ public final class Compact {
 		@Override
 		public void add(final int index, final GItem element) {
 			if((index < 0) || (index > this.size)) throw new IndexOutOfBoundsException();
-			this.insertItems(this.from + index, 1);
+			this.customInsert(this.from + index, 1);
 			this.setItem(this.from + index, element);
 		}
 
@@ -1255,7 +1265,7 @@ public final class Compact {
 			if((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException();
 			final int index2 = this.from + index;
 			final GItem item = this.getItem(index2);
-			this.removeItems(index2, 1);
+			this.customRemove(index2, 1);
 			return item;
 		}
 
@@ -1346,7 +1356,12 @@ public final class Compact {
 		 */
 		@Override
 		public int hashCode() {
-			return new ItemList<GItem>(this).hashCode();
+			int hash = 1;
+			for(int from = this.from, last = from + this.size; from < last; from++){
+				final Object item = this.list[from];
+				hash = (31 * hash) + (item == null ? 0 : item.hashCode());
+			}
+			return hash;
 		}
 
 		/**
@@ -1383,12 +1398,12 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class ItemSet<GItem> extends AbstractSet<GItem> {
+		protected static final class ItemSet<GItem> extends AbstractSet<GItem> {
 
 			/**
 			 * Dieses Feld speichert das {@link CompactSet}.
 			 */
-			final CompactSet<GItem> data;
+			protected final CompactSet<GItem> data;
 
 			/**
 			 * Dieser Konstrukteur initialisiert das {@link CompactSet}.
@@ -1460,10 +1475,10 @@ public final class Compact {
 		 */
 		@Override
 		public boolean add(final GItem item) {
-			int index = this.itemIndex(item);
+			int index = this.customItemIndex(item);
 			if(index >= 0) return false;
 			index = -index - 1;
-			this.insertItems(index, 1);
+			this.customInsert(index, 1);
 			this.setItem(index, item);
 			return true;
 		}
@@ -1575,7 +1590,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object key) {
+		protected int customItemIndex(final Object key) {
 			if(key == null) return this.equalsIndex(null, 0);
 			return this.equalsIndex(key, key.hashCode());
 		}
@@ -1584,7 +1599,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 			if(key == null) return item == null;
 			return key.equals(item);
 		}
@@ -1593,7 +1608,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			if(item == null) return hash;
 			return Comparators.compare(hash, item.hashCode());
 		}
@@ -1636,12 +1651,12 @@ public final class Compact {
 			 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 			 * @param <GItem> Typ der Elemente.
 			 */
-			static final class ItemSet<GItem> extends AbstractSet<GItem> {
+			protected static final class ItemSet<GItem> extends AbstractSet<GItem> {
 
 				/**
 				 * Dieses Feld speichert das {@link CompactNavigableSubSet}.
 				 */
-				final CompactNavigableSubSet<GItem> data;
+				protected final CompactNavigableSubSet<GItem> data;
 
 				/**
 				 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSubSet}.
@@ -2199,7 +2214,7 @@ public final class Compact {
 		protected final GItem poll(final int index) {
 			if((index < 0) || (index >= this.size)) return null;
 			final GItem item = this.getItem(index);
-			this.removeItems(index, 1);
+			this.customRemove(index, 1);
 			return item;
 		}
 
@@ -2230,7 +2245,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object key) {
+		protected final int customItemIndex(final Object key) {
 			return this.compareIndex(key, 0);
 		}
 
@@ -2238,7 +2253,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected final boolean customItemEquals(final Object key, final int hash, final Object item) {
 			return false;
 		}
 
@@ -2247,7 +2262,7 @@ public final class Compact {
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected final int customItemCompare(final Object key, final int hash, final Object item) {
 			return this.comparator.compare((GItem)key, (GItem)item);
 		}
 
@@ -2385,7 +2400,7 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> descendingIterator() {
-			return new CompactDescendingCollectionIterator<GItem>(this, firstIndex(), this.lastIndex() + 1);
+			return new CompactDescendingCollectionIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
 		}
 
 	}
@@ -2398,6 +2413,69 @@ public final class Compact {
 	 * @param <GValue> Typ der Werte.
 	 */
 	public abstract static class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
+
+		protected static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
+
+			protected final CompactMap<GKey, GValue> data;
+
+			public ItemMap(final CompactMap<GKey, GValue> data) {
+				this.data = data;
+			}
+
+			@Override
+			public Set<Entry<GKey, GValue>> entrySet() {
+				return this.data.entrySet();
+			}
+
+		}
+
+		protected static final class ItemEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
+
+			private static final long serialVersionUID = -543360027933297926L;
+
+			protected final CompactMap<GKey, GValue> data;
+
+			protected final int index;
+
+			public ItemEntry(final CompactMap<GKey, GValue> data, final int index) {
+				super(data.getKey(index), data.getValue(index));
+				this.data = data;
+				this.index = index;
+			}
+
+			@Override
+			public GValue setValue(final GValue value) {
+				final GValue result = super.setValue(value);
+				this.data.setEntry(this.index, this.getKey(), value);
+				return result;
+			}
+
+		}
+
+		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
+
+			protected final CompactMap<?, GValue> data;
+
+			public ValueCollection(final CompactMap<?, GValue> data) {
+				this.data = data;
+			}
+
+			@Override
+			public int size() {
+				return this.data.size;
+			}
+
+			@Override
+			public void clear() {
+				this.data.clear();
+			}
+
+			@Override
+			public Iterator<GValue> iterator() {
+				return new CompactMapValueIterator<GValue>(this.data, 0, this.data.size);
+			}
+
+		}
 
 		/**
 		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der Schlüssel.
@@ -2586,18 +2664,7 @@ public final class Compact {
 		 * @return {@code index}-tes Element
 		 */
 		protected final Entry<GKey, GValue> getEntry(final int index) {
-			return new SimpleEntry<GKey, GValue>(this.getKey(index), this.getValue(index)) {
-
-				private static final long serialVersionUID = -543360027933297926L;
-
-				@Override
-				public GValue setValue(final GValue value) {
-					final GValue v = super.setValue(value);
-					CompactMap.this.setEntry(index, this.getKey(), value);
-					return v;
-				}
-
-			};
+			return new ItemEntry<GKey, GValue>(this, index);
 		}
 
 		/**
@@ -2616,14 +2683,7 @@ public final class Compact {
 		 * @return {@link Set}.
 		 */
 		protected final Map<GKey, GValue> getItemMap() {
-			return new AbstractMap<GKey, GValue>() {
-
-				@Override
-				public Set<Entry<GKey, GValue>> entrySet() {
-					return CompactMap.this.entrySet();
-				}
-
-			};
+			return new ItemMap<GKey, GValue>(this);
 		}
 
 		/**
@@ -2637,7 +2697,7 @@ public final class Compact {
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		@Override
-		protected abstract int itemIndex(final Object key);
+		protected abstract int customItemIndex(final Object key);
 
 		/**
 		 * {@inheritDoc}
@@ -2652,7 +2712,7 @@ public final class Compact {
 		 */
 		@Override
 		public void clear() {
-			this.removeItems(0, this.size);
+			this.customRemove(0, this.size);
 		}
 
 		/**
@@ -2660,24 +2720,7 @@ public final class Compact {
 		 */
 		@Override
 		public Collection<GValue> values() {
-			return new AbstractCollection<GValue>() {
-
-				@Override
-				public int size() {
-					return CompactMap.this.size;
-				}
-
-				@Override
-				public void clear() {
-					CompactMap.this.clear();
-				}
-
-				@Override
-				public Iterator<GValue> iterator() {
-					return new CompactMapValueIterator<GValue>(CompactMap.this, 0, CompactMap.this.size);
-				}
-
-			};
+			return new ValueCollection<GValue>(this);
 		}
 
 		/**
@@ -2743,7 +2786,7 @@ public final class Compact {
 		 */
 		@Override
 		public boolean containsKey(final Object key) {
-			return this.itemIndex(key) >= 0;
+			return this.customItemIndex(key) >= 0;
 		}
 
 		/**
@@ -2751,7 +2794,7 @@ public final class Compact {
 		 */
 		@Override
 		public GValue get(final Object key) {
-			final int index = this.itemIndex(key);
+			final int index = this.customItemIndex(key);
 			if(index < 0) return null;
 			return this.getValue(index);
 		}
@@ -2761,14 +2804,14 @@ public final class Compact {
 		 */
 		@Override
 		public GValue put(final GKey key, final GValue value) {
-			int index = this.itemIndex(key);
+			int index = this.customItemIndex(key);
 			if(index >= 0){
 				final GValue item = this.getValue(index);
 				this.setEntry(index, this.getKey(index), value);
 				return item;
 			}
 			index = -index - 1;
-			this.insertItems(index, 1);
+			this.customInsert(index, 1);
 			this.setEntry(index, key, value);
 			return null;
 		}
@@ -2788,10 +2831,10 @@ public final class Compact {
 		 */
 		@Override
 		public GValue remove(final Object key) {
-			final int index = this.itemIndex(key);
+			final int index = this.customItemIndex(key);
 			if(index < 0) return null;
 			final GValue item = this.getValue(index);
-			this.removeItems(index, 1);
+			this.customRemove(index, 1);
 			return item;
 		}
 
@@ -2931,7 +2974,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object key) {
+		protected int customItemIndex(final Object key) {
 			if(key == null) return this.equalsIndex(null, 0);
 			return this.equalsIndex(key, key.hashCode());
 		}
@@ -2941,7 +2984,7 @@ public final class Compact {
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 			if(key == null) return this.getKey((GValue)item) == null;
 			return key.equals(this.getKey((GValue)item));
 		}
@@ -2951,7 +2994,7 @@ public final class Compact {
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			final Object value = this.getKey((GValue)item);
 			if(value == null) return hash;
 			return Comparators.compare(hash, value.hashCode());
@@ -3048,9 +3091,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
+		protected void customInsert(final int index, final int count) throws IllegalArgumentException {
 			final int size = this.size;
-			super.insertItems(index, count);
+			super.customInsert(index, count);
 			// this.values = CompactData.insertItems(this.values, size, this.list.length, index, count);
 		}
 
@@ -3058,9 +3101,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
+		protected void customRemove(final int index, final int count) throws IllegalArgumentException {
 			final int size = this.size;
-			super.removeItems(index, count);
+			super.customRemove(index, count);
 			// this.values = CompactData.removeItems(this.values, size, this.list.length, index, count);
 		}
 
@@ -3068,8 +3111,8 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void allocateItems(final int count) {
-			super.allocateItems(count);
+		protected void customAllocate(final int count) {
+			super.customAllocate(count);
 			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
 		}
 
@@ -3077,8 +3120,8 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void compactItems() {
-			super.compactItems();
+		protected void customCompact() {
+			super.customCompact();
 			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
 		}
 
@@ -3147,7 +3190,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object key) {
+		protected int customItemIndex(final Object key) {
 			if(key == null) return this.equalsIndex(null, 0);
 			return this.equalsIndex(key, key.hashCode());
 		}
@@ -3156,7 +3199,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 			if(key == null) return item == null;
 			return key.equals(item);
 		}
@@ -3165,7 +3208,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			if(item == null) return hash;
 			return Comparators.compare(hash, item.hashCode());
 		}
@@ -4139,7 +4182,7 @@ public final class Compact {
 		protected final Entry<GKey, GValue> poll(final int index) {
 			if((index < 0) || (index >= this.size)) return null;
 			final Entry<GKey, GValue> item = this.getEntry(index);
-			this.removeItems(index, 1);
+			this.customRemove(index, 1);
 			return item;
 		}
 
@@ -4193,7 +4236,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int itemIndex(final Object key) {
+		protected int customItemIndex(final Object key) {
 			return this.compareIndex(key, 0);
 		}
 
@@ -4201,7 +4244,7 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final Object key, final int hash, final Object item) {
+		protected boolean customItemEquals(final Object key, final int hash, final Object item) {
 			return false;
 		}
 
@@ -4498,7 +4541,7 @@ public final class Compact {
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			return this.comparator.compare((GKey)key, this.getKey((GValue)item));
 		}
 
@@ -4638,7 +4681,7 @@ public final class Compact {
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
-		protected int compare(final Object key, final int hash, final Object item) {
+		protected int customItemCompare(final Object key, final int hash, final Object item) {
 			return this.comparator.compare((GKey)key, (GKey)item);
 		}
 
@@ -4646,9 +4689,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void insertItems(final int index, final int count) throws IllegalArgumentException {
+		protected void customInsert(final int index, final int count) throws IllegalArgumentException {
 			final int size = this.size;
-			super.insertItems(index, count);
+			super.customInsert(index, count);
 			// this.values = CompactData.insertItems(this.values, size, this.list.length, index, count);
 		}
 
@@ -4656,9 +4699,9 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void removeItems(final int index, final int count) throws IllegalArgumentException {
+		protected void customRemove(final int index, final int count) throws IllegalArgumentException {
 			final int size = this.size;
-			super.removeItems(index, count);
+			super.customRemove(index, count);
 			// this.values = CompactData.removeItems(this.values, size, this.list.length, index, count);
 		}
 
@@ -4666,8 +4709,8 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void allocateItems(final int count) {
-			super.allocateItems(count);
+		protected void customAllocate(final int count) {
+			super.customAllocate(count);
 			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
 		}
 
@@ -4675,8 +4718,8 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void compactItems() {
-			super.compactItems();
+		protected void customCompact() {
+			super.customCompact();
 			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
 		}
 

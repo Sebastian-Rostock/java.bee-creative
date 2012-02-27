@@ -676,7 +676,7 @@ public final class Comparators {
 	 * @return {@link NullComparator}
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public static <GEntry> Comparator<GEntry> nullComparator(final Comparator<? super GEntry> comparator)
+	public static <GEntry> NullComparator<GEntry> nullComparator(final Comparator<? super GEntry> comparator)
 		throws NullPointerException {
 		return new NullComparator<GEntry>(comparator);
 	}
@@ -702,7 +702,7 @@ public final class Comparators {
 	 * @return {@link ReverseComparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public static <GEntry> Comparator<GEntry> reverseComparator(final Comparator<? super GEntry> comparator)
+	public static <GEntry> ReverseComparator<GEntry> reverseComparator(final Comparator<? super GEntry> comparator)
 		throws NullPointerException {
 		return new ReverseComparator<GEntry>(comparator);
 	}
@@ -719,7 +719,7 @@ public final class Comparators {
 	 * @return {@link IterableComparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public static <GEntry extends Iterable<? extends GValue>, GValue> Comparator<GEntry> iterableComparator(
+	public static <GEntry extends Iterable<? extends GValue>, GValue> IterableComparator<GEntry, GValue> iterableComparator(
 		final Comparator<? super GValue> comparator) throws NullPointerException {
 		return new IterableComparator<GEntry, GValue>(comparator);
 	}
@@ -736,7 +736,7 @@ public final class Comparators {
 	 * @return {@link ChainedComparator}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparator Comparatoren} {@code null} ist.
 	 */
-	public static <GEntry> Comparator<GEntry> chainedComparator(final Comparator<? super GEntry> comparator1,
+	public static <GEntry> ChainedComparator<GEntry> chainedComparator(final Comparator<? super GEntry> comparator1,
 		final Comparator<? super GEntry> comparator2) throws NullPointerException {
 		return new ChainedComparator<GEntry>(comparator1, comparator2);
 	}
@@ -756,7 +756,7 @@ public final class Comparators {
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} oder der gegebene {@link Converter Converter}
 	 *         {@code null} sind.
 	 */
-	public static <GEntry, GValue> Comparator<GEntry> convertedComparator(
+	public static <GEntry, GValue> ConvertedComparator<GEntry, GValue> convertedComparator(
 		final Converter<? super GEntry, ? extends GValue> converter, final Comparator<? super GValue> comparator)
 		throws NullPointerException {
 		return new ConvertedComparator<GEntry, GValue>(comparator, converter);

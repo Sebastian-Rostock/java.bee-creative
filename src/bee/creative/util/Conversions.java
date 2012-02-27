@@ -374,9 +374,10 @@ public final class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param output Ausgabe.
-	 * @return {@link StaticConversion Static-Conversion}.
+	 * @return {@link StaticConversion}.
 	 */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
+	public static <GInput, GOutput> StaticConversion<GInput, GOutput> staticConversion(final GInput input,
+		final GOutput output) {
 		return new StaticConversion<GInput, GOutput>(input, output);
 	}
 
@@ -403,10 +404,10 @@ public final class Conversions {
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
-	 * @return {@link InverseConversion Inverse-Conversion}.
+	 * @return {@link InverseConversion}.
 	 * @throws NullPointerException Wenn der gegebenen {@link Conversion} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(
+	public static <GInput, GOutput> InverseConversion<GInput, GOutput> inverseConversion(
 		final Conversion<? extends GOutput, ? extends GInput> conversion) {
 		return new InverseConversion<GInput, GOutput>(conversion);
 	}
@@ -433,10 +434,10 @@ public final class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param converter {@link Converter}.
-	 * @return {@link DynamicConversion Dynamic-Conversion}.
+	 * @return {@link DynamicConversion}.
 	 * @throws NullPointerException Wenn der gegebenen {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
+	public static <GInput, GOutput> DynamicConversion<GInput, GOutput> dynamicConversion(final GInput input,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		return new DynamicConversion<GInput, GOutput>(input, converter);
 	}

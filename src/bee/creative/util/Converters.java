@@ -936,7 +936,7 @@ public final class Converters {
 	 * @return {@link NamedFieldConverter}.
 	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final String name)
+	public static <GInput, GOutput> NamedFieldConverter<GInput, GOutput> fieldConverter(final String name)
 		throws NullPointerException {
 		return new NamedFieldConverter<GInput, GOutput>(name);
 	}
@@ -957,7 +957,7 @@ public final class Converters {
 	 *         existiert.
 	 * @throws SecurityException Wenn auf das {@link Field} nicht zugegriffen werden darf.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final String name,
+	public static <GInput, GOutput> FixedFieldConverter<GInput, GOutput> fieldConverter(final String name,
 		final Class<? extends GInput> clazz) throws NullPointerException, NoSuchFieldException, SecurityException {
 		return Converters.fieldConverter(clazz.getField(name));
 	}
@@ -974,7 +974,7 @@ public final class Converters {
 	 * @return {@link FixedFieldConverter}.
 	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> fieldConverter(final Field field)
+	public static <GInput, GOutput> FixedFieldConverter<GInput, GOutput> fieldConverter(final Field field)
 		throws NullPointerException {
 		return new FixedFieldConverter<GInput, GOutput>(field);
 	}
@@ -991,7 +991,7 @@ public final class Converters {
 	 * @return {@link NamedMethodConverter}.
 	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final String name)
+	public static <GInput, GOutput> NamedMethodConverter<GInput, GOutput> methodConverter(final String name)
 		throws NullPointerException {
 		return new NamedMethodConverter<GInput, GOutput>(name);
 	}
@@ -1012,7 +1012,7 @@ public final class Converters {
 	 *         existiert.
 	 * @throws SecurityException Wenn auf die {@link Method} nicht zugegriffen werden darf.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final String name,
+	public static <GInput, GOutput> FixedMethodConverter<GInput, GOutput> methodConverter(final String name,
 		final Class<? extends GInput> clazz) throws NullPointerException, NoSuchMethodException, SecurityException {
 		return Converters.methodConverter(clazz.getMethod(name));
 	}
@@ -1029,7 +1029,7 @@ public final class Converters {
 	 * @return {@link FixedMethodConverter}.
 	 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> methodConverter(final Method method)
+	public static <GInput, GOutput> FixedMethodConverter<GInput, GOutput> methodConverter(final Method method)
 		throws NullPointerException {
 		return new FixedMethodConverter<GInput, GOutput>(method);
 	}
@@ -1043,7 +1043,7 @@ public final class Converters {
 	 * @param output {@code default}-Ausgabe.
 	 * @return {@link DefaultConverter}.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> defaultConverter(final GOutput output) {
+	public static <GInput, GOutput> DefaultConverter<GInput, GOutput> defaultConverter(final GOutput output) {
 		return new DefaultConverter<GInput, GOutput>(output);
 	}
 
@@ -1064,9 +1064,9 @@ public final class Converters {
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} oder einer der gegebenen {@link Converter}
 	 *         {@code null} sind.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> filteredConverter(final Filter<? super GInput> filter,
-		final Converter<? super GInput, ? extends GOutput> accept, final Converter<? super GInput, ? extends GOutput> reject)
-		throws NullPointerException {
+	public static <GInput, GOutput> FilteredConverter<GInput, GOutput> filteredConverter(
+		final Filter<? super GInput> filter, final Converter<? super GInput, ? extends GOutput> accept,
+		final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
 		return new FilteredConverter<GInput, GOutput>(filter, accept, reject);
 	}
 
@@ -1083,7 +1083,7 @@ public final class Converters {
 	 * @return {@link CachedConverter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(
+	public static <GInput, GOutput> CachedConverter<GInput, GOutput> cachedConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		return Converters.cachedConverter(-1, Pointers.SOFT, Pointers.SOFT, converter);
 	}
@@ -1106,9 +1106,9 @@ public final class Converters {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn einer der gegebenen Modi ungültig ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(final int limit, final int inputMode,
-		final int outputMode, final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException,
-		IllegalArgumentException {
+	public static <GInput, GOutput> CachedConverter<GInput, GOutput> cachedConverter(final int limit,
+		final int inputMode, final int outputMode, final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException, IllegalArgumentException {
 		return new CachedConverter<GInput, GOutput>(limit, inputMode, outputMode, converter);
 	}
 
@@ -1125,7 +1125,7 @@ public final class Converters {
 	 * @return {@link ChainedConverter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(
+	public static <GInput, GValue, GOutput> ChainedConverter<GInput, GValue, GOutput> chainedConverter(
 		final Converter<? super GInput, ? extends GValue> converter1,
 		final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
 		return new ChainedConverter<GInput, GValue, GOutput>(converter1, converter2);
@@ -1141,7 +1141,7 @@ public final class Converters {
 	 * @return {@link SynchronizedConverter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> synchronizedConverter(
+	public static <GInput, GOutput> SynchronizedConverter<GInput, GOutput> synchronizedConverter(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		return new SynchronizedConverter<GInput, GOutput>(converter);
 	}

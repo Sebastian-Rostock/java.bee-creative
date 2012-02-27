@@ -333,7 +333,7 @@ public class Builders {
 	 * @return {@link CachedBuilder}.
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
-	public static <GData> Builder<GData> cachedBuilder(final Builder<? extends GData> builder)
+	public static <GData> CachedBuilder<GData> cachedBuilder(final Builder<? extends GData> builder)
 		throws NullPointerException {
 		return Builders.cachedBuilder(Pointers.SOFT, builder);
 	}
@@ -349,7 +349,7 @@ public class Builders {
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen {@link Pointer}-Modus ungültig ist.
 	 */
-	public static <GData> Builder<GData> cachedBuilder(final int mode, final Builder<? extends GData> builder)
+	public static <GData> CachedBuilder<GData> cachedBuilder(final int mode, final Builder<? extends GData> builder)
 		throws NullPointerException, IllegalArgumentException {
 		return new CachedBuilder<GData>(mode, builder);
 	}
@@ -367,7 +367,7 @@ public class Builders {
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Builder} {@code null}
 	 *         ist.
 	 */
-	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(
+	public static <GInput, GOutput> ConvertedBuilder<GInput, GOutput> convertedBuilder(
 		final Converter<? super GInput, ? extends GOutput> converter, final Builder<? extends GInput> builder)
 		throws NullPointerException {
 		return new ConvertedBuilder<GInput, GOutput>(converter, builder);
@@ -382,7 +382,7 @@ public class Builders {
 	 * @return {@link SynchronizedBuilder}.
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
-	public static <GData> Builder<GData> synchronizedBuilder(final Builder<? extends GData> builder)
+	public static <GData> SynchronizedBuilder<GData> synchronizedBuilder(final Builder<? extends GData> builder)
 		throws NullPointerException {
 		return new SynchronizedBuilder<GData>(builder);
 	}

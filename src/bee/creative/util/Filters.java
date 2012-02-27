@@ -532,7 +532,8 @@ public final class Filters {
 	 * @return {@link InverseFilter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> inverseFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static <GInput> InverseFilter<GInput> inverseFilter(final Filter<? super GInput> filter)
+		throws NullPointerException {
 		return new InverseFilter<GInput>(filter);
 	}
 
@@ -566,8 +567,9 @@ public final class Filters {
 	 * @return {@link ConvertedFilter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} oder der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Filter<? super GOutput> filter,
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+	public static <GInput, GOutput> ConvertedFilter<GInput, GOutput> convertedFilter(
+		final Filter<? super GOutput> filter, final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
 		return new ConvertedFilter<GInput, GOutput>(filter, converter);
 	}
 
@@ -583,7 +585,7 @@ public final class Filters {
 	 * @return {@link DisjunctionFilter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1,
+	public static <GInput> DisjunctionFilter<GInput> disjunctionFilter(final Filter<? super GInput> filter1,
 		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new DisjunctionFilter<GInput>(filter1, filter2);
 	}
@@ -600,7 +602,7 @@ public final class Filters {
 	 * @return {@link ConjunctionFilter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1,
+	public static <GInput> ConjunctionFilter<GInput> conjunctionFilter(final Filter<? super GInput> filter1,
 		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new ConjunctionFilter<GInput>(filter1, filter2);
 	}
@@ -617,7 +619,7 @@ public final class Filters {
 	 * @return {@link EquivalenceFilter}.
 	 * @throws NullPointerException Wenn einer der gegebenen {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1,
+	public static <GInput> EquivalenceFilter<GInput> equivalenceFilter(final Filter<? super GInput> filter1,
 		final Filter<? super GInput> filter2) throws NullPointerException {
 		return new EquivalenceFilter<GInput>(filter1, filter2);
 	}
@@ -631,7 +633,7 @@ public final class Filters {
 	 * @return {@link SynchronizedFilter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter)
+	public static <GInput> SynchronizedFilter<GInput> synchronizedFilter(final Filter<? super GInput> filter)
 		throws NullPointerException {
 		return new SynchronizedFilter<GInput>(filter);
 	}
