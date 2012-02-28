@@ -1,17 +1,13 @@
 package bee.creative.util;
 
+import java.util.AbstractCollection;
 import java.util.AbstractList;
 import java.util.AbstractSet;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.NavigableSet;
 import java.util.Set;
-import java.util.SortedSet;
-import bee.creative.util.Compact.CompactSet;
 
 public class Pairs {
 
@@ -23,7 +19,11 @@ public class Pairs {
 
 	}
 
-	static abstract class absPairColle<E, T extends Collection<E>> extends absPair<T> implements Collection<E> {
+	static abstract class absPairColle<E, T extends Collection<E>> extends AbstractCollection<E> {
+
+		T a;
+
+		T b;
 
 		@Override
 		public int size() {
@@ -45,49 +45,6 @@ public class Pairs {
 			if(this.a.isEmpty()) return this.b.iterator();
 			if(this.b.isEmpty()) return this.a.iterator();
 			return Iterators.chainedIterator(this.a.iterator(), this.b.iterator());
-		}
-
-		@Override
-		public Object[] toArray() {
-			if(this.a.isEmpty()) return this.b.toArray();
-			if(this.b.isEmpty()) return this.a.toArray();
-			final Object[] o1 = this.a.toArray();
-			final Object[] o2 = this.a.toArray();
-			final Object[] o12 = new Object[o1.length + o2.length];
-			System.arraycopy(o1, 0, o12, 0, o1.length);
-			System.arraycopy(o2, 0, o12, o1.length, o2.length);
-			return o12;
-		}
-
-		@Override
-		public <T> T[] toArray(final T[] x) {
-			if(this.a.isEmpty()) return this.b.toArray(x);
-			if(this.b.isEmpty()) return this.a.toArray(x);
-			final T[] o1 = this.a.toArray(x);
-			final T[] o2 = this.a.toArray(x);
-			final T[] o12 = Arrays.copyOf(o1, o1.length + o2.length);
-			System.arraycopy(o2, 0, o12, o1.length, o2.length);
-			return o12;
-		}
-
-		@Override
-		public boolean containsAll(final Collection<?> c) {
-			return CompactSet.containsAll(this, c);
-		}
-
-		@Override
-		public boolean addAll(final Collection<? extends E> c) {
-			return CompactSet.addAll(this, c);
-		}
-
-		@Override
-		public boolean removeAll(final Collection<?> c) {
-			return CompactSet.removeAll(this, c);
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> c) {
-			return CompactSet.retainAll(this, c);
 		}
 
 		@Override
@@ -130,17 +87,17 @@ public class Pairs {
 
 		@Override
 		public int hashCode() {
-			return set().hashCode();
+			return this.set().hashCode();
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			return set().equals(obj);
+		public boolean equals(final Object obj) {
+			return this.set().equals(obj);
 		}
 
 		@Override
 		public String toString() {
-			return set().toString();
+			return this.set().toString();
 		}
 
 	}
@@ -156,7 +113,7 @@ public class Pairs {
 				}
 
 				@Override
-				public E get(int index) {
+				public E get(final int index) {
 					return PairList.this.get(index);
 				}
 
@@ -164,36 +121,36 @@ public class Pairs {
 		}
 
 		@Override
-		public E get(int index) {
+		public E get(final int index) {
 			return null;
 		}
 
 		@Override
-		public E set(int index, E element) {
+		public E set(final int index, final E element) {
 			return null;
 		}
 
 		@Override
-		public boolean add(E e) {
+		public boolean add(final E e) {
 			return false;
 		}
 
 		@Override
-		public void add(int index, E element) {
+		public void add(final int index, final E element) {
 		}
 
 		@Override
-		public boolean addAll(int index, Collection<? extends E> c) {
+		public boolean addAll(final int index, final Collection<? extends E> c) {
 			return false;
 		}
 
 		@Override
-		public E remove(int index) {
+		public E remove(final int index) {
 			return null;
 		}
 
 		@Override
-		public boolean remove(Object o) {
+		public boolean remove(final Object o) {
 			return false;
 		}
 
@@ -201,9 +158,9 @@ public class Pairs {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int indexOf(Object o) {
-			int index = a.indexOf(o);
-			if(index < 0) return b.indexOf(o);
+		public int indexOf(final Object o) {
+			final int index = this.a.indexOf(o);
+			if(index < 0) return this.b.indexOf(o);
 			return index;
 		}
 
@@ -211,9 +168,9 @@ public class Pairs {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int lastIndexOf(Object o) {
-			int index = b.lastIndexOf(o);
-			if(index < 0) return a.lastIndexOf(o);
+		public int lastIndexOf(final Object o) {
+			final int index = this.b.lastIndexOf(o);
+			if(index < 0) return this.a.lastIndexOf(o);
 			return index;
 		}
 
@@ -222,35 +179,35 @@ public class Pairs {
 		 */
 		@Override
 		public ListIterator<E> listIterator() {
-			return set().listIterator();
+			return this.set().listIterator();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListIterator<E> listIterator(int index) {
-			return set().listIterator(index);
+		public ListIterator<E> listIterator(final int index) {
+			return this.set().listIterator(index);
 		}
 
 		@Override
-		public List<E> subList(int fromIndex, int toIndex) {
+		public List<E> subList(final int fromIndex, final int toIndex) {
 			return null;
 		}
 
 		@Override
 		public int hashCode() {
-			return set().hashCode();
+			return this.set().hashCode();
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			return set().equals(obj);
+		public boolean equals(final Object obj) {
+			return this.set().equals(obj);
 		}
 
 		@Override
 		public String toString() {
-			return set().toString();
+			return this.set().toString();
 		}
 
 	}

@@ -519,8 +519,17 @@ public final class Compact {
 		 */
 		public static final Object[] VOID = new Object[0];
 
-		boolean containsItem(final Object[] items, final Object value) {
-			return Arrays.asList(items).subList(this.from, this.from + this.size).contains(value);
+		protected static final int indexOf(final Object[] list, int from, final int size, final Object item) {
+			if(item == null){
+				for(final int last = from + size; from < last; from++){
+					if(list[from] == null) return from;
+				}
+			}else{
+				for(final int last = from + size; from < last; from++){
+					if(item.equals(list[from])) return from;
+				}
+			}
+			return -1;
 		}
 
 		/**
@@ -1221,6 +1230,16 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public void add(final int index, final GItem element) {
+			if((index < 0) || (index > this.size)) throw new IndexOutOfBoundsException();
+			this.customInsert(this.from + index, 1);
+			this.setItem(this.from + index, element);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public boolean addAll(final Collection<? extends GItem> collection) {
 			return this.addAll(this.size, collection);
 		}
@@ -1251,21 +1270,11 @@ public final class Compact {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void add(final int index, final GItem element) {
-			if((index < 0) || (index > this.size)) throw new IndexOutOfBoundsException();
-			this.customInsert(this.from + index, 1);
-			this.setItem(this.from + index, element);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public GItem remove(final int index) {
 			if((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException();
-			final int index2 = this.from + index;
-			final GItem item = this.getItem(index2);
-			this.customRemove(index2, 1);
+			final int i = this.from + index;
+			final GItem item = this.getItem(i);
+			this.customRemove(i, 1);
 			return item;
 		}
 
@@ -1274,16 +1283,9 @@ public final class Compact {
 		 */
 		@Override
 		public int indexOf(final Object o) {
-			if(o == null){
-				for(int from = this.from, last = from + this.size; from < last; from++){
-					if(this.getItem(from) == null) return from - this.from;
-				}
-			}else{
-				for(int from = this.from, last = from + this.size; from < last; from++){
-					if(o.equals(this.getItem(from))) return from - this.from;
-				}
-			}
-			return -1;
+			final int index = CompactData.indexOf(this.list, this.from, this.size, o);
+			if(index < 0) return -1;
+			return index - this.from;
 		}
 
 		/**
@@ -2212,7 +2214,8 @@ public final class Compact {
 		 * @return {@code index}-te Element oder {@code null}.
 		 */
 		protected final GItem poll(final int index) {
-			if((index < 0) || (index >= this.size)) return null;
+			final int i = index - this.from;
+			if((i < 0) || (i >= this.size)) return null;
 			final GItem item = this.getItem(index);
 			this.customRemove(index, 1);
 			return item;
@@ -2225,7 +2228,8 @@ public final class Compact {
 		 * @return {@code index}-tes Element oder {@code null}.
 		 */
 		protected final GItem getItemOrNull(final int index) {
-			if((index < 0) || (index >= this.size)) return null;
+			final int i = index - this.from;
+			if((i < 0) || (i >= this.size)) return null;
 			return this.getItem(index);
 		}
 
@@ -2237,7 +2241,8 @@ public final class Compact {
 		 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
 		 */
 		protected final GItem getItemOrException(final int index) throws NoSuchElementException {
-			if((index < 0) || (index >= this.size)) throw new NoSuchElementException();
+			final int i = index - this.from;
+			if((i < 0) || (i >= this.size)) throw new NoSuchElementException();
 			return this.getItem(index);
 		}
 
@@ -2414,14 +2419,131 @@ public final class Compact {
 	 */
 	public abstract static class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
-		protected static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
+		/**
+		 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer
+		 * {@link CompactMap} delegiert.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ der Schlüssel.
+		 */
+		protected static final class KeySet<GKey> extends AbstractSet<GKey> {
 
+			/**
+			 * Dieses Feld speichert die {@link CompactMap}.
+			 */
+			protected final CompactMap<GKey, ?> data;
+
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+			 * 
+			 * @param data {@link CompactMap}.
+			 */
+			public KeySet(final CompactMap<GKey, ?> data) {
+				this.data = data;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int size() {
+				return this.data.size;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void clear() {
+				this.data.clear();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Iterator<GKey> iterator() {
+				return new CompactMapKeyAscendingIterator<GKey>(this.data, this.data.firstIndex(), this.data.lastIndex() + 1);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
+		 * {@link CompactMap} delegiert.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 */
+		protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+
+			/**
+			 * Dieses Feld speichert die {@link CompactMap}.
+			 */
 			protected final CompactMap<GKey, GValue> data;
 
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+			 * 
+			 * @param data {@link CompactMap}.
+			 */
+			public EntrySet(final CompactMap<GKey, GValue> data) {
+				this.data = data;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int size() {
+				return this.data.size;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void clear() {
+				this.data.clear();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Iterator<Entry<GKey, GValue>> iterator() {
+				return new CompactMapEntryIterator<GKey, GValue>(this.data, this.data.firstIndex(), this.data.lastIndex() + 1);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert eine {@link AbstractMap}, die ihre Schnittstelle an eine {@link CompactMap} delegiert.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 */
+		protected static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
+
+			/**
+			 * Dieses Feld speichert die {@link CompactMap}.
+			 */
+			protected final CompactMap<GKey, GValue> data;
+
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+			 * 
+			 * @param data {@link CompactMap}.
+			 */
 			public ItemMap(final CompactMap<GKey, GValue> data) {
 				this.data = data;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public Set<Entry<GKey, GValue>> entrySet() {
 				return this.data.entrySet();
@@ -2429,50 +2551,96 @@ public final class Compact {
 
 		}
 
+		/**
+		 * Diese Klasse implementiert das {@link SimpleEntry} einer {@link CompactMap}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ der Schlüssel.
+		 * @param <GValue> Typ der Werte.
+		 */
 		protected static final class ItemEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
 
+			/**
+			 * Dieses Feld speichert die {@code SerialVersionUID}.
+			 */
 			private static final long serialVersionUID = -543360027933297926L;
 
+			/**
+			 * Dieses Feld speichert die {@link CompactMap}.
+			 */
 			protected final CompactMap<GKey, GValue> data;
 
-			protected final int index;
-
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactMap} und den Index.
+			 * 
+			 * @param data {@link CompactMap}.
+			 * @param index Index.
+			 */
 			public ItemEntry(final CompactMap<GKey, GValue> data, final int index) {
 				super(data.getKey(index), data.getValue(index));
 				this.data = data;
-				this.index = index;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public GValue setValue(final GValue value) {
+				final GKey key = this.getKey();
 				final GValue result = super.setValue(value);
-				this.data.setEntry(this.index, this.getKey(), value);
+				final int index = this.data.customItemIndex(this.getKey());
+				if(index < 0) throw new IllegalStateException();
+				this.data.setEntry(index, key, value);
 				return result;
 			}
 
 		}
 
+		/**
+		 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
+		 * {@link CompactMap} delegiert.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GValue> Typ der Werte.
+		 */
 		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
 
+			/**
+			 * Dieses Feld speichert die {@link CompactMap}.
+			 */
 			protected final CompactMap<?, GValue> data;
 
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+			 * 
+			 * @param data {@link CompactMap}.
+			 */
 			public ValueCollection(final CompactMap<?, GValue> data) {
 				this.data = data;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public int size() {
 				return this.data.size;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public void clear() {
 				this.data.clear();
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public Iterator<GValue> iterator() {
-				return new CompactMapValueIterator<GValue>(this.data, 0, this.data.size);
+				return new CompactMapValueIterator<GValue>(this.data, this.data.firstIndex(), this.data.lastIndex() + 1);
 			}
 
 		}
@@ -2567,7 +2735,7 @@ public final class Compact {
 		}
 
 		/**
-		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link Entry}s.
+		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link ItemEntry}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -2677,16 +2845,6 @@ public final class Compact {
 		protected abstract void setEntry(int index, GKey key, GValue value);
 
 		/**
-		 * Diese Methode gibt ein neues {@link Set} zurück, das aus dem {@link Iterator} erzeugt wird.
-		 * 
-		 * @see AbstractSet
-		 * @return {@link Set}.
-		 */
-		protected final Map<GKey, GValue> getItemMap() {
-			return new ItemMap<GKey, GValue>(this);
-		}
-
-		/**
 		 * Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den
 		 * Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist
 		 * der Index, bei dem der Eintrag eingefügt werden müsste.
@@ -2712,7 +2870,7 @@ public final class Compact {
 		 */
 		@Override
 		public void clear() {
-			this.customRemove(0, this.size);
+			this.customRemove(this.from, this.size);
 		}
 
 		/**
@@ -2728,24 +2886,7 @@ public final class Compact {
 		 */
 		@Override
 		public Set<GKey> keySet() {
-			return new AbstractSet<GKey>() {
-
-				@Override
-				public int size() {
-					return CompactMap.this.size;
-				}
-
-				@Override
-				public void clear() {
-					CompactMap.this.clear();
-				}
-
-				@Override
-				public Iterator<GKey> iterator() {
-					return new CompactMapKeyAscendingIterator<GKey>(CompactMap.this, 0, CompactMap.this.size);
-				}
-
-			};
+			return new KeySet<GKey>(this);
 		}
 
 		/**
@@ -2753,24 +2894,7 @@ public final class Compact {
 		 */
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
-			return new AbstractSet<Entry<GKey, GValue>>() {
-
-				@Override
-				public int size() {
-					return CompactMap.this.size;
-				}
-
-				@Override
-				public void clear() {
-					CompactMap.this.clear();
-				}
-
-				@Override
-				public Iterator<Entry<GKey, GValue>> iterator() {
-					return new CompactMapEntryIterator<GKey, GValue>(CompactMap.this, 0, CompactMap.this.size);
-				}
-
-			};
+			return new EntrySet<GKey, GValue>(this);
 		}
 
 		/**
@@ -2843,7 +2967,7 @@ public final class Compact {
 		 */
 		@Override
 		public int hashCode() {
-			return this.getItemMap().hashCode();
+			return new ItemMap<GKey, GValue>(this).hashCode();
 		}
 
 		/**
@@ -2853,7 +2977,7 @@ public final class Compact {
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof Map<?, ?>)) return false;
-			return this.getItemMap().equals(object);
+			return new ItemMap<GKey, GValue>(this).equals(object);
 		}
 
 		/**
@@ -2861,7 +2985,7 @@ public final class Compact {
 		 */
 		@Override
 		public String toString() {
-			return this.getItemMap().toString();
+			return new ItemMap<GKey, GValue>(this).toString();
 		}
 
 	}
@@ -2937,7 +3061,7 @@ public final class Compact {
 		@Override
 		public boolean containsValue(final Object value) {
 			if(value == null) return false;
-			return false;// CompactData.containsItem(this.list, this.size, value);
+			return CompactData.indexOf(this.list, this.from, this.size, value) >= 0;
 		}
 
 	}
@@ -3092,9 +3216,12 @@ public final class Compact {
 		 */
 		@Override
 		protected void customInsert(final int index, final int count) throws IllegalArgumentException {
+			final int from = this.from;
 			final int size = this.size;
-			super.customInsert(index, count);
-			// this.values = CompactData.insertItems(this.values, size, this.list.length, index, count);
+			this.list = this.defaultInsert(this.list, index, count);
+			this.from = from;
+			this.size = size;
+			this.values = this.defaultInsert(this.values, index, count);
 		}
 
 		/**
@@ -3102,9 +3229,12 @@ public final class Compact {
 		 */
 		@Override
 		protected void customRemove(final int index, final int count) throws IllegalArgumentException {
+			final int from = this.from;
 			final int size = this.size;
-			super.customRemove(index, count);
-			// this.values = CompactData.removeItems(this.values, size, this.list.length, index, count);
+			this.list = this.defaultRemove(this.list, index, count);
+			this.from = from;
+			this.size = size;
+			this.values = this.defaultRemove(this.values, index, count);
 		}
 
 		/**
@@ -3112,8 +3242,11 @@ public final class Compact {
 		 */
 		@Override
 		protected void customAllocate(final int count) {
-			super.customAllocate(count);
-			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
+			final int from = this.from;
+			final int length = this.defaultLength(this.list, count);
+			this.list = this.defaultResize(this.list, length);
+			this.from = from;
+			this.values = this.defaultResize(this.values, length);
 		}
 
 		/**
@@ -3121,8 +3254,11 @@ public final class Compact {
 		 */
 		@Override
 		protected void customCompact() {
-			super.customCompact();
-			// this.values = CompactData.resizeItems(this.values, this.size, this.list.length);
+			final int from = this.from;
+			final int length = this.size;
+			this.list = this.defaultResize(this.list, length);
+			this.from = from;
+			this.values = this.defaultResize(this.values, length);
 		}
 
 		/**
@@ -3130,7 +3266,7 @@ public final class Compact {
 		 */
 		@Override
 		public boolean containsValue(final Object value) {
-			return false;// CompactData.containsItem(this.values, this.size, value);
+			return CompactData.indexOf(this.values, this.from, this.size, value) >= 0;
 		}
 
 	}
@@ -3253,9 +3389,9 @@ public final class Compact {
 			}
 
 			/**
-			 * Diese Methode gibt den Schlüssel des gegebenen {@link Entry}s oder {@code null} zurück.
+			 * Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
 			 * 
-			 * @param entry {@link Entry}.
+			 * @param entry {@link ItemEntry}.
 			 * @return Schlüssel oder {@code null}.
 			 */
 			protected final GKey getKeyOrNull(final Entry<GKey, ?> entry) {
