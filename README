@@ -1,7 +1,29 @@
 bee-creative.util - [cc-by] Sebastian Rostock
 Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:  [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
 
-Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden:
+Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung verschiedener Algebren auf Filtern, Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen. 
+
+
+Filters {
+	classes {
+		InverseFilter
+		ConvertedFilter
+		DisjunctionFilter
+		ConjunctionFilter
+		EquivalenceFilter
+		SynchronizedFilter
+	}
+	methods {
+		nullFilter()
+		inverseFilter(Filter)
+		defaultFilter(boolean)
+		convertedFilter(Filter, Converter)
+		disjunctionFilter(Filter, Filter)
+		conjunctionFilter(Filter, Filter)
+		equivalenceFilter(Filter, Filter)
+		synchronizedFilter(Filter)
+	}
+}
 
 Iterators {
 	classes {
@@ -139,26 +161,6 @@ Objects {
 	}
 }
 
-Filters {
-	classes {
-		InverseFilter
-		ConvertedFilter
-		DisjunctionFilter
-		ConjunctionFilter
-		EquivalenceFilter
-		SynchronizedFilter
-	}
-	methods {
-		nullFilter()
-		inverseFilter(Filter)
-		defaultFilter(boolean)
-		convertedFilter(Filter, Converter)
-		disjunctionFilter(Filter, Filter)
-		conjunctionFilter(Filter, Filter)
-		equivalenceFilter(Filter, Filter)
-		synchronizedFilter(Filter)
-	}
-}
 
 Converters {
 	classes {

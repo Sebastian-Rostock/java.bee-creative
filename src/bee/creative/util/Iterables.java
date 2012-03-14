@@ -632,8 +632,8 @@ public final class Iterables {
 	 */
 	public static boolean retainAll(final Collection<?> collection, final Iterable<?> iterable)
 		throws NullPointerException {
-		if(iterable == null) throw new NullPointerException("iterable is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterable == null) throw new NullPointerException("iterable is null");
 		return Iterators.retainAll(collection, iterable.iterator());
 	}
 
@@ -669,8 +669,8 @@ public final class Iterables {
 	 */
 	public static <GEntry> boolean appendAll(final Collection<GEntry> collection,
 		final Iterable<? extends GEntry> iterable) throws NullPointerException {
-		if(iterable == null) throw new NullPointerException("iterable is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterable == null) throw new NullPointerException("iterable is null");
 		return Iterators.appendAll(collection, iterable.iterator());
 	}
 
@@ -685,10 +685,10 @@ public final class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null}
 	 *         ist.
 	 */
-	public static boolean removeAll(final Iterable<?> iterable, final Collection<?> collection)
+	public static boolean removeAll(final Collection<?> collection, final Iterable<?> iterable)
 		throws NullPointerException {
-		if(iterable == null) throw new NullPointerException("iterable is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterable == null) throw new NullPointerException("iterable is null");
 		return Iterators.removeAll(collection, iterable.iterator());
 	}
 
@@ -705,8 +705,8 @@ public final class Iterables {
 	 */
 	public static boolean containsAll(final Collection<?> collection, final Iterable<?> iterable)
 		throws NullPointerException {
-		if(iterable == null) throw new NullPointerException("iterable is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterable == null) throw new NullPointerException("iterable is null");
 		return Iterators.containsAll(collection, iterable.iterator());
 	}
 

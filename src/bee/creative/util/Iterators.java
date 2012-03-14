@@ -858,8 +858,8 @@ public final class Iterators {
 	 */
 	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator)
 		throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("iterator is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
 		final List<Object> list = new ArrayList<Object>();
 		Iterators.appendAll(list, iterator);
 		return collection.retainAll(list);
@@ -904,8 +904,8 @@ public final class Iterators {
 	 */
 	public static <GEntry> boolean appendAll(final Collection<GEntry> collection,
 		final Iterator<? extends GEntry> iterator) throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("iterator is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
 		boolean modified = false;
 		while(iterator.hasNext()){
 			if(collection.add(iterator.next())){
@@ -928,8 +928,8 @@ public final class Iterators {
 	 */
 	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator)
 		throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("iterator is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
 		boolean modified = false;
 		while(iterator.hasNext()){
 			if(collection.remove(iterator.next())){
@@ -952,8 +952,8 @@ public final class Iterators {
 	 */
 	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator)
 		throws NullPointerException {
-		if(iterator == null) throw new NullPointerException("iterator is null");
 		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
 		while(iterator.hasNext())
 			if(!collection.contains(iterator.next())) return false;
 		return true;
