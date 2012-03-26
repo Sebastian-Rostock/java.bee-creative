@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.util.Collection;
 import bee.creative.util.Converters.ConverterLink;
 
 /**
@@ -176,6 +177,69 @@ public final class Filters {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("inverseFilter", this.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Filter}, der nur die in einer gegebenen {@link Collection} enthaltenen
+	 * Eingaben akzeptiert.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 */
+	public static final class ContainsFilter<GInput> implements Filter<GInput> {
+
+		/**
+		 * Dieses Feld speichert die {@link Collection}.
+		 */
+		final Collection<?> collection;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Collection}.
+		 * 
+		 * @param collection {@link Collection}.
+		 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+		 */
+		public ContainsFilter(final Collection<?> collection) {
+			if(collection == null) throw new NullPointerException("collection is null");
+			this.collection = collection;
+		}
+
+		/**
+		 * Diese Methode gibt die {@link Collection} zurück.
+		 * 
+		 * @return {@link Collection}.
+		 */
+		public Collection<?> collection() {
+			return this.collection;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean accept(final GInput input) {
+			return this.collection.contains(input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.collection);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ContainsFilter<?>)) return false;
+			final ContainsFilter<?> data = (ContainsFilter<?>)object;
+			return Objects.equals(this.collection, data.collection);
 		}
 
 	}
@@ -477,9 +541,9 @@ public final class Filters {
 	};
 
 	/**
-	 * Dieses Feld speichert einen {@link Filter}, der von {@link Filters#defaultFilter(boolean)} zurück gegeben wird.
+	 * Dieses Feld speichert einen {@link Filter}, der von {@link Filters#acceptFilter()} zurück gegeben wird.
 	 */
-	static final Filter<?> DEFAULT_TRUE_FILTER = new Filter<Object>() {
+	static final Filter<?> ACCEPT_FILTER = new Filter<Object>() {
 
 		@Override
 		public boolean accept(final Object input) {
@@ -488,15 +552,15 @@ public final class Filters {
 
 		@Override
 		public String toString() {
-			return Objects.toStringCall("defaultFilter", true);
+			return Objects.toStringCall("acceptFilter", true);
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert einen {@link Filter}, der von {@link Filters#defaultFilter(boolean)} zurück gegeben wird.
+	 * Dieses Feld speichert einen {@link Filter}, der von {@link Filters#rejectFilter()} zurück gegeben wird.
 	 */
-	static final Filter<?> DEFAULT_FALSE_FILTER = new Filter<Object>() {
+	static final Filter<?> REJECT_FILTER = new Filter<Object>() {
 
 		@Override
 		public boolean accept(final Object input) {
@@ -505,7 +569,7 @@ public final class Filters {
 
 		@Override
 		public String toString() {
-			return Objects.toStringCall("defaultFilter", false);
+			return Objects.toStringCall("rejectFilter", false);
 		}
 
 	};
@@ -522,6 +586,43 @@ public final class Filters {
 	}
 
 	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe
+	 * akzeptiert.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @return {@code accept}-{@link Filter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GInput> Filter<GInput> acceptFilter() {
+		return (Filter<GInput>)Filters.ACCEPT_FILTER;
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @return {@code reject}-{@link Filter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GInput> Filter<GInput> rejectFilter() {
+		return (Filter<GInput>)Filters.REJECT_FILTER;
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Filter}, der nur die in der gegebenen {@link Collection} enthaltenen Eingaben
+	 * akzeptiert, und gibt diesen zurück.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param collection {@link Collection}.
+	 * @return {@link ContainsFilter}.
+	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+	 */
+	public static <GInput> ContainsFilter<GInput> containsFilter(final Collection<?> collection)
+		throws NullPointerException {
+		return new ContainsFilter<GInput>(collection);
+	}
+
+	/**
 	 * Diese Methode erzeugt einen {@link Filter}, der die Inversion ({@code !}-Operator) des gegebenen {@link Filter}s
 	 * berechnet, und gibt diesen zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebene
 	 * {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn der gegebene {@link Filter} die
@@ -535,20 +636,6 @@ public final class Filters {
 	public static <GInput> InverseFilter<GInput> inverseFilter(final Filter<? super GInput> filter)
 		throws NullPointerException {
 		return new InverseFilter<GInput>(filter);
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode für jede Eingabe den
-	 * gegebenen Akzeptanzmodus liefert. Wenn der Akzeptanzmodus {@code true} ist, akzeptiert der {@link Filter} jede
-	 * Eingabe und wenn der Akzeptanzmodus {@code false} ist, lehnt der {@link Filter} jede Eingabe ab.
-	 * 
-	 * @param <GInput> Typ der Eingabe.
-	 * @param accept Akzeptanzmodus.
-	 * @return {@code default}-{@link Filter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> defaultFilter(final boolean accept) {
-		return (Filter<GInput>)(accept ? Filters.DEFAULT_TRUE_FILTER : Filters.DEFAULT_FALSE_FILTER);
 	}
 
 	/**

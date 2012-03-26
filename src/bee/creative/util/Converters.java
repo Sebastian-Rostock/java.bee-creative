@@ -832,7 +832,7 @@ public final class Converters {
 			if(object == this) return true;
 			if(!(object instanceof ChainedConverter<?, ?, ?>)) return false;
 			final ChainedConverter<?, ?, ?> data = (ChainedConverter<?, ?, ?>)object;
-			return this.converter1.equals(data.converter1) && this.converter2.equals(data.converter2);
+			return Objects.equals(this.converter1, data.converter1, this.converter2, data.converter2);
 		}
 
 		/**

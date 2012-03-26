@@ -846,26 +846,6 @@ public final class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator}
-	 * vorkommen, und gibt nur bei Veränderung der {@link Collection} {@code true} zurück.
-	 * 
-	 * @see Collection#retainAll(Collection)
-	 * @param collection {@link Collection}.
-	 * @param iterator {@link Iterator}.
-	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
-	 *         ist.
-	 */
-	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator)
-		throws NullPointerException {
-		if(collection == null) throw new NullPointerException("collection is null");
-		if(iterator == null) throw new NullPointerException("iterator is null");
-		final List<Object> list = new ArrayList<Object>();
-		Iterators.appendAll(list, iterator);
-		return collection.retainAll(list);
-	}
-
-	/**
 	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die nicht in der gegebenen {@link Collection}
 	 * vorkommen, und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
 	 * 
@@ -891,6 +871,26 @@ public final class Iterators {
 	}
 
 	/**
+	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator}
+	 * vorkommen, und gibt nur bei Veränderung der {@link Collection} {@code true} zurück.
+	 * 
+	 * @see Collection#retainAll(Collection)
+	 * @param collection {@link Collection}.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen an der {@link Collection}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
+	 *         ist.
+	 */
+	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator)
+		throws NullPointerException {
+		if(collection == null) throw new NullPointerException("collection is null");
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		final List<Object> list = new ArrayList<Object>();
+		Iterators.appendAll(list, iterator);
+		return collection.retainAll(list);
+	}
+
+	/**
 	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein und gibt
 	 * nur bei Veränderungen an der {@link Collection} {@code true} zurück.
 	 * 
@@ -909,6 +909,51 @@ public final class Iterators {
 		boolean modified = false;
 		while(iterator.hasNext()){
 			if(collection.add(iterator.next())){
+				modified = true;
+			}
+		}
+		return modified;
+	}
+
+	/**
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s und gibt nur bei Veränderung des
+	 * {@link Iterator}s {@code true} zurück.
+	 * 
+	 * @see Iterator#remove()
+	 * @param iterator {@link Iterator}.
+	 * @return {@code true} bei Veränderungen am {@link Iterator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 */
+	public static boolean removeAll(final Iterator<?> iterator) throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		boolean modified = false;
+		while(iterator.hasNext()){
+			iterator.next();
+			iterator.remove();
+			modified = true;
+		}
+		return modified;
+	}
+
+	/**
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die in der gegebenen {@link Collection}
+	 * vorkommen, und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
+	 * 
+	 * @see Collection#retainAll(Collection)
+	 * @param iterator {@link Iterator}.
+	 * @param collection {@link Collection}.
+	 * @return {@code true} bei Veränderungen am {@link Iterator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null}
+	 *         ist.
+	 */
+	public static boolean removeAll(final Iterator<?> iterator, final Collection<?> collection)
+		throws NullPointerException {
+		if(iterator == null) throw new NullPointerException("iterator is null");
+		if(collection == null) throw new NullPointerException("collection is null");
+		boolean modified = false;
+		while(iterator.hasNext()){
+			if(collection.contains(iterator.next())){
+				iterator.remove();
 				modified = true;
 			}
 		}

@@ -344,31 +344,11 @@ public final class Objects {
 	/**
 	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück.
 	 * 
-	 * @see Arrays#hashCode(int[])
-	 * @see Arrays#hashCode(long[])
-	 * @see Arrays#hashCode(byte[])
-	 * @see Arrays#hashCode(char[])
-	 * @see Arrays#hashCode(short[])
-	 * @see Arrays#hashCode(float[])
-	 * @see Arrays#hashCode(double[])
-	 * @see Arrays#hashCode(boolean[])
-	 * @see Objects#hash(Object...)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object) {
-		if(object == null) return 0;
-		final Class<?> clazz = object.getClass();
-		if(!clazz.isArray()) return object.hashCode();
-		if(clazz == int[].class) return Arrays.hashCode((int[])object);
-		if(clazz == long[].class) return Arrays.hashCode((long[])object);
-		if(clazz == byte[].class) return Arrays.hashCode((byte[])object);
-		if(clazz == char[].class) return Arrays.hashCode((char[])object);
-		if(clazz == short[].class) return Arrays.hashCode((short[])object);
-		if(clazz == float[].class) return Arrays.hashCode((float[])object);
-		if(clazz == double[].class) return Arrays.hashCode((double[])object);
-		if(clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
-		return Objects.hash((Object[])object);
+		return ((object == null) ? 0 : object.hashCode());
 	}
 
 	/**
@@ -415,35 +395,80 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
-	 * @see Objects#hash(Object)
-	 * @see Objects#hash(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @param object3 Objekt oder {@code null}.
-	 * @param object4 Objekt oder {@code null}.
+	 * @see Arrays#hashCode(int[])
+	 * @see Arrays#hashCode(long[])
+	 * @see Arrays#hashCode(byte[])
+	 * @see Arrays#hashCode(char[])
+	 * @see Arrays#hashCode(short[])
+	 * @see Arrays#hashCode(float[])
+	 * @see Arrays#hashCode(double[])
+	 * @see Arrays#hashCode(boolean[])
+	 * @see Objects#hashEx(Object...)
+	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object object1, final Object object2, final Object object3, final Object object4) {
-		return (Objects.hash(object1, object2, object3) * 31) + Objects.hash(object4);
+	public static int hashEx(final Object object) {
+		if(object == null) return 0;
+		final Class<?> clazz = object.getClass();
+		if(!clazz.isArray()) return object.hashCode();
+		if(clazz == int[].class) return Arrays.hashCode((int[])object);
+		if(clazz == long[].class) return Arrays.hashCode((long[])object);
+		if(clazz == byte[].class) return Arrays.hashCode((byte[])object);
+		if(clazz == char[].class) return Arrays.hashCode((char[])object);
+		if(clazz == short[].class) return Arrays.hashCode((short[])object);
+		if(clazz == float[].class) return Arrays.hashCode((float[])object);
+		if(clazz == double[].class) return Arrays.hashCode((double[])object);
+		if(clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
+		return Objects.hashEx((Object[])object);
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
-	 * @see Objects#hash(Object)
-	 * @see Objects#hash(Object...)
+	 * @see Objects#hashEx(Object)
+	 * @param objects Objekte oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hashEx(final Object... objects) {
+		if(objects == null) return 0;
+		int hash = 1;
+		for(final Object object: objects){
+			hash = (31 * hash) + Objects.hashEx(object);
+		}
+		return hash;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#hashEx(Object)
+	 * @see Objects#hashEx(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int hashEx(final Object object1, final Object object2) {
+		return ((31 + Objects.hashEx(object1)) * 31) + Objects.hashEx(object2);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#hashEx(Object)
+	 * @see Objects#hashEx(Object...)
 	 * @param object1 Objekt oder {@code null}.
 	 * @param object2 Objekt oder {@code null}.
 	 * @param object3 Objekt oder {@code null}.
-	 * @param object4 Objekt oder {@code null}.
-	 * @param object5 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object object1, final Object object2, final Object object3, final Object object4,
-		final Object object5) {
-		return (Objects.hash(object1, object2, object3, object4) * 31) + Objects.hash(object5);
+	public static int hashEx(final Object object1, final Object object2, final Object object3) {
+		return (Objects.hashEx(object1, object2) * 31) + Objects.hashEx(object3);
 	}
 
 	/**
@@ -486,21 +511,7 @@ public final class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object object1, final Object object2) {
-		if(object1 == object2) return true;
-		if((object1 == null) || (object2 == null)) return false;
-		final Class<?> c1 = object1.getClass();
-		if(!c1.isArray()) return !object2.getClass().isArray() && object1.equals(object2);
-		final Class<?> c2 = object2.getClass();
-		if(!c2.isArray()) return false;
-		if(c1 == int[].class) return (c2 == int[].class) && Arrays.equals((int[])object1, (int[])object2);
-		if(c1 == long[].class) return (c2 == long[].class) && Arrays.equals((long[])object1, (long[])object2);
-		if(c1 == byte[].class) return (c2 == byte[].class) && Arrays.equals((byte[])object1, (byte[])object2);
-		if(c1 == char[].class) return (c2 == char[].class) && Arrays.equals((char[])object1, (char[])object2);
-		if(c1 == short[].class) return (c2 == short[].class) && Arrays.equals((short[])object1, (short[])object2);
-		if(c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
-		if(c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
-		if(c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
-		return Objects.equals((Object[])object1, (Object[])object2);
+		return (object1 == object2) || ((object1 != null) && (object2 != null) && object1.equals(object2));
 	}
 
 	/**
@@ -564,23 +575,120 @@ public final class Objects {
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
 	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
-	 * @see Objects#equals(Object, Object)
-	 * @see Objects#equals(Object...)
+	 * @see Objects#equalsEx(Object, Object)
+	 * @param objects Objekte oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
+	 */
+	public static boolean equalsEx(final Object... objects) {
+		if(objects == null) return true;
+		for(int i = 0, size = objects.length; i < size; i += 2){
+			if(!Objects.equalsEx(objects[i], objects[i + 1])) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
+	 * {@code null}-Eingaben und {@link Array}s. Für {@link Array}s werden die entsprechenden Hilfsmethoden aus der
+	 * Hilfsklasse {@link Arrays} verwendet. Wenn beide Objekte keine {@link Array}s sind, entspricht der Rückgabewert:
+	 * 
+	 * <pre>
+	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equalsEx(object2))
+	 * </pre>
+	 * 
+	 * @see Arrays#equals(int[], int[])
+	 * @see Arrays#equals(long[], long[])
+	 * @see Arrays#equals(byte[], byte[])
+	 * @see Arrays#equals(char[], char[])
+	 * @see Arrays#equals(short[], short[])
+	 * @see Arrays#equals(float[], float[])
+	 * @see Arrays#equals(double[], double[])
+	 * @see Arrays#equals(boolean[], boolean[])
+	 * @see Objects#equalsEx(Object[], Object[])
+	 * @param object1 Objekt 1 oder {@code null}.
+	 * @param object2 Objekt 2 oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
+	 */
+	public static boolean equalsEx(final Object object1, final Object object2) {
+		if(object1 == object2) return true;
+		if((object1 == null) || (object2 == null)) return false;
+		final Class<?> c1 = object1.getClass();
+		if(!c1.isArray()) return !object2.getClass().isArray() && object1.equals(object2);
+		final Class<?> c2 = object2.getClass();
+		if(!c2.isArray()) return false;
+		if(c1 == int[].class) return (c2 == int[].class) && Arrays.equals((int[])object1, (int[])object2);
+		if(c1 == long[].class) return (c2 == long[].class) && Arrays.equals((long[])object1, (long[])object2);
+		if(c1 == byte[].class) return (c2 == byte[].class) && Arrays.equals((byte[])object1, (byte[])object2);
+		if(c1 == char[].class) return (c2 == char[].class) && Arrays.equals((char[])object1, (char[])object2);
+		if(c1 == short[].class) return (c2 == short[].class) && Arrays.equals((short[])object1, (short[])object2);
+		if(c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
+		if(c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
+		if(c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
+		return Objects.equalsEx((Object[])object1, (Object[])object2);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen {@link Array}s zurück und tolleriert
+	 * dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays}
+	 * wird via {@link Objects#equalsEx(Object, Object)} ermittelt. Für {@link Array}s werden die entsprechenden
+	 * Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#equalsEx(Object, Object)
+	 * @param objects1 {@link Array} 1 oder {@code null}.
+	 * @param objects2 {@link Array} 2 oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
+	 */
+	public static boolean equalsEx(final Object[] objects1, final Object[] objects2) {
+		if(objects1 == objects2) return true;
+		if((objects1 == null) || (objects2 == null)) return false;
+		final int length = objects1.length;
+		if(length != objects2.length) return false;
+		for(int i = 0; i < length; i++){
+			if(!Objects.equalsEx(objects1[i], objects2[i])) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#equalsEx(Object, Object)
+	 * @see Objects#equalsEx(Object...)
+	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
+	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
+	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
+	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
+	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
+	 */
+	public static boolean equalsEx(final Object object1, final Object object2, final Object object3, final Object object4) {
+		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
+	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
+	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für
+	 * {@link Array}s werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#equalsEx(Object, Object)
+	 * @see Objects#equalsEx(Object...)
 	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
 	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
 	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
 	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
 	 * @param object5 {@code 4}-tes Objekt oder {@code null}.
 	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
-	 * @param object7 {@code 6}-tes Objekt oder {@code null}.
-	 * @param object8 {@code 7}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
-		final Object object5, final Object object6, final Object object7, final Object object8) {
-		return Objects.equals(object1, object2, object3, object4) && Objects.equals(object5, object6, object7, object8);
+	public static boolean equalsEx(final Object object1, final Object object2, final Object object3,
+		final Object object4, final Object object5, final Object object6) {
+		return Objects.equalsEx(object1, object2, object3, object4) && Objects.equalsEx(object5, object6);
 	}
 
 	/**

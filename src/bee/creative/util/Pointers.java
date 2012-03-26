@@ -23,7 +23,7 @@ public final class Pointers {
 		/**
 		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer}s zurück.
 		 * 
-		 * @see Pointers#hashCode()
+		 * @see Pointer#hashCode()
 		 * @param pointer {@link Pointer}.
 		 * @return {@link Object#hashCode() Streuwert}.
 		 */
@@ -34,7 +34,7 @@ public final class Pointers {
 		/**
 		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
 		 * 
-		 * @see Pointers#equals(Object)
+		 * @see Pointer#equals(Object)
 		 * @param pointer {@link Pointer}.
 		 * @param object Objekt.
 		 * @return {@link Object#equals(Object) Äquivalenz}.
