@@ -1,9 +1,13 @@
-package bee.creative.util;
+package bee.creative.utilx;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import bee.creative.util.Compact;
+import bee.creative.util.Filters;
+import bee.creative.util.Iterators;
+import bee.creative.util.Tester;
 import bee.creative.util.Compact.CompactList;
 
 class SpeedTests {
