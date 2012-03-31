@@ -44,21 +44,18 @@ import java.util.List;
 public class Comparables {
 
 	/**
-	 * Diese Klasse implementiert ein {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle
-	 * anderen Eingaben an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element
-	 * {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
-	 * 
-	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
+	 * Diese Klasse implementiert einen abstrakten delegierenden {@link Comparable}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Comparable}s.
 	 */
-	public static final class NullComparable<GEntry> implements Comparable<GEntry> {
+	static abstract class AbstractComparable<GEntry, GEntry2> implements Comparable<GEntry> {
 
 		/**
 		 * Dieses Feld speichert den {@link Comparable}.
 		 */
-		final Comparable<? super GEntry> comparable;
+		final Comparable<? super GEntry2> comparable;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
@@ -66,17 +63,9 @@ public class Comparables {
 		 * @param comparable {@link Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
-		public NullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+		public AbstractComparable(final Comparable<? super GEntry2> comparable) throws NullPointerException {
 			if(comparable == null) throw new NullPointerException("comparable is null");
 			this.comparable = comparable;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GEntry o) {
-			return ((o == null) ? 1 : this.comparable.compareTo(o));
 		}
 
 		/**
@@ -92,10 +81,50 @@ public class Comparables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
+			final AbstractComparable<?, ?> data = (AbstractComparable<?, ?>)object;
+			return Objects.equals(this.comparable, data.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle
+	 * anderen Eingaben an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element
+	 * {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
+	 * 
+	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class NullComparable<GEntry> extends AbstractComparable<GEntry, GEntry> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
+		 * 
+		 * @param comparable {@link Comparable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
+		 */
+		public NullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+			super(comparable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry o) {
+			return ((o == null) ? 1 : this.comparable.compareTo(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof NullComparable<?>)) return false;
-			final NullComparable<?> data = (NullComparable<?>)object;
-			return Objects.equals(this.comparable, data.comparable);
+			return super.equals(object);
 		}
 
 		/**
@@ -116,14 +145,9 @@ public class Comparables {
 	 * <pre>-comparable.compareTo(element)</pre>
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class ReverseComparable<GEntry> implements Comparable<GEntry> {
-
-		/**
-		 * Dieses Feld speichert den {@link Comparable}.
-		 */
-		final Comparable<? super GEntry> comparable;
+	public static final class ReverseComparable<GEntry> extends AbstractComparable<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
@@ -132,8 +156,7 @@ public class Comparables {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public ReverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-			if(comparable == null) throw new NullPointerException("comparable is null");
-			this.comparable = comparable;
+			super(comparable);
 		}
 
 		/**
@@ -148,19 +171,10 @@ public class Comparables {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hashCode() {
-			return Objects.hash(this.comparable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof ReverseComparable<?>)) return false;
-			final ReverseComparable<?> data = (ReverseComparable<?>)object;
-			return Objects.equals(this.comparable, data.comparable);
+			return super.equals(object);
 		}
 
 		/**
@@ -182,7 +196,7 @@ public class Comparables {
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 */
 	public static final class ChainedComparable<GEntry> implements Comparable<GEntry> {
 
@@ -258,20 +272,15 @@ public class Comparables {
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Eingabe des konvertierenden {@link Comparable}s.
-	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Eingabe des gegebenen {@link Comparable}s.
+	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
+	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
 	 */
-	public static final class ConvertedComparable<GInput, GOutput> implements Comparable<GInput> {
+	public static final class ConvertedComparable<GInput, GOutput> extends AbstractComparable<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter}.
 		 */
 		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieses Feld speichert den {@link Comparable}.
-		 */
-		final Comparable<? super GOutput> comparable;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Comparable} und {@link Converter}.
@@ -283,10 +292,9 @@ public class Comparables {
 		 */
 		public ConvertedComparable(final Comparable<? super GOutput> comparable,
 			final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+			super(comparable);
 			if(converter == null) throw new NullPointerException("converter is null");
-			if(comparable == null) throw new NullPointerException("comparable is null");
 			this.converter = converter;
-			this.comparable = comparable;
 		}
 
 		/**
@@ -399,7 +407,7 @@ public class Comparables {
 	 * 
 	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable {@link Comparable}
 	 * @return {@link NullComparable}
 	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
@@ -415,7 +423,7 @@ public class Comparables {
 	 * 
 	 * <pre>- comparable.compareTo(element)</pre>
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable {@link Comparable}.
 	 * @return {@link ReverseComparable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
@@ -433,7 +441,7 @@ public class Comparables {
 	 * 
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable1 erster {@link Comparable}.
 	 * @param comparable2 zweiter {@link Comparable}.
 	 * @return {@link ChainedComparable}.
@@ -452,8 +460,8 @@ public class Comparables {
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
 	 * @see Converter
-	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Eingabe des konvertierenden {@link Comparable}s.
-	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Eingabe des gegebenen {@link Comparable}s.
+	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
+	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
 	 * @param converter {@link Converter}.
 	 * @param comparable {@link Comparable}.
 	 * @return {@link ConvertedComparable}.

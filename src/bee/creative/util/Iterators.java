@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import bee.creative.util.Converters.ConverterLink;
-import bee.creative.util.Filters.FilterLink;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterator}en.
@@ -76,7 +74,17 @@ public final class Iterators {
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static abstract class BaseIterator<GEntry> extends FilterLink<GEntry> implements Iterator<GEntry> {
+	static abstract class AbstractIterator<GEntry> implements Iterator<GEntry> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieses Feld speichert den {@link Iterator}.
+		 */
+		final Iterator<? extends GEntry> iterator;
 
 		/**
 		 * Dieses Feld speichert {@code true}, wenn ein nächstes Element existiert.
@@ -89,11 +97,6 @@ public final class Iterators {
 		GEntry entry;
 
 		/**
-		 * Dieses Feld speichert den {@link Iterator}.
-		 */
-		final Iterator<? extends GEntry> iterator;
-
-		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Iterator}.
 		 * 
 		 * @param filter {@link Filter}.
@@ -101,10 +104,11 @@ public final class Iterators {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} bzw. der gegebenen {@link Iterator} {@code null}
 		 *         ist.
 		 */
-		public BaseIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
+		public AbstractIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
 			throws NullPointerException {
-			super(filter);
+			if(filter == null) throw new NullPointerException("filter is null");
 			if(iterator == null) throw new NullPointerException("iterator is null");
+			this.filter = filter;
 			this.iterator = iterator;
 		}
 
@@ -127,12 +131,51 @@ public final class Iterators {
 			this.iterator.remove();
 		}
 
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#limitedIterator(Filter, Iterator)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static abstract class AbstractIteratorConverter<GEntry> implements
+		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter}.
+		 * 
+		 * @param filter {@link Filter}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter} {@code null} ist.
+		 */
+		public AbstractIteratorConverter(final Filter<? super GEntry> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException("filter is null");
+			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter);
+		}
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return object == this;
+			if(object == this) return true;
+			if(!(object instanceof AbstractIteratorConverter<?>)) return false;
+			final AbstractIteratorConverter<?> data = (AbstractIteratorConverter<?>)object;
+			return Objects.equals(this.filter, data.filter);
 		}
 
 	}
@@ -206,8 +249,7 @@ public final class Iterators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class LimitedIteratorConverter<GEntry> extends FilterLink<GEntry> implements
-		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
+	static final class LimitedIteratorConverter<GEntry> extends AbstractIteratorConverter<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter}.
@@ -254,8 +296,7 @@ public final class Iterators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class FilteredIteratorConverter<GEntry> extends FilterLink<GEntry> implements
-		Converter<Iterator<? extends GEntry>, Iterator<GEntry>> {
+	static final class FilteredIteratorConverter<GEntry> extends AbstractIteratorConverter<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter}.
@@ -304,8 +345,13 @@ public final class Iterators {
 	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> extends
-		Converters.ConverterLink<GValue, GOutput> implements Converter<GInput, Iterator<GOutput>> {
+	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> implements
+		Converter<GInput, Iterator<GOutput>> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter}.
+		 */
+		final Converter<? super GValue, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter}.
@@ -314,7 +360,8 @@ public final class Iterators {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
 		public ConvertedIteratorConverter(final Converter<? super GValue, ? extends GOutput> converter) {
-			super(converter);
+			if(converter == null) throw new NullPointerException("converter is null");
+			this.converter = converter;
 		}
 
 		/**
@@ -329,10 +376,19 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return Objects.hash(this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof ConvertedIteratorConverter<?, ?, ?>)) return false;
-			return super.equals(object);
+			final ConvertedIteratorConverter<?, ?, ?> data = (ConvertedIteratorConverter<?, ?, ?>)object;
+			return Objects.equals(this.converter, data.converter);
 		}
 
 		/**
@@ -441,8 +497,8 @@ public final class Iterators {
 		public CountIterator(final int count, final Iterator<? extends GEntry> iterator) throws NullPointerException,
 			IllegalArgumentException {
 			if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
-			this.count = count;
 			if(iterator == null) throw new NullPointerException("iterator is null");
+			this.count = count;
 			this.iterator = iterator;
 		}
 
@@ -468,6 +524,7 @@ public final class Iterators {
 		 */
 		@Override
 		public final GEntry next() {
+			if(this.count == 0) throw new NoSuchElementException();
 			this.count--;
 			return this.iterator.next();
 		}
@@ -490,7 +547,7 @@ public final class Iterators {
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class LimitedIterator<GEntry> extends BaseIterator<GEntry> {
+	public static final class LimitedIterator<GEntry> extends AbstractIterator<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Iterator}.
@@ -531,7 +588,7 @@ public final class Iterators {
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class FilteredIterator<GEntry> extends BaseIterator<GEntry> {
+	public static final class FilteredIterator<GEntry> extends AbstractIterator<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Iterator}.
@@ -657,13 +714,17 @@ public final class Iterators {
 	 *        s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente.
 	 */
-	public static final class ConvertedIterator<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
-		Iterator<GOutput> {
+	public static final class ConvertedIterator<GInput, GOutput> implements Iterator<GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Iterator};
 		 */
 		final Iterator<? extends GInput> iterator;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Converter} und {@link Iterator}.
@@ -675,7 +736,8 @@ public final class Iterators {
 		 */
 		public ConvertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterator<? extends GInput> iterator) throws NullPointerException {
-			super(converter);
+			if(converter == null) throw new NullPointerException("converter is null");
+			this.converter = converter;
 			if(iterator == null) throw new NullPointerException("iterator is null");
 			this.iterator = iterator;
 		}
@@ -702,14 +764,6 @@ public final class Iterators {
 		@Override
 		public void remove() {
 			this.iterator.remove();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return object == this;
 		}
 
 		/**

@@ -24,7 +24,7 @@ public final class Objects {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class BaseObject {
+	static abstract class AbstractObject {
 
 		/**
 		 * Dieses Feld speichert das Objekt.
@@ -36,7 +36,7 @@ public final class Objects {
 		 * 
 		 * @param object Objekt.
 		 */
-		public BaseObject(final Object object) {
+		public AbstractObject(final Object object) {
 			this.object = object;
 		}
 
@@ -62,7 +62,7 @@ public final class Objects {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseObject data = (BaseObject)object;
+			final AbstractObject data = (AbstractObject)object;
 			return Objects.equals(this.object, data.object);
 		}
 
@@ -75,7 +75,7 @@ public final class Objects {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class NormalObject extends BaseObject {
+	static final class NormalObject extends AbstractObject {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das Objekt.
@@ -113,7 +113,7 @@ public final class Objects {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class FormatObject extends BaseObject {
+	static final class FormatObject extends AbstractObject {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das Objekt.

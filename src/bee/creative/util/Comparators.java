@@ -13,14 +13,13 @@ import java.util.Iterator;
 public final class Comparators {
 
 	/**
-	 * Diese Klasse implementiert einen delegierenden {@link Comparator}, der seine Berechnungen an einen gegebenen
-	 * {@link Comparator} delegiert.
+	 * Diese Klasse implementiert einen abstrakten delegierenden {@link Comparator}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Objekte.
-	 * @param <GEntry2> Typ der Objekte des gegebenen {@link Comparator}s.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Comparator}s.
 	 */
-	static abstract class BaseComparator<GEntry, GEntry2> implements Comparator<GEntry> {
+	static abstract class AbstractComparator<GEntry, GEntry2> implements Comparator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert den {@link Comparator}.
@@ -33,18 +32,9 @@ public final class Comparators {
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
-		public BaseComparator(final Comparator<? super GEntry2> comparator) throws NullPointerException {
+		public AbstractComparator(final Comparator<? super GEntry2> comparator) throws NullPointerException {
 			if(comparator == null) throw new NullPointerException("comparator is null");
 			this.comparator = comparator;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Comparator} zurück.
-		 * 
-		 * @return {@link Comparator}.
-		 */
-		public Comparator<? super GEntry2> comparator() {
-			return this.comparator;
 		}
 
 		/**
@@ -60,7 +50,7 @@ public final class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseComparator<?, ?> data = (BaseComparator<?, ?>)object;
+			final AbstractComparator<?, ?> data = (AbstractComparator<?, ?>)object;
 			return Objects.equals(this.comparator, data.comparator);
 		}
 
@@ -78,7 +68,7 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	public static final class NullComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
+	public static final class NullComparator<GEntry> extends AbstractComparator<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
@@ -125,7 +115,7 @@ public final class Comparators {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
 	 */
-	public static final class ReverseComparator<GEntry> extends BaseComparator<GEntry, GEntry> {
+	public static final class ReverseComparator<GEntry> extends AbstractComparator<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
@@ -175,7 +165,7 @@ public final class Comparators {
 	 *        verglichenen Objekte.
 	 */
 	public static final class IterableComparator<GEntry extends Iterable<? extends GValue>, GValue> extends
-		BaseComparator<GEntry, GValue> {
+		AbstractComparator<GEntry, GValue> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
@@ -304,7 +294,7 @@ public final class Comparators {
 	 * @param <GValue> Typ der Ausgabe des {@link Converter}s sowie der vom gegebenen {@link Comparator} zu vergleichenden
 	 *        Objekte.
 	 */
-	public static final class ConvertedComparator<GEntry, GValue> extends BaseComparator<GEntry, GValue> {
+	public static final class ConvertedComparator<GEntry, GValue> extends AbstractComparator<GEntry, GValue> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter}.
@@ -324,15 +314,6 @@ public final class Comparators {
 			super(comparator);
 			if(converter == null) throw new NullPointerException("converter is null");
 			this.converter = converter;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Converter} zurück.
-		 * 
-		 * @return den {@link Converter}.
-		 */
-		public Converter<? super GEntry, ? extends GValue> converter() {
-			return this.converter;
 		}
 
 		/**
@@ -359,7 +340,7 @@ public final class Comparators {
 			if(object == this) return true;
 			if(!(object instanceof ConvertedComparator<?, ?>)) return false;
 			final ConvertedComparator<?, ?> data = (ConvertedComparator<?, ?>)object;
-			return super.equals(object) && Objects.equals(this.converter, data.converter);
+			return Objects.equals(this.converter, data.converter) && Objects.equals(this.comparator, data.comparator);
 		}
 
 		/**
@@ -376,7 +357,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der als Zeichenkette kodierte {@link Integer}
 	 * vergleicht.
 	 */
-	private static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
+	static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -411,7 +392,7 @@ public final class Comparators {
 	/**
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der Groß-/Kleinschreibung ignoriert.
 	 */
-	private static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
+	static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -429,7 +410,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten {@link Integer}
 	 * und normalem Text vergleicht und dabei Groß-/Kleinschreibung ignoriert.
 	 */
-	private static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
+	static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -511,7 +492,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#longValue()}
 	 * vergleicht.
 	 */
-	private static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
+	static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -529,7 +510,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#floatValue()}
 	 * vergleicht.
 	 */
-	private static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
+	static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -547,7 +528,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()}
 	 * vergleicht.
 	 */
-	private static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
+	static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -565,7 +546,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()}
 	 * vergleicht.
 	 */
-	private static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
+	static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -582,7 +563,7 @@ public final class Comparators {
 	/**
 	 * Dieses Feld speichert den {@link Comparator} für die natürliche Ordnung.
 	 */
-	private static final Comparator<? extends Comparable<?>> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
+	static final Comparator<? extends Comparable<?>> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
 
 		@Override
 		public int compare(final Comparable<Object> o1, final Comparable<Object> o2) {
@@ -653,7 +634,7 @@ public final class Comparators {
 	 * ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)))
 	 * </pre>
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator {@link Comparator}
 	 * @return {@link NullComparator}
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -667,7 +648,7 @@ public final class Comparators {
 	 * Diese Methode gibt den {@link Comparator} für die natürliche Ordnung zurück.
 	 * 
 	 * @see Comparable
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link Comparable}-{@link Comparator}.
 	 */
 	@SuppressWarnings ("unchecked")
@@ -679,7 +660,7 @@ public final class Comparators {
 	 * Diese Methode erzeugt einen {@link Comparator}, der den Vergleichswert des gegebenen {@link Comparator}s umkehrt,
 	 * und gibt ihn zurück.
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link ReverseComparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -696,7 +677,7 @@ public final class Comparators {
 	 * @see Iterable
 	 * @param <GEntry> Typ der {@link Iterable}.
 	 * @param <GValue> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} zu
-	 *        verglichenen Objekte.
+	 *        verglichenen Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link IterableComparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -712,7 +693,7 @@ public final class Comparators {
 	 * {@link Comparator} nur dann, wenn der erste {@link Comparator} mit dem Vergleichswert {@code 0} die Gleichheit der
 	 * beiden Objekte anzeigt.
 	 * 
-	 * @param <GEntry> Typ der Objekte.
+	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator1 erster {@link Comparator}.
 	 * @param comparator2 zweiter {@link Comparator}.
 	 * @return {@link ChainedComparator}.
@@ -729,9 +710,9 @@ public final class Comparators {
 	 * 
 	 * @see Converter
 	 * @param <GEntry> Typ der Eingabe des {@link Converter} sowie der vom konvertierender {@link Comparator} zu
-	 *        vergleichenden Objekte.
+	 *        vergleichenden Elemente.
 	 * @param <GValue> Typ der Ausgabe des {@link Converter} sowie der vom gegebenen {@link Comparator} zu vergleichenden
-	 *        Objekte.
+	 *        Elemente.
 	 * @param converter {@link Converter}.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link ConvertedComparator}.
@@ -820,7 +801,7 @@ public final class Comparators {
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
-	private Comparators() {
+	Comparators() {
 	}
 
 }

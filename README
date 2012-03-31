@@ -1,268 +1,83 @@
 bee-creative.util - [cc-by] Sebastian Rostock
-Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:  [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
+Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz
+anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:
+[ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
 
-Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung verschiedener Algebren auf Filtern, Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen. 
-
-
-Filters {
-	classes {
-		InverseFilter
-		ConvertedFilter
-		DisjunctionFilter
-		ConjunctionFilter
-		EquivalenceFilter
-		SynchronizedFilter
-	}
-	methods {
-		nullFilter()
-		inverseFilter(Filter)
-		defaultFilter(boolean)
-		convertedFilter(Filter, Converter)
-		disjunctionFilter(Filter, Filter)
-		conjunctionFilter(Filter, Filter)
-		equivalenceFilter(Filter, Filter)
-		synchronizedFilter(Filter)
-	}
-}
-
-Iterators {
-	classes {
-		EntryIterator
-		LimitedIterator
-		FilteredIterator
-		ChainedIterator
-		ConvertedIterator
-	}
-	methods {
-		skip(Iterator, int)
-		appendAll(Iterator, Collection)
-		removeAll(Iterator, Collection)
-		iterator(Iterator)
-		iteratorConverter()
-		voidIterator()
-		entryIterator(GEntry)
-		entryIteratorConverter()
-		limitedIterator(Filter, Iterator)
-		limitedIteratorConverter(Filter)
-		filteredIterator(Filter, Iterator)
-		filteredIteratorConverter(Filter)
-		chainedIterator(Iterator...)
-		chainedIterator(Iterator, Iterator)
-		chainedIterator(Iterator>)
-		chainedIterator(Iterable>)
-		chainedIteratorConverter()
-		convertedIterator(Converter, Iterator)
-		convertedIteratorConverter(Converter)
-	}
-}
-
-Iterables {
-	classes {
-		EntryIterable
-		LimitedIterable
-		FilteredIterable
-		ChainedIterable
-		ConvertedIterable
-	}
-	methods {
-		appendAll(Iterable, Collection)
-		removeAll(Iterable, Collection)
-		iterable(Iterable)
-		iterableConverter()
-		iterableIteratorConverter()
-		voidIterable()
-		entryIterable(GEntry)
-		entryIteratorConverter()
-		limitedIterable(Filter, Iterable)
-		limitedIterableConverter(Filter)
-		filteredIterable(Filter, Iterable)
-		filteredIterableConverter(Filter)
-		chainedIterable(Iterable)
-		chainedIterableConverter()
-		convertedIterable(Converter, Iterable)
-		convertedIterableConverter(Converter)
-	}
-}
-
-Comparators {
-	classes {
-		NullComparator
-		ReverseComparator
-		IterableComparator
-		ChainedComparator
-		ConvertedComparator
-	}
-	methods {
-		nullComparator(Comparator)
-		naturalComparator()
-		reverseComparator(Comparator)
-		iterableComparator(Comparator)
-		chainedComparator(Comparator, Comparator)
-		convertedComparator(Converter, Comparator)
-		stringNumericalComparator()
-		stringAlphabeticalComparator()
-		stringAlphanumericalComparator()
-		numberLongComparator()
-		numberFloatComparator()
-		numberIntegerComparator()
-		numberDoubleComparator()
-	}
-}
-
-Comparables {
-	classes {
-		NullComparable
-		ReverseComparable
-		ChainedComparable
-		ConvertedComparable
-	}
-	methods {
-		nullComparable(Comparable)
-		reverseComparable(Comparable)
-		chainedComparable(Comparable, Comparable)
-		convertedComparable(Converter, Comparable)
-		binarySearch(List, Comparable, int, int)
-		binarySearchFirst(List, Comparable, int, int)
-		binarySearchLast(List, Comparable, int, int)
-	}
-}
-
-Strings {
-	methods {
-		join(String, Iterable)
-		joinConverter(String)
-		split(Pattern, CharSequence, int)
-		splitConverter(Pattern, int)
-		splitAll(Pattern, CharSequence)
-		splitAllConverter(Pattern)
-		match(Pattern, CharSequence, int)
-		matchConverter(Pattern, int)
-		matchAll(Pattern, CharSequence)
-		matchAllConverter(Pattern)
-		splatch(Pattern, CharSequence, int)
-		splatchConverter(Pattern, int)
-		splatchAll(Pattern, CharSequence)
-		splatchAllConverter(Pattern)
-		patternConverter(int)
-	}
-}
-
-Objects {
-	classes {
-		UseToString
-	}
-	methods {
-		hash(Object...)
-		equals(Object...)
-		toString(boolean, Object)
-		toStringCall(boolean, boolean, String, Object...)
-		toStringObject(boolean, Object)
-		toStringConverter(boolean)
-	}
-}
+Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, 
+Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen. 
 
 
-Converters {
-	classes {
-		FixedFieldConverter
-		FixedMethodConverter
-		NamedFieldConverter
-		NamedMethodConverter
-		DefaultConverter
-		FilteredConverter
-		CachedConverter
-		ChainedConverter
-		SynchronizedConverter
-	}
-	methods {
-		voidConverter()
-		fieldConverter(String)
-		fieldConverter(Field)
-		methodConverter(String)
-		methodConverter(Method)
-		defaultConverter(Object)
-		cachedConverter(int, int, int, Converter)
-		chainedConverter(Converter, Converter)
-		filteredConverter(Filter, Converter, Converter)
-		synchronizedConverter(Converter)
-	}
-}
+TODO Beispiele: Filter, Converter, Iterable
+	Iteration über einem Baum mit Navigation über Converter
+	mit Filtern in einer Ebene der Iteration
 
-Conversions {
-	classes {
-		StaticConversion
-		InverseConversion
-		DynamicConversion
-	}
-	methods {
-		staticConversion(Object, Object)
-		staticConversionConverter(Converter)
-		inverseConversion(Conversion)
-		inverseConversionConverter()
-		dynamicConversion(Object, Converter)
-		dynamicConversionConverter(Converter)
-		conversionInputConverter()
-		conversionOutputConverter()
-	}
-}
 
-Builders {
-	classes {
-		CachedBuilder
-		ConvertedBuilder
-		SynchronizedBuilder
-	}
-	methods {
-		nullBuilder()
-		cachedBuilder(int, Builder)
-		convertedBuilder(Converter, Builder)
-		synchronizedBuilder(Builder)
-	}
-}
+TODO Beispiele 1: Comparator, Converter, Conversion
+	schnelle sortierung mit Conversion bei aufwändigen Convertern
+		 Iterable<I> entries = // ...
+		 Converter<I, O> converter = // ...
+		 Comparator<O> comparator = // ...
+		 List<Conversion<I, O>> conversions = new ArrayList<Conversion<I, O>>();
+		 Iterables.appendAll(Iterables.convertedIterable(Conversions.staticConversionConverter(converter), entries), conversions);
+		 Collections.sort(conversions, Comparators.convertedComparator(Conversions.<O>conversionOutputConverter(), comparator));
+		 Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInputConverter(), conversions);
+		 Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutputConverter(), conversions);
+ 
+	
+TODO Beispiele 2: Comparable
+	schnelle suche mit comparable in sortierten Listen
 
-Pointers {
-	classes {
-		HardPointer
-		WeakPointer
-		SoftPointer
-		ConvertedPointer
+	public static class Range {
+		public int from; // Startposition der Range
+		public int size; // Größe/Länge der Range
+		// ...
 	}
-	methods {
-		valid(Pointer)
-		pointer(Pointer)
-		pointer(int, Object)
-		pointerConverter(int)
-		pointerDataConverter()
-		nullPointer()
-		hardPointer(Object)
-		hardPointerConverter()
-		weakPointer(Object)
-		weakPointerConverter()
-		softPointer(Object)
-		softPointerConverter()
-		convertedPointer(Converter, Pointer)
+
+	public Range find(final List<Range> ranges, final int position) {
+		final int index = Comparables.binarySearch(ranges, new Comparable<Range>() {
+
+			@Override
+			public int compareTo(final Range o) {
+				if(o.from > position) return 1; 
+				if((o.from + o.size) <= position) return -1;
+				return 0;
+			}
+
+		});
+		if(index < 0) return null;
+		return ranges.get(index);
 	}
-}
 
-Hash {
-}
 
-Tester {
-}
 
-Compact {
-	classes {
-		CompactData
-		CompactSet
-		CompactHashSet
-		CompactNavigableSet
-		CompactMap
-		CompactItemMap
-		CompactItemHashMap
-		CompactEntryMap
-		CompactEntryHashMap
-		CompactNavigableMap
-		CompactNavigableItemMap
-		CompactNavigableEntryMap
+TODO Beispiele: pointer, builder 
+	statischer cache mit automatischem builder
+
+	public final class Helper {
+
+		private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(
+			Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {
+
+				@Override
+				public Helper build() {
+					return new Helper();
+				}
+
+			}));
+
+		public static Helper get() {
+			return Helper.BUILDER.build();
+		}
+
+		Helper() {
+			// ...
+		}
+
 	}
-}
+
+
+	public void work() {
+		final Helper helper = Helper.get();
+		// ...
+	}
+	

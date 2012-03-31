@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import bee.creative.util.Converters.ConverterLink;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer}n.
@@ -13,70 +12,18 @@ import bee.creative.util.Converters.ConverterLink;
 public final class Pointers {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Pointer}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ des Datensatzes.
-	 */
-protected	static abstract class BasePointer<GData> implements Pointer<GData> {
-
-		/**
-		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer}s zurück.
-		 * 
-		 * @see Pointer#hashCode()
-		 * @param pointer {@link Pointer}.
-		 * @return {@link Object#hashCode() Streuwert}.
-		 */
-		static public int hashCode(final Pointer<?> pointer) {
-			return Objects.hash(pointer.data());
-		}
-
-		/**
-		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
-		 * 
-		 * @see Pointer#equals(Object)
-		 * @param pointer {@link Pointer}.
-		 * @param object Objekt.
-		 * @return {@link Object#equals(Object) Äquivalenz}.
-		 */
-		static public boolean equals(final Pointer<?> pointer, final Object object) {
-			if(object == pointer) return true;
-			if(!(object instanceof Pointer<?>)) return false;
-			final Pointer<?> data = (Pointer<?>)object;
-			return Objects.equals(pointer.data(), data.data());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return BasePointer.hashCode(this);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return BasePointer.equals(this, object);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert einen harten {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines
 	 * solcher {@link Pointer}s wird nicht automatisch aufgelöst.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static final class HardPointer<GData> extends BasePointer<GData> {
+	public static final class HardPointer<GData> implements Pointer<GData> {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
 		 */
-		private			final GData data;
+		final GData data;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -138,7 +85,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public int hashCode() {
-			return BasePointer.hashCode(this);
+			return Pointers.hashCode(this);
 		}
 
 		/**
@@ -146,7 +93,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return BasePointer.equals(this, object);
+			return Pointers.equals(this, object);
 		}
 
 		/**
@@ -192,7 +139,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public int hashCode() {
-			return BasePointer.hashCode(this);
+			return Pointers.hashCode(this);
 		}
 
 		/**
@@ -200,7 +147,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return BasePointer.equals(this, object);
+			return Pointers.equals(this, object);
 		}
 
 		/**
@@ -222,13 +169,17 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	 *        {@link Pointer}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 */
-	public static final class ConvertedPointer<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
-		Pointer<GOutput> {
+	public static final class ConvertedPointer<GInput, GOutput> implements Pointer<GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Pointer}.
 		 */
-		private		final Pointer<? extends GInput> pointer;
+		final Pointer<? extends GInput> pointer;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Pointer} und {@link Converter}.
@@ -240,9 +191,10 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
 			final Pointer<? extends GInput> pointer) throws NullPointerException {
-			super(converter);
 			if(pointer == null) throw new NullPointerException("pointer is null");
+			if(converter == null) throw new NullPointerException("converter is null");
 			this.pointer = pointer;
+			this.converter = converter;
 		}
 
 		/**
@@ -267,7 +219,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public int hashCode() {
-			return BasePointer.hashCode(this);
+			return Pointers.hashCode(this);
 		}
 
 		/**
@@ -275,7 +227,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return BasePointer.equals(this, object);
+			return Pointers.equals(this, object);
 		}
 
 		/**
@@ -291,11 +243,21 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	/**
 	 * Dieses Feld speichert den {@link Pointer} auf {@code null}.
 	 */
-	private	static final Pointer<?> NULL_POINTER = new BasePointer<Object>() {
+	static final Pointer<?> NULL_POINTER = new Pointer<Object>() {
 
 		@Override
 		public Object data() {
 			return null;
+		}
+
+		@Override
+		public int hashCode() {
+			return Pointers.hashCode(this);
+		}
+
+		@Override
+		public boolean equals(final Object object) {
+			return Pointers.equals(this, object);
 		}
 
 		@Override
@@ -309,7 +271,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#hardPointer(Object)} in einen
 	 * {@link HardPointer Hard-Pointer} umwandelt.
 	 */
-	private	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -327,7 +289,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#weakPointer(Object)} in einen
 	 * {@link WeakPointer Weak-Pointer} umwandelt.
 	 */
-	private	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -345,7 +307,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#softPointer(Object)} in einen
 	 * {@link SoftPointer} umwandelt.
 	 */
-	private	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -362,7 +324,7 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	/**
 	 * Dieses Feld speichert den {@link Converter}, der den Datensatz eines {@link Pointer}s ermitelt.
 	 */
-	private	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
+	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
 
 		@Override
 		public Object convert(final Pointer<?> input) {
@@ -397,6 +359,32 @@ protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 	 * entscheidet.
 	 */
 	public static final int SOFT = 2;
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer}s zurück.
+	 * 
+	 * @see Pointer#hashCode()
+	 * @param pointer {@link Pointer}.
+	 * @return {@link Object#hashCode() Streuwert}.
+	 */
+	static int hashCode(final Pointer<?> pointer) {
+		return Objects.hash(pointer.data());
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
+	 * 
+	 * @see Pointer#equals(Object)
+	 * @param pointer {@link Pointer}.
+	 * @param object Objekt.
+	 * @return {@link Object#equals(Object) Äquivalenz}.
+	 */
+	static boolean equals(final Pointer<?> pointer, final Object object) {
+		if(object == pointer) return true;
+		if(!(object instanceof Pointer<?>)) return false;
+		final Pointer<?> data = (Pointer<?>)object;
+		return Objects.equals(pointer.data(), data.data());
+	}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich dem {@code null}-

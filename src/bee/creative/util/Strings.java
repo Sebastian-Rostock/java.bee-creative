@@ -22,7 +22,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class JoinConverter implements Converter<Iterable<?>, String> {
+	 static final class JoinConverter implements Converter<Iterable<?>, String> {
 
 		/**
 		 * Dieses Feld speichert das Trennzeichen.
@@ -84,7 +84,7 @@ public final class Strings {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	private static abstract class BaseConverter<GOutput> implements Converter<CharSequence, GOutput> {
+	 static abstract class BaseConverter<GOutput> implements Converter<CharSequence, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den kompilierten regulären Ausdruck.
@@ -133,7 +133,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static abstract class ApplyConverter extends BaseConverter<List<String>> {
+	 static abstract class ApplyConverter extends BaseConverter<List<String>> {
 
 		/**
 		 * Dieses Feld speichert den Index.
@@ -193,7 +193,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static abstract class ApplyAllConverter extends BaseConverter<List<List<String>>> {
+	 static abstract class ApplyAllConverter extends BaseConverter<List<List<String>>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -243,7 +243,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class SplitConverter extends ApplyConverter {
+	 static final class SplitConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -273,7 +273,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class SplitAllConverter extends ApplyAllConverter {
+	 static final class SplitAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -301,7 +301,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class MatchConverter extends ApplyConverter {
+	 static final class MatchConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -331,7 +331,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class MatchAllConverter extends ApplyAllConverter {
+	 static final class MatchAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -359,7 +359,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class SplatchConverter extends ApplyConverter {
+	 static final class SplatchConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -390,7 +390,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class SplatchAllConverter extends ApplyAllConverter {
+	 static final class SplatchAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -418,7 +418,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class PatternConverter implements Converter<String, Pattern> {
+	 static final class PatternConverter implements Converter<String, Pattern> {
 
 		/**
 		 * Dieses Feld speichert die Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
@@ -1201,7 +1201,7 @@ public final class Strings {
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
-	private Strings() {
+	 Strings() {
 	}
 
 }

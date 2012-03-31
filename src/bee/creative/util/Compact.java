@@ -35,7 +35,6 @@ import java.util.TreeSet;
  */
 public final class Compact {
 
-	// TODO Prüfung
 	/**
 	 * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem (sortierten) {@link Array} verwaltet
 	 * werden.
@@ -50,7 +49,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		protected static abstract class CompactLink<GData extends CompactData> {
+		protected static abstract class CompactDataOwner<GData extends CompactData> {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactData}.
@@ -62,7 +61,7 @@ public final class Compact {
 			 * 
 			 * @param data {@link CompactData}.
 			 */
-			public CompactLink(final GData data) {
+			public CompactDataOwner(final GData data) {
 				if(data == null) throw new NullPointerException("data is null");
 				this.data = data;
 			}
@@ -76,8 +75,8 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		protected static abstract class CompactIterator<GItem, GData extends CompactData> extends CompactLink<GData>
-			implements Iterator<GItem> {
+		protected static abstract class CompactDataIterator<GItem, GData extends CompactData> extends
+			CompactDataOwner<GData> implements Iterator<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Index des ersten Elements (inklusiv).
@@ -101,7 +100,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactIterator(final GData data, final int from, final int last) {
+			public CompactDataIterator(final GData data, final int from, final int last) {
 				super(data);
 				this.from = from;
 				this.item = -1;
@@ -148,8 +147,8 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		public static abstract class CompactAscendingIterator<GItem, GData extends CompactData> extends
-			CompactIterator<GItem, GData> {
+		public static abstract class CompactDataAscendingIterator<GItem, GData extends CompactData> extends
+			CompactDataIterator<GItem, GData> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
@@ -158,7 +157,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingIterator(final GData data, final int from, final int last) {
+			public CompactDataAscendingIterator(final GData data, final int from, final int last) {
 				super(data, from - 1, last - 1);
 			}
 
@@ -189,8 +188,8 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		public static abstract class CompactDescendingIterator<GItem, GData extends CompactData> extends
-			CompactIterator<GItem, GData> {
+		public static abstract class CompactDataDescendingIterator<GItem, GData extends CompactData> extends
+			CompactDataIterator<GItem, GData> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
@@ -199,7 +198,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactDescendingIterator(final GData array, final int from, final int last) {
+			public CompactDataDescendingIterator(final GData array, final int from, final int last) {
 				super(array, from, last);
 			}
 
@@ -219,10 +218,10 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		public static abstract class CompactSubData<GData extends CompactData> extends CompactLink<GData> {
+		public static abstract class CompactSubData<GData extends CompactData> extends CompactDataOwner<GData> {
 
 			/**
-			 * Dieses Feld speichert das Objekt zur offenen Begrenzung sortierter Teilmengen.
+			 * Dieses Feld speichert das Objekt zur offenen Begrenzung von Teilmengen.
 			 */
 			protected static final Object OPEN = new Object();
 
@@ -520,6 +519,17 @@ public final class Compact {
 		 */
 		protected static final Object[] VOID = new Object[0];
 
+		/**
+		 * Diese Methode sucht das gegebene Element im gegebenen {@link Array} linear und gibt den Index des ersten Treffers
+		 * oder oder {@code -1} zurück.
+		 * 
+		 * @see Object#equals(Object)
+		 * @param list {@link Array}.
+		 * @param from Index des ersten Elements.
+		 * @param size Anzahl der Elemente.
+		 * @param item gesuchtes Element.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 */
 		protected static final int indexOf(final Object[] list, int from, final int size, final Object item) {
 			if(item == null){
 				for(final int last = from + size; from < last; from++){
@@ -930,7 +940,7 @@ public final class Compact {
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	static abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
+	public static abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
 
 		/**
 		 * Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
@@ -938,8 +948,8 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class CompactAscendingCollectionIterator<GItem> extends
-			CompactAscendingIterator<GItem, CompactCollection<GItem>> {
+		protected static final class CompactCollectionAscendingIterator<GItem> extends
+			CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.
@@ -948,7 +958,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactAscendingCollectionIterator(final CompactCollection<GItem> data, final int from, final int last) {
+			public CompactCollectionAscendingIterator(final CompactCollection<GItem> data, final int from, final int last) {
 				super(data, from, last);
 			}
 
@@ -968,8 +978,8 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class CompactDescendingCollectionIterator<GItem> extends
-			CompactDescendingIterator<GItem, CompactCollection<GItem>> {
+		protected static final class CompactCollectionDescendingIterator<GItem> extends
+			CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.
@@ -978,7 +988,7 @@ public final class Compact {
 			 * @param from Index des ersten Elements (inklusiv).
 			 * @param last Index des letzten Elements (exklusiv).
 			 */
-			public CompactDescendingCollectionIterator(final CompactCollection<GItem> data, final int from, final int last) {
+			public CompactCollectionDescendingIterator(final CompactCollection<GItem> data, final int from, final int last) {
 				super(data, from, last);
 			}
 
@@ -1131,7 +1141,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class ItemList<GItem> extends AbstractList<GItem> implements RandomAccess {
+		protected final class ItemList<GItem> extends AbstractList<GItem> implements RandomAccess {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactList}.
@@ -1310,7 +1320,7 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new CompactAscendingCollectionIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
+			return new CompactCollectionAscendingIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
 		}
 
 		/**
@@ -1396,7 +1406,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class ItemSet<GItem> extends AbstractSet<GItem> {
+		protected static final class ItemSet<GItem> extends AbstractSet<GItem> {
 
 			/**
 			 * Dieses Feld speichert das {@link Set}.
@@ -1465,7 +1475,7 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new CompactAscendingCollectionIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
+			return new CompactCollectionAscendingIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
 		}
 
 		/**
@@ -1639,8 +1649,8 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>> implements
-			NavigableSet<GItem> {
+		protected static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>>
+			implements NavigableSet<GItem> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -1719,23 +1729,6 @@ public final class Compact {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public boolean remove(final Object item) {
-				if(!this.isInRange(item)) return false;
-				return this.data.remove(item);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean contains(final Object item) {
-				return this.isInRange(item) && this.data.contains(item);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
 			public boolean addAll(final Collection<? extends GItem> collection) {
 				return Iterables.appendAll(this, collection);
 			}
@@ -1752,8 +1745,25 @@ public final class Compact {
 			 * {@inheritDoc}
 			 */
 			@Override
+			public boolean remove(final Object item) {
+				if(!this.isInRange(item)) return false;
+				return this.data.remove(item);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
 			public boolean removeAll(final Collection<?> collection) {
 				return Iterables.removeAll((Iterable<?>)this, collection);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean contains(final Object item) {
+				return this.isInRange(item) && this.data.contains(item);
 			}
 
 			/**
@@ -1814,7 +1824,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
+		protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -1837,7 +1847,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> iterator() {
-				return new CompactAscendingCollectionIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactCollectionAscendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -1926,7 +1936,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> descendingIterator() {
-				return new CompactDescendingCollectionIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactCollectionDescendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -1966,7 +1976,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class CompactDescendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
+		protected static final class CompactDescendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -1989,7 +1999,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> iterator() {
-				return new CompactDescendingCollectionIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactCollectionDescendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -2078,7 +2088,7 @@ public final class Compact {
 			 */
 			@Override
 			public Iterator<GItem> descendingIterator() {
-				return new CompactAscendingCollectionIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
+				return new CompactCollectionAscendingIterator<GItem>(this.data, this.firstIndex(), this.lastIndex() + 1);
 			}
 
 			/**
@@ -2360,12 +2370,11 @@ public final class Compact {
 		 */
 		@Override
 		public Iterator<GItem> descendingIterator() {
-			return new CompactDescendingCollectionIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
+			return new CompactCollectionDescendingIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
 		}
 
 	}
 
-	// TODO Prüfung
 	/**
 	 * Diese Klasse implementiert eine abstrakte {@link Map}, deren Daten in einem {@link Array} verwaltet werden.
 	 * 
@@ -2382,7 +2391,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 */
-		static final class KeySet<GKey> extends AbstractSet<GKey> {
+		protected static final class KeySet<GKey> extends AbstractSet<GKey> {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactMap}.
@@ -2432,7 +2441,7 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+		protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactMap}.
@@ -2482,7 +2491,7 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
+		protected static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
 
 			/**
 			 * Dieses Feld speichert die {@link Map}.
@@ -2515,7 +2524,7 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class ItemEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
+		protected static final class ItemEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
 
 			/**
 			 * Dieses Feld speichert die {@code SerialVersionUID}.
@@ -2560,7 +2569,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
+		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactMap}.
@@ -2608,7 +2617,8 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 */
-		static final class CompactMapKeyAscendingIterator<GKey> extends CompactAscendingIterator<GKey, CompactMap<GKey, ?>> {
+		protected static final class CompactMapKeyAscendingIterator<GKey> extends
+			CompactDataAscendingIterator<GKey, CompactMap<GKey, ?>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -2637,8 +2647,8 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 */
-		static final class CompactMapKeyDescendingIterator<GKey> extends
-			CompactDescendingIterator<GKey, CompactMap<GKey, ?>> {
+		protected static final class CompactMapKeyDescendingIterator<GKey> extends
+			CompactDataDescendingIterator<GKey, CompactMap<GKey, ?>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -2667,7 +2677,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <V> Typ der Werte.
 		 */
-		static final class CompactMapValueIterator<V> extends CompactAscendingIterator<V, CompactMap<?, V>> {
+		protected static final class CompactMapValueIterator<V> extends CompactDataAscendingIterator<V, CompactMap<?, V>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -2697,8 +2707,8 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <V> Typ der Werte.
 		 */
-		static final class CompactMapEntryIterator<GKey, V> extends
-			CompactAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
+		protected static final class CompactMapEntryIterator<GKey, V> extends
+			CompactDataAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -3325,8 +3335,8 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GData> Typ der {@link NavigableMap}.
 		 */
-		static abstract class AbstractNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends AbstractSet<GKey>
-			implements NavigableSet<GKey> {
+		protected static abstract class AbstractNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends
+			AbstractSet<GKey> implements NavigableSet<GKey> {
 
 			/**
 			 * Dieses Feld speichert die {@link NavigableMap}.
@@ -3536,12 +3546,28 @@ public final class Compact {
 
 		}
 
-		static final class CompactNavigableKeySet<GKey> extends AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
+		/**
+		 * Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactNavigableMap}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ der Schlüssel.
+		 */
+		protected static final class CompactNavigableKeySet<GKey> extends
+			AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
 
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap}.
+			 * 
+			 * @param data {@link CompactNavigableMap}.
+			 * @throws NullPointerException Wenn die gegebene {@link CompactNavigableMap} {@code null} ist.
+			 */
 			public CompactNavigableKeySet(final CompactNavigableMap<GKey, ?> data) throws NullPointerException {
 				super(data);
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public Iterator<GKey> iterator() {
 				return new CompactMapKeyAscendingIterator<GKey>(this.data, this.data.firstIndex(), this.data.lastIndex() + 1);
@@ -3555,7 +3581,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 */
-		static final class CompactAscendingKeySet<GKey> extends
+		protected static final class CompactAscendingKeySet<GKey> extends
 			AbstractNavigableKeySet<GKey, CompactAscendingSubMap<GKey, ?>> {
 
 			/**
@@ -3585,7 +3611,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 */
-		static final class CompactDescendingKeySet<GKey> extends
+		protected static final class CompactDescendingKeySet<GKey> extends
 			AbstractNavigableKeySet<GKey, CompactDescendingSubMap<GKey, ?>> {
 
 			/**
@@ -3616,22 +3642,52 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static abstract class CompactNavigableSubMap<GKey, GValue> extends
+		protected static abstract class CompactNavigableSubMap<GKey, GValue> extends
 			CompactSubData<CompactNavigableMap<GKey, GValue>> implements NavigableMap<GKey, GValue> {
 
-			static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+			/**
+			 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
+			 * {@link CompactNavigableSubMap} delegiert.
+			 * 
+			 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+			 * @param <GKey> Typ der Schlüssel.
+			 * @param <GValue> Typ der Werte.
+			 */
+			protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
+				/**
+				 * Dieses Feld speichert die {@link CompactNavigableSubMap}.
+				 */
 				protected final CompactNavigableSubMap<GKey, GValue> data;
 
+				/**
+				 * Dieser Konstrukteur initialisiert die {@link CompactNavigableSubMap}.
+				 * 
+				 * @param data {@link CompactNavigableSubMap}.
+				 */
 				public EntrySet(final CompactNavigableSubMap<GKey, GValue> data) {
 					this.data = data;
 				}
 
+				/**
+				 * {@inheritDoc}
+				 */
 				@Override
 				public int size() {
 					return this.data.size();
 				}
 
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public void clear() {
+					this.data.clear();
+				}
+
+				/**
+				 * {@inheritDoc}
+				 */
 				@Override
 				public Iterator<Entry<GKey, GValue>> iterator() {
 					return new CompactMapEntryIterator<GKey, GValue>(this.data.data, this.data.firstIndex(),
@@ -3639,23 +3695,53 @@ public final class Compact {
 				}
 			}
 
-			static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
+			/**
+			 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
+			 * {@link CompactNavigableSubMap} delegiert.
+			 * 
+			 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+			 * @param <GValue> Typ der Werte.
+			 */
+			protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
 
+				/**
+				 * Dieses Feld speichert die {@link CompactNavigableSubMap}.
+				 */
 				protected final CompactNavigableSubMap<?, GValue> data;
 
+				/**
+				 * Dieser Konstrukteur initialisiert die {@link CompactNavigableSubMap}.
+				 * 
+				 * @param data {@link CompactNavigableSubMap}.
+				 */
 				public ValueCollection(final CompactNavigableSubMap<?, GValue> data) {
 					this.data = data;
 				}
 
+				/**
+				 * {@inheritDoc}
+				 */
 				@Override
 				public int size() {
 					return this.data.size();
 				}
 
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public void clear() {
+					this.data.clear();
+				}
+
+				/**
+				 * {@inheritDoc}
+				 */
 				@Override
 				public Iterator<GValue> iterator() {
 					return new CompactMapValueIterator<GValue>(this.data.data, this.data.firstIndex(), this.data.lastIndex() + 1);
 				}
+
 			}
 
 			/**
@@ -3679,6 +3765,14 @@ public final class Compact {
 			@Override
 			public int size() {
 				return this.countItems();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void clear() {
+				this.clearItems();
 			}
 
 			/**
@@ -3711,22 +3805,6 @@ public final class Compact {
 			@Override
 			public NavigableMap<GKey, GValue> tailMap(final GKey fromElement) {
 				return this.tailMap(fromElement, true);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean containsKey(final Object key) {
-				return this.isInRange(key) && this.data.containsKey(key);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean containsValue(final Object value) {
-				return this.values().contains(value);
 			}
 
 			/**
@@ -3770,8 +3848,16 @@ public final class Compact {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public void clear() {
-				this.clearItems();
+			public boolean containsKey(final Object key) {
+				return this.isInRange(key) && this.data.containsKey(key);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean containsValue(final Object value) {
+				return this.values().contains(value);
 			}
 
 			/**
@@ -3780,14 +3866,6 @@ public final class Compact {
 			@Override
 			public Set<GKey> keySet() {
 				return this.navigableKeySet();
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public Collection<GValue> values() {
-				return new ValueCollection<GValue>(this);
 			}
 
 			/**
@@ -3804,6 +3882,14 @@ public final class Compact {
 			@Override
 			public NavigableSet<GKey> descendingKeySet() {
 				return this.descendingMap().navigableKeySet();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Collection<GValue> values() {
+				return new ValueCollection<GValue>(this);
 			}
 
 			/**
@@ -3841,7 +3927,7 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
+		protected static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
@@ -4035,7 +4121,7 @@ public final class Compact {
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
 		 */
-		static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
+		protected static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableSubMap<GKey, GValue> {
 
 			/**
 			 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.

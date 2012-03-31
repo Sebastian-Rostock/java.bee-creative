@@ -4,8 +4,6 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.util.Converters.ConverterLink;
-import bee.creative.util.Filters.FilterLink;
 import bee.creative.util.Iterators.EntryLink;
 import bee.creative.util.Objects.UseToString;
 
@@ -51,7 +49,12 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static abstract class BaseIterable<GEntry> extends FilterLink<GEntry> implements Iterable<GEntry>, UseToString {
+	static abstract class AbstractIterable<GEntry> implements Iterable<GEntry>, UseToString {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter}.
+		 */
+		final Filter<? super GEntry> filter;
 
 		/**
 		 * Dieses Feld speichert den {@link Iterable}.
@@ -66,10 +69,11 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} bzw. der gegebene {@link Iterable} {@code null}
 		 *         ist.
 		 */
-		public BaseIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
+		public AbstractIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 			throws NullPointerException {
-			super(filter);
+			if(filter == null) throw new NullPointerException("filter is null");
 			if(iterable == null) throw new NullPointerException("iterable is null");
+			this.filter = filter;
 			this.iterable = iterable;
 		}
 
@@ -95,8 +99,8 @@ public final class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final BaseIterable<?> data = (BaseIterable<?>)object;
-			return super.equals(object) && Objects.equals(this.iterable, data.iterable);
+			final AbstractIterable<?> data = (AbstractIterable<?>)object;
+			return Objects.equals(this.filter, data.filter) && Objects.equals(this.iterable, data.iterable);
 		}
 
 	}
@@ -108,8 +112,52 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class LimitedIterableConverter<GEntry> extends FilterLink<GEntry> implements
+	static abstract class AbstractIterableConverter<GEntry> implements
 		Converter<Iterable<? extends GEntry>, Iterable<GEntry>> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Filter}.
+		 * 
+		 * @param filter {@link Filter}.
+		 * @throws NullPointerException Wenn der gegebenen {@link Filter} {@code null} ist.
+		 */
+		public AbstractIterableConverter(final Filter<? super GEntry> filter) throws NullPointerException {
+			if(filter == null) throw new NullPointerException("filter is null");
+			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			final AbstractIterableConverter<?> data = (AbstractIterableConverter<?>)object;
+			return Objects.equals(this.filter, data.filter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterables#limitedIterable(Filter, Iterable)} in seine Ausgabe überführt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static final class LimitedIterableConverter<GEntry> extends AbstractIterableConverter<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter}.
@@ -156,8 +204,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	static final class FilteredIterableConverter<GEntry> extends FilterLink<GEntry> implements
-		Converter<Iterable<? extends GEntry>, Iterable<GEntry>> {
+	static final class FilteredIterableConverter<GEntry> extends AbstractIterableConverter<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Filter}.
@@ -206,8 +253,13 @@ public final class Iterables {
 	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static final class ConvertedIterableConverter<GInput extends Iterable<? extends GValue>, GValue, GOutput> extends
-		ConverterLink<GValue, GOutput> implements Converter<GInput, Iterable<GOutput>> {
+	static final class ConvertedIterableConverter<GInput extends Iterable<? extends GValue>, GValue, GOutput> implements
+		Converter<GInput, Iterable<GOutput>> {
+
+		/**
+		 * Dieses Feld speichert den {@link Converter}.
+		 */
+		final Converter<? super GValue, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter}.
@@ -216,7 +268,8 @@ public final class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
 		public ConvertedIterableConverter(final Converter<? super GValue, ? extends GOutput> converter) {
-			super(converter);
+			if(converter == null) throw new NullPointerException("converter is null");
+			this.converter = converter;
 		}
 
 		/**
@@ -231,10 +284,19 @@ public final class Iterables {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return Objects.hash(this.converter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof ConvertedIterableConverter<?, ?, ?>)) return false;
-			return super.equals(object);
+			final ConvertedIterableConverter<?, ?, ?> data = (ConvertedIterableConverter<?, ?, ?>)object;
+			return Objects.equals(this.converter, data.converter);
 		}
 
 		/**
@@ -299,7 +361,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class LimitedIterable<GEntry> extends BaseIterable<GEntry> {
+	public static final class LimitedIterable<GEntry> extends AbstractIterable<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Filter} und {@link Iterable}.
@@ -350,7 +412,7 @@ public final class Iterables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class FilteredIterable<GEntry> extends BaseIterable<GEntry> {
+	public static final class FilteredIterable<GEntry> extends AbstractIterable<GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Filter} und {@link Iterable}.
@@ -474,13 +536,17 @@ public final class Iterables {
 	 *        s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente.
 	 */
-	public static final class ConvertedIterable<GInput, GOutput> extends ConverterLink<GInput, GOutput> implements
-		Iterable<GOutput>, UseToString {
+	public static final class ConvertedIterable<GInput, GOutput> implements Iterable<GOutput>, UseToString {
 
 		/**
 		 * Dieses Feld speichert den {@link Iterable}.
 		 */
 		final Iterable<? extends GInput> iterable;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter}.
+		 */
+		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Converter} und {@link Iterable}.
@@ -492,7 +558,8 @@ public final class Iterables {
 		 */
 		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
 			final Iterable<? extends GInput> iterable) throws NullPointerException {
-			super(converter);
+			if(converter == null) throw new NullPointerException("converter is null");
+			this.converter = converter;
 			if(iterable == null) throw new NullPointerException("iterable is null");
 			this.iterable = iterable;
 		}
@@ -530,7 +597,7 @@ public final class Iterables {
 			if(object == this) return true;
 			if(!(object instanceof EntryIterable<?>)) return false;
 			final ConvertedIterable<?, ?> data = (ConvertedIterable<?, ?>)object;
-			return super.equals(object) && Objects.equals(this.iterable, data.iterable);
+			return Objects.equals(this.converter, data.converter) && Objects.equals(this.iterable, data.iterable);
 		}
 
 		/**
