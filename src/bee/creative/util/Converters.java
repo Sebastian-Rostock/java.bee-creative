@@ -697,7 +697,7 @@ public final class Converters {
 		}
 
 		/**
-		 * Diese Methode leert die Abbildung.
+		 * Diese Methode leert den Cache.
 		 */
 		public void clear() {
 			this.map.clear();
@@ -710,16 +710,16 @@ public final class Converters {
 		public GOutput convert(final GInput input) {
 			final Pointer<GOutput> pointer = this.map.get(Pointers.hardPointer(input));
 			if(pointer != null){
-				if(pointer == Pointers.NULL_POINTER) return null;
 				final GOutput output = pointer.data();
 				if(output != null) return output;
+				if(Pointers.isValid(pointer)) return null;
 				int valid = this.limit - 1;
 				for(final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = this.map.entrySet().iterator(); iterator
 					.hasNext();){
 					final Entry<Pointer<GInput>, Pointer<GOutput>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
 					if(valid != 0){
-						if(!Pointers.valid(key) || !Pointers.valid(value)){
+						if(!Pointers.isValid(key) || !Pointers.isValid(value)){
 							iterator.remove();
 						}else{
 							valid--;

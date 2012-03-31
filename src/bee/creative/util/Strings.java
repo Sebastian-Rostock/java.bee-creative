@@ -22,7 +22,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class JoinConverter implements Converter<Iterable<?>, String> {
+	private static final class JoinConverter implements Converter<Iterable<?>, String> {
 
 		/**
 		 * Dieses Feld speichert das Trennzeichen.
@@ -38,15 +38,6 @@ public final class Strings {
 		public JoinConverter(final String space) throws NullPointerException {
 			if(space == null) throw new NullPointerException("space is null");
 			this.space = space;
-		}
-
-		/**
-		 * Diese Methode gibt das Trennzeichen zurück.
-		 * 
-		 * @return Trennzeichen.
-		 */
-		public String space() {
-			return this.space;
 		}
 
 		/**
@@ -93,7 +84,7 @@ public final class Strings {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static abstract class BaseConverter<GOutput> implements Converter<CharSequence, GOutput> {
+	private static abstract class BaseConverter<GOutput> implements Converter<CharSequence, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den kompilierten regulären Ausdruck.
@@ -126,15 +117,6 @@ public final class Strings {
 		}
 
 		/**
-		 * Diese Methode gibt den kompilierten regulären Ausdruck zurück.
-		 * 
-		 * @return kompilierter regulärer Ausdruck.
-		 */
-		public Pattern pattern() {
-			return this.pattern;
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -151,7 +133,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class ApplyConverter extends BaseConverter<List<String>> {
+	private static abstract class ApplyConverter extends BaseConverter<List<String>> {
 
 		/**
 		 * Dieses Feld speichert den Index.
@@ -174,15 +156,6 @@ public final class Strings {
 			if((index < 0) || (index > pattern.matcher("").groupCount()))
 				throw new IllegalArgumentException("index out of range: " + index);
 			this.index = index;
-		}
-
-		/**
-		 * Diese Methode gibt den Index zurück.
-		 * 
-		 * @return Index.
-		 */
-		public int index() {
-			return this.index;
 		}
 
 		/**
@@ -220,7 +193,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class ApplyAllConverter extends BaseConverter<List<List<String>>> {
+	private static abstract class ApplyAllConverter extends BaseConverter<List<List<String>>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -270,7 +243,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SplitConverter extends ApplyConverter {
+	private static final class SplitConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -300,7 +273,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SplitAllConverter extends ApplyAllConverter {
+	private static final class SplitAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -328,7 +301,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MatchConverter extends ApplyConverter {
+	private static final class MatchConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -358,7 +331,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MatchAllConverter extends ApplyAllConverter {
+	private static final class MatchAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -386,7 +359,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SplatchConverter extends ApplyConverter {
+	private static final class SplatchConverter extends ApplyConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck und den Index.
@@ -417,7 +390,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SplatchAllConverter extends ApplyAllConverter {
+	private static final class SplatchAllConverter extends ApplyAllConverter {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den kompilierten regulären Ausdruck.
@@ -445,7 +418,7 @@ public final class Strings {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class PatternConverter implements Converter<String, Pattern> {
+	private static final class PatternConverter implements Converter<String, Pattern> {
 
 		/**
 		 * Dieses Feld speichert die Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
@@ -463,17 +436,6 @@ public final class Strings {
 		 */
 		public PatternConverter(final int flags) {
 			this.flags = flags;
-		}
-
-		/**
-		 * Diese Methode gibt die Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
-		 * {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES},
-		 * {@link Pattern#LITERAL}, {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS}) zurück.
-		 * 
-		 * @return Bitmaske.
-		 */
-		public int flags() {
-			return this.flags;
 		}
 
 		/**
@@ -1239,7 +1201,7 @@ public final class Strings {
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
-	Strings() {
+	private Strings() {
 	}
 
 }

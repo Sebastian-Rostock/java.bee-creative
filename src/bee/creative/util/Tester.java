@@ -8,9 +8,11 @@ package bee.creative.util;
  * 
  * <pre>
  * Tester result = new Tester(new Runnable() {
+ * 
  * 	public void run() {
- * 	// ...
+ * 		// ...
  * 	}
+ * 
  * });
  * </pre>
  * 

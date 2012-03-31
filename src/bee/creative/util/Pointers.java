@@ -18,7 +18,7 @@ public final class Pointers {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	static abstract class BasePointer<GData> implements Pointer<GData> {
+protected	static abstract class BasePointer<GData> implements Pointer<GData> {
 
 		/**
 		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer}s zurück.
@@ -76,7 +76,7 @@ public final class Pointers {
 		/**
 		 * Dieses Feld speichert den Datensatz.
 		 */
-		final GData data;
+		private			final GData data;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -228,7 +228,7 @@ public final class Pointers {
 		/**
 		 * Dieses Feld speichert den {@link Pointer}.
 		 */
-		final Pointer<? extends GInput> pointer;
+		private		final Pointer<? extends GInput> pointer;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Pointer} und {@link Converter}.
@@ -291,7 +291,7 @@ public final class Pointers {
 	/**
 	 * Dieses Feld speichert den {@link Pointer} auf {@code null}.
 	 */
-	static final Pointer<?> NULL_POINTER = new BasePointer<Object>() {
+	private	static final Pointer<?> NULL_POINTER = new BasePointer<Object>() {
 
 		@Override
 		public Object data() {
@@ -309,7 +309,7 @@ public final class Pointers {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#hardPointer(Object)} in einen
 	 * {@link HardPointer Hard-Pointer} umwandelt.
 	 */
-	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	private	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -327,7 +327,7 @@ public final class Pointers {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#weakPointer(Object)} in einen
 	 * {@link WeakPointer Weak-Pointer} umwandelt.
 	 */
-	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	private	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -345,7 +345,7 @@ public final class Pointers {
 	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#softPointer(Object)} in einen
 	 * {@link SoftPointer} umwandelt.
 	 */
-	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	private	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
 
 		@Override
 		public Pointer<Object> convert(final Object input) {
@@ -362,7 +362,7 @@ public final class Pointers {
 	/**
 	 * Dieses Feld speichert den {@link Converter}, der den Datensatz eines {@link Pointer}s ermitelt.
 	 */
-	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
+	private	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
 
 		@Override
 		public Object convert(final Pointer<?> input) {
@@ -406,7 +406,7 @@ public final class Pointers {
 	 * @return {@link Pointer}-Validität.
 	 * @throws NullPointerException Wenn der gegebenen {@link Pointer} {@code null} ist.
 	 */
-	public static boolean valid(final Pointer<?> pointer) throws NullPointerException {
+	public static boolean isValid(final Pointer<?> pointer) throws NullPointerException {
 		if(pointer == null) throw new NullPointerException("pointer is null");
 		return (pointer == Pointers.NULL_POINTER) || (pointer.data() != null);
 	}

@@ -258,24 +258,6 @@ public final class Comparators {
 		}
 
 		/**
-		 * Diese Methode gibt den primären {@link Comparator} zurück.
-		 * 
-		 * @return primärer {@link Comparator}.
-		 */
-		public Comparator<? super GEntry> comparator1() {
-			return this.comparator1;
-		}
-
-		/**
-		 * Diese Methode gibt den sekundären {@link Comparator} zurück.
-		 * 
-		 * @return sekundärer {@link Comparator}.
-		 */
-		public Comparator<? super GEntry> comparator2() {
-			return this.comparator2;
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -300,7 +282,7 @@ public final class Comparators {
 			if(object == this) return true;
 			if(!(object instanceof ChainedComparator<?>)) return false;
 			final ChainedComparator<?> data = (ChainedComparator<?>)object;
-			return Objects.equals(this.comparator1, data.comparator1, this.comparator2, data.comparator2);
+			return Objects.equals(this.comparator1, data.comparator1) && Objects.equals(this.comparator2, data.comparator2);
 		}
 
 		/**
@@ -394,7 +376,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der als Zeichenkette kodierte {@link Integer}
 	 * vergleicht.
 	 */
-	static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
+	private static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -429,7 +411,7 @@ public final class Comparators {
 	/**
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der Groß-/Kleinschreibung ignoriert.
 	 */
-	static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
+	private static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -447,7 +429,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten {@link Integer}
 	 * und normalem Text vergleicht und dabei Groß-/Kleinschreibung ignoriert.
 	 */
-	static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
+	private static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String o1, final String o2) {
@@ -529,7 +511,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#longValue()}
 	 * vergleicht.
 	 */
-	static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
+	private static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -547,7 +529,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#floatValue()}
 	 * vergleicht.
 	 */
-	static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
+	private static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -565,7 +547,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()}
 	 * vergleicht.
 	 */
-	static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
+	private static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -583,7 +565,7 @@ public final class Comparators {
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()}
 	 * vergleicht.
 	 */
-	static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
+	private static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number o1, final Number o2) {
@@ -600,7 +582,7 @@ public final class Comparators {
 	/**
 	 * Dieses Feld speichert den {@link Comparator} für die natürliche Ordnung.
 	 */
-	static final Comparator<? extends Comparable<?>> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
+	private static final Comparator<? extends Comparable<?>> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
 
 		@Override
 		public int compare(final Comparable<Object> o1, final Comparable<Object> o2) {
@@ -838,7 +820,7 @@ public final class Comparators {
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
-	Comparators() {
+	private Comparators() {
 	}
 
 }

@@ -1,4 +1,4 @@
-﻿package bee.creative.util;
+package bee.creative.util;
 
 import java.lang.reflect.Array;
 import java.util.AbstractCollection;
@@ -42,7 +42,7 @@ public final class Compact {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class CompactData {
+	public static abstract class CompactData {
 
 		/**
 		 * Diese Klasse implementiert ein abstraktes Objekt mit {@link CompactData}.
@@ -50,7 +50,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		static abstract class CompactLink<GData extends CompactData> {
+		protected static abstract class CompactLink<GData extends CompactData> {
 
 			/**
 			 * Dieses Feld speichert die {@link CompactData}.
@@ -76,8 +76,8 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		static abstract class CompactIterator<GItem, GData extends CompactData> extends CompactLink<GData> implements
-			Iterator<GItem> {
+		protected static abstract class CompactIterator<GItem, GData extends CompactData> extends CompactLink<GData>
+			implements Iterator<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Index des ersten Elements (inklusiv).
@@ -148,7 +148,7 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		static abstract class CompactAscendingIterator<GItem, GData extends CompactData> extends
+		public static abstract class CompactAscendingIterator<GItem, GData extends CompactData> extends
 			CompactIterator<GItem, GData> {
 
 			/**
@@ -189,7 +189,7 @@ public final class Compact {
 		 * @param <GItem> Typ der Elemente.
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		static abstract class CompactDescendingIterator<GItem, GData extends CompactData> extends
+		public static abstract class CompactDescendingIterator<GItem, GData extends CompactData> extends
 			CompactIterator<GItem, GData> {
 
 			/**
@@ -219,7 +219,7 @@ public final class Compact {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GData> Typ des {@link CompactData}s.
 		 */
-		static abstract class CompactSubData<GData extends CompactData> extends CompactLink<GData> {
+		public static abstract class CompactSubData<GData extends CompactData> extends CompactLink<GData> {
 
 			/**
 			 * Dieses Feld speichert das Objekt zur offenen Begrenzung sortierter Teilmengen.
@@ -518,7 +518,7 @@ public final class Compact {
 		/**
 		 * Dieses Feld speichert das leere {@link Array}.
 		 */
-		public static final Object[] VOID = new Object[0];
+		protected static final Object[] VOID = new Object[0];
 
 		protected static final int indexOf(final Object[] list, int from, final int size, final Object item) {
 			if(item == null){
