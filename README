@@ -7,13 +7,13 @@ Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisiru
 Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen. 
 
 
-TODO Beispiele: Filter, Converter, Iterable
-	Iteration über einem Baum mit Navigation über Converter
-	mit Filtern in einer Ebene der Iteration
+TODO Beispiele 1: Filter, Converter, Iterable
+  - Iteration Attribute einer Liste von Objekten (Converter,Iterable)
+  - Filtern in der Liste (Filter)
 
+TODO Beispiele 2: Comparator, Converter, Conversion
+  - Sortierung einer Liste nach abgeleitetem Attribut der Elemente 
 
-TODO Beispiele 1: Comparator, Converter, Conversion
-	schnelle sortierung mit Conversion bei aufwändigen Convertern
 		 Iterable<I> entries = // ...
 		 Converter<I, O> converter = // ...
 		 Comparator<O> comparator = // ...
@@ -23,9 +23,8 @@ TODO Beispiele 1: Comparator, Converter, Conversion
 		 Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInputConverter(), conversions);
 		 Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutputConverter(), conversions);
  
-	
-TODO Beispiele 2: Comparable
-	schnelle suche mit comparable in sortierten Listen
+TODO Beispiele 3: Comparable
+  - Binäre Suche nach Bereichen in Liste
 
 	public static class Range {
 		public int from; // Startposition der Range
@@ -48,10 +47,8 @@ TODO Beispiele 2: Comparable
 		return ranges.get(index);
 	}
 
-
-
-TODO Beispiele: pointer, builder 
-	statischer cache mit automatischem builder
+TODO Beispiele 4: Pointer, Builder 
+  - Cache mit automatischem Builder
 
 	public final class Helper {
 
