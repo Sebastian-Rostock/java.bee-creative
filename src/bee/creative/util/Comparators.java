@@ -478,7 +478,7 @@ public final class Comparators {
 				a1 = e1;
 				a2 = e2;
 			}
-			return 0;
+			return (s1 - a1) - (s2 - a2);
 		}
 
 		@Override
