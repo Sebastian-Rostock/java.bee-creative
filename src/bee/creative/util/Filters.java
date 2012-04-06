@@ -234,8 +234,8 @@ public final class Filters {
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} oder der gegebene {@link Converter} {@code null}
 		 *         ist.
 		 */
-		public ConvertedFilter(final Filter<? super GOutput> filter,
-			final Converter<? super GInput, ? extends GOutput> converter) {
+		public ConvertedFilter(final Converter<? super GInput, ? extends GOutput> converter,
+			final Filter<? super GOutput> filter) {
 			super(filter);
 			if(converter == null) throw new NullPointerException("converter is null");
 			this.converter = converter;
@@ -612,15 +612,15 @@ public final class Filters {
 	 * @param <GInput> Typ der Eingabe des {@link Filter}s sowie des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Eingabe des gegebenen {@link Filter
 	 *        Filters}.
-	 * @param filter {@link Filter}.
 	 * @param converter {@link Converter}.
+	 * @param filter {@link Filter}.
 	 * @return {@link ConvertedFilter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} oder der gegebene {@link Converter} {@code null} ist.
 	 */
 	public static <GInput, GOutput> ConvertedFilter<GInput, GOutput> convertedFilter(
-		final Filter<? super GOutput> filter, final Converter<? super GInput, ? extends GOutput> converter)
+		final Converter<? super GInput, ? extends GOutput> converter, final Filter<? super GOutput> filter)
 		throws NullPointerException {
-		return new ConvertedFilter<GInput, GOutput>(filter, converter);
+		return new ConvertedFilter<GInput, GOutput>(converter, filter);
 	}
 
 	/**
