@@ -11,23 +11,23 @@ ________________________________________________________________________________
 Beispiele 1: Filter, Iterable, Converter 
 
   In diesem Beispiel soll aus einer Menge benannter Objekte (NamedEntry) die Menge der Objekte ermittelt werden, deren
-  Name mit einem gegebenen Präfix beginnt bzw. einem gegebenen Suffix endet.
+  Name mit einem gegebenen Präfix beginnt oder einem gegebenen Suffix endet.
 
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Eingabe
+  Eingabe:
     - String - Präfix
     - String - Suffix
     - Iterable<NamedEntry> - Menge der benannten Objekte 
 
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Ausgabe
+  Ausgabe:
     - Iterable<NamedEntry> - Objekte mit dem Präfix oder Suffix im Namen
 
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Quelltext
+  Quelltext:
   
     class NamedEntry {
 
@@ -71,9 +71,9 @@ Beispiele 1: Filter, Iterable, Converter
         }
 
       };
-      Filter<NamedEntry> namedPrefixFilter = Filters.convertedFilter(nameConverter, prefixFilter);
-      Filter<NamedEntry> namedSuffixFilter = Filters.convertedFilter(nameConverter, suffixFilter);
-      Filter<NamedEntry> filter = Filters.disjunctionFilter(namedPrefixFilter, namedSuffixFilter);
+      Filter<NamedEntry> namePrefixFilter = Filters.convertedFilter(nameConverter, prefixFilter);
+      Filter<NamedEntry> nameSuffixFilter = Filters.convertedFilter(nameConverter, suffixFilter);
+      Filter<NamedEntry> filter = Filters.disjunctionFilter(namePrefixFilter, nameSuffixFilter);
 
       // Ausgabe
       Iterable<NamedEntry> filteredNamedEntris = Iterables.filteredIterable(filter, namedEntris);
@@ -91,18 +91,18 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
   
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Eingabe
+  Eingabe:
     - Iterable<ComplexEntry> - Menge der komplexen Objekte 
 
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Ausgabe
+  Ausgabe:
     - List<String> - sortierte Liste der Texte zu den komplexen Objekte
     - List<ComplexEntry> - nach Text sortierte Liste der komplexen Objekte
 
   ---------------------------------------------------------------------------------------------------------------------
 
-  * Quelltext
+  Quelltext:
   
     class ComplexEntry {
 
@@ -167,58 +167,107 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
     
 _______________________________________________________________________________________________________________________
  
-TODO Beispiele 3: Comparable
-  - Binäre Suche nach Bereichen in Liste
+Beispiele 3: Comparable
 
-  public static class Range {
-    int from; // Startposition der Range
-    int size; // Größe/Länge der Range
-    // ...
-  }
-
-  public Range find(final List<Range> ranges, final int position) {
-    final int index = Comparables.binarySearch(ranges, new Comparable<Range>() {
-
-      @Override
-      public int compareTo(final Range o) {
-        if(o.from > position) return 1; 
-        if((o.from + o.size) <= position) return -1;
-        return 0;
-      }
-
-    });
-    if(index < 0) return null;
-    return ranges.get(index);
-  }
-
-TODO Beispiele 4: Pointer, Builder 
-  - Cache mit automatischem Builder
-
-  public final class Helper {
-
-    private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(
-      Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {
-
-        @Override
-        public Helper build() {
-          return new Helper();
-        }
-
-      }));
-
-    public static Helper get() {
-      return Helper.BUILDER.build();
-    }
-
-    Helper() {
-      // ...
-    }
-
-  }
-
-
-  public void work() {
-    final Helper helper = Helper.get();
-    // ...
-  }
+  In diesem Beispiel soll in einer sortierten Liste von sich nicht überlappenden Bereichen (Region) nach einem Bereich
+  gesucht werden, der eine gegebene Position enthält.
   
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Eingabe:
+    - int - Position
+    - List<Region> - sortierte Liste der Bereiche
+
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Ausgabe:
+    - Region - Bereich, der die Position enthält
+
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Quelltext:
+     
+    class Region {
+    
+      int start;
+      
+      int length;
+      
+      // ...
+      
+    }
+  
+    Region find(List<Region> ranges, final int position) {
+      
+      Comparable<Region> comparable = new Comparable<Region>() {
+  
+        @Override
+        public int compareTo(Region region) {
+          if(position < region.start) return 1; 
+          if(position >= (region.start + region.length)) return -1;
+          return 0;
+        }
+  
+      };
+      
+      int index = Comparables.binarySearch(ranges, comparable);
+      if(index < 0) return null;
+      return ranges.get(index);
+    }
+
+_______________________________________________________________________________________________________________________
+ 
+Beispiele 4: Pointer, Builder 
+
+  In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung eienr automatischen Erzeugung und 
+  Zwischenspeicherung zur Verfügung gestellt werden. Wenn das Hilfsobjekt dann nicht mehr verwendet wird soll es 
+  bei Speichermangel und automatisch gelöscht werden. 
+  
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Eingabe:
+    - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts
+
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Ausgabe:
+    - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts mit speichersensitiver Zwischenspeicherung
+
+  ---------------------------------------------------------------------------------------------------------------------
+
+  Quelltext:
+     
+    public final class Helper {
+  
+      private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(
+        Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {
+  
+          @Override
+          public Helper build() {
+            return new Helper();
+          }
+  
+        }));
+  
+      public static Helper get() {
+        return Helper.BUILDER.build();
+      }
+  
+      Helper() {
+        // ...
+      }
+      
+      // ...
+  
+    }
+  
+  
+    public void work() {
+    
+      Helper helper = Helper.get();
+      
+      // ...
+      
+    }
+    
+    
