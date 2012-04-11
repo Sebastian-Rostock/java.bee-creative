@@ -203,8 +203,8 @@ Beispiele 3: Comparable
   
         @Override
         public int compareTo(Region region) {
-          if(position < region.start) return 1; 
-          if(position >= (region.start + region.length)) return -1;
+          if(position < region.start) return -1; 
+          if(position >= (region.start + region.length)) return +1;
           return 0;
         }
   
