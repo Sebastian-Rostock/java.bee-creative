@@ -113,8 +113,8 @@ public class Comparables {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compareTo(final GEntry o) {
-			return ((o == null) ? 1 : this.comparable.compareTo(o));
+		public int compareTo(final GEntry entry) {
+			return ((entry == null) ? 1 : this.comparable.compareTo(entry));
 		}
 
 		/**
@@ -133,6 +133,79 @@ public class Comparables {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("nullComparable", this.comparable);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Comparable}, der einen gegebenen {@link Comparator} sowie ein gegebenes
+	 * Element zur Berechnung des Navigationswert verwendet. Das gegebene Element ist hierbei das erstes Argument des
+	 * {@link Comparator}s. Der Navigationswert für ein Element {@code element} sowie das gegebene Element {@code entry}
+	 * und den gegebenen {@link Comparator} {@code comparator} ergibt sich aus:
+	 * 
+	 * <pre>comparator.compare(entry, element)</pre>
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class EntryComparable<GEntry> implements Comparable<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das erste Argument für den {@link Comparator}.
+		 */
+		final GEntry entry;
+
+		/**
+		 * Dieses Feld speichert den {@link Comparator}.
+		 */
+		final Comparator<? super GEntry> comparator;
+
+		/**
+		 * Dieser Konstrukteur initialisiert Element und {@link Comparator}.
+		 * 
+		 * @param entry erstes Argument des {@link Comparator}s.
+		 * @param comparator {@link Comparator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+		 */
+		public EntryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
+			this.entry = entry;
+			if(comparator == null) throw new NullPointerException("comparator is null");
+			this.comparator = comparator;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final GEntry entry) {
+			return this.comparator.compare(this.entry, entry);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.entry, this.comparator);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof EntryComparable<?>)) return false;
+			final EntryComparable<?> data = (EntryComparable<?>)object;
+			return Objects.equals(this.entry, data.entry) && Objects.equals(this.comparator, data.comparator);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("entryComparable", this.entry, this.comparator);
 		}
 
 	}
@@ -163,8 +236,8 @@ public class Comparables {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compareTo(final GEntry o) {
-			return -this.comparable.compareTo(o);
+		public int compareTo(final GEntry entry) {
+			return -this.comparable.compareTo(entry);
 		}
 
 		/**
@@ -229,9 +302,9 @@ public class Comparables {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compareTo(final GEntry o) {
-			final int comp = this.comparable1.compareTo(o);
-			return ((comp != 0) ? comp : this.comparable2.compareTo(o));
+		public int compareTo(final GEntry entry) {
+			final int comp = this.comparable1.compareTo(entry);
+			return ((comp != 0) ? comp : this.comparable2.compareTo(entry));
 		}
 
 		/**
@@ -301,8 +374,8 @@ public class Comparables {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compareTo(final GInput o) {
-			return this.comparable.compareTo(this.converter.convert(o));
+		public int compareTo(final GInput entry) {
+			return this.comparable.compareTo(this.converter.convert(entry));
 		}
 
 		/**
@@ -415,6 +488,24 @@ public class Comparables {
 	public static <GEntry> Comparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable)
 		throws NullPointerException {
 		return new NullComparable<GEntry>(comparable);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Comparable}, der den gegebenen {@link Comparator} sowie das gegebene Element zur
+	 * Berechnung des Navigationswert verwendet, und gibt ihn zurück. Das gegebene Element wird als erstes Argument des
+	 * {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * 
+	 * <pre>comparator.compare(entry, element)</pre>
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param entry erstes Argument des {@link Comparator}s.
+	 * @param comparator {@link Comparator}.
+	 * @return {@link EntryComparable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 */
+	public static <GEntry> EntryComparable<GEntry> entryComparable(final GEntry entry,
+		final Comparator<? super GEntry> comparator) throws NullPointerException {
+		return new EntryComparable<GEntry>(entry, comparator);
 	}
 
 	/**
