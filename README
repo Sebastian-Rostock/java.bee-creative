@@ -1,31 +1,32 @@
 bee-creative.util - [cc-by] Sebastian Rostock
-Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz
-anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:
-[ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
+Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert.
+Um die Lizenz anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ]
+oder schicken Sie einen Brief an: [ Creative Commons, 171 Second Street, Suite 300, San Francisco, 
+California 94105, USA. ]
 
-Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern,
-Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.
+Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler 
+Operatoren auf Filtern, Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.
 
-_______________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 Beispiele 1: Filter, Iterable, Converter
 
-  In diesem Beispiel soll aus einer Menge benannter Objekte (NamedEntry) die Menge der Objekte ermittelt werden, deren
-  Name mit einem gegebenen Präfix beginnt oder einem gegebenen Suffix endet.
+  In diesem Beispiel soll aus einer Menge benannter Objekte (NamedEntry) die Menge der Objekte
+  ermittelt werden, deren Name mit einem gegebenen Präfix beginnt oder einem gegebenen Suffix endet.
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Eingabe:
     - String - Präfix
     - String - Suffix
     - Iterable<NamedEntry> - Menge der benannten Objekte
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Ausgabe:
     - Iterable<NamedEntry> - Objekte mit dem Präfix oder Suffix im Namen
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Quelltext:
 
@@ -80,42 +81,43 @@ Beispiele 1: Filter, Iterable, Converter
 
     }
 
-_______________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 Beispiele 2: Iterable, Converter, Conversion, Comparator
 
-  In diesem Beispiel soll eine Menge komplexer Objekte (ComplexEntry) zur Anzeige in einer sortierten Auswahlliste
-  aufbereitet werden. Die für die Anzeige benötigten Texte (String) werden hierbei mit Hilfe einer aufwändigen
-  Formatierungsmethode (ComplexFormatConverter) berechnet. Die Sortierung der Auswahlliste soll an Hand der
-  berechneten Texte erfolgen.
+  In diesem Beispiel soll eine Menge komplexer Objekte (ComplexEntry) zur Anzeige in einer
+  sortierten Auswahlliste aufbereitet werden. Die für die Anzeige benötigten Texte (String) werden
+  hierbei mit Hilfe einer aufwändigen Formatierungsmethode (ComplexFormatConverter) berechnet. Die
+  Sortierung der Auswahlliste soll an Hand der berechneten Texte erfolgen.
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Eingabe:
     - Iterable<ComplexEntry> - Menge der komplexen Objekte
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Ausgabe:
     - List<String> - sortierte Liste der Texte zu den komplexen Objekte
     - List<ComplexEntry> - nach Text sortierte Liste der komplexen Objekte
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Quelltext:
 
     class ComplexEntry {
 
-      static Converter<ComplexEntry, String> ComplexFormatConverter = new Converter<ComplexEntry, String>() {
+      static Converter<ComplexEntry, String> ComplexFormatConverter =
+        new Converter<ComplexEntry, String>() {
 
-        @Override
-        public String convert(final ComplexEntry input) {
-          final StringBuilder builder = new StringBuilder();
-          // ... aufwändige Formatierung
-          return builder.toString();
-        }
+          @Override
+          public String convert(final ComplexEntry input) {
+            final StringBuilder builder = new StringBuilder();
+            // ... aufwändige Formatierung
+            return builder.toString();
+          }
 
-      };
+        };
 
       // ...
 
@@ -131,7 +133,8 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
       List<String> sortedComplexFormatList = new ArrayList<String>();
 
       // Conversion
-      List<Conversion<ComplexEntry, String>> conversionList = new ArrayList<Conversion<ComplexEntry, String>>();
+      List<Conversion<ComplexEntry, String>> conversionList =
+        new ArrayList<Conversion<ComplexEntry, String>>();
       Converter<ComplexEntry, Conversion<ComplexEntry, String>> conversionConverter =
         Conversions.staticConversionConverter(ComplexEntry.ComplexFormatConverter);
 
@@ -145,7 +148,8 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
         Conversions.conversionOutputConverter();
 
       ConvertedComparator<Conversion<?, ? extends String>, String> conversionOutputComparator =
-        Comparators.convertedComparator(conversionOutputConverter, Comparators.stringAlphanumericalComparator());
+        Comparators.convertedComparator(conversionOutputConverter, Comparators
+          .stringAlphanumericalComparator());
 
       Collections.sort(conversionList, conversionOutputComparator);
 
@@ -165,25 +169,25 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
 
     }
 
-_______________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 Beispiele 3: Comparable
 
-  In diesem Beispiel soll in einer sortierten Liste von sich nicht überlappenden Bereichen (Region) nach einem Bereich
-  gesucht werden, der eine gegebene Position enthält.
+  In diesem Beispiel soll in einer sortierten Liste von sich nicht überlappenden Bereichen (Region)
+  nach einem Bereich gesucht werden, der eine gegebene Position enthält.
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Eingabe:
     - int - Position
     - List<Region> - sortierte Liste der Bereiche
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Ausgabe:
     - Region - Bereich, der die Position enthält
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Quelltext:
 
@@ -215,25 +219,26 @@ Beispiele 3: Comparable
       return ranges.get(index);
     }
 
-_______________________________________________________________________________________________________________________
+____________________________________________________________________________________________________
 
 Beispiele 4: Pointer, Builder
 
-  In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung eienr automatischen Erzeugung und
-  Zwischenspeicherung zur Verfügung gestellt werden. Wenn das Hilfsobjekt dann nicht mehr verwendet wird soll es
-  bei Speichermangel und automatisch gelöscht werden.
+  In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung eienr automatischen
+  Erzeugung und Zwischenspeicherung zur Verfügung gestellt werden. Wenn das Hilfsobjekt dann nicht
+  mehr verwendet wird soll es bei Speichermangel und automatisch gelöscht werden.
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Eingabe:
     - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Ausgabe:
-    - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts mit speichersensitiver Zwischenspeicherung
+    - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts mit speichersensitiver
+      Zwischenspeicherung
 
-  ---------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------
 
   Quelltext:
 

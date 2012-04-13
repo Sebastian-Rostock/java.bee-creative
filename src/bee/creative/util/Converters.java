@@ -19,7 +19,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * <pre>
  * public final class Helper {
  * 
- *   static final {@literal Converter<Thread, Helper>} CACHE = Converters.synchronizedConverter(Converters.cachedConverter(new Converter<Thread, Helper>() {
+ *   static final  Converter&lt;Thread, Helper&gt; CACHE = Converters.synchronizedConverter(Converters.cachedConverter(new Converter&lt;Thread, Helper&gt;() {
  *   
  *     public Helper convert(Thread value) {
  *       return new Helper(value);
@@ -186,7 +186,6 @@ public final class Converters {
 			if(method == null) throw new NullPointerException("method is null");
 			this.method = method;
 		}
-
 
 		/**
 		 * {@inheritDoc}
@@ -376,7 +375,6 @@ public final class Converters {
 			this.output = output;
 		}
 
-	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -461,7 +459,6 @@ public final class Converters {
 			this.reject = reject;
 		}
 
-	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -571,8 +568,6 @@ public final class Converters {
 			this.outputMode = outputMode;
 		}
 
-	
-
 		/**
 		 * Diese Methode leert den Cache.
 		 */
@@ -675,8 +670,6 @@ public final class Converters {
 			this.converter1 = converter1;
 			this.converter2 = converter2;
 		}
-
-	
 
 		/**
 		 * {@inheritDoc}

@@ -569,7 +569,7 @@ public final class Objects {
 	 */
 	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
 		final Object object5, final Object object6) {
-		return Objects.equals(object1, object2) && Objects.equals( object3, object4) && Objects.equals(object5, object6);
+		return Objects.equals(object1, object2) && Objects.equals(object3, object4) && Objects.equals(object5, object6);
 	}
 
 	/**
@@ -688,7 +688,8 @@ public final class Objects {
 	 */
 	public static boolean equalsEx(final Object object1, final Object object2, final Object object3,
 		final Object object4, final Object object5, final Object object6) {
-		return Objects.equalsEx(object1, object2) && Objects.equalsEx( object3, object4) && Objects.equalsEx(object5, object6);
+		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4)
+			&& Objects.equalsEx(object5, object6);
 	}
 
 	/**
