@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1227,7 +1226,7 @@ public final class Iterators {
 	 * @see ChainedIterator
 	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
-	 * @param iterators {@link Iterator}-{@link Array}.
+	 * @param iterators {@link Iterator}-Array.
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Iterator}en {@code null} sind.
 	 */

@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -974,9 +973,9 @@ public final class Iterables {
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
-	 * @param iterables {@link Iterable}-{@link Array}.
+	 * @param iterables {@link Iterable}-Array.
 	 * @return {@link ChainedIterable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-{@link Array} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-Array {@code null} ist.
 	 */
 	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables)
 		throws NullPointerException {

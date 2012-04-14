@@ -12,7 +12,15 @@ Schnittstellen.
 
 __________________________________________________________________________________________
 
-Beispiele 1: Filter, Iterable, Converter
+TODO Beispiel: CachedConverter
+
+
+      final CachedConverter<String, String> uniqueString =
+			Converters.cachedConverter(-1, Pointers.WEAK, Pointers.WEAK, Converters.<String>voidConverter());
+
+__________________________________________________________________________________________
+
+Beispiel: Filter, Iterable, Converter
 
   In diesem Beispiel soll aus einer Menge benannter Objekte (NamedEntry) die Menge der
   Objekte ermittelt werden, deren Name mit einem gegebenen Präfix beginnt oder einem
@@ -91,7 +99,7 @@ Beispiele 1: Filter, Iterable, Converter
 
 __________________________________________________________________________________________
 
-Beispiele 2: Iterable, Converter, Conversion, Comparator
+Beispiel: Iterable, Converter, Conversion, Comparator
 
   In diesem Beispiel soll eine Menge komplexer Objekte (ComplexEntry) zur Anzeige in einer
   sortierten Auswahlliste aufbereitet werden. Die für die Anzeige benötigten Texte
@@ -183,7 +191,7 @@ Beispiele 2: Iterable, Converter, Conversion, Comparator
 
 __________________________________________________________________________________________
 
-Beispiele 3: Comparable
+Beispiel: Comparable
 
   In diesem Beispiel soll in einer sortierten Liste von sich nicht überlappenden Bereichen
   (Region) nach einem Bereich gesucht werden, der eine gegebene Position enthält.
@@ -233,7 +241,7 @@ Beispiele 3: Comparable
 
 __________________________________________________________________________________________
 
-Beispiele 4: Pointer, Builder
+Beispiel: Pointer, Builder
 
   In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung einer
   automatischen Erzeugung und Zwischenspeicherung zur Verfügung gestellt werden. Wenn das

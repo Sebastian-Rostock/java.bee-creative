@@ -1,11 +1,12 @@
 package bee.creative.util;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import bee.creative.util.Converters.CachedConverter;
+import bee.creative.util.Converters.SynchronizedConverter;
 
 /**
  * Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken mit Zeichenketten zur
@@ -476,10 +477,16 @@ public final class Strings {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter} zur Kompilation der {@link Pattern Pattern}.
+	 * Dieses Feld speichert den {@link CachedConverter} zur Kompilation von {@link Pattern}.
 	 */
-	static final Converter<String, Pattern> CACHED_PATTERN_CONVERTER = Converters.synchronizedConverter(Converters
-		.cachedConverter(Strings.patternConverter(0)));
+	static final CachedConverter<String, Pattern> CACHED_PATTERN_CONVERTER = Converters.cachedConverter(Strings
+		.patternConverter(0));
+
+	/**
+	 * Dieses Feld speichert den {@link SynchronizedConverter} zur Kompilation von {@link Pattern}.
+	 */
+	static final Converter<String, Pattern> SYNCHRONIZED_CACHED_PATTERN_CONVERTER = Converters
+		.synchronizedConverter(Strings.CACHED_PATTERN_CONVERTER);
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von
@@ -501,7 +508,7 @@ public final class Strings {
 		if(regex == null) throw new NullPointerException("regex is null");
 		if(string == null) throw new NullPointerException("string is null");
 		if(index < 0) throw new IllegalArgumentException("index out of range: " + index);
-		return Strings.apply(Strings.CACHED_PATTERN_CONVERTER.convert(regex), string, index, split, match);
+		return Strings.apply(Strings.SYNCHRONIZED_CACHED_PATTERN_CONVERTER.convert(regex), string, index, split, match);
 	}
 
 	/**
@@ -565,7 +572,7 @@ public final class Strings {
 		final boolean match) throws NullPointerException {
 		if(regex == null) throw new NullPointerException("regex is null");
 		if(string == null) throw new NullPointerException("string is null");
-		return Strings.applyAll(Strings.CACHED_PATTERN_CONVERTER.convert(regex), string, split, match);
+		return Strings.applyAll(Strings.SYNCHRONIZED_CACHED_PATTERN_CONVERTER.convert(regex), string, split, match);
 	}
 
 	/**
@@ -637,7 +644,7 @@ public final class Strings {
 	 * @see Strings#join(String, Object...)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebenen Array {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
 		if(items == null) throw new NullPointerException("items is null");
@@ -653,7 +660,7 @@ public final class Strings {
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
 	 * @return Verkettungstext.
-	 * @throws NullPointerException Wenn das gegebenen {@link Array} bzw. das gegebene Trennzeichen {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebenen Array bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
 		if(space == null) throw new NullPointerException("space is null");
@@ -1196,6 +1203,32 @@ public final class Strings {
 	 */
 	public static Converter<String, Pattern> patternConverter(final int flags) {
 		return new PatternConverter(flags);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link CachedConverter} zurück, der seine Eingabe via {@link Pattern#compile(String)} in
+	 * einen kompilierten regulären Ausdruck umwandelt.
+	 * 
+	 * @see CachedConverter
+	 * @see Pattern#compile(String)
+	 * @return {@link Pattern#compile(String)}-{@link CachedConverter}.
+	 */
+	public static CachedConverter<String, Pattern> cachedPatternConverter() {
+		return Strings.CACHED_PATTERN_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link SynchronizedConverter} zum {@link CachedConverter} zurück, der seine Eingabe via
+	 * {@link Pattern#compile(String)} in einen kompilierten regulären Ausdruck umwandelt.
+	 * 
+	 * @see CachedConverter
+	 * @see SynchronizedConverter
+	 * @see Pattern#compile(String)
+	 * @see Strings#cachedPatternConverter()
+	 * @return {@link Pattern#compile(String)}-{@link CachedConverter}.
+	 */
+	public static Converter<String, Pattern> synchronizedCachedPatternConverter() {
+		return Strings.SYNCHRONIZED_CACHED_PATTERN_CONVERTER;
 	}
 
 	/**
