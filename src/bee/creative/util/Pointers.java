@@ -46,6 +46,22 @@ public final class Pointers {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return Pointers.hashCode(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return Pointers.equals(this, object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return Objects.toStringCall("hardPointer", this.data);
 		}

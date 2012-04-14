@@ -514,7 +514,7 @@ public final class Converters {
 		 * Dieses Feld speichert die {@link Map} von Schlüsseln ({@link Pointer} auf Eingaben) auf Werte ({@link Pointer}
 		 * auf die Ausgaben).
 		 */
-		final Map<Pointer<GInput>, Pointer<GOutput>> map;
+		Map<Pointer<GInput>, Pointer<GOutput>> map;
 
 		/**
 		 * Dieses Feld speichert das Maximum für die Anzahl der Einträge in der {@link Map}.
@@ -538,6 +538,12 @@ public final class Converters {
 		final int outputMode;
 
 		/**
+		 * Dieses Feld speichert die maximale Anzahl an Einträgen in der {@link Map}. Wenn die aktuelle Anzahl 25% der
+		 * maximalen Anzahl unterschreitet, wird die Größe der {@link Map} angepasst.
+		 */
+		int capacity = 0;
+
+		/**
 		 * Dieses Feld speichert den {@link Converter}.
 		 */
 		final Converter<? super GInput, ? extends GOutput> converter;
@@ -558,21 +564,23 @@ public final class Converters {
 		public CachedConverter(final int limit, final int inputMode, final int outputMode,
 			final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException,
 			IllegalArgumentException {
-			if(converter == null) throw new NullPointerException("converter is null");
-			this.converter = converter;
 			Pointers.pointerConverter(inputMode);
 			Pointers.pointerConverter(outputMode);
+			if(converter == null) throw new NullPointerException("converter is null");
 			this.map = new LinkedHashMap<Pointer<GInput>, Pointer<GOutput>>(0, 0.75f, true);
 			this.limit = limit;
 			this.inputMode = inputMode;
 			this.outputMode = outputMode;
+			this.converter = converter;
 		}
 
 		/**
 		 * Diese Methode leert den Cache.
 		 */
 		public void clear() {
-			this.map.clear();
+			if(this.capacity == 0) return;
+			this.map = new LinkedHashMap<Pointer<GInput>, Pointer<GOutput>>(0, 0.75f, true);
+			this.capacity = 0;
 		}
 
 		/**
@@ -580,13 +588,14 @@ public final class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			final Pointer<GOutput> pointer = this.map.get(Pointers.hardPointer(input));
+			final Map<Pointer<GInput>, Pointer<GOutput>> map = this.map;
+			final Pointer<GOutput> pointer = map.get(Pointers.hardPointer(input));
 			if(pointer != null){
 				final GOutput output = pointer.data();
 				if(output != null) return output;
 				if(Pointers.isValid(pointer)) return null;
 				int valid = this.limit - 1;
-				for(final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = this.map.entrySet().iterator(); iterator
+				for(final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = map.entrySet().iterator(); iterator
 					.hasNext();){
 					final Entry<Pointer<GInput>, Pointer<GOutput>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
@@ -602,7 +611,14 @@ public final class Converters {
 				}
 			}
 			final GOutput output = this.converter.convert(input);
-			this.map.put(Pointers.pointer(this.inputMode, input), Pointers.pointer(this.outputMode, output));
+			map.put(Pointers.pointer(this.inputMode, input), Pointers.pointer(this.outputMode, output));
+			final int size = map.size(), capacity = this.capacity;
+			if(size >= capacity){
+				this.capacity = size;
+			}else if((size << 2) <= capacity){
+				(this.map = new LinkedHashMap<Pointer<GInput>, Pointer<GOutput>>(0, 0.75f, true)).putAll(map);
+				this.capacity = size;
+			}
 			return output;
 		}
 
