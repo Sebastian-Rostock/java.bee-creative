@@ -2,12 +2,12 @@ package bee.creative.util;
 
 /**
  * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von eienr
- * Testmethode ({@link Runnable}) benötigt werden.
+ * Testmethode ({@link Test}) benötigt werden.
  * <p>
  * Im nachfolgenden Beispiel wird ein anonymes {@link Runnable} als Testmethode initialisiert und gleich vermessen:
  * 
  * <pre>
- * Tester result = new Tester(new Runnable() {
+ * Tester result = new Tester(new Test() {
  * 
  * 	public void run() {
  * 		// ...
@@ -19,6 +19,23 @@ package bee.creative.util;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Tester {
+
+	/**
+	 * Diese Schnittstelle definiert die Testmethode eines {@link Tester}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface Test {
+
+		/**
+		 * Diese Methode führt den Test aus. Ein gegebenenfalls geworfenes {@link Throwable} wird dann im {@link Tester}
+		 * gespeichert.
+		 * 
+		 * @throws Throwable Wenn während des Tests ein Fehler eintritt.
+		 */
+		public void run() throws Throwable;
+
+	}
 
 	/**
 	 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
@@ -66,24 +83,35 @@ public class Tester {
 	public final long leaveMemory;
 
 	/**
+	 * Dieses Feld speichert das {@link Throwable} der Testmethode oder {@code null}.
+	 */
+	public final Throwable throwable;
+
+	/**
 	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Zur Ermittlung der
 	 * Speicherstände vor und nach dem Aufruf der Testmethode wird {@link Runtime#gc()} aufgerufen.
 	 * 
-	 * @param method Testmethode.
+	 * @param test Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
 	 */
-	public Tester(final Runnable method) throws NullPointerException {
-		if(method == null) throw new NullPointerException("method is null");
+	public Tester(final Test test) throws NullPointerException {
+		if(test == null) throw new NullPointerException("method is null");
 		final Runtime runtime = Runtime.getRuntime();
+		Throwable throwable = null;
 		runtime.gc();
 		this.enterMemory = runtime.totalMemory() - runtime.freeMemory();
 		this.enterTime = System.nanoTime();
-		method.run();
+		try{
+			test.run();
+		}catch(final Throwable e){
+			throwable = e;
+		}
 		this.leaveTime = System.nanoTime();
 		runtime.gc();
 		this.leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 		this.usedTime = this.leaveTime - this.enterTime;
 		this.usedMemory = this.leaveMemory - this.enterMemory;
+		this.throwable = throwable;
 	}
 
 	/**
