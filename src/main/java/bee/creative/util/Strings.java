@@ -422,18 +422,18 @@ public final class Strings {
 	static final class PatternConverter implements Converter<String, Pattern> {
 
 		/**
-		 * Dieses Feld speichert die Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
+		 * Dieses Feld speichert die Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE},
 		 * {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES},
-		 * {@link Pattern#LITERAL}, {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS}).
+		 * {@link Pattern#LITERAL}, {@link Pattern#COMMENTS}).
 		 */
 		final int flags;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Bitmaske.
 		 * 
-		 * @param flags Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
+		 * @param flags Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
 		 *        {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES},
-		 *        {@link Pattern#LITERAL}, {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS})
+		 *        {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 		 */
 		public PatternConverter(final int flags) {
 			this.flags = flags;
@@ -1196,9 +1196,9 @@ public final class Strings {
 	 * 
 	 * @see Converter
 	 * @see Pattern#compile(String, int)
-	 * @param flags Bitmaske ({@link Pattern #CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
+	 * @param flags Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
 	 *        {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL},
-	 *        {@link Pattern#UNICODE_CHARACTER_CLASS}, {@link Pattern#COMMENTS})
+	 *        {@link Pattern#COMMENTS})
 	 * @return {@link Pattern#compile(String, int)}-{@link Converter}.
 	 */
 	public static Converter<String, Pattern> patternConverter(final int flags) {
