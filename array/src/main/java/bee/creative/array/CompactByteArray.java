@@ -1,0 +1,383 @@
+package bee.creative.array;
+
+import java.util.Arrays;
+
+/**
+ * Diese Klasse implementiert ein {@link ByteArray} als {@link CompactArray}.
+ * 
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ */
+public class CompactByteArray extends CompactArray<byte[], Byte> implements ByteArray {
+
+	/**
+	 * Diese Klasse implementiert ein {@link ByteArray} als modifizierbare Sicht auf einen Teil eines
+	 * {@link CompactByteArray}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	protected static class CompactByteSubArray extends CompactSubArray<CompactByteArray, byte[], Byte> implements
+		ByteArray {
+
+		/**
+		 * Dieser Konstrukteur initialisiert Besitzer und Indices.
+		 * 
+		 * @param owner Besitzer.
+		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
+		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder
+		 *         {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
+		 */
+		public CompactByteSubArray(final CompactByteArray owner, final int startIndex, final int finalIndex)
+			throws NullPointerException, IndexOutOfBoundsException {
+			super(owner, startIndex, finalIndex);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ByteArraySection section() {
+			return new CompactByteSubArraySection(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte get(final int index) {
+			return this.owner.get(this.ownerIndex(index));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void get(final int index, final byte[] values) {
+			this.get(index, ByteArraySection.from(values));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void set(final int index, final byte value) {
+			this.owner.set(this.ownerIndex(index), value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void set(final int index, final byte[] values) {
+			this.set(index, ByteArraySection.from(values));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final byte value) {
+			this.add(this.size(), value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final byte[] values) {
+			this.add(this.size(), values);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final int index, final byte value) {
+			this.insert(index, 1);
+			this.set(index, value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final int index, final byte[] values) {
+			this.add(this.size(), ByteArraySection.from(values));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ByteArray subArray(final int fromIndex, final int toIndex) {
+			return (ByteArray)this.ownerSubArray(fromIndex, toIndex);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteArray}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	protected static class CompactByteArraySection extends ByteArraySection {
+
+		/**
+		 * Dieses Feld speichert den Besitzer.
+		 */
+		protected final CompactByteArray owner;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 */
+		public CompactByteArraySection(final CompactByteArray owner) throws NullPointerException {
+			if(owner == null) throw new NullPointerException();
+			this.owner = owner;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.owner.size;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte[] array() {
+			return this.owner.array;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int startIndex() {
+			return this.owner.from;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int finalIndex() {
+			final CompactByteArray owner = this.owner;
+			return owner.from + owner.size;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteSubArray}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	protected static class CompactByteSubArraySection extends ByteArraySection {
+
+		/**
+		 * Dieses Feld speichert den Besitzer.
+		 */
+		protected final CompactByteSubArray owner;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 */
+		public CompactByteSubArraySection(final CompactByteSubArray owner) throws NullPointerException {
+			if(owner == null) throw new NullPointerException();
+			this.owner = owner;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.owner.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte[] array() {
+			return this.owner.owner.array;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int startIndex() {
+			return this.owner.startIndex;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int finalIndex() {
+			return this.owner.finalIndex;
+		}
+
+	}
+
+	/**
+	 * Dieses Feld speichert das leere {@code byte}-Array.
+	 */
+	protected static final byte[] VOID = new byte[0];
+
+	/**
+	 * Dieses Feld speichert das {@code byte}-Array.
+	 */
+	protected byte[] array;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected byte[] getArray() {
+		return this.array;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void setArray(final byte[] array) {
+		this.array = array;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected byte[] newArray(final int length) {
+		if(length == 0) return CompactByteArray.VOID;
+		return new byte[length];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void clearArray(final byte[] array, final int fromIndex, final int toIndex) {
+		Arrays.fill(array, fromIndex, toIndex, (byte)0);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Byte getValue(final int index) {
+		return Byte.valueOf(this.get(index));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void setValue(final int index, final Byte value) {
+		this.set(index, value.byteValue());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected int getLength(final byte[] array) {
+		return array.length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public byte get(final int index) {
+		return this.array[this.inclusiveIndex(index)];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void get(final int index, final byte[] values) {
+		this.get(index, ByteArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void set(final int index, final byte value) {
+		this.array[this.inclusiveIndex(index)] = value;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void set(final int index, final byte[] values) {
+		this.set(index, ByteArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void add(final byte value) {
+		this.add(this.size, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void add(final byte[] values) {
+		this.add(this.size, values);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void add(final int index, final byte value) {
+		this.exclusiveIndex(index);
+		this.insert(index, 1);
+		this.set(this.from + index, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void add(final int index, final byte[] values) {
+		this.add(this.size, ByteArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ByteArraySection section() {
+		return new CompactByteArraySection(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ByteArray subArray(final int startIndex, final int finalIndex) {
+		return new CompactByteSubArray(this, startIndex, finalIndex);
+	}
+
+}

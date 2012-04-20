@@ -1,10 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>core</artifactId>
-    <groupId>bee-creative</groupId>
-    <version>1.0.1</version>
-    <relativePath>..</relativePath>
-  </parent>
-  <artifactId>util</artifactId>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>bee-creative</groupId>
+	<artifactId>core</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+	<name>bee-creative</name>
+	<description>Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, 
+Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.</description>
+	<licenses>
+		<license>
+			<url>http://creativecommons.org/licenses/by/3.0/de/</url>
+			<name>Creative Commons Namensnennung 3.0 Deutschland</name>
+			<comments>bee-creative.util - [cc-by] Sebastian Rostock
+Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz
+anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an:
+[ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]</comments>
+		</license>
+	</licenses>
+	<build>
+		<finalName>${project.groupId}.${project.artifactId}-${project.version}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<modules>
+		<module>compact</module>
+		<module>util</module>
+		<module>array</module>
+		<module>function</module>
+		<module>xml</module>
+		<module>virtual</module>
+	</modules>
 </project>

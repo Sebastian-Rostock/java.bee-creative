@@ -1,0 +1,40 @@
+bee-creative.array - [cc-by] Sebastian Rostock
+
+Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag
+lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu:
+ [ http://creativecommons.org/licenses/by/3.0/de/ ]
+oder schicken Sie einen Brief an:
+ [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
+
+Dieses Package definiert eine allgemeine Array-Schnittstelle sowie acht davon abgeleitete spezialisierte Array-Schnittstellen zur Verarbeitung dynamischer byte-, char-, short-, int-, long-, float-, double- und boolean-Arrays. Diese Schnittstellen bieten darüber hinaus live List-Sichten zur Verarbeitung der primitiven Werte mit Hilfe von Byte-, Character-, Short-, Integer-, Long-, Float-, Double- bzw. Boolean-Objekten. 
+
+Neben den diesen Array-Schnittstelle stellt diese Bibliothek auch noch Array-Section-Klassen zur Verfügung, mit welcher Abschnitte primitiver Arrays beschrieben und verarbeitet werden können. 
+
+__________________________________________________________________________________________
+
+CompactByteArray
+
+	CompactByteArray byteArray = new CompactByteArray();
+	List<Byte> byteList = byteArray.values(); // List-API, aber 8,3% speicherverbrauch 
+
+__________________________________________________________________________________________
+
+TODO Beispiel: 
+
+  In diesem Beispiel soll ...
+
+  ----------------------------------------------------------------------------------------
+
+  Eingabe:
+    - ... - ...
+
+  ----------------------------------------------------------------------------------------
+
+  Ausgabe:
+    - ... - ...
+
+  ----------------------------------------------------------------------------------------
+
+  Quelltext:
+
+    ...
