@@ -1,7 +1,5 @@
 package bee.creative.array;
 
-import java.util.Arrays;
-
 /**
  * Diese Klasse implementiert ein {@link IntegerArray} als {@link CompactArray}.
  * 
@@ -242,6 +240,44 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	protected int[] array;
 
 	/**
+	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition
+	 * {@code 0.5}.
+	 */
+	public CompactIntegerArray() {
+		super();
+	}
+
+	/**
+	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition
+	 * {@code 0.5}.
+	 * 
+	 * @see ArrayData#allocate(int)
+	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
+	 */
+	public CompactIntegerArray(final int capacity) throws IllegalArgumentException {
+		super(capacity);
+	}
+
+	/**
+	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als
+	 * internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird
+	 * {@code 0.5} verwendet.
+	 * 
+	 * @see ArrayData#allocate(int)
+	 * @see ArraySection#validate(ArraySection)
+	 * @param section {@link ArraySection}.
+	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
+	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder
+	 *         {@code section.finalIndex() > section.arrayLength()}.
+	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}.
+	 */
+	public CompactIntegerArray(final ArraySection<int[]> section) throws NullPointerException, IndexOutOfBoundsException,
+		IllegalArgumentException {
+		super(section);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -264,14 +300,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	protected int[] newArray(final int length) {
 		if(length == 0) return CompactIntegerArray.VOID;
 		return new int[length];
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void clearArray(final int[] array, final int fromIndex, final int toIndex) {
-		Arrays.fill(array, fromIndex, toIndex, (int)0);
 	}
 
 	/**

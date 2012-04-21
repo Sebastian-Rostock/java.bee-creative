@@ -1,7 +1,5 @@
 package bee.creative.array;
 
-import java.util.Arrays;
-
 /**
  * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung dynamischer Arrays.
  * <p>
@@ -275,12 +273,12 @@ public abstract class ArrayData<GArray> {
 	/**
 	 * Diese Methode leert den gegebenen Bereich im gegebenen Array.
 	 * 
-	 * @see Arrays#fill(Object[], Object)
 	 * @param array Array.
 	 * @param startIndex Index des ersten Elements im Bereich.
 	 * @param finalIndex Index des ersten Elements nach dem Bereich.
 	 */
-	protected abstract void clearArray(GArray array, int startIndex, int finalIndex);
+	protected void clearArray(final GArray array, final int startIndex, final int finalIndex) {
+	}
 
 	/**
 	 * Diese Methode gibt die Länge des gegebenen Arrays zurück.
@@ -293,10 +291,12 @@ public abstract class ArrayData<GArray> {
 	/**
 	 * Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 * 
-	 * @param count Anzahl.
+	 * @param capacity Anzahl.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public final void allocate(final int count) {
-		this.customAllocate(count);
+	public final void allocate(final int capacity) throws IllegalArgumentException {
+		if(capacity < 0) throw new IllegalArgumentException("capacity < 0");
+		this.customAllocate(capacity);
 	}
 
 	/**

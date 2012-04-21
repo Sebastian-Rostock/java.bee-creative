@@ -372,28 +372,30 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	private float alignment = 0.5f;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Array} mit der Kapazität {@code 0} und der relativen
-	 * Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition
+	 * {@code 0.5}.
 	 */
 	public CompactArray() {
 		this(0);
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Array} mit der gegebenen Kapazität und der relativen
-	 * Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition
+	 * {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public CompactArray(final int capacity) {
-		this.setArray(this.newArray(0));
+	public CompactArray(final int capacity) throws IllegalArgumentException {
+		if(capacity < 0) throw new IllegalArgumentException("capacity < 0");
+		this.setArray(this.newArray(capacity));
 		this.allocate(capacity);
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert {@link Array} und Ausrichtung mit den Daten der gegebenen {@link ArraySection}.
-	 * Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird
+	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als
+	 * internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird
 	 * {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
