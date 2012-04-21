@@ -1,13 +1,6 @@
-bee-creative.compact - [cc-by] Sebastian Rostock
+# bee.creative.compact
 
-Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag
-lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu:
- [ http://creativecommons.org/licenses/by/3.0/de/ ]
-oder schicken Sie einen Brief an:
- [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
 
-Diese Bibliothek beinhaltet speicherminimale Implementationen der Schnittstellen List,
-Set, NavigableSet, Map und NavigableMap.
 
 __________________________________________________________________________________________
 
@@ -94,22 +87,7 @@ CompactNavigableMap
 
 __________________________________________________________________________________________
 
-TODO Beispiel: CompactItemHashSet
 
-  In diesem Beispiel soll ...
+##### [cc-by] Sebastian Rostock ( bee-creative@gmx.de )
 
-  ----------------------------------------------------------------------------------------
-
-  Eingabe:
-    - ... - ...
-
-  ----------------------------------------------------------------------------------------
-
-  Ausgabe:
-    - ... - ...
-
-  ----------------------------------------------------------------------------------------
-
-  Quelltext:
-
-    ...
+Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu: [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an: [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]

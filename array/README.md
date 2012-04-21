@@ -2,7 +2,9 @@
 
 Benötigt man `hashCode()`, `equals()`, `toString()` oder `compareTo()` für Abschnitte primitiver Arrays, vielleicht auch noch speicherminimale und schnelle modifizierbare Arrays mit `List`-Schnittstelle, dann ist man bei `bee.creative.array` genau an der richtigen Adresse.
 
----
+__________________________________________________________________________________________
+
+
 ### ArraySection
 
 Mit `ArraySection`s werden Abschnitte primitiver Arrays um die Methoden `hashCode()`, `equals()`, `toString()` und `compareTo()` erweitert, wobei es für `byte`, `char`-, `short`-, `int`-, `long`-, `float`-, `double`- und `boolean`-Arrays je eine spezielle `ArraySection`-Implementation gibt. `ArraySection`s kann aus einem `int`-Array beispielsweise so erzeugen:
@@ -13,7 +15,9 @@ Mit `ArraySection`s werden Abschnitte primitiver Arrays um die Methoden `hashCod
 
 In `arraySection1` sind allen Werte des `int`-Arrays enthalte, `arraySection2` beschreibt dagegen nur den Abschnitt von einschließlich `2` bis ausschließlich `6` mit den Werten `{ 789, 101, 112, 131 }`.
 
----
+__________________________________________________________________________________________
+
+
 ### Array
 
 Die Schnittstelle `Array` definiert ein modifizierbares primitives Array mit `List`- und `ArraySection`-Sicht, wobei es für `byte`, `char`-, `short`-, `int`-, `long`-, `float`-, `double`- und `boolean`-Arrays je spezielle `Array`-Schnittstellen und Implementation gibt. Die kompakten `Array`-Implementationen haben im Vergleich zur `ArrayList` einen deutlich geringen Speicherverbrauch und benötigen auch weniger Rechenzeit beim Einfügen und Entfernen von Elementen.
@@ -24,7 +28,8 @@ Die Schnittstelle `Array` definiert ein modifizierbares primitives Array mit `Li
 Die `ArrayList` (`byteList2`) benötigt `2`-mal soviel Rechenzeit beim Einfügen und Entfernen von Elementen und `16`-mal soviel Speicher für ihre Elemente im vergleich zur 
 `List`-Sicht des `CompactByteArray`s.
 
----
+__________________________________________________________________________________________
+
 
 ##### [cc-by] Sebastian Rostock ( bee-creative@gmx.de )
 
