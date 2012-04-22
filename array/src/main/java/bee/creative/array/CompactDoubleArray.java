@@ -322,8 +322,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final double[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

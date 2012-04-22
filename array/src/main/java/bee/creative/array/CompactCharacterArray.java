@@ -322,8 +322,8 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final char[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

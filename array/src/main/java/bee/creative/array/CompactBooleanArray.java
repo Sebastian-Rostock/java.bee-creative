@@ -322,8 +322,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final boolean[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

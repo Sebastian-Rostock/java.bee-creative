@@ -418,7 +418,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int customAlignment(final int space) {
+	protected int defaultAlignment(final int space) {
 		return (int)(space * this.alignment);
 	}
 
@@ -613,7 +613,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void insert(final int index, final int count) throws IndexOutOfBoundsException, IllegalArgumentException {
-		this.customInsert(this.exclusiveIndex(index), count);
+		this.defaultInsert(this.exclusiveIndex(index), count);
 	}
 
 	/**
@@ -621,7 +621,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void remove(final int index, final int count) throws IndexOutOfBoundsException, IllegalArgumentException {
-		this.customRemove(this.exclusiveIndex(index), count);
+		this.defaultRemove(this.exclusiveIndex(index), count);
 	}
 
 	/**

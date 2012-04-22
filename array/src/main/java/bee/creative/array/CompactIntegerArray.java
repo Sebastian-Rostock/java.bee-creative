@@ -322,8 +322,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final int[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

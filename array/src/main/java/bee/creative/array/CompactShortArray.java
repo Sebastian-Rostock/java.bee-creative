@@ -322,8 +322,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final short[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

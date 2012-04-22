@@ -322,8 +322,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final long[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

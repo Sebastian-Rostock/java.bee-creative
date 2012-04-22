@@ -322,8 +322,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final byte[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**

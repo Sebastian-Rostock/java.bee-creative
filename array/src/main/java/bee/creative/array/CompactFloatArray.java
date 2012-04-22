@@ -322,8 +322,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getLength(final float[] array) {
-		return array.length;
+	protected int getArrayLength() {
+		return this.array.length;
 	}
 
 	/**
