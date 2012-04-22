@@ -1,6 +1,5 @@
 package bee.creative.compact;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -14,11 +13,8 @@ import java.util.NavigableSet;
  * <p>
  * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben.
  * Dadurch vergrößert sich entweder die Größe des Leerraums vor oder die die Größe des Leerraums nach dem
- * Nutzdatenbereich.
- * <p>
- * Beim Einfügen von Elementen wird versucht, die wenigen Elemente vor bzw. nach der Einfügeposition zu verschieben.
- * Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus, werden alle Elemente verschoben und
- * im Array neu ausgerichtet.
+ * Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus, werden alle
+ * Elemente verschoben und im Array neu ausgerichtet.
  * <p>
  * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des Arrays ausgerichtet wird, wird das
  * häufige Einfügen von Elementen am Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des Arrays
@@ -545,7 +541,7 @@ public abstract class CompactData {
 
 	/**
 	 * Diese Methode gibt die neue Länge für das gegebene Array zurück, um darin die gegebene Anzahl an Elementen
-	 * verwalten zu können. Die Berechnung ist an die in {@link ArrayList} angelehnt.
+	 * verwalten zu können.
 	 * 
 	 * @param list Array.
 	 * @param count Anzahl.
@@ -593,58 +589,62 @@ public abstract class CompactData {
 	 * 
 	 * @see CompactData#customAlignment(int)
 	 * @see CompactData#defaultLength(Object[], int)
-	 * @param list Array.
+	 * @param array Array.
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.
 	 * @return (neues) Array.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
 	 */
-	protected final Object[] defaultInsert(final Object[] list, final int index, final int count)
+	protected final Object[] defaultInsert(final Object[] array, final int index, final int count)
 		throws IllegalArgumentException {
 		final int from = this.from;
-		final int size = this.size;
 		final int index2 = index - from;
-		if((index2 < 0) || (index2 > size)) throw new IllegalArgumentException("index out of range: " + index);
-		if(count < 0) throw new IllegalArgumentException("count out of range: " + count);
-		if(count == 0) return list;
+		if(index2 < 0) throw new IllegalArgumentException("index < from");
+		final int size = this.size;
+		if(index2 > size) throw new IllegalArgumentException("index > from + size");
+		if(count == 0) return array;
+		if(count < 0) throw new IllegalArgumentException("count < 0");
 		final int size2 = size + count;
-		final int length = this.defaultLength(list, size2);
+		final int array2Length = this.defaultLength(array, size2);
 		this.size = size2;
-		if(length != list.length){
-			final Object[] list2 = new Object[length];
-			final int from2 = this.customAlignment(length - size2);
-			System.arraycopy(list, from, list2, from2, index2);
-			System.arraycopy(list, index, list2, from2 + index2 + count, size - index2);
+		if(array2Length != array.length){
+			final Object[] array2 = new Object[array2Length];
+			final int from2 = this.customAlignment(array2Length - size2);
+			System.arraycopy(array, from, array2, from2, index2);
+			System.arraycopy(array, index, array2, from2 + index2 + count, size - index2);
 			this.from = from2;
-			return list2;
+			return array2;
 		}
 		if(index2 > (size / 2)){
-			if((from + size2) <= length){
-				System.arraycopy(list, index, list, index + count, size - index2);
-				return list;
+			if((from + size2) <= array2Length){
+				System.arraycopy(array, index, array, index + count, size - index2);
+				return array;
 			}
-			final int from2 = this.customAlignment(length - size2);
-			this.from = from2;
-			System.arraycopy(list, from, list, from2, index2);
-			System.arraycopy(list, index, list, from2 + index2 + count, size - index2);
-			final int last = from + size, last2 = from2 + size2;
-			if(last2 >= last) return list;
-			Arrays.fill(list, last2, last, null);
-			return list;
+		}else{
+			if(from >= count){
+				final int from2 = from - count;
+				this.from = from2;
+				System.arraycopy(array, from, array, from2, index2);
+				return array;
+			}
 		}
-		if(from >= count){
-			final int from2 = from - count;
-			this.from = from2;
-			System.arraycopy(list, from, list, from2, index2);
-			return list;
-		}
-		final int from2 = this.customAlignment(length - size2);
+		final int from2 = this.defaultAlignment(array2Length - size2);
 		this.from = from2;
-		System.arraycopy(list, index, list, from2 + index2 + count, size - index2);
-		System.arraycopy(list, from, list, from2, index2);
-		if(from >= from2) return list;
-		Arrays.fill(list, from, from2, null);
-		return list;
+		if(from2 < from){
+			System.arraycopy(array, from, array, from2, index2);
+			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
+			final int last = from + size, last2 = from2 + size2;
+			if(last2 < last){
+				Arrays.fill(array, last2, last, null);
+			}
+		}else{
+			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
+			System.arraycopy(array, from, array, from2, index2);
+			if(from2 > from){
+				Arrays.fill(array, from, from2, null);
+			}
+		}
+		return array;
 	}
 
 	/**
@@ -824,7 +824,7 @@ public abstract class CompactData {
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
 	 * @param item Element.
-	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der  Schlüssel.
+	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der Schlüssel.
 	 */
 	protected abstract int customItemCompare(Object key, int hash, Object item);
 
