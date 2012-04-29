@@ -1,6 +1,6 @@
 # bee.creative.compact
 
-Wer speicherminimale, modifizierbare `Maps`, `NavigableMaps`, `Sets`, `NavigableSets` oder `Lists` sucht, dem kann mit `bee.creative.compact` geholfen werden.
+Wer speicherminimale, modifizierbare Implementationen von `Map`, `NavigableMap`, `Set`, `NavigableSet` oder `List` sucht, dem kann mit `bee.creative.compact` geholfen werden.
 
 __________________________________________________________________________________________
 

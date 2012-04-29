@@ -3,6 +3,10 @@
 
 __________________________________________________________________________________________
 
+### bee.creative.util
+
+__________________________________________________________________________________________
+
 ### bee.creative.array
 
 Benötigt man `hashCode()`, `equals()`, `toString()` oder `compareTo()` für Abschnitte primitiver Arrays, vielleicht auch noch schnelle, speicherminimale, modifizierbare Arrays mit `List`-Schnittstelle, dann ist man bei `bee.creative.array` genau an der richtigen Adresse.
@@ -11,7 +15,7 @@ ________________________________________________________________________________
 
 ### bee.creative.compact
 
-Wer speicherminimale, modifizierbare `Maps`, `NavigableMaps`, `Sets`, `NavigableSets` oder `Lists` sucht, dem kann mit `bee.creative.compact` geholfen werden.
+Wer speicherminimale, modifizierbare Implementationen von `Map`, `NavigableMap`, `Set`, `NavigableSet` oder `List` sucht, dem kann mit `bee.creative.compact` geholfen werden.
 
 __________________________________________________________________________________________
 

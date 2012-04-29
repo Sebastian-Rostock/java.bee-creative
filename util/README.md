@@ -1,11 +1,12 @@
 # bee-creative.util - [cc-by] Sebastian Rostock
 
-Mit `bee-creative.util` werden *Iterator*, *Iterable*, *Comparator* und *Comparable* zu richtigen Multitalenten. Durch die Verknüpfung dieser Schnittstellen über die in `bee-creative.util`
-definierten funktionalen Operatoren sowie den Schnittstellen *Filter* und *Converter* lassen sich leicht sehr Aufgaben lösen.
+Wenn sich Probleme mit einem verkettenden, filternden, konvertierenden oder begrenzenden `Iterator` bzw. `Iterable` oder
+mit einem verkettenden oder konvertierenden `Comparator` bzw. `Comparable` lösen lassen, kann man sich mit `bee-creative.util` viel Arbeit sparen.
+Dazu finden sich in dieser Bibliothek `Filter` für verschiedene logische Operationen, verkettende, filternde sowie gepufferte `Converter`,
+statische, dynamische sowie inverse `Conversion`, gepufferte sowie konvertierende `Builder`, `Pointer` unterschiedlicher 
+Stärke sowie `Tester` zur Ermittlung von Rechenzeit und Speicherbelegung einer Testmethode.
 
-
-
-
+ 
 
 ---
 
@@ -260,9 +261,9 @@ Helper helper = Helper.get();
 
 
 
----
+__________________________________________________________________________________________
+
 
 ##### [cc-by] Sebastian Rostock ( bee-creative@gmx.de )
-
 
 Dieses Werk ist unter einem Creative Commons Namensnennung 3.0 Deutschland Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu: [ http://creativecommons.org/licenses/by/3.0/de/ ] oder schicken Sie einen Brief an: [ Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA. ]
