@@ -5,6 +5,8 @@ ________________________________________________________________________________
 
 ### bee.creative.util
 
+Wenn sich Probleme mit einem verkettenden, filternden, konvertierenden oder begrenzenden `Iterator` bzw. `Iterable` oder mit einem verkettenden oder konvertierenden `Comparator` bzw. `Comparable` lösen lassen, kann man sich mit `bee-creative.util` viel Arbeit sparen.
+
 __________________________________________________________________________________________
 
 ### bee.creative.array

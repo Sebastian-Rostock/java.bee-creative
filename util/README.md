@@ -1,68 +1,80 @@
-# bee-creative.util - [cc-by] Sebastian Rostock
+# bee-creative.util
 
-Wenn sich Probleme mit einem verkettenden, filternden, konvertierenden oder begrenzenden `Iterator` bzw. `Iterable` oder
-mit einem verkettenden oder konvertierenden `Comparator` bzw. `Comparable` lösen lassen, kann man sich mit `bee-creative.util` viel Arbeit sparen.
-Dazu finden sich in dieser Bibliothek `Filter` für verschiedene logische Operationen, verkettende, filternde sowie gepufferte `Converter`,
-statische, dynamische sowie inverse `Conversion`, gepufferte sowie konvertierende `Builder`, `Pointer` unterschiedlicher 
-Stärke sowie `Tester` zur Ermittlung von Rechenzeit und Speicherbelegung einer Testmethode.
+Wenn sich Probleme mit einem verkettenden, filternden, konvertierenden oder begrenzenden `Iterator` bzw. `Iterable` oder mit einem verkettenden oder konvertierenden `Comparator` bzw. `Comparable` lösen lassen, kann `bee-creative.util` die Lösung sein.
 
- 
-
----
-
-TODO Beispiel: CachedConverter
-
-
-      final CachedConverter<String, String> uniqueString = Converters.cachedConverter(-1, Pointers.WEAK, Pointers.WEAK, Converters.<String>voidConverter());
+In dieser Bibliothek finden sich dazu `Filter` für verschiedene logische Operationen, verkettende, filternde sowie gepufferte `Converter`, statische, dynamische sowie inverse `Conversion`, gepufferte sowie konvertierende `Builder`, `Pointer` unterschiedlicher Stärke sowie `Tester` zur Ermittlung von Rechenzeit und Speicherbelegung einer Testmethode.
 
 __________________________________________________________________________________________
 
-#### Beispiel: Filter, Iterable, Converter
 
-In diesem Beispiel soll aus einer Menge benannter Objekte `NamedEntry` die Menge der Objekte ermittelt werden, deren Name mit einem gegebenen Präfix beginnt oder einem gegebenen Suffix endet.
+### Filter
 
-	class NamedEntry {
+Ein `Filter` ist eine Methode, die mit den beiden Rückgabewerten *true* und *false* einen gegebenen Eingabewert entweder akzeptieren oder ablehnen kann. Beispielsweise könnten die `Filter` *prefixFilter* und *suffixFilter* einen gegebenen `String` akzeptieren, wenn dieser mit einem bestimmten *prefix* beginnt bzw. *suffix* endet.
+
+	Filter<String> prefixFilter = new Filter<String>() {
+		public boolean accept(String input) {
+			return input.startsWith(prefix);
+		}
+	};
+
+	Filter<String> suffixFilter = new Filter<String>() {
+		public boolean accept(String input) {
+			return input.endsWith(suffix);
+		}
+	};
+
+`Filter` entsprechen damit logischen Eigenschaften bzw. Prädikaten und können als soche über logische Operatoren miteinander verklüpft werden. Einige Beispiele hierfür sind:
+
+	Filter<String> prefixOrSuffixFilter = Filters.disjunctionFilter(prefixFilter, suffixFilter);
+	Filter<String> prefixAndSuffixFilter = Filters.conjunctionFilter(prefixFilter, suffixFilter);
+	Filter<String> prefixXorSuffixFilter = Filters.inverseFilter(Filters.equivalenceFilter(prefixFilter, suffixFilter));
+
+Ein konvertierender `Filter` verbindet einen speziellen `Filter` meist mit einem navigierenden `Converter`, da der `Converter` das Eingabeobjekt für diesen speziellen `Filter` ermittelt. 
+Der konvertierende `Filter` *itemNameFilter* könnte beispielsweise ein `Item` akzeptieren, dessen Name mit einem bestimmten *prefix* beginnt oder *suffix* endet.
+
+	class Item {
 		String name;
 		...
 	}
 	
-	void work(...) {
-
-		// Eingabe
-		final String prefix = ...
-		final String suffix = ...
-		Iterable<NamedEntry> namedEntris = ...
-
-		// Converter
-		Converter<NamedEntry, String> nameConverter = new Converter<NamedEntry, String>() {
-			public String convert(final NamedEntry input) {
-				return input.name;
-			}
-		};
-
-		// Filter
-		Filter<String> prefixFilter = new Filter<String>() {
-			public boolean accept(final String input) {
-				return input.startsWith(prefix);
-			}
-		};
-		Filter<String> suffixFilter = new Filter<String>() {
-			public boolean accept(final String input) {
-				return input.endsWith(suffix);
-			}
-		};
-		Filter<NamedEntry> namePrefixFilter = Filters.convertedFilter(nameConverter, prefixFilter);
-		Filter<NamedEntry> nameSuffixFilter = Filters.convertedFilter(nameConverter, suffixFilter);
-		Filter<NamedEntry> filter = Filters.disjunctionFilter(namePrefixFilter, nameSuffixFilter);
-		
-		// Ausgabe
-		Iterable<NamedEntry> filteredNamedEntris = Iterables.filteredIterable(filter, namedEntris);
-		
-	}
+	Converter<Item, String> itemNameConverter = new Converter<Item, String>() {
+		public String convert(Item input) {
+			return input.name;
+		}
+	};
 	
+	Filter<Item> itemNameFilter = Filters.convertedFilter(itemNameConverter, prefixOrSuffixFilter);
+
 __________________________________________________________________________________________
 
-Beispiel: Iterable, Converter, Conversion, Comparator
+
+### Converter
+
+Ein `Converter` ist eine Methode, die ein gegebenes Eingabeobjekt in ein Ausgabeobjekt umwandelt. Bei dieser Umwandlung kann es sich beispielsweise um eine Navigation in einem Objektgraph oder auch das Parsen, Formatieren bzw. Umkodieren des Eingabeobjekts handel.
+
+Der unnötigen Speicherverschwendung, die beim Landen identischer Texten aus Dateien auftreten kann, lässt sich beispielsweise mit dem gepufferter `Converter` *uniqueStringConverter* begegnen, dessen Ausgabeobjekt dem einzigartigen `String` entspricht, der zum Eingabeobjekt äquivalent ist.
+
+	Converter<String, String> voidConverter = Converters.voidConverter();
+	Converter<String, String> uniqueStringConverter = Converters.cachedConverter(-1, Pointers.WEAK, Pointers.WEAK, voidConverter);
+
+Der Puffer in diesem `Converter` besteht aus einer `Map`, deren Schlüssel und Werte schwach auf die Eingabe- bzw. Ausgabeobjekte verweisen. Diese schwachen Verweise werden dann automatisch aufgelöst, wenn diese Objekte nur noch über eine `WeakReference` erreichbar sind.
+
+`Converter` zur Navigation 
+
+ChainedConverter
+
+
+
+
+
+
+
+__________________________________________________________________________________________
+
+### Conversion
+
+
+	
 
 In diesem Beispiel soll eine Menge komplexer Objekte (ComplexEntry) zur Anzeige in einer
 sortierten Auswahlliste aufbereitet werden. Die für die Anzeige benötigten Texte
@@ -154,57 +166,7 @@ Iterables.appendAll(sortedComplexEntryList, conversionInputIterable);
 
 __________________________________________________________________________________________
 
-Beispiel: Comparable
-
-In diesem Beispiel soll in einer sortierten Liste von sich nicht überlappenden Bereichen
-(Region) nach einem Bereich gesucht werden, der eine gegebene Position enthält.
-
-----------------------------------------------------------------------------------------
-
-Eingabe:
-- int - Position
-- List<Region> - sortierte Liste der Bereiche
-
-----------------------------------------------------------------------------------------
-
-Ausgabe:
-- Region - Bereich, der die Position enthält
-
-----------------------------------------------------------------------------------------
-
-Quelltext:
-
-class Region {
-
-int start;
-
-int length;
-
-// ...
-
-}
-
-Region find(List<Region> ranges, final int position) {
-
-Comparable<Region> comparable = new Comparable<Region>() {
-
-@Override
-public int compareTo(Region region) {
-if(position < region.start) return -1;
-if(position >= (region.start + region.length)) return +1;
-return 0;
-}
-
-};
-
-int index = Comparables.binarySearch(ranges, comparable);
-if(index < 0) return null;
-return ranges.get(index);
-}
-
-__________________________________________________________________________________________
-
-Beispiel: Pointer, Builder
+### Builder
 
 In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung einer
 automatischen Erzeugung und Zwischenspeicherung zur Verfügung gestellt werden. Wenn das
@@ -260,6 +222,13 @@ Helper helper = Helper.get();
 }
 
 
+__________________________________________________________________________________________
+
+### Pointer
+
+__________________________________________________________________________________________
+
+### Tester
 
 __________________________________________________________________________________________
 
