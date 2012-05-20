@@ -117,24 +117,16 @@ return builder.toString();
 
 void work(...) {
 
-// Eingabe
-Iterable<ComplexEntry> complexEntries = ...
+	// Eingabe
+	Iterable<ComplexEntry> complexEntries = ...
 
-// Ausgabe
-List<ComplexEntry> sortedComplexEntryList = new ArrayList<ComplexEntry>();
-List<String> sortedComplexFormatList = new ArrayList<String>();
+	// Ausgabe
+	List<ComplexEntry> sortedComplexEntryList = new ArrayList<ComplexEntry>();
+	List<String> sortedComplexFormatList = new ArrayList<String>();
 
-// Conversion
-List<Conversion<ComplexEntry, String>> conversionList =
-new ArrayList<Conversion<ComplexEntry, String>>();
-Converter<ComplexEntry, Conversion<ComplexEntry, String>> conversionConverter =
-Conversions.staticConversionConverter(ComplexEntry.ComplexFormatConverter);
-
-ConvertedIterable<ComplexEntry, Conversion<ComplexEntry, String>>
-conversionIterable = Iterables.convertedIterable(conversionConverter,
-complexEntries);
-
-Iterables.appendAll(conversionList, conversionIterable);
+	// Conversion
+	List<Conversion<ComplexEntry, String>> conversionList = new ArrayList<Conversion<ComplexEntry, String>>();
+	Iterables.appendAll(conversionList, Iterables.convertedIterable(Conversions.staticConversionConverter(ComplexEntry.ComplexFormatConverter), complexEntries));
 
 // Conversion.Output
 Converter<Conversion<?, ? extends String>, String> conversionOutputConverter =

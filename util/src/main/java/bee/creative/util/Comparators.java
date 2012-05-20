@@ -59,10 +59,10 @@ public final class Comparators {
 	/**
 	 * Diese Klasse implementiert einen {@link Comparator}, der {@code null}-Eingaben vergleicht und alle anderen Eingaben
 	 * an einen gegebenen {@link Comparator} weiterleitet. Der {@link Comparator} berechnet den Vergleichswert zweier
-	 * Objekte {@code o1} und {@code o2} via:
+	 * Objekte {@code value1} und {@code value2} via:
 	 * 
 	 * <pre>
-	 * ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)));
+	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)));
 	 * </pre>
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -84,8 +84,8 @@ public final class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry o1, final GEntry o2) {
-			return ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : this.comparator.compare(o1, o2)));
+		public int compare(final GEntry value1, final GEntry value2) {
+			return Comparators.compare(value1, value2, this.comparator);
 		}
 
 		/**
@@ -131,8 +131,8 @@ public final class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry o1, final GEntry o2) {
-			return this.comparator.compare(o2, o1);
+		public int compare(final GEntry value1, final GEntry value2) {
+			return this.comparator.compare(value2, value1);
 		}
 
 		/**
@@ -160,12 +160,12 @@ public final class Comparators {
 	 * {@link Comparator}s analog zu Zeichenketten vergleicht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der {@link Iterable}.
-	 * @param <GValue> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator}
+	 * @param <GValue> Typ der {@link Iterable}.
+	 * @param <GEntry> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator}
 	 *        verglichenen Objekte.
 	 */
-	public static final class IterableComparator<GEntry extends Iterable<? extends GValue>, GValue> extends
-		AbstractComparator<GEntry, GValue> {
+	public static final class IterableComparator<GValue extends Iterable<? extends GEntry>, GEntry> extends
+		AbstractComparator<GValue, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
@@ -173,7 +173,7 @@ public final class Comparators {
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
-		public IterableComparator(final Comparator<? super GValue> comparator) throws NullPointerException {
+		public IterableComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
 			super(comparator);
 		}
 
@@ -181,15 +181,8 @@ public final class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry o1, final GEntry o2) {
-			final Iterator<? extends GValue> i1 = o1.iterator(), i2 = o2.iterator();
-			while(true){
-				final boolean h1 = i1.hasNext(), h2 = i2.hasNext();
-				if(!h1) return (h2 ? -1 : 0);
-				if(!h2) return 1;
-				final int comp = this.comparator.compare(i1.next(), i2.next());
-				if(comp != 0) return comp;
-			}
+		public int compare(final GValue value1, final GValue value2) {
+			return Comparators.compare(value1, value2, this.comparator);
 		}
 
 		/**
@@ -251,9 +244,9 @@ public final class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry o1, final GEntry o2) {
-			final int comp = this.comparator1.compare(o1, o2);
-			return ((comp != 0) ? comp : this.comparator2.compare(o1, o2));
+		public int compare(final GEntry value1, final GEntry value2) {
+			final int comp = this.comparator1.compare(value1, value2);
+			return ((comp != 0) ? comp : this.comparator2.compare(value1, value2));
 		}
 
 		/**
@@ -320,8 +313,8 @@ public final class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry o1, final GEntry o2) {
-			return this.comparator.compare(this.converter.convert(o1), this.converter.convert(o2));
+		public int compare(final GEntry value1, final GEntry value2) {
+			return this.comparator.compare(this.converter.convert(value1), this.converter.convert(value2));
 		}
 
 		/**
@@ -360,14 +353,14 @@ public final class Comparators {
 	static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
-		public int compare(final String o1, final String o2) {
-			final int s1 = o1.length(), s2 = o2.length();
+		public int compare(final String value1, final String value2) {
+			final int s1 = value1.length(), s2 = value2.length();
 			int a1 = 0, a2 = 0;
 			{ // '0' überspringen
-				while((a1 < s1) && (o1.charAt(a1) == '0')){
+				while((a1 < s1) && (value1.charAt(a1) == '0')){
 					a1++;
 				}
-				while((a2 < s2) && (o2.charAt(a2) == '0')){
+				while((a2 < s2) && (value2.charAt(a2) == '0')){
 					a2++;
 				}
 			}
@@ -378,7 +371,7 @@ public final class Comparators {
 			{ // Zahlen vergleichen
 				final int comp = (s1 - a1) - (s2 - a2);
 				if(comp != 0) return comp;
-				return o1.substring(a1, s1).compareTo(o2.substring(a2, s2));
+				return value1.substring(a1, s1).compareTo(value2.substring(a2, s2));
 			}
 		}
 
@@ -395,8 +388,8 @@ public final class Comparators {
 	static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
-		public int compare(final String o1, final String o2) {
-			return o1.compareToIgnoreCase(o2);
+		public int compare(final String value1, final String value2) {
+			return value1.compareToIgnoreCase(value2);
 		}
 
 		@Override
@@ -413,19 +406,19 @@ public final class Comparators {
 	static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
-		public int compare(final String o1, final String o2) {
-			final int s1 = o1.length(), s2 = o2.length();
+		public int compare(final String value1, final String value2) {
+			final int s1 = value1.length(), s2 = value2.length();
 			int a1 = 0, a2 = 0, e1, e2;
 			while((a1 < s1) && (a2 < s2)){
 				{ // Buchstaben überspringen = Halt, wenn Ziffer gefunden
 					for(e1 = a1; e1 < s1; e1++){
-						final char c1 = o1.charAt(e1);
+						final char c1 = value1.charAt(e1);
 						if(('0' <= c1) && (c1 <= '9')){
 							break;
 						}
 					}
 					for(e2 = a2; e2 < s2; e2++){
-						final char c2 = o2.charAt(e2);
+						final char c2 = value2.charAt(e2);
 						if(('0' <= c2) && (c2 <= '9')){
 							break;
 						}
@@ -435,31 +428,31 @@ public final class Comparators {
 					if(a1 == e1){
 						if(a2 != e2) return -1;
 					}else if(a2 != e2){
-						final int comp = o1.substring(a1, e1).compareToIgnoreCase(o2.substring(a2, e2));
+						final int comp = value1.substring(a1, e1).compareToIgnoreCase(value2.substring(a2, e2));
 						if(comp != 0) return comp;
 					}else return 1;
 				}
 				{ // '0' überspringen = Halt, wenn nicht '0' gefunden
 					for(a1 = e1; a1 < s1; a1++){
-						if(o1.charAt(a1) != '0'){
+						if(value1.charAt(a1) != '0'){
 							break;
 						}
 					}
 					for(a2 = e2; a2 < s2; a2++){
-						if(o2.charAt(a2) != '0'){
+						if(value2.charAt(a2) != '0'){
 							break;
 						}
 					}
 				}
 				{ // Ziffern überspringen = Halt, wenn nicht Ziffer gefunden
 					for(e1 = a1; e1 < s1; e1++){
-						final char c1 = o1.charAt(e1);
+						final char c1 = value1.charAt(e1);
 						if(('0' > c1) || (c1 > '9')){
 							break;
 						}
 					}
 					for(e2 = a2; e2 < s2; e2++){
-						final char c2 = o2.charAt(e2);
+						final char c2 = value2.charAt(e2);
 						if(('0' > c2) || (c2 > '9')){
 							break;
 						}
@@ -471,7 +464,7 @@ public final class Comparators {
 					}else if(a2 != e2){
 						int comp = (e1 - a1) - (e2 - a2);
 						if(comp != 0) return comp;
-						comp = o1.substring(a1, e1).compareTo(o2.substring(a2, e2));
+						comp = value1.substring(a1, e1).compareTo(value2.substring(a2, e2));
 						if(comp != 0) return comp;
 					}else return 1;
 				}
@@ -495,8 +488,8 @@ public final class Comparators {
 	static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
 
 		@Override
-		public int compare(final Number o1, final Number o2) {
-			return Comparators.compare(o1.longValue(), o2.longValue());
+		public int compare(final Number value1, final Number value2) {
+			return Comparators.compare(value1.longValue(), value2.longValue());
 		}
 
 		@Override
@@ -513,8 +506,8 @@ public final class Comparators {
 	static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
 
 		@Override
-		public int compare(final Number o1, final Number o2) {
-			return Comparators.compare(o1.floatValue(), o2.floatValue());
+		public int compare(final Number value1, final Number value2) {
+			return Comparators.compare(value1.floatValue(), value2.floatValue());
 		}
 
 		@Override
@@ -531,8 +524,8 @@ public final class Comparators {
 	static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
 
 		@Override
-		public int compare(final Number o1, final Number o2) {
-			return Comparators.compare(o1.intValue(), o2.intValue());
+		public int compare(final Number value1, final Number value2) {
+			return Comparators.compare(value1.intValue(), value2.intValue());
 		}
 
 		@Override
@@ -549,8 +542,8 @@ public final class Comparators {
 	static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
 
 		@Override
-		public int compare(final Number o1, final Number o2) {
-			return Comparators.compare(o1.doubleValue(), o2.doubleValue());
+		public int compare(final Number value1, final Number value2) {
+			return Comparators.compare(value1.doubleValue(), value2.doubleValue());
 		}
 
 		@Override
@@ -566,8 +559,8 @@ public final class Comparators {
 	static final Comparator<? extends Comparable<?>> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
 
 		@Override
-		public int compare(final Comparable<Object> o1, final Comparable<Object> o2) {
-			return o1.compareTo(o2);
+		public int compare(final Comparable<Object> value1, final Comparable<Object> value2) {
+			return value1.compareTo(value2);
 		}
 
 		@Override
@@ -579,7 +572,9 @@ public final class Comparators {
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als,
-	 * gleich bzw. größer als der zweite Wert ist.
+	 * gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * 
+	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
 	 * @param value1 erster Wert.
 	 * @param value2 zweiter Wert.
@@ -591,7 +586,9 @@ public final class Comparators {
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als,
-	 * gleich bzw. größer als der zweite Wert ist.
+	 * gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * 
+	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
 	 * @param value1 erster Wert.
 	 * @param value2 zweiter Wert.
@@ -603,7 +600,9 @@ public final class Comparators {
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als,
-	 * gleich bzw. größer als der zweite Wert ist.
+	 * gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * 
+	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
 	 * @param value1 erster Wert.
 	 * @param value2 zweiter Wert.
@@ -615,7 +614,9 @@ public final class Comparators {
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als,
-	 * gleich bzw. größer als der zweite Wert ist.
+	 * gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * 
+	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
 	 * @param value1 erster Wert.
 	 * @param value2 zweiter Wert.
@@ -626,14 +627,80 @@ public final class Comparators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparator}, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an
-	 * einen gegebenen {@link Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte {@link Comparator} berechnet den
-	 * Vergleichswert zweier Objekte {@code o1} und {@code o2} via:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr
+	 * als, gleich bzw. größer als das zweite Objekt ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>
-	 * ((o1 == null) ? ((o2 == null) ? 0 : -1) : ((o2 == null) ? 1 : comparator.compare(o1, o2)))
+	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : value1.compareTo(value2)));
 	 * </pre>
 	 * 
+	 * @param <GValue> Typ der Objekte.
+	 * @param value1 erstes Objekt.
+	 * @param value2 zweites Objekt.
+	 * @return Vergleichswert.
+	 */
+	public static <GValue extends Comparable<? super GValue>> int compare(final GValue value1, final GValue value2) {
+		return ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : value1.compareTo(value2)));
+	}
+
+	/**
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr
+	 * als, gleich bzw. größer als das zweite Objekt ist. Der berechnete Vergleichswert entspricht:
+	 * 
+	 * <pre>
+	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)))
+	 * </pre>
+	 * 
+	 * @param <GValue> Typ der Objekte.
+	 * @param value1 erstes Objekt.
+	 * @param value2 zweites Objekt.
+	 * @param comparator {@link Comparator}.
+	 * @return Vergleichswert.
+	 */
+	public static <GValue> int compare(final GValue value1, final GValue value2,
+		final Comparator<? super GValue> comparator) {
+		return ((value1 == null) ? ((value2 == null) ? 0 : -1)
+			: ((value2 == null) ? 1 : comparator.compare(value1, value2)));
+	}
+
+	/**
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable}
+	 * kleienr als, gleich bzw. größer als das zweite {@link Iterable} ist. Die gegebenen {@link Iterable} werden für den
+	 * Verglcich parallel iteriert. Wenn der erste {@link Iterator} kein nächstes Element besitzt, der zweite
+	 * {@link Iterator} jedoch ein nächstes Element liefern kann, wird {@code -1} zurück gegeben. Wenn beide
+	 * {@link Iterator}en je ein nächstes Element liefern können, werden diese mit dem gegebenen {@link Comparator}
+	 * verglichen. Wenn der so berechnete Vergleichswert unglich {@code 0} ist, wird er zurück gegeben. Anderenfalls läuft
+	 * die Iteration weiter. Wenn der erste {@link Iterator} ein nächstes Element besitzt, der zweite {@link Iterator}
+	 * jedoch kein nächstes Element liefern kann, wird {@code 1} zurück gegeben.
+	 * 
+	 * @param <GValue> Typ der Elemente der {@link Iterable}.
+	 * @param value1 erster {@link Iterable}.
+	 * @param value2 zweiter {@link Iterable}.
+	 * @param comparator {@link Comparator} für die Elemente der {@link Iterable}.
+	 * @return Vergleichswert.
+	 */
+	public static <GValue> int compare(final Iterable<? extends GValue> value1, final Iterable<? extends GValue> value2,
+		final Comparator<? super GValue> comparator) {
+		final Iterator<? extends GValue> i1 = value1.iterator(), i2 = value2.iterator();
+		while(true){
+			final boolean h1 = i1.hasNext(), h2 = i2.hasNext();
+			if(!h1) return (h2 ? -1 : 0);
+			if(!h2) return 1;
+			final int comp = comparator.compare(i1.next(), i2.next());
+			if(comp != 0) return comp;
+		}
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Comparator}, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an
+	 * einen gegebenen {@link Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte {@link Comparator} berechnet den
+	 * Vergleichswert zweier Objekte {@code value1} und {@code value2} via:
+	 * 
+	 * <pre>
+	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)))
+	 * </pre>
+	 * 
+	 * @see Comparators#compare(Object, Object, Comparator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator {@link Comparator}
 	 * @return {@link NullComparator}
@@ -675,6 +742,7 @@ public final class Comparators {
 	 * {@link Comparator}s analog zu Zeichenketten vergleicht, und gibt ihn zurück.
 	 * 
 	 * @see Iterable
+	 * @see Comparators#compare(Iterable, Iterable, Comparator)
 	 * @param <GEntry> Typ der {@link Iterable}.
 	 * @param <GValue> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} zu
 	 *        verglichenen Elemente.

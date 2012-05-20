@@ -8,5 +8,12 @@
 	</parent>
 	<artifactId>array</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.1</version>
+	<version>1.1.2</version>
+	<dependencies>
+		<dependency>
+			<groupId>bee-creative</groupId>
+			<artifactId>util</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+	</dependencies>
 </project>
