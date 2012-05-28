@@ -610,6 +610,48 @@ public final class Iterables {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen unmodifizierbaren {@link Iterable}.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class UnmodifiableIterable<GEntry> implements Iterable<GEntry> {
+
+		/**
+		 * Dieses Feld speichert den {@link Iterable};
+		 */
+		final Iterable<? extends GEntry> iterable;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Iterable}.
+		 * 
+		 * @param iterable {@link Iterable}.
+		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
+		 */
+		public UnmodifiableIterable(final Iterable<? extends GEntry> iterable) throws NullPointerException {
+			if(iterable == null) throw new NullPointerException("iterator is null");
+			this.iterable = iterable;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return Iterators.unmodifiableIterator(this.iterable.iterator());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("unmodifiableIterable", this.iterable);
+		}
+
+	}
+
+	/**
 	 * Dieses Feld speichert den leeren {@link Iterable}.
 	 */
 	static final Iterable<Object> VOID_ITERABLE = new VoidIterable();
@@ -681,6 +723,24 @@ public final class Iterables {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("chainedIterableConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterables#unmodifiableIterable(Iterable)} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> UNMODIFIABLE_ITERABLE_CONVERTER = new Converter<Iterable<?>, Iterable<?>>() {
+
+		@Override
+		public Iterable<?> convert(final Iterable<?> input) {
+			return Iterables.unmodifiableIterable(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("unmodifiableIterableConverter");
 		}
 
 	};
@@ -816,8 +876,9 @@ public final class Iterables {
 	 * @param iterable {@link Iterable}.
 	 * @return {@link Iterable} oder {@code void}-{@link Iterable}.
 	 */
-	public static <GEntry> Iterable<GEntry> iterable(final Iterable<GEntry> iterable) {
-		return ((iterable == null) ? Iterables.<GEntry>voidIterable() : iterable);
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Iterable<GEntry> iterable(final Iterable<? extends GEntry> iterable) {
+		return (Iterable<GEntry>)((iterable == null) ? Iterables.VOID_ITERABLE : iterable);
 	}
 
 	/**
@@ -1050,6 +1111,33 @@ public final class Iterables {
 	public static <GInput extends Iterable<? extends GValue>, GValue, GOutput> Converter<GInput, Iterable<GOutput>> convertedIterableConverter(
 		final Converter<? super GValue, ? extends GOutput> converter) {
 		return new ConvertedIterableConverter<GInput, GValue, GOutput>(converter);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen unmodifizierbaren {@link Iterable}, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable {@link Iterable}.
+	 * @return {@link UnmodifiableIterable}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
+	 */
+	public static <GEntry> UnmodifiableIterable<GEntry> unmodifiableIterable(final Iterable<? extends GEntry> iterable)
+		throws NullPointerException {
+		return new UnmodifiableIterable<GEntry>(iterable);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterables#unmodifiableIterable(Iterable)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @see Iterables#unmodifiableIterable(Iterable)
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link Iterables#unmodifiableIterable(Iterable)}-{@link Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Converter<Iterable<? extends GEntry>, Iterable<GEntry>> unmodifiableIterableConverter() {
+		return (Converter<Iterable<? extends GEntry>, Iterable<GEntry>>)Iterables.UNMODIFIABLE_ITERABLE_CONVERTER;
 	}
 
 	/**

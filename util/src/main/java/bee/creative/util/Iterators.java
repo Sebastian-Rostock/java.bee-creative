@@ -341,16 +341,15 @@ public final class Iterators {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static final class ConvertedIteratorConverter<GInput extends Iterator<? extends GValue>, GValue, GOutput> implements
-		Converter<GInput, Iterator<GOutput>> {
+	static final class ConvertedIteratorConverter<GInput, GOutput> implements
+		Converter<Iterator<? extends GInput>, Iterator<GOutput>> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter}.
 		 */
-		final Converter<? super GValue, ? extends GOutput> converter;
+		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Converter}.
@@ -358,7 +357,7 @@ public final class Iterators {
 		 * @param converter {@link Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
-		public ConvertedIteratorConverter(final Converter<? super GValue, ? extends GOutput> converter) {
+		public ConvertedIteratorConverter(final Converter<? super GInput, ? extends GOutput> converter) {
 			if(converter == null) throw new NullPointerException("converter is null");
 			this.converter = converter;
 		}
@@ -367,7 +366,7 @@ public final class Iterators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<GOutput> convert(final GInput input) {
+		public Iterator<GOutput> convert(final Iterator<? extends GInput> input) {
 			return Iterators.convertedIterator(this.converter, input);
 		}
 
@@ -385,8 +384,8 @@ public final class Iterators {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ConvertedIteratorConverter<?, ?, ?>)) return false;
-			final ConvertedIteratorConverter<?, ?, ?> data = (ConvertedIteratorConverter<?, ?, ?>)object;
+			if(!(object instanceof ConvertedIteratorConverter<?, ?>)) return false;
+			final ConvertedIteratorConverter<?, ?> data = (ConvertedIteratorConverter<?, ?>)object;
 			return Objects.equals(this.converter, data.converter);
 		}
 
@@ -776,6 +775,65 @@ public final class Iterators {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen unmodifizierbaren {@link Iterator}.
+	 * 
+	 * @see Iterator#remove()
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class UnmodifiableIterator<GEntry> implements Iterator<GEntry> {
+
+		/**
+		 * Dieses Feld speichert den {@link Iterator};
+		 */
+		final Iterator<? extends GEntry> iterator;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link Iterator}.
+		 * 
+		 * @param iterator {@link Iterator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
+		 */
+		public UnmodifiableIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
+			if(iterator == null) throw new NullPointerException("iterator is null");
+			this.iterator = iterator;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry next() {
+			return this.iterator.next();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("unmodifiableIterator", this.iterator);
+		}
+
+	}
+
+	/**
 	 * Dieses Feld speichert den leeren {@link Iterator}.
 	 */
 	static final Iterator<Object> VOID_ITERATOR = new Iterator<Object>() {
@@ -852,6 +910,24 @@ public final class Iterators {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("chainedIteratorConverter");
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#unmodifiableIterator(Iterator)} in seine Ausgabe überführt.
+	 */
+	static final Converter<?, ?> UNMODIFIABLE_ITERATOR_CONVERTER = new Converter<Iterator<?>, Iterator<?>>() {
+
+		@Override
+		public Iterator<?> convert(final Iterator<?> input) {
+			return Iterators.unmodifiableIterator(input);
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringCall("unmodifiableIteratorConverter");
 		}
 
 	};
@@ -1065,8 +1141,9 @@ public final class Iterators {
 	 * @param iterator {@link Iterator}.
 	 * @return {@link Iterator} oder {@code Void}-{@link Iterator}.
 	 */
-	public static <GEntry> Iterator<GEntry> iterator(final Iterator<GEntry> iterator) {
-		return ((iterator == null) ? Iterators.<GEntry>voidIterator() : iterator);
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Iterator<GEntry> iterator(final Iterator<? extends GEntry> iterator) {
+		return (Iterator<GEntry>)((iterator == null) ? Iterators.VOID_ITERATOR : iterator);
 	}
 
 	/**
@@ -1326,15 +1403,42 @@ public final class Iterators {
 	 * @see Converter
 	 * @see Iterators#convertedIterator(Converter, Iterator)
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ der Elemente.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
 	 * @return {@link Iterators#convertedIterator(Converter, Iterator)}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput extends Iterator<? extends GValue>, GValue, GOutput> Converter<GInput, Iterator<GOutput>> convertedIteratorConverter(
-		final Converter<? super GValue, ? extends GOutput> converter) {
-		return new ConvertedIteratorConverter<GInput, GValue, GOutput>(converter);
+	public static <GInput, GOutput> Converter<Iterator<? extends GInput>, Iterator<GOutput>> convertedIteratorConverter(
+		final Converter<? super GInput, ? extends GOutput> converter) {
+		return new ConvertedIteratorConverter<GInput, GOutput>(converter);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen unmodifizierbaren {@link Iterator}, und gibt ihn zurück.
+	 * 
+	 * @see Iterator#remove()
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterator {@link Iterator}.
+	 * @return {@link UnmodifiableIterator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 */
+	public static <GEntry> UnmodifiableIterator<GEntry> unmodifiableIterator(final Iterator<? extends GEntry> iterator)
+		throws NullPointerException {
+		return new UnmodifiableIterator<GEntry>(iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe mit Hilfe der Methode
+	 * {@link Iterators#unmodifiableIterator(Iterator)} in seine Ausgabe überführt, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @see Iterators#unmodifiableIterator(Iterator)
+	 * @param <GEntry> Typ der Elemente.
+	 * @return {@link Iterators#unmodifiableIterator(Iterator)}-{@link Converter}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GEntry> Converter<Iterator<? extends GEntry>, Iterator<GEntry>> unmodifiableIteratorConverter() {
+		return (Converter<Iterator<? extends GEntry>, Iterator<GEntry>>)UNMODIFIABLE_ITERATOR_CONVERTER;
 	}
 
 	/**
