@@ -379,9 +379,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	 */
 	@Override
 	public void add(final int index, final short value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	@Override
 	public void add(final int index, final short[] values) {
 		this.add(this.size, ShortArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public short[] array() {
+		return this.array;
 	}
 
 	/**

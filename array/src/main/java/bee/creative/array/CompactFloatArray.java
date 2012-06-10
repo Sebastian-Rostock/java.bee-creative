@@ -379,9 +379,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public void add(final int index, final float value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	@Override
 	public void add(final int index, final float[] values) {
 		this.add(this.size, FloatArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public float[] array() {
+		return this.array;
 	}
 
 	/**

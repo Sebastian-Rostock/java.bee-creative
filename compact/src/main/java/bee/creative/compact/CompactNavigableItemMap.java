@@ -7,8 +7,8 @@ import java.util.Map;
  * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden
  * und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
  * 
- * @see CompactMap#getKey(Object)
- * @see CompactMap#setKey(Object, Object)
+ * @see CompactNavigableItemMap#getKey(Object)
+ * @see CompactNavigableItemMap#setKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
@@ -31,10 +31,11 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
 	public CompactNavigableItemMap(final int capacity, final Comparator<? super GKey> comparator)
-		throws NullPointerException {
+		throws IllegalArgumentException, NullPointerException {
 		super(capacity, comparator);
 	}
 
@@ -45,12 +46,28 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
 	 */
 	public CompactNavigableItemMap(final Map<? extends GKey, ? extends GValue> map,
 		final Comparator<? super GKey> comparator) throws NullPointerException {
 		super(map, comparator);
 	}
+
+	/**
+	 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
+	 * 
+	 * @param value Wert.
+	 * @return Schlüssel.
+	 */
+	protected abstract GKey getKey(final GValue value);
+
+	/**
+	 * Diese Methode setzt den Schlüssel des gegebenen Werts.
+	 * 
+	 * @param key Schlüssel.
+	 * @param value Wert.
+	 */
+	protected abstract void setKey(GKey key, final GValue value);
 
 	/**
 	 * {@inheritDoc}
@@ -66,7 +83,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected final GValue getValue(final int index) {
-		return (GValue)this.list[index];
+		return (GValue)this.items.get(index);
 	}
 
 	/**
@@ -75,7 +92,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
 		if(value == null) throw new NullPointerException();
-		this.list[index] = value;
+		this.items.set(index, value);
 		this.setKey(key, value);
 	}
 
@@ -103,7 +120,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@Override
 	public boolean containsValue(final Object value) {
 		if(value == null) return false;
-		return CompactData.indexOf(this.list, this.from, this.size, value) >= 0;
+		return this.items.values().contains(value);
 	}
 
 }

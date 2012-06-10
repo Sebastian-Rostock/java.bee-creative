@@ -1,6 +1,7 @@
 package bee.creative.compact;
 
 import java.util.Map;
+import bee.creative.array.Array;
 
 /**
  * Diese Klasse implementiert eine abstrakte {@link Map}, deren Schlüssel und Werte in je einem Array verwaltet werden.
@@ -12,15 +13,16 @@ import java.util.Map;
 public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GValue> {
 
 	/**
-	 * Dieses Feld speichert die Werte.
+	 * Dieses Feld speichert das {@link Array} der Werte.
 	 */
-	protected Object[] values = CompactData.VOID;
+	protected final CompactDataArray values;
 
 	/**
 	 * Dieser Konstrukteur initialisiert die {@link Map}.
 	 */
 	public CompactEntryMap() {
 		super();
+		this.values = new CompactDataArray();
 	}
 
 	/**
@@ -28,9 +30,11 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public CompactEntryMap(final int capacity) {
-		super(capacity);
+	public CompactEntryMap(final int capacity) throws IllegalArgumentException {
+		this();
+		this.allocate(capacity);
 	}
 
 	/**
@@ -38,25 +42,13 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
 	 */
 	public CompactEntryMap(final Map<? extends GKey, ? extends GValue> map) {
-		super(map);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected GKey getKey(final GValue value) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void setKey(final GKey key, final GValue value) {
-		throw new UnsupportedOperationException();
+		this();
+		if(map == null) throw new NullPointerException("map is null");
+		this.allocate(map.size());
+		this.putAll(map);
 	}
 
 	/**
@@ -65,7 +57,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected GKey getKey(final int index) {
-		return (GKey)this.list[index];
+		return (GKey)this.items.get(index);
 	}
 
 	/**
@@ -74,7 +66,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected GValue getValue(final int index) {
-		return (GValue)this.values[index];
+		return (GValue)this.values.get(index);
 	}
 
 	/**
@@ -82,8 +74,8 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	protected void setEntry(final int index, final GKey key, final GValue value) {
-		this.list[index] = key;
-		this.values[index] = value;
+		this.items.set(index, key);
+		this.values.set(index, value);
 	}
 
 	/**
@@ -91,12 +83,8 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int size = this.size;
-		this.list = this.defaultInsert(this.list, index, count);
-		this.from = from;
-		this.size = size;
-		this.values = this.defaultInsert(this.values, index, count);
+		super.customInsert(index, count);
+		this.values.insert(index, count);
 	}
 
 	/**
@@ -104,12 +92,8 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int size = this.size;
-		this.list = this.defaultRemove(this.list, index, count);
-		this.from = from;
-		this.size = size;
-		this.values = this.defaultRemove(this.values, index, count);
+		super.customRemove(index, count);
+		this.values.remove(index, count);
 	}
 
 	/**
@@ -117,11 +101,8 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	protected void customAllocate(final int count) {
-		final int from = this.from;
-		final int length = this.defaultLength(this.list, count);
-		this.list = this.defaultResize(this.list, length);
-		this.from = from;
-		this.values = this.defaultResize(this.values, length);
+		super.customAllocate(count);
+		this.values.allocate(count);
 	}
 
 	/**
@@ -129,11 +110,8 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	protected void customCompact() {
-		final int from = this.from;
-		final int length = this.size;
-		this.list = this.defaultResize(this.list, length);
-		this.from = from;
-		this.values = this.defaultResize(this.values, length);
+		super.customCompact();
+		this.values.compact();
 	}
 
 	/**
@@ -141,7 +119,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	@Override
 	public boolean containsValue(final Object value) {
-		return CompactData.indexOf(this.values, this.from, this.size, value) >= 0;
+		return this.values.values().contains(value);
 	}
 
 }

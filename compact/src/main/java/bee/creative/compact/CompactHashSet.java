@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import bee.creative.util.Comparators;
+import bee.creative.util.Objects;
 
 /**
  * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet}. Der
- * Speicherverbrauch eines {@link CompactHashSet}s liegt bei ca. {@code 13%} des Speicherverbrauchs eines
- * {@link HashSet}s.
+ * Speicherverbrauch eines {@link CompactHashSet}s liegt bei ca. {@code 20%} ({@code 64-Bit}) des Speicherverbrauchs
+ * eines {@link HashSet}s.
  * <p>
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen
  * sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 245%} der Rechenzeit, die ein {@link HashSet} dazu
@@ -60,9 +61,9 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int customItemIndex(final Object key) {
-		if(key == null) return this.equalsIndex(null, 0);
-		return this.equalsIndex(key, key.hashCode());
+	protected int customItemIndex(final Object item) {
+		if(item == null) return this.defaultEqualsIndex(null, 0);
+		return this.defaultEqualsIndex(item, Objects.hash(item));
 	}
 
 	/**

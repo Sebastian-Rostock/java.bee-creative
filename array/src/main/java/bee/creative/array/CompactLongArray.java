@@ -379,9 +379,8 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 	 */
 	@Override
 	public void add(final int index, final long value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 	@Override
 	public void add(final int index, final long[] values) {
 		this.add(this.size, LongArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long[] array() {
+		return this.array;
 	}
 
 	/**

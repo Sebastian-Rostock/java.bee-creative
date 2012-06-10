@@ -76,6 +76,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * Dieser Konstrukteur initialisiert die {@link Collection}.
 	 */
 	public CompactCollection() {
+		super();
 	}
 
 	/**
@@ -85,6 +86,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @param capacity Kapazität.
 	 */
 	public CompactCollection(final int capacity) {
+		super();
 		this.allocate(capacity);
 	}
 
@@ -97,6 +99,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
 	 */
 	public CompactCollection(final Collection<? extends GItem> collection) {
+		super();
 		if(collection == null) throw new NullPointerException("collection is null");
 		this.allocate(collection.size());
 		this.addAll(collection);
@@ -110,48 +113,66 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final GItem getItem(final int index) {
-		return (GItem)this.list[index];
+		return (GItem)this.items.get(index);
 	}
 
 	/**
 	 * Diese Methode setzt das {@code index}-te Element.
 	 * 
 	 * @param index Index.
-	 * @param item Element.
+	 * @param item {@code index}-tes Element.
 	 */
 	protected final void setItem(final int index, final GItem item) {
-		this.list[index] = item;
+		this.items.set(index, item);
+	}
+
+	/**
+	 * Diese Methode kopiert die Werte des gegebenen Arrays an die gegebene Position.
+	 * 
+	 * @param index Index.
+	 * @param items {@code index}-tes Elemente.
+	 */
+	protected final void setItems(final int index, final Object[] items) {
+		this.items.set(index, items);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int size() {
-		return this.size;
+	public final int size() {
+		return this.items.size();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void clear() {
-		this.customRemove(this.from, this.size);
+	public final void clear() {
+		this.customRemove(0, this.items.size());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isEmpty() {
-		return this.size == 0;
+	public final boolean isEmpty() {
+		return this.items.isEmpty();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean remove(final Object item) {
+	public final Iterator<GItem> iterator() {
+		return new CompactCollectionAscendingIterator<GItem>(this, 0, this.size());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean remove(final Object item) {
 		final int index = this.customItemIndex(item);
 		if(index < 0) return false;
 		this.customRemove(index, 1);
@@ -162,15 +183,16 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean contains(final Object key) {
-		return this.customItemIndex(key) >= 0;
+	public final boolean contains(final Object item) {
+		return this.customItemIndex(item) >= 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean retainAll(final Collection<?> collection) {
+	public final boolean retainAll(final Collection<?> collection) {
+		if(this.isEmpty()) return false;
 		return Iterables.retainAll((Iterable<?>)this, collection);
 	}
 
@@ -178,7 +200,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean removeAll(final Collection<?> collection) {
+	public final boolean removeAll(final Collection<?> collection) {
+		if(this.isEmpty()) return false;
 		return Iterables.removeAll((Iterable<?>)this, collection);
 	}
 
@@ -186,8 +209,32 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean containsAll(final Collection<?> collection) {
+	public final boolean containsAll(final Collection<?> collection) {
 		return Iterables.containsAll(this, collection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return this.items.values().toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object[] toArray() {
+		return this.items.values().toArray();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <T> T[] toArray(final T[] a) {
+		return this.items.values().toArray(a);
 	}
 
 }

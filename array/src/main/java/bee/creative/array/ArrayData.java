@@ -96,13 +96,14 @@ public abstract class ArrayData<GArray> {
 	protected void defaultResize(final int length) throws IllegalArgumentException {
 		final int size = this.size;
 		if(size > length) throw new IllegalArgumentException("size > length");
-		if(length == this.getArrayLength()) return;
-		final GArray array = this.getArray();
-		final GArray array2 = this.newArray(length);
 		final int from2 = this.defaultAlignment(length - size);
-		System.arraycopy(array, this.from, array2, from2, size);
+		if(length != this.getArrayLength()){
+			final GArray array = this.getArray();
+			final GArray array2 = this.newArray(length);
+			System.arraycopy(array, this.from, array2, from2, size);
+			this.setArray(array2);
+		}
 		this.from = from2;
-		this.setArray(array2);
 	}
 
 	/**

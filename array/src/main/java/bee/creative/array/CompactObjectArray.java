@@ -188,7 +188,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	}
 
 	/**
-	 * Diese Klasse implementiert die live {@link ObjectArraySection} eines {@link CompactObjectArray.CompactObjectSubArray}s.
+	 * Diese Klasse implementiert die live {@link ObjectArraySection} eines
+	 * {@link CompactObjectArray.CompactObjectSubArray}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der {@link Object}s.
@@ -389,9 +390,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public void add(final int index, final GValue value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -400,6 +400,14 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	@Override
 	public void add(final int index, final GValue[] values) {
 		this.add(this.size, ObjectArraySection.from(this, values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GValue[] array() {
+		return this.array;
 	}
 
 	/**

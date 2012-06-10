@@ -26,9 +26,21 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public CompactItemHashMap(final int capacity) {
+	public CompactItemHashMap(final int capacity) throws IllegalArgumentException {
 		super(capacity);
+	}
+
+	/**
+	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
+	 * 
+	 * @see Map#putAll(Map)
+	 * @param map Elemente.
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
+	 */
+	public CompactItemHashMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
+		super(map);
 	}
 
 	/**
@@ -36,8 +48,8 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	 */
 	@Override
 	protected int customItemIndex(final Object key) {
-		if(key == null) return this.equalsIndex(null, 0);
-		return this.equalsIndex(key, key.hashCode());
+		if(key == null) return this.defaultEqualsIndex(null, 0);
+		return this.defaultEqualsIndex(key, key.hashCode());
 	}
 
 	/**

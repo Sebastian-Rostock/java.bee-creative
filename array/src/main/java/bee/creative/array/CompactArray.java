@@ -23,7 +23,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
 	 *        {@link Float}, {@link Double} oder {@link Boolean}).
 	 */
-	protected static class Values<GValue> extends AbstractList<GValue> implements RandomAccess {
+	protected static final class Values<GValue> extends AbstractList<GValue> implements RandomAccess {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
@@ -47,6 +47,48 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		@Override
 		protected void removeRange(final int fromIndex, final int toIndex) {
 			this.owner.remove(fromIndex, toIndex - fromIndex);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.owner.size;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int indexOf(final Object item) {
+			if(item == null){
+				for(int index = 0, count = this.size(); index < count; index++){
+					if(this.get(index) == null) return index;
+				}
+			}else{
+				for(int index = 0, count = this.size(); index < count; index++){
+					if(item.equals(this.get(index))) return index;
+				}
+			}
+			return -1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int lastIndexOf(final Object item) {
+			if(item == null){
+				for(int index = this.size() - 1; 0 <= index; index--){
+					if(this.get(index) == null) return index;
+				}
+			}else{
+				for(int index = this.size() - 1; 0 <= index; index--){
+					if(item.equals(this.get(index))) return index;
+				}
+			}
+			return -1;
 		}
 
 		/**
@@ -89,14 +131,6 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 			final GValue entry = owner.getValue(index);
 			owner.remove(index, 1);
 			return entry;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.owner.size;
 		}
 
 	}
@@ -485,7 +519,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	@Override
 	public void get(final int index, final ArraySection<GArray> values) throws NullPointerException,
 		IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values == null");
+		if(values == null) throw new NullPointerException("values is null");
 		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
@@ -509,7 +543,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	@Override
 	public void set(final int index, final ArraySection<GArray> values) throws NullPointerException,
 		IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values == null");
+		if(values == null) throw new NullPointerException("values is null");
 		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
 		if((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
@@ -548,7 +582,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	@Override
 	public void add(final int index, final ArraySection<GArray> values) throws NullPointerException,
 		IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values == null");
+		if(values == null) throw new NullPointerException("values is null");
 		final int valuesSize = values.size();
 		if(valuesSize == 0) return;
 		this.insert(index, valuesSize);
@@ -590,6 +624,34 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	@Override
 	public int size() {
 		return this.size;
+	}
+
+	/**
+	 * Diese Methode gibt das interne Array zurück.
+	 * 
+	 * @see ArraySection#array()
+	 * @return Array.
+	 */
+	public abstract GArray array();
+
+	/**
+	 * Diese Methode gibt den Index des ersten Werts im Abschnitt des internen Arrays zurück.
+	 * 
+	 * @see ArraySection#startIndex()
+	 * @return Index des ersten Werts im Abschnitt.
+	 */
+	public int startIndex() {
+		return this.from;
+	}
+
+	/**
+	 * Diese Methode gibt den Index des ersten Werts nach dem Abschnitt des internen Arrays zurück.
+	 * 
+	 * @see ArraySection#finalIndex()
+	 * @return Index des ersten Werts nach dem Abschnitt.
+	 */
+	public int finalIndex() {
+		return this.from + this.size;
 	}
 
 	/**

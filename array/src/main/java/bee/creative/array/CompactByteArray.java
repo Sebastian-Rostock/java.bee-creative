@@ -379,9 +379,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	 */
 	@Override
 	public void add(final int index, final byte value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	@Override
 	public void add(final int index, final byte[] values) {
 		this.add(this.size, ByteArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public byte[] array() {
+		return this.array;
 	}
 
 	/**

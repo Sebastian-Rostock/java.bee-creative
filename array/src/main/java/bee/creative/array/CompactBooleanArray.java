@@ -379,9 +379,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public void add(final int index, final boolean value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	@Override
 	public void add(final int index, final boolean[] values) {
 		this.add(this.size, BooleanArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean[] array() {
+		return this.array;
 	}
 
 	/**

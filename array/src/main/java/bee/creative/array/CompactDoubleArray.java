@@ -379,9 +379,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	 */
 	@Override
 	public void add(final int index, final double value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	@Override
 	public void add(final int index, final double[] values) {
 		this.add(this.size, DoubleArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double[] array() {
+		return this.array;
 	}
 
 	/**

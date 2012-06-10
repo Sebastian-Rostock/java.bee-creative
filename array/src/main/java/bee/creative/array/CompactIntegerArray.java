@@ -379,9 +379,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public void add(final int index, final int value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	@Override
 	public void add(final int index, final int[] values) {
 		this.add(this.size, IntegerArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int[] array() {
+		return this.array;
 	}
 
 	/**

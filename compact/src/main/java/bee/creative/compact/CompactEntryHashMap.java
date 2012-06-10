@@ -38,6 +38,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
 	public CompactEntryHashMap(final int capacity) {
 		super(capacity);
@@ -48,6 +49,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
 	 */
 	public CompactEntryHashMap(final Map<? extends GKey, ? extends GValue> map) {
 		super(map);
@@ -58,8 +60,8 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 */
 	@Override
 	protected int customItemIndex(final Object key) {
-		if(key == null) return this.equalsIndex(null, 0);
-		return this.equalsIndex(key, key.hashCode());
+		if(key == null) return this.defaultEqualsIndex(null, 0);
+		return this.defaultEqualsIndex(key, key.hashCode());
 	}
 
 	/**

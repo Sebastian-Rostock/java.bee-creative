@@ -379,9 +379,8 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	 */
 	@Override
 	public void add(final int index, final char value) {
-		this.exclusiveIndex(index);
 		this.insert(index, 1);
-		this.set(this.from + index, value);
+		this.set(index, value);
 	}
 
 	/**
@@ -390,6 +389,14 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	@Override
 	public void add(final int index, final char[] values) {
 		this.add(this.size, CharacterArraySection.from(values));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public char[] array() {
+		return this.array;
 	}
 
 	/**

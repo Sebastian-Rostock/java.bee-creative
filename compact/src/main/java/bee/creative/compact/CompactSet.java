@@ -15,25 +15,27 @@ import bee.creative.util.Iterables;
 public abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
 
 	/**
-	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an ein gegebenes {@link Set} delegiert.
+	 * Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
+	 * @param <GItem> Typ den Elemente.
 	 */
-	protected static final class ItemSet<GItem> extends AbstractSet<GItem> {
+	protected static final class CompactSetItems<GItem> extends AbstractSet<GItem> {
 
 		/**
 		 * Dieses Feld speichert das {@link Set}.
 		 */
-		protected final Set<GItem> data;
+		protected final Set<GItem> set;
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link Set}.
 		 * 
-		 * @param data {@link Set}.
+		 * @param set {@link Set}.
+		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist.
 		 */
-		public ItemSet(final Set<GItem> data) {
-			this.data = data;
+		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
+			if(set == null) throw new NullPointerException("set is null");
+			this.set = set;
 		}
 
 		/**
@@ -41,7 +43,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		 */
 		@Override
 		public int size() {
-			return this.data.size();
+			return this.set.size();
 		}
 
 		/**
@@ -49,7 +51,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return this.data.iterator();
+			return this.set.iterator();
 		}
 
 	}
@@ -88,20 +90,12 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterator<GItem> iterator() {
-		return new CompactCollectionAscendingIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean add(final GItem item) {
+	public final boolean add(final GItem item) {
 		final int index = this.customItemIndex(item);
 		if(index >= 0) return false;
-		final int i = this.from - index - 1;
-		this.customInsert(i + this.from, 1);
-		this.setItem(i + this.from, item);
+		final int index2 = -index - 1;
+		this.customInsert(index2, 1);
+		this.setItem(index2, item);
 		return true;
 	}
 
@@ -109,7 +103,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean addAll(final Collection<? extends GItem> collection) {
+	public final boolean addAll(final Collection<? extends GItem> collection) {
 		return Iterables.appendAll(this, collection);
 	}
 
@@ -117,42 +111,18 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object[] toArray() {
-		return new CompactSet.ItemSet<GItem>(this).toArray();
+	public final int hashCode() {
+		return new CompactSetItems<GItem>(this).hashCode();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <T> T[] toArray(final T[] a) {
-		return new CompactSet.ItemSet<GItem>(this).toArray(a);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return new CompactSet.ItemSet<GItem>(this).hashCode();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if(object == this) return true;
-		if(!(object instanceof Set<?>)) return false;
-		return new CompactSet.ItemSet<GItem>(this).equals(object);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return new CompactSet.ItemSet<GItem>(this).toString();
+		if(!(object instanceof Set)) return false;
+		return new CompactSetItems<GItem>(this).equals(object);
 	}
 
 }

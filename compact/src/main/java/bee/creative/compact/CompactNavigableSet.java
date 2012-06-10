@@ -168,7 +168,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public Object[] toArray() {
-			return new CompactSet.ItemSet<GItem>(this).toArray();
+			return new CompactSetItems<GItem>(this).toArray();
 		}
 
 		/**
@@ -176,7 +176,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public <T> T[] toArray(final T[] a) {
-			return new CompactSet.ItemSet<GItem>(this).toArray(a);
+			return new CompactSetItems<GItem>(this).toArray(a);
 		}
 
 		/**
@@ -184,7 +184,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public int hashCode() {
-			return new CompactSet.ItemSet<GItem>(this).hashCode();
+			return new CompactSetItems<GItem>(this).hashCode();
 		}
 
 		/**
@@ -194,7 +194,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof Set<?>)) return false;
-			return new ItemSet<GItem>(this).equals(object);
+			return new CompactSetItems<GItem>(this).equals(object);
 		}
 
 		/**
@@ -202,7 +202,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public String toString() {
-			return new CompactSet.ItemSet<GItem>(this).toString();
+			return new CompactSetItems<GItem>(this).toString();
 		}
 
 	}
@@ -213,7 +213,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSet.CompactNavigableSubSet<GItem> {
+	protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -533,6 +533,20 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/**
+	 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
+	 * 
+	 * @see CompactData#allocate(int)
+	 * @param capacity Kapazität.
+	 * @param comparator {@link Comparator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 */
+	public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator)
+		throws NullPointerException {
+		this(comparator);
+		this.allocate(capacity);
+	}
+
+	/**
 	 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see Set#addAll(Collection)
@@ -550,28 +564,13 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
-	 * 
-	 * @see CompactData#allocate(int)
-	 * @param capacity Kapazität.
-	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
-	 */
-	public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator)
-		throws NullPointerException {
-		this(comparator);
-		this.allocate(capacity);
-	}
-
-	/**
 	 * Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
 	 * 
 	 * @param index Index.
 	 * @return {@code index}-te Element oder {@code null}.
 	 */
 	protected final GItem poll(final int index) {
-		final int i = index - this.from;
-		if((i < 0) || (i >= this.size)) return null;
+		if((index < 0) || (index >= this.size())) return null;
 		final GItem item = this.getItem(index);
 		this.customRemove(index, 1);
 		return item;
@@ -584,8 +583,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @return {@code index}-tes Element oder {@code null}.
 	 */
 	protected final GItem getItemOrNull(final int index) {
-		final int i = index - this.from;
-		if((i < 0) || (i >= this.size)) return null;
+		if((index < 0) || (index >= this.size())) return null;
 		return this.getItem(index);
 	}
 
@@ -597,8 +595,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
 	 */
 	protected final GItem getItemOrException(final int index) throws NoSuchElementException {
-		final int i = index - this.from;
-		if((i < 0) || (i >= this.size)) throw new NoSuchElementException();
+		if((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getItem(index);
 	}
 
@@ -607,7 +604,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	@Override
 	protected final int customItemIndex(final Object key) {
-		return this.compareIndex(key, 0);
+		return this.defaultCompareIndex(key, 0);
 	}
 
 	/**
@@ -764,7 +761,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	@Override
 	public Iterator<GItem> descendingIterator() {
-		return new CompactCollectionDescendingIterator<GItem>(this, this.firstIndex(), this.lastIndex() + 1);
+		return new CompactCollectionDescendingIterator<GItem>(this, 0, this.size());
 	}
 
 }

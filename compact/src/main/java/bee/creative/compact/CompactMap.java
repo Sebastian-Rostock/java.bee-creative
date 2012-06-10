@@ -26,7 +26,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 */
-	protected static final class KeySet<GKey> extends AbstractSet<GKey> {
+	protected static final class CompactMapKeys<GKey> extends AbstractSet<GKey> {
 
 		/**
 		 * Dieses Feld speichert die {@link CompactMap}.
@@ -38,7 +38,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		 * 
 		 * @param data {@link CompactMap}.
 		 */
-		public KeySet(final CompactMap<GKey, ?> data) {
+		public CompactMapKeys(final CompactMap<GKey, ?> data) {
 			this.data = data;
 		}
 
@@ -47,7 +47,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		 */
 		@Override
 		public int size() {
-			return this.data.size;
+			return this.data.size();
 		}
 
 		/**
@@ -63,187 +63,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		 */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMap.CompactMapKeyAscendingIterator<GKey>(this.data, this.data.firstIndex(),
-				this.data.lastIndex() + 1);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
-	 * {@link CompactMap} delegiert.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
-	protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
-
-		/**
-		 * Dieses Feld speichert die {@link CompactMap}.
-		 */
-		protected final CompactMap<GKey, GValue> data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
-		 * 
-		 * @param data {@link CompactMap}.
-		 */
-		public EntrySet(final CompactMap<GKey, GValue> data) {
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.data.size;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void clear() {
-			this.data.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<Entry<GKey, GValue>> iterator() {
-			return new CompactMap.CompactMapEntryIterator<GKey, GValue>(this.data, this.data.firstIndex(),
-				this.data.lastIndex() + 1);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link AbstractMap}, die ihre Schnittstelle an eine gegebene {@link Map} delegiert.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
-	protected static final class ItemMap<GKey, GValue> extends AbstractMap<GKey, GValue> {
-
-		/**
-		 * Dieses Feld speichert die {@link Map}.
-		 */
-		protected final Map<GKey, GValue> data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map}.
-		 * 
-		 * @param data {@link Map}.
-		 */
-		public ItemMap(final Map<GKey, GValue> data) {
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Set<Entry<GKey, GValue>> entrySet() {
-			return this.data.entrySet();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert das {@link SimpleEntry} einer {@link CompactMap}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
-	protected static final class ItemEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
-
-		/**
-		 * Dieses Feld speichert die {@code SerialVersionUID}.
-		 */
-		private static final long serialVersionUID = -543360027933297926L;
-
-		/**
-		 * Dieses Feld speichert die {@link CompactMap}.
-		 */
-		protected final CompactMap<GKey, GValue> data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap} und den Index.
-		 * 
-		 * @param data {@link CompactMap}.
-		 * @param index Index.
-		 */
-		public ItemEntry(final CompactMap<GKey, GValue> data, final int index) {
-			super(data.getKey(index), data.getValue(index));
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GValue setValue(final GValue value) {
-			final GKey key = this.getKey();
-			final GValue result = super.setValue(value);
-			final int index = this.data.customItemIndex(this.getKey());
-			if(index < 0) throw new IllegalStateException();
-			this.data.setEntry(index, key, value);
-			return result;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
-	 * {@link CompactMap} delegiert.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Werte.
-	 */
-	protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
-
-		/**
-		 * Dieses Feld speichert die {@link CompactMap}.
-		 */
-		protected final CompactMap<?, GValue> data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
-		 * 
-		 * @param data {@link CompactMap}.
-		 */
-		public ValueCollection(final CompactMap<?, GValue> data) {
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.data.size;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void clear() {
-			this.data.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<GValue> iterator() {
-			return new CompactMap.CompactMapValueIterator<GValue>(this.data, this.data.firstIndex(),
-				this.data.lastIndex() + 1);
+			return new CompactMapKeyAscendingIterator<GKey>(this.data, 0, this.data.size());
 		}
 
 	}
@@ -309,6 +129,88 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
+	 * Diese Klasse implementiert eine {@link AbstractMap}, die ihre Schnittstelle an eine gegebene {@link Map} delegiert.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 */
+	protected static final class CompactMapItems<GKey, GValue> extends AbstractMap<GKey, GValue> {
+
+		/**
+		 * Dieses Feld speichert die {@link Map}.
+		 */
+		protected final Map<GKey, GValue> map;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link Map}.
+		 * 
+		 * @param data {@link Map}.
+		 */
+		public CompactMapItems(final Map<GKey, GValue> data) {
+			this.map = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Set<Entry<GKey, GValue>> entrySet() {
+			return this.map.entrySet();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
+	 * {@link CompactMap} delegiert.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Werte.
+	 */
+	protected static final class CompactMapValues<GValue> extends AbstractCollection<GValue> {
+
+		/**
+		 * Dieses Feld speichert die {@link CompactMap}.
+		 */
+		protected final CompactMap<?, GValue> data;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+		 * 
+		 * @param data {@link CompactMap}.
+		 */
+		public CompactMapValues(final CompactMap<?, GValue> data) {
+			this.data = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.data.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.data.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GValue> iterator() {
+			return new CompactMapValueIterator<GValue>(this.data, 0, this.data.size());
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der Werte.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -338,7 +240,102 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
-	 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link ItemEntry}s.
+	 * Diese Klasse implementiert das {@link SimpleEntry} einer {@link CompactMap}.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 */
+	protected static final class CompactMapEntry<GKey, GValue> extends SimpleEntry<GKey, GValue> {
+
+		/**
+		 * Dieses Feld speichert die {@code SerialVersionUID}.
+		 */
+		private static final long serialVersionUID = -543360027933297926L;
+
+		/**
+		 * Dieses Feld speichert die {@link CompactMap}.
+		 */
+		protected final CompactMap<GKey, GValue> data;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link CompactMap} und den Index.
+		 * 
+		 * @param data {@link CompactMap}.
+		 * @param index Index.
+		 */
+		public CompactMapEntry(final CompactMap<GKey, GValue> data, final int index) {
+			super(data.getKey(index), data.getValue(index));
+			this.data = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GValue setValue(final GValue value) {
+			final GKey key = this.getKey();
+			final GValue result = super.setValue(value);
+			final int index = this.data.customItemIndex(this.getKey());
+			if(index < 0) throw new IllegalStateException();
+			this.data.setEntry(index, key, value);
+			return result;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
+	 * {@link CompactMap} delegiert.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 */
+	protected static final class CompactMapEntries<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
+
+		/**
+		 * Dieses Feld speichert die {@link CompactMap}.
+		 */
+		protected final CompactMap<GKey, GValue> data;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+		 * 
+		 * @param data {@link CompactMap}.
+		 */
+		public CompactMapEntries(final CompactMap<GKey, GValue> data) {
+			this.data = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.data.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.data.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<Entry<GKey, GValue>> iterator() {
+			return new CompactMapEntryIterator<GKey, GValue>(this.data, 0, this.data.size());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link CompactMapEntry}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -372,6 +369,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * Dieser Konstrukteur initialisiert die {@link Map}.
 	 */
 	public CompactMap() {
+		super();
 	}
 
 	/**
@@ -379,8 +377,10 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public CompactMap(final int capacity) {
+	public CompactMap(final int capacity) throws IllegalArgumentException {
+		this();
 		this.allocate(capacity);
 	}
 
@@ -390,27 +390,14 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
 	 */
-	public CompactMap(final Map<? extends GKey, ? extends GValue> map) {
+	public CompactMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
+		this();
+		if(map == null) throw new NullPointerException("map is null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}
-
-	/**
-	 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
-	 * 
-	 * @param value Wert.
-	 * @return Schlüssel.
-	 */
-	protected abstract GKey getKey(final GValue value);
-
-	/**
-	 * Diese Methode setzt den Schlüssel des gegebenen Werts.
-	 * 
-	 * @param key Schlüssel.
-	 * @param value Wert.
-	 */
-	protected abstract void setKey(GKey key, final GValue value);
 
 	/**
 	 * Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
@@ -435,7 +422,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @return {@code index}-tes Element
 	 */
 	protected final Entry<GKey, GValue> getEntry(final int index) {
-		return new CompactMap.ItemEntry<GKey, GValue>(this, index);
+		return new CompactMapEntry<GKey, GValue>(this, index);
 	}
 
 	/**
@@ -452,8 +439,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der
 	 * Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
-	 * @see CompactData#equalsIndex(Object, int)
-	 * @see CompactData#compareIndex(Object, int)
+	 * @see CompactData#defaultEqualsIndex(Object, int)
+	 * @see CompactData#defaultCompareIndex(Object, int)
 	 * @param key Syhlüssel.
 	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 	 */
@@ -464,55 +451,55 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int size() {
-		return this.size;
+	public final int size() {
+		return this.items.size();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void clear() {
-		this.customRemove(this.from, this.size);
+	public final void clear() {
+		this.customRemove(0, this.size());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Collection<GValue> values() {
-		return new CompactMap.ValueCollection<GValue>(this);
+	public final boolean isEmpty() {
+		return this.items.isEmpty();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<GKey> keySet() {
-		return new CompactMap.KeySet<GKey>(this);
+	public final Collection<GValue> values() {
+		return new CompactMapValues<GValue>(this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Entry<GKey, GValue>> entrySet() {
-		return new CompactMap.EntrySet<GKey, GValue>(this);
+	public final Set<GKey> keySet() {
+		return new CompactMapKeys<GKey>(this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isEmpty() {
-		return this.size == 0;
+	public final Set<Entry<GKey, GValue>> entrySet() {
+		return new CompactMapEntries<GKey, GValue>(this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean containsKey(final Object key) {
+	public final boolean containsKey(final Object key) {
 		return this.customItemIndex(key) >= 0;
 	}
 
@@ -520,7 +507,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GValue get(final Object key) {
+	public final GValue get(final Object key) {
 		final int index = this.customItemIndex(key);
 		if(index < 0) return null;
 		return this.getValue(index);
@@ -531,15 +518,15 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		int index = this.customItemIndex(key);
+		final int index = this.customItemIndex(key);
 		if(index >= 0){
 			final GValue item = this.getValue(index);
 			this.setEntry(index, this.getKey(index), value);
 			return item;
 		}
-		index = -index - 1;
-		this.customInsert(index, 1);
-		this.setEntry(index, key, value);
+		final int index2 = -index - 1;
+		this.customInsert(index2, 1);
+		this.setEntry(index2, key, value);
 		return null;
 	}
 
@@ -570,7 +557,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public int hashCode() {
-		return new CompactMap.ItemMap<GKey, GValue>(this).hashCode();
+		return new CompactMapItems<GKey, GValue>(this).hashCode();
 	}
 
 	/**
@@ -580,7 +567,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	public boolean equals(final Object object) {
 		if(object == this) return true;
 		if(!(object instanceof Map<?, ?>)) return false;
-		return new CompactMap.ItemMap<GKey, GValue>(this).equals(object);
+		return new CompactMapItems<GKey, GValue>(this).equals(object);
 	}
 
 	/**
@@ -588,7 +575,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public String toString() {
-		return new CompactMap.ItemMap<GKey, GValue>(this).toString();
+		return new CompactMapItems<GKey, GValue>(this).toString();
 	}
 
 }

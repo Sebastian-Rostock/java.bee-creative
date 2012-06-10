@@ -595,7 +595,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public int hashCode() {
-			return new ItemMap<GKey, GValue>(this).hashCode();
+			return new CompactMapItems<GKey, GValue>(this).hashCode();
 		}
 
 		/**
@@ -605,7 +605,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof Set<?>)) return false;
-			return new ItemMap<GKey, GValue>(this).equals(object);
+			return new CompactMapItems<GKey, GValue>(this).equals(object);
 		}
 
 		/**
@@ -613,7 +613,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public String toString() {
-			return new ItemMap<GKey, GValue>(this).toString();
+			return new CompactMapItems<GKey, GValue>(this).toString();
 		}
 
 	}
@@ -1034,12 +1034,13 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator) throws NullPointerException {
-		super(capacity);
-		if(comparator == null) throw new NullPointerException("comparator is null");
-		this.comparator = comparator;
+	public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator)
+		throws IllegalArgumentException, NullPointerException {
+		this(comparator);
+		this.allocate(capacity);
 	}
 
 	/**
@@ -1049,14 +1050,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
 	 */
 	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator)
 		throws NullPointerException {
-		super(map);
-		if(comparator == null) throw new NullPointerException("comparator is null");
-		this.comparator = comparator;
-
+		this(comparator);
+		if(map == null) throw new NullPointerException("map is null");
+		this.allocate(map.size());
+		this.putAll(map);
 	}
 
 	/**
@@ -1066,7 +1067,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @return {@code index}-te Element oder {@code null}.
 	 */
 	protected final Entry<GKey, GValue> poll(final int index) {
-		if((index < 0) || (index >= this.size)) return null;
+		if((index < 0) || (index >= this.size())) return null;
 		final Entry<GKey, GValue> item = this.getEntry(index);
 		this.customRemove(index, 1);
 		return item;
@@ -1079,7 +1080,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @return {@code index}-ter Schlüssel oder {@code null}.
 	 */
 	protected final GKey getKeyOrNull(final int index) {
-		if((index < 0) || (index >= this.size)) return null;
+		if((index < 0) || (index >= this.size())) return null;
 		return this.getKey(index);
 	}
 
@@ -1090,7 +1091,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @return {@code index}-tes Element oder {@code null}.
 	 */
 	protected final Entry<GKey, GValue> getEntryOrNull(final int index) {
-		if((index < 0) || (index >= this.size)) return null;
+		if((index < 0) || (index >= this.size())) return null;
 		return this.getEntry(index);
 	}
 
@@ -1102,7 +1103,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
 	 */
 	protected final GKey getKeyOrException(final int index) throws NoSuchElementException {
-		if((index < 0) || (index >= this.size)) throw new NoSuchElementException();
+		if((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getKey(index);
 	}
 
@@ -1114,7 +1115,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
 	 */
 	protected final Entry<GKey, GValue> getEntryOrException(final int index) throws NoSuchElementException {
-		if((index < 0) || (index >= this.size)) throw new NoSuchElementException();
+		if((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getEntry(index);
 	}
 
@@ -1123,7 +1124,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 */
 	@Override
 	protected int customItemIndex(final Object key) {
-		return this.compareIndex(key, 0);
+		return this.defaultCompareIndex(key, 0);
 	}
 
 	/**

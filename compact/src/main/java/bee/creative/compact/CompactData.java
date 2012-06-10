@@ -1,9 +1,12 @@
 package bee.creative.compact;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
+import bee.creative.array.Array;
+import bee.creative.array.CompactArray;
+import bee.creative.array.CompactObjectArray;
 
 /**
  * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem (sortierten) Array verwaltet werden.
@@ -23,6 +26,37 @@ import java.util.NavigableSet;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public abstract class CompactData {
+
+	/**
+	 * Diese Klasse implementiert das {@link CompactObjectArray} der {@link CompactData}.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	protected static final class CompactDataArray extends CompactObjectArray<Object> {
+
+		/**
+		 * Dieses Feld speichert das leere Array.
+		 */
+		protected static final Object[] VOID = new Object[0];
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(final Object o1, final Object o2) {
+			return 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Object[] newArray(final int length) {
+			if(length == 0) return CompactDataArray.VOID;
+			return new Object[length];
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert ein abstraktes Objekt mit {@link CompactData}.
@@ -111,12 +145,8 @@ public abstract class CompactData {
 		public void remove() {
 			final int item = this.item;
 			if(item < 0) throw new IllegalStateException();
-			int move = this.data.from;
 			this.data.customRemove(item, 1);
-			move = this.data.from - move;
-			this.from += move;
 			this.item = -1;
-			this.last += move;
 		}
 
 	}
@@ -194,12 +224,13 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData}s.
+	 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData}s und wird zur realisierung von
+	 * {@link NavigableSet}s und {@link NavigableMap}s verwendet.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des {@link CompactData}s.
 	 */
-	public static abstract class CompactSubData<GData extends CompactData> extends CompactData.CompactDataOwner<GData> {
+	public static abstract class CompactSubData<GData extends CompactData> extends CompactDataOwner<GData> {
 
 		/**
 		 * Dieses Feld speichert das Objekt zur offenen Begrenzung von Teilmengen.
@@ -264,8 +295,10 @@ public abstract class CompactData {
 		 * @return {@code true}, wenn der gegebene Index zu groß bzw. das {@code index}-te Element zu klein ist.
 		 */
 		protected final boolean isTooLow(final int index) {
-			final GData data = this.data;
-			return (index > data.lastIndex()) || ((index >= data.firstIndex()) && this.isTooLow(data.list[index]));
+			final CompactObjectArray<Object> array = this.data.items;
+			if(index >= array.size()) return true;
+			if(index < 0) return false;
+			return this.isTooLow(array.get(index));
 		}
 
 		/**
@@ -296,8 +329,10 @@ public abstract class CompactData {
 		 * @return {@code true}, wenn der gegebene Index bzw. das {@code index}-te Element zu groß ist.
 		 */
 		protected final boolean isTooHigh(final int index) {
-			final GData data = this.data;
-			return (index > data.lastIndex()) || ((index >= data.firstIndex()) && this.isTooHigh(data.list[index]));
+			final CompactObjectArray<Object> array = this.data.items;
+			if(index >= array.size()) return true;
+			if(index < 0) return false;
+			return this.isTooHigh(array.get(index));
 		}
 
 		/**
@@ -496,267 +531,119 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Dieses Feld speichert das leere Array.
+	 * Dieses Feld speichert das {@link Array} der Elemente.
 	 */
-	protected static final Object[] VOID = new Object[0];
+	protected final CompactDataArray items;
 
 	/**
-	 * Diese Methode sucht das gegebene Element im gegebenen Array linear und gibt den Index des ersten Treffers oder oder
-	 * {@code -1} zurück.
-	 * 
-	 * @see Object#equals(Object)
-	 * @param list Array.
-	 * @param from Index des ersten Elements.
-	 * @param size Anzahl der Elemente.
-	 * @param item gesuchtes Element.
-	 * @return Index des ersten Treffers oder {@code -1}.
+	 * Dieser Konstrukteur initialisiert das {@link Array} der Elemente.
 	 */
-	protected static final int indexOf(final Object[] list, int from, final int size, final Object item) {
-		if(item == null){
-			for(final int last = from + size; from < last; from++){
-				if(list[from] == null) return from;
-			}
-		}else{
-			for(final int last = from + size; from < last; from++){
-				if(item.equals(list[from])) return from;
-			}
-		}
-		return -1;
+	public CompactData() {
+		this.items = new CompactDataArray();
 	}
 
 	/**
-	 * Dieses Feld speichert die Elemente.
-	 */
-	protected Object[] list = CompactData.VOID;
-
-	/**
-	 * Dieses Feld speichert den Index des ersten Elements.
-	 */
-	protected int from;
-
-	/**
-	 * Dieses Feld speichert die Anzahl der Elemente.
-	 */
-	protected int size;
-
-	/**
-	 * Diese Methode gibt die neue Länge für das gegebene Array zurück, um darin die gegebene Anzahl an Elementen
-	 * verwalten zu können.
+	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen
+	 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
+	 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element} ist
+	 * dann zum gegebenen Schlüssel gleich, wenn:
 	 * 
-	 * @param list Array.
-	 * @param count Anzahl.
-	 * @return Länge.
+	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
+	 * 
+	 * @see CompactData#defaultCompareIndex(Object, int)
+	 * @see CompactData#customItemEquals(Object, int, Object)
+	 * @see CompactData#customItemCompare(Object, int, Object)
+	 * @param key Schlüssel.
+	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 	 */
-	protected final int defaultLength(final Object[] list, final int count) {
-		final int oldLength = list.length;
-		if(oldLength >= count) return oldLength;
-		final int newLength = oldLength + (oldLength >> 1);
-		if(newLength >= count) return newLength;
-		return count;
+	protected final int defaultEqualsIndex(final Object key, final int hash) {
+		final int index = this.defaultCompareIndex(key, hash);
+		if(index < 0) return index;
+		final CompactDataArray data = this.items;
+		final Object[] array = data.array();
+		final int from = data.startIndex();
+		if(this.customItemEquals(key, hash, array[index + from])) return index;
+		Object item;
+		for(int next = (index + from) - 1; (from <= next) && (this.customItemCompare(key, hash, item = array[next]) == 0); next--){
+			if(this.customItemEquals(key, hash, item)) return next - from;
+		}
+		for(int next = (index + from) + 1, last = data.finalIndex(); (next < last)
+			&& (this.customItemCompare(key, hash, item = array[next]) == 0); next++){
+			if(this.customItemEquals(key, hash, item)) return next - from;
+		}
+		return -index - 1;
 	}
 
 	/**
-	 * Diese Methode setzt die Größe des gegebenen Arrays und gibt es zurück. Wenn die Größe des gegebenen Arrays von der
-	 * gegebenen Größe abweicht, werden ein neues Array mit passender Größe erzeugt, die Elemente des gegebenen Arrays
-	 * mittig in das neue Array kopiert und das neue Array zurück gegeben.
+	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen
+	 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
+	 * der Eintrag eingefügt werden müsste.
 	 * 
-	 * @see CompactData#customAlignment(int)
-	 * @param list Array.
-	 * @param length neue Größe.
-	 * @return (neues) Array.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
+	 * @see CompactData#customItemCompare(Object, int, Object)
+	 * @param key Schlüssel.
+	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 	 */
-	protected final Object[] defaultResize(final Object[] list, final int length) throws IllegalArgumentException {
-		final int size = this.size;
-		if(size > length) throw new IllegalArgumentException("size > length");
-		if(length == 0) return CompactData.VOID;
-		if(length == list.length) return list;
-		final Object[] list2 = new Object[length];
-		final int from2 = this.customAlignment(length - size);
-		System.arraycopy(list, this.from, list2, from2, size);
-		this.from = from2;
-		return list2;
-	}
-
-	/**
-	 * Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position in das gegebenen Array ein und gibt
-	 * das Array zurück. Wenn die Größe des gegebenen Arrays nicht verändert werden muss, wird versucht, die wenigen
-	 * Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum
-	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und mittig im gegebenen Array
-	 * ausgerichtet. Wenn die Größe des gegebenen Arrays dagegen angepasst werden muss, werden ein neues Array mit
-	 * passender Größe erzeugt und die Elemente des gegebenen Arrays mittig in das neue Array kopiert. Die benötigte Größe
-	 * wird via {@link CompactData#defaultLength(Object[], int)} ermittelt.
-	 * 
-	 * @see CompactData#customAlignment(int)
-	 * @see CompactData#defaultLength(Object[], int)
-	 * @param array Array.
-	 * @param index Index des ersten neuen Elements.
-	 * @param count Anzahl der neuen Elemente.
-	 * @return (neues) Array.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
-	 */
-	protected final Object[] defaultInsert(final Object[] array, final int index, final int count)
-		throws IllegalArgumentException {
-		final int from = this.from;
-		final int index2 = index - from;
-		if(index2 < 0) throw new IllegalArgumentException("index < from");
-		final int size = this.size;
-		if(index2 > size) throw new IllegalArgumentException("index > from + size");
-		if(count == 0) return array;
-		if(count < 0) throw new IllegalArgumentException("count < 0");
-		final int size2 = size + count;
-		final int array2Length = this.defaultLength(array, size2);
-		this.size = size2;
-		if(array2Length != array.length){
-			final Object[] array2 = new Object[array2Length];
-			final int from2 = this.customAlignment(array2Length - size2);
-			System.arraycopy(array, from, array2, from2, index2);
-			System.arraycopy(array, index, array2, from2 + index2 + count, size - index2);
-			this.from = from2;
-			return array2;
+	protected final int defaultCompareIndex(final Object key, final int hash) {
+		final CompactDataArray data = this.items;
+		final Object[] array = data.array();
+		final int offset = data.startIndex();
+		int from = offset, last = data.finalIndex();
+		while(from < last){
+			final int index = (from + last) >>> 1, value = this.customItemCompare(key, hash, array[index]);
+			if(value < 0){
+				last = index;
+			}else if(value > 0){
+				from = index + 1;
+			}else return index - offset;
 		}
-		if(index2 > (size / 2)){
-			if((from + size2) <= array2Length){
-				System.arraycopy(array, index, array, index + count, size - index2);
-				return array;
-			}
-		}else{
-			if(from >= count){
-				final int from2 = from - count;
-				this.from = from2;
-				System.arraycopy(array, from, array, from2, index2);
-				return array;
-			}
-		}
-		final int from2 = this.defaultAlignment(array2Length - size2);
-		this.from = from2;
-		if(from2 < from){
-			System.arraycopy(array, from, array, from2, index2);
-			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
-			final int last = from + size, last2 = from2 + size2;
-			if(last2 < last){
-				Arrays.fill(array, last2, last, null);
-			}
-		}else{
-			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
-			System.arraycopy(array, from, array, from2, index2);
-			if(from2 > from){
-				Arrays.fill(array, from, from2, null);
-			}
-		}
-		return array;
-	}
-
-	/**
-	 * Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im gegebenen Array und gibt das
-	 * Array zurück. Es wird versucht, die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich um die gegebene
-	 * Anzahl zu verschieben.
-	 * 
-	 * @see CompactData#customAlignment(int)
-	 * @param list Array.
-	 * @param index Index des ersten entfallenden Elements.
-	 * @param count Anzahl der entfallende Elemente.
-	 * @return (neues) Array.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
-	 */
-	protected final Object[] defaultRemove(final Object[] list, final int index, final int count)
-		throws IllegalArgumentException {
-		final int from = this.from;
-		final int size = this.size;
-		final int index2 = index - from;
-		if((index2 < 0) || (index2 > size)) throw new IllegalArgumentException("index out of range: " + index);
-		final int size2 = size - count;
-		if((count < 0) || (size2 < 0)) throw new IllegalArgumentException("count out of range: " + count);
-		if(count == 0) return list;
-		this.size = size2;
-		if(size2 == 0){
-			this.from = this.customAlignment(list.length);
-			Arrays.fill(list, from, from + size, null);
-			return list;
-		}
-		if(index2 > (size2 / 2)){
-			System.arraycopy(list, index + count, list, index, size2 - index2);
-			Arrays.fill(list, from + size2, from + size, null);
-			return list;
-		}
-		final int from2 = from + count;
-		this.from = from2;
-		System.arraycopy(list, from, list, from2, index2);
-		Arrays.fill(list, from, from2, null);
-		return list;
-	}
-
-	/**
-	 * Diese Methode gibt die Position zurück, an der die Elemente des Arrays ausgerichtet werden sollen. Diese ergibt
-	 * sich aus {@code space / 2}.
-	 * 
-	 * @param space Anzahl der nicht belegten Elemente.
-	 * @return Position zur Ausrichtung.
-	 */
-	protected final int defaultAlignment(final int space) {
-		return space / 2;
+		return offset - from - 1;
 	}
 
 	/**
 	 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das Array ein.
 	 * 
-	 * @see CompactData#defaultInsert(Object[], int, int)
+	 * @see CompactArray#insert(int, int)
 	 * @param index Index.
 	 * @param count Anzahl.
 	 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 	 */
 	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		this.list = this.defaultInsert(this.list, index, count);
+		this.items.insert(index, count);
 	}
 
 	/**
 	 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem Array mit der gegebenen
 	 * Länge der Belegung.
 	 * 
-	 * @see CompactData#defaultRemove(Object[], int, int)
+	 * @see CompactArray#remove(int, int)
 	 * @param index Index.
 	 * @param count Anzahl.
 	 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 	 */
 	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		this.list = this.defaultRemove(this.list, index, count);
+		this.items.remove(index, count);
 	}
 
 	/**
-	 * Diese Methode vergrößert die Kapazität des Arrays, sodass dieses die gegebene Anzahl an Elementen verwalten kann.
+	 * Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 * 
-	 * @see CompactData#defaultResize(Object[], int)
-	 * @param count Anzahl.
+	 * @see CompactArray#allocate(int)
+	 * @param capacity Anzahl.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	protected void customAllocate(final int count) {
-		this.list = this.defaultResize(this.list, this.defaultLength(this.list, count));
+	protected void customAllocate(final int capacity) {
+		this.items.allocate(capacity);
 	}
 
 	/**
-	 * Diese Methode verkleinert die Kapazität des Arrays auf das Minimum für seine Belegung.
+	 * Diese Methode verkleinert die Kapazität auf das Minimum.
 	 * 
-	 * @see CompactData#defaultResize(Object[], int)
+	 * @see CompactArray#compact()
 	 */
 	protected void customCompact() {
-		this.list = this.defaultResize(this.list, this.size);
-	}
-
-	/**
-	 * Diese Methode gibt die Position zurück, an der die Elemente des Arrays ausgerichtet werden sollen. Bei der
-	 * Ausrichtung {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von
-	 * Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtung {@code space} gilt das gegenteil, da
-	 * hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des
-	 * Arrays beschleunigt wird.
-	 * 
-	 * @see CompactData#defaultInsert(Object[], int, int)
-	 * @see CompactData#defaultRemove(Object[], int, int)
-	 * @see CompactData#defaultResize(Object[], int)
-	 * @see CompactData#defaultAlignment(int)
-	 * @param space Anzahl der nicht belegten Elemente.
-	 * @return Position zur Ausrichtung ({@code 0..space}).
-	 */
-	protected int customAlignment(final int space) {
-		return this.defaultAlignment(space);
+		this.items.compact();
 	}
 
 	/**
@@ -764,9 +651,9 @@ public abstract class CompactData {
 	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag
 	 * eingefügt werden müsste.
 	 * 
-	 * @see CompactData#equalsIndex(Object, int)
-	 * @see CompactData#compareIndex(Object, int)
-	 * @param item Objekt.
+	 * @see CompactData#defaultEqualsIndex(Object, int)
+	 * @see CompactData#defaultCompareIndex(Object, int)
+	 * @param item Objekt oder {@code null}.
 	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 	 */
 	protected abstract int customItemIndex(final Object item);
@@ -785,42 +672,16 @@ public abstract class CompactData {
 	protected abstract boolean customItemEquals(Object key, int hash, Object item);
 
 	/**
-	 * Diese Methode sucht zuerst binär und danach linear nach einem Eintrag, dessen Schlüssel gleich dem gegebenen
-	 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
-	 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element} ist
-	 * dann zum gegebenen Schlüssel gleich, wenn {@code (compare(key, hash, element) == 0) &&
-	 * equals(key, hash, element)}.
-	 * 
-	 * @see CompactData#customItemEquals(Object, int, Object)
-	 * @see CompactData#customItemCompare(Object, int, Object)
-	 * @see CompactData#compareIndex(Object, int)
-	 * @param key Schlüssel.
-	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 */
-	protected final int equalsIndex(final Object key, final int hash) {
-		Object item;
-		final int index = this.compareIndex(key, hash);
-		if(index < 0) return index;
-		final Object[] list = this.list;
-		if(this.customItemEquals(key, hash, list[index])) return index;
-		for(int next = index + 1, last = this.from + this.size; (next < last)
-			&& (this.customItemCompare(key, hash, item = list[next]) == 0); next++){
-			if(this.customItemEquals(key, hash, item)) return next;
-		}
-		for(int next = index - 1, from = this.from; (from <= next)
-			&& (this.customItemCompare(key, hash, item = list[next]) == 0); next--){
-			if(this.customItemEquals(key, hash, item)) return next;
-		}
-		return -(index + 1);
-	}
-
-	/**
 	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel kleiner,
 	 * gleich bzw. größer als der Schlüssel des gegebenen Elements ist. Die Berechnung kann auf den Schlüsseln selbst oder
 	 * ihren {@link Object#hashCode() Streuwerten} beruhen.
 	 * 
 	 * @see Comparator#compare(Object, Object)
+	 * @see CompactSubData
+	 * @see CompactSubData#isTooLow(Object)
+	 * @see CompactSubData#isTooHigh(Object)
+	 * @see CompactSubData#isInClosedRange(Object)
+	 * @see CompactSubData#CompactSubData(CompactData, Object, boolean, Object, boolean)
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
 	 * @param item Element.
@@ -829,43 +690,18 @@ public abstract class CompactData {
 	protected abstract int customItemCompare(Object key, int hash, Object item);
 
 	/**
-	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen
-	 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
-	 * der Eintrag eingefügt werden müsste.
-	 * 
-	 * @see CompactData#customItemCompare(Object, int, Object)
-	 * @param key Schlüssel.
-	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 */
-	protected final int compareIndex(final Object key, final int hash) {
-		int from = this.from, last = from + this.size;
-		final Object[] list = this.list;
-		while(from < last){
-			final int next = (from + last) >>> 1;
-			final int comp = this.customItemCompare(key, hash, list[next]);
-			if(comp < 0){
-				last = next;
-			}else if(comp > 0){
-				from = next + 1;
-			}else return next;
-		}
-		return -(from + 1);
-	}
-
-	/**
-	 * Diese Methode gibt den Index des ersten Elements zurück. Dieser Index kann den Wert {@code from+size} annehmen.
+	 * Diese Methode gibt den Index des ersten Elements zurück. Dieser Index kann den Wert {@code size} annehmen.
 	 * 
 	 * @see NavigableSet#first()
 	 * @return Index des ersten Elements.
 	 */
 	protected final int firstIndex() {
-		return this.from;
+		return 0;
 	}
 
 	/**
 	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Dieser Index kann die
-	 * Werte {@code from-1} und {@code from+size} annehmen.
+	 * Werte {@code -1} und {@code from+size} annehmen.
 	 * 
 	 * @see NavigableSet#lower(Object)
 	 * @param item Element.
@@ -879,7 +715,7 @@ public abstract class CompactData {
 
 	/**
 	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebene ist. Dieser Index
-	 * kann die Werte {@code from-1} und {@code from+size} annehmen.
+	 * kann die Werte {@code -1} und {@code from+size} annehmen.
 	 * 
 	 * @see NavigableSet#floor(Object)
 	 * @param item Element.
@@ -893,7 +729,7 @@ public abstract class CompactData {
 
 	/**
 	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer oder gleich dem gegebene ist. Dieser Index
-	 * kann den Wert {@code from+size} annehmen.
+	 * kann den Wert {@code size} annehmen.
 	 * 
 	 * @see NavigableSet#ceiling(Object)
 	 * @param item Element.
@@ -907,7 +743,7 @@ public abstract class CompactData {
 
 	/**
 	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer dem gegebene ist. Dieser Index kann den
-	 * Wert {@code from+size} annehmen.
+	 * Wert {@code size} annehmen.
 	 * 
 	 * @see NavigableSet#higher(Object)
 	 * @param item Element.
@@ -920,22 +756,24 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode gibt den Index des letzten Elements zurück. Dieser Index kann deb Wert {@code from-1} annehmen.
+	 * Diese Methode gibt den Index des letzten Elements zurück. Dieser Index kann deb Wert {@code -1} annehmen.
 	 * 
 	 * @see NavigableSet#last()
 	 * @return Index des letzten Elements.
 	 */
 	protected final int lastIndex() {
-		return (this.from + this.size) - 1;
+		return this.items.size() - 1;
 	}
 
 	/**
 	 * Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 * 
-	 * @param count Anzahl.
+	 * @see CompactObjectArray#allocate(int)
+	 * @param capacity Anzahl.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	public final void allocate(final int count) {
-		this.customAllocate(count);
+	public final void allocate(final int capacity) throws IllegalArgumentException {
+		this.customAllocate(capacity);
 	}
 
 	/**

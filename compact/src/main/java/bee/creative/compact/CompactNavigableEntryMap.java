@@ -3,6 +3,7 @@ package bee.creative.compact;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
+import bee.creative.array.Array;
 
 /**
  * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Schlüssel und Werte in je einem Array
@@ -18,8 +19,6 @@ import java.util.TreeMap;
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen
  * Rechenzeiten, unabhängig von der Anzahl der Elemente.
  * 
- * @see CompactMap#getKey(Object)
- * @see CompactMap#setKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
@@ -27,18 +26,19 @@ import java.util.TreeMap;
 public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 	/**
-	 * Dieses Feld speichert die Werte.
+	 * Dieses Feld speichert das {@link Array} der Werte.
 	 */
-	protected Object[] values = CompactData.VOID;
+	protected final CompactDataArray values;
 
 	/**
 	 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 	 * 
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
 	 */
 	public CompactNavigableEntryMap(final Comparator<? super GKey> comparator) throws NullPointerException {
 		super(comparator);
+		this.values = new CompactDataArray();
 	}
 
 	/**
@@ -47,11 +47,13 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
 	public CompactNavigableEntryMap(final int capacity, final Comparator<? super GKey> comparator)
-		throws NullPointerException {
-		super(capacity, comparator);
+		throws IllegalArgumentException, NullPointerException {
+		this(comparator);
+		this.allocate(capacity);
 	}
 
 	/**
@@ -65,32 +67,20 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 */
 	public CompactNavigableEntryMap(final Map<? extends GKey, ? extends GValue> map,
 		final Comparator<? super GKey> comparator) throws NullPointerException {
-		super(map, comparator);
+		this(comparator);
+		if(map == null) throw new NullPointerException("map is null");
+		this.allocate(map.size());
+		this.putAll(map);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final GKey getKey(final GValue value) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final void setKey(final GKey key, final GValue value) {
-		throw new UnsupportedOperationException();
-	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected GKey getKey(final int index) {
-		return (GKey)this.list[index];
+		return (GKey)this.items.get(index);
 	}
 
 	/**
@@ -99,7 +89,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected GValue getValue(final int index) {
-		return (GValue)this.values[index];
+		return (GValue)this.values.get(index);
 	}
 
 	/**
@@ -107,8 +97,44 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 */
 	@Override
 	protected void setEntry(final int index, final GKey key, final GValue value) {
-		this.list[index] = key;
-		this.values[index] = value;
+		this.items.set(index, key);
+		this.values.set(index, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
+		super.customInsert(index, count);
+		this.values.insert(index, count);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
+		super.customRemove(index, count);
+		this.values.remove(index, count);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void customAllocate(final int count) {
+		super.customAllocate(count);
+		this.values.allocate(count);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void customCompact() {
+		super.customCompact();
+		this.values.compact();
 	}
 
 	/**
@@ -124,58 +150,8 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int size = this.size;
-		this.list = this.defaultInsert(this.list, index, count);
-		this.from = from;
-		this.size = size;
-		this.values = this.defaultInsert(this.values, index, count);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		final int from = this.from;
-		final int size = this.size;
-		this.list = this.defaultRemove(this.list, index, count);
-		this.from = from;
-		this.size = size;
-		this.values = this.defaultRemove(this.values, index, count);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void customAllocate(final int count) {
-		final int from = this.from;
-		final int length = this.defaultLength(this.list, count);
-		this.list = this.defaultResize(this.list, length);
-		this.from = from;
-		this.values = this.defaultResize(this.values, length);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void customCompact() {
-		final int from = this.from;
-		final int length = this.size;
-		this.list = this.defaultResize(this.list, length);
-		this.from = from;
-		this.values = this.defaultResize(this.values, length);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public boolean containsValue(final Object value) {
-		return CompactData.indexOf(this.values, this.from, this.size, value) >= 0;
+		return this.values.values().contains(value);
 	}
 
 }
