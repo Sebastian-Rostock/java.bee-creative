@@ -490,21 +490,12 @@ public final class Objects {
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * {@code null}-Eingaben und Arrays. Wenn beide Objekte keine Arrays sind, entspricht der Rückgabewert:
+	 * {@code null}-Eingaben. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
 	 * </pre>
 	 * 
-	 * @see Arrays#equals(int[], int[])
-	 * @see Arrays#equals(long[], long[])
-	 * @see Arrays#equals(byte[], byte[])
-	 * @see Arrays#equals(char[], char[])
-	 * @see Arrays#equals(short[], short[])
-	 * @see Arrays#equals(float[], float[])
-	 * @see Arrays#equals(double[], double[])
-	 * @see Arrays#equals(boolean[], boolean[])
-	 * @see Objects#equals(Object[], Object[])
 	 * @param object1 Objekt 1 oder {@code null}.
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
