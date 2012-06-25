@@ -18,9 +18,9 @@ import bee.creative.util.Tests.A1Test;
 
 public class Main {
 
-	static final int COUNT =
+	static int COUNT =
 	// 32
-		64 * 1024;
+		128 * 1024;
 
 	static final Random RANDOM = new Random();
 
@@ -65,6 +65,28 @@ public class Main {
 			public void run(final Map<Integer, Integer> data) throws Throwable {
 				for(int i = 0; i < Main.COUNT; i++){
 					data.remove(new Integer(Main.RANDOM.nextInt(Main.COUNT)));
+				}
+			}
+
+		},
+
+		containsIndex {
+
+			@Override
+			public void run(final Map<Integer, Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.get(new Integer(i));
+				}
+			}
+
+		},
+
+		containsRandom {
+
+			@Override
+			public void run(final Map<Integer, Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.get(new Integer(Main.RANDOM.nextInt(Main.COUNT)));
 				}
 			}
 
@@ -153,6 +175,28 @@ public class Main {
 			public void run(final Set<Integer> data) throws Throwable {
 				for(int i = 0; i < Main.COUNT; i++){
 					data.remove(new Integer(Main.RANDOM.nextInt(Main.COUNT)));
+				}
+			}
+
+		},
+
+		containsIndex {
+
+			@Override
+			public void run(final Set<Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.contains(new Integer(i));
+				}
+			}
+
+		},
+
+		containsRandom {
+
+			@Override
+			public void run(final Set<Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.contains(new Integer(Main.RANDOM.nextInt(Main.COUNT)));
 				}
 			}
 
@@ -266,7 +310,7 @@ public class Main {
 			}
 
 		},
-		
+
 		removeCenterIndex {
 
 			@Override
@@ -284,6 +328,26 @@ public class Main {
 			public void run(final List<Integer> data) throws Throwable {
 				for(int i = 0; i < Main.COUNT; i++){
 					data.remove(Main.RANDOM.nextInt(data.size() + 1));
+				}
+			}
+
+		},
+		containsIndex {
+
+			@Override
+			public void run(final List<Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.contains(new Integer(i));
+				}
+			}
+
+		},
+		containsRandom {
+
+			@Override
+			public void run(final List<Integer> data) throws Throwable {
+				for(int i = 0; i < Main.COUNT; i++){
+					data.contains(new Integer(Main.RANDOM.nextInt(Main.COUNT)));
 				}
 			}
 
@@ -311,7 +375,7 @@ public class Main {
 
 		},
 
-		compactIntegerArrayValues {
+		compactArray {
 
 			@Override
 			public List<Integer> build() {
@@ -329,6 +393,14 @@ public class Main {
 		Tests.printA1Test(removeTest2, value);
 	}
 
+	private static <GValue> void printACRTest(A1Test<? super GValue> appendTest, A1Test<? super GValue> removeTest,
+		A1Test<? super GValue> containsTest, Builder<? extends GValue> valueBuilder) {
+		GValue value = valueBuilder.build();
+		Tests.printA1Test(appendTest, value);
+		Tests.printA1Test(containsTest, value);
+		Tests.printA1Test(removeTest, value);
+	}
+
 	/**
 	 * Diese Methode gibt das zurück.
 	 * 
@@ -338,40 +410,57 @@ public class Main {
 
 		Tests.printA1Title();
 
-		printARTest(MapTest.addIndex, MapTest.removeIndex, MapBuilder.hashMap);
-		printARTest(MapTest.addIndex, MapTest.removeIndex, MapBuilder.treeMap);
-		printARTest(MapTest.addIndex, MapTest.removeIndex, MapBuilder.compactEntryHashMap);
-		printARTest(MapTest.addIndex, MapTest.removeIndex, MapBuilder.compactNavigableEntryMap);
+		COUNT = 1024 * 1024;
 
-		printARTest(MapTest.addRandom, MapTest.removeRandom, MapBuilder.hashMap);
-		printARTest(MapTest.addRandom, MapTest.removeRandom, MapBuilder.treeMap);
-		printARTest(MapTest.addRandom, MapTest.removeRandom, MapBuilder.compactEntryHashMap);
-		printARTest(MapTest.addRandom, MapTest.removeRandom, MapBuilder.compactNavigableEntryMap);
+		printACRTest(MapTest.addIndex, MapTest.removeIndex, MapTest.containsIndex, MapBuilder.hashMap);
+		printACRTest(MapTest.addIndex, MapTest.removeIndex, MapTest.containsIndex, MapBuilder.treeMap);
+		printACRTest(MapTest.addIndex, MapTest.removeIndex, MapTest.containsIndex, MapBuilder.compactEntryHashMap);
+		printACRTest(MapTest.addIndex, MapTest.removeIndex, MapTest.containsIndex, MapBuilder.compactNavigableEntryMap);
 
-		printARTest(SetTest.addIndex, SetTest.removeIndex, SetBuilder.hashSet);
-		printARTest(SetTest.addIndex, SetTest.removeIndex, SetBuilder.treeSet);
-		printARTest(SetTest.addIndex, SetTest.removeIndex, SetBuilder.compactHashSet);
-		printARTest(SetTest.addIndex, SetTest.removeIndex, SetBuilder.compactNavigableSet);
+		COUNT = 128 * 1024;
 
-		printARTest(SetTest.addRandom, SetTest.removeRandom, SetBuilder.hashSet);
-		printARTest(SetTest.addRandom, SetTest.removeRandom, SetBuilder.treeSet);
-		printARTest(SetTest.addRandom, SetTest.removeRandom, SetBuilder.compactHashSet);
-		printARTest(SetTest.addRandom, SetTest.removeRandom, SetBuilder.compactNavigableSet);
+		printACRTest(MapTest.addRandom, MapTest.removeRandom, MapTest.containsRandom, MapBuilder.hashMap);
+		printACRTest(MapTest.addRandom, MapTest.removeRandom, MapTest.containsRandom, MapBuilder.treeMap);
+		printACRTest(MapTest.addRandom, MapTest.removeRandom, MapTest.containsRandom, MapBuilder.compactEntryHashMap);
+		printACRTest(MapTest.addRandom, MapTest.removeRandom, MapTest.containsRandom, MapBuilder.compactNavigableEntryMap);
+
+		COUNT = 1024 * 1024;
+
+		printACRTest(SetTest.addIndex, SetTest.removeIndex, SetTest.containsIndex, SetBuilder.hashSet);
+		printACRTest(SetTest.addIndex, SetTest.removeIndex, SetTest.containsIndex, SetBuilder.treeSet);
+		printACRTest(SetTest.addIndex, SetTest.removeIndex, SetTest.containsIndex, SetBuilder.compactHashSet);
+		printACRTest(SetTest.addIndex, SetTest.removeIndex, SetTest.containsIndex, SetBuilder.compactNavigableSet);
+
+		COUNT = 128 * 1024;
+
+		printACRTest(SetTest.addRandom, SetTest.removeRandom, SetTest.containsRandom, SetBuilder.hashSet);
+		printACRTest(SetTest.addRandom, SetTest.removeRandom, SetTest.containsRandom, SetBuilder.treeSet);
+		printACRTest(SetTest.addRandom, SetTest.removeRandom, SetTest.containsRandom, SetBuilder.compactHashSet);
+		printACRTest(SetTest.addRandom, SetTest.removeRandom, SetTest.containsRandom, SetBuilder.compactNavigableSet);
+
+		COUNT = 32 * 1024;
 
 		printARTest(ListTest.addStartIndex, ListTest.removeStartIndex, ListBuilder.arrayList);
-		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.arrayList);
-		printARTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListBuilder.arrayList);
-		printARTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListBuilder.arrayList);
-
 		printARTest(ListTest.addStartIndex, ListTest.removeStartIndex, ListBuilder.compactList);
-		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.compactList);
-		printARTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListBuilder.compactList);
-		printARTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListBuilder.compactList);
+		printARTest(ListTest.addStartIndex, ListTest.removeStartIndex, ListBuilder.compactArray);
 
-		printARTest(ListTest.addStartIndex, ListTest.removeStartIndex, ListBuilder.compactIntegerArrayValues);
-		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.compactIntegerArrayValues);
-		printARTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListBuilder.compactIntegerArrayValues);
-		printARTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListBuilder.compactIntegerArrayValues);
+		COUNT = 32 * 1024;
+
+		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.arrayList);
+		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.compactList);
+		printARTest(ListTest.addFinalIndex, ListTest.removeFinalIndex, ListBuilder.compactArray);
+
+		COUNT = 16 * 1024;
+
+		printACRTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListTest.containsIndex, ListBuilder.arrayList);
+		printACRTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListTest.containsIndex, ListBuilder.compactList);
+		printACRTest(ListTest.addCenterIndex, ListTest.removeCenterIndex, ListTest.containsIndex, ListBuilder.compactArray);
+
+		COUNT = 32 * 1024;
+
+		printACRTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListTest.containsRandom, ListBuilder.arrayList);
+		printACRTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListTest.containsRandom, ListBuilder.compactList);
+		printACRTest(ListTest.addRandomIndex, ListTest.removeRandomIndex, ListTest.containsRandom, ListBuilder.compactArray);
 
 	}
 
