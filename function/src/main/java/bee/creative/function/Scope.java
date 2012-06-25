@@ -12,9 +12,8 @@ import bee.creative.util.Objects.UseToString;
  * @see Scopes
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GContext> Typ des Kontextobjekts.
  */
-public interface Scope<GContext> extends Iterable<Value>, UseToString {
+public interface Scope extends Iterable<Value>, UseToString {
 
 	/**
 	 * Diese Methode gibt den {@link Value Parameterwert} mit dem gegebenen Index zurück.
@@ -39,7 +38,7 @@ public interface Scope<GContext> extends Iterable<Value>, UseToString {
 	 * 
 	 * @return Kontextobjekt.
 	 */
-	public GContext context();
+	public Object context();
 
 	/**
 	 * Diese Methode gibt den {@link Iterator} über die {@link Value Parameterwerte} zurück.

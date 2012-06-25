@@ -10,9 +10,8 @@ package bee.creative.function;
  * @see Scope
  * @see Functions
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GContext> Typ des Kontextobjekts.
  */
-public interface Function<GContext> {
+public interface Function {
 
 	/**
 	 * Diese Methode führt Berechnungen im gegebenen {@link Scope Ausführungskontext} durch und gibt deren {@link Value
@@ -21,6 +20,6 @@ public interface Function<GContext> {
 	 * @param scope {@link Scope Ausführungskontext}.
 	 * @return {@link Value Ergebniswert}.
 	 */
-	public Value execute(Scope<? extends GContext> scope);
+	public Value execute(Scope scope);
 
 }

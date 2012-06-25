@@ -19,9 +19,9 @@ public final class Functions {
 	 * Diese Klasse implementiert eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 */
-	public static final class ValueFunction<GContext> implements Function<GContext> {
+	public static final class ValueFunction implements Function {
 
 		/**
 		 * Dieses Feld speichert den {@link Value Ergebniswert}.
@@ -43,7 +43,7 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope<? extends GContext> scope) {
+		public Value execute(final Scope scope) {
 			return this.value;
 		}
 
@@ -61,8 +61,8 @@ public final class Functions {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ValueFunction<?>)) return false;
-			final ValueFunction<?> data = (ValueFunction<?>)object;
+			if(!(object instanceof ValueFunction)) return false;
+			final ValueFunction data = (ValueFunction)object;
 			return Objects.equals(this.value, data.value);
 		}
 
@@ -81,9 +81,9 @@ public final class Functions {
 	 * {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 */
-	public static final class ParamFunction<GContext> implements Function<GContext> {
+	public static final class ParamFunction implements Function {
 
 		/**
 		 * Dieses Feld speichert den Index des {@link Value Parameterwerts}.
@@ -105,7 +105,7 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope<? extends GContext> scope) {
+		public Value execute(final Scope scope) {
 			return scope.get(this.index);
 		}
 
@@ -123,8 +123,8 @@ public final class Functions {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ParamFunction<?>)) return false;
-			final ParamFunction<?> data = (ParamFunction<?>)object;
+			if(!(object instanceof ParamFunction)) return false;
+			final ParamFunction data = (ParamFunction)object;
 			return this.index == data.index;
 		}
 
@@ -143,9 +143,9 @@ public final class Functions {
 	 * Funktion} mit den {@link Value Ergebniswerten} mehrerer gegebener {@link Function Parameterfunktionen} berechnet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GContext> Typ des Ausführungskontextes.
+	 * @param  Typ des Ausführungskontextes.
 	 */
-	public static final class ChainedFunction<GContext> implements Function<GContext> {
+	public static final class ChainedFunction implements Function {
 
 		/**
 		 * Diese Klasse implementiert den {@link Value Ergebniswert} einer {@link Function Funktion}, die von einem
@@ -164,14 +164,14 @@ public final class Functions {
 			 * Dieses Feld speichert den parametrisierten {@link ExecuteScope Ausführungskontext} einer {@link Function
 			 * Funktion}.
 			 */
-			ExecuteScope<?> scope;
+			ExecuteScope scope;
 
 			/**
 			 * Dieser Konstrukteur initialisiert den parametrisierten {@link ExecuteScope Ausführungskontext}.
 			 * 
 			 * @param scope {@link ExecuteScope Ausführungskontext}
 			 */
-			public ExecuteValue(final ExecuteScope<?> scope) {
+			public ExecuteValue(final ExecuteScope scope) {
 				this.scope = scope;
 			}
 
@@ -262,15 +262,15 @@ public final class Functions {
 		 * ermittelten {@link Value Parameterwerte} werden hierbei gepuffert.
 		 * 
 		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GContext> Typ des Quellobjekts.
+		 * @param  Typ des Quellobjekts.
 		 */
-		static final class ExecuteScope<GContext> extends BaseScope<GContext> {
+		static final class ExecuteScope extends BaseScope {
 
 			/**
 			 * Dieses Feld speichert den aufrufenden {@link Scope Ausführungskontext}, der für die {@link Function
 			 * Parameterfunktionen} genutzt wird.
 			 */
-			final Scope<? extends GContext> scope;
+			final Scope scope;
 
 			/**
 			 * Dieses Feld speichert die {@link Value Parameterwerte} (Cache).
@@ -280,13 +280,13 @@ public final class Functions {
 			/**
 			 * Dieses Feld speichert die mit diesem {@link Scope Ausführungskontext} aufzurufende {@link Function Funktion}.
 			 */
-			final Function<? super GContext> function;
+			final Function function;
 
 			/**
 			 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als
 			 * {@link Value Parameterwerte} verwendet werden sollen.
 			 */
-			final Function<? super GContext>[] functions;
+			final Function[] functions;
 
 			/**
 			 * Dieser Konstrukteur initialisiert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte}
@@ -298,8 +298,8 @@ public final class Functions {
 			 * @param function {@link Function Funktion}.
 			 * @param functions {@link Function Parameterfunktionen}.
 			 */
-			public ExecuteScope(final Scope<? extends GContext> scope, final Function<? super GContext> function,
-				final Function<? super GContext>[] functions) {
+			public ExecuteScope(final Scope scope, final Function function,
+				final Function[] functions) {
 				this.scope = scope;
 				this.values = new Value[functions.length];
 				this.function = function;
@@ -333,7 +333,7 @@ public final class Functions {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public GContext context() {
+			public Object context() {
 				return this.scope.context();
 			}
 
@@ -360,13 +360,13 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert die aufzurufende {@link Function Funktion}.
 		 */
-		final Function<? super GContext> function;
+		final Function function;
 
 		/**
 		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als
 		 * {@link Value Parameterwerte} verwendet werden sollen.
 		 */
-		final Function<? super GContext>[] functions;
+		final Function[] functions;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die aufzurufende {@link Function Funktion} und die {@link Function
@@ -376,7 +376,7 @@ public final class Functions {
 		 * @param functions {@link Function Parameterfunktionen}.
 		 * @throws NullPointerException Wenn eine der gegebenen {@link Function Funktionen} {@code null} ist.
 		 */
-		public ChainedFunction(final Function<? super GContext> function, final Function<? super GContext>... functions)
+		public ChainedFunction(final Function function, final Function... functions)
 			throws NullPointerException {
 			if(function == null) throw new NullPointerException("functions is null");
 			if(functions == null) throw new NullPointerException("functions is null");
@@ -389,8 +389,8 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope<? extends GContext> scope) {
-			return new ExecuteValue(new ExecuteScope<GContext>(scope, this.function, this.functions));
+		public Value execute(final Scope scope) {
+			return new ExecuteValue(new ExecuteScope(scope, this.function, this.functions));
 		}
 
 		/**
@@ -407,8 +407,8 @@ public final class Functions {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ChainedFunction<?>)) return false;
-			final ChainedFunction<?> data = (ChainedFunction<?>)object;
+			if(!(object instanceof ChainedFunction)) return false;
+			final ChainedFunction data = (ChainedFunction)object;
 			return Objects.equals(this.function, data.function) && Objects.equals(this.functions, data.functions);
 		}
 
@@ -425,10 +425,10 @@ public final class Functions {
 	/**
 	 * Dieses Feld speichert die {@code null}-{@link Function Funktion}.
 	 */
-	static final Function<?> VOID_FUNCTION = new Function<Object>() {
+	static final Function VOID_FUNCTION = new Function() {
 
 		@Override
-		public Value execute(final Scope<? extends Object> scope) {
+		public Value execute(final Scope scope) {
 			return Values.voidValue();
 		}
 
@@ -447,22 +447,22 @@ public final class Functions {
 	/**
 	 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
 	 */
-	static final Function<?>[] PARAM_FUNCTIONS = {new ParamFunction<Object>(0), new ParamFunction<Object>(1),
-		new ParamFunction<Object>(2), new ParamFunction<Object>(3), new ParamFunction<Object>(4),
-		new ParamFunction<Object>(5), new ParamFunction<Object>(6), new ParamFunction<Object>(7),
-		new ParamFunction<Object>(8), new ParamFunction<Object>(9)};
+	static final Function[] PARAM_FUNCTIONS = {new ParamFunction(0), new ParamFunction(1),
+		new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
+		new ParamFunction(5), new ParamFunction(6), new ParamFunction(7),
+		new ParamFunction(8), new ParamFunction(9)};
 
 	/**
 	 * Diese Methode gibt die leere {@link Function Funktion} zurück, welche immer den {@link Values#voidValue() leeren
 	 * Wert} als {@link Value Ergebniswert} liefert.
 	 * 
 	 * @see Values#voidValue()
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 * @return {@link Function Funktion}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static final <GContext> Function<GContext> voidFunction() {
-		return (Function<GContext>)Functions.VOID_FUNCTION;
+	public static final Function voidFunction() {
+		return Functions.VOID_FUNCTION;
 	}
 
 	/**
@@ -472,13 +472,13 @@ public final class Functions {
 	 * @see Values#value(Object)
 	 * @see Functions#voidFunction()
 	 * @see Functions#valueFunction(Value)
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 * @param data {@link Value Ergebniswert}.
 	 * @return {@link ValueFunction Value-Funktion}.
 	 */
-	public static final <GContext> Function<GContext> valueFunction(final Object data) {
+	public static final Function valueFunction(final Object data) {
 		if(data == null) return Functions.voidFunction();
-		return new ValueFunction<GContext>(Values.value(data));
+		return new ValueFunction(Values.value(data));
 	}
 
 	/**
@@ -486,29 +486,28 @@ public final class Functions {
 	 * zurück.
 	 * 
 	 * @see Functions#voidFunction()
-	 * @param <GContext> Typ des Kontextobjekts.
 	 * @param data {@link Value Ergebniswert}.
 	 * @return {@link ValueFunction Value-Funktion}.
 	 */
-	public static final <GContext> Function<GContext> valueFunction(final Value data) {
+	public static final Function valueFunction(final Value data) {
 		if(data == null) return Functions.voidFunction();
-		return new ValueFunction<GContext>(data);
+		return new ValueFunction(data);
 	}
 
 	/**
 	 * Diese Methode erzeugt eine eine projezierende {@link Function Funktion}, deren {@link Value Ergebniswert} einem der
 	 * {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht und gibt diese zurück.
 	 * 
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 * @param index Index des {@link Value Parameterwerts}.
 	 * @return {@link ParamFunction Param-Funktion}.
 	 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static final <GContext> Function<GContext> paramFunctions(final int index) throws IndexOutOfBoundsException {
+	public static final  Function paramFunctions(final int index) throws IndexOutOfBoundsException {
 		if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
-		if(index < Functions.PARAM_FUNCTIONS.length) return (Function<GContext>)Functions.PARAM_FUNCTIONS[index];
-		return new ParamFunction<GContext>(index);
+		if(index < Functions.PARAM_FUNCTIONS.length) return (Function)Functions.PARAM_FUNCTIONS[index];
+		return new ParamFunction(index);
 	}
 
 	/**
@@ -516,15 +515,15 @@ public final class Functions {
 	 * Funktion} mit den {@link Value Ergebniswerten} der gegebenen {@link Function Parameterfunktionen} als Parameter
 	 * berechnet, und gibt diese zurück.
 	 * 
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param  Typ des Kontextobjekts.
 	 * @param function {@link Function Funktion}.
 	 * @param functions {@link Function Parameterfunktionen}.
 	 * @return {@link ChainedFunction Chained-Funktion}.
 	 * @throws NullPointerException Wenn eine der gegebenen {@link Function Funktionen} {@code null} ist.
 	 */
-	public static final <GContext> Function<GContext> chainedFunction(final Function<? super GContext> function,
-		final Function<? super GContext>... functions) throws NullPointerException {
-		return new ChainedFunction<GContext>(function, functions);
+	public static final  Function chainedFunction(final Function  function,
+		final Function... functions) throws NullPointerException {
+		return new ChainedFunction(function, functions);
 	}
 
 	/**

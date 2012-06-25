@@ -19,9 +19,8 @@ public final class Scopes {
 	 * Diese Klasse implementiert einen abstrakten, leeren {@link Scope Ausführungskontext}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GContext> Typ des Kontextobjekts.
 	 */
-	static abstract class BaseScope<GContext> implements Scope<GContext>, UseToString {
+	static abstract class BaseScope implements Scope, UseToString {
 
 		/**
 		 * {@inheritDoc}
@@ -43,7 +42,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GContext context() {
+		public Object context() {
 			return null;
 		}
 
@@ -92,8 +91,8 @@ public final class Scopes {
 		@Override
 		public final boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof Scope<?>)) return false;
-			final Scope<?> data = (Scope<?>)object;
+			if(!(object instanceof Scope)) return false;
+			final Scope data = (Scope)object;
 			final int size = this.size();
 			if(data.size() != size) return false;
 			for(int i = 0; i < size; i++)
@@ -108,14 +107,13 @@ public final class Scopes {
 	 * Parameterwerten}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GContext> Typ des Kontextobjekts.
 	 */
-	public static final class DefaultScope<GContext> extends BaseScope<GContext> {
+	public static final class DefaultScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert das Kontextobjekt.
 		 */
-		final GContext context;
+		final Object context;
 
 		/**
 		 * Dieses Feld speichert das values.
@@ -131,7 +129,7 @@ public final class Scopes {
 		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} oder einer der gegebenen
 		 *         {@link Value Parameterwerte} {@code null} sind.
 		 */
-		public DefaultScope(final GContext context, final Value... values) throws NullPointerException {
+		public DefaultScope(final Object context, final Value... values) throws NullPointerException {
 			if(context == null) throw new NullPointerException("context is null");
 			if(values == null) throw new NullPointerException("values is null");
 			if(Arrays.asList(values).contains(null)) throw new NullPointerException("values contains null");
@@ -162,7 +160,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GContext context() {
+		public final Object context() {
 			return this.context;
 		}
 
@@ -176,10 +174,12 @@ public final class Scopes {
 
 	}
 
+	
+	
 	/**
 	 * Dieses Feld speichert den leeren {@link Scope Ausführungskontext}.
 	 */
-	static final Scope<?> VOID_SCOPE = new BaseScope<Object>() {
+	static final Scope VOID_SCOPE = new BaseScope() {
 
 		@Override
 		public String toString() {
@@ -192,12 +192,12 @@ public final class Scopes {
 	 * Diese Methode gibt den leeren {@link Scope Ausführungskontext} ohne Kontextobjekt und ohne {@link Value
 	 * Parameterwerte} zurück.
 	 * 
-	 * @param <GSource> Typ des Kontextobjekts.
+	 * @param Typ des Kontextobjekts.
 	 * @return {@code void}-{@link Scope Ausführungskontext}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static final <GSource> Scope<GSource> voidScope() {
-		return (Scope<GSource>)Scopes.VOID_SCOPE;
+	public static final Scope voidScope() {
+		return Scopes.VOID_SCOPE;
 	}
 
 	/**
@@ -208,11 +208,11 @@ public final class Scopes {
 	 * @see Scopes#createScope(Object, Value...)
 	 * @see Value#arrayData()
 	 * @see Values#voidValue()
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param Typ des Kontextobjekts.
 	 * @param context Kontextobjekt.
 	 * @return {@link Scope Ausführungskontext}.
 	 */
-	public static final <GContext> Scope<GContext> createScope(final GContext context) {
+	public static final Scope createScope(final Object context) {
 		if(context == null) return Scopes.voidScope();
 		return Scopes.createScope(context, Values.voidValue().arrayData());
 	}
@@ -225,14 +225,13 @@ public final class Scopes {
 	 * @see Scopes#createScope(Object, Value...)
 	 * @see Value#arrayData()
 	 * @see Values#arrayValue(Object...)
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param Typ des Kontextobjekts.
 	 * @param context Kontextobjekt.
 	 * @param values {@link Value Parameterwerte}.
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static final <GContext> Scope<GContext> createScope(final GContext context, final Object... values)
-		throws NullPointerException {
+	public static final Scope createScope(final Object context, final Object... values) throws NullPointerException {
 		if((context == null) && (values.length == 0)) return Scopes.voidScope();
 		return Scopes.createScope(context, Values.arrayValue(values).arrayData());
 	}
@@ -242,16 +241,15 @@ public final class Scopes {
 	 * gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
 	 * 
 	 * @see Scopes#voidScope()
-	 * @param <GContext> Typ des Kontextobjekts.
+	 * @param Typ des Kontextobjekts.
 	 * @param context Kontextobjekt.
 	 * @param values {@link Value Parameterwerte}.
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static final <GContext> Scope<GContext> createScope(final GContext context, final Value... values)
-		throws NullPointerException {
+	public static final Scope createScope(final Object context, final Value... values) throws NullPointerException {
 		if((context == null) && (values.length == 0)) return Scopes.voidScope();
-		return new DefaultScope<GContext>(context, values);
+		return new DefaultScope(context, values);
 	}
 
 	/**

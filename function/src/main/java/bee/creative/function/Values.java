@@ -133,6 +133,14 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public Function functionData() {
+			return Functions.valueFunction(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public int hashCode() {
 			return this.data().hashCode();
 		}
@@ -146,8 +154,6 @@ public final class Values {
 			if(!(object instanceof Value)) return false;
 			final Value data = (Value)object;
 			switch(data.type()){
-				default:
-					return Objects.equals(this.data(), data.data());
 				case Value.TYPE_ARRAY:
 					return Arrays.equals(this.arrayData(), data.arrayData());
 				case Value.TYPE_STRING:
@@ -156,6 +162,8 @@ public final class Values {
 					return Objects.equals(this.numberData(), data.numberData());
 				case Value.TYPE_BOOLEAN:
 					return Objects.equals(this.booleanData(), data.booleanData());
+				default:
+					return Objects.equals(this.data(), data.data());
 			}
 		}
 
@@ -167,7 +175,7 @@ public final class Values {
 	 * @see Value#TYPE_ARRAY
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends BaseValue {
+	static final class ArrayValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert die Datensätze.
@@ -258,7 +266,7 @@ public final class Values {
 	 * @see Value#TYPE_OBJECT
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectValue extends BaseValue {
+	static final class ObjectValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
@@ -332,7 +340,7 @@ public final class Values {
 	 * @see Value#TYPE_STRING
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringValue extends BaseValue {
+	static final class StringValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
@@ -472,7 +480,7 @@ public final class Values {
 	 * @see Value#TYPE_NUMBER
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NumberValue extends BaseValue {
+	static final class NumberValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
@@ -549,9 +557,88 @@ public final class Values {
 	}
 
 	/**
-	 * Dieses Feld speichert den Datentypidentifikator {@code org.w3c.dom.Text}.
+	 * Diese Klasse implementiert einen {@link Value Wert} mit {@link Function Funktion} als Datensatz.
+	 * 
+	 * @see Value#TYPE_FUNCTION
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class FunctionValue extends BaseValue {
+
+		/**
+		 * Dieses Feld speichert den Datensatz.
+		 */
+		final Function data;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * 
+		 * @param data Datensatz.
+		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
+		 */
+		public FunctionValue(final Function data) throws NullPointerException {
+			if(data == null) throw new NullPointerException("data is null");
+			this.data = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int type() {
+			return Value.TYPE_FUNCTION;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object data() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String stringData() {
+			return this.data.toString();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Boolean booleanData() {
+			return BaseValue.BOOLEAN_TRUE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.data.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("numberValue", this.data);
+		}
+
+	}
+
+	/**
+	 * Dieses Feld speichert den {@code null}-{@link Value Wert}.
 	 */
 	static final Value VOID_VALUE = new BaseValue() {
+
+		@Override
+		public Function functionData() {
+			return Functions.VOID_FUNCTION;
+		}
 
 		@Override
 		public int hashCode() {
@@ -814,6 +901,17 @@ public final class Values {
 	public static final Value booleanValue(final Boolean data) {
 		if(data == null) return Values.voidValue();
 		return Values.booleanValue(data.booleanValue());
+	}
+
+	/**
+	 * Diese Methode konvertiert die gegebene {@link Function Funktion} in einen {@link Value} und gibt diesen zurück.
+	 * 
+	 * @param data {@link Function}.
+	 * @return {@link Value}.
+	 */
+	public static final Value functionValue(final Function data) {
+		if(data == null) return Values.voidValue();
+		return new FunctionValue(data);
 	}
 
 	/**

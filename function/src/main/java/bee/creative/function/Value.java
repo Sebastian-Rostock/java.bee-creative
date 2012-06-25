@@ -44,6 +44,11 @@ public interface Value {
 	public static final int TYPE_BOOLEAN = 5;
 
 	/**
+	 * Dieses Feld speichert den {@link Value#type() Datentyp} für {@link Function Funktionen}.
+	 */
+	public static final int TYPE_FUNCTION = 6;
+
+	/**
 	 * Diese Methode gibt den Datentyp zurück.
 	 * 
 	 * @return Datentyp.
@@ -89,6 +94,10 @@ public interface Value {
 	 * <td>{@link Value#TYPE_BOOLEAN TYPE_BOOLEAN}</td>
 	 * <td>{@code new Value[0]}</code></td>
 	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_FUNCTION TYPE_FUNCTION}</td>
+	 * <td>{@code new Value[0]}</code></td>
+	 * </tr>
 	 * </table>
 	 * 
 	 * @return Datensatz als {@link Value Wertliste}.
@@ -127,6 +136,10 @@ public interface Value {
 	 * <td>{@link Value#TYPE_BOOLEAN TYPE_BOOLEAN}</td>
 	 * <td>{@code String.valueOf(booleanData())}</td>
 	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_FUNCTION TYPE_FUNCTION}</td>
+	 * <td>{@code String.valueOf(functionData())}</td>
+	 * </tr>
 	 * </table>
 	 * 
 	 * @return Datensatz als {@link String Zeichenkette}.
@@ -151,12 +164,12 @@ public interface Value {
 	 * </tr>
 	 * <tr>
 	 * <td>{@link Value#TYPE_OBJECT TYPE_OBJECT}</td>
-	 * <td>{@code Double.valueOf(stringData())} bzw. {@code  Double.valueOf(NaN)} bei einer {@link NumberFormatException
+	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException
 	 * NumberFormatException}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link Value#TYPE_STRING TYPE_STRING}</td>
-	 * <td>{@code Double.valueOf(stringData())} bzw. {@code  Double.valueOf(NaN)} bei einer {@link NumberFormatException
+	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException
 	 * NumberFormatException}</td>
 	 * </tr>
 	 * <tr>
@@ -166,6 +179,10 @@ public interface Value {
 	 * <tr>
 	 * <td>{@link Value#TYPE_BOOLEAN TYPE_BOOLEAN}</td>
 	 * <td>{@code booleanData() ? Integer.valueOf(1) : Integer.valueOf(0)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_FUNCTION TYPE_FUNCTION}</td>
+	 * <td>{@code Double.valueOf(NaN)}</td>
 	 * </tr>
 	 * </table>
 	 * 
@@ -205,10 +222,57 @@ public interface Value {
 	 * <td>{@link Value#TYPE_BOOLEAN TYPE_BOOLEAN}</td>
 	 * <td>{@code (Boolean)data()}</td>
 	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_FUNCTION TYPE_FUNCTION}</td>
+	 * <td>{@code Boolean.valueOf(true)}</code></td>
+	 * </tr>
 	 * </table>
 	 * 
 	 * @return Datensatz als {@link Boolean Wahrheitswert}.
 	 */
 	public Boolean booleanData();
+
+	/**
+	 * Diese Methode gibt den Datensatz als {@link Function Funktion} zurück.
+	 * <p>
+	 * <table style="width:auto;">
+	 * <tr>
+	 * <th>{@link Value#type() Datentyp}</th>
+	 * <th>{@link Number Zahlenwert}</th>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_VOID TYPE_VOID}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_ARRAY TYPE_ARRAY}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_OBJECT TYPE_OBJECT}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_STRING TYPE_STRING}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_NUMBER TYPE_NUMBER}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_BOOLEAN TYPE_BOOLEAN}</td>
+	 * <td>{@code Functions.valueFunction(this)}</td>
+	 * </tr>
+	 * </tr>
+	 * <tr>
+	 * <td>{@link Value#TYPE_FUNCTION TYPE_FUNCTION}</td>
+	 * <td>{@code (Function)data()}</td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return Datensatz als {@link Function Funktion}.
+	 */
+	public Function functionData();
 
 }
