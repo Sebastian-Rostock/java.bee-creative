@@ -108,9 +108,9 @@ public abstract class Unique<GInput, GOutput> {
 		public boolean equals(final Object object) {
 			if(object == this) return true;
 			if(!(object instanceof UniqueKey<?>)) return false;
-			final GInput input = this.input;
-			if(input == null) return ((UniqueKey<GInput>)object).input == null;
-			return this.owner.equals(this.input, ((UniqueKey<GInput>)object).input);
+			final GInput input1 = this.input, input2 = ((UniqueKey<GInput>)object).input;
+			if(input1 == null) return input2 == null;
+			return (input1 == input2) || ((input2 != null) && this.owner.equals(input1, input2));
 		}
 
 		/**
