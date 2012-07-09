@@ -9,7 +9,7 @@ import java.util.List;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]},
  *        {@code float[]}, {@code double[]} oder {@code boolean[]}).
- * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
+ * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
  *        {@link Float}, {@link Double} oder {@link Boolean}).
  */
 public interface Array<GArray, GValue> {

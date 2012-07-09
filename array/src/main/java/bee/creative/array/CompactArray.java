@@ -10,7 +10,7 @@ import java.util.RandomAccess;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]},
  *        {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
- * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
+ * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
  *        {@link Float}, {@link Double} oder {@link Boolean}).
  */
 public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> implements Array<GArray, GValue> {
@@ -143,7 +143,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @param <GOwner> Typ des {@link CompactArray}s.
 	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]},
 	 *        {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
-	 * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
+	 * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
 	 *        {@link Float}, {@link Double} oder {@link Boolean}).
 	 */
 	protected static abstract class CompactSubArray<GOwner extends CompactArray<GArray, GValue>, GArray, GValue>
