@@ -1,12 +1,13 @@
 package bee.creative.function;
 
 import java.util.Iterator;
+import bee.creative.function.Scopes.ExecuteScope;
+import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Objects.UseToString;
 
 /**
- * Diese Schnittstelle definiert den Ausführungskontext einer {@link Function Funktion}. Ein Ausführungskontext
- * beinhalten die Liste der {@link Value Parameterwerte} für die aufgerufene {@link Function Funktion} und das
- * Kontextobjekt.
+ * Diese Schnittstelle definiert den Ausführungskontext einer {@link Function Funktion}. Ein solcher {@link Scope
+ * Ausführungskontext} stellt eine Liste von {@link Value Parameterwerten} sowie ein Kontextobjekt zur Verfügung.
  * 
  * @see Value
  * @see Scopes
@@ -16,25 +17,27 @@ import bee.creative.util.Objects.UseToString;
 public interface Scope extends Iterable<Value>, UseToString {
 
 	/**
-	 * Diese Methode gibt den {@link Value Parameterwert} mit dem gegebenen Index zurück.
+	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück.
 	 * 
+	 * @see Value
 	 * @param index Index.
-	 * @return {@link Value Parameterwerte}.
-	 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+	 * @return {@code index}-ter {@link Value Parameterwert}.
+	 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist, d.h. {@code index < 0} oder
+	 *         {@code index >= size()}.
 	 */
 	public Value get(int index) throws IndexOutOfBoundsException;
 
 	/**
 	 * Diese Methode gibt die Anzahl der {@link Value Parameterwerte} zurück.
 	 * 
-	 * @return Anzahl der {@link Value Parameterwerte}.
+	 * @return Anzahl der {@link Value Parameterwert}.
 	 */
 	public int size();
 
 	/**
 	 * Diese Methode gibt das Kontextobjekt zurück. {@link Function Funktionen} können aus diesem Objekt Informationen für
 	 * ihre Berechnungen extrahieren oder auch den Zustand dieses Objekts modifizieren. Das Kontextobjekt entspricht dem
-	 * Kontext {@code this} in Java-Methoden.
+	 * Kontext {@code this} in {@code Java}-Methoden.
 	 * 
 	 * @return Kontextobjekt.
 	 */
@@ -42,18 +45,66 @@ public interface Scope extends Iterable<Value>, UseToString {
 
 	/**
 	 * Diese Methode gibt den {@link Iterator} über die {@link Value Parameterwerte} zurück.
+	 * 
+	 * @return {@link Value Parameterwert}-{@link Iterator}.
 	 */
 	@Override
 	public Iterator<Value> iterator();
 
 	/**
-	 * {@inheritDoc} Der {@link Object#hashCode() Streuwert} wird aus den {@link Value Parameterwerten} berechnet.
+	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und
+	 * gibt deren {@link Value Ergebniswert} mit {@link ReturnValue call-by-reference}-Semantik zurück. Der hierfür
+	 * erzeugte {@link Scope Ausführungskontext} verwendet das Kontextobjekt dieses {@link Scope Ausführungskontexts} und
+	 * besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount}
+	 * {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen
+	 * {@link Value Parameterwerten} entsteht.
+	 * 
+	 * @see ReturnValue
+	 * @see ExecuteScope
+	 * @see #execute(Object, Function, int, Value...)
+	 * @param function {@link Function Funktion}.
+	 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} dieses {@link Scope
+	 *        Ausführungskontexts}.
+	 * @param insertValues Array der ersten {@link Value Parameterwerte} des neuen {@link Scope Ausführungskontexts}.
+	 * @return {@link Value Ergebniswert}.
+	 * @throws NullPointerException Wenn die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value
+	 *         Parameterwerte} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist.
+	 */
+	public Value execute(Function function, int deleteCount, Value... insertValues) throws NullPointerException,
+		IllegalArgumentException;
+
+	/**
+	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und
+	 * gibt deren {@link Value Ergebniswert} mit {@link ReturnValue call-by-reference}-Semantik zurück. Der hierfür
+	 * erzeugte {@link Scope Ausführungskontext} verwendet das gegebene Kontextobjekt {@code context} und besitzt eine
+	 * Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value
+	 * Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value
+	 * Parameterwerten} entsteht.
+	 * 
+	 * @see ReturnValue
+	 * @see ExecuteScope
+	 * @param context Kontextobjekt.
+	 * @param function {@link Function Funktion}.
+	 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} dieses {@link Scope
+	 *        Ausführungskontexts}.
+	 * @param insertValues Array der ersten {@link Value Parameterwerte} des neuen {@link Scope Ausführungskontexts}.
+	 * @return {@link Value Ergebniswert}.
+	 * @throws NullPointerException Wenn die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value
+	 *         Parameterwerte} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist.
+	 */
+	public Value execute(Object context, Function function, int deleteCount, Value... insertValues)
+		throws NullPointerException, IllegalArgumentException;
+
+	/**
+	 * {@inheritDoc} Der {@link Object#hashCode() Streuwert} wird aus den {@link Value}s berechnet.
 	 */
 	@Override
 	public int hashCode();
 
 	/**
-	 * {@inheritDoc} Die {@link Object#equals(Object) Äquivalenz} basiert auf den {@link Value Parameterwerten}.
+	 * {@inheritDoc} Die {@link Object#equals(Object) Äquivalenz} basiert auf den {@link Value}s.
 	 */
 	@Override
 	public boolean equals(Object obj);
