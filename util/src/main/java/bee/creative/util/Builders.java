@@ -35,7 +35,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * @see Builder
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class Builders {
+public final class Builders {
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten delegierenden {@link Builder}.

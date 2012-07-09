@@ -40,7 +40,7 @@ import java.util.List;
  * @see Comparable
  * @author Sebastian Rostock 2011.
  */
-public class Comparables {
+public final class Comparables {
 
 	/**
 	 * Diese Schnittstelle definiert eine Methode zum Lesen eines Element zu einem gegebenen Index.

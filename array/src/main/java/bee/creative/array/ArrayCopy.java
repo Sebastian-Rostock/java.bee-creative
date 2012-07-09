@@ -1,12 +1,11 @@
 package bee.creative.array;
 
-
 /**
  * Diese Klasse implementiert Methoden zum konvertierenden Kopieren von {@code byte}-Arrays.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class ArrayCopy {
+public final class ArrayCopy {
 
 	/**
 	 * Diese Methode ließt {@code 2 byte} aus dem gegebenen Array und gib diese als {@code int} interpretiert zurück. Das
@@ -338,6 +337,12 @@ public class ArrayCopy {
 		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 8){
 			ArrayCopy.set8(target, targetOffset, Double.doubleToRawLongBits(source[sourceOffset]));
 		}
+	}
+
+	/**
+	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 */
+	ArrayCopy() {
 	}
 
 }

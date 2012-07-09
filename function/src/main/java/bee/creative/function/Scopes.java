@@ -423,7 +423,7 @@ public final class Scopes {
 	 * @param context Kontextobjekt.
 	 * @return {@link Scope Ausführungskontext}.
 	 */
-	public static final Scope createScope(final Object context) {
+	public static  Scope createScope(final Object context) {
 		if(context == null) return Scopes.voidScope();
 		return Scopes.createScope(context, Values.voidValue().arrayData());
 	}
@@ -441,7 +441,7 @@ public final class Scopes {
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static final Scope createScope(final Object context, final Object... values) throws NullPointerException {
+	public static  Scope createScope(final Object context, final Object... values) throws NullPointerException {
 		return Scopes.createScope(context, Values.arrayValue(values).arrayData());
 	}
 
@@ -455,7 +455,7 @@ public final class Scopes {
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static final Scope createScope(final Object context, final Value... values) throws NullPointerException {
+	public static  Scope createScope(final Object context, final Value... values) throws NullPointerException {
 		if(values == null) throw new NullPointerException("values is null");
 		if((context == null) && (values.length == 0)) return Scopes.voidScope();
 		return new DefaultScope(context, values);
@@ -467,7 +467,7 @@ public final class Scopes {
 	 * 
 	 * @return {@code void}-{@link Scope Ausführungskontext}.
 	 */
-	public static final Scope voidScope() {
+	public static  Scope voidScope() {
 		return Scopes.VOID_SCOPE;
 	}
 

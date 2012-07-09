@@ -685,7 +685,8 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("resultValue", this.value, this.scope, this.function);
+			return Objects.toStringCall(true, true, "resultValue", "value", this.value, "scope", this.scope, "function",
+				this.function);
 		}
 
 	}

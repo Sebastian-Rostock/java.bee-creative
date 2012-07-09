@@ -204,7 +204,8 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("chainedFunction", this.function, this.functions);
+			return Objects
+				.toStringCall(true, true, "chainedFunction", "function", this.function, "functions", this.functions);
 		}
 
 	}
@@ -234,7 +235,7 @@ public final class Functions {
 	/**
 	 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
 	 */
-	static final Function[] PARAMETER_FUNCTIONS = {new ParameterFunction(0), new ParameterFunction(1),
+	static final ParameterFunction[] PARAMETER_FUNCTIONS = {new ParameterFunction(0), new ParameterFunction(1),
 		new ParameterFunction(2), new ParameterFunction(3), new ParameterFunction(4), new ParameterFunction(5),
 		new ParameterFunction(6), new ParameterFunction(7), new ParameterFunction(8), new ParameterFunction(9)};
 
@@ -245,7 +246,7 @@ public final class Functions {
 	 * @see Values#voidValue()
 	 * @return {@link Function Funktion}.
 	 */
-	public static final Function voidFunction() {
+	public static Function voidFunction() {
 		return Functions.VOID_FUNCTION;
 	}
 
@@ -257,9 +258,9 @@ public final class Functions {
 	 * @see Functions#voidFunction()
 	 * @see Functions#valueFunction(Value)
 	 * @param data {@link Value Ergebniswert}.
-	 * @return {@link ValueFunction Value-Funktion}.
+	 * @return {@link ValueFunction Wert-Funktion}.
 	 */
-	public static final Function valueFunction(final Object data) {
+	public static Function valueFunction(final Object data) {
 		if(data == null) return Functions.voidFunction();
 		return new ValueFunction(Values.value(data));
 	}
@@ -270,9 +271,9 @@ public final class Functions {
 	 * 
 	 * @see Functions#voidFunction()
 	 * @param data {@link Value Ergebniswert}.
-	 * @return {@link ValueFunction Value-Funktion}.
+	 * @return {@link ValueFunction Wert-Funktion}.
 	 */
-	public static final Function valueFunction(final Value data) {
+	public static Function valueFunction(final Value data) {
 		if(data == null) return Functions.voidFunction();
 		return new ValueFunction(data);
 	}
@@ -285,7 +286,7 @@ public final class Functions {
 	 * @return {@link ParameterFunction projizierende Funktion}.
 	 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 	 */
-	public static final Function parameterFunctions(final int index) throws IndexOutOfBoundsException {
+	public static ParameterFunction parameterFunctions(final int index) throws IndexOutOfBoundsException {
 		if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
 		if(index < Functions.PARAMETER_FUNCTIONS.length) return Functions.PARAMETER_FUNCTIONS[index];
 		return new ParameterFunction(index);
@@ -301,7 +302,7 @@ public final class Functions {
 	 * @return {@link CompositeFunction komponierte Funktion}.
 	 * @throws NullPointerException Wenn eine der gegebenen {@link Function Funktionen} {@code null} ist.
 	 */
-	public static final Function compositeFunction(final Function function, final Function... functions)
+	public static CompositeFunction compositeFunction(final Function function, final Function... functions)
 		throws NullPointerException {
 		return new CompositeFunction(function, functions);
 	}
