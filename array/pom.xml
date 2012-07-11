@@ -3,17 +3,18 @@
 	<parent>
 		<version>1.0.0</version>
 		<groupId>bee-creative</groupId>
-		<artifactId>core</artifactId>
+		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
 	<version>1.2.4</version>
-	<artifactId>array</artifactId>
+	<artifactId>bee-creative.array</artifactId>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
-			<version>1.2.3</version>
+			<version>1.3.4</version>
 			<groupId>bee-creative</groupId>
-			<artifactId>util</artifactId>
+			<artifactId>bee-creative.util</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
