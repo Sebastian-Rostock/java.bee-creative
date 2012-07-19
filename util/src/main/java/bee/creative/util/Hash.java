@@ -1,5 +1,6 @@
 package bee.creative.util;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -78,6 +79,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 					return;
 				}
 			}
+			this.next = null;
 		}
 
 		/**
@@ -343,7 +345,6 @@ public abstract class Hash<GKey, GValue, GEntry> {
 				this.verifyLength();
 				return item;
 			}
-
 		}
 		return null;
 	}
@@ -370,7 +371,10 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		final int oldLength = oldTable.length;
 		if(oldLength == newLength) return;
 		final GEntry[] newTable = (GEntry[])(this.table = new Object[newLength]);
-		if(newLength == 0) return;
+		if(newLength == 0){
+			if(this.size != 0) throw new IllegalArgumentException();
+			return;
+		}
 		for(int oldIndex = 0; oldIndex < oldLength; oldIndex++){
 			for(GEntry item = oldTable[oldIndex], next; item != null; item = next){
 				next = this.getEntryNext(item);
@@ -389,6 +393,15 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 */
 	protected final Iterator<GEntry> getEntries() {
 		return ((this.size == 0) ? Iterators.<GEntry>voidIterator() : new HashIterator<GKey, GEntry>(this));
+	}
+
+	/**
+	 * Diese Methode entfernt alle Einträge.
+	 */
+	protected final void clearEntries() {
+		if(this.size == 0) return;
+		this.size = 0;
+		Arrays.fill(this.table, null);
 	}
 
 }
