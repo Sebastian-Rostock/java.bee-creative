@@ -25,6 +25,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 import bee.creative.array.ArrayCopy;
 import bee.creative.util.Comparators;
+import bee.creative.util.Hash;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Unique;
 
@@ -37,6 +39,236 @@ import bee.creative.util.Unique;
 public class Encoder {
 
 	/**
+	 * Diese Schnittstelle definiert die Ausgabe eines {@link Encoder}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface EncodeTarget {
+
+		/**
+		 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array ab dem gegebenen
+		 * Index in die Ausgabe.
+		 * 
+		 * @see RandomAccessFile#write(byte[], int, int)
+		 * @param array {@code byte}-Array.
+		 * @param offset Index des ersten geschriebenen {@code byte}s.
+		 * @param length Anzahl der geschriebenen {@code byte}s.
+		 * @throws IOException Wenn beim schreiben ein Fehler auftritt.
+		 */
+		void write(byte[] array, int offset, int length) throws IOException;
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link EncodeTarget} mit {@link RandomAccessFile}.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class EncodeTargetFile implements EncodeTarget {
+
+		/**
+		 * Dieses Feld speichert das {@link RandomAccessFile}.
+		 */
+		final RandomAccessFile file;
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link RandomAccessFile}.
+		 * 
+		 * @param file {@link RandomAccessFile}.
+		 * @throws NullPointerException Wenn das gegebene {@link RandomAccessFile} {@code null} ist.
+		 */
+		public EncodeTargetFile(final RandomAccessFile file) throws NullPointerException {
+			if(file == null) throw new NullPointerException("file is null");
+			this.file = file;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void write(final byte[] values, final int offset, final int count) throws IOException {
+			this.file.write(values, offset, count);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung einzigartiger Elemente in einer Art {@link Hash}-
+	 * {@code Set}. Wenn das via {@link #get(EncodeItem)} zu einem gegebenen Element
+	 * {@link #equals(EncodeItem, EncodeItem) äquivalente} Element ermittelt werden konnte, wird die Wiederverwendung via
+	 * {@link #reuse(EncodeItem)} signalisiert. Das Einfügen eines neuen Elements wird dagegen mit
+	 * {@link #insert(EncodeItem)} angezeigt.
+	 * <p>
+	 * Die Implementation ähnelt einem {@link Unique}, jedoch mit deutlich geringere Speicherlast.
+	 * 
+	 * @see Unique
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 */
+	public static class EncodePool<GItem extends EncodeItem> extends Hash<GItem, GItem, GItem> {
+
+		/**
+		 * Dieser Konstrukteur initialisiert die Größe der {@link Hash}-Tabelle mit {@code 512}.
+		 */
+		public EncodePool() {
+			this.verifyLength(512);
+		}
+
+		/**
+		 * Diese Methode gibt das einzigartiges, zum gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente}
+		 * Element zurück. Wenn ein solches Element gefunden wurde, wird dessen Wiederverwendung via
+		 * {@link #reuse(EncodeItem)} signalisiert. Sollte dagegen kein {@link #equals(EncodeItem, EncodeItem) äquivalentes}
+		 * Element gefunden werden, werden das gegebene Element in den {@link Hash} eingefügt, das Einfügen mit
+		 * {@link #insert(EncodeItem)} angezeigt und das Element zurück gegeben.
+		 * 
+		 * @see #hash(EncodeItem)
+		 * @see #equals(EncodeItem, EncodeItem)
+		 * @param key Element.
+		 * @return einzigartiges, {@link #equals(EncodeItem, EncodeItem) äquivalentes} Element.
+		 */
+		public final GItem get(final GItem key) {
+			if(key == null) throw new NullPointerException();
+			final GItem value = this.findEntry(key);
+			if(value == null){
+				this.insert(key);
+				this.appendEntry(key, key, true);
+				return key;
+			}
+			this.reuse(value);
+			return value;
+		}
+
+		/**
+		 * Diese Methode gibt die Anzahl der Elemente zurück.
+		 * 
+		 * @return Anzahl der Elemente.
+		 */
+		public int size() {
+			return this.getSize();
+		}
+
+		/**
+		 * Diese Methode entfernt alle Elemente.
+		 */
+		public void clear() {
+			this.clearEntries();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final int getLength(final int size, int length) {
+			while(size > length){
+				length <<= 1;
+			}
+			return length;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final GItem getEntryKey(final GItem entry) {
+			return entry;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		protected final GItem getEntryNext(final GItem entry) {
+			return (GItem)entry.next;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final void setEntryNext(final GItem entry, final GItem next) {
+			entry.next = next;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final GItem getEntryValue(final GItem entry) {
+			return entry;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final GItem createEntry(final GItem key, final GItem value, final GItem next, final int hash) {
+			value.next = next;
+			return value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final int getKeyHash(final GItem key) {
+			int hash = this.hash(key);
+			hash ^= (hash >>> 20) ^ (hash >>> 12);
+			return hash ^ (hash >>> 7) ^ (hash >>> 4);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final boolean getEntryEquals(final GItem entry, final GItem key, final int hash) {
+			return this.equals(entry, key);
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Eingabe zurück. Die Eingabe ist nie
+		 * {@code null}.
+		 * 
+		 * @param input Eingabe.
+		 * @return {@link Object#hashCode() Streuwert}.
+		 */
+		protected int hash(final GItem input) {
+			return input.hashCode();
+		}
+
+		/**
+		 * Diese Methode wird bei der Wiederverwendung der gegebenen Elements aufgerufen.
+		 * 
+		 * @see #get(EncodeItem)
+		 * @param value Element.
+		 */
+		protected void reuse(final GItem value) {
+		}
+
+		/**
+		 * Diese Methode wird beim Einfügen des gegebenen Elements aufgerufen.
+		 * 
+		 * @see #get(EncodeItem)
+		 * @param value Element.
+		 */
+		protected void insert(final GItem value) {
+		}
+
+		/**
+		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Elemente zurück. Die Elemente sind
+		 * nie {@code null}.
+		 * 
+		 * @param input1 Element 1.
+		 * @param input2 Element 2.
+		 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Elemente.
+		 */
+		protected boolean equals(final GItem input1, final GItem input2) {
+			return input1.equals(input2);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert einen abstrakten Datensatz mit Index zur Verwaltung der Daten eingelesener
 	 * {@link Document}s.
 	 * 
@@ -45,72 +277,109 @@ public class Encoder {
 	public static abstract class EncodeItem {
 
 		/**
+		 * Dieses Feld speichert das nächste {@link EncodeItem} im {@link EncodePool}.
+		 * 
+		 * @see Hash
+		 */
+		EncodeItem next;
+
+		/**
 		 * Dieses Feld speichert beim Einlesen die absolute Häufigkeit und beim Speichern den Index des Datensatzes.
 		 */
 		public int index = 1;
 
 		/**
-		 * Diese Methode schreibt den Datensatz in das gegebenen {@link RandomAccessFile}.
+		 * Diese Methode schreibt den Datensatz in das gegebenen {@link EncodeTarget}.
 		 * 
-		 * @param file {@link RandomAccessFile}.
-		 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+		 * @param file {@link EncodeTarget}.
+		 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 		 */
-		public abstract void write(final RandomAccessFile file) throws IOException;
+		public abstract void write(final EncodeTarget file) throws IOException;
 
 	}
 
 	/**
 	 * Diese Klasse implementiert ein abstraktes {@link Unique} für {@link EncodeItem}s. In der Methode
-	 * {@link #reuse(EncodeItem, EncodeItem)} wird der Index der {@link EncodeItem}s erhöht.
+	 * {@link #reuse(EncodeItem)} wird der Index der {@link EncodeItem}s erhöht.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der {@link EncodeItem}s (Ein- und Ausgabe).
+	 * @param <GItem> Typ der {@link EncodeItem}s.
 	 */
-	public static abstract class EncodeItemCache<GValue extends EncodeItem> extends Unique<GValue, GValue> {
+	public static abstract class EncodeItemPool<GItem extends EncodeItem> extends EncodePool<GItem> {
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Aufrufe von {@link #reuse(EncodeItem, EncodeItem)}.
+		 * Dieses Feld speichert die Anzahl der Aufrufe von {@link #reuse(EncodeItem)}.
 		 */
-		public int reuseCount;
+		int reuseCount;
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Aufrufe von {@link #compile(EncodeItem)}.
+		 * Dieses Feld speichert die Anzahl der Aufrufe von {@link #insert(EncodeItem)}.
 		 */
-		public int compileCount;
+		int insertCount;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die interne {@link Map} mit {@link Unique#HASHMAP}.
+		 * {@inheritDoc}
 		 */
-		public EncodeItemCache() {
-			super(Unique.HASHMAP);
+		@Override
+		protected void reuse(final GItem value) {
+			this.reuseCount++;
+			value.index++;
 		}
 
 		/**
-		 * Diese Methode leert die interne {@link Map} und setzt die Zähler zurück.
+		 * {@inheritDoc}
 		 */
+		@Override
+		protected void insert(final GItem value) {
+			this.insertCount++;
+		}
+
+		/**
+		 * Diese Methode leert den {@link EncodePool} und setzt die Zähler zurück.
+		 */
+		@Override
 		public void clear() {
-			this.map.clear();
+			super.clear();
 			this.reuseCount = 0;
-			this.compileCount = 0;
+			this.insertCount = 0;
 		}
 
 		/**
-		 * Diese Methode fügt alle {@link EncodeItem}s des {@link EncodeItemCache}s in eine neue {@link List} ein, sortiert
+		 * Diese Methode gibt die Anzahl der Aufrufe von {@link #reuse(EncodeItem)} zurück.
+		 * 
+		 * @return Anzahl der Aufrufe von {@link #reuse(EncodeItem)}.
+		 */
+		public int reuseCount() {
+			return this.reuseCount;
+		}
+
+		/**
+		 * Diese Methode gibt die Anzahl der Aufrufe von {@link #insert(EncodeItem)} zurück.
+		 * 
+		 * @return Anzahl der Aufrufe von {@link #insert(EncodeItem)}.
+		 */
+		public int insertCount() {
+			return this.insertCount;
+		}
+
+		/**
+		 * Diese Methode fügt alle {@link EncodeItem}s des {@link EncodeItemPool}s in eine neue {@link List} ein, sortiert
 		 * diese {@link List} mit dem gegebenen {@link Comparator}, setzt den Index der Elemente unter Beachtung des
-		 * gegebenen Offsets, entfernt alle Elemente aus dem {@link EncodeItemCache} und gibt die {@link List} zurück. Der
+		 * gegebenen Offsets, entfernt alle Elemente aus dem {@link EncodeItemPool} und gibt die {@link List} zurück. Der
 		 * Index des {@code i} -ten {@link EncodeItem}s der erzeugetn {@link List} ergibt sich aus:
 		 * 
 		 * <pre>list.get(i).index = i + offset</pre>
 		 * 
 		 * @see EncodeItem#index
-		 * @see EncodeItemCache#clear()
+		 * @see EncodeItemPool#clear()
 		 * @see Collections#sort(List, Comparator)
 		 * @param offset Offset der Indizes.
 		 * @param comparator {@link Comparator}.
 		 * @return {@link EncodeItem}-{@link List}.
 		 */
-		public final List<GValue> compile(final int offset, final Comparator<? super GValue> comparator) {
-			final List<GValue> list = new ArrayList<GValue>(this.entryMap().values());
+		public final List<GItem> compile(final int offset, final Comparator<? super GItem> comparator) {
+			final List<GItem> list = new ArrayList<GItem>(this.size());
+			Iterators.appendAll(list, this.getEntries());
 			this.clear();
 			Collections.sort(list, comparator);
 			for(int i = 0, size = list.size(); i < size; i++){
@@ -123,27 +392,9 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void reuse(final GValue input, final GValue output) {
-			this.reuseCount++;
-			output.index++;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected GValue compile(final GValue input) {
-			this.compileCount++;
-			return input;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public String toString() {
 			return Objects.toStringCall(true, true, this.getClass().getSimpleName(), "reuseCount", this.reuseCount,
-				"compileCount", this.compileCount);
+				"insertCount", this.insertCount);
 		}
 
 	}
@@ -165,35 +416,47 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link EncodeItemCache} für {@link EncodeList}s.
+	 * Diese Klasse implementiert einen abstrakten {@link EncodeItemPool} für {@link EncodeList}s.
 	 * 
-	 * @see EncodeItemCache
+	 * @see EncodeItemPool
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der {@link EncodeList}s (Ein- und Ausgabe).
+	 * @param <GItem> Typ der {@link EncodeList}s.
 	 */
-	public static abstract class EncodeListCache<GValue extends EncodeList> extends EncodeItemCache<GValue> {
+	public static abstract class EncodeListCache<GItem extends EncodeList> extends EncodeItemPool<GItem> {
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Werte in den {@link EncodeList}s.
+		 * 
+		 * @see EncodeList#length()
 		 */
-		public int valueLength;
+		int valueCount;
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void clear() {
-			this.valueLength = 0;
-			super.clear();
+		protected void insert(final GItem value) {
+			super.insert(value);
+			this.valueCount += value.length();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GValue compile(final GValue input) {
-			this.valueLength += input.length();
-			return super.compile(input);
+		public void clear() {
+			super.clear();
+			this.valueCount = 0;
+		}
+
+		/**
+		 * Diese Methode gibt die Anzahl der Werte in den {@link EncodeList}s zurück.
+		 * 
+		 * @see EncodeList#length()
+		 * @return Anzahl der Werte in den {@link EncodeList}s.
+		 */
+		public int valueCount() {
+			return this.valueCount;
 		}
 
 	}
@@ -242,7 +505,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			final byte[] bytes = this.value.getBytes(EncodeValue.CHARSET);
 			Encoder.write(file, bytes, 0, bytes.length);
 		}
@@ -262,7 +525,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeValueCache extends EncodeListCache<EncodeValue> {
+	public static final class EncodeValuePool extends EncodeListCache<EncodeValue> {
 
 		/**
 		 * Diese Methode gibt die einzigartige {@link EncodeValue} zum gegebenen {@code String} zurück.
@@ -330,7 +593,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeValues(file, this.uri.index, this.name.index);
 		}
 
@@ -345,29 +608,29 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link EncodeItemCache} zu {@link EncodeLabel}.
+	 * Diese Klasse implementiert den {@link EncodeItemPool} zu {@link EncodeLabel}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeLabelCache extends EncodeItemCache<EncodeLabel> {
+	public static final class EncodeLabelPool extends EncodeItemPool<EncodeLabel> {
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code URI}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@code URI}s.
 		 */
-		public final EncodeValueCache uriCache;
+		public final EncodeValuePool uriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für den {@code Name}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für den {@code Name}s.
 		 */
-		public final EncodeValueCache nameCache;
+		public final EncodeValuePool nameCache;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@code URI}- und {@code Name}-{@link EncodeValueCache}.
+		 * Dieser Konstrukteur initialisiert {@code URI}- und {@code Name}-{@link EncodeValuePool}.
 		 * 
-		 * @param uriCache {@link EncodeValueCache} für die {@code URI}s.
-		 * @param nameCache {@link EncodeValueCache} für den {@code Name}s.
+		 * @param uriCache {@link EncodeValuePool} für die {@code URI}s.
+		 * @param nameCache {@link EncodeValuePool} für den {@code Name}s.
 		 */
-		public EncodeLabelCache(final EncodeValueCache uriCache, final EncodeValueCache nameCache) {
+		public EncodeLabelPool(final EncodeValuePool uriCache, final EncodeValuePool nameCache) {
 			this.uriCache = uriCache;
 			this.nameCache = nameCache;
 		}
@@ -406,7 +669,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeElement extends EncodeItem {
+	public static final class EncodeElementNode extends EncodeItem {
 
 		/**
 		 * Dieses Feld speichert das {@link EncodeLabel}.
@@ -447,8 +710,8 @@ public class Encoder {
 		 * @param children {@link EncodeElementChildren} für {@link Element#getChildNodes()}.
 		 * @param attributes {@link EncodeElementAttributes} für {@link Element#getAttributes()}.
 		 */
-		public EncodeElement(final EncodeLabel label, final EncodeElementXmlns xmlns, final EncodeElementChildren children,
-			final EncodeElementAttributes attributes) {
+		public EncodeElementNode(final EncodeLabel label, final EncodeElementXmlns xmlns,
+			final EncodeElementChildren children, final EncodeElementAttributes attributes) {
 			this.label = label;
 			this.xmlns = xmlns;
 			this.children = children;
@@ -459,7 +722,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeValues(file, this.label.index, this.xmlns.index, this.children.index, this.attributes.index);
 		}
 
@@ -475,52 +738,52 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link EncodeItemCache} zu {@link EncodeElement}.
+	 * Diese Klasse implementiert den {@link EncodeItemPool} zu {@link EncodeElementNode}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeElementCache extends EncodeItemCache<EncodeElement> {
+	public static final class EncodeElementNodePool extends EncodeItemPool<EncodeElementNode> {
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeLabelCache} für die {@link Element}-{@code Label}s.
+		 * Dieses Feld speichert den {@link EncodeLabelPool} für die {@link Element}-{@code Label}s.
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Element#getNamespaceURI()
 		 */
-		public final EncodeLabelCache labelCache;
+		public final EncodeLabelPool labelCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementXmlnsCache} für die {@code Xmlns}-{@code Label}s.
+		 * Dieses Feld speichert den {@link EncodeElementXmlnsPool} für die {@code Xmlns}-{@code Label}s.
 		 * 
 		 * @see Element#lookupPrefix(String)
 		 * @see Element#lookupNamespaceURI(String)
 		 */
-		public final EncodeElementXmlnsCache xmlnsCache;
+		public final EncodeElementXmlnsPool xmlnsCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getChildNodes()}.
+		 * Dieses Feld speichert den {@link EncodeElementChildrenPool} für die {@link Element#getChildNodes()}.
 		 * 
 		 * @see Element#getChildNodes()
 		 */
-		public final EncodeElementChildrenCache childrenCache;
+		public final EncodeElementChildrenPool childrenCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementAttributesCache} für die {@link Element#getAttributes()}.
+		 * Dieses Feld speichert den {@link EncodeElementAttributesPool} für die {@link Element#getAttributes()}.
 		 * 
 		 * @see Element#getAttributes()
 		 */
-		public final EncodeElementAttributesCache attributesCache;
+		public final EncodeElementAttributesPool attributesCache;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeItemCache}s und {@link EncodeLabelCache}s.
+		 * Dieser Konstrukteur initialisiert die {@link EncodeItemPool}s und {@link EncodeLabelPool}s.
 		 * 
-		 * @param labelCache {@link EncodeLabelCache} für die {@link Element}-{@code Label}s.
-		 * @param xmlnsCache {@link EncodeElementXmlnsCache} für die {@code Xmlns}-{@code Label}s.
-		 * @param childrenCache {@link EncodeElementChildrenCache} für die {@link Element#getChildNodes()}.
-		 * @param attributesCache {@link EncodeElementAttributesCache} für die {@link Element#getAttributes()}.
+		 * @param labelCache {@link EncodeLabelPool} für die {@link Element}-{@code Label}s.
+		 * @param xmlnsCache {@link EncodeElementXmlnsPool} für die {@code Xmlns}-{@code Label}s.
+		 * @param childrenCache {@link EncodeElementChildrenPool} für die {@link Element#getChildNodes()}.
+		 * @param attributesCache {@link EncodeElementAttributesPool} für die {@link Element#getAttributes()}.
 		 */
-		public EncodeElementCache(final EncodeLabelCache labelCache, final EncodeElementXmlnsCache xmlnsCache,
-			final EncodeElementChildrenCache childrenCache, final EncodeElementAttributesCache attributesCache) {
+		public EncodeElementNodePool(final EncodeLabelPool labelCache, final EncodeElementXmlnsPool xmlnsCache,
+			final EncodeElementChildrenPool childrenCache, final EncodeElementAttributesPool attributesCache) {
 			this.labelCache = labelCache;
 			this.xmlnsCache = xmlnsCache;
 			this.childrenCache = childrenCache;
@@ -528,18 +791,18 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt das einzigartige {@link EncodeElement} mit den gegebenen Eigenschaften zurück.
+		 * Diese Methode gibt das einzigartige {@link EncodeElementNode} mit den gegebenen Eigenschaften zurück.
 		 * 
 		 * @param uri {@code URI} des {@link Element}-{@code Label}s.
 		 * @param name {@code Name} des {@link Element}-{@code Label}s.
 		 * @param xmlns {@link EncodeLabel}-{@link List} der {@code Xmlns}-{@code Label}s.
 		 * @param children {@link EncodeItem}-{@link List} der {@link Element#getChildNodes()}.
-		 * @param attributes {@link EncodeAttribute}-{@link List} der {@link Element#getAttributes()}.
-		 * @return einzigartige {@link EncodeElement}.
+		 * @param attributes {@link EncodeAttributeNode}-{@link List} der {@link Element#getAttributes()}.
+		 * @return einzigartige {@link EncodeElementNode}.
 		 */
-		public EncodeElement unique(final String uri, final String name, final List<EncodeLabel> xmlns,
-			final List<EncodeItem> children, final List<EncodeAttribute> attributes) {
-			return this.get(new EncodeElement(this.labelCache.unique(uri, name), this.xmlnsCache.unique(xmlns),
+		public EncodeElementNode unique(final String uri, final String name, final List<EncodeLabel> xmlns,
+			final List<EncodeItem> children, final List<EncodeAttributeNode> attributes) {
+			return this.get(new EncodeElementNode(this.labelCache.unique(uri, name), this.xmlnsCache.unique(xmlns),
 				this.childrenCache.unique(children), this.attributesCache.unique(attributes)));
 		}
 
@@ -547,7 +810,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int hash(final EncodeElement input) {
+		protected int hash(final EncodeElementNode input) {
 			return Objects.hash(input.label, input.xmlns, input.children, input.attributes);
 		}
 
@@ -555,7 +818,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final EncodeElement input1, final EncodeElement input2) {
+		protected boolean equals(final EncodeElementNode input1, final EncodeElementNode input2) {
 			return (input1.label == input2.label) && (input1.xmlns == input2.xmlns) && (input1.children == input2.children)
 				&& (input1.attributes == input2.attributes);
 		}
@@ -598,7 +861,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeIndices(file, this.values);
 		}
 
@@ -617,7 +880,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeElementXmlnsCache extends EncodeListCache<EncodeElementXmlns> {
+	public static final class EncodeElementXmlnsPool extends EncodeListCache<EncodeElementXmlns> {
 
 		/**
 		 * Diese Methode gibt die einzigartige {@link EncodeElementXmlns} mit der gegebenen {@link EncodeLabel}-
@@ -689,7 +952,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeIndices(file, this.values);
 		}
 
@@ -708,7 +971,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeElementChildrenCache extends EncodeListCache<EncodeElementChildren> {
+	public static final class EncodeElementChildrenPool extends EncodeListCache<EncodeElementChildren> {
 
 		/**
 		 * Diese Methode gibt die einzigartige {@link EncodeElementChildren} mit der gegebenen {@link EncodeItem}-
@@ -740,7 +1003,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link EncodeList} von {@link EncodeAttribute}s.
+	 * Diese Klasse implementiert eine {@link EncodeList} von {@link EncodeAttributeNode}s.
 	 * 
 	 * @see Element#getAttributes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -748,16 +1011,16 @@ public class Encoder {
 	public static final class EncodeElementAttributes extends EncodeList {
 
 		/**
-		 * Dieses Feld speichert die {@link EncodeAttribute}-{@link List}.
+		 * Dieses Feld speichert die {@link EncodeAttributeNode}-{@link List}.
 		 */
-		public final List<EncodeAttribute> values;
+		public final List<EncodeAttributeNode> values;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeAttribute}-{@link List}.
+		 * Dieser Konstrukteur initialisiert die {@link EncodeAttributeNode}-{@link List}.
 		 * 
-		 * @param value {@link EncodeAttribute}-{@link List}.
+		 * @param value {@link EncodeAttributeNode}-{@link List}.
 		 */
-		public EncodeElementAttributes(final List<EncodeAttribute> value) {
+		public EncodeElementAttributes(final List<EncodeAttributeNode> value) {
 			this.values = value;
 		}
 
@@ -773,7 +1036,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeIndices(file, this.values);
 		}
 
@@ -792,16 +1055,16 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeElementAttributesCache extends EncodeListCache<EncodeElementAttributes> {
+	public static final class EncodeElementAttributesPool extends EncodeListCache<EncodeElementAttributes> {
 
 		/**
-		 * Diese Methode gibt die einzigartige {@link EncodeElementAttributes} mit der gegebenen {@link EncodeAttribute}-
-		 * {@link List} zurück.
+		 * Diese Methode gibt die einzigartige {@link EncodeElementAttributes} mit der gegebenen {@link EncodeAttributeNode}
+		 * - {@link List} zurück.
 		 * 
-		 * @param value {@link EncodeAttribute}-{@link List}.
+		 * @param value {@link EncodeAttributeNode}-{@link List}.
 		 * @return einzigartige {@link EncodeElementAttributes}.
 		 */
-		public EncodeElementAttributes unique(final List<EncodeAttribute> value) {
+		public EncodeElementAttributes unique(final List<EncodeAttributeNode> value) {
 			return this.get(new EncodeElementAttributes(value));
 		}
 
@@ -828,7 +1091,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeAttribute extends EncodeItem {
+	public static final class EncodeAttributeNode extends EncodeItem {
 
 		/**
 		 * Dieses Feld speichert das {@link EncodeLabel}.
@@ -851,7 +1114,7 @@ public class Encoder {
 		 * @param label {@link EncodeLabel} für {@link Attr#getLocalName()} und {@link Attr#getNamespaceURI()}.
 		 * @param value {@link EncodeValue} für {@link Attr#getNodeValue()}.
 		 */
-		public EncodeAttribute(final EncodeLabel label, final EncodeValue value) {
+		public EncodeAttributeNode(final EncodeLabel label, final EncodeValue value) {
 			this.label = label;
 			this.value = value;
 		}
@@ -860,7 +1123,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final RandomAccessFile file) throws IOException {
+		public void write(final EncodeTarget file) throws IOException {
 			Encoder.writeValues(file, this.label.index, this.value.index);
 		}
 
@@ -874,50 +1137,50 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link EncodeItemCache} zu {@link EncodeAttribute}.
+	 * Diese Klasse implementiert den {@link EncodeItemPool} zu {@link EncodeAttributeNode}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class EncodeAttributeCache extends EncodeItemCache<EncodeAttribute> {
+	public static final class EncodeAttributeNodePool extends EncodeItemPool<EncodeAttributeNode> {
 
 		/**
-		 * Dieses Feld speichert das {@link EncodeLabelCache} für die {@link Attr}-{@code Label}s.
+		 * Dieses Feld speichert das {@link EncodeLabelPool} für die {@link Attr}-{@code Label}s.
 		 */
-		public final EncodeLabelCache labelCache;
+		public final EncodeLabelPool labelCache;
 
 		/**
-		 * Dieses Feld speichert das {@link EncodeValueCache} für den {@code Value}.
+		 * Dieses Feld speichert das {@link EncodeValuePool} für den {@code Value}.
 		 */
-		public final EncodeValueCache valueCache;
+		public final EncodeValuePool valueCache;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link Unique}s für Beschriftung und Wert.
 		 * 
-		 * @param labelCache {@link EncodeLabelCache} für die {@link Attr}-{@code Label}s.
-		 * @param valueCache {@link EncodeValueCache} für den {@code Value}.
+		 * @param labelCache {@link EncodeLabelPool} für die {@link Attr}-{@code Label}s.
+		 * @param valueCache {@link EncodeValuePool} für den {@code Value}.
 		 */
-		public EncodeAttributeCache(final EncodeLabelCache labelCache, final EncodeValueCache valueCache) {
+		public EncodeAttributeNodePool(final EncodeLabelPool labelCache, final EncodeValuePool valueCache) {
 			this.labelCache = labelCache;
 			this.valueCache = valueCache;
 		}
 
 		/**
-		 * Diese Methode gibt das einzigartige {@link EncodeAttribute} mit den gegebenen Eigenschaften zurück.
+		 * Diese Methode gibt das einzigartige {@link EncodeAttributeNode} mit den gegebenen Eigenschaften zurück.
 		 * 
 		 * @param uri Namensraum.
 		 * @param name Beschriftung.
 		 * @param value Textwert.
-		 * @return einzigartiges {@link EncodeAttribute}.
+		 * @return einzigartiges {@link EncodeAttributeNode}.
 		 */
-		public EncodeAttribute unique(final String uri, final String name, final String value) {
-			return this.get(new EncodeAttribute(this.labelCache.unique(uri, name), this.valueCache.unique(value)));
+		public EncodeAttributeNode unique(final String uri, final String name, final String value) {
+			return this.get(new EncodeAttributeNode(this.labelCache.unique(uri, name), this.valueCache.unique(value)));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int hash(final EncodeAttribute input) {
+		protected int hash(final EncodeAttributeNode input) {
 			return Objects.hash(input.label, input.value);
 		}
 
@@ -925,7 +1188,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final EncodeAttribute input1, final EncodeAttribute input2) {
+		protected boolean equals(final EncodeAttributeNode input1, final EncodeAttributeNode input2) {
 			return (input1.label == input2.label) && (input1.value == input2.value);
 		}
 
@@ -1012,9 +1275,9 @@ public class Encoder {
 		public final List<EncodeItem> children;
 
 		/**
-		 * Dieses Feld speichert die {@link EncodeAttribute}-{@link List} für die {@link Element#getAttributes()}.
+		 * Dieses Feld speichert die {@link EncodeAttributeNode}-{@link List} für die {@link Element#getAttributes()}.
 		 */
-		public final List<EncodeAttribute> attributes;
+		public final List<EncodeAttributeNode> attributes;
 
 		/**
 		 * Dieses Feld speichert den nächsten {@link EncodeCursorStack} oder {@code null}.
@@ -1035,11 +1298,11 @@ public class Encoder {
 		 * @param name {@code Name} ({@link Element#getLocalName()}).
 		 * @param xmlns {@link EncodeLabel}-{@link List} für die Paare aus {@code URI} und {@code Prefix} (
 		 *        {@link Node#lookupPrefix(String)}, {@link Node#lookupNamespaceURI(String)}).
-		 * @param attributes {@link EncodeAttribute}-{@link List} für die {@link Element#getAttributes()}.
+		 * @param attributes {@link EncodeAttributeNode}-{@link List} für die {@link Element#getAttributes()}.
 		 * @param next nächster {@link EncodeCursorStack} oder {@code null}.
 		 */
 		public EncodeCursorStack(final String uri, final String name, final List<EncodeLabel> xmlns,
-			final List<EncodeAttribute> attributes, final EncodeCursorStack next) {
+			final List<EncodeAttributeNode> attributes, final EncodeCursorStack next) {
 			this.uri = uri;
 			this.name = name;
 			this.xmlns = xmlns;
@@ -1070,137 +1333,144 @@ public class Encoder {
 		/**
 		 * Dieses Feld speichert die aktuellen Paare aus {@code URI} und {@code Prefix}.
 		 */
-		protected List<EncodeLabel> xmlns;
+		List<EncodeLabel> xmlns;
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeXmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix}
 		 * oder {@code null}.
 		 */
-		protected EncodeXmlnsStack xmlnsStack;
+		EncodeXmlnsStack xmlnsStack;
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeCursorStack} für das aktuelle {@link Element}.
 		 */
-		protected EncodeCursorStack cursorStack;
+		EncodeCursorStack cursorStack;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code URI}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@code URI}s.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 */
-		public final EncodeValueCache uriValuePool;
+		public final EncodeValuePool uriValuePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Value}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@code Value}s.
 		 * 
 		 * @see Text#getNodeValue()
 		 * @see Attr#getNodeValue()
 		 */
-		public final EncodeValueCache valuePool;
+		public final EncodeValuePool valuePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Prefix}es.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@code Prefix}es.
 		 * 
 		 * @see Node#getPrefix()
 		 */
-		public final EncodeValueCache xmlnsNamePool;
+		public final EncodeValuePool xmlnsNamePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@code Xmlns}-{@code Prefix}
+		 * Dieses Feld speichert den {@link EncodeLabelPool} für die Paare aus {@code URI} und {@code Xmlns}-{@code Prefix}
 		 * .
 		 * 
 		 * @see Node#getNamespaceURI()
 		 * @see Node#getPrefix()
 		 */
-		public final EncodeLabelCache xmlnsLabelPool;
+		public final EncodeLabelPool xmlnsLabelPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementCache} für die {@link Element}-Daten.
+		 * Dieses Feld speichert den {@link EncodeElementNodePool} für die {@link Element}-Daten.
 		 * 
-		 * @see EncodeElement
+		 * @see EncodeElementNode
 		 */
-		public final EncodeElementCache elementPool;
+		public final EncodeElementNodePool elementPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Element}-{@code Name}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@link Element}-{@code Name}s.
 		 * 
 		 * @see Element#getLocalName()
 		 */
-		public final EncodeValueCache elementNamePool;
+		public final EncodeValuePool elementNamePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@link Element}-{@code Name}
+		 * Dieses Feld speichert den {@link EncodeLabelPool} für die Paare aus {@code URI} und {@link Element}-{@code Name}
 		 * .
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Element#getNamespaceURI()
 		 */
-		public final EncodeLabelCache elementLabelPool;
+		public final EncodeLabelPool elementLabelPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementXmlnsCache} für die {@code Xmlns}.
+		 * Dieses Feld speichert den {@link EncodeElementXmlnsPool} für die {@code Xmlns}.
 		 * 
 		 * @see Node#lookupPrefix(String)
 		 * @see Node#lookupNamespaceURI(String)
 		 */
-		public final EncodeElementXmlnsCache elementXmlnsPool;
+		public final EncodeElementXmlnsPool elementXmlnsPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getChildNodes()}.
+		 * Dieses Feld speichert den {@link EncodeElementChildrenPool} für die {@link Element#getChildNodes()}.
 		 * 
 		 * @see Element#getChildNodes()
 		 */
-		public final EncodeElementChildrenCache elementChildrenPool;
+		public final EncodeElementChildrenPool elementChildrenPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getAttributes()}.
+		 * Dieses Feld speichert den {@link EncodeElementChildrenPool} für die {@link Element#getAttributes()}.
 		 * 
 		 * @see Element#getAttributes()
 		 */
-		public final EncodeElementAttributesCache elementAttributesPool;
+		public final EncodeElementAttributesPool elementAttributesPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeAttributeCache} für die {@link Attr}-Daten.
+		 * Dieses Feld speichert den {@link EncodeAttributeNodePool} für die {@link Attr}-Daten.
 		 * 
-		 * @see EncodeAttribute
+		 * @see EncodeAttributeNode
 		 */
-		public final EncodeAttributeCache attributePool;
+		public final EncodeAttributeNodePool attributePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Attr}-{@code Name}s.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für die {@link Attr}-{@code Name}s.
 		 * 
 		 * @see Attr#getLocalName()
 		 */
-		public final EncodeValueCache attributeNamePool;
+		public final EncodeValuePool attributeNamePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@link Attr}-{@code Name}.
+		 * Dieses Feld speichert den {@link EncodeLabelPool} für die Paare aus {@code URI} und {@link Attr}-{@code Name}.
 		 * 
 		 * @see Attr#getLocalName()
 		 * @see Attr#getNamespaceURI()
 		 */
-		public final EncodeLabelCache attributeLabelPool;
+		public final EncodeLabelPool attributeLabelPool;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeItemCache}s und {@link EncodeListCache}s.
+		 * Dieses Feld speichert das {@code Document}-{@link EncodeItem}.
+		 * 
+		 * @see Document#getDocumentElement()
+		 */
+		public EncodeItem documentElement;
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link EncodeItemPool}s und {@link EncodeListCache}s.
 		 */
 		public EncodeContentHandler() {
 			this.cursorStack = new EncodeCursorStack();
-			this.uriValuePool = new EncodeValueCache();
-			this.valuePool = new EncodeValueCache();
-			this.xmlnsNamePool = new EncodeValueCache();
-			this.xmlnsLabelPool = new EncodeLabelCache(this.uriValuePool, this.xmlnsNamePool);
-			this.elementNamePool = new EncodeValueCache();
-			this.elementLabelPool = new EncodeLabelCache(this.uriValuePool, this.elementNamePool);
-			this.elementXmlnsPool = new EncodeElementXmlnsCache();
-			this.elementChildrenPool = new EncodeElementChildrenCache();
-			this.elementAttributesPool = new EncodeElementAttributesCache();
+			this.uriValuePool = new EncodeValuePool();
+			this.valuePool = new EncodeValuePool();
+			this.xmlnsNamePool = new EncodeValuePool();
+			this.xmlnsLabelPool = new EncodeLabelPool(this.uriValuePool, this.xmlnsNamePool);
+			this.elementNamePool = new EncodeValuePool();
+			this.elementLabelPool = new EncodeLabelPool(this.uriValuePool, this.elementNamePool);
+			this.elementXmlnsPool = new EncodeElementXmlnsPool();
+			this.elementChildrenPool = new EncodeElementChildrenPool();
+			this.elementAttributesPool = new EncodeElementAttributesPool();
 			this.elementPool =
-				new EncodeElementCache(this.elementLabelPool, this.elementXmlnsPool, this.elementChildrenPool,
+				new EncodeElementNodePool(this.elementLabelPool, this.elementXmlnsPool, this.elementChildrenPool,
 					this.elementAttributesPool);
-			this.attributeNamePool = new EncodeValueCache();
-			this.attributeLabelPool = new EncodeLabelCache(this.uriValuePool, this.attributeNamePool);
-			this.attributePool = new EncodeAttributeCache(this.attributeLabelPool, this.valuePool);
+			this.attributeNamePool = new EncodeValuePool();
+			this.attributeLabelPool = new EncodeLabelPool(this.uriValuePool, this.attributeNamePool);
+			this.attributePool = new EncodeAttributeNodePool(this.attributeLabelPool, this.valuePool);
 			this.startPrefixMapping(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
 			this.startPrefixMapping(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.NULL_NS_URI);
 		}
@@ -1260,7 +1530,7 @@ public class Encoder {
 			if(textValue.length() != 0){
 				newChildren.add(this.valuePool.unique(textValue.toString()));
 			}
-			final EncodeElement elementNode =
+			final EncodeElementNode elementNode =
 				this.elementPool.unique(oldCursor.uri, oldCursor.name, oldCursor.xmlns, newChildren, oldCursor.attributes);
 			newCursor.children.add(elementNode);
 			this.cursorStack = newCursor;
@@ -1291,7 +1561,7 @@ public class Encoder {
 				this.xmlns = xmlns;
 			}
 			final int size = atts.getLength();
-			final List<EncodeAttribute> attributes = new ArrayList<EncodeAttribute>(size);
+			final List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>(size);
 			for(int i = 0; i < size; i++){
 				attributes.add(this.attributePool.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)));
 			}
@@ -1306,6 +1576,7 @@ public class Encoder {
 		 */
 		@Override
 		public void endDocument() {
+			this.documentElement = this.cursorStack.children.get(0);
 		}
 
 		/**
@@ -1411,14 +1682,14 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute} primär nach
-	 * den {@code Name}-{@link EncodeValue} und sekundär nach den {@code URI}-{@link EncodeValue} ihrer
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttributeNode} primär
+	 * nach den {@code Name}-{@link EncodeValue} und sekundär nach den {@code URI}-{@link EncodeValue} ihrer
 	 * {@link EncodeLabel}s via {@link Encoder#ValueComparator}.
 	 */
-	static public final Comparator<EncodeAttribute> AttributeComparator = new Comparator<EncodeAttribute>() {
+	static public final Comparator<EncodeAttributeNode> AttributeComparator = new Comparator<EncodeAttributeNode>() {
 
 		@Override
-		public int compare(final EncodeAttribute value1, final EncodeAttribute value2) {
+		public int compare(final EncodeAttributeNode value1, final EncodeAttributeNode value2) {
 			final EncodeLabel o1 = value1.label;
 			final EncodeLabel o2 = value2.label;
 			final int comp = Encoder.ValueComparator.compare(o1.name, o2.name);
@@ -1430,29 +1701,29 @@ public class Encoder {
 
 	/**
 	 * Diese Methode schreibt den gegebenen Abschitt des gegebenen {@code byte}-Arrays in das gegebene
-	 * {@link RandomAccessFile}.
+	 * {@link EncodeTarget}.
 	 * 
-	 * @param file {@link RandomAccessFile}.
+	 * @param file {@link EncodeTarget}.
 	 * @param value {@code byte}-Array.
 	 * @param offset Index des erten geschriebenen {@code byte}s.
 	 * @param count Anzahl der geschrieben {@code byte}s.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	static public void write(final RandomAccessFile file, final byte[] value, final int offset, final int count)
+	static public void write(final EncodeTarget file, final byte[] value, final int offset, final int count)
 		throws IOException {
 		file.write(value, offset, count);
 	}
 
 	/**
-	 * Diese Methode schreibt das gegebenen {@code int}-Array in das gegebene {@link RandomAccessFile}.
+	 * Diese Methode schreibt das gegebenen {@code int}-Array in das gegebene {@link EncodeTarget}.
 	 * 
 	 * @see ArrayCopy#copy(int[], int, byte[], int, int)
-	 * @see Encoder#write(RandomAccessFile, byte[], int, int)
-	 * @param file {@link RandomAccessFile}.
+	 * @see Encoder#write(EncodeTarget, byte[], int, int)
+	 * @param file {@link EncodeTarget}.
 	 * @param value {@code int}-Array.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	static public void writeValues(final RandomAccessFile file, final int... value) throws IOException {
+	static public void writeValues(final EncodeTarget file, final int... value) throws IOException {
 		final int count = value.length << 2;
 		final byte[] array = new byte[count];
 		ArrayCopy.copy(value, 0, array, 0, count);
@@ -1460,16 +1731,15 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt die Indices der gegebenen {@link EncodeItem}s in das gegebene {@link RandomAccessFile}.
+	 * Diese Methode schreibt die Indices der gegebenen {@link EncodeItem}s in das gegebene {@link EncodeTarget}.
 	 * 
 	 * @see EncodeItem#index
-	 * @see Encoder#writeValues(RandomAccessFile, int...)
-	 * @param file {@link RandomAccessFile}.
+	 * @see Encoder#writeValues(EncodeTarget, int...)
+	 * @param file {@link EncodeTarget}.
 	 * @param list {@link EncodeItem}-{@link List}.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	public static void writeIndices(final RandomAccessFile file, final List<? extends EncodeItem> list)
-		throws IOException {
+	public static void writeIndices(final EncodeTarget file, final List<? extends EncodeItem> list) throws IOException {
 		final int count = list.size();
 		if(count == 0) return;
 		final int[] value = new int[count];
@@ -1481,17 +1751,17 @@ public class Encoder {
 
 	/**
 	 * Diese Methode schreibt dia Anzahl der gegebenen {@link EncodeItem}s sowie jedes der {@link EncodeItem} in das
-	 * gegebene {@link RandomAccessFile}.
+	 * gegebene {@link EncodeTarget}.
 	 * 
 	 * <pre>N|item1|...|itemN</pre>
 	 * 
-	 * @see EncodeItem#write(RandomAccessFile)
-	 * @see Encoder#writeValues(RandomAccessFile, int...)
-	 * @param file {@link RandomAccessFile}.
+	 * @see EncodeItem#write(EncodeTarget)
+	 * @see Encoder#writeValues(EncodeTarget, int...)
+	 * @param file {@link EncodeTarget}.
 	 * @param list {@link EncodeItem}-{@link List}.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	public static void writeEncodeItems(final RandomAccessFile file, final List<? extends EncodeItem> list)
+	public static void writeEncodeItems(final EncodeTarget file, final List<? extends EncodeItem> list)
 		throws IOException {
 		Encoder.writeValues(file, list.size());
 		for(final EncodeItem item: list){
@@ -1501,19 +1771,19 @@ public class Encoder {
 
 	/**
 	 * Diese Methode speichert dia Anzahl der gegebenen {@link EncodeList}s ihre aufsummierten Längen, die Summe aller
-	 * Längen, sowie jedes der {@link EncodeItem} in das gegebene {@link RandomAccessFile}.
+	 * Längen, sowie jedes der {@link EncodeItem} in das gegebene {@link EncodeTarget}.
 	 * 
 	 * <pre>N|offset1|...|offsetN|offsetN+1|item1|...|itemN
 	 * offset0 = 0
 	 * offsetI+1 = offsetI + list.get(I).length()</pre>
 	 * 
 	 * @see EncodeList#length()
-	 * @see Encoder#writeValues(RandomAccessFile, int...)
-	 * @param file {@link RandomAccessFile}.
+	 * @see Encoder#writeValues(EncodeTarget, int...)
+	 * @param file {@link EncodeTarget}.
 	 * @param list {@link EncodeList}-{@link List}.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	public static void writeEncodeLists(final RandomAccessFile file, final List<? extends EncodeList> list)
+	public static void writeEncodeLists(final EncodeTarget file, final List<? extends EncodeList> list)
 		throws IOException {
 		Encoder.writeValues(file, list.size());
 		final int count = list.size();
@@ -1538,33 +1808,33 @@ public class Encoder {
 
 	/**
 	 * Diese Methode liest die gegebene {@link InputSource} mit einem neuen {@link XMLReader} in einen neuen
-	 * {@link EncodeContentHandler} ein und speichert dessen Daten in das gegebene {@link RandomAccessFile}.
+	 * {@link EncodeContentHandler} ein und speichert dessen Daten in das gegebene {@link EncodeTarget}.
 	 * 
-	 * @see Encoder#encode(XMLReader, InputSource, RandomAccessFile)
+	 * @see Encoder#encode(XMLReader, InputSource, EncodeTarget)
 	 * @see XMLReaderFactory#createXMLReader()
 	 * @param source {@link InputSource}.
-	 * @param target {@link RandomAccessFile}.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
 	 */
-	public void encode(final InputSource source, final RandomAccessFile target) throws IOException, SAXException {
+	public void encode(final InputSource source, final EncodeTarget target) throws IOException, SAXException {
 		this.encode(XMLReaderFactory.createXMLReader(), source, target);
 	}
 
 	/**
 	 * Diese Methode liest die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in einen neuen
-	 * {@link EncodeContentHandler} ein und speichert dessen Daten in das gegebene {@link RandomAccessFile}.
+	 * {@link EncodeContentHandler} ein und speichert dessen Daten in das gegebene {@link EncodeTarget}.
 	 * 
 	 * @see XMLReader#setContentHandler(ContentHandler)
 	 * @see XMLReader#parse(InputSource)
 	 * @param reader {@link XMLReader}.
 	 * @param source {@link InputSource}.
-	 * @param target {@link RandomAccessFile}.
-	 * @throws IOException Wenn das {@link RandomAccessFile} eine {@link IOException} auslöst.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
 	 */
-	public void encode(final XMLReader reader, final InputSource source, final RandomAccessFile target)
-		throws IOException, SAXException {
+	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException,
+		SAXException {
 		final EncodeContentHandler handler = new EncodeContentHandler();
 		reader.setContentHandler(handler);
 		reader.parse(source);
@@ -1581,8 +1851,8 @@ public class Encoder {
 			handler.elementChildrenPool.compile(0, Encoder.IndexComparator);
 		final List<EncodeElementAttributes> elementAttributesPool =
 			handler.elementAttributesPool.compile(0, Encoder.IndexComparator);
-		final List<EncodeElement> elementPool = handler.elementPool.compile(valuePool.size(), Encoder.IndexComparator);
-		final List<EncodeAttribute> attributePool = handler.attributePool.compile(0, Encoder.IndexComparator);
+		final List<EncodeElementNode> elementPool = handler.elementPool.compile(valuePool.size(), Encoder.IndexComparator);
+		final List<EncodeAttributeNode> attributePool = handler.attributePool.compile(0, Encoder.IndexComparator);
 		Encoder.writeEncodeLists(target, uriCharsPool);
 		Encoder.writeEncodeLists(target, xmlnsCharsPool);
 		Encoder.writeEncodeLists(target, elementCharsPool);
@@ -1596,8 +1866,7 @@ public class Encoder {
 		Encoder.writeEncodeLists(target, elementAttributesPool);
 		Encoder.writeEncodeItems(target, elementPool);
 		Encoder.writeEncodeItems(target, attributePool);
-		final EncodeItem documentElement = handler.cursorStack.children.get(0);
-		Encoder.writeValues(target, documentElement.index - valuePool.size());
+		Encoder.writeValues(target, handler.documentElement.index - valuePool.size());
 	}
 
 }
