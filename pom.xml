@@ -49,6 +49,6 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 		<module>function</module>
 		<module>xml</module>
 		<module>virtual</module>
-		<module>fastdom</module>
+		<module>xml-coder</module>
 	</modules>
 </project>
