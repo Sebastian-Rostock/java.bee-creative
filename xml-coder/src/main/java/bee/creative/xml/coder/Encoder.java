@@ -1,4 +1,4 @@
-package bee.creative.xml.fastdom;
+package bee.creative.xml.coder;
 
 import java.io.File;
 import java.io.FileReader;

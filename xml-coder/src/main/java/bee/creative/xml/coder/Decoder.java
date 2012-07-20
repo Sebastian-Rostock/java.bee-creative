@@ -1,4 +1,4 @@
-package bee.creative.xml.fastdom;
+package bee.creative.xml.coder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +36,7 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Objects;
-import bee.creative.xml.fastdom.Encoder.EncodeValue;
+import bee.creative.xml.coder.Encoder.EncodeValue;
 
 /**
  * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus der von einem {@link Encoder} erzeugten,

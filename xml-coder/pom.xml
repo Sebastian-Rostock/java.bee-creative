@@ -7,7 +7,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<version>1.0.1</version>
-	<artifactId>bee-creative.xml-fastdom</artifactId>
+	<artifactId>bee-creative.xml-coder</artifactId>
 	<dependencies>
 		<dependency>
 			<version>1.4.5</version>
