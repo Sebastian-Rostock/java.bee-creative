@@ -1,5 +1,7 @@
 package bee.creative.xml.fastdom;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -37,7 +39,8 @@ import bee.creative.util.Objects;
 import bee.creative.xml.fastdom.Encoder.EncodeValue;
 
 /**
- * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus einer optimierten binären Darstellung.
+ * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus der von einem {@link Encoder} erzeugten,
+ * optimierten, binären Darstellung.
  * 
  * @see Encoder
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -52,20 +55,35 @@ public class Decoder {
 	public static interface DecodeSource {
 
 		/**
-		 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus der Eingabe in das gegebene {@code byte}-Array an
-		 * den gegebenen Index.
+		 * Diese Methode liest die gegebene Anzahl an {@code byte}s ab der aktuellen Leseposition aus der Eingabe in das
+		 * gegebene {@code byte}-Array an die gegebene Position ein und vergrößert die Leseposition um die gegebene Anzahl.
 		 * 
+		 * @see #index()
 		 * @param array {@code byte}-Array.
 		 * @param offset Index des ersten gelesenen {@code byte}s.
 		 * @param length Anzahl der zulesenden {@code byte}s.
-		 * @return Anzahl der gelesenen {@code byte}s.
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
-		int read(byte[] array, int offset, int length) throws IOException;
+		public void read(byte[] array, int offset, int length) throws IOException;
 
-		void seek(long index) throws IOException;
+		/**
+		 * Diese Methode setzt die Leseposition der Eingabe, ab der via {@link #read(byte[], int, int)} die nächsten
+		 * {@code byte}s gelesen werden können.
+		 * 
+		 * @see #index()
+		 * @param index Leseposition.
+		 * @throws IOException Wenn die gegebene Position negativ ist ein I/O-Fehler auftritt.
+		 */
+		public void seek(long index) throws IOException;
 
-		long index() throws IOException;
+		/**
+		 * Diese Methode gibt die aktuelle Leseposition zurück, ab der via {@link #read(byte[], int, int)} die nächsten
+		 * {@code byte}s gelesen werden können.
+		 * 
+		 * @return Leseposition.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 */
+		public long index() throws IOException;
 
 	}
 
@@ -96,8 +114,8 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int read(final byte[] values, final int offset, final int count) throws IOException {
-			return this.file.read(values, offset, count);
+		public void read(final byte[] values, final int offset, final int count) throws IOException {
+			this.file.readFully(values, offset, count);
 		}
 
 		/**
@@ -119,158 +137,37 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert die Caches der {@link DecodeItem}s.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static abstract class DecodeCache {
-
-		/**
-		 * Dieses Feld speichert den {@code byte}-Puffer zum Laden geringer Datenmengen.
-		 */
-		protected static final byte[] BYTES = new byte[16];
-
-		/**
-		 * Dieses Feld speichert den {@code int}-Puffer zum Laden geringer Datenmengen.
-		 */
-		protected static final int[] INTS = new int[4];
-
-		static public final void read(final DecodeSource file, final byte[] value, final int offset, final int count)
-			throws IOException {
-			for(int read = 0; read != count;){
-				read += file.read(value, offset + read, count - read);
-			}
-		}
-
-		static final int readIndex(final DecodeSource file) throws IOException {
-			final byte[] bytes = DecodeCache.BYTES;
-			DecodeCache.read(file, bytes, 0, 4);
-			return ArrayCopy.get4(bytes, 0);
-		}
-
-		static final int[] readIndex2(final DecodeSource file) throws IOException {
-			final int[] ints = DecodeCache.INTS;
-			final byte[] bytes = DecodeCache.BYTES;
-			DecodeCache.read(file, bytes, 0, 8);
-			ArrayCopy.copy(bytes, 0, ints, 0, 2);
-			return ints;
-		}
-
-		static final int[] readIndex4(final DecodeSource file) throws IOException {
-			final int[] ints = DecodeCache.INTS;
-			final byte[] bytes = DecodeCache.BYTES;
-			DecodeCache.read(file, bytes, 0, 16);
-			ArrayCopy.copy(bytes, 0, ints, 0, 4);
-			return ints;
-		}
-
-		static final int[] readIndices(final DecodeSource file, final int count) throws IOException {
-			final int[] ints = new int[count];
-			final int length = count << 2;
-			final byte[] bytes = new byte[length];
-			DecodeCache.read(file, bytes, 0, length);
-			ArrayCopy.copy(bytes, 0, ints, 0, count);
-			return ints;
-		}
-
-		/**
-		 * Dieses Feld speichert das {@link DecodeSource}.
-		 */
-		public final DecodeSource file;
-
-		/**
-		 * Dieses Feld speichert die Position im {@link DecodeSource}, an der das Laden begonnen hat.
-		 */
-		public final long fileIndex;
-
-		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
-		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
-		 */
-		public DecodeCache(final DecodeSource file) throws IOException {
-			this.file = file;
-			this.fileIndex = file.index();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten Datensatz, der von einem {@link DecodeCache} erzeugt, aus einem
-	 * {@link DecodeSource} geladen und in einem {@link DecodeItemCache} verwaltet wird.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static abstract class DecodeItem {
-
-		/**
-		 * Dieses Feld speichert den Index dieses Datensatzes im {@link DecodeItemCache}.
-		 */
-		public final int index;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Index dieses Datensatzes im {@link DecodeItemCache}.
-		 * 
-		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
-		 */
-		public DecodeItem(final int index) {
-			this.index = index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DecodeItem)) return false;
-			final DecodeItem data = (DecodeItem)object;
-			return this.index == data.index;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link DecodeCache}, dessen Elemente in einem {@link DecodeItemCache} gespeichert
-	 * werden.
+	 * Diese Klasse implementiert einen abstrakten Caches, dessen seine Elemente über einen Index identifiziert und
+	 * nachgeladen werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	public static abstract class DecodeItemCache<GItem> extends DecodeCache implements Iterable<GItem> {
+	public static abstract class DecodeCache<GItem> implements Iterable<GItem> {
 
 		/**
 		 * Diese Klasse implementiert ein Objekt zur Verwaltung einer Teilmenge von Elementen.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		static final class DecodeItemCachePage {
+		static final class DecodeCachePage {
 
 			/**
-			 * Dieses Feld speichert die Anzahl der Bits zur Adressierung der Elemente innerhalb einer
-			 * {@link DecodeItemCachePage}.
+			 * Dieses Feld speichert die Anzahl der Bits zur Adressierung der Elemente innerhalb einer {@link DecodeCachePage}
+			 * .
 			 */
 			static final int PAGE_BITS = 7;
 
 			/**
-			 * Dieses Feld speichert die maximale Anzahl der Elemente in einer {@link DecodeItemCachePage}.
+			 * Dieses Feld speichert die maximale Anzahl der Elemente in einer {@link DecodeCachePage}.
 			 */
-			static final int PAGE_SIZE = 1 << DecodeItemCachePage.PAGE_BITS;
+			static final int PAGE_SIZE = 1 << DecodeCachePage.PAGE_BITS;
 
 			/**
 			 * Dieses Feld speichert die Bitmaske zur Ermittlung des Index eines Elements innerhalb einer
-			 * {@link DecodeItemCachePage}.
+			 * {@link DecodeCachePage}.
 			 */
-			static final int PAGE_MASK = DecodeItemCachePage.PAGE_SIZE - 1;
+			static final int PAGE_MASK = DecodeCachePage.PAGE_SIZE - 1;
 
 			/**
 			 * Dieses Feld speichert die Anzahl der Elemente.
@@ -280,28 +177,28 @@ public class Decoder {
 			/**
 			 * Dieses Feld speichert die Elemente.
 			 */
-			final Object[] items = new Object[DecodeItemCachePage.PAGE_SIZE];
+			final Object[] items = new Object[DecodeCachePage.PAGE_SIZE];
 
 		}
 
 		/**
-		 * Diese Klasse implementiert den {@link Iterator} über die im {@link DecodeItemCache} enthaltenen Elemente.
+		 * Diese Klasse implementiert den {@link Iterator} über die im {@link DecodeCache} enthaltenen Elemente.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @see DecodeItemCache
+		 * @see DecodeCache
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeItemCacheIterator<GItem> implements Iterator<GItem> {
+		static final class DecodeCacheIterator<GItem> implements Iterator<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
 			 */
-			final DecodeItemCache<GItem> owner;
+			final DecodeCache<GItem> owner;
 
 			/**
-			 * Dieses Feld speichert die nächste {@link DecodeItemCachePage}.
+			 * Dieses Feld speichert die nächste {@link DecodeCachePage}.
 			 */
-			DecodeItemCachePage nextPage;
+			DecodeCachePage nextPage;
 
 			/**
 			 * Dieses Feld speichert das nächste Element.
@@ -309,7 +206,7 @@ public class Decoder {
 			GItem nextItem;
 
 			/**
-			 * Dieses Feld speichert den Index der nächsten {@link DecodeItemCachePage}.
+			 * Dieses Feld speichert den Index der nächsten {@link DecodeCachePage}.
 			 */
 			int nextPageIndex;
 
@@ -319,7 +216,7 @@ public class Decoder {
 			int nextItemIndex;
 
 			/**
-			 * Dieses Feld speichert den Index der letzten {@link DecodeItemCachePage}.
+			 * Dieses Feld speichert den Index der letzten {@link DecodeCachePage}.
 			 */
 			int lastPageIndex;
 
@@ -334,7 +231,7 @@ public class Decoder {
 			 * @param owner Besitzer.
 			 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 			 */
-			public DecodeItemCacheIterator(final DecodeItemCache<GItem> owner) throws NullPointerException {
+			public DecodeCacheIterator(final DecodeCache<GItem> owner) throws NullPointerException {
 				if(owner == null) throw new NullPointerException("owner is null");
 				this.owner = owner;
 				this.nextPageIndex = -1;
@@ -346,12 +243,12 @@ public class Decoder {
 			}
 
 			/**
-			 * Diese Methode navigiert zur nächsten {@link DecodeItemCachePage}.
+			 * Diese Methode navigiert zur nächsten {@link DecodeCachePage}.
 			 */
 			void seekPage() {
-				final DecodeItemCachePage[] pages = this.owner.pages;
+				final DecodeCachePage[] pages = this.owner.pages;
 				for(int i = this.nextPageIndex + 1, size = pages.length; i < size; i++){
-					final DecodeItemCachePage page = pages[i];
+					final DecodeCachePage page = pages[i];
 					if(page != null){
 						this.nextPage = page;
 						this.nextPageIndex = i;
@@ -409,42 +306,43 @@ public class Decoder {
 			 */
 			@Override
 			public void remove() {
-				final int removePageIndex = this.lastPageIndex;
-				if(removePageIndex < 0) throw new IllegalStateException();
-				final DecodeItemCachePage page = this.owner.pages[removePageIndex];
-				if(page == null) throw new IllegalStateException();
-				this.owner.size--;
-				if(page.size == 1){
-					this.owner.pages[removePageIndex] = null;
-				}else{
-					page.size--;
-					page.items[this.lastItemIndex] = null;
-				}
+				final int lastPageIndex = this.lastPageIndex;
+				if(lastPageIndex < 0) throw new IllegalStateException();
+				final DecodeCachePage page = this.owner.pages[lastPageIndex];
+				if(page == null) return;
 				this.lastPageIndex = -1;
+				final int lastItemIndex = this.lastItemIndex;
+				final Object item = page.items[lastItemIndex];
+				if(item == null) return;
+				page.size--;
+				page.items[lastItemIndex] = null;
+				this.owner.size--;
+				if(page.size != 0) return;
+				this.owner.pages[lastPageIndex] = null;
 			}
 
 		}
 
 		/**
 		 * Diese Klasse implementiert das {@link Get} für {@link Comparables#binarySearch(Get, Comparable, int, int)} zur
-		 * direkten Suche in einem {@link DecodeItemCache}.
+		 * direkten Suche in einem {@link DecodeCache}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeItemCacheGetAll<GItem> implements Get<GItem> {
+		static final class DecodeCacheGetAll<GItem> implements Get<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
 			 */
-			final DecodeItemCache<GItem> owner;
+			final DecodeCache<GItem> owner;
 
 			/**
 			 * Dieser Konstrukteur initialisiert den Besitzer.
 			 * 
 			 * @param owner Besitzer.
 			 */
-			public DecodeItemCacheGetAll(final DecodeItemCache<GItem> owner) {
+			public DecodeCacheGetAll(final DecodeCache<GItem> owner) {
 				this.owner = owner;
 			}
 
@@ -460,17 +358,17 @@ public class Decoder {
 
 		/**
 		 * Diese Klasse implementiert das {@link Get} für {@link Comparables#binarySearch(Get, Comparable, int, int)} zur
-		 * indirekten Suche in einem {@link DecodeItemCache}.
+		 * indirekten Suche in einem {@link DecodeCache}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeItemCacheGetSection<GItem> implements Get<GItem> {
+		static final class DecodeCacheGetSection<GItem> implements Get<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
 			 */
-			final DecodeItemCache<GItem> owner;
+			final DecodeCache<GItem> owner;
 
 			/**
 			 * Dieses Feld speichert den Suchraum.
@@ -483,7 +381,7 @@ public class Decoder {
 			 * @param owner Besitzer.
 			 * @param indices Suchraum.
 			 */
-			public DecodeItemCacheGetSection(final DecodeItemCache<GItem> owner, final int[] indices) {
+			public DecodeCacheGetSection(final DecodeCache<GItem> owner, final int[] indices) {
 				this.owner = owner;
 				this.indices = indices;
 			}
@@ -504,9 +402,9 @@ public class Decoder {
 		int size;
 
 		/**
-		 * Dieses Feld speichert die {@link DecodeItemCachePage}s.
+		 * Dieses Feld speichert die {@link DecodeCachePage}s.
 		 */
-		DecodeItemCachePage[] pages = {};
+		DecodeCachePage[] pages = {};
 
 		/**
 		 * Dieses Feld speichert die minimale Anzahl der Elemente, auf welche beim Bereinigen zurückgesetzt werden soll.
@@ -524,45 +422,6 @@ public class Decoder {
 		int capacity;
 
 		/**
-		 * Dieses Feld speichert die Größe eines Elements.
-		 */
-		public final int itemSize;
-
-		/**
-		 * Dieses Feld speichert die Anzahl der Elemente.
-		 */
-		public final int itemCount;
-
-		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource} und die Größe eines Elements.
-		 * 
-		 * @param file {@link DecodeSource}.
-		 * @param itemSize Größe eines Elements.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
-		 */
-		public DecodeItemCache(final DecodeSource file, final int itemSize) throws IOException {
-			super(file);
-			final int itemCount = DecodeCache.readIndex(file);
-			this.itemSize = itemSize;
-			this.itemCount = itemCount;
-			this.setMinSize(1024);
-			this.setMaxSize(4096);
-			this.setCapacity(itemCount);
-			this.seekIndex(itemCount);
-		}
-
-		/**
-		 * Diese Methode navigiert in der {@link DecodeSource} an die Position des {@code index}-ten Elements. Die Position
-		 * ergibt sich aus {@code fileIndex + 4 + index * itemSize}.
-		 * 
-		 * @param index Index.
-		 * @throws IOException Wenn die {@link DecodeSource} eine {@link IOException} auslöst.
-		 */
-		protected final void seekIndex(final int index) throws IOException {
-			this.file.seek(this.fileIndex + 4 + (index * this.itemSize));
-		}
-
-		/**
 		 * Diese Methode gibt das {@code index}-te Element zurück. Wenn dieses noch nicht existiert, wird es via
 		 * {@link #load(int)} nachgeladen.
 		 * 
@@ -572,12 +431,12 @@ public class Decoder {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		public final GItem get(final int index) throws NullPointerException, IndexOutOfBoundsException {
+		public GItem get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
-			final int pageIndex = index >> DecodeItemCachePage.PAGE_BITS;
-			final int itemIndex = index & DecodeItemCachePage.PAGE_MASK;
-			DecodeItemCachePage page = this.pages[pageIndex];
+			final int pageIndex = index >> DecodeCachePage.PAGE_BITS;
+			final int itemIndex = index & DecodeCachePage.PAGE_MASK;
+			DecodeCachePage page = this.pages[pageIndex];
 			GItem item;
 			if(page != null){
 				item = (GItem)page.items[itemIndex];
@@ -597,7 +456,7 @@ public class Decoder {
 				if(this.size >= this.maxSize){
 					this.compact();
 				}
-				page = new DecodeItemCachePage();
+				page = new DecodeCachePage();
 				this.pages[pageIndex] = page;
 			}
 			page.items[itemIndex] = item;
@@ -610,13 +469,13 @@ public class Decoder {
 		 * Diese Methode sucht binäre nach dem ersten Treffer des gegebenen {@link Comparable}s und gibt diesen oder
 		 * {@code null} zurück.
 		 * 
-		 * @see DecodeItemCacheGetAll
+		 * @see DecodeCacheGetAll
 		 * @see Comparables#binarySearch(Get, Comparable, int, int)
 		 * @param comparable {@link Comparable}.
 		 * @return erster Treffer oder {@code null}.
 		 */
-		public final GItem find(final Comparable<? super GItem> comparable) {
-			final Get<GItem> get = new DecodeItemCacheGetAll<GItem>(this);
+		public GItem find(final Comparable<? super GItem> comparable) {
+			final Get<GItem> get = new DecodeCacheGetAll<GItem>(this);
 			final int index = Comparables.binarySearch(get, comparable, 0, this.capacity);
 			if(index < 0) return null;
 			return get.get(index);
@@ -626,15 +485,15 @@ public class Decoder {
 		 * Diese Methode sucht binäre im gegebenen Suchraum nach dem ersten Treffer des gegebenen {@link Comparable}s und
 		 * gibt diesen oder {@code null} zurück.
 		 * 
-		 * @see DecodeItemCacheGetSection
+		 * @see DecodeCacheGetSection
 		 * @see Comparables#binarySearch(Get, Comparable, int, int)
 		 * @param indices Suchraum.
 		 * @param comparable {@link Comparable}.
 		 * @return erster Treffer oder {@code null}.
 		 */
-		public final GItem find(final int[] indices, final Comparable<? super GItem> comparable) {
+		public GItem find(final int[] indices, final Comparable<? super GItem> comparable) {
 			if(indices.length == 0) return null;
-			final Get<GItem> get = new DecodeItemCacheGetSection<GItem>(this, indices);
+			final Get<GItem> get = new DecodeCacheGetSection<GItem>(this, indices);
 			final int index = Comparables.binarySearch(get, comparable, 0, indices.length);
 			if(index < 0) return null;
 			return get.get(index);
@@ -653,14 +512,14 @@ public class Decoder {
 		 * 
 		 * @return aktuelle Anzahl der Elemente.
 		 */
-		public final int size() {
+		public int size() {
 			return this.size;
 		}
 
 		/**
 		 * Diese Methode entfernt alle Elemente.
 		 */
-		public final void clear() {
+		public void clear() {
 			if(this.size == 0) return;
 			Arrays.fill(this.pages, null);
 			this.size = 0;
@@ -674,13 +533,13 @@ public class Decoder {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		public final GItem clear(final int index) throws IndexOutOfBoundsException {
+		public GItem clear(final int index) throws IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
-			final int pageIndex = index >> DecodeItemCachePage.PAGE_BITS;
-			final DecodeItemCachePage page = this.pages[pageIndex];
+			final int pageIndex = index >> DecodeCachePage.PAGE_BITS;
+			final DecodeCachePage page = this.pages[pageIndex];
 			if(page == null) return null;
-			final int itemIndex = index & DecodeItemCachePage.PAGE_MASK;
+			final int itemIndex = index & DecodeCachePage.PAGE_MASK;
 			final GItem item = (GItem)page.items[itemIndex];
 			if(item == null) return null;
 			page.items[itemIndex] = null;
@@ -695,13 +554,13 @@ public class Decoder {
 		 * Diese Methode entfernt solange überflüssige Elemente, bis die aktuelle Anzahl der Elemente nicht mehr größer der
 		 * minimalen Anzahl ist.
 		 */
-		public final void compact() {
+		public void compact() {
 			int count = this.minSize - this.size;
 			if(count >= 0) return;
-			final DecodeItemCachePage[] pages = this.pages;
+			final DecodeCachePage[] pages = this.pages;
 			this.size = this.minSize;
 			for(int i = pages.length - 1; 0 <= i; i--){
-				final DecodeItemCachePage page = pages[i];
+				final DecodeCachePage page = pages[i];
 				if(page != null){
 					count += page.size;
 					if(count <= 0){
@@ -732,7 +591,7 @@ public class Decoder {
 		 * 
 		 * @return minimale Anzahl der Elemente.
 		 */
-		public final int getMinSize() {
+		public int getMinSize() {
 			return this.minSize;
 		}
 
@@ -743,7 +602,7 @@ public class Decoder {
 		 * @param value minimale Anzahl der Elemente.
 		 * @throws IllegalArgumentException Wenn die gegebene minimale Anzahl der Elemente kleiner als {@code 0} ist.
 		 */
-		public final void setMinSize(final int value) throws IllegalArgumentException {
+		public void setMinSize(final int value) throws IllegalArgumentException {
 			if(this.minSize == value) return;
 			if(value < 0) throw new IllegalArgumentException("value < 0");
 			this.minSize = value;
@@ -756,7 +615,7 @@ public class Decoder {
 		 * 
 		 * @return maximale Anzahl der Elemente.
 		 */
-		public final int getMaxSize() {
+		public int getMaxSize() {
 			return this.maxSize;
 		}
 
@@ -767,7 +626,7 @@ public class Decoder {
 		 * @param value maximale Anzahl der Elemente.
 		 * @throws IllegalArgumentException Wenn die gegebene maximale Anzahl der Elemente kleiner als {@code 0} ist.
 		 */
-		public final void setMaxSize(final int value) {
+		public void setMaxSize(final int value) {
 			if(this.maxSize == value) return;
 			if(value < 0) throw new IllegalArgumentException("value < 0");
 			this.maxSize = value;
@@ -783,7 +642,7 @@ public class Decoder {
 		 * 
 		 * @return Kapazität.
 		 */
-		final int getCapacity() {
+		public int getCapacity() {
 			return this.capacity;
 		}
 
@@ -793,25 +652,25 @@ public class Decoder {
 		 * @param value Kapazität.
 		 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 		 */
-		final void setCapacity(final int value) throws IllegalArgumentException {
+		public void setCapacity(final int value) throws IllegalArgumentException {
 			if(this.capacity == value) return;
 			if(value < 0) throw new IllegalArgumentException("value < 0");
 			this.capacity = value;
-			final int length = ((value + DecodeItemCachePage.PAGE_SIZE) - 1) / DecodeItemCachePage.PAGE_SIZE;
+			final int length = ((value + DecodeCachePage.PAGE_SIZE) - 1) / DecodeCachePage.PAGE_SIZE;
 			if(this.pages.length != length){
 				this.size = 0;
-				this.pages = new DecodeItemCachePage[length];
+				this.pages = new DecodeCachePage[length];
 			}else{
 				this.clear();
 			}
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Iterator} über die im {@link DecodeItemCache} enthaltenen Elemente zurück.
+		 * Diese Methode gibt den {@link Iterator} über die im {@link DecodeCache} enthaltenen Elemente zurück.
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new DecodeItemCacheIterator<GItem>(this);
+			return new DecodeCacheIterator<GItem>(this);
 		}
 
 		/**
@@ -819,7 +678,113 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, this.getClass().getSimpleName(), this);
+			return Objects.toStringCall(true, "DecodeCache", this);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen abstrakten Datensatz, der von einem {@link DecodeCache} erzeugt, aus einem
+	 * {@link DecodeSource} geladen und in einem {@link DecodeItemCache} verwaltet wird.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static abstract class DecodeItem {
+
+		/**
+		 * Dieses Feld speichert den Index dieses Datensatzes im {@link DecodeItemCache}.
+		 */
+		public final int index;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Index dieses Datensatzes im {@link DecodeItemCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
+		 */
+		public DecodeItem(final int index) {
+			this.index = index;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.index;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof DecodeItem)) return false;
+			final DecodeItem data = (DecodeItem)object;
+			return this.index == data.index;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link DecodeCache}, dessen Elemente in einem {@link DecodeItemCache} gespeichert
+	 * werden.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 */
+	public static abstract class DecodeItemCache<GItem> extends DecodeCache<GItem> {
+
+		/**
+		 * Dieses Feld speichert das {@link DecodeSource}.
+		 */
+		public final DecodeSource source;
+
+		/**
+		 * Dieses Feld speichert die Position im {@link DecodeSource}, an der das Laden begonnen hat.
+		 */
+		public final long sourceIndex;
+
+		/**
+		 * Dieses Feld speichert die Größe eines Elements.
+		 */
+		public final int itemSize;
+
+		/**
+		 * Dieses Feld speichert die Anzahl der Elemente.
+		 */
+		public final int itemCount;
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link DecodeSource} und die Größe eines Elements.
+		 * 
+		 * @param source {@link DecodeSource}.
+		 * @param itemSize Größe eines Elements.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
+		 */
+		public DecodeItemCache(final DecodeSource source, final int itemSize) throws IOException, NullPointerException {
+			if(source == null) throw new NullPointerException("source is null");
+			this.source = source;
+			this.sourceIndex = source.index();
+			final int itemCount = Decoder.readInts(source, 1)[0];
+			this.itemSize = itemSize;
+			this.itemCount = itemCount;
+			this.setMinSize(1024);
+			this.setMaxSize(4096);
+			this.setCapacity(itemCount);
+			this.seekIndex(itemCount);
+		}
+
+		/**
+		 * Diese Methode navigiert in der {@link DecodeSource} an die Position des {@code index}-ten Elements. Die Position
+		 * ergibt sich aus {@code fileIndex + 4 + index * itemSize}.
+		 * 
+		 * @param index Index.
+		 * @throws IOException Wenn die {@link DecodeSource} eine {@link IOException} auslöst.
+		 */
+		protected final void seekIndex(final int index) throws IOException {
+			this.source.seek(this.sourceIndex + 4 + (index * this.itemSize));
 		}
 
 	}
@@ -835,6 +800,22 @@ public class Decoder {
 		 * Dieses Feld speichert die Indices der Datensätze.
 		 */
 		public final int[] indices;
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeListCache}.
+		 * @param cache {@link DecodeListCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeList(final int index, final DecodeListCache<?> cache) throws IOException {
+			super(index);
+			cache.seekIndex(index);
+			final int[] ints = Decoder.readInts(cache.source, 2);
+			cache.seekOffset(ints[0]);
+			final int length = ints[1] - ints[0];
+			this.indices = Decoder.readInts(cache.source, length);
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
@@ -870,14 +851,15 @@ public class Decoder {
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link DecodeSource} und die Größe eines Werts.
 		 * 
-		 * @param file {@link DecodeSource}.
+		 * @param source {@link DecodeSource}.
 		 * @param valueSize Größe eines Werts.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 		 */
-		public DecodeListCache(final DecodeSource file, final int valueSize) throws IOException {
-			super(file, 4);
+		public DecodeListCache(final DecodeSource source, final int valueSize) throws IOException, NullPointerException {
+			super(source, 4);
 			this.valueSize = valueSize;
-			final int valueCount = DecodeCache.readIndex(file);
+			final int valueCount = Decoder.readInts(source, 1)[0];
 			this.valueCount = valueCount;
 			this.seekOffset(valueCount);
 		}
@@ -890,7 +872,7 @@ public class Decoder {
 		 * @throws IOException Wenn die {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
 		protected final void seekOffset(final int offset) throws IOException {
-			this.file.seek(this.fileIndex + 4 + (this.itemSize * this.itemCount) + 4 + (offset * this.valueSize));
+			this.source.seek(this.sourceIndex + 4 + (this.itemSize * this.itemCount) + 4 + (offset * this.valueSize));
 		}
 
 	}
@@ -900,12 +882,29 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeValue extends DecodeItem {
+	public static class DecodeValue extends DecodeItem {
 
 		/**
 		 * Dieses Feld speichert den {@link String}.
 		 */
 		public final String value;
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeListCache}.
+		 * @param cache {@link DecodeListCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeValue(final int index, final DecodeListCache<?> cache) throws IOException {
+			super(index);
+			cache.seekIndex(index);
+			final int[] ints = Decoder.readInts(cache.source, 2);
+			cache.seekOffset(ints[0]);
+			final int length = ints[1] - ints[0];
+			final byte[] bytes = Decoder.readBytes(cache.source, length);
+			this.value = new String(bytes, EncodeValue.CHARSET);
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert Index und {@link String}.
@@ -933,16 +932,17 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeValueCache extends DecodeListCache<DecodeValue> {
+	public static class DecodeValueCache extends DecodeListCache<DecodeValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 		 */
-		public DecodeValueCache(final DecodeSource file) throws IOException {
-			super(file, 1);
+		public DecodeValueCache(final DecodeSource source) throws IOException, NullPointerException {
+			super(source, 1);
 		}
 
 		/**
@@ -988,13 +988,7 @@ public class Decoder {
 		@Override
 		public DecodeValue load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				this.seekOffset(ints[0]);
-				final int length = ints[1] - ints[0];
-				final byte[] bytes = new byte[length];
-				DecodeCache.read(this.file, bytes, 0, length);
-				return new DecodeValue(index, new String(bytes, EncodeValue.CHARSET));
+				return new DecodeValue(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1009,7 +1003,7 @@ public class Decoder {
 	 * @see Node#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeLabel extends DecodeItem {
+	public static class DecodeLabel extends DecodeItem {
 
 		/**
 		 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
@@ -1024,6 +1018,21 @@ public class Decoder {
 		 * @see Node#getLocalName()
 		 */
 		public final int name;
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeItemCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
+		 * @param cache {@link DecodeItemCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeLabel(final int index, final DecodeItemCache<?> cache) throws IOException {
+			super(index);
+			cache.seekIndex(index);
+			final int[] ints = Decoder.readInts(cache.source, 2);
+			this.uri = ints[0];
+			this.name = ints[1];
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indizes.
@@ -1053,16 +1062,16 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeLabelCache extends DecodeItemCache<DecodeLabel> {
+	public static class DecodeLabelCache extends DecodeItemCache<DecodeLabel> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeLabelCache(final DecodeSource file) throws IOException {
-			super(file, 8);
+		public DecodeLabelCache(final DecodeSource source) throws IOException {
+			super(source, 8);
 		}
 
 		/**
@@ -1093,6 +1102,7 @@ public class Decoder {
 		 * @return {@link DecodeLabel} oder {@code null}.
 		 */
 		public DecodeLabel findUri(final int[] indices, final int uri) {
+			if(indices.length == 0) return null;
 			return this.find(indices, new Comparable<DecodeLabel>() {
 
 				@Override
@@ -1163,7 +1173,7 @@ public class Decoder {
 		 * @return {@link DecodeLabel} oder {@code null}.
 		 */
 		public DecodeLabel findLabel(final int[] indices, final int uri, final int name) {
-			if(this.itemCount == 0) return null;
+			if(indices.length == 0) return null;
 			return this.find(indices, new Comparable<DecodeLabel>() {
 
 				@Override
@@ -1182,9 +1192,7 @@ public class Decoder {
 		@Override
 		public DecodeLabel load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				return new DecodeLabel(index, ints[0], ints[1]);
+				return new DecodeLabel(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1197,7 +1205,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElement extends DecodeItem {
+	public static class DecodeElementNode extends DecodeItem {
 
 		/**
 		 * Dieses Feld speichert den Index des {@link DecodeLabel}s.
@@ -1230,6 +1238,23 @@ public class Decoder {
 		public final int attributes;
 
 		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeItemCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
+		 * @param cache {@link DecodeItemCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeElementNode(final int index, final DecodeItemCache<?> cache) throws IOException {
+			super(index);
+			cache.seekIndex(index);
+			final int[] ints = Decoder.readInts(cache.source, 4);
+			this.label = ints[0];
+			this.xmlns = ints[1];
+			this.children = ints[2];
+			this.attributes = ints[3];
+		}
+
+		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
 		 * 
 		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
@@ -1239,7 +1264,7 @@ public class Decoder {
 		 * @param children Index der {@link DecodeElementChildren} ({@link Element#getChildNodes()}).
 		 * @param attributes Index der {@link DecodeElementAttributes} ({@link Element#getAttributes()}).
 		 */
-		public DecodeElement(final int index, final int label, final int xmlns, final int children, final int attributes) {
+		public DecodeElementNode(final int index, final int label, final int xmlns, final int children, final int attributes) {
 			super(index);
 			this.label = label;
 			this.xmlns = xmlns;
@@ -1252,37 +1277,36 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeElement", this.index, this.label, this.xmlns, this.children, this.attributes);
+			return Objects.toStringCall("DecodeElementNode", this.index, this.label, this.xmlns, this.children,
+				this.attributes);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DecodeCache} der {@link DecodeElement}s.
+	 * Diese Klasse implementiert den {@link DecodeCache} der {@link DecodeElementNode}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementCache extends DecodeItemCache<DecodeElement> {
+	public static class DecodeElementNodeCache extends DecodeItemCache<DecodeElementNode> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeElementCache(final DecodeSource file) throws IOException {
-			super(file, 16);
+		public DecodeElementNodeCache(final DecodeSource source) throws IOException {
+			super(source, 16);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DecodeElement load(final int index) {
+		public DecodeElementNode load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex4(this.file);
-				return new DecodeElement(index, ints[0], ints[1], ints[2], ints[3]);
+				return new DecodeElementNode(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1297,7 +1321,18 @@ public class Decoder {
 	 * @see Node#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementXmlns extends DecodeList {
+	public static class DecodeElementXmlns extends DecodeList {
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeListCache}.
+		 * @param cache {@link DecodeListCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeElementXmlns(final int index, final DecodeListCache<?> cache) throws IOException {
+			super(index, cache);
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
@@ -1324,16 +1359,16 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementXmlnsCache extends DecodeListCache<DecodeElementXmlns> {
+	public static class DecodeElementXmlnsCache extends DecodeListCache<DecodeElementXmlns> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeElementXmlnsCache(final DecodeSource file) throws IOException {
-			super(file, 4);
+		public DecodeElementXmlnsCache(final DecodeSource source) throws IOException {
+			super(source, 4);
 		}
 
 		/**
@@ -1342,12 +1377,7 @@ public class Decoder {
 		@Override
 		public DecodeElementXmlns load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				this.seekOffset(ints[0]);
-				final int length = ints[1] - ints[0];
-				final int[] indices = DecodeCache.readIndices(this.file, length);
-				return new DecodeElementXmlns(index, indices);
+				return new DecodeElementXmlns(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1361,13 +1391,24 @@ public class Decoder {
 	 * @see Element#getChildNodes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementChildren extends DecodeList {
+	public static class DecodeElementChildren extends DecodeList {
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeListCache}.
+		 * @param cache {@link DecodeListCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeElementChildren(final int index, final DecodeListCache<?> cache) throws IOException {
+			super(index, cache);
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
 		 * 
 		 * @param index den Index dieses Datensatzes im {@link DecodeItemCache}.
-		 * @param indices Indices der {@link DecodeValue}s und {@link DecodeElement}s.
+		 * @param indices Indices der {@link DecodeValue}s und {@link DecodeElementNode}s.
 		 */
 		public DecodeElementChildren(final int index, final int[] indices) {
 			super(index, indices);
@@ -1388,16 +1429,16 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementChildrenCache extends DecodeListCache<DecodeElementChildren> {
+	public static class DecodeElementChildrenCache extends DecodeListCache<DecodeElementChildren> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeElementChildrenCache(final DecodeSource file) throws IOException {
-			super(file, 4);
+		public DecodeElementChildrenCache(final DecodeSource source) throws IOException {
+			super(source, 4);
 		}
 
 		/**
@@ -1406,12 +1447,7 @@ public class Decoder {
 		@Override
 		public DecodeElementChildren load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				this.seekOffset(ints[0]);
-				final int length = ints[1] - ints[0];
-				final int[] indices = DecodeCache.readIndices(this.file, length);
-				return new DecodeElementChildren(index, indices);
+				return new DecodeElementChildren(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1420,18 +1456,29 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link DecodeList} von {@link DecodeAttribute}s.
+	 * Diese Klasse implementiert eine {@link DecodeList} von {@link DecodeAttributeNode}s.
 	 * 
 	 * @see Element#getAttributes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementAttributes extends DecodeList {
+	public static class DecodeElementAttributes extends DecodeList {
+
+		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeListCache}.
+		 * @param cache {@link DecodeListCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeElementAttributes(final int index, final DecodeListCache<?> cache) throws IOException {
+			super(index, cache);
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
 		 * 
 		 * @param index den Index dieses Datensatzes im {@link DecodeItemCache}.
-		 * @param indices Indices der {@link DecodeAttribute}s.
+		 * @param indices Indices der {@link DecodeAttributeNode}s.
 		 */
 		public DecodeElementAttributes(final int index, final int[] indices) {
 			super(index, indices);
@@ -1452,16 +1499,16 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementAttributesCache extends DecodeListCache<DecodeElementAttributes> {
+	public static class DecodeElementAttributesCache extends DecodeListCache<DecodeElementAttributes> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeElementAttributesCache(final DecodeSource file) throws IOException {
-			super(file, 4);
+		public DecodeElementAttributesCache(final DecodeSource source) throws IOException {
+			super(source, 4);
 		}
 
 		/**
@@ -1470,12 +1517,7 @@ public class Decoder {
 		@Override
 		public DecodeElementAttributes load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				this.seekOffset(ints[0]);
-				final int length = ints[1] - ints[0];
-				final int[] indices = DecodeCache.readIndices(this.file, length);
-				return new DecodeElementAttributes(index, indices);
+				return new DecodeElementAttributes(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1488,7 +1530,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeAttribute extends DecodeItem {
+	public static class DecodeAttributeNode extends DecodeItem {
 
 		/**
 		 * Dieses Feld speichert den Index des {@link DecodeLabel}s.
@@ -1506,6 +1548,21 @@ public class Decoder {
 		public final int value;
 
 		/**
+		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeItemCache}.
+		 * 
+		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
+		 * @param cache {@link DecodeItemCache}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public DecodeAttributeNode(final int index, final DecodeItemCache<?> cache) throws IOException {
+			super(index);
+			cache.seekIndex(index);
+			final int[] ints = Decoder.readInts(cache.source, 2);
+			this.label = ints[0];
+			this.value = ints[1];
+		}
+
+		/**
 		 * Dieser Konstrukteur initialisiert die Indizes.
 		 * 
 		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
@@ -1513,7 +1570,7 @@ public class Decoder {
 		 *        {@link Attr#getNamespaceURI()}).
 		 * @param value Index des {@code Value}-{@link DecodeValue} ({@link Attr#getNodeValue()}).
 		 */
-		public DecodeAttribute(final int index, final int label, final int value) {
+		public DecodeAttributeNode(final int index, final int label, final int value) {
 			super(index);
 			this.label = label;
 			this.value = value;
@@ -1524,31 +1581,31 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeAttribute", this.index, this.label, this.value);
+			return Objects.toStringCall("DecodeAttributeNode", this.index, this.label, this.value);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DecodeCache} der {@link DecodeAttribute}s.
+	 * Diese Klasse implementiert den {@link DecodeCache} der {@link DecodeAttributeNode}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeAttributeCache extends DecodeItemCache<DecodeAttribute> {
+	public static class DecodeAttributeNodeCache extends DecodeItemCache<DecodeAttributeNode> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeAttributeCache(final DecodeSource file) throws IOException {
-			super(file, 8);
+		public DecodeAttributeNodeCache(final DecodeSource source) throws IOException {
+			super(source, 8);
 		}
 
 		/**
-		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeAttribute} mit den gegebenen
-		 * {@code Label}- -Index und gibt dieses oder {@code null} zurück. Die {@link DecodeAttribute} müssen dazum im
+		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeAttributeNode} mit den gegebenen
+		 * {@code Label}- -Index und gibt dieses oder {@code null} zurück. Die {@link DecodeAttributeNode} müssen dazum im
 		 * Index-Array aufsteigend sortiert sein.
 		 * 
 		 * @see Encoder#LabelComparator
@@ -1557,14 +1614,14 @@ public class Decoder {
 		 * @see DecodeLabel#name
 		 * @param indices Index-Array.
 		 * @param label {@code Label}-Index.
-		 * @return {@link DecodeAttribute} oder {@code null}.
+		 * @return {@link DecodeAttributeNode} oder {@code null}.
 		 */
-		public DecodeAttribute findLabel(final int[] indices, final int label) {
-			if(this.itemCount == 0) return null;
-			return this.find(indices, new Comparable<DecodeAttribute>() {
+		public DecodeAttributeNode findLabel(final int[] indices, final int label) {
+			if(indices.length == 0) return null;
+			return this.find(indices, new Comparable<DecodeAttributeNode>() {
 
 				@Override
-				public int compareTo(final DecodeAttribute value) {
+				public int compareTo(final DecodeAttributeNode value) {
 					return Comparators.compare(label, value.label);
 				}
 
@@ -1575,11 +1632,9 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DecodeAttribute load(final int index) {
+		public DecodeAttributeNode load(final int index) {
 			try{
-				this.seekIndex(index);
-				final int[] ints = DecodeCache.readIndex2(this.file);
-				return new DecodeAttribute(index, ints[0], ints[1]);
+				return new DecodeAttributeNode(index, this);
 			}catch(final IOException e){
 				throw new IllegalStateException(e);
 			}
@@ -1593,14 +1648,14 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeDocumentCache extends DecodeCache {
+	public static class DecodeDocumentNode {
 
 		/**
 		 * Dieses Feld speichert den {@code UIR}-{@link DecodeValueCache}.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 */
-		public final DecodeValueCache uriCharsCache;
+		public final DecodeValueCache uriCache;
 
 		/**
 		 * Dieses Feld speichert den {@code Value}-{@link DecodeValueCache}.
@@ -1614,7 +1669,7 @@ public class Decoder {
 		 * 
 		 * @see Node#getPrefix()
 		 */
-		public final DecodeValueCache xmlnsCharsCache;
+		public final DecodeValueCache xmlnsNameCache;
 
 		/**
 		 * Dieses Feld speichert den {@code URI/Prefix}-{@link DecodeLabelCache}.
@@ -1625,18 +1680,18 @@ public class Decoder {
 		public final DecodeLabelCache xmlnsLabelCache;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeElementCache}.
+		 * Dieses Feld speichert den {@link DecodeElementNodeCache}.
 		 * 
 		 * @see Element
 		 */
-		public final DecodeElementCache elementCache;
+		public final DecodeElementNodeCache elementNodeCache;
 
 		/**
 		 * Dieses Feld speichert den {@code Element}-{@link DecodeValueCache}.
 		 * 
 		 * @see Element#getLocalName()
 		 */
-		public final DecodeValueCache elementCharsCache;
+		public final DecodeValueCache elementNameCache;
 
 		/**
 		 * Dieses Feld speichert den {@code URI/Element}-{@link DecodeLabelCache}.
@@ -1669,18 +1724,18 @@ public class Decoder {
 		public final DecodeElementAttributesCache elementAttributesCache;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeAttributeCache}.
+		 * Dieses Feld speichert den {@link DecodeAttributeNodeCache}.
 		 * 
 		 * @see Attr
 		 */
-		public final DecodeAttributeCache attributeCache;
+		public final DecodeAttributeNodeCache attributeNodeCache;
 
 		/**
 		 * Dieses Feld speichert den {@code Attribute}-{@link DecodeValueCache}.
 		 * 
 		 * @see Attr#getLocalName()
 		 */
-		public final DecodeValueCache attributeCharsCache;
+		public final DecodeValueCache attributeNameCache;
 
 		/**
 		 * Dieses Feld speichert den {@code URI/Attribute}-{@link DecodeLabelCache}.
@@ -1691,32 +1746,32 @@ public class Decoder {
 		public final DecodeLabelCache attributeLabelCache;
 
 		/**
-		 * Dieses Feld speichert den Index des {@link DecodeElement}s für {@link Document#getDocumentElement()}.
+		 * Dieses Feld speichert den Index des {@link DecodeElementNode}s für {@link Document#getDocumentElement()}.
 		 */
 		public final int documentElement;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 		 */
-		public DecodeDocumentCache(final DecodeSource file) throws IOException {
-			super(file);
-			this.uriCharsCache = new DecodeValueCache(file);
-			this.xmlnsCharsCache = new DecodeValueCache(file);
-			this.elementCharsCache = new DecodeValueCache(file);
-			this.attributeCharsCache = new DecodeValueCache(file);
-			this.valueCache = new DecodeValueCache(file);
-			this.xmlnsLabelCache = new DecodeLabelCache(file);
-			this.elementLabelCache = new DecodeLabelCache(file);
-			this.attributeLabelCache = new DecodeLabelCache(file);
-			this.elementXmlnsCache = new DecodeElementXmlnsCache(file);
-			this.elementChildrenCache = new DecodeElementChildrenCache(file);
-			this.elementAttributesCache = new DecodeElementAttributesCache(file);
-			this.elementCache = new DecodeElementCache(file);
-			this.attributeCache = new DecodeAttributeCache(file);
-			this.documentElement = DecodeCache.readIndex(file);
+		public DecodeDocumentNode(final DecodeSource source) throws IOException, NullPointerException {
+			this.uriCache = new DecodeValueCache(source);
+			this.xmlnsNameCache = new DecodeValueCache(source);
+			this.elementNameCache = new DecodeValueCache(source);
+			this.attributeNameCache = new DecodeValueCache(source);
+			this.valueCache = new DecodeValueCache(source);
+			this.xmlnsLabelCache = new DecodeLabelCache(source);
+			this.elementLabelCache = new DecodeLabelCache(source);
+			this.attributeLabelCache = new DecodeLabelCache(source);
+			this.elementXmlnsCache = new DecodeElementXmlnsCache(source);
+			this.elementChildrenCache = new DecodeElementChildrenCache(source);
+			this.elementAttributesCache = new DecodeElementAttributesCache(source);
+			this.elementNodeCache = new DecodeElementNodeCache(source);
+			this.attributeNodeCache = new DecodeAttributeNodeCache(source);
+			this.documentElement = Decoder.readInts(source, 1)[0];
 		}
 
 		/**
@@ -1724,37 +1779,29 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "InputDocumentCache", //
-				"documentElement", this.documentElement,//
-				"uriCharsCache", this.uriCharsCache,//
-				"xmlnsCharsCache", this.xmlnsCharsCache,//
-				"elementCharsCache", this.elementCharsCache,//
-				"attributeCharsCache", this.attributeCharsCache,//
-				"valueCharsCache", this.valueCache,//
-				"xmlnsLabelCache", this.xmlnsLabelCache,//
-				"elementLabelCache", this.elementLabelCache,//
-				"attributeLabelCache", this.attributeLabelCache,//
-				"elementChildrenCache", this.elementChildrenCache,//
-				"elementAttributesCache", this.elementAttributesCache,//
-				"elementCache", this.elementCache,//
-				"attributeCache", this.attributeCache //
-				);
+			return Objects.toStringCall(true, true, "InputDocumentCache", "uriCache", this.uriCache, "valueCache",
+				this.valueCache, "xmlnsNameCache", this.xmlnsNameCache, "xmlnsLabelCache", this.xmlnsLabelCache,
+				"elementNodeCache", this.elementNodeCache, "elementNameCache", this.elementNameCache, "elementLabelCache",
+				this.elementLabelCache, "elementXmlnsCache", this.elementXmlnsCache, "elementChildrenCache",
+				this.elementChildrenCache, "elementAttributesCache", this.elementAttributesCache, "attributeNodeCache",
+				this.attributeNodeCache, "attributeNameCache", this.attributeNameCache, "attributeLabelCache",
+				this.attributeLabelCache, "documentElement", this.documentElement);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert die Methoden zum Auslesen eines {@link DecodeDocumentCache}s als Grundlage eines
+	 * Diese Klasse implementiert die Methoden zum Auslesen eines {@link DecodeDocumentNode}s als Grundlage eines
 	 * {@link DecodeDocumentAdapter}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeAdapter {
+	public static class DecodeAdapter {
 
 		/**
 		 * Dieses Feld speichert die leere {@link NodeList}.
 		 */
-		static final NodeList VOID_NODE_LIST = new NodeList() {
+		public static final NodeList VOID_NODE_LIST = new NodeList() {
 
 			@Override
 			public Node item(final int index) {
@@ -1771,7 +1818,7 @@ public class Decoder {
 		/**
 		 * Dieses Feld speichert die leere {@link TypeInfo}.
 		 */
-		static final TypeInfo VOID_TYPE_INFO = new TypeInfo() {
+		public static final TypeInfo VOID_TYPE_INFO = new TypeInfo() {
 
 			@Override
 			public String getTypeName() {
@@ -1791,14 +1838,16 @@ public class Decoder {
 		};
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeDocumentCache}.
+		 * Dieses Feld speichert den {@link DecodeDocumentNode}.
 		 */
-		public final DecodeDocumentCache cache;
+		public final DecodeDocumentNode cache;
 
 		/**
-		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der
+		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElementNode}s in den Indices der
 		 * {@link DecodeElementChildren}. Der Wert entspricht der Anzahl der {@link DecodeValue}s in
-		 * {@link DecodeDocumentCache#valueCache}.
+		 * {@link DecodeDocumentNode#valueCache}.
+		 * 
+		 * @see #elementGetChildNodesItem(DecodeNodeAdapter, int, int)
 		 */
 		public final int offset;
 
@@ -1808,24 +1857,24 @@ public class Decoder {
 		public final DecodeDocumentAdapter adapter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link DecodeDocumentCache}.
+		 * Dieser Konstrukteur initialisiert den {@link DecodeDocumentNode}.
 		 * 
-		 * @param cache {@link DecodeDocumentCache}.
+		 * @param cache {@link DecodeDocumentNode}.
 		 */
-		public DecodeAdapter(final DecodeDocumentCache cache) {
+		public DecodeAdapter(final DecodeDocumentNode cache) {
 			this.cache = cache;
 			this.offset = this.cache.valueCache.itemCount;
 			this.adapter = new DecodeDocumentAdapter(this);
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link DecodeDocumentCache} mit dem gegebenen {@link DecodeSource}.
+		 * Dieser Konstrukteur initialisiert den {@link DecodeDocumentNode} mit dem gegebenen {@link DecodeSource}.
 		 * 
-		 * @param file {@link DecodeSource}.
-		 * @throws IOException Wenn das gegebene {@link DecodeSource} eine {@link IOException} auslöst.
+		 * @param source {@link DecodeSource}.
+		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeAdapter(final DecodeSource file) throws IOException {
-			this(new DecodeDocumentCache(file));
+		public DecodeAdapter(final DecodeSource source) throws IOException {
+			this(new DecodeDocumentNode(source));
 		}
 
 		/**
@@ -1852,15 +1901,15 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getPrefix()}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @return {@link Element#getPrefix()}.
 		 */
 		public String elementGetPrefix(final int index) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeElementXmlns elementXmlns = this.cache.elementXmlnsCache.get(element.xmlns);
 			final DecodeLabel nodeLabel = this.cache.elementLabelCache.get(element.label);
 			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelCache.getUri(elementXmlns.indices, nodeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsCharsCache.get(xmlnsLabel.name);
+			final DecodeValue xmlnsChars = this.cache.xmlnsNameCache.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
 			return xmlnsValue;
@@ -1869,16 +1918,16 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getNodeName()}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @return {@link Element#getNodeName()}.
 		 */
 		public String elementGetNodeName(final int index) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeElementXmlns elementXmlns = this.cache.elementXmlnsCache.get(element.xmlns);
 			final DecodeLabel elementLabel = this.cache.elementLabelCache.get(element.label);
-			final DecodeValue elementLabelName = this.cache.elementCharsCache.get(elementLabel.name);
+			final DecodeValue elementLabelName = this.cache.elementNameCache.get(elementLabel.name);
 			final DecodeLabel elementXmlnsLabel = this.cache.xmlnsLabelCache.getUri(elementXmlns.indices, elementLabel.uri);
-			final DecodeValue elementXmlnsLabelName = this.cache.xmlnsCharsCache.get(elementXmlnsLabel.name);
+			final DecodeValue elementXmlnsLabelName = this.cache.xmlnsNameCache.get(elementXmlnsLabel.name);
 			final String elementXmlnsLabelNameValue = elementXmlnsLabelName.value;
 			if(elementXmlnsLabelNameValue.isEmpty()) return elementLabelName.value;
 			return elementXmlnsLabelNameValue + ":" + elementLabelName.value;
@@ -1887,26 +1936,26 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getLocalName()}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @return {@link Element#getLocalName()}.
 		 */
 		public String elementGetLocalName(final int index) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeLabel nodeLabel = this.cache.elementLabelCache.get(element.label);
-			final DecodeValue elementChars = this.cache.elementCharsCache.get(nodeLabel.name);
+			final DecodeValue elementChars = this.cache.elementNameCache.get(nodeLabel.name);
 			return elementChars.value;
 		}
 
 		/**
 		 * Diese Methode implementiert {@link Element#getNamespaceURI()}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @return {@link Element#getNamespaceURI()}.
 		 */
 		public String elementGetNamespaceURI(final int index) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeLabel elementLabel = this.cache.elementLabelCache.get(element.label);
-			final DecodeValue uriChars = this.cache.uriCharsCache.get(elementLabel.uri);
+			final DecodeValue uriChars = this.cache.uriCache.get(elementLabel.uri);
 			final String uriValue = uriChars.value;
 			if(uriValue.isEmpty()) return null;
 			return uriValue;
@@ -1946,17 +1995,17 @@ public class Decoder {
 				if("*".equals(name)){
 					collector = new DecodeElementCollector(this);
 				}else{
-					final DecodeValue nameChars = this.cache.elementCharsCache.findValue(name);
+					final DecodeValue nameChars = this.cache.elementNameCache.findValue(name);
 					if(nameChars == null) return DecodeAdapter.VOID_NODE_LIST;
 					collector = new DecodeElementNameCollector(this, nameChars.index);
 				}
 			}else{
-				final DecodeValue uriChars = this.cache.uriCharsCache.findValue(uri);
+				final DecodeValue uriChars = this.cache.uriCache.findValue(uri);
 				if(uriChars == null) return DecodeAdapter.VOID_NODE_LIST;
 				if("*".equals(name)){
 					collector = new DecodeElementUriCollector(this, uriChars.index);
 				}else{
-					final DecodeValue nameChars = this.cache.elementCharsCache.findValue(name);
+					final DecodeValue nameChars = this.cache.elementNameCache.findValue(name);
 					if(nameChars == null) return DecodeAdapter.VOID_NODE_LIST;
 					final DecodeLabel elementlLabel = this.cache.elementLabelCache.findLabel(uriChars.index, nameChars.index);
 					if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
@@ -1974,7 +2023,7 @@ public class Decoder {
 		 * @return {@link Element#getFirstChild()}.
 		 */
 		public Node elementGetFirstChild(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			final int[] indices = elementChildren.indices;
 			if(indices.length == 0) return null;
@@ -1988,7 +2037,7 @@ public class Decoder {
 		 * @return {@link Element#getLastChild()}.
 		 */
 		public Node elementGetLastChild(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			final int[] indices = elementChildren.indices;
 			final int index = indices.length - 1;
@@ -1999,11 +2048,11 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#hasChildNodes()}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @return {@link Element#hasChildNodes()}.
 		 */
 		public boolean elementHasChildNodes(final int index) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			return elementChildren.indices.length != 0;
 		}
@@ -2015,7 +2064,7 @@ public class Decoder {
 		 * @return {@link Element#getChildNodes()}.
 		 */
 		public DecodeElementChildrenAdapter elementGetChildNodes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			return new DecodeElementChildrenAdapter(parent, elementChildren.indices);
 		}
@@ -2023,8 +2072,10 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link NodeList#item(int)} für {@link Node#getChildNodes()}.
 		 * 
+		 * @see #offset
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
-		 * @param index Index des {@link DecodeValue}s bzw. des {@link DecodeElement}s {@code + cache.textCache.itemCount}.
+		 * @param index Index des {@link DecodeValue}s bzw. des {@link DecodeElementNode}s
+		 *        {@code + cache.textCache.itemCount}.
 		 * @param child Index des {@code Child}-{@link Node}s in {@link Node#getChildNodes()}.
 		 * @return {@code Child}-{@link Node} als {@link DecodeTextAdapter} bzw. {@link DecodeElementAdapter}.
 		 */
@@ -2037,7 +2088,7 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#hasAttribute(String)}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param name {@code Name} ({@link Attr#getLocalName()}).
 		 * @return {@link Element#hasAttribute(String)}.
 		 */
@@ -2048,7 +2099,7 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getAttribute(String)}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param name {@code Name} ({@link Attr#getLocalName()}).
 		 * @return {@link Element#getAttribute(String)}.
 		 */
@@ -2059,24 +2110,24 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#hasAttributeNS(String, String)}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param uri {@code URI} ({@link Attr#getNamespaceURI()}).
 		 * @param name {@code Name} ({@link Attr#getLocalName()}).
 		 * @return {@link Element#hasAttributeNS(String, String)}.
 		 */
 		public boolean elementHasAttribute(final int index, final String uri, final String name) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeElementAttributes elementAttributes = this.cache.elementAttributesCache.get(element.attributes);
 			if(elementAttributes.indices.length == 0) return false;
-			final DecodeValue uriChars = this.cache.uriCharsCache.findValue(uri);
+			final DecodeValue uriChars = this.cache.uriCache.findValue(uri);
 			if(uriChars == null) return false;
-			final DecodeValue nameChars = this.cache.attributeCharsCache.findValue(name);
+			final DecodeValue nameChars = this.cache.attributeNameCache.findValue(name);
 			if(nameChars == null) return false;
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.findLabel(uriChars.index, nameChars.index);
 			if(attributeLabel == null) return false;
 
-			final DecodeAttribute attribute =
-				this.cache.attributeCache.findLabel(elementAttributes.indices, attributeLabel.index);
+			final DecodeAttributeNode attribute =
+				this.cache.attributeNodeCache.findLabel(elementAttributes.indices, attributeLabel.index);
 
 			return attribute != null;
 		}
@@ -2084,23 +2135,23 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getAttributeNodeNS(String, String)}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param uri {@code URI} ({@link Attr#getNamespaceURI()}).
 		 * @param name {@code Name} ({@link Attr#getLocalName()}).
 		 * @return {@link Element#getAttributeNodeNS(String, String)}.
 		 */
 		public String elementGetAttribute(final int index, final String uri, final String name) {
-			final DecodeElement element = this.cache.elementCache.get(index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(index);
 			final DecodeElementAttributes elementAttributes = this.cache.elementAttributesCache.get(element.attributes);
 			final int[] indices = elementAttributes.indices;
 			if(indices.length == 0) return "";
-			final DecodeValue uriChars = this.cache.uriCharsCache.findValue(uri);
+			final DecodeValue uriChars = this.cache.uriCache.findValue(uri);
 			if(uriChars == null) return "";
-			final DecodeValue nameChars = this.cache.attributeCharsCache.findValue(name);
+			final DecodeValue nameChars = this.cache.attributeNameCache.findValue(name);
 			if(nameChars == null) return "";
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.findLabel(uriChars.index, nameChars.index);
 			if(attributeLabel == null) return "";
-			final DecodeAttribute attribute = this.cache.attributeCache.findLabel(indices, attributeLabel.index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.findLabel(indices, attributeLabel.index);
 			final DecodeValue attributeChars = this.cache.valueCache.get(attribute.value);
 			return attributeChars.value;
 		}
@@ -2109,7 +2160,7 @@ public class Decoder {
 		 * Diese Methode implementiert {@link NamedNodeMap#item(int)} für {@link Element#getAttributes()}.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link DecodeAttributeAdapter}.
 		 */
 		public Node elementGetAttributesItem(final DecodeElementAdapter parent, final int index) {
@@ -2148,7 +2199,7 @@ public class Decoder {
 		 * @return {@link Element#hasAttributes()}.
 		 */
 		public boolean elementHasAttributes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementAttributes elementAttributes = this.cache.elementAttributesCache.get(element.attributes);
 			return elementAttributes.indices.length != 0;
 		}
@@ -2160,7 +2211,7 @@ public class Decoder {
 		 * @return {@link Element#getAttributes()}.
 		 */
 		public NamedNodeMap elementGetAttributes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementAttributes elementAttributes = this.cache.elementAttributesCache.get(element.attributes);
 			return new DecodeElementAttributesAdapter(parent, elementAttributes.indices);
 		}
@@ -2169,18 +2220,18 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Element#lookupPrefix(String)} und gibt den {@code Prefix} zur gegebenen
 		 * {@code URI} oder {@code null} zurück.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param uri {@code URI}.
 		 * @return {@code Prefix} oder {@code null}.
 		 */
 		public String elementLookupPrefix(final int index, final String uri) {
-			final DecodeValue uriChars = this.cache.uriCharsCache.findValue(uri);
+			final DecodeValue uriChars = this.cache.uriCache.findValue(uri);
 			if(uriChars == null) return null;
-			final DecodeElement node = this.cache.elementCache.get(index);
+			final DecodeElementNode node = this.cache.elementNodeCache.get(index);
 			final DecodeElementXmlns nodeXmlns = this.cache.elementXmlnsCache.get(node.xmlns);
 			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelCache.findUri(nodeXmlns.indices, uriChars.index);
 			if(xmlnsLabel == null) return null;
-			final DecodeValue xmlnsChars = this.cache.xmlnsCharsCache.get(xmlnsLabel.name);
+			final DecodeValue xmlnsChars = this.cache.xmlnsNameCache.get(xmlnsLabel.name);
 			return xmlnsChars.value;
 		}
 
@@ -2188,18 +2239,18 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)} und gibt die {@code URI} zum gegebenen
 		 * {@code Prefix} oder {@code null} zurück.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param name {@code Prefix}.
 		 * @return {@code URI} oder {@code null}.
 		 */
 		public String elementLookupNamespaceURI(final int index, final String name) {
-			final DecodeValue nameChars = this.cache.xmlnsCharsCache.findValue(name);
+			final DecodeValue nameChars = this.cache.xmlnsNameCache.findValue(name);
 			if(nameChars == null) return null;
-			final DecodeElement node = this.cache.elementCache.get(index);
+			final DecodeElementNode node = this.cache.elementNodeCache.get(index);
 			final DecodeElementXmlns nodeXmlns = this.cache.elementXmlnsCache.get(node.xmlns);
 			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelCache.findName(nodeXmlns.indices, nameChars.index);
 			if(xmlnsLabel == null) return null;
-			final DecodeValue uriChars = this.cache.uriCharsCache.get(xmlnsLabel.uri);
+			final DecodeValue uriChars = this.cache.uriCache.get(xmlnsLabel.uri);
 			return uriChars.value;
 		}
 
@@ -2207,17 +2258,17 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Attr#getPrefix()}.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link Attr#getPrefix()}.
 		 */
 		public String attributeGetPrefix(final DecodeElementAdapter parent, final int index) {
-			final DecodeAttribute attribute = this.cache.attributeCache.get(index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.get(index);
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.get(attribute.label);
 			if(attributeLabel.uri == 0) return null;
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementXmlns elementXmlns = this.cache.elementXmlnsCache.get(element.xmlns);
 			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelCache.getUri(elementXmlns.indices, attributeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsCharsCache.get(xmlnsLabel.name);
+			final DecodeValue xmlnsChars = this.cache.xmlnsNameCache.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
 			return xmlnsValue;
@@ -2227,18 +2278,18 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Attr#getNodeName()}.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link Attr#getNodeName()}.
 		 */
 		public String attributeGetNodeName(final DecodeElementAdapter parent, final int index) {
-			final DecodeAttribute attribute = this.cache.attributeCache.get(index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.get(index);
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.get(attribute.label);
-			final DecodeValue attributeChars = this.cache.attributeCharsCache.get(attributeLabel.name);
+			final DecodeValue attributeChars = this.cache.attributeNameCache.get(attributeLabel.name);
 			if(attributeLabel.uri == 0) return attributeChars.value;
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			final DecodeElementXmlns elementXmlns = this.cache.elementXmlnsCache.get(element.xmlns);
 			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelCache.getUri(elementXmlns.indices, attributeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsCharsCache.get(xmlnsLabel.name);
+			final DecodeValue xmlnsChars = this.cache.xmlnsNameCache.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return attributeChars.value;
 			return xmlnsValue + ":" + attributeChars.value;
@@ -2247,26 +2298,26 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Attr#getLocalName()}.
 		 * 
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link Attr#getLocalName()}.
 		 */
 		public String attributeLabelName(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeCache.get(index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.get(index);
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.get(attribute.label);
-			final DecodeValue attributeChars = this.cache.attributeCharsCache.get(attributeLabel.name);
+			final DecodeValue attributeChars = this.cache.attributeNameCache.get(attributeLabel.name);
 			return attributeChars.value;
 		}
 
 		/**
 		 * Diese Methode implementiert {@link Attr#getNamespaceURI()}.
 		 * 
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link Attr#getNamespaceURI()}.
 		 */
 		public String attributeGetNamespaceURI(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeCache.get(index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.get(index);
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.get(attribute.label);
-			final DecodeValue uriChars = this.cache.uriCharsCache.get(attributeLabel.uri);
+			final DecodeValue uriChars = this.cache.uriCache.get(attributeLabel.uri);
 			final String uriValue = uriChars.value;
 			if(uriValue.isEmpty()) return null;
 			return uriValue;
@@ -2275,11 +2326,11 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Attr#getNodeValue()}.
 		 * 
-		 * @param index Index des {@link DecodeAttribute}s.
+		 * @param index Index des {@link DecodeAttributeNode}s.
 		 * @return {@link Attr#getNodeValue()}.
 		 */
 		public String attributeGetNodeValue(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeCache.get(index);
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.get(index);
 			final DecodeValue valueChars = this.cache.valueCache.get(attribute.value);
 			return valueChars.value;
 		}
@@ -2563,7 +2614,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeTextAdapter extends DecodeChildAdapter implements Text {
+	public static class DecodeTextAdapter extends DecodeChildAdapter implements Text {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeNodeAdapter}, Index des {@link DecodeValue}s und
@@ -2850,14 +2901,14 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementAdapter extends DecodeChildAdapter implements Element {
+	public static class DecodeElementAdapter extends DecodeChildAdapter implements Element {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeNodeAdapter}, Index des {@link DecodeElement}s und
-		 * {@code Child-Index}.
+		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeNodeAdapter}, Index des {@link DecodeElementNode}s
+		 * und {@code Child-Index}.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
-		 * @param index Index des {@link DecodeElement}s.
+		 * @param index Index des {@link DecodeElementNode}s.
 		 * @param child {@code Child-Index}.
 		 */
 		public DecodeElementAdapter(final DecodeNodeAdapter parent, final int index, final int child) {
@@ -3209,7 +3260,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementChildrenAdapter implements NodeList, Iterable<Node> {
+	public static class DecodeElementChildrenAdapter implements NodeList, Iterable<Node> {
 
 		/**
 		 * Dieses Feld speichert den {@code Parent}-{@link DecodeElementAdapter}.
@@ -3217,7 +3268,7 @@ public class Decoder {
 		public final DecodeElementAdapter parent;
 
 		/**
-		 * Dieses Feld speichert die Indices der {@link DecodeValue}s und {@link DecodeElement}s.
+		 * Dieses Feld speichert die Indices der {@link DecodeValue}s und {@link DecodeElementNode}s.
 		 * 
 		 * @see DecodeAdapter#offset
 		 */
@@ -3225,10 +3276,10 @@ public class Decoder {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeElementAdapter} und Indices der {@link DecodeValue}
-		 * s und {@link DecodeElement}s.
+		 * s und {@link DecodeElementNode}s.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param indices Indices der {@link DecodeValue}s und {@link DecodeElement}s.
+		 * @param indices Indices der {@link DecodeValue}s und {@link DecodeElementNode}s.
 		 */
 		public DecodeElementChildrenAdapter(final DecodeElementAdapter parent, final int[] indices) {
 			this.parent = parent;
@@ -3296,7 +3347,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementAttributesAdapter implements NamedNodeMap, Iterable<Node> {
+	public static class DecodeElementAttributesAdapter implements NamedNodeMap, Iterable<Node> {
 
 		/**
 		 * Dieses Feld speichert den {@code Parent}-{@link DecodeElementAdapter}.
@@ -3304,16 +3355,16 @@ public class Decoder {
 		public final DecodeElementAdapter parent;
 
 		/**
-		 * Dieses Feld speichert die Indices der {@link DecodeAttribute}s.
+		 * Dieses Feld speichert die Indices der {@link DecodeAttributeNode}s.
 		 */
 		public final int[] indices;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeElementAdapter} und Indices der
-		 * {@link DecodeAttribute}s.
+		 * {@link DecodeAttributeNode}s.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param indices Indices der {@link DecodeAttribute}s.
+		 * @param indices Indices der {@link DecodeAttributeNode}s.
 		 */
 		public DecodeElementAttributesAdapter(final DecodeElementAdapter parent, final int[] indices) {
 			this.parent = parent;
@@ -3435,15 +3486,15 @@ public class Decoder {
 	 * @see Document#getElementsByTagNameNS(String, String)
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeElementCollector implements Filter<DecodeElement>, NodeList {
+	public static class DecodeElementCollector implements Filter<DecodeElementNode>, NodeList {
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeDocumentCache}.
+		 * Dieses Feld speichert den {@link DecodeDocumentNode}.
 		 */
-		public final DecodeDocumentCache cache;
+		public final DecodeDocumentNode cache;
 
 		/**
-		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der
+		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElementNode}s in den Indices der
 		 * {@link DecodeElementChildren}. Der Wert entspricht der Anzahl der {@link DecodeValue}s.
 		 */
 		public final int offset;
@@ -3466,14 +3517,14 @@ public class Decoder {
 
 		/**
 		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach
-		 * {@link Element}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die Treffer
-		 * in die {@link List} {@link #results}. Der gegebene {@link DecodeElementAdapter} wird hierbei in die Suche mit
-		 * einbezogen.
+		 * {@link Element}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und speichert die
+		 * Treffer in die {@link List} {@link #results}. Der gegebene {@link DecodeElementAdapter} wird hierbei in die Suche
+		 * mit einbezogen.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
 		 */
 		protected final void collectChild(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementCache.get(parent.index);
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
 			if(this.accept(element)){
 				this.results.add(parent);
 			}
@@ -3481,14 +3532,14 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode Sucht in den {@link DecodeElementChildren} des gegebenen {@link DecodeElement}s nach
-		 * {@link DecodeElement}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die
-		 * {@link DecodeElementAdapter} der Treffer in die {@link List} {@link #results}.
+		 * Diese Methode Sucht in den {@link DecodeElementChildren} des gegebenen {@link DecodeElementNode}s nach
+		 * {@link DecodeElementNode}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und
+		 * speichert die {@link DecodeElementAdapter} der Treffer in die {@link List} {@link #results}.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
-		 * @param element {@link DecodeElement}.
+		 * @param element {@link DecodeElementNode}.
 		 */
-		protected final void collectChildren(final DecodeElementAdapter parent, final DecodeElement element) {
+		protected final void collectChildren(final DecodeElementAdapter parent, final DecodeElementNode element) {
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			final int[] indices = elementChildren.indices;
 			final int count = indices.length;
@@ -3504,7 +3555,7 @@ public class Decoder {
 		/**
 		 * Diese Methode leert die Ergebnisse.
 		 */
-		public final void clear() {
+		public void clear() {
 			this.results.clear();
 		}
 
@@ -3512,24 +3563,24 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean accept(final DecodeElement element) {
+		public boolean accept(final DecodeElementNode element) {
 			return true;
 		}
 
 		/**
 		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach
-		 * {@link Element}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die Treffer
-		 * in die {@link List} {@link #results}.
+		 * {@link Element}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und speichert die
+		 * Treffer in die {@link List} {@link #results}.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
 		 * @param include {@code true}, wenn der gegebene {@link DecodeElementAdapter} selbst in die Suche einbezogen werden
 		 *        soll.
 		 */
-		public final void collect(final DecodeElementAdapter parent, final boolean include) {
+		public void collect(final DecodeElementAdapter parent, final boolean include) {
 			if(include){
 				this.collectChild(parent);
 			}else{
-				this.collectChildren(parent, this.cache.elementCache.get(parent.index));
+				this.collectChildren(parent, this.cache.elementNodeCache.get(parent.index));
 			}
 		}
 
@@ -3537,7 +3588,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final Node item(final int index) {
+		public Node item(final int index) {
 			if((index < 0) || (index >= this.results.size())) return null;
 			return this.results.get(index);
 		}
@@ -3546,7 +3597,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int getLength() {
+		public int getLength() {
 			return this.results.size();
 		}
 
@@ -3567,7 +3618,7 @@ public class Decoder {
 	 * @see Element#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementUriCollector extends DecodeElementCollector {
+	public static class DecodeElementUriCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index der {@code URI}-{@link DecodeValue}.
@@ -3592,7 +3643,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean accept(final DecodeElement element) {
+		public boolean accept(final DecodeElementNode element) {
 			final DecodeLabel elementLabel = this.cache.elementLabelCache.get(element.label);
 			return elementLabel.uri == this.uri;
 		}
@@ -3606,7 +3657,7 @@ public class Decoder {
 	 * @see Element#getLocalName()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementNameCollector extends DecodeElementCollector {
+	public static class DecodeElementNameCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index der {@code Name}-{@link DecodeValue}.
@@ -3631,7 +3682,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean accept(final DecodeElement element) {
+		public boolean accept(final DecodeElementNode element) {
 			final DecodeLabel elementLabel = this.cache.elementLabelCache.get(element.label);
 			return elementLabel.name == this.name;
 		}
@@ -3646,7 +3697,7 @@ public class Decoder {
 	 * @see Element#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeElementLabelCollector extends DecodeElementCollector {
+	public static class DecodeElementLabelCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index des {@code Element}-{@link DecodeLabel}s.
@@ -3673,7 +3724,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean accept(final DecodeElement element) {
+		public boolean accept(final DecodeElementNode element) {
 			return element.label == this.label;
 		}
 
@@ -3684,7 +3735,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeAttributeAdapter extends DecodeNodeAdapter implements Attr {
+	public static class DecodeAttributeAdapter extends DecodeNodeAdapter implements Attr {
 
 		/**
 		 * Dieses Feld speichert den {@code Parent}-{@link DecodeElementAdapter}.
@@ -3692,16 +3743,16 @@ public class Decoder {
 		public final DecodeElementAdapter parent;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeAttribute}-{@code Index}.
+		 * Dieses Feld speichert den {@link DecodeAttributeNode}-{@code Index}.
 		 */
 		public final int index;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@code Parent}- {@link DecodeElementAdapter} und {@link DecodeAttribute}-
+		 * Dieser Konstrukteur initialisiert {@code Parent}- {@link DecodeElementAdapter} und {@link DecodeAttributeNode}-
 		 * {@code Index}.
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param index {@link DecodeAttribute}-{@code Index}.
+		 * @param index {@link DecodeAttributeNode}-{@code Index}.
 		 */
 		public DecodeAttributeAdapter(final DecodeElementAdapter parent, final int index) {
 			this.parent = parent;
@@ -3890,12 +3941,12 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class DecodeDocumentAdapter extends DecodeNodeAdapter implements Document, NodeList {
+	public static class DecodeDocumentAdapter extends DecodeNodeAdapter implements Document, NodeList {
 
 		/**
 		 * Dieses Feld speichert die leere {@link DOMConfiguration}.
 		 */
-		static final DOMConfiguration VOID_DOM_CONFIGURATION = new DOMConfiguration() {
+		public static final DOMConfiguration VOID_DOM_CONFIGURATION = new DOMConfiguration() {
 
 			@Override
 			public void setParameter(final String name, final Object value) throws DOMException {
@@ -3926,7 +3977,7 @@ public class Decoder {
 		 * 
 		 * @see DOMConfiguration#getParameterNames()
 		 */
-		static final DOMStringList VOID_DOM_CONFIGURATION_PARAMETER_LIST = new DOMStringList() {
+		public static final DOMStringList VOID_DOM_CONFIGURATION_PARAMETER_LIST = new DOMStringList() {
 
 			@Override
 			public String item(final int index) {
@@ -3954,23 +4005,23 @@ public class Decoder {
 		 * 
 		 * @see DOMConfiguration#getParameter(String)
 		 */
-		static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_TRUE_LIST = Collections.unmodifiableList(Arrays.asList(
-			"comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations",
-			"element-content-whitespace"));
+		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_TRUE_LIST = Collections.unmodifiableList(Arrays
+			.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations",
+				"element-content-whitespace"));
 
 		/**
 		 * Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
 		 * 
 		 * @see DOMConfiguration#getParameter(String)
 		 */
-		static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_FALSE_LIST = Collections.unmodifiableList(Arrays.asList(
-			"cdata-sections", "entities", "split-cdata-sections", "validate", "infoset", "normalize-characters",
-			"canonical-form", "validate-if-schema", "check-character-normalization"));
+		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_FALSE_LIST = Collections.unmodifiableList(Arrays
+			.asList("cdata-sections", "entities", "split-cdata-sections", "validate", "infoset", "normalize-characters",
+				"canonical-form", "validate-if-schema", "check-character-normalization"));
 
 		/**
 		 * Dieses Feld speichert die leere {@link DOMImplementation}.
 		 */
-		static final DOMImplementation VOID_DOM_IMPLEMENTATION = new DOMImplementation() {
+		public static final DOMImplementation VOID_DOM_IMPLEMENTATION = new DOMImplementation() {
 
 			@Override
 			public boolean hasFeature(final String feature, final String version) {
@@ -4453,9 +4504,59 @@ public class Decoder {
 	}
 
 	/**
+	 * Diese Methode liest die gegebene Anzahl an {@code int}s aus der gegebenen {@link DecodeSource} und gibt sie als
+	 * Array zurück.
+	 * 
+	 * @see Decoder#readBytes(DecodeSource, int)
+	 * @param source {@link DecodeSource}.
+	 * @param count Anzahl der {@code int}s.
+	 * @return {@code int}-Array.
+	 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+	 */
+	static final int[] readInts(final DecodeSource source, final int count) throws IOException {
+		final int[] ints = new int[count];
+		final byte[] bytes = Decoder.readBytes(source, count << 2);
+		ArrayCopy.copy(bytes, 0, ints, 0, count);
+		return ints;
+	}
+
+	/**
+	 * Diese Methode liest die gegebene Anzahl an {@code byte}s aus der gegebenen {@link DecodeSource} und gibt sie als
+	 * Array zurück.
+	 * 
+	 * @see DecodeSource#read(byte[], int, int)
+	 * @param source {@link DecodeSource}.
+	 * @param count Anzahl der {@code byte}s.
+	 * @return {@code byte}-Array.
+	 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+	 */
+	static final byte[] readBytes(final DecodeSource source, final int count) throws IOException {
+		final byte[] bytes = new byte[count];
+		source.read(bytes, 0, count);
+		return bytes;
+	}
+
+	/**
 	 * Dieser Konstrukteur initialisiert den {@link Decoder}.
 	 */
 	public Decoder() {
+	}
+
+	/**
+	 * Diese Methode liest das gegebene {@link File} in einen neuen {@link DecodeAdapter} ein und gibt dessen
+	 * {@link DecodeDocumentAdapter} zurück.
+	 * 
+	 * @see DecodeSourceFile
+	 * @see RandomAccessFile
+	 * @see #decode(DecodeSource)
+	 * @param source {@link File}.
+	 * @return {@link DecodeDocumentAdapter}.
+	 * @throws IOException Wenn eine {@link IOException} auftritt.
+	 * @throws NullPointerException Wenn das gegebene {@link File} {@code null} ist.
+	 * @throws FileNotFoundException Wenn das gegebene {@link File} nicht existiert.
+	 */
+	public Document decode(final File source) throws NullPointerException, FileNotFoundException, IOException {
+		return this.decode(new DecodeSourceFile(new RandomAccessFile(source, "r")));
 	}
 
 	/**
@@ -4466,6 +4567,7 @@ public class Decoder {
 	 * @param source {@link DecodeSource}.
 	 * @return {@link DecodeDocumentAdapter}.
 	 * @throws IOException Wenn das {@link DecodeSource} eine {@link IOException} auslöst.
+	 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 	 */
 	public DecodeDocumentAdapter decode(final DecodeSource source) throws IOException {
 		return new DecodeAdapter(source).document();
