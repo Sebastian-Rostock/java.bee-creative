@@ -1965,31 +1965,30 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Element#getElementsByTagName(String)} bzw.
 		 * {@link Document#getElementsByTagName(String)}.
 		 * 
+		 * @see DecodeElementCollector#collect(DecodeElementAdapter, int)
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}
 		 * @param name {@code Name} ({@link Element#getLocalName()}).
-		 * @param include {@code true}, wenn der gegebene {@code Parent}-{@link DecodeElementAdapter} in die Suche
-		 *        einbezogen werden soll.
+		 * @param mode Modus der Suche.
 		 * @return {@link Element#getElementsByTagName(String)} bzw. {@link Document#getElementsByTagName(String)}.
 		 */
-		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String name,
-			final boolean include) {
-			return this.elementGetElementsByTagName(parent, XMLConstants.NULL_NS_URI, name, include);
+		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String name, final int mode) {
+			return this.elementGetElementsByTagName(parent, XMLConstants.NULL_NS_URI, name, mode);
 		}
 
 		/**
 		 * Diese Methode implementiert {@link Element#getElementsByTagNameNS(String, String)} bzw.
 		 * {@link Document#getElementsByTagNameNS(String, String)}.
 		 * 
+		 * @see DecodeElementCollector#collect(DecodeElementAdapter, int)
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}
 		 * @param uri {@code Name} ({@link Element#getNamespaceURI()}).
 		 * @param name {@code Name} ({@link Element#getLocalName()}).
-		 * @param include {@code true}, wenn der gegebene {@code Parent}-{@link DecodeElementAdapter} in die Suche
-		 *        einbezogen werden soll.
+		 * @param mode Modus der Suche.
 		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw.
 		 *         {@link Document#getElementsByTagNameNS(String, String)}.
 		 */
 		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String uri, final String name,
-			final boolean include) {
+			final int mode) {
 			final DecodeElementCollector collector;
 			if("*".equals(uri)){
 				if("*".equals(name)){
@@ -2012,7 +2011,7 @@ public class Decoder {
 					collector = new DecodeElementLabelCollector(this, elementlLabel.index);
 				}
 			}
-			collector.collect(parent, include);
+			collector.collect(parent, mode);
 			return collector;
 		}
 
@@ -2152,6 +2151,7 @@ public class Decoder {
 			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.findLabel(uriChars.index, nameChars.index);
 			if(attributeLabel == null) return "";
 			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.findLabel(indices, attributeLabel.index);
+			if(attribute==null)return "";
 			final DecodeValue attributeChars = this.cache.valueCache.get(attribute.value);
 			return attributeChars.value;
 		}
@@ -2188,8 +2188,19 @@ public class Decoder {
 		 * @return {@link DecodeAttributeAdapter}.
 		 */
 		public Attr elementGetAttributesNamedItem(final DecodeElementAdapter parent, final String uri, final String name) {
-			// TODO
-			return null;
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
+			final DecodeElementAttributes elementAttributes = this.cache.elementAttributesCache.get(element.attributes);
+			final int[] indices = elementAttributes.indices;
+			if(indices.length == 0) return null;
+			final DecodeValue uriChars = this.cache.uriCache.findValue(uri);
+			if(uriChars == null) return null;
+			final DecodeValue nameChars = this.cache.attributeNameCache.findValue(name);
+			if(nameChars == null) return null;
+			final DecodeLabel attributeLabel = this.cache.attributeLabelCache.findLabel(uriChars.index, nameChars.index);
+			if(attributeLabel == null) return null;
+			final DecodeAttributeNode attribute = this.cache.attributeNodeCache.findLabel(indices, attributeLabel.index);
+			if(attribute==null)return null;
+			return new DecodeAttributeAdapter(parent, attribute.index);
 		}
 
 		/**
@@ -3196,7 +3207,7 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagName(final String name) {
-			return this.adapter().elementGetElementsByTagName(this, name, false);
+			return this.adapter().elementGetElementsByTagName(this, name, DecodeElementCollector.MODE_DESCENDANT);
 		}
 
 		/**
@@ -3204,7 +3215,7 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
-			return this.adapter().elementGetElementsByTagName(this, uri, name, false);
+			return this.adapter().elementGetElementsByTagName(this, uri, name, DecodeElementCollector.MODE_DESCENDANT);
 		}
 
 		/**
@@ -3489,6 +3500,24 @@ public class Decoder {
 	public static class DecodeElementCollector implements Filter<DecodeElementNode>, NodeList {
 
 		/**
+		 * Dieses Feld speichert den Modus für die Suche auf den {@link DecodeElementChildren} eines gegebenen
+		 * {@link DecodeElementAdapter}s.
+		 */
+		public static final int MODE_CHILDREN = 0;
+
+		/**
+		 * Dieses Feld speichert den Modus für die rekursive Suche auf den {@link DecodeElementChildren} eines gegebenen
+		 * {@link DecodeElementAdapter}s.
+		 */
+		public static final int MODE_DESCENDANT = 1;
+
+		/**
+		 * Dieses Feld speichert den Modus für die rekursive Suche auf den {@link DecodeElementChildren} eines gegebenen
+		 * {@link DecodeElementAdapter}s sowie dem {@link DecodeElementAdapter} selbst.
+		 */
+		public static final int MODE_DESCENDANT_SELF = 2;
+
+		/**
 		 * Dieses Feld speichert den {@link DecodeDocumentNode}.
 		 */
 		public final DecodeDocumentNode cache;
@@ -3516,30 +3545,37 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach
-		 * {@link Element}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und speichert die
-		 * Treffer in die {@link List} {@link #results}. Der gegebene {@link DecodeElementAdapter} wird hierbei in die Suche
-		 * mit einbezogen.
-		 * 
-		 * @param parent {@link DecodeElementAdapter}.
-		 */
-		protected final void collectChild(final DecodeElementAdapter parent) {
-			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
-			if(this.accept(element)){
-				this.results.add(parent);
-			}
-			this.collectChildren(parent, element);
-		}
-
-		/**
 		 * Diese Methode Sucht in den {@link DecodeElementChildren} des gegebenen {@link DecodeElementNode}s nach
 		 * {@link DecodeElementNode}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und
 		 * speichert die {@link DecodeElementAdapter} der Treffer in die {@link List} {@link #results}.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
+		 */
+		protected final void collectChildren(final DecodeElementAdapter parent) {
+			final DecodeElementNode elementNode = this.cache.elementNodeCache.get(parent.index);
+			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(elementNode.children);
+			final int[] indices = elementChildren.indices;
+			final int count = indices.length;
+			if(count == 0) return;
+			for(int child = 0, offset = this.offset; child < count; child++){
+				final int index = indices[child] - offset;
+				if(index >= 0){
+					final DecodeElementNode childNode = this.cache.elementNodeCache.get(index);
+					if(this.accept(childNode)){
+						this.results.add(new DecodeElementAdapter(parent, index, child));
+					}
+				}
+			}
+		}
+
+		/**
+		 * Diese Methode ruft {@link #collectDescendantSelf(DecodeElementAdapter)} für jeden {@link DecodeElementNode} in
+		 * den {@link DecodeElementChildren} des gegebenen {@link DecodeElementNode}s auf.
+		 * 
+		 * @param parent {@link DecodeElementAdapter}.
 		 * @param element {@link DecodeElementNode}.
 		 */
-		protected final void collectChildren(final DecodeElementAdapter parent, final DecodeElementNode element) {
+		protected final void collectDescendant(final DecodeElementAdapter parent, final DecodeElementNode element) {
 			final DecodeElementChildren elementChildren = this.cache.elementChildrenCache.get(element.children);
 			final int[] indices = elementChildren.indices;
 			final int count = indices.length;
@@ -3547,9 +3583,24 @@ public class Decoder {
 			for(int child = 0, offset = this.offset; child < count; child++){
 				final int index = indices[child] - offset;
 				if(index >= 0){
-					this.collectChild(new DecodeElementAdapter(parent, index, child));
+					this.collectDescendantSelf(new DecodeElementAdapter(parent, index, child));
 				}
 			}
+		}
+
+		/**
+		 * Diese Methode fügt den gegebenen {@link DecodeElementAdapter}s nur dann in die Ergebnis {@link List}
+		 * {@link #results} ein, wenn dieser via {@link #accept(DecodeElementNode)} akzeptiert wird. Anschließend wird
+		 * {@link #collectDescendant(DecodeElementAdapter, DecodeElementNode)} aufgerufen.
+		 * 
+		 * @param parent {@link DecodeElementAdapter}.
+		 */
+		protected final void collectDescendantSelf(final DecodeElementAdapter parent) {
+			final DecodeElementNode element = this.cache.elementNodeCache.get(parent.index);
+			if(this.accept(element)){
+				this.results.add(parent);
+			}
+			this.collectDescendant(parent, element);
 		}
 
 		/**
@@ -3570,17 +3621,29 @@ public class Decoder {
 		/**
 		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach
 		 * {@link Element}s, die von der Methode {@link #accept(DecodeElementNode)} akzeptiert werden und speichert die
-		 * Treffer in die {@link List} {@link #results}.
+		 * Treffer in die {@link List} {@link #results}. Der Modus entscheiden hierbei, ob die Suche rekursiv ist und ob sie
+		 * den gegebenen {@link DecodeElementAdapter} mit einbezieht.
 		 * 
+		 * @see #MODE_CHILDREN
+		 * @see #MODE_DESCENDANT
+		 * @see #MODE_DESCENDANT_SELF
 		 * @param parent {@link DecodeElementAdapter}.
-		 * @param include {@code true}, wenn der gegebene {@link DecodeElementAdapter} selbst in die Suche einbezogen werden
-		 *        soll.
+		 * @param mode Modus der Suche.
+		 * @throws IllegalArgumentException Wenn der gegebene Modul ungültig ist.
 		 */
-		public void collect(final DecodeElementAdapter parent, final boolean include) {
-			if(include){
-				this.collectChild(parent);
-			}else{
-				this.collectChildren(parent, this.cache.elementNodeCache.get(parent.index));
+		public void collect(final DecodeElementAdapter parent, final int mode) throws IllegalArgumentException {
+			switch(mode){
+				case MODE_CHILDREN:
+					collectChildren(parent);
+					break;
+				case MODE_DESCENDANT:
+					this.collectDescendant(parent, this.cache.elementNodeCache.get(parent.index));
+					break;
+				case MODE_DESCENDANT_SELF:
+					this.collectDescendantSelf(parent);
+					break;
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
@@ -4233,7 +4296,8 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagName(final String name) {
-			return this.adapter().elementGetElementsByTagName(this.documentElement, name, true);
+			return this.adapter().elementGetElementsByTagName(this.documentElement, name,
+				DecodeElementCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**
@@ -4241,7 +4305,8 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagNameNS(final String uri, final String name) {
-			return this.adapter().elementGetElementsByTagName(this.documentElement, uri, name, true);
+			return this.adapter().elementGetElementsByTagName(this.documentElement, uri, name,
+				DecodeElementCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**

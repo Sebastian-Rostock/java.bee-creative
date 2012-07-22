@@ -1714,6 +1714,36 @@ public class XML {
 	}
 
 	/**
+	 * Diese Methode erzeugt neue {@link XPathOptions} und gibt diese zurück.
+	 * 
+	 * @see XPathOptions#XPathOptions()
+	 * @return {@link XPathOptions}.
+	 */
+	public static XPathOptions xpathOptions() {
+		return new XPathOptions();
+	}
+
+	/**
+	 * Diese Methode erzeugt neue {@link ParseOptions} und gibt diese zurück.
+	 * 
+	 * @see ParseOptions#ParseOptions()
+	 * @return {@link ParseOptions}.
+	 */
+	public static ParseOptions parseOptions() {
+		return new ParseOptions();
+	}
+
+	/**
+	 * Diese Methode erzeugt neue {@link FormatOptions} und gibt diese zurück.
+	 * 
+	 * @see FormatOptions#FormatOptions()
+	 * @return {@link FormatOptions}.
+	 */
+	public static FormatOptions formatOptions() {
+		return new FormatOptions();
+	}
+
+	/**
 	 * Diese Methode erzeugt eine {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück.
 	 * 
 	 * @see XPathOptions#DEFAULT

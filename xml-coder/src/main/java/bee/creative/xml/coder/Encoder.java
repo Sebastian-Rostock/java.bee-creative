@@ -1854,7 +1854,7 @@ public class Encoder {
 		final List<EncodeValue> xmlnsCharsCache = handler.xmlnsNameCache.compile(0, Encoder.ValueComparator);
 		final List<EncodeValue> elementCharsCache = handler.elementNameCache.compile(0, Encoder.ValueComparator);
 		final List<EncodeValue> attributeCharsCache = handler.attributeNameCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeValue> valueCache = handler.valueCache.compile(0, Encoder.IndexComparator);
+		final List<EncodeValue> valueCache = handler.valueCache.compile(0, Encoder.ValueComparator);
 		final List<EncodeLabel> xmlnsLabelCache = handler.xmlnsLabelCache.compile(0, Encoder.LabelComparator);
 		final List<EncodeLabel> elementLabelCache = handler.elementLabelCache.compile(0, Encoder.LabelComparator);
 		final List<EncodeLabel> attributeLabelCache = handler.attributeLabelCache.compile(0, Encoder.LabelComparator);
