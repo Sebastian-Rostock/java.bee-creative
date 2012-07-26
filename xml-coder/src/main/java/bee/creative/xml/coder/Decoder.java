@@ -36,7 +36,6 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Objects;
-import bee.creative.xml.coder.Encoder.EncodeValue;
 
 /**
  * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus der von einem {@link Encoder} erzeugten,
@@ -903,7 +902,7 @@ public class Decoder {
 			cache.seekOffset(ints[0]);
 			final int length = ints[1] - ints[0];
 			final byte[] bytes = Decoder.readBytes(cache.source, length);
-			this.value = new String(bytes, EncodeValue.CHARSET);
+			this.value = new String(bytes, Coder.CHARSET);
 		}
 
 		/**
