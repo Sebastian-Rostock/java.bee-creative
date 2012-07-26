@@ -6,17 +6,17 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>1.0.1</version>
+	<version>2.2.6</version>
 	<artifactId>bee-creative.xml-coder</artifactId>
 	<dependencies>
 		<dependency>
-			<version>1.4.5</version>
+			<version>2.2.6</version>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative.util</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<version>1.2.4</version>
+			<version>2.2.6</version>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative.array</artifactId>
 			<scope>provided</scope>

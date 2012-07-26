@@ -790,11 +790,11 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link DecodeItem} mit Indices auf anderer Datensätze.
+	 * Diese Klasse implementiert ein {@link DecodeItem} mit Indices auf anderer Datensätze.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class DecodeList extends DecodeItem {
+	public static class DecodeIndices extends DecodeItem {
 
 		/**
 		 * Dieses Feld speichert die Indices der Datensätze.
@@ -808,7 +808,7 @@ public class Decoder {
 		 * @param cache {@link DecodeListCache}.
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
-		public DecodeList(final int index, final DecodeListCache<?> cache) throws IOException {
+		public DecodeIndices(final int index, final DecodeListCache<?> cache) throws IOException {
 			super(index);
 			cache.seekIndex(index);
 			final int[] ints = Decoder.readInts(cache.source, 2);
@@ -823,7 +823,7 @@ public class Decoder {
 		 * @param index Index dieses Datensatzes im {@link DecodeItemCache}.
 		 * @param indices Indices der Datensätze.
 		 */
-		public DecodeList(final int index, final int[] indices) {
+		public DecodeIndices(final int index, final int[] indices) {
 			super(index);
 			this.indices = indices;
 		}
@@ -1315,13 +1315,13 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link DecodeList} von {@link DecodeLabel}s.
+	 * Diese Klasse implementiert eine {@link DecodeIndices} von {@link DecodeLabel}s.
 	 * 
 	 * @see Node#getLocalName()
 	 * @see Node#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeElementXmlns extends DecodeList {
+	public static class DecodeElementXmlns extends DecodeIndices {
 
 		/**
 		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
@@ -1386,12 +1386,12 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link DecodeList} von {@link DecodeItem}s.
+	 * Diese Klasse implementiert eine {@link DecodeIndices} von {@link DecodeItem}s.
 	 * 
 	 * @see Element#getChildNodes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeElementChildren extends DecodeList {
+	public static class DecodeElementChildren extends DecodeIndices {
 
 		/**
 		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.
@@ -1456,12 +1456,12 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link DecodeList} von {@link DecodeAttributeNode}s.
+	 * Diese Klasse implementiert eine {@link DecodeIndices} von {@link DecodeAttributeNode}s.
 	 * 
 	 * @see Element#getAttributes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeElementAttributes extends DecodeList {
+	public static class DecodeElementAttributes extends DecodeIndices {
 
 		/**
 		 * Dieser Konstrukteur lädt die Indices aus der {@link DecodeSource} des gegebenen {@link DecodeListCache}.

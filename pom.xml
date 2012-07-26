@@ -48,7 +48,6 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 		<module>array</module>
 		<module>function</module>
 		<module>xml</module>
-		<module>virtual</module>
 		<module>xml-coder</module>
 	</modules>
 </project>

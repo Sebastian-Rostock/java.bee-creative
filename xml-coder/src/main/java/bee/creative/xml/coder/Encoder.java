@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -302,7 +305,7 @@ public class Encoder {
 		 * @param target {@link EncodeTarget}.
 		 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 		 */
-		public abstract void write(final EncodeTarget target) throws IOException;
+		public abstract void write(final EncodeTarget target, boolean useXmlns) throws IOException;
 
 	}
 
@@ -385,7 +388,7 @@ public class Encoder {
 		 * @param comparator {@link Comparator}.
 		 * @return {@link EncodeItem}-{@link List}.
 		 */
-		public final List<GItem> compile(final int offset, final Comparator<? super GItem> comparator) {
+		public final List<GItem> compileCache(final int offset, final Comparator<? super GItem> comparator) {
 			final List<GItem> list = new ArrayList<GItem>(this.size());
 			Iterators.appendAll(list, this.getEntries());
 			this.clear();
@@ -516,7 +519,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			final byte[] bytes = this.value.getBytes(EncodeValue.CHARSET);
 			target.write(bytes, 0, bytes.length);
 		}
@@ -604,7 +607,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			Encoder.writeInts(target, this.uri.index, this.name.index);
 		}
 
@@ -699,11 +702,11 @@ public class Encoder {
 		public final EncodeElementXmlns xmlns;
 
 		/**
-		 * Dieses Feld speichert die {@link EncodeElementChildren}.
+		 * Dieses Feld speichert die {@link EncodeItems}.
 		 * 
 		 * @see Element#getChildNodes()
 		 */
-		public final EncodeElementChildren children;
+		public final EncodeItems children;
 
 		/**
 		 * Dieses Feld speichert die {@link EncodeElementAttributes}.
@@ -718,11 +721,11 @@ public class Encoder {
 		 * @param label {@link EncodeLabel} für {@link Element#getLocalName()} und {@link Element#getNamespaceURI()}.
 		 * @param xmlns {@link EncodeElementXmlns} für {@link Element#lookupPrefix(String)} und
 		 *        {@link Element#lookupNamespaceURI(String)}.
-		 * @param children {@link EncodeElementChildren} für {@link Element#getChildNodes()}.
+		 * @param children {@link EncodeItems} für {@link Element#getChildNodes()}.
 		 * @param attributes {@link EncodeElementAttributes} für {@link Element#getAttributes()}.
 		 */
 		public EncodeElementNode(final EncodeLabel label, final EncodeElementXmlns xmlns,
-			final EncodeElementChildren children, final EncodeElementAttributes attributes) {
+			final EncodeItems children, final EncodeElementAttributes attributes) {
 			this.label = label;
 			this.xmlns = xmlns;
 			this.children = children;
@@ -733,8 +736,10 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
-			Encoder.writeInts(target, this.label.index, this.xmlns.index, this.children.index, this.attributes.index);
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
+			if(useXmlns) Encoder.writeInts(target, this.label.index, this.xmlns.index, this.children.index,
+				this.attributes.index);
+			else Encoder.writeInts(target, this.label.name.index, this.children.index, this.attributes.index);
 		}
 
 		/**
@@ -879,7 +884,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			Encoder.writeIndices(target, this.values);
 		}
 
@@ -935,7 +940,7 @@ public class Encoder {
 	 * @see Element#getChildNodes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class EncodeElementChildren extends EncodeList {
+	public static class EncodeItems extends EncodeList {
 
 		/**
 		 * Dieses Feld speichert die {@link EncodeItem}-{@link List}.
@@ -945,7 +950,7 @@ public class Encoder {
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList}.
 		 */
-		public EncodeElementChildren() {
+		public EncodeItems() {
 			this(new ArrayList<EncodeItem>());
 		}
 
@@ -954,7 +959,7 @@ public class Encoder {
 		 * 
 		 * @param value {@link EncodeItem}-{@link List}.
 		 */
-		public EncodeElementChildren(final List<EncodeItem> value) {
+		public EncodeItems(final List<EncodeItem> value) {
 			this.values = value;
 		}
 
@@ -970,7 +975,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			Encoder.writeIndices(target, this.values);
 		}
 
@@ -985,28 +990,28 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link EncodeListCache} zu {@link EncodeElementChildren}.
+	 * Diese Klasse implementiert den {@link EncodeListCache} zu {@link EncodeItems}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class EncodeElementChildrenCache extends EncodeListCache<EncodeElementChildren> {
+	public static class EncodeElementChildrenCache extends EncodeListCache<EncodeItems> {
 
 		/**
-		 * Diese Methode gibt die einzigartige {@link EncodeElementChildren} mit der gegebenen {@link EncodeItem}-
+		 * Diese Methode gibt die einzigartige {@link EncodeItems} mit der gegebenen {@link EncodeItem}-
 		 * {@link List} zurück.
 		 * 
 		 * @param value {@link EncodeItem}-{@link List}.
-		 * @return einzigartige {@link EncodeElementChildren}.
+		 * @return einzigartige {@link EncodeItems}.
 		 */
-		public EncodeElementChildren unique(final List<EncodeItem> value) {
-			return this.get(new EncodeElementChildren(value));
+		public EncodeItems unique(final List<EncodeItem> value) {
+			return this.get(new EncodeItems(value));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int hash(final EncodeElementChildren input) {
+		protected int hash(final EncodeItems input) {
 			return Objects.hash(input.values);
 		}
 
@@ -1014,7 +1019,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean equals(final EncodeElementChildren input1, final EncodeElementChildren input2) {
+		protected boolean equals(final EncodeItems input1, final EncodeItems input2) {
 			return input1.values.equals(input2.values);
 		}
 
@@ -1061,7 +1066,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			Encoder.writeIndices(target, this.values);
 		}
 
@@ -1148,7 +1153,7 @@ public class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void write(final EncodeTarget target) throws IOException {
+		public void write(final EncodeTarget target, boolean useXmlns) throws IOException {
 			Encoder.writeInts(target, this.label.index, this.value.index);
 		}
 
@@ -1371,15 +1376,19 @@ public class Encoder {
 		 */
 		EncodeCursorStack cursorStack;
 
+		public final boolean useXmlns;
+
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code URI}s.
+		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code URI}s. Im {@link EncodeTarget} werden diese
+		 * {@link EncodeValue}s nach ihrem {@link EncodeValue#value value} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 */
-		public final EncodeValueCache uriValueCache;
+		public final EncodeValueCache uriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Value}s.
+		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Value}s. Im {@link EncodeTarget} werden diese
+		 * {@link EncodeValue}s nach ihrem {@link EncodeValue#value value} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Text#getNodeValue()
 		 * @see Attr#getNodeValue()
@@ -1387,15 +1396,17 @@ public class Encoder {
 		public final EncodeValueCache valueCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Prefix}es.
+		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@code Prefix}es. Im {@link EncodeTarget} werden diese
+		 * {@link EncodeValue}s nach ihrem {@link EncodeValue#value value} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getPrefix()
 		 */
 		public final EncodeValueCache xmlnsNameCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@code Xmlns}-{@code Prefix}
-		 * .
+		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@code Prefix}. Im
+		 * {@link EncodeTarget} werden diese {@link EncodeLabel}s primär nach {@code Name} und sekundär nach {@code URI}
+		 * aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 * @see Node#getPrefix()
@@ -1403,14 +1414,16 @@ public class Encoder {
 		public final EncodeLabelCache xmlnsLabelCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementNodeCache} für die {@link Element}-Daten.
+		 * Dieses Feld speichert den {@link EncodeElementNodeCache} für die {@link Element}-Daten. Im {@link EncodeTarget}
+		 * werden diese {@link EncodeElementNode}s nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see EncodeElementNode
 		 */
-		public final EncodeElementNodeCache elementCache;
+		public final EncodeElementNodeCache elementNodeCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Element}-{@code Name}s.
+		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Element}-{@code Name}s. Im {@link EncodeTarget}
+		 * werden diese {@link EncodeValue}s nach ihrem {@link EncodeValue#value value} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getLocalName()
 		 */
@@ -1418,7 +1431,8 @@ public class Encoder {
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@link Element}-{@code Name}
-		 * .
+		 * . Im {@link EncodeTarget} werden diese {@link EncodeLabel}s primär nach {@code Name} und sekundär nach
+		 * {@code URI} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Element#getNamespaceURI()
@@ -1426,7 +1440,8 @@ public class Encoder {
 		public final EncodeLabelCache elementLabelCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementXmlnsCache} für die {@code Xmlns}.
+		 * Dieses Feld speichert den {@link EncodeElementXmlnsCache} für die {@code Xmlns}. Im {@link EncodeTarget} werden
+		 * diese {@link EncodeElementXmlns}s nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#lookupPrefix(String)
 		 * @see Node#lookupNamespaceURI(String)
@@ -1434,28 +1449,34 @@ public class Encoder {
 		public final EncodeElementXmlnsCache elementXmlnsCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getChildNodes()}.
+		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getChildNodes()}. Im
+		 * {@link EncodeTarget} werden diese {@link EncodeItems}s nach ihrer Häufigkeit aufsteigend sortiert
+		 * gespeichert.
 		 * 
 		 * @see Element#getChildNodes()
 		 */
 		public final EncodeElementChildrenCache elementChildrenCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getAttributes()}.
+		 * Dieses Feld speichert den {@link EncodeElementChildrenCache} für die {@link Element#getAttributes()}. Im
+		 * {@link EncodeTarget} werden diese {@link EncodeElementAttributes}s nach ihrer Häufigkeit aufsteigend sortiert
+		 * gespeichert.
 		 * 
 		 * @see Element#getAttributes()
 		 */
 		public final EncodeElementAttributesCache elementAttributesCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeAttributeNodeCache} für die {@link Attr}-Daten.
+		 * Dieses Feld speichert den {@link EncodeAttributeNodeCache} für die {@link Attr}-Daten. Im {@link EncodeTarget}
+		 * werden diese {@link EncodeAttributeNode}s nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see EncodeAttributeNode
 		 */
-		public final EncodeAttributeNodeCache attributeCache;
+		public final EncodeAttributeNodeCache attributeNodeCache;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Attr}-{@code Name}s.
+		 * Dieses Feld speichert den {@link EncodeValueCache} für die {@link Attr}-{@code Name}s. Im {@link EncodeTarget}
+		 * werden diese {@link EncodeValue}s nach ihrem {@link EncodeValue#value value} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Attr#getLocalName()
 		 */
@@ -1463,6 +1484,8 @@ public class Encoder {
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeLabelCache} für die Paare aus {@code URI} und {@link Attr}-{@code Name}.
+		 * Im {@link EncodeTarget} werden diese {@link EncodeLabel}s primär nach {@code Name} und sekundär nach {@code URI}
+		 * aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Attr#getLocalName()
 		 * @see Attr#getNamespaceURI()
@@ -1479,23 +1502,25 @@ public class Encoder {
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link EncodeItemCache}s und {@link EncodeListCache}s.
 		 */
-		public EncodeContentHandler() {
+		public EncodeContentHandler(boolean useXmlns) {
+			this.useXmlns = useXmlns;
 			this.cursorStack = new EncodeCursorStack();
-			this.uriValueCache = new EncodeValueCache();
+			this.uriCache = new EncodeValueCache();
 			this.valueCache = new EncodeValueCache();
 			this.xmlnsNameCache = new EncodeValueCache();
-			this.xmlnsLabelCache = new EncodeLabelCache(this.uriValueCache, this.xmlnsNameCache);
+			this.xmlnsLabelCache = new EncodeLabelCache(this.uriCache, this.xmlnsNameCache);
 			this.elementNameCache = new EncodeValueCache();
-			this.elementLabelCache = new EncodeLabelCache(this.uriValueCache, this.elementNameCache);
+			this.elementLabelCache = new EncodeLabelCache(this.uriCache, this.elementNameCache);
 			this.elementXmlnsCache = new EncodeElementXmlnsCache();
 			this.elementChildrenCache = new EncodeElementChildrenCache();
 			this.elementAttributesCache = new EncodeElementAttributesCache();
-			this.elementCache =
+			this.elementNodeCache =
 				new EncodeElementNodeCache(this.elementLabelCache, this.elementXmlnsCache, this.elementChildrenCache,
 					this.elementAttributesCache);
 			this.attributeNameCache = new EncodeValueCache();
-			this.attributeLabelCache = new EncodeLabelCache(this.uriValueCache, this.attributeNameCache);
-			this.attributeCache = new EncodeAttributeNodeCache(this.attributeLabelCache, this.valueCache);
+			this.attributeLabelCache = new EncodeLabelCache(this.uriCache, this.attributeNameCache);
+			this.attributeNodeCache = new EncodeAttributeNodeCache(this.attributeLabelCache, this.valueCache);
+			if(!useXmlns) return;
 			this.startPrefixMapping(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
 			this.startPrefixMapping(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.NULL_NS_URI);
 		}
@@ -1505,6 +1530,7 @@ public class Encoder {
 		 */
 		@Override
 		public void endPrefixMapping(final String prefix) {
+			if(!useXmlns) return;
 			for(EncodeXmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
 				if(scope.map.values().remove(prefix)){
 					if(scope.map.isEmpty() && (scope == this.xmlnsStack)){
@@ -1521,6 +1547,7 @@ public class Encoder {
 		 */
 		@Override
 		public void startPrefixMapping(final String prefix, final String uri) {
+			if(!useXmlns) return;
 			EncodeXmlnsStack scope = this.xmlnsStack;
 			if((scope == null) || scope.map.containsValue(prefix)){
 				scope = new EncodeXmlnsStack(scope);
@@ -1556,7 +1583,7 @@ public class Encoder {
 				newChildren.add(this.valueCache.unique(textValue.toString()));
 			}
 			final EncodeElementNode elementNode =
-				this.elementCache.unique(oldCursor.uri, oldCursor.name, oldCursor.xmlns, newChildren, oldCursor.attributes);
+				this.elementNodeCache.unique(oldCursor.uri, oldCursor.name, oldCursor.xmlns, newChildren, oldCursor.attributes);
 			newCursor.children.add(elementNode);
 			this.cursorStack = newCursor;
 		}
@@ -1566,34 +1593,46 @@ public class Encoder {
 		 */
 		@Override
 		public void startElement(final String uri, final String name, final String qName, final Attributes atts) {
-			if(this.xmlns == null){
-				final Map<String, String> map = new HashMap<String, String>();
-				final ArrayList<EncodeLabel> xmlns = new ArrayList<EncodeLabel>();
-				for(EncodeXmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
-					for(final Entry<String, String> entry: scope.map.entrySet()){
-						final String xmlnsName = entry.getValue();
-						if(!map.containsKey(xmlnsName)){
-							final String xmlnsUri = entry.getKey();
-							map.put(xmlnsName, xmlnsUri);
-							xmlns.add(this.xmlnsLabelCache.unique(xmlnsUri, xmlnsName));
+			if(useXmlns){
+				if(this.xmlns == null){
+					final Map<String, String> map = new HashMap<String, String>();
+					final ArrayList<EncodeLabel> xmlns = new ArrayList<EncodeLabel>();
+					for(EncodeXmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
+						for(final Entry<String, String> entry: scope.map.entrySet()){
+							final String xmlnsName = entry.getValue();
+							if(!map.containsKey(xmlnsName)){
+								final String xmlnsUri = entry.getKey();
+								map.put(xmlnsName, xmlnsUri);
+								xmlns.add(this.xmlnsLabelCache.unique(xmlnsUri, xmlnsName));
+							}
 						}
 					}
+					xmlns.trimToSize();
+					if(xmlns.size() > 1){
+						Collections.sort(xmlns, Encoder.XmlnsComparator);
+					}
+					this.xmlns = xmlns;
 				}
-				xmlns.trimToSize();
-				if(xmlns.size() > 1){
-					Collections.sort(xmlns, Encoder.XmlnsComparator);
+				final int size = atts.getLength();
+				final List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>(size);
+				for(int i = 0; i < size; i++){
+					attributes.add(this.attributeNodeCache.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)));
 				}
-				this.xmlns = xmlns;
+				if(size > 1){
+					Collections.sort(attributes, Encoder.AttributeComparator);
+				}
+				this.cursorStack = new EncodeCursorStack(uri, name, this.xmlns, attributes, this.cursorStack);
+			}else{
+				final int size = atts.getLength();
+				final List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>(size);
+				for(int i = 0; i < size; i++){
+					attributes.add(this.attributeNodeCache.unique("", atts.getLocalName(i), atts.getValue(i)));
+				}
+				if(size > 1){
+					Collections.sort(attributes, Encoder.AttributeComparator);
+				}
+				this.cursorStack = new EncodeCursorStack("", name, null, attributes, this.cursorStack);
 			}
-			final int size = atts.getLength();
-			final List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>(size);
-			for(int i = 0; i < size; i++){
-				attributes.add(this.attributeCache.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)));
-			}
-			if(size > 1){
-				Collections.sort(attributes, Encoder.AttributeComparator);
-			}
-			this.cursorStack = new EncodeCursorStack(uri, name, this.xmlns, attributes, this.cursorStack);
 		}
 
 		/**
@@ -1752,10 +1791,11 @@ public class Encoder {
 	 * @param list {@link EncodeItem}-{@link List}.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	static void writeItems(final EncodeTarget target, final List<? extends EncodeItem> list) throws IOException {
+	static void writeItems(final EncodeTarget target, final List<? extends EncodeItem> list, boolean useXmlns)
+		throws IOException {
 		Encoder.writeInts(target, list.size());
 		for(final EncodeItem item: list){
-			item.write(target);
+			item.write(target, useXmlns);
 		}
 	}
 
@@ -1773,7 +1813,8 @@ public class Encoder {
 	 * @param list {@link EncodeList}-{@link List}.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
-	static void writeLists(final EncodeTarget target, final List<? extends EncodeList> list) throws IOException {
+	static void writeLists(final EncodeTarget target, final List<? extends EncodeList> list, boolean useXmlns)
+		throws IOException {
 		Encoder.writeInts(target, list.size());
 		final int count = list.size();
 		int offset = 0;
@@ -1785,7 +1826,7 @@ public class Encoder {
 		value[count] = offset;
 		Encoder.writeInts(target, value);
 		for(final EncodeItem item: list){
-			item.write(target);
+			item.write(target, useXmlns);
 		}
 	}
 
@@ -1813,6 +1854,18 @@ public class Encoder {
 	 */
 	public Encoder() {
 	}
+
+	boolean useXmlns=true;
+
+	boolean useUriHash;
+
+	boolean useValueHash;
+
+	boolean useXmlnsNameHash;
+
+	boolean useElementNameHash;
+
+	boolean useAttributeNameHash;
 
 	/**
 	 * Diese Methode liest die gegebene Quell-{@link File} mit dem einem neuen {@link XMLReader} in einen neuen
@@ -1847,38 +1900,84 @@ public class Encoder {
 	 */
 	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException,
 		SAXException {
-		final EncodeContentHandler handler = new EncodeContentHandler();
+		boolean useXmlns = this.useXmlns;
+		final EncodeContentHandler handler = new EncodeContentHandler(useXmlns);
 		reader.setContentHandler(handler);
 		reader.parse(source);
-		final List<EncodeValue> uriCharsCache = handler.uriValueCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeValue> xmlnsCharsCache = handler.xmlnsNameCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeValue> elementCharsCache = handler.elementNameCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeValue> attributeCharsCache = handler.attributeNameCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeValue> valueCache = handler.valueCache.compile(0, Encoder.ValueComparator);
-		final List<EncodeLabel> xmlnsLabelCache = handler.xmlnsLabelCache.compile(0, Encoder.LabelComparator);
-		final List<EncodeLabel> elementLabelCache = handler.elementLabelCache.compile(0, Encoder.LabelComparator);
-		final List<EncodeLabel> attributeLabelCache = handler.attributeLabelCache.compile(0, Encoder.LabelComparator);
-		final List<EncodeElementXmlns> elementXmlnsCache = handler.elementXmlnsCache.compile(0, Encoder.IndexComparator);
-		final List<EncodeElementChildren> elementChildrenCache =
-			handler.elementChildrenCache.compile(0, Encoder.IndexComparator);
-		final List<EncodeElementAttributes> elementAttributesCache =
-			handler.elementAttributesCache.compile(0, Encoder.IndexComparator);
-		final List<EncodeElementNode> elementCache =
-			handler.elementCache.compile(valueCache.size(), Encoder.IndexComparator);
-		final List<EncodeAttributeNode> attributeCache = handler.attributeCache.compile(0, Encoder.IndexComparator);
-		Encoder.writeLists(target, uriCharsCache);
-		Encoder.writeLists(target, xmlnsCharsCache);
-		Encoder.writeLists(target, elementCharsCache);
-		Encoder.writeLists(target, attributeCharsCache);
-		Encoder.writeLists(target, valueCache);
-		Encoder.writeItems(target, xmlnsLabelCache);
-		Encoder.writeItems(target, elementLabelCache);
-		Encoder.writeItems(target, attributeLabelCache);
-		Encoder.writeLists(target, elementXmlnsCache);
-		Encoder.writeLists(target, elementChildrenCache);
-		Encoder.writeLists(target, elementAttributesCache);
-		Encoder.writeItems(target, elementCache);
-		Encoder.writeItems(target, attributeCache);
+		List<EncodeValue> uriCache = Collections.emptyList();
+		List<EncodeItems> uriHashCache = Collections.emptyList();
+		List<EncodeValue> valueCache = Collections.emptyList();
+		List<EncodeItems> valueHashCache = Collections.emptyList();
+		List<EncodeValue> xmlnsNameCache = Collections.emptyList();
+		List<EncodeItems> xmlnsNameHashCache = Collections.emptyList();
+		List<EncodeValue> elementNameCache = Collections.emptyList();
+		List<EncodeItems> elementNameHashCache = Collections.emptyList();
+		List<EncodeValue> attributeNameCache = Collections.emptyList();
+		List<EncodeItems> attributeNameHashCache = Collections.emptyList();
+		List<EncodeLabel> xmlnsLabelCache = Collections.emptyList();
+		List<EncodeLabel> elementLabelCache = Collections.emptyList();
+		List<EncodeLabel> attributeLabelCache = Collections.emptyList();
+		List<EncodeElementXmlns> elementXmlnsCache = Collections.emptyList();
+		List<EncodeItems> elementChildrenCache = Collections.emptyList();
+		List<EncodeElementAttributes> elementAttributesCache = Collections.emptyList();
+		List<EncodeElementNode> elementNodeCache = Collections.emptyList();
+		List<EncodeAttributeNode> attributeNodeCache = Collections.emptyList();
+		if(useXmlns){
+			uriCache = handler.uriCache.compileCache(0, Encoder.ValueComparator);
+			xmlnsNameCache = handler.xmlnsNameCache.compileCache(0, Encoder.ValueComparator);
+			elementNameCache = handler.elementNameCache.compileCache(0, Encoder.ValueComparator);
+			attributeNameCache = handler.attributeNameCache.compileCache(0, Encoder.ValueComparator);
+			valueCache = handler.valueCache.compileCache(0, Encoder.ValueComparator);
+			xmlnsLabelCache = handler.xmlnsLabelCache.compileCache(0, Encoder.LabelComparator);
+			elementLabelCache = handler.elementLabelCache.compileCache(0, Encoder.LabelComparator);
+			attributeLabelCache = handler.attributeLabelCache.compileCache(0, Encoder.LabelComparator);
+			elementXmlnsCache = handler.elementXmlnsCache.compileCache(0, Encoder.IndexComparator);
+			elementChildrenCache = handler.elementChildrenCache.compileCache(0, Encoder.IndexComparator);
+			elementAttributesCache = handler.elementAttributesCache.compileCache(0, Encoder.IndexComparator);
+			elementNodeCache = handler.elementNodeCache.compileCache(valueCache.size(), Encoder.IndexComparator);
+			attributeNodeCache = handler.attributeNodeCache.compileCache(0, Encoder.IndexComparator);
+			if(useUriHash){
+				
+			}
+			if(useXmlnsNameHash){
+				
+			}
+		}else{
+			elementNameCache = handler.elementNameCache.compileCache(0, Encoder.ValueComparator);
+			attributeNameCache = handler.attributeNameCache.compileCache(0, Encoder.ValueComparator);
+			valueCache = handler.valueCache.compileCache(0, Encoder.ValueComparator);
+			elementChildrenCache = handler.elementChildrenCache.compileCache(0, Encoder.IndexComparator);
+			elementAttributesCache = handler.elementAttributesCache.compileCache(0, Encoder.IndexComparator);
+			elementNodeCache = handler.elementNodeCache.compileCache(valueCache.size(), Encoder.IndexComparator);
+			attributeNodeCache = handler.attributeNodeCache.compileCache(0, Encoder.IndexComparator);
+		}
+		if(useValueHash){
+			
+		}
+		if(useElementNameHash){
+			
+		}
+		if(useAttributeNameHash){
+			
+		}
+		Encoder.writeLists(target, uriCache, useXmlns);
+		Encoder.writeLists(target, uriHashCache, useXmlns);
+		Encoder.writeLists(target, valueCache, useXmlns);
+		Encoder.writeLists(target, valueHashCache, useXmlns);
+		Encoder.writeLists(target, xmlnsNameCache, useXmlns);
+		Encoder.writeLists(target, xmlnsNameHashCache, useXmlns);
+		Encoder.writeLists(target, elementNameCache, useXmlns);
+		Encoder.writeLists(target, elementNameHashCache, useXmlns);
+		Encoder.writeLists(target, attributeNameCache, useXmlns);
+		Encoder.writeLists(target, attributeNameHashCache, useXmlns);
+		Encoder.writeItems(target, xmlnsLabelCache, useXmlns);
+		Encoder.writeItems(target, elementLabelCache, useXmlns);
+		Encoder.writeItems(target, attributeLabelCache, useXmlns);
+		Encoder.writeLists(target, elementXmlnsCache, useXmlns);
+		Encoder.writeLists(target, elementChildrenCache, useXmlns);
+		Encoder.writeLists(target, elementAttributesCache, useXmlns);
+		Encoder.writeItems(target, elementNodeCache, useXmlns);
+		Encoder.writeItems(target, attributeNodeCache, useXmlns);
 		Encoder.writeInts(target, handler.documentElement.index - valueCache.size());
 	}
 
