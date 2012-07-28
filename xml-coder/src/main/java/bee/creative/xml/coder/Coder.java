@@ -1,15 +1,20 @@
 package bee.creative.xml.coder;
 
 import java.nio.charset.Charset;
+import bee.creative.array.ArrayCopy;
 
 public class Coder {
+
+	static final int[] VOID_INTS = new int[0];
+
+	static final byte[] VOID_BYTES = new byte[0];
 
 	/**
 	 * Dieses Feld speichert das verwendete {@link Charset}.
 	 */
 	static final Charset CHARSET = Charset.forName("UTF-8");
 
-	public static int hashHash(int hash) {
+	static int hashHash(int hash) {
 		hash ^= (hash >>> 23) ^ (hash >>> 11);
 		return hash ^ (hash >>> 7) ^ (hash >>> 3);
 	}
@@ -26,12 +31,28 @@ public class Coder {
 		return Coder.hashHash((uri * 31) + name);
 	}
 
-	public static byte[] encode(final String value) {
+	public static byte[] encodeChars(final String value) {
 		return value.getBytes(Coder.CHARSET);
 	}
 
-	public static String decode(final byte[] value) {
+	public static String decodeChars(final byte[] value) {
 		return new String(value, Coder.CHARSET);
+	}
+
+	public static byte[] encodeIndices(final int... value) {
+		final int length = value.length << 2;
+		if(length == 0) return Coder.VOID_BYTES;
+		final byte[] array = new byte[length];
+		ArrayCopy.copy(value, 0, array, 0, length);
+		return array;
+	}
+
+	public static int[] decodeIndices(final byte... value) {
+		final int length = value.length >> 2;
+		if(length == 0) return Coder.VOID_INTS;
+		final int[] array = new int[length];
+		ArrayCopy.copy(value, 0, array, 0, length);
+		return array;
 	}
 
 }

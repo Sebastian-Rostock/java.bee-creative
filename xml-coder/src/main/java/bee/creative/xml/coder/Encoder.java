@@ -26,7 +26,6 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
-import bee.creative.array.ArrayCopy;
 import bee.creative.util.Comparators;
 import bee.creative.util.Hash;
 import bee.creative.util.Iterators;
@@ -314,7 +313,7 @@ public class Encoder {
 		@Override
 		public String toString() {
 			return Objects.toStringCall(false, true, this.getClass().getSimpleName(), "size", this.size(), "reuses",
-				this.reuses, "compression", (100 * size()) / (this.size() + this.reuses + 1));
+				this.reuses, "compression", (100 * this.size()) / (this.size() + this.reuses + 1));
 		}
 
 	}
@@ -392,7 +391,7 @@ public class Encoder {
 		 */
 		@Override
 		public int length() {
-			return Coder.encode(this.value).length;
+			return Coder.encodeChars(this.value).length;
 		}
 
 		/**
@@ -400,7 +399,7 @@ public class Encoder {
 		 */
 		@Override
 		public void write(final EncodeTarget target) throws IOException {
-			final byte[] bytes = Coder.encode(this.value);
+			final byte[] bytes = Coder.encodeChars(this.value);
 			target.write(bytes, 0, bytes.length);
 		}
 
@@ -1022,157 +1021,157 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als
-	 * {@link EncodeLabel}s während des Einlesens eines {@link Document}s.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class EncodeXmlnsStack {
-
-		/**
-		 * Dieses Feld speichert die {@code URI}-{@code Prefix}-{@link Map}.
-		 */
-		final Map<String, String> map;
-
-		/**
-		 * Dieses Feld speichert den nächsten {@link EncodeXmlnsStack} oder {@code null}.
-		 */
-		final EncodeXmlnsStack next;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den leeren {@link EncodeXmlnsStack}.
-		 */
-		public EncodeXmlnsStack() {
-			this(null);
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den nächsten {@link EncodeXmlnsStack}.
-		 * 
-		 * @param next nächster {@link EncodeXmlnsStack} oder {@code null}.
-		 */
-		public EncodeXmlnsStack(final EncodeXmlnsStack next) {
-			this.map = new HashMap<String, String>(1);
-			this.next = next;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(true, "EncodeXmlnsStack", this.map, this.next);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung der Inhalte eine {@link Element}s während des Einlesens eines
-	 * {@link Document}s.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class EncodeCursorStack {
-
-		/**
-		 * Dieses Feld speichert die {@code URI}.
-		 * 
-		 * @see Element#getNamespaceURI()
-		 */
-		final String uri;
-
-		/**
-		 * Dieses Feld speichert den {@code Name}.
-		 * 
-		 * @see Element#getLocalName()
-		 */
-		final String name;
-
-		/**
-		 * Dieses Feld speichert die {@link EncodeLabel}-{@link List} für die Paare aus {@code URI} und {@code Prefix}.
-		 * 
-		 * @see Node#lookupPrefix(String)
-		 * @see Node#lookupNamespaceURI(String)
-		 */
-		final List<EncodeLabel> spaces;
-
-		/**
-		 * Dieses Feld speichert die {@link EncodeItem}-{@link List} für die {@link Element#getChildNodes()}.
-		 */
-		final List<EncodeItem> children;
-
-		/**
-		 * Dieses Feld speichert die {@link EncodeAttribute}-{@link List} für die {@link Element#getAttributes()}.
-		 */
-		final List<? extends EncodeItem> attributes;
-
-		/**
-		 * Dieses Feld speichert den nächsten {@link EncodeCursorStack} oder {@code null}.
-		 */
-		final EncodeCursorStack next;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den leeren {@link EncodeCursorStack}.
-		 */
-		public EncodeCursorStack() {
-			this(null, null, null, null, null);
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link EncodeCursorStack}.
-		 * 
-		 * @see Element#getNodeName()
-		 * @see Element#getAttributes()
-		 * @param name {@code Name}.
-		 * @param attributes {@link EncodeAttribute}-{@link List}.
-		 * @param next nächster {@link EncodeCursorStack} oder {@code null}.
-		 */
-		public EncodeCursorStack(final String name, final List<EncodeAttribute> attributes, final EncodeCursorStack next) {
-			this(null, name, null, attributes, next);
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den {@link EncodeCursorStack}.
-		 * 
-		 * @see Element#getLocalName()
-		 * @see Element#getNamespaceURI()
-		 * @see Element#getAttributes()
-		 * @see Element#lookupPrefix(String)
-		 * @see Element#lookupNamespaceURI(String)
-		 * @param uri {@code URI}.
-		 * @param name {@code Name}.
-		 * @param spaces {@code URI/Prefix}-{@link EncodeLabel}-{@link List}.
-		 * @param attributes {@link EncodeAttribute}-{@link List}.
-		 * @param next nächster {@link EncodeCursorStack} oder {@code null}.
-		 */
-		public EncodeCursorStack(final String uri, final String name, final List<EncodeLabel> spaces,
-			final List<EncodeAttribute> attributes, final EncodeCursorStack next) {
-			this.uri = uri;
-			this.name = name;
-			this.spaces = spaces;
-			this.children = new ArrayList<EncodeItem>(0);
-			this.attributes = attributes;
-			this.next = next;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(true, "EncodeCursorStack", this.uri, this.name, this.spaces, this.children,
-				this.attributes, this.next);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert den {@link ContentHandler} zum Einlsenen eines {@link Document}s mit Hilfe eines
 	 * {@link XMLReader}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class EncodeContentHandler implements ContentHandler {
+	public static class EncodeDocument implements ContentHandler {
+
+		/**
+		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als
+		 * {@link EncodeLabel}s während des Einlesens eines {@link Document}s.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static final class XmlnsStack {
+
+			/**
+			 * Dieses Feld speichert die {@code URI}-{@code Prefix}-{@link Map}.
+			 */
+			final Map<String, String> map;
+
+			/**
+			 * Dieses Feld speichert den nächsten {@link XmlnsStack} oder {@code null}.
+			 */
+			final XmlnsStack next;
+
+			/**
+			 * Dieser Konstrukteur initialisiert den leeren {@link XmlnsStack}.
+			 */
+			public XmlnsStack() {
+				this(null);
+			}
+
+			/**
+			 * Dieser Konstrukteur initialisiert den nächsten {@link XmlnsStack}.
+			 * 
+			 * @param next nächster {@link XmlnsStack} oder {@code null}.
+			 */
+			public XmlnsStack(final XmlnsStack next) {
+				this.map = new HashMap<String, String>(1);
+				this.next = next;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall(true, "EncodeXmlnsStack", this.map, this.next);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Inhalte eine {@link Element}s während des Einlesens
+		 * eines {@link Document}s.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static final class CursorStack {
+
+			/**
+			 * Dieses Feld speichert die {@code URI}.
+			 * 
+			 * @see Element#getNamespaceURI()
+			 */
+			final String uri;
+
+			/**
+			 * Dieses Feld speichert den {@code Name}.
+			 * 
+			 * @see Element#getLocalName()
+			 */
+			final String name;
+
+			/**
+			 * Dieses Feld speichert die {@link EncodeLabel}-{@link List} für die Paare aus {@code URI} und {@code Prefix}.
+			 * 
+			 * @see Node#lookupPrefix(String)
+			 * @see Node#lookupNamespaceURI(String)
+			 */
+			final List<EncodeLabel> spaces;
+
+			/**
+			 * Dieses Feld speichert die {@link EncodeItem}-{@link List} für die {@link Element#getChildNodes()}.
+			 */
+			final List<EncodeItem> children;
+
+			/**
+			 * Dieses Feld speichert die {@link EncodeAttribute}-{@link List} für die {@link Element#getAttributes()}.
+			 */
+			final List<? extends EncodeItem> attributes;
+
+			/**
+			 * Dieses Feld speichert den nächsten {@link CursorStack} oder {@code null}.
+			 */
+			final CursorStack next;
+
+			/**
+			 * Dieser Konstrukteur initialisiert den leeren {@link CursorStack}.
+			 */
+			public CursorStack() {
+				this(null, null, null, null, null);
+			}
+
+			/**
+			 * Dieser Konstrukteur initialisiert den {@link CursorStack}.
+			 * 
+			 * @see Element#getNodeName()
+			 * @see Element#getAttributes()
+			 * @param name {@code Name}.
+			 * @param attributes {@link EncodeAttribute}-{@link List}.
+			 * @param next nächster {@link CursorStack} oder {@code null}.
+			 */
+			public CursorStack(final String name, final List<EncodeAttribute> attributes, final CursorStack next) {
+				this(null, name, null, attributes, next);
+			}
+
+			/**
+			 * Dieser Konstrukteur initialisiert den {@link CursorStack}.
+			 * 
+			 * @see Element#getLocalName()
+			 * @see Element#getNamespaceURI()
+			 * @see Element#getAttributes()
+			 * @see Element#lookupPrefix(String)
+			 * @see Element#lookupNamespaceURI(String)
+			 * @param uri {@code URI}.
+			 * @param name {@code Name}.
+			 * @param spaces {@code URI/Prefix}-{@link EncodeLabel}-{@link List}.
+			 * @param attributes {@link EncodeAttribute}-{@link List}.
+			 * @param next nächster {@link CursorStack} oder {@code null}.
+			 */
+			public CursorStack(final String uri, final String name, final List<EncodeLabel> spaces,
+				final List<EncodeAttribute> attributes, final CursorStack next) {
+				this.uri = uri;
+				this.name = name;
+				this.spaces = spaces;
+				this.children = new ArrayList<EncodeItem>(0);
+				this.attributes = attributes;
+				this.next = next;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall(true, "EncodeCursorStack", this.uri, this.name, this.spaces, this.children,
+					this.attributes, this.next);
+			}
+
+		}
 
 		/**
 		 * Dieses Feld speichert die aktuellen Paare aus {@code URI} und {@code Prefix}.
@@ -1180,16 +1179,24 @@ public class Encoder {
 		List<EncodeLabel> xmlns;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeXmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix}
-		 * oder {@code null}.
+		 * Dieses Feld speichert den {@link XmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix} oder
+		 * {@code null}.
 		 */
-		EncodeXmlnsStack xmlnsStack;
+		XmlnsStack xmlnsStack;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeCursorStack} für das aktuelle {@link Element}.
+		 * Dieses Feld speichert den {@link CursorStack} für das aktuelle {@link Element}.
 		 */
-		EncodeCursorStack cursorStack;
+		CursorStack cursorStack;
 
+		/**
+		 * Dieses Feld speichert die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen
+		 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
+		 * {@code Prefix}.
+		 * 
+		 * @see Node#getPrefix()
+		 * @see Node#getNamespaceURI()
+		 */
 		final boolean xmlnsEnabled;
 
 		/**
@@ -1312,11 +1319,15 @@ public class Encoder {
 		public EncodeItem documentElement;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodePool}s und {@link EncodePool}s.
+		 * Dieser Konstrukteur initialisiert die {@code xmlns}-Aktivierung. Wenn diese {@code true} ist, besitzen
+		 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
+		 * {@code Prefix}.
+		 * 
+		 * @param xmlnsEnabled {@code xmlns}-Aktivierung.
 		 */
-		public EncodeContentHandler(final boolean xmlnsEnabled) {
+		public EncodeDocument(final boolean xmlnsEnabled) {
 			this.xmlnsEnabled = xmlnsEnabled;
-			this.cursorStack = new EncodeCursorStack();
+			this.cursorStack = new CursorStack();
 			this.uriPool = new EncodeValuePool();
 			this.valuePool = new EncodeValuePool();
 			this.xmlnsNamePool = new EncodeValuePool();
@@ -1343,7 +1354,7 @@ public class Encoder {
 		@Override
 		public void endPrefixMapping(final String prefix) {
 			if(!this.xmlnsEnabled) return;
-			for(EncodeXmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
+			for(XmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
 				if(scope.map.values().remove(prefix)){
 					if(scope.map.isEmpty() && (scope == this.xmlnsStack)){
 						this.xmlnsStack = scope.next;
@@ -1360,9 +1371,9 @@ public class Encoder {
 		@Override
 		public void startPrefixMapping(final String prefix, final String uri) {
 			if(!this.xmlnsEnabled) return;
-			EncodeXmlnsStack scope = this.xmlnsStack;
+			XmlnsStack scope = this.xmlnsStack;
 			if((scope == null) || scope.map.containsValue(prefix)){
-				scope = new EncodeXmlnsStack(scope);
+				scope = new XmlnsStack(scope);
 				this.xmlnsStack = scope;
 			}
 			scope.map.put(uri, prefix);
@@ -1374,8 +1385,8 @@ public class Encoder {
 		 */
 		@Override
 		public void endElement(final String uri, final String name, final String qName) {
-			final EncodeCursorStack oldCursor = this.cursorStack;
-			final EncodeCursorStack newCursor = this.cursorStack.next;
+			final CursorStack oldCursor = this.cursorStack;
+			final CursorStack newCursor = this.cursorStack.next;
 			final List<EncodeItem> oldChildren = oldCursor.children;
 			final List<EncodeItem> newChildren = new ArrayList<EncodeItem>(oldChildren.size());
 			final StringBuilder textValue = new StringBuilder();
@@ -1412,7 +1423,7 @@ public class Encoder {
 				if(this.xmlns == null){
 					final Map<String, String> map = new HashMap<String, String>();
 					final ArrayList<EncodeLabel> xmlns = new ArrayList<EncodeLabel>();
-					for(EncodeXmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
+					for(XmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
 						for(final Entry<String, String> entry: scope.map.entrySet()){
 							final String xmlnsName = entry.getValue();
 							if(!map.containsKey(xmlnsName)){
@@ -1436,7 +1447,7 @@ public class Encoder {
 				if(size > 1){
 					Collections.sort(attributes, Encoder.AttributeLabelComparator);
 				}
-				this.cursorStack = new EncodeCursorStack(uri, name, this.xmlns, attributes, this.cursorStack);
+				this.cursorStack = new CursorStack(uri, name, this.xmlns, attributes, this.cursorStack);
 			}else{
 				final int size = atts.getLength();
 				final List<EncodeAttribute> attributes = new ArrayList<EncodeAttribute>(size);
@@ -1446,7 +1457,7 @@ public class Encoder {
 				if(size > 1){
 					Collections.sort(attributes, Encoder.AttributeNameComparator);
 				}
-				this.cursorStack = new EncodeCursorStack("", name, null, attributes, this.cursorStack);
+				this.cursorStack = new CursorStack("", name, null, attributes, this.cursorStack);
 			}
 		}
 
@@ -1503,6 +1514,12 @@ public class Encoder {
 
 	}
 
+	/**
+	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
+	 * {@link EncodeValue}s.
+	 * 
+	 * @see Encoder#compilePool(EncodePool, int, Comparator)
+	 */
 	static final Comparable<EncodeValue> ValueHasher = new Comparable<EncodeValue>() {
 
 		@Override
@@ -1512,6 +1529,12 @@ public class Encoder {
 
 	};
 
+	/**
+	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
+	 * {@link EncodeLabel}s.
+	 * 
+	 * @see Encoder#compilePool(EncodePool, int, Comparator)
+	 */
 	static final Comparable<EncodeLabel> LabelHasher = new Comparable<EncodeLabel>() {
 
 		@Override
@@ -1612,17 +1635,15 @@ public class Encoder {
 	/**
 	 * Diese Methode schreibt das gegebenen {@code int}-Array in das gegebene {@link EncodeTarget}.
 	 * 
-	 * @see ArrayCopy#copy(int[], int, byte[], int, int)
+	 * @see Coder#encodeIndices(int...)
 	 * @see EncodeTarget#write(byte[], int, int)
 	 * @param target {@link EncodeTarget}.
 	 * @param value {@code int}-Array.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
 	 */
 	static void writeInts(final EncodeTarget target, final int... value) throws IOException {
-		final int count = value.length << 2;
-		final byte[] array = new byte[count];
-		ArrayCopy.copy(value, 0, array, 0, count);
-		target.write(array, 0, count);
+		final byte[] array = Coder.encodeIndices(value);
+		target.write(array, 0, array.length);
 	}
 
 	/**
@@ -1720,8 +1741,8 @@ public class Encoder {
 		return list;
 	}
 
-	static <GValue extends EncodeItem> List<EncodeGroup> cimpileHash(final List<GValue> values, final boolean useHash,
-		final Comparable<GValue> hasher) {
+	static <GItem extends EncodeItem> List<EncodeGroup> cimpileHash(final List<GItem> values, final boolean useHash,
+		final Comparable<GItem> hasher) {
 		if(!useHash) return Collections.emptyList();
 		final int size = values.size();
 		if(size == 0) return Collections.emptyList();
@@ -1731,34 +1752,34 @@ public class Encoder {
 		}
 		final List<EncodeGroup> list = new ArrayList<EncodeGroup>(count);
 		for(int i = 0; i < count; i++){
-			list.set(i, new EncodeGroup());
+			list.add(i, new EncodeGroup());
 		}
 		final int mask = count - 1;
 		for(int i = 0; i < size; i++){
-			final GValue value = values.get(i);
+			final GItem value = values.get(i);
 			final int index = hasher.compareTo(value) & mask;
 			list.get(index).values.add(value);
 		}
 		return list;
 	}
 
-	boolean xmlnsEnabled = false;
+	boolean xmlnsEnabled = true;
 
-	boolean uriHashEnabled;
+	boolean uriHashEnabled = true;
 
-	boolean valueHashEnabled;
+	boolean valueHashEnabled = false;
 
-	boolean xmlnsNameHashEnabled;
+	boolean xmlnsNameHashEnabled = true;
 
-	boolean xmlnsLabelHashEnabled;
+	boolean xmlnsLabelHashEnabled = true;
 
-	boolean elementNameHashEnabled;
+	boolean elementNameHashEnabled = true;
 
-	boolean elementLabelHashEnabled;
+	boolean elementLabelHashEnabled = true;
 
-	boolean attributeNameHashEnabled;
+	boolean attributeNameHashEnabled = true;
 
-	boolean attributeLabelHashEnabled;
+	boolean attributeLabelHashEnabled = true;
 
 	/**
 	 * Dieser Konstrukteur initialisiert den {@link Encoder}.
@@ -1768,7 +1789,7 @@ public class Encoder {
 
 	/**
 	 * Diese Methode liest die gegebene Quell-{@link File} mit dem einem neuen {@link XMLReader} in einen neuen
-	 * {@link EncodeContentHandler} ein und speichert dessen Daten in die gegebene Ziel-{@link File}.
+	 * {@link EncodeDocument} ein und speichert dessen Daten in die gegebene Ziel-{@link File}.
 	 * 
 	 * @see FileReader
 	 * @see InputSource
@@ -1787,7 +1808,7 @@ public class Encoder {
 
 	/**
 	 * Diese Methode liest die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in einen neuen
-	 * {@link EncodeContentHandler} ein und speichert dessen Daten in das gegebene {@link EncodeTarget}.
+	 * {@link EncodeDocument} ein und speichert dessen Daten in das gegebene {@link EncodeTarget}.
 	 * 
 	 * @see XMLReader#setContentHandler(ContentHandler)
 	 * @see XMLReader#parse(InputSource)
@@ -1799,7 +1820,7 @@ public class Encoder {
 	 */
 	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException,
 		SAXException {
-		final EncodeContentHandler handler = new EncodeContentHandler(this.xmlnsEnabled);
+		final EncodeDocument handler = new EncodeDocument(this.xmlnsEnabled);
 		reader.setContentHandler(handler);
 		reader.parse(source);
 		final List<EncodeValue> uriPool = //
@@ -1844,22 +1865,22 @@ public class Encoder {
 			Encoder.compilePool(handler.elementNodePool, valuePool.size(), Encoder.IndexComparator);
 		final List<EncodeAttribute> attributeNodePool = //
 			Encoder.compilePool(handler.attributeNodePool, 0, Encoder.IndexComparator);
-		Encoder.writeLists(target, uriPool);
 		Encoder.writeLists(target, uriHash);
-		Encoder.writeLists(target, valuePool);
+		Encoder.writeLists(target, uriPool);
 		Encoder.writeLists(target, valueHash);
-		Encoder.writeLists(target, xmlnsNamePool);
+		Encoder.writeLists(target, valuePool);
 		Encoder.writeLists(target, xmlnsNameHash);
-		Encoder.writeItems(target, xmlnsLabelPool);
+		Encoder.writeLists(target, xmlnsNamePool);
 		Encoder.writeLists(target, xmlnsLabelHash);
-		Encoder.writeLists(target, elementNamePool);
+		Encoder.writeItems(target, xmlnsLabelPool);
 		Encoder.writeLists(target, elementNameHash);
-		Encoder.writeItems(target, elementLabelPool);
+		Encoder.writeLists(target, elementNamePool);
 		Encoder.writeLists(target, elementLabelHash);
-		Encoder.writeLists(target, attributeNamePool);
+		Encoder.writeItems(target, elementLabelPool);
 		Encoder.writeLists(target, attributeNameHash);
-		Encoder.writeItems(target, attributeLabelPool);
+		Encoder.writeLists(target, attributeNamePool);
 		Encoder.writeLists(target, attributeLabelHash);
+		Encoder.writeItems(target, attributeLabelPool);
 		Encoder.writeLists(target, elementXmlnsPool);
 		Encoder.writeLists(target, elementChildrenPool);
 		Encoder.writeLists(target, elementAttributesPool);
@@ -1868,165 +1889,176 @@ public class Encoder {
 		Encoder.writeInts(target, handler.documentElement.index - valuePool.size());
 	}
 
-	
 	/**
-	 * Diese Methode gibt das xmlnsEnabled zurück.
-	 * @return xmlnsEnabled.
+	 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen
+	 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
+	 * {@code Prefix}.
+	 * 
+	 * @see Node#getPrefix()
+	 * @see Node#getLocalName()
+	 * @see Node#getNamespaceURI()
+	 * @return {@code xmlns}-Aktivierung.
 	 */
 	public boolean isXmlnsEnabled() {
-		return xmlnsEnabled;
+		return this.xmlnsEnabled;
 	}
 
-	
 	/**
-	 * Diese Methode setzt das xmlnsEnabled.
-	 * @param xmlnsEnabled xmlnsEnabled.
+	 * Diese Methode setzt die {@code xmlns}-Aktivierung. Wenn diese Option {@code true} ist, besitzen
+	 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
+	 * {@code Prefix}.
+	 * 
+	 * @see Node#getPrefix()
+	 * @see Node#getLocalName()
+	 * @see Node#getNamespaceURI()
+	 * @param value {@code xmlns}-Aktivierung.
 	 */
-	public void setXmlnsEnabled(boolean xmlnsEnabled) {
-		this.xmlnsEnabled = xmlnsEnabled;
+	public void setXmlnsEnabled(final boolean value) {
+		this.xmlnsEnabled = value;
 	}
 
-	
 	/**
-	 * Diese Methode gibt das uriHashEnabled zurück.
-	 * @return uriHashEnabled.
+	 * Diese Methode gibt die {@code URI-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird die
+	 * {@code URI-Hash-Table} erzeugt.
+	 * 
+	 * @return {@code URI-Hash}-Aktivierung.
 	 */
 	public boolean isUriHashEnabled() {
-		return uriHashEnabled;
+		return this.uriHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das uriHashEnabled.
+	 * 
 	 * @param uriHashEnabled uriHashEnabled.
 	 */
-	public void setUriHashEnabled(boolean uriHashEnabled) {
+	public void setUriHashEnabled(final boolean uriHashEnabled) {
 		this.uriHashEnabled = uriHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das valueHashEnabled zurück.
+	 * 
 	 * @return valueHashEnabled.
 	 */
 	public boolean isValueHashEnabled() {
-		return valueHashEnabled;
+		return this.valueHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das valueHashEnabled.
+	 * 
 	 * @param valueHashEnabled valueHashEnabled.
 	 */
-	public void setValueHashEnabled(boolean valueHashEnabled) {
+	public void setValueHashEnabled(final boolean valueHashEnabled) {
 		this.valueHashEnabled = valueHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das xmlnsNameHashEnabled zurück.
+	 * 
 	 * @return xmlnsNameHashEnabled.
 	 */
 	public boolean isXmlnsNameHashEnabled() {
-		return xmlnsNameHashEnabled;
+		return this.xmlnsNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das xmlnsNameHashEnabled.
+	 * 
 	 * @param xmlnsNameHashEnabled xmlnsNameHashEnabled.
 	 */
-	public void setXmlnsNameHashEnabled(boolean xmlnsNameHashEnabled) {
+	public void setXmlnsNameHashEnabled(final boolean xmlnsNameHashEnabled) {
 		this.xmlnsNameHashEnabled = xmlnsNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das xmlnsLabelHashEnabled zurück.
+	 * 
 	 * @return xmlnsLabelHashEnabled.
 	 */
 	public boolean isXmlnsLabelHashEnabled() {
-		return xmlnsLabelHashEnabled;
+		return this.xmlnsLabelHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das xmlnsLabelHashEnabled.
+	 * 
 	 * @param xmlnsLabelHashEnabled xmlnsLabelHashEnabled.
 	 */
-	public void setXmlnsLabelHashEnabled(boolean xmlnsLabelHashEnabled) {
+	public void setXmlnsLabelHashEnabled(final boolean xmlnsLabelHashEnabled) {
 		this.xmlnsLabelHashEnabled = xmlnsLabelHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das elementNameHashEnabled zurück.
+	 * 
 	 * @return elementNameHashEnabled.
 	 */
 	public boolean isElementNameHashEnabled() {
-		return elementNameHashEnabled;
+		return this.elementNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das elementNameHashEnabled.
+	 * 
 	 * @param elementNameHashEnabled elementNameHashEnabled.
 	 */
-	public void setElementNameHashEnabled(boolean elementNameHashEnabled) {
+	public void setElementNameHashEnabled(final boolean elementNameHashEnabled) {
 		this.elementNameHashEnabled = elementNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das elementLabelHashEnabled zurück.
+	 * 
 	 * @return elementLabelHashEnabled.
 	 */
 	public boolean isElementLabelHashEnabled() {
-		return elementLabelHashEnabled;
+		return this.elementLabelHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das elementLabelHashEnabled.
+	 * 
 	 * @param elementLabelHashEnabled elementLabelHashEnabled.
 	 */
-	public void setElementLabelHashEnabled(boolean elementLabelHashEnabled) {
+	public void setElementLabelHashEnabled(final boolean elementLabelHashEnabled) {
 		this.elementLabelHashEnabled = elementLabelHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das attributeNameHashEnabled zurück.
+	 * 
 	 * @return attributeNameHashEnabled.
 	 */
 	public boolean isAttributeNameHashEnabled() {
-		return attributeNameHashEnabled;
+		return this.attributeNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das attributeNameHashEnabled.
+	 * 
 	 * @param attributeNameHashEnabled attributeNameHashEnabled.
 	 */
-	public void setAttributeNameHashEnabled(boolean attributeNameHashEnabled) {
+	public void setAttributeNameHashEnabled(final boolean attributeNameHashEnabled) {
 		this.attributeNameHashEnabled = attributeNameHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode gibt das attributeLabelHashEnabled zurück.
+	 * 
 	 * @return attributeLabelHashEnabled.
 	 */
 	public boolean isAttributeLabelHashEnabled() {
-		return attributeLabelHashEnabled;
+		return this.attributeLabelHashEnabled;
 	}
 
-	
 	/**
 	 * Diese Methode setzt das attributeLabelHashEnabled.
+	 * 
 	 * @param attributeLabelHashEnabled attributeLabelHashEnabled.
 	 */
-	public void setAttributeLabelHashEnabled(boolean attributeLabelHashEnabled) {
+	public void setAttributeLabelHashEnabled(final boolean attributeLabelHashEnabled) {
 		this.attributeLabelHashEnabled = attributeLabelHashEnabled;
 	}
 
