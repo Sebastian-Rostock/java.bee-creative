@@ -932,7 +932,7 @@ public class Decoder {
 
 		protected final DecodeGroupPool valueHash;
 
-		final int valueHashMask;
+		final int valueHashCount;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
@@ -946,9 +946,7 @@ public class Decoder {
 			NullPointerException {
 			super(source, 1);
 			this.valueHash = valueHash;
-			this.valueHashMask = valueHash.itemCount - 1;
-			if((valueHash.itemCount & this.valueHashMask) != 0)
-				throw new IllegalArgumentException("valueHash.itemCount is no power of 2");
+			this.valueHashCount = valueHash.itemCount;
 		}
 
 		/**
@@ -978,8 +976,8 @@ public class Decoder {
 		 */
 		public DecodeValue findValue(final String value) {
 			if(this.itemCount == 0) return null;
-			if(this.valueHashMask < 0) return this.find(new DecodeValueComparable(value));
-			return this.findValue(this.valueHash.get(Coder.hashValue(value) & this.valueHashMask).indices, value);
+			if(this.valueHashCount == 0) return this.find(new DecodeValueComparable(value));
+			return this.findValue(this.valueHash.get(Coder.hashValue(value) % this.valueHashCount).indices, value);
 		}
 
 		public DecodeValue findValue(final int[] indices, final String value) {
@@ -1069,7 +1067,7 @@ public class Decoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeLabelCache extends DecodeItemPool<DecodeLabel> {
+	public static class DecodeLabelPool extends DecodeItemPool<DecodeLabel> {
 
 		static final class DecodeLabelUriComparable implements Comparable<DecodeLabel> {
 
@@ -1106,7 +1104,7 @@ public class Decoder {
 
 		protected final DecodeGroupPool labelHash;
 
-		final int labelHashMask;
+		protected final boolean labelHashEnabled;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
@@ -1115,12 +1113,10 @@ public class Decoder {
 		 * @param hashPool
 		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
-		public DecodeLabelCache(final DecodeSource source, final DecodeGroupPool labelHash) throws IOException {
+		public DecodeLabelPool(final DecodeSource source, final DecodeGroupPool labelHash) throws IOException {
 			super(source, 8);
 			this.labelHash = labelHash;
-			this.labelHashMask = labelHash.itemCount - 1;
-			if((labelHash.itemCount & this.labelHashMask) != 0)
-				throw new IllegalArgumentException("labelHash.itemCount is no power of 2");
+			this.labelHashEnabled = labelHash.itemCount != 0;
 		}
 
 		/**
@@ -1188,8 +1184,10 @@ public class Decoder {
 		 */
 		public DecodeLabel findLabel(final int uri, final int name) {
 			if(this.itemCount == 0) return null;
-			if(this.labelHashMask < 0) return this.find(new DecodeLabelUriNameComparable(uri, name));
-			return this.findLabel(this.labelHash.get(Coder.hashLabel(uri, name) & this.labelHashMask).indices, uri, name);
+			if(!this.labelHashEnabled) return this.find(new DecodeLabelUriNameComparable(uri, name));
+			final int index = Coder.hashLabel(uri, name) % this.labelHash.itemCount;
+			final DecodeGroup group = this.labelHash.get(index);
+			return this.findLabel(group.indices, uri, name);
 		}
 
 		/**
@@ -1369,7 +1367,7 @@ public class Decoder {
 		 * der {@link DecodeElement} um die Anzahl der {@link DecodeValue}s im {@link DecodeDocument#getValuePool()}
 		 * verschoben sind.
 		 * 
-		 * @see DecodeAdapter#getChildOffset()
+		 * @see DecodeAdapter#getOffset()
 		 * @return Index der {@link DecodeGroup} der {@link Element#getChildNodes()}.
 		 */
 		public int getChildren() {
@@ -1601,12 +1599,12 @@ public class Decoder {
 		private final DecodeGroupPool xmlnsLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Prefix}-{@link DecodeLabelCache}.
+		 * Dieses Feld speichert den {@code URI/Prefix}-{@link DecodeLabelPool}.
 		 * 
 		 * @see Node#getPrefix()
 		 * @see Node#getNamespaceURI()
 		 */
-		public final DecodeLabelCache xmlnsLabelPool;
+		public final DecodeLabelPool xmlnsLabelPool;
 
 		private final DecodeGroupPool elementNameHash;
 
@@ -1620,12 +1618,12 @@ public class Decoder {
 		private final DecodeGroupPool elementLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Element}-{@link DecodeLabelCache}.
+		 * Dieses Feld speichert den {@code URI/Element}-{@link DecodeLabelPool}.
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Element#getNamespaceURI()
 		 */
-		public final DecodeLabelCache elementLabelPool;
+		public final DecodeLabelPool elementLabelPool;
 
 		private final DecodeGroupPool attributeNameHash;
 
@@ -1639,12 +1637,12 @@ public class Decoder {
 		private final DecodeGroupPool attributeLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Attribute}-{@link DecodeLabelCache}.
+		 * Dieses Feld speichert den {@code URI/Attribute}-{@link DecodeLabelPool}.
 		 * 
 		 * @see Attr#getLocalName()
 		 * @see Attr#getNamespaceURI()
 		 */
-		public final DecodeLabelCache attributeLabelPool;
+		public final DecodeLabelPool attributeLabelPool;
 
 		/**
 		 * Dieses Feld speichert den {@link DecodeGroupPool}.
@@ -1703,15 +1701,15 @@ public class Decoder {
 			this.xmlnsNameHash = new DecodeGroupPool(source);
 			this.xmlnsNamePool = new DecodeValuePool(source, this.xmlnsNameHash);
 			this.xmlnsLabelHash = new DecodeGroupPool(source);
-			this.xmlnsLabelPool = new DecodeLabelCache(source, this.xmlnsLabelHash);
+			this.xmlnsLabelPool = new DecodeLabelPool(source, this.xmlnsLabelHash);
 			this.elementNameHash = new DecodeGroupPool(source);
 			this.elementNamePool = new DecodeValuePool(source, this.elementNameHash);
 			this.elementLabelHash = new DecodeGroupPool(source);
-			this.elementLabelPool = new DecodeLabelCache(source, this.elementLabelHash);
+			this.elementLabelPool = new DecodeLabelPool(source, this.elementLabelHash);
 			this.attributeNameHash = new DecodeGroupPool(source);
 			this.attributeNamePool = new DecodeValuePool(source, this.attributeNameHash);
 			this.attributeLabelHash = new DecodeGroupPool(source);
-			this.attributeLabelPool = new DecodeLabelCache(source, this.attributeLabelHash);
+			this.attributeLabelPool = new DecodeLabelPool(source, this.attributeLabelHash);
 			this.elementXmlnsPool = new DecodeGroupPool(source);
 			this.elementChildrenPool = new DecodeGroupPool(source);
 			this.elementAttributesPool = new DecodeGroupPool(source);
@@ -1754,7 +1752,7 @@ public class Decoder {
 			return this.xmlnsLabelHash;
 		}
 
-		public DecodeLabelCache getXmlnsLabelPool() {
+		public DecodeLabelPool getXmlnsLabelPool() {
 			return this.xmlnsLabelPool;
 		}
 
@@ -1770,7 +1768,7 @@ public class Decoder {
 			return this.elementLabelHash;
 		}
 
-		public DecodeLabelCache getElementLabelPool() {
+		public DecodeLabelPool getElementLabelPool() {
 			return this.elementLabelPool;
 		}
 
@@ -1786,7 +1784,7 @@ public class Decoder {
 			return this.attributeLabelHash;
 		}
 
-		public DecodeLabelCache getAttributeLabelPool() {
+		public DecodeLabelPool getAttributeLabelPool() {
 			return this.attributeLabelPool;
 		}
 
@@ -1878,11 +1876,6 @@ public class Decoder {
 		};
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeDocument}.
-		 */
-		protected final DecodeDocument cache;
-
-		/**
 		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der
 		 * {@link DecodeGroup}. Der Wert entspricht der Anzahl der {@link DecodeValue}s in {@link DecodeDocument#valuePool}.
 		 * 
@@ -1896,13 +1889,21 @@ public class Decoder {
 		protected final DecodeDocumentAdapter adapter;
 
 		/**
+		 * Dieses Feld speichert den {@link DecodeDocument}.
+		 */
+		protected final DecodeDocument document;
+
+		protected final boolean xmlnsEnabled;
+
+		/**
 		 * Dieser Konstrukteur initialisiert den {@link DecodeDocument}.
 		 * 
-		 * @param cache {@link DecodeDocument}.
+		 * @param document {@link DecodeDocument}.
 		 */
-		public DecodeAdapter(final DecodeDocument cache) {
-			this.cache = cache;
-			this.offset = this.cache.valuePool.itemCount;
+		public DecodeAdapter(final DecodeDocument document) {
+			this.offset = document.valuePool.itemCount;
+			this.document = document;
+			this.xmlnsEnabled = document.xmlnsEnabled;
 			this.adapter = new DecodeDocumentAdapter(this);
 		}
 
@@ -1914,7 +1915,7 @@ public class Decoder {
 		 * @see #elementGetChildNodesItem(DecodeNodeAdapter, int, int)
 		 * @return Verschiebung des Indexes der {@link DecodeElement}s.
 		 */
-		public int getChildOffset() {
+		public int getOffset() {
 			return this.offset;
 		}
 
@@ -1923,16 +1924,16 @@ public class Decoder {
 		 * 
 		 * @return {@link DecodeDocument}.
 		 */
-		public DecodeDocument getDecodeDocument() {
-			return this.cache;
+		public DecodeDocument getDocument() {
+			return this.document;
 		}
 
 		/**
-		 * Diese Methode gibt den {@link DecodeDocumentAdapter} zurück.
+		 * Diese Methode implementiert {@link Node#getOwnerDocument()}.
 		 * 
-		 * @return {@link DecodeDocumentAdapter}.
+		 * @return {@link Node#getOwnerDocument()}.
 		 */
-		public DecodeDocumentAdapter getDocumentAdapter() {
+		public DecodeDocumentAdapter nodeGetOwnerDocument() {
 			return this.adapter;
 		}
 
@@ -1943,7 +1944,7 @@ public class Decoder {
 		 * @return {@link Text#getData()}.
 		 */
 		public String textGetData(final int index) {
-			final DecodeValue textValue = this.cache.valuePool.get(index);
+			final DecodeValue textValue = this.document.valuePool.get(index);
 			return textValue.value;
 		}
 
@@ -1964,11 +1965,12 @@ public class Decoder {
 		 * @return {@link Element#getPrefix()}.
 		 */
 		public String elementGetPrefix(final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup elementXmlns = this.cache.elementXmlnsPool.get(element.xmlns);
-			final DecodeLabel nodeLabel = this.cache.elementLabelPool.get(element.label);
-			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelPool.getUri(elementXmlns.indices, nodeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsNamePool.get(xmlnsLabel.name);
+			if(!this.xmlnsEnabled) return null;
+			final DecodeElement element = this.document.elementNodePool.get(index);
+			final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
+			final DecodeLabel nodeLabel = this.document.elementLabelPool.get(element.label);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, nodeLabel.uri);
+			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
 			return xmlnsValue;
@@ -1981,15 +1983,21 @@ public class Decoder {
 		 * @return {@link Element#getNodeName()}.
 		 */
 		public String elementGetNodeName(final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup elementXmlns = this.cache.elementXmlnsPool.get(element.xmlns);
-			final DecodeLabel elementLabel = this.cache.elementLabelPool.get(element.label);
-			final DecodeValue elementLabelName = this.cache.elementNamePool.get(elementLabel.name);
-			final DecodeLabel elementXmlnsLabel = this.cache.xmlnsLabelPool.getUri(elementXmlns.indices, elementLabel.uri);
-			final DecodeValue elementXmlnsLabelName = this.cache.xmlnsNamePool.get(elementXmlnsLabel.name);
-			final String elementXmlnsLabelNameValue = elementXmlnsLabelName.value;
-			if(elementXmlnsLabelNameValue.isEmpty()) return elementLabelName.value;
-			return elementXmlnsLabelNameValue + ":" + elementLabelName.value;
+			final DecodeElement elementNode = this.document.elementNodePool.get(index);
+			if(this.xmlnsEnabled){
+				final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(elementNode.xmlns);
+				final DecodeLabel elementLabel = this.document.elementLabelPool.get(elementNode.label);
+				final DecodeValue elementLabelName = this.document.elementNamePool.get(elementLabel.name);
+				final DecodeLabel elementXmlnsLabel =
+					this.document.xmlnsLabelPool.getUri(elementXmlns.indices, elementLabel.uri);
+				final DecodeValue elementXmlnsLabelName = this.document.xmlnsNamePool.get(elementXmlnsLabel.name);
+				final String elementXmlnsLabelNameValue = elementXmlnsLabelName.value;
+				if(elementXmlnsLabelNameValue.isEmpty()) return elementLabelName.value;
+				return elementXmlnsLabelNameValue + ":" + elementLabelName.value;
+			}else{
+				final DecodeValue elementName = this.document.elementNamePool.get(elementNode.label);
+				return elementName.value;
+			}
 		}
 
 		/**
@@ -1999,10 +2007,15 @@ public class Decoder {
 		 * @return {@link Element#getLocalName()}.
 		 */
 		public String elementGetLocalName(final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeLabel nodeLabel = this.cache.elementLabelPool.get(element.label);
-			final DecodeValue elementChars = this.cache.elementNamePool.get(nodeLabel.name);
-			return elementChars.value;
+			final DecodeElement elementNode = this.document.elementNodePool.get(index);
+			if(this.xmlnsEnabled){
+				final DecodeLabel elementLabel = this.document.elementLabelPool.get(elementNode.label);
+				final DecodeValue elementName = this.document.elementNamePool.get(elementLabel.name);
+				return elementName.value;
+			}else{
+				final DecodeValue elementName = this.document.elementNamePool.get(elementNode.label);
+				return elementName.value;
+			}
 		}
 
 		/**
@@ -2012,9 +2025,10 @@ public class Decoder {
 		 * @return {@link Element#getNamespaceURI()}.
 		 */
 		public String elementGetNamespaceURI(final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeLabel elementLabel = this.cache.elementLabelPool.get(element.label);
-			final DecodeValue uriChars = this.cache.uriPool.get(elementLabel.uri);
+			if(!this.xmlnsEnabled) return null;
+			final DecodeElement element = this.document.elementNodePool.get(index);
+			final DecodeLabel elementLabel = this.document.elementLabelPool.get(element.label);
+			final DecodeValue uriChars = this.document.uriPool.get(elementLabel.uri);
 			final String uriValue = uriChars.value;
 			if(uriValue.isEmpty()) return null;
 			return uriValue;
@@ -2039,8 +2053,8 @@ public class Decoder {
 		 * @param index Index des {@link DecodeElement}s.
 		 */
 		public void elementGetTextContent(final StringBuffer target, final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup children = this.cache.elementChildrenPool.get(element.children);
+			final DecodeElement element = this.document.elementNodePool.get(index);
+			final DecodeGroup children = this.document.elementChildrenPool.get(element.children);
 			for(final int index2: children.indices){
 				final int index3 = index2 - this.offset;
 				if(index3 < 0){
@@ -2083,25 +2097,36 @@ public class Decoder {
 		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String uri, final String name,
 			final int mode) {
 			final DecodeCollector collector;
-			if("*".equals(uri)){
+			if(this.xmlnsEnabled){
+				if("*".equals(uri)){
+					if("*".equals(name)){
+						collector = new DecodeCollector(this);
+					}else{
+						final DecodeValue elementName = this.document.elementNamePool.findValue(name);
+						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+						collector = new DecodeNameCollector(this, elementName.index);
+					}
+				}else{
+					final DecodeValue elementUri = this.document.uriPool.findValue(uri);
+					if(elementUri == null) return DecodeAdapter.VOID_NODE_LIST;
+					if("*".equals(name)){
+						collector = new DecodeUriCollector(this, elementUri.index);
+					}else{
+						final DecodeValue elementName = this.document.elementNamePool.findValue(name);
+						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+						final DecodeLabel elementlLabel =
+							this.document.elementLabelPool.findLabel(elementUri.index, elementName.index);
+						if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
+						collector = new DecodeLabelCollector(this, elementlLabel.index);
+					}
+				}
+			}else{
 				if("*".equals(name)){
 					collector = new DecodeCollector(this);
 				}else{
-					final DecodeValue nameChars = this.cache.elementNamePool.findValue(name);
-					if(nameChars == null) return DecodeAdapter.VOID_NODE_LIST;
-					collector = new DecodeNameCollector(this, nameChars.index);
-				}
-			}else{
-				final DecodeValue uriChars = this.cache.uriPool.findValue(uri);
-				if(uriChars == null) return DecodeAdapter.VOID_NODE_LIST;
-				if("*".equals(name)){
-					collector = new DecodeUriCollector(this, uriChars.index);
-				}else{
-					final DecodeValue nameChars = this.cache.elementNamePool.findValue(name);
-					if(nameChars == null) return DecodeAdapter.VOID_NODE_LIST;
-					final DecodeLabel elementlLabel = this.cache.elementLabelPool.findLabel(uriChars.index, nameChars.index);
-					if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
-					collector = new DecodeLabelCollector(this, elementlLabel.index);
+					final DecodeValue elementName = this.document.elementNamePool.findValue(name);
+					if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+					collector = new DecodeLabelCollector(this, elementName.index);
 				}
 			}
 			collector.collect(parent, mode);
@@ -2115,8 +2140,8 @@ public class Decoder {
 		 * @return {@link Element#getFirstChild()}.
 		 */
 		public DecodeChildAdapter elementGetFirstChild(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
 			final int[] indices = elementChildren.indices;
 			if(indices.length == 0) return null;
 			return this.elementGetChildNodesItem(parent, indices[0], 0);
@@ -2129,8 +2154,8 @@ public class Decoder {
 		 * @return {@link Element#getLastChild()}.
 		 */
 		public DecodeChildAdapter elementGetLastChild(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
 			final int[] indices = elementChildren.indices;
 			final int index = indices.length - 1;
 			if(index < 0) return null;
@@ -2144,8 +2169,8 @@ public class Decoder {
 		 * @return {@link Element#hasChildNodes()}.
 		 */
 		public boolean elementHasChildNodes(final int index) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
+			final DecodeElement element = this.document.elementNodePool.get(index);
+			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
 			return elementChildren.indices.length != 0;
 		}
 
@@ -2156,8 +2181,8 @@ public class Decoder {
 		 * @return {@link Element#getChildNodes()}.
 		 */
 		public DecodeElementChildrenAdapter elementGetChildNodes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
 			return new DecodeElementChildrenAdapter(parent, elementChildren.indices);
 		}
 
@@ -2207,20 +2232,26 @@ public class Decoder {
 		 * @return {@link Element#hasAttributeNS(String, String)}.
 		 */
 		public boolean elementHasAttribute(final int index, final String uri, final String name) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup elementAttributes = this.cache.elementAttributesPool.get(element.attributes);
-			if(elementAttributes.indices.length == 0) return false;
-			final DecodeValue uriChars = this.cache.uriPool.findValue(uri);
-			if(uriChars == null) return false;
-			final DecodeValue nameChars = this.cache.attributeNamePool.findValue(name);
-			if(nameChars == null) return false;
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
-			if(attributeLabel == null) return false;
-
-			final DecodeAttribute attribute =
-				this.cache.attributeNodePool.findLabel(elementAttributes.indices, attributeLabel.index);
-
-			return attribute != null;
+			final DecodeElement elementNode = this.document.elementNodePool.get(index);
+			final DecodeGroup attributeGroup = this.document.elementAttributesPool.get(elementNode.attributes);
+			if(attributeGroup.indices.length == 0) return false;
+			if(xmlnsEnabled){
+				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
+				if(uriChars == null) return false;
+				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
+				if(nameChars == null) return false;
+				final DecodeLabel attributeLabel = this.document.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
+				if(attributeLabel == null) return false;
+				final DecodeAttribute attribute =
+					this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeLabel.index);
+				return attribute != null;
+			}else{
+				final DecodeValue attributeName = this.document.attributeNamePool.findValue(name);
+				if(attributeName == null) return false;
+				final DecodeAttribute attributeNode =
+					this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeName.index);
+				return attributeNode != null;
+			}
 		}
 
 		/**
@@ -2232,20 +2263,29 @@ public class Decoder {
 		 * @return {@link Element#getAttributeNodeNS(String, String)}.
 		 */
 		public String elementGetAttribute(final int index, final String uri, final String name) {
-			final DecodeElement element = this.cache.elementNodePool.get(index);
-			final DecodeGroup elementAttributes = this.cache.elementAttributesPool.get(element.attributes);
+			final DecodeElement element = this.document.elementNodePool.get(index);
+			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			final int[] indices = elementAttributes.indices;
 			if(indices.length == 0) return "";
-			final DecodeValue uriChars = this.cache.uriPool.findValue(uri);
-			if(uriChars == null) return "";
-			final DecodeValue nameChars = this.cache.attributeNamePool.findValue(name);
-			if(nameChars == null) return "";
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
-			if(attributeLabel == null) return "";
-			final DecodeAttribute attribute = this.cache.attributeNodePool.findLabel(indices, attributeLabel.index);
-			if(attribute == null) return "";
-			final DecodeValue attributeChars = this.cache.valuePool.get(attribute.value);
-			return attributeChars.value;
+			if(xmlnsEnabled){
+				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
+				if(uriChars == null) return "";
+				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
+				if(nameChars == null) return "";
+				final DecodeLabel attributeLabel = this.document.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
+				if(attributeLabel == null) return "";
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(indices, attributeLabel.index);
+				if(attribute == null) return "";
+				final DecodeValue attributeChars = this.document.valuePool.get(attribute.value);
+				return attributeChars.value;
+			}else{
+				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
+				if(nameChars == null) return "";
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(indices, nameChars.index);
+				if(attribute == null) return "";
+				final DecodeValue attributeChars = this.document.valuePool.get(attribute.value);
+				return attributeChars.value;
+			}
 		}
 
 		/**
@@ -2281,19 +2321,27 @@ public class Decoder {
 		 */
 		public DecodeAttributeAdapter elementGetAttributesNamedItem(final DecodeElementAdapter parent, final String uri,
 			final String name) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementAttributes = this.cache.elementAttributesPool.get(element.attributes);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			final int[] indices = elementAttributes.indices;
 			if(indices.length == 0) return null;
-			final DecodeValue uriChars = this.cache.uriPool.findValue(uri);
-			if(uriChars == null) return null;
-			final DecodeValue nameChars = this.cache.attributeNamePool.findValue(name);
-			if(nameChars == null) return null;
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
-			if(attributeLabel == null) return null;
-			final DecodeAttribute attribute = this.cache.attributeNodePool.findLabel(indices, attributeLabel.index);
-			if(attribute == null) return null;
-			return new DecodeAttributeAdapter(parent, attribute.index);
+			if(xmlnsEnabled){
+				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
+				if(uriChars == null) return null;
+				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
+				if(nameChars == null) return null;
+				final DecodeLabel attributeLabel = this.document.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
+				if(attributeLabel == null) return null;
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(indices, attributeLabel.index);
+				if(attribute == null) return null;
+				return new DecodeAttributeAdapter(parent, attribute.index);
+			}else{
+				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
+				if(nameChars == null) return null;
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(indices, nameChars.index);
+				if(attribute == null) return null;
+				return new DecodeAttributeAdapter(parent, attribute.index);
+			}
 		}
 
 		/**
@@ -2303,8 +2351,8 @@ public class Decoder {
 		 * @return {@link Element#hasAttributes()}.
 		 */
 		public boolean elementHasAttributes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementAttributes = this.cache.elementAttributesPool.get(element.attributes);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			return elementAttributes.indices.length != 0;
 		}
 
@@ -2315,8 +2363,8 @@ public class Decoder {
 		 * @return {@link Element#getAttributes()}.
 		 */
 		public DecodeElementAttributesAdapter elementGetAttributes(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementAttributes = this.cache.elementAttributesPool.get(element.attributes);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			return new DecodeElementAttributesAdapter(parent, elementAttributes.indices);
 		}
 
@@ -2329,13 +2377,14 @@ public class Decoder {
 		 * @return {@code Prefix} oder {@code null}.
 		 */
 		public String elementLookupPrefix(final int index, final String uri) {
-			final DecodeValue uriChars = this.cache.uriPool.findValue(uri);
+			if(!xmlnsEnabled) return null;
+			final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 			if(uriChars == null) return null;
-			final DecodeElement node = this.cache.elementNodePool.get(index);
-			final DecodeGroup nodeXmlns = this.cache.elementXmlnsPool.get(node.xmlns);
-			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelPool.findUri(nodeXmlns.indices, uriChars.index);
+			final DecodeElement node = this.document.elementNodePool.get(index);
+			final DecodeGroup nodeXmlns = this.document.elementXmlnsPool.get(node.xmlns);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(nodeXmlns.indices, uriChars.index);
 			if(xmlnsLabel == null) return null;
-			final DecodeValue xmlnsChars = this.cache.xmlnsNamePool.get(xmlnsLabel.name);
+			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			return xmlnsChars.value;
 		}
 
@@ -2348,13 +2397,14 @@ public class Decoder {
 		 * @return {@code URI} oder {@code null}.
 		 */
 		public String elementLookupNamespaceURI(final int index, final String name) {
-			final DecodeValue nameChars = this.cache.xmlnsNamePool.findValue(name);
+			if(!xmlnsEnabled) return null;
+			final DecodeValue nameChars = this.document.xmlnsNamePool.findValue(name);
 			if(nameChars == null) return null;
-			final DecodeElement node = this.cache.elementNodePool.get(index);
-			final DecodeGroup nodeXmlns = this.cache.elementXmlnsPool.get(node.xmlns);
-			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelPool.findName(nodeXmlns.indices, nameChars.index);
+			final DecodeElement node = this.document.elementNodePool.get(index);
+			final DecodeGroup nodeXmlns = this.document.elementXmlnsPool.get(node.xmlns);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(nodeXmlns.indices, nameChars.index);
 			if(xmlnsLabel == null) return null;
-			final DecodeValue uriChars = this.cache.uriPool.get(xmlnsLabel.uri);
+			final DecodeValue uriChars = this.document.uriPool.get(xmlnsLabel.uri);
 			return uriChars.value;
 		}
 
@@ -2366,13 +2416,14 @@ public class Decoder {
 		 * @return {@link Attr#getPrefix()}.
 		 */
 		public String attributeGetPrefix(final DecodeElementAdapter parent, final int index) {
-			final DecodeAttribute attribute = this.cache.attributeNodePool.get(index);
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.get(attribute.label);
+			if(!this.xmlnsEnabled) return null;
+			final DecodeAttribute attribute = this.document.attributeNodePool.get(index);
+			final DecodeLabel attributeLabel = this.document.attributeLabelPool.get(attribute.label);
 			if(attributeLabel.uri == 0) return null;
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementXmlns = this.cache.elementXmlnsPool.get(element.xmlns);
-			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsNamePool.get(xmlnsLabel.name);
+			final DecodeElement element = this.document.elementNodePool.get(parent.index);
+			final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
+			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
 			return xmlnsValue;
@@ -2386,17 +2437,22 @@ public class Decoder {
 		 * @return {@link Attr#getNodeName()}.
 		 */
 		public String attributeGetNodeName(final DecodeElementAdapter parent, final int index) {
-			final DecodeAttribute attribute = this.cache.attributeNodePool.get(index);
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.get(attribute.label);
-			final DecodeValue attributeChars = this.cache.attributeNamePool.get(attributeLabel.name);
-			if(attributeLabel.uri == 0) return attributeChars.value;
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementXmlns = this.cache.elementXmlnsPool.get(element.xmlns);
-			final DecodeLabel xmlnsLabel = this.cache.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
-			final DecodeValue xmlnsChars = this.cache.xmlnsNamePool.get(xmlnsLabel.name);
-			final String xmlnsValue = xmlnsChars.value;
-			if(xmlnsValue.isEmpty()) return attributeChars.value;
-			return xmlnsValue + ":" + attributeChars.value;
+			final DecodeAttribute attributeNode = this.document.attributeNodePool.get(index);
+			if(this.xmlnsEnabled){
+				final DecodeLabel attributeLabel = this.document.attributeLabelPool.get(attributeNode.label);
+				final DecodeValue attributeChars = this.document.attributeNamePool.get(attributeLabel.name);
+				if(attributeLabel.uri == 0) return attributeChars.value;
+				final DecodeElement element = this.document.elementNodePool.get(parent.index);
+				final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
+				final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
+				final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
+				final String xmlnsValue = xmlnsChars.value;
+				if(xmlnsValue.isEmpty()) return attributeChars.value;
+				return xmlnsValue + ":" + attributeChars.value;
+			}else{
+				final DecodeValue attributeName = this.document.attributeNamePool.get(attributeNode.label);
+				return attributeName.value;
+			}
 		}
 
 		/**
@@ -2406,10 +2462,16 @@ public class Decoder {
 		 * @return {@link Attr#getLocalName()}.
 		 */
 		public String attributeLabelName(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeNodePool.get(index);
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.get(attribute.label);
-			final DecodeValue attributeChars = this.cache.attributeNamePool.get(attributeLabel.name);
-			return attributeChars.value;
+			final DecodeAttribute attributeNode = this.document.attributeNodePool.get(index);
+			if(this.xmlnsEnabled){
+				final DecodeLabel attributeLabel = this.document.attributeLabelPool.get(attributeNode.label);
+				final DecodeValue attributeName = this.document.attributeNamePool.get(attributeLabel.name);
+				return attributeName.value;
+			}else{
+				final DecodeValue attributeName = this.document.attributeNamePool.get(attributeNode.label);
+				return attributeName.value;
+
+			}
 		}
 
 		/**
@@ -2419,9 +2481,10 @@ public class Decoder {
 		 * @return {@link Attr#getNamespaceURI()}.
 		 */
 		public String attributeGetNamespaceURI(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeNodePool.get(index);
-			final DecodeLabel attributeLabel = this.cache.attributeLabelPool.get(attribute.label);
-			final DecodeValue uriChars = this.cache.uriPool.get(attributeLabel.uri);
+			if(!this.xmlnsEnabled) return null;
+			final DecodeAttribute attribute = this.document.attributeNodePool.get(index);
+			final DecodeLabel attributeLabel = this.document.attributeLabelPool.get(attribute.label);
+			final DecodeValue uriChars = this.document.uriPool.get(attributeLabel.uri);
 			final String uriValue = uriChars.value;
 			if(uriValue.isEmpty()) return null;
 			return uriValue;
@@ -2434,8 +2497,8 @@ public class Decoder {
 		 * @return {@link Attr#getNodeValue()}.
 		 */
 		public String attributeGetNodeValue(final int index) {
-			final DecodeAttribute attribute = this.cache.attributeNodePool.get(index);
-			final DecodeValue valueChars = this.cache.valuePool.get(attribute.value);
+			final DecodeAttribute attribute = this.document.attributeNodePool.get(index);
+			final DecodeValue valueChars = this.document.valuePool.get(attribute.value);
 			return valueChars.value;
 		}
 
@@ -2444,8 +2507,9 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeAdapter", this.cache);
+			return Objects.toStringCall("DecodeAdapter", this.document);
 		}
+
 	}
 
 	/**
@@ -2643,7 +2707,7 @@ public class Decoder {
 		 */
 		@Override
 		public Document getOwnerDocument() {
-			return this.adapter().getDocumentAdapter();
+			return this.adapter().nodeGetOwnerDocument();
 		}
 
 		/**
@@ -3995,7 +4059,7 @@ public class Decoder {
 		 */
 		public DecodeDocumentAdapter(final DecodeAdapter adapter) {
 			this.adapter = adapter;
-			this.documentElement = new DecodeElementAdapter(this, adapter.cache.documentElement, 0);
+			this.documentElement = new DecodeElementAdapter(this, adapter.document.documentElement, 0);
 		}
 
 		/**
@@ -4489,7 +4553,7 @@ public class Decoder {
 		 * @param adapter {@link DecodeAdapter}.
 		 */
 		public DecodeCollector(final DecodeAdapter adapter) {
-			this.cache = adapter.cache;
+			this.cache = adapter.document;
 			this.offset = adapter.offset;
 			this.results = new ArrayList<DecodeElementAdapter>();
 		}
@@ -4803,14 +4867,14 @@ public class Decoder {
 	 * Diese Methode liest die gegebene {@link DecodeSource} in einen neuen {@link DecodeAdapter} ein und gibt dessen
 	 * {@link DecodeDocumentAdapter} zurück.
 	 * 
-	 * @see DecodeAdapter#getDocumentAdapter()
+	 * @see DecodeAdapter#nodeGetOwnerDocument()
 	 * @param source {@link DecodeSource}.
 	 * @return {@link DecodeDocumentAdapter}.
 	 * @throws IOException Wenn das {@link DecodeSource} eine {@link IOException} auslöst.
 	 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 	 */
 	public DecodeDocumentAdapter decode(final DecodeSource source) throws IOException {
-		return new DecodeAdapter(new DecodeDocument(source)).getDocumentAdapter();
+		return new DecodeAdapter(new DecodeDocument(source)).nodeGetOwnerDocument();
 	}
 
 }

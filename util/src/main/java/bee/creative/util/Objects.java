@@ -360,9 +360,9 @@ public final class Objects {
 	 */
 	public static int hash(final Object... objects) {
 		if(objects == null) return 0;
-		int hash = 1;
+		int hash = 0x811C9DC5;
 		for(final Object object: objects){
-			hash = (31 * hash) + Objects.hash(object);
+			hash = (hash * 0x01000193) ^ Objects.hash(object);
 		}
 		return hash;
 	}
@@ -377,7 +377,7 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object1, final Object object2) {
-		return ((31 + Objects.hash(object1)) * 31) + Objects.hash(object2);
+		return ((0x50C5D1F ^ Objects.hash(object1)) * 0x01000193) ^ Objects.hash(object2);
 	}
 
 	/**
@@ -391,7 +391,7 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object1, final Object object2, final Object object3) {
-		return (Objects.hash(object1, object2) * 31) + Objects.hash(object3);
+		return (Objects.hash(object1, object2) * 0x01000193)^ Objects.hash(object3);
 	}
 
 	/**
@@ -435,9 +435,9 @@ public final class Objects {
 	 */
 	public static int hashEx(final Object... objects) {
 		if(objects == null) return 0;
-		int hash = 1;
+		int hash = 0x811C9DC5;
 		for(final Object object: objects){
-			hash = (31 * hash) + Objects.hashEx(object);
+			hash = (hash*0x01000193) ^ Objects.hashEx(object);
 		}
 		return hash;
 	}
@@ -453,7 +453,7 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hashEx(final Object object1, final Object object2) {
-		return ((31 + Objects.hashEx(object1)) * 31) + Objects.hashEx(object2);
+		return ((0x50C5D1F ^ Objects.hashEx(object1))*0x01000193) ^Objects.hashEx(object2);
 	}
 
 	/**
@@ -468,7 +468,7 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hashEx(final Object object1, final Object object2, final Object object3) {
-		return (Objects.hashEx(object1, object2) * 31) + Objects.hashEx(object3);
+		return (Objects.hashEx(object1, object2) * 0x01000193) ^ Objects.hashEx(object3);
 	}
 
 	/**

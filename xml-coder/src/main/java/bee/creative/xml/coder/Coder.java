@@ -14,21 +14,16 @@ public class Coder {
 	 */
 	static final Charset CHARSET = Charset.forName("UTF-8");
 
-	static int hashHash(int hash) {
-		hash ^= (hash >>> 23) ^ (hash >>> 11);
-		return hash ^ (hash >>> 7) ^ (hash >>> 3);
-	}
-
 	public static int hashValue(final String value) {
-		int hash = 1;
+		int hash = 0x811C9DC5;
 		for(int i = 0, length = value.length(); i < length; i++){
-			hash = (hash * 31) + value.charAt(i);
+			hash = (hash * 0x01000193) ^ value.charAt(i);
 		}
-		return Coder.hashHash(hash);
+		return hash;
 	}
 
 	public static int hashLabel(final int uri, final int name) {
-		return Coder.hashHash((uri * 31) + name);
+		return (uri * 23) ^ (name * 97);
 	}
 
 	public static byte[] encodeChars(final String value) {
