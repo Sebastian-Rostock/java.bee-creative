@@ -894,7 +894,7 @@ public class Decoder {
 			this.value = value;
 		}
 
-		public String getValue() {
+		public String value() {
 			return this.value;
 		}
 
@@ -942,8 +942,7 @@ public class Decoder {
 		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 		 */
-		public DecodeValuePool(final DecodeSource source, final DecodeGroupPool valueHash) throws IOException,
-			NullPointerException {
+		public DecodeValuePool(final DecodeSource source, final DecodeGroupPool valueHash) throws IOException, NullPointerException {
 			super(source, 1);
 			this.valueHash = valueHash;
 			this.valueHashCount = valueHash.itemCount;
@@ -1044,11 +1043,11 @@ public class Decoder {
 			this.name = nameChars;
 		}
 
-		public int getUri() {
+		public int uri() {
 			return this.uri;
 		}
 
-		public int getName() {
+		public int name() {
 			return this.name;
 		}
 
@@ -1383,8 +1382,7 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeElementNode", this.index, this.label, this.xmlns, this.children,
-				this.attributes);
+			return Objects.toStringCall("DecodeElementNode", this.index, this.label, this.xmlns, this.children, this.attributes);
 		}
 
 	}
@@ -1724,91 +1722,91 @@ public class Decoder {
 			return this.xmlnsEnabled;
 		}
 
-		public DecodeGroupPool getUriHash() {
+		public DecodeGroupPool uriHash() {
 			return this.uriHash;
 		}
 
-		public DecodeValuePool getUriPool() {
+		public DecodeValuePool uriPool() {
 			return this.uriPool;
 		}
 
-		public DecodeGroupPool getValueHash() {
+		public DecodeGroupPool valueHash() {
 			return this.valueHash;
 		}
 
-		public DecodeValuePool getValuePool() {
+		public DecodeValuePool valuePool() {
 			return this.valuePool;
 		}
 
-		public DecodeGroupPool getXmlnsNameHash() {
+		public DecodeGroupPool xmlnsNameHash() {
 			return this.xmlnsNameHash;
 		}
 
-		public DecodeValuePool getXmlnsNamePool() {
+		public DecodeValuePool xmlnsNamePool() {
 			return this.xmlnsNamePool;
 		}
 
-		public DecodeGroupPool getXmlnsLabelHash() {
+		public DecodeGroupPool xmlnsLabelHash() {
 			return this.xmlnsLabelHash;
 		}
 
-		public DecodeLabelPool getXmlnsLabelPool() {
+		public DecodeLabelPool xmlnsLabelPool() {
 			return this.xmlnsLabelPool;
 		}
 
-		public DecodeGroupPool getElementNameHash() {
+		public DecodeGroupPool elementNameHash() {
 			return this.elementNameHash;
 		}
 
-		public DecodeValuePool getElementNamePool() {
+		public DecodeValuePool elementNamePool() {
 			return this.elementNamePool;
 		}
 
-		public DecodeGroupPool getElementLabelHash() {
+		public DecodeGroupPool elementLabelHash() {
 			return this.elementLabelHash;
 		}
 
-		public DecodeLabelPool getElementLabelPool() {
+		public DecodeLabelPool elementLabelPool() {
 			return this.elementLabelPool;
 		}
 
-		public DecodeGroupPool getAttributeNameHash() {
+		public DecodeGroupPool attributeNameHash() {
 			return this.attributeNameHash;
 		}
 
-		public DecodeValuePool getAttributeNamePool() {
+		public DecodeValuePool attributeNamePool() {
 			return this.attributeNamePool;
 		}
 
-		public DecodeGroupPool getAttributeLabelHash() {
+		public DecodeGroupPool attributeLabelHash() {
 			return this.attributeLabelHash;
 		}
 
-		public DecodeLabelPool getAttributeLabelPool() {
+		public DecodeLabelPool attributeLabelPool() {
 			return this.attributeLabelPool;
 		}
 
-		public DecodeGroupPool getElementXmlnsPool() {
+		public DecodeGroupPool elementXmlnsPool() {
 			return this.elementXmlnsPool;
 		}
 
-		public DecodeGroupPool getElementChildrenPool() {
+		public DecodeGroupPool elementChildrenPool() {
 			return this.elementChildrenPool;
 		}
 
-		public DecodeGroupPool getElementAttributesPool() {
+		public DecodeGroupPool elementAttributesPool() {
 			return this.elementAttributesPool;
 		}
 
-		public DecodeElementPool getElementNodePool() {
+		public DecodeElementPool elementNodePool() {
 			return this.elementNodePool;
 		}
 
-		public DecodeAttributePool getAttributeNodePool() {
+		public DecodeAttributePool attributeNodePool() {
 			return this.attributeNodePool;
 		}
 
-		public int getDocumentElement() {
+		public int documentElement() {
 			return this.documentElement;
 		}
 
@@ -1817,13 +1815,11 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "InputDocumentCache", "uriCache", this.uriPool, "valueCache",
-				this.valuePool, "xmlnsNameCache", this.xmlnsNamePool, "xmlnsLabelCache", this.xmlnsLabelPool,
-				"elementNodeCache", this.elementNodePool, "elementNameCache", this.elementNamePool, "elementLabelCache",
-				this.elementLabelPool, "elementXmlnsCache", this.elementXmlnsPool, "elementChildrenCache",
-				this.elementChildrenPool, "elementAttributesCache", this.elementAttributesPool, "attributeNodeCache",
-				this.attributeNodePool, "attributeNameCache", this.attributeNamePool, "attributeLabelCache",
-				this.attributeLabelPool, "documentElement", this.documentElement);
+			return Objects.toStringCall(true, true, "InputDocumentCache", "uriCache", this.uriPool, "valueCache", this.valuePool, "xmlnsNameCache",
+				this.xmlnsNamePool, "xmlnsLabelCache", this.xmlnsLabelPool, "elementNodeCache", this.elementNodePool, "elementNameCache", this.elementNamePool,
+				"elementLabelCache", this.elementLabelPool, "elementXmlnsCache", this.elementXmlnsPool, "elementChildrenCache", this.elementChildrenPool,
+				"elementAttributesCache", this.elementAttributesPool, "attributeNodeCache", this.attributeNodePool, "attributeNameCache", this.attributeNamePool,
+				"attributeLabelCache", this.attributeLabelPool, "documentElement", this.documentElement);
 		}
 
 	}
@@ -1988,8 +1984,7 @@ public class Decoder {
 				final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(elementNode.xmlns);
 				final DecodeLabel elementLabel = this.document.elementLabelPool.get(elementNode.label);
 				final DecodeValue elementLabelName = this.document.elementNamePool.get(elementLabel.name);
-				final DecodeLabel elementXmlnsLabel =
-					this.document.xmlnsLabelPool.getUri(elementXmlns.indices, elementLabel.uri);
+				final DecodeLabel elementXmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, elementLabel.uri);
 				final DecodeValue elementXmlnsLabelName = this.document.xmlnsNamePool.get(elementXmlnsLabel.name);
 				final String elementXmlnsLabelNameValue = elementXmlnsLabelName.value;
 				if(elementXmlnsLabelNameValue.isEmpty()) return elementLabelName.value;
@@ -2094,8 +2089,7 @@ public class Decoder {
 		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw.
 		 *         {@link Document#getElementsByTagNameNS(String, String)}.
 		 */
-		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String uri, final String name,
-			final int mode) {
+		public NodeList elementGetElementsByTagName(final DecodeElementAdapter parent, final String uri, final String name, final int mode) {
 			final DecodeCollector collector;
 			if(this.xmlnsEnabled){
 				if("*".equals(uri)){
@@ -2114,8 +2108,7 @@ public class Decoder {
 					}else{
 						final DecodeValue elementName = this.document.elementNamePool.findValue(name);
 						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-						final DecodeLabel elementlLabel =
-							this.document.elementLabelPool.findLabel(elementUri.index, elementName.index);
+						final DecodeLabel elementlLabel = this.document.elementLabelPool.findLabel(elementUri.index, elementName.index);
 						if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
 						collector = new DecodeLabelCollector(this, elementlLabel.index);
 					}
@@ -2235,21 +2228,19 @@ public class Decoder {
 			final DecodeElement elementNode = this.document.elementNodePool.get(index);
 			final DecodeGroup attributeGroup = this.document.elementAttributesPool.get(elementNode.attributes);
 			if(attributeGroup.indices.length == 0) return false;
-			if(xmlnsEnabled){
+			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 				if(uriChars == null) return false;
 				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
 				if(nameChars == null) return false;
 				final DecodeLabel attributeLabel = this.document.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
 				if(attributeLabel == null) return false;
-				final DecodeAttribute attribute =
-					this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeLabel.index);
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeLabel.index);
 				return attribute != null;
 			}else{
 				final DecodeValue attributeName = this.document.attributeNamePool.findValue(name);
 				if(attributeName == null) return false;
-				final DecodeAttribute attributeNode =
-					this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeName.index);
+				final DecodeAttribute attributeNode = this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeName.index);
 				return attributeNode != null;
 			}
 		}
@@ -2267,7 +2258,7 @@ public class Decoder {
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			final int[] indices = elementAttributes.indices;
 			if(indices.length == 0) return "";
-			if(xmlnsEnabled){
+			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 				if(uriChars == null) return "";
 				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
@@ -2319,13 +2310,12 @@ public class Decoder {
 		 * @param name {@code Name}.
 		 * @return {@link DecodeAttributeAdapter}.
 		 */
-		public DecodeAttributeAdapter elementGetAttributesNamedItem(final DecodeElementAdapter parent, final String uri,
-			final String name) {
+		public DecodeAttributeAdapter elementGetAttributesNamedItem(final DecodeElementAdapter parent, final String uri, final String name) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
 			final int[] indices = elementAttributes.indices;
 			if(indices.length == 0) return null;
-			if(xmlnsEnabled){
+			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 				if(uriChars == null) return null;
 				final DecodeValue nameChars = this.document.attributeNamePool.findValue(name);
@@ -2377,7 +2367,7 @@ public class Decoder {
 		 * @return {@code Prefix} oder {@code null}.
 		 */
 		public String elementLookupPrefix(final int index, final String uri) {
-			if(!xmlnsEnabled) return null;
+			if(!this.xmlnsEnabled) return null;
 			final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 			if(uriChars == null) return null;
 			final DecodeElement node = this.document.elementNodePool.get(index);
@@ -2397,7 +2387,7 @@ public class Decoder {
 		 * @return {@code URI} oder {@code null}.
 		 */
 		public String elementLookupNamespaceURI(final int index, final String name) {
-			if(!xmlnsEnabled) return null;
+			if(!this.xmlnsEnabled) return null;
 			final DecodeValue nameChars = this.document.xmlnsNamePool.findValue(name);
 			if(nameChars == null) return null;
 			final DecodeElement node = this.document.elementNodePool.get(index);
@@ -3258,8 +3248,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void setAttributeNS(final String namespaceURI, final String qualifiedName, final String value)
-			throws DOMException {
+		public void setAttributeNS(final String namespaceURI, final String qualifiedName, final String value) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -3307,8 +3296,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void setIdAttributeNS(final String namespaceURI, final String localName, final boolean isId)
-			throws DOMException {
+		public void setIdAttributeNS(final String namespaceURI, final String localName, final boolean isId) throws DOMException {
 			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
 		}
 
@@ -4000,18 +3988,16 @@ public class Decoder {
 		 * 
 		 * @see DOMConfiguration#getParameter(String)
 		 */
-		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_TRUE_LIST = Collections.unmodifiableList(Arrays
-			.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations",
-				"element-content-whitespace"));
+		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_TRUE_LIST = Collections.unmodifiableList(Arrays.asList("comments",
+			"datatype-normalization", "well-formed", "namespaces", "namespace-declarations", "element-content-whitespace"));
 
 		/**
 		 * Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
 		 * 
 		 * @see DOMConfiguration#getParameter(String)
 		 */
-		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_FALSE_LIST = Collections.unmodifiableList(Arrays
-			.asList("cdata-sections", "entities", "split-cdata-sections", "validate", "infoset", "normalize-characters",
-				"canonical-form", "validate-if-schema", "check-character-normalization"));
+		public static final List<String> VOID_DOM_CONFIGURATION_PARAMETER_FALSE_LIST = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities",
+			"split-cdata-sections", "validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
 
 		/**
 		 * Dieses Feld speichert die leere {@link DOMImplementation}.
@@ -4029,14 +4015,12 @@ public class Decoder {
 			}
 
 			@Override
-			public DocumentType createDocumentType(final String qualifiedName, final String publicId, final String systemId)
-				throws DOMException {
+			public DocumentType createDocumentType(final String qualifiedName, final String publicId, final String systemId) throws DOMException {
 				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 			}
 
 			@Override
-			public Document createDocument(final String namespaceURI, final String qualifiedName, final DocumentType doctype)
-				throws DOMException {
+			public Document createDocument(final String namespaceURI, final String qualifiedName, final DocumentType doctype) throws DOMException {
 				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 			}
 
@@ -4228,8 +4212,7 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagName(final String name) {
-			return this.adapter().elementGetElementsByTagName(this.documentElement, name,
-				DecodeCollector.MODE_DESCENDANT_SELF);
+			return this.adapter().elementGetElementsByTagName(this.documentElement, name, DecodeCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**
@@ -4237,8 +4220,7 @@ public class Decoder {
 		 */
 		@Override
 		public NodeList getElementsByTagNameNS(final String uri, final String name) {
-			return this.adapter().elementGetElementsByTagName(this.documentElement, uri, name,
-				DecodeCollector.MODE_DESCENDANT_SELF);
+			return this.adapter().elementGetElementsByTagName(this.documentElement, uri, name, DecodeCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**
@@ -4293,8 +4275,7 @@ public class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ProcessingInstruction createProcessingInstruction(final String target, final String data)
-			throws DOMException {
+		public ProcessingInstruction createProcessingInstruction(final String target, final String data) throws DOMException {
 			throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
 		}
 
