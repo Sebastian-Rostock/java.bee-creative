@@ -39,8 +39,8 @@ import bee.creative.xml.coder.Decoder.DecodeDocument;
  * Darstellung.
  * <p>
  * Als Eingabe werden ein {@link XMLReader} und eine {@link InputSource} verwendet, wobei das
- * {@link EncodeDocumentAdapter} als {@link ContentHandler} die vom {@link XMLReader} gelesenen Daten aufnimmt. Die
- * eingelesenen Daten des {@link EncodeDocumentAdapter}s werden anschließend unter beachtung der Optionen des
+ * {@link EncodeDocumentHandler} als {@link ContentHandler} die vom {@link XMLReader} gelesenen Daten aufnimmt. Die
+ * eingelesenen Daten des {@link EncodeDocumentHandler}s werden anschließend unter beachtung der Optionen des
  * {@link Encoder}s in ein {@link EncodeTarget} gespeichert.
  * 
  * @see Decoder
@@ -863,6 +863,8 @@ public class Encoder {
 
 		/**
 		 * Diese Methode gibt die {@link EncodeGroup} der {@code URI/Prefix}-{@link EncodeLabel}s oder {@code null} zurück.
+		 * Die Elemente dieser {@link EncodeGroup} sind primär nach {@link EncodeLabel#uri()} und sekundär nach
+		 * {@link EncodeLabel#name()} aufsteigend sortiert.
 		 * 
 		 * @see Element#lookupPrefix(String)
 		 * @see Element#lookupNamespaceURI(String)
@@ -883,7 +885,9 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@link EncodeGroup} der {@code Attributes} zurück.
+		 * Diese Methode gibt die {@link EncodeGroup} der {@code Attributes} zurück. Die Elemente dieser {@link EncodeGroup}
+		 * sind nach {@link EncodeAttribute#name()} bzw. primär nach {@link EncodeLabel#name()} und sekundär nach
+		 * {@link EncodeLabel#uri()} des {@link EncodeAttribute#label()} aufsteigend sortiert.
 		 * 
 		 * @see Element#getAttributes()
 		 * @return {@link EncodeGroup} der {@code Attributes}.
@@ -1552,7 +1556,7 @@ public class Encoder {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class EncodeDocumentAdapter implements ContentHandler {
+	public static class EncodeDocumentHandler implements ContentHandler {
 
 		/**
 		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als
@@ -1731,7 +1735,7 @@ public class Encoder {
 		 * @param xmlnsEnabled {@code xmlns}-Aktivierung.
 		 * @throws NullPointerException Wenn das gegebene {@link EncodeDocument} {@code null} ist.
 		 */
-		public EncodeDocumentAdapter(final EncodeDocument document, final boolean xmlnsEnabled) throws NullPointerException {
+		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled) throws NullPointerException {
 			if(document == null) throw new NullPointerException("document is null");
 			this.document = document;
 			this.cursorStack = new CursorStack();
@@ -1931,9 +1935,10 @@ public class Encoder {
 	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
 	 * {@link EncodeValue}s.
 	 * 
+	 * @see Coder#hashValue(String)
 	 * @see Encoder#compilePool(EncodePool, int, Comparator)
 	 */
-	static final Comparable<EncodeValue> ValueHasher = new Comparable<EncodeValue>() {
+	protected static final Comparable<EncodeValue> ValueHasher = new Comparable<EncodeValue>() {
 
 		@Override
 		public int compareTo(final EncodeValue value) {
@@ -1946,9 +1951,10 @@ public class Encoder {
 	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
 	 * {@link EncodeLabel}s.
 	 * 
+	 * @see Coder#hashLabel(int, int)
 	 * @see Encoder#compilePool(EncodePool, int, Comparator)
 	 */
-	static final Comparable<EncodeLabel> LabelHasher = new Comparable<EncodeLabel>() {
+	protected static final Comparable<EncodeLabel> LabelHasher = new Comparable<EncodeLabel>() {
 
 		@Override
 		public int compareTo(final EncodeLabel value) {
@@ -1958,10 +1964,10 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeItem} nach ihren
-	 * {@link EncodeItem#index indices}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeItem}s nach ihrem
+	 * {@link EncodeItem#index()}.
 	 */
-	static final Comparator<EncodeItem> IndexComparator = new Comparator<EncodeItem>() {
+	protected static final Comparator<EncodeItem> IndexComparator = new Comparator<EncodeItem>() {
 
 		@Override
 		public int compare(final EncodeItem o1, final EncodeItem o2) {
@@ -1971,10 +1977,11 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s nach ihren
-	 * {@code Name}- und {@code URI}-{@link EncodeValue} via {@link Encoder#IndexComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach
+	 * ihrem {@link EncodeLabel#name()} und sekundär nach ihrer {@link EncodeLabel#uri()} via
+	 * {@link Encoder#IndexComparator}.
 	 */
-	static final Comparator<EncodeLabel> LabelComparator = new Comparator<EncodeLabel>() {
+	protected static final Comparator<EncodeLabel> LabelComparator = new Comparator<EncodeLabel>() {
 
 		@Override
 		public int compare(final EncodeLabel o1, final EncodeLabel o2) {
@@ -1986,10 +1993,10 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeValue} nach ihren
-	 * {@link EncodeValue#value values}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeValue}s nach ihrem
+	 * {@link EncodeValue#value()}.
 	 */
-	static final Comparator<EncodeValue> ValueComparator = new Comparator<EncodeValue>() {
+	protected static final Comparator<EncodeValue> ValueComparator = new Comparator<EncodeValue>() {
 
 		@Override
 		public int compare(final EncodeValue o1, final EncodeValue o2) {
@@ -2000,10 +2007,10 @@ public class Encoder {
 
 	/**
 	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach
-	 * ihren {@code URI}-{@link EncodeValue} und sekundär nach ihren {@code Name}-{@link EncodeValue} via
+	 * ihrer {@link EncodeLabel#uri()} und sekundär nach ihrem {@link EncodeLabel#name()} via
 	 * {@link Encoder#ValueComparator}.
 	 */
-	static final Comparator<EncodeLabel> XmlnsComparator = new Comparator<EncodeLabel>() {
+	protected static final Comparator<EncodeLabel> XmlnsComparator = new Comparator<EncodeLabel>() {
 
 		@Override
 		public int compare(final EncodeLabel o1, final EncodeLabel o2) {
@@ -2015,10 +2022,10 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s nach den
-	 * {@code Name}-{@link EncodeValue} via {@link Encoder#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s nach ihrem
+	 * {@link EncodeAttribute#name()} via {@link Encoder#ValueComparator}.
 	 */
-	static final Comparator<EncodeAttribute> AttributeNameComparator = new Comparator<EncodeAttribute>() {
+	protected static final Comparator<EncodeAttribute> AttributeNameComparator = new Comparator<EncodeAttribute>() {
 
 		@Override
 		public int compare(final EncodeAttribute value1, final EncodeAttribute value2) {
@@ -2028,19 +2035,17 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute} primär nach
-	 * den {@code Name}-{@link EncodeValue} und sekundär nach den {@code URI}-{@link EncodeValue} ihrer
-	 * {@link EncodeLabel}s via {@link Encoder#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s primär nach
+	 * dem {@link EncodeLabel#name()} und sekundär nach der {@link EncodeLabel#uri()} der {@link EncodeAttribute#label()}
+	 * via {@link Encoder#ValueComparator}.
 	 */
-	static final Comparator<EncodeAttribute> AttributeLabelComparator = new Comparator<EncodeAttribute>() {
+	protected static final Comparator<EncodeAttribute> AttributeLabelComparator = new Comparator<EncodeAttribute>() {
 
 		@Override
 		public int compare(final EncodeAttribute value1, final EncodeAttribute value2) {
-			final EncodeLabel o1 = value1.label;
-			final EncodeLabel o2 = value2.label;
-			final int comp = Encoder.ValueComparator.compare(o1.name, o2.name);
+			final int comp = Encoder.ValueComparator.compare(value1.label.name, value2.label.name);
 			if(comp != 0) return comp;
-			return Encoder.ValueComparator.compare(o1.uri, o2.uri);
+			return Encoder.ValueComparator.compare(value1.label.uri, value2.label.uri);
 		}
 
 	};
@@ -2056,7 +2061,7 @@ public class Encoder {
 	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. das gegebene {@code int}-Array
 	 *         {@code null} ist.
 	 */
-	static void writeInts(final EncodeTarget target, final int... values) throws IOException, NullPointerException {
+	protected static void writeInts(final EncodeTarget target, final int... values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(values == null) throw new NullPointerException("values is null");
 		final byte[] array = Coder.encodeIndices(values);
@@ -2077,7 +2082,7 @@ public class Encoder {
 	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}-
 	 *         {@link List} {@code null} ist.
 	 */
-	static void writeItems(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
+	protected static void writeItems(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(values == null) throw new NullPointerException("values is null");
 		Encoder.writeInts(target, values.size());
@@ -2102,7 +2107,7 @@ public class Encoder {
 	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeList}-
 	 *         {@link List} {@code null} ist.
 	 */
-	static void writeLists(final EncodeTarget target, final List<? extends EncodeList> values) throws IOException, NullPointerException {
+	protected static void writeLists(final EncodeTarget target, final List<? extends EncodeList> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(values == null) throw new NullPointerException("values is null");
 		Encoder.writeInts(target, values.size());
@@ -2131,7 +2136,7 @@ public class Encoder {
 	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}-
 	 *         {@link List} {@code null} ist.
 	 */
-	static void writeIndices(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
+	protected static void writeIndices(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(values == null) throw new NullPointerException("values is null");
 		final int size = values.size();
@@ -2162,8 +2167,8 @@ public class Encoder {
 	 * @throws NullPointerException Wenn der gegebene {@link EncodePool} bzw. der gegebene {@link Comparator} {@code null}
 	 *         ist.
 	 */
-	static <GItem extends EncodeItem> List<GItem> compilePool(final EncodePool<? extends GItem> values, final int offset, final Comparator<? super GItem> helper)
-		throws NullPointerException {
+	protected static <GItem extends EncodeItem> List<GItem> compilePool(final EncodePool<? extends GItem> values, final int offset,
+		final Comparator<? super GItem> helper) throws NullPointerException {
 		if(values == null) throw new NullPointerException("values is null");
 		if(helper == null) throw new NullPointerException("helper is null");
 		final List<GItem> list = new ArrayList<GItem>(values.size());
@@ -2190,7 +2195,7 @@ public class Encoder {
 	 * @return {@link EncodeGroup}-{@link List} als {@code Hash-Table} (möglicherweise leer).
 	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. das gegebene {@link Comparable} {@code null} ist.
 	 */
-	static <GItem extends EncodeItem> List<EncodeGroup> cimpileHash(final List<? extends GItem> values, final boolean enabled,
+	protected static <GItem extends EncodeItem> List<EncodeGroup> cimpileHash(final List<? extends GItem> values, final boolean enabled,
 		final Comparable<? super GItem> helper) throws NullPointerException {
 		if(values == null) throw new NullPointerException("values is null");
 		if(helper == null) throw new NullPointerException("helper is null");
@@ -2213,112 +2218,55 @@ public class Encoder {
 		return list;
 	}
 
+	/**
+	 * Dieses Feld speichert die {@code xmlns}-Aktivierung.
+	 */
 	protected boolean xmlnsEnabled = true;
 
+	/**
+	 * Dieses Feld speichert die {@code URI-Hash}-Aktivierung.
+	 */
 	protected boolean uriHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Value-Hash}-Aktivierung.
+	 */
 	protected boolean valueHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Xmlns-Name-Hash}-Aktivierung.
+	 */
 	protected boolean xmlnsNameHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Xmlns-Label-Hash}-Aktivierung.
+	 */
 	protected boolean xmlnsLabelHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Element-Name-Hash}-Aktivierung.
+	 */
 	protected boolean elementNameHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Element-Label-Hash}-Aktivierung.
+	 */
 	protected boolean elementLabelHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Attribute-Name-Hash}-Aktivierung.
+	 */
 	protected boolean attributeNameHashEnabled = false;
 
+	/**
+	 * Dieses Feld speichert die {@code Attribute-Label-Hash}-Aktivierung.
+	 */
 	protected boolean attributeLabelHashEnabled = false;
 
 	/**
 	 * Dieser Konstrukteur initialisiert den {@link Encoder}.
 	 */
 	public Encoder() {
-	}
-
-	/**
-	 * Diese Methode liest die gegebene Quell-{@link File} mit dem einem neuen {@link XMLReader} in einen neuen
-	 * {@link EncodeDocumentAdapter} ein und speichert dessen Daten in die gegebene Ziel-{@link File}.
-	 * 
-	 * @see FileReader
-	 * @see InputSource
-	 * @see RandomAccessFile
-	 * @see EncodeTargetFile
-	 * @see #encode(XMLReader, InputSource, EncodeTarget)
-	 * @param source Quell-{@link File}.
-	 * @param target Ziel-{@link File}.
-	 * @throws IOException Wenn das verwendete {@link RandomAccessFile} eine {@link IOException} auslöst.
-	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
-	 */
-	public void encode(final File source, final File target) throws IOException, SAXException {
-		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new EncodeTargetFile(target));
-	}
-
-	public EncodeDocument encode(final XMLReader reader, final InputSource source) throws IOException, SAXException {
-		final EncodeDocumentAdapter adapter = new EncodeDocumentAdapter(new EncodeDocument(), this.xmlnsEnabled);
-		reader.setContentHandler(adapter);
-		reader.parse(source);
-		return adapter.document;
-	}
-
-	/**
-	 * Diese Methode liest die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in einen neuen
-	 * {@link EncodeDocumentAdapter} ein und speichert dessen Daten in das gegebene {@link EncodeTarget}.
-	 * 
-	 * @see XMLReader#setContentHandler(ContentHandler)
-	 * @see XMLReader#parse(InputSource)
-	 * @param reader {@link XMLReader}.
-	 * @param source {@link InputSource}.
-	 * @param target {@link EncodeTarget}.
-	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
-	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
-	 */
-	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException, SAXException {
-		final EncodeDocument document = this.encode(reader, source);
-		final List<EncodeValue> uriPool = Encoder.compilePool(document.uriPool, 0, Encoder.ValueComparator);
-		final List<EncodeGroup> uriHash = Encoder.cimpileHash(uriPool, this.uriHashEnabled, Encoder.ValueHasher);
-		final List<EncodeValue> valuePool = Encoder.compilePool(document.valuePool, 0, Encoder.ValueComparator);
-		final List<EncodeGroup> valueHash = Encoder.cimpileHash(valuePool, this.valueHashEnabled, Encoder.ValueHasher);
-		final List<EncodeValue> xmlnsNamePool = Encoder.compilePool(document.xmlnsNamePool, 0, Encoder.ValueComparator);
-		final List<EncodeGroup> xmlnsNameHash = Encoder.cimpileHash(xmlnsNamePool, this.xmlnsNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> xmlnsLabelPool = Encoder.compilePool(document.xmlnsLabelPool, 0, Encoder.LabelComparator);
-		final List<EncodeGroup> xmlnsLabelHash = Encoder.cimpileHash(xmlnsLabelPool, this.xmlnsLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeValue> elementNamePool = Encoder.compilePool(document.elementNamePool, 0, Encoder.ValueComparator);
-		final List<EncodeGroup> elementNameHash = Encoder.cimpileHash(elementNamePool, this.elementNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> elementLabelPool = Encoder.compilePool(document.elementLabelPool, 0, Encoder.LabelComparator);
-		final List<EncodeGroup> elementLabelHash = Encoder.cimpileHash(elementLabelPool, this.elementLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeValue> attributeNamePool = Encoder.compilePool(document.attributeNamePool, 0, Encoder.ValueComparator);
-		final List<EncodeGroup> attributeNameHash = Encoder.cimpileHash(attributeNamePool, this.attributeNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> attributeLabelPool = Encoder.compilePool(document.attributeLabelPool, 0, Encoder.LabelComparator);
-		final List<EncodeGroup> attributeLabelHash = Encoder.cimpileHash(attributeLabelPool, this.attributeLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeGroup> elementXmlnsPool = Encoder.compilePool(document.elementXmlnsPool, 0, Encoder.IndexComparator);
-		final List<EncodeGroup> elementChildrenPool = Encoder.compilePool(document.elementChildrenPool, 0, Encoder.IndexComparator);
-		final List<EncodeGroup> elementAttributesPool = Encoder.compilePool(document.elementAttributesPool, 0, Encoder.IndexComparator);
-		final List<EncodeElement> elementNodePool = Encoder.compilePool(document.elementNodePool, valuePool.size(), Encoder.IndexComparator);
-		final List<EncodeAttribute> attributeNodePool = Encoder.compilePool(document.attributeNodePool, 0, Encoder.IndexComparator);
-		Encoder.writeLists(target, uriHash);
-		Encoder.writeLists(target, uriPool);
-		Encoder.writeLists(target, valueHash);
-		Encoder.writeLists(target, valuePool);
-		Encoder.writeLists(target, xmlnsNameHash);
-		Encoder.writeLists(target, xmlnsNamePool);
-		Encoder.writeLists(target, xmlnsLabelHash);
-		Encoder.writeItems(target, xmlnsLabelPool);
-		Encoder.writeLists(target, elementNameHash);
-		Encoder.writeLists(target, elementNamePool);
-		Encoder.writeLists(target, elementLabelHash);
-		Encoder.writeItems(target, elementLabelPool);
-		Encoder.writeLists(target, attributeNameHash);
-		Encoder.writeLists(target, attributeNamePool);
-		Encoder.writeLists(target, attributeLabelHash);
-		Encoder.writeItems(target, attributeLabelPool);
-		Encoder.writeLists(target, elementXmlnsPool);
-		Encoder.writeLists(target, elementChildrenPool);
-		Encoder.writeLists(target, elementAttributesPool);
-		Encoder.writeItems(target, elementNodePool);
-		Encoder.writeItems(target, attributeNodePool);
-		Encoder.writeInts(target, document.documentElement.index - valuePool.size());
 	}
 
 	/**
@@ -2361,8 +2309,16 @@ public class Encoder {
 		return this.uriHashEnabled;
 	}
 
-	public void setUriHashEnabled(final boolean uriHashEnabled) {
-		this.uriHashEnabled = uriHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code URI-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashValue(String)
+	 * @see DecodeDocument#uriHash()
+	 * @param value {@code URI-Hash}-Aktivierung.
+	 */
+	public void setUriHashEnabled(final boolean value) {
+		this.uriHashEnabled = value;
 	}
 
 	/**
@@ -2377,8 +2333,16 @@ public class Encoder {
 		return this.valueHashEnabled;
 	}
 
-	public void setValueHashEnabled(final boolean valueHashEnabled) {
-		this.valueHashEnabled = valueHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Value-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashValue(String)
+	 * @see DecodeDocument#valueHash()
+	 * @param value {@code Value-Hash}-Aktivierung.
+	 */
+	public void setValueHashEnabled(final boolean value) {
+		this.valueHashEnabled = value;
 	}
 
 	/**
@@ -2393,16 +2357,40 @@ public class Encoder {
 		return this.xmlnsNameHashEnabled;
 	}
 
-	public void setXmlnsNameHashEnabled(final boolean xmlnsNameHashEnabled) {
-		this.xmlnsNameHashEnabled = xmlnsNameHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Xmlns-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashValue(String)
+	 * @see DecodeDocument#xmlnsNameHash()
+	 * @param value {@code Xmlns-Name-Hash}-Aktivierung.
+	 */
+	public void setXmlnsNameHashEnabled(final boolean value) {
+		this.xmlnsNameHashEnabled = value;
 	}
 
+	/**
+	 * Diese Methode gibt die {@code Xmlns-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#xmlnsLabelHash()
+	 * @return {@code Xmlns-Label-Hash}-Aktivierung.
+	 */
 	public boolean isXmlnsLabelHashEnabled() {
 		return this.xmlnsLabelHashEnabled;
 	}
 
-	public void setXmlnsLabelHashEnabled(final boolean xmlnsLabelHashEnabled) {
-		this.xmlnsLabelHashEnabled = xmlnsLabelHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Xmlns-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#xmlnsLabelHash()
+	 * @param value {@code Xmlns-Label-Hash}-Aktivierung.
+	 */
+	public void setXmlnsLabelHashEnabled(final boolean value) {
+		this.xmlnsLabelHashEnabled = value;
 	}
 
 	/**
@@ -2417,16 +2405,40 @@ public class Encoder {
 		return this.elementNameHashEnabled;
 	}
 
-	public void setElementNameHashEnabled(final boolean elementNameHashEnabled) {
-		this.elementNameHashEnabled = elementNameHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Element-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashValue(String)
+	 * @see DecodeDocument#elementNameHash()
+	 * @param value {@code Element-Name-Hash}-Aktivierung.
+	 */
+	public void setElementNameHashEnabled(final boolean value) {
+		this.elementNameHashEnabled = value;
 	}
 
+	/**
+	 * Diese Methode gibt die {@code Element-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#elementLabelHash()
+	 * @return {@code Element-Label-Hash}-Aktivierung.
+	 */
 	public boolean isElementLabelHashEnabled() {
 		return this.elementLabelHashEnabled;
 	}
 
-	public void setElementLabelHashEnabled(final boolean elementLabelHashEnabled) {
-		this.elementLabelHashEnabled = elementLabelHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Element-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#elementLabelHash()
+	 * @param value {@code Element-Label-Hash}-Aktivierung.
+	 */
+	public void setElementLabelHashEnabled(final boolean value) {
+		this.elementLabelHashEnabled = value;
 	}
 
 	/**
@@ -2435,22 +2447,184 @@ public class Encoder {
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#attributeNameHash()
-	 * @return {@code Element-Name-Hash}-Aktivierung.
+	 * @return {@code Attribute-Name-Hash}-Aktivierung.
 	 */
 	public boolean isAttributeNameHashEnabled() {
 		return this.attributeNameHashEnabled;
 	}
 
-	public void setAttributeNameHashEnabled(final boolean attributeNameHashEnabled) {
-		this.attributeNameHashEnabled = attributeNameHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Attribute-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashValue(String)
+	 * @see DecodeDocument#attributeNameHash()
+	 * @param value {@code Attribute-Name-Hash}-Aktivierung.
+	 */
+	public void setAttributeNameHashEnabled(final boolean value) {
+		this.attributeNameHashEnabled = value;
 	}
 
+	/**
+	 * Diese Methode gibt die {@code Attribute-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird
+	 * für {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#attributeLabelHash()
+	 * @return {@code Attribute-Label-Hash}-Aktivierung.
+	 */
 	public boolean isAttributeLabelHashEnabled() {
 		return this.attributeLabelHashEnabled;
 	}
 
-	public void setAttributeLabelHashEnabled(final boolean attributeLabelHashEnabled) {
-		this.attributeLabelHashEnabled = attributeLabelHashEnabled;
+	/**
+	 * Diese Methode setzt die {@code Attribute-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
+	 * {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashLabel(int, int)
+	 * @see DecodeDocument#attributeLabelHash()
+	 * @param value {@code Attribute-Label-Hash}-Aktivierung.
+	 */
+	public void setAttributeLabelHashEnabled(final boolean value) {
+		this.attributeLabelHashEnabled = value;
+	}
+
+	/**
+	 * Diese Methode kodiert das im {@code Source}-{@link File} gegebene XML-Dokument in eine optimierte binäre
+	 * Darstellung und speichert diese im {@code Target}-{@link File}.
+	 * 
+	 * @see #encode(XMLReader, InputSource, EncodeTarget)
+	 * @param source {@code Source}-{@link File}.
+	 * @param target {@code Target}-{@link File}.
+	 * @throws IOException Wenn die verwendete {@link InputSource} bzw. das verwendete {@link EncodeTarget} eine
+	 *         {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new EncodeTargetFile(target));
+	}
+
+	/**
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues
+	 * {@link EncodeDocument} ein und gibt dieses zurück.
+	 * 
+	 * @see #encode(XMLReader, InputSource, EncodeDocument)
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @return {@link EncodeDocument}.
+	 * @throws IOException Wenn die {@link InputSource} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public EncodeDocument encode(final XMLReader reader, final InputSource source) throws IOException, SAXException, NullPointerException {
+		if(reader == null) throw new NullPointerException("reader is null");
+		if(source == null) throw new NullPointerException("source is null");
+		final EncodeDocument target = new EncodeDocument();
+		this.encode(reader, source, target);
+		return target;
+	}
+
+	/**
+	 * Diese Methode speichert das gegebene {@link EncodeDocument} in das gegebene {@link EncodeTarget}.
+	 * 
+	 * @see #compilePool(EncodePool, int, Comparator)
+	 * @see #cimpileHash(List, boolean, Comparable)
+	 * @param source {@link EncodeDocument}.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final EncodeDocument source, final EncodeTarget target) throws IOException, NullPointerException {
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		final List<EncodeValue> uriPool = Encoder.compilePool(source.uriPool, 0, Encoder.ValueComparator);
+		final List<EncodeGroup> uriHash = Encoder.cimpileHash(uriPool, this.uriHashEnabled, Encoder.ValueHasher);
+		final List<EncodeValue> valuePool = Encoder.compilePool(source.valuePool, 0, Encoder.ValueComparator);
+		final List<EncodeGroup> valueHash = Encoder.cimpileHash(valuePool, this.valueHashEnabled, Encoder.ValueHasher);
+		final List<EncodeValue> xmlnsNamePool = Encoder.compilePool(source.xmlnsNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeGroup> xmlnsNameHash = Encoder.cimpileHash(xmlnsNamePool, this.xmlnsNameHashEnabled, Encoder.ValueHasher);
+		final List<EncodeLabel> xmlnsLabelPool = Encoder.compilePool(source.xmlnsLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeGroup> xmlnsLabelHash = Encoder.cimpileHash(xmlnsLabelPool, this.xmlnsLabelHashEnabled, Encoder.LabelHasher);
+		final List<EncodeValue> elementNamePool = Encoder.compilePool(source.elementNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeGroup> elementNameHash = Encoder.cimpileHash(elementNamePool, this.elementNameHashEnabled, Encoder.ValueHasher);
+		final List<EncodeLabel> elementLabelPool = Encoder.compilePool(source.elementLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeGroup> elementLabelHash = Encoder.cimpileHash(elementLabelPool, this.elementLabelHashEnabled, Encoder.LabelHasher);
+		final List<EncodeValue> attributeNamePool = Encoder.compilePool(source.attributeNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeGroup> attributeNameHash = Encoder.cimpileHash(attributeNamePool, this.attributeNameHashEnabled, Encoder.ValueHasher);
+		final List<EncodeLabel> attributeLabelPool = Encoder.compilePool(source.attributeLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeGroup> attributeLabelHash = Encoder.cimpileHash(attributeLabelPool, this.attributeLabelHashEnabled, Encoder.LabelHasher);
+		final List<EncodeGroup> elementXmlnsPool = Encoder.compilePool(source.elementXmlnsPool, 0, Encoder.IndexComparator);
+		final List<EncodeGroup> elementChildrenPool = Encoder.compilePool(source.elementChildrenPool, 0, Encoder.IndexComparator);
+		final List<EncodeGroup> elementAttributesPool = Encoder.compilePool(source.elementAttributesPool, 0, Encoder.IndexComparator);
+		final List<EncodeElement> elementNodePool = Encoder.compilePool(source.elementNodePool, valuePool.size(), Encoder.IndexComparator);
+		final List<EncodeAttribute> attributeNodePool = Encoder.compilePool(source.attributeNodePool, 0, Encoder.IndexComparator);
+		Encoder.writeLists(target, uriHash);
+		Encoder.writeLists(target, uriPool);
+		Encoder.writeLists(target, valueHash);
+		Encoder.writeLists(target, valuePool);
+		Encoder.writeLists(target, xmlnsNameHash);
+		Encoder.writeLists(target, xmlnsNamePool);
+		Encoder.writeLists(target, xmlnsLabelHash);
+		Encoder.writeItems(target, xmlnsLabelPool);
+		Encoder.writeLists(target, elementNameHash);
+		Encoder.writeLists(target, elementNamePool);
+		Encoder.writeLists(target, elementLabelHash);
+		Encoder.writeItems(target, elementLabelPool);
+		Encoder.writeLists(target, attributeNameHash);
+		Encoder.writeLists(target, attributeNamePool);
+		Encoder.writeLists(target, attributeLabelHash);
+		Encoder.writeItems(target, attributeLabelPool);
+		Encoder.writeLists(target, elementXmlnsPool);
+		Encoder.writeLists(target, elementChildrenPool);
+		Encoder.writeLists(target, elementAttributesPool);
+		Encoder.writeItems(target, elementNodePool);
+		Encoder.writeItems(target, attributeNodePool);
+		Encoder.writeInts(target, source.documentElement.index - valuePool.size());
+	}
+
+	/**
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues
+	 * {@link EncodeDocument} ein und speichert dessen in das gegebene {@link EncodeTarget}.
+	 * 
+	 * @see #encode(XMLReader, InputSource)
+	 * @see #encode(EncodeDocument, EncodeTarget)
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn {@link InputSource} oder {@link EncodeTarget} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException, SAXException, NullPointerException {
+		if(reader == null) throw new NullPointerException("reader is null");
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		this.encode(this.encode(reader, source), target);
+	}
+
+	/**
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in das gegebene
+	 * {@link EncodeDocument} ein.
+	 * 
+	 * @see XMLReader#setContentHandler(ContentHandler)
+	 * @see XMLReader#parse(InputSource)
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @param target {@link EncodeDocument}.
+	 * @throws IOException Wenn die {@link InputSource} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final XMLReader reader, final InputSource source, final EncodeDocument target) throws IOException, SAXException, NullPointerException {
+		if(reader == null) throw new NullPointerException("reader is null");
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.xmlnsEnabled);
+		reader.setContentHandler(adapter);
+		reader.parse(source);
 	}
 
 }
