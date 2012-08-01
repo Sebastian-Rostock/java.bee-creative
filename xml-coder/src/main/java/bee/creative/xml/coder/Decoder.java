@@ -1016,11 +1016,11 @@ public class Decoder {
 		protected final DecodeGroupPool valueHash;
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Elemente im {@link #valueHash()}.
+		 * Dieses Feld speichert die Anzahl der Elemente im {@link #valueHash()} minus {@code 1}.
 		 * 
 		 * @see DecodeGroupPool#itemCount()
 		 */
-		protected final int valueHashCount;
+		protected final int valueHashMask;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link DecodeSource} sowie {@code Hash-Tabelle} und lädt die Header.
@@ -1033,7 +1033,8 @@ public class Decoder {
 		public DecodeValuePool(final DecodeSource source, final DecodeGroupPool valueHash) throws IOException, NullPointerException {
 			super(source, 1);
 			this.valueHash = valueHash;
-			this.valueHashCount = valueHash.itemCount;
+			this.valueHashMask = valueHash.itemCount - 1;
+			if((this.valueHashMask & valueHash.itemCount) != 0) throw new IOException(new IllegalArgumentException("valueHash.itemCount is no power of two"));
 		}
 
 		/**
@@ -1094,8 +1095,8 @@ public class Decoder {
 		public DecodeValue findValue(final String value) throws NullPointerException {
 			if(value == null) throw new NullPointerException("value is null");
 			if(this.itemCount == 0) return null;
-			if(this.valueHashCount == 0) return this.find(new DecodeValueComparable(value));
-			return this.findValue(this.valueHash.get(Coder.hashValue(value) % this.valueHashCount).values, value);
+			if(this.valueHashMask < 0) return this.find(new DecodeValueComparable(value));
+			return this.findValue(this.valueHash.get(Coder.hashValue(value) & this.valueHashMask).values, value);
 		}
 
 		/**
@@ -1271,11 +1272,11 @@ public class Decoder {
 		protected final DecodeGroupPool labelHash;
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Elemente im {@link #labelHash()}.
+		 * Dieses Feld speichert die Anzahl der Elemente im {@link #labelHash()} minus {@code 1}.
 		 * 
 		 * @see DecodeGroupPool#itemCount()
 		 */
-		protected final int labelHashCount;
+		protected final int labelHashMask;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link DecodeSource} sowie {@code Hash-Tabelle} und lädt die Header.
@@ -1287,7 +1288,8 @@ public class Decoder {
 		public DecodeLabelPool(final DecodeSource source, final DecodeGroupPool labelHash) throws IOException {
 			super(source, 8);
 			this.labelHash = labelHash;
-			this.labelHashCount = labelHash.itemCount;
+			this.labelHashMask = labelHash.itemCount - 1;
+			if((this.labelHashMask & labelHash.itemCount) != 0) throw new IOException(new IllegalArgumentException("labelHash.itemCount is no power of two"));
 		}
 
 		/**
@@ -1382,8 +1384,8 @@ public class Decoder {
 		 */
 		public DecodeLabel findLabel(final int uri, final int name) {
 			if(this.itemCount == 0) return null;
-			if(this.labelHashCount == 0) return this.find(new DecodeLabelUriNameComparable(uri, name));
-			return this.findLabel(this.labelHash.get(Coder.hashLabel(uri, name) % this.labelHashCount).values, uri, name);
+			if(this.labelHashMask < 0) return this.find(new DecodeLabelUriNameComparable(uri, name));
+			return this.findLabel(this.labelHash.get(Coder.hashLabel(uri, name) & this.labelHashMask).values, uri, name);
 		}
 
 		/**
@@ -2835,7 +2837,7 @@ public class Decoder {
 		 * @param index Index des {@link DecodeAttribute}s.
 		 * @return {@link Attr#getLocalName()}.
 		 */
-		public String attributeLabelName(final int index) {
+		public String attributeGetLocalNameName(final int index) {
 			final DecodeAttribute attributeNode = this.document.attributeNodePool.get(index);
 			if(this.xmlnsEnabled){
 				final DecodeLabel attributeLabel = this.document.attributeLabelPool.get(attributeNode.label);
@@ -2844,7 +2846,6 @@ public class Decoder {
 			}else{
 				final DecodeValue attributeName = this.document.attributeNamePool.get(attributeNode.label);
 				return attributeName.value;
-
 			}
 		}
 
@@ -4180,7 +4181,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getLocalName() {
-			return this.adapter().attributeLabelName(this.index);
+			return this.adapter().attributeGetLocalNameName(this.index);
 		}
 
 		/**

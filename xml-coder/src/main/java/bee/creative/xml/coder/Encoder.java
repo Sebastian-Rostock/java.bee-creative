@@ -1547,7 +1547,7 @@ public class Encoder {
 
 		/**
 		 * {@inheritDoc}
-		*/
+		 */
 		@Override
 		public String toString() {
 			return Objects.toStringCall(true, true, "EncodeDocument", //
@@ -2230,9 +2230,10 @@ public class Encoder {
 		for(int i = 0; i < count; i++){
 			list.add(i, new EncodeGroup());
 		}
+		count--;
 		for(int i = 0; i < size; i++){
 			final GItem value = values.get(i);
-			final int index = helper.compareTo(value) % count;
+			final int index = helper.compareTo(value) & count;
 			list.get(index).values.add(value);
 		}
 		return list;
