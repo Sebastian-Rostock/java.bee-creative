@@ -35,6 +35,8 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Objects;
+import bee.creative.xml.coder.Encoder.EncodeAttribute;
+import bee.creative.xml.coder.Encoder.EncodeElement;
 
 /**
  * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus der von einem {@link Encoder} erzeugten,
@@ -70,7 +72,7 @@ public class Decoder {
 		 * 
 		 * @see #index()
 		 * @param index Leseposition.
-		 * @throws IOException Wenn die gegebene Position negativ ist ein I/O-Fehler auftritt.
+		 * @throws IOException Wenn die gegebene Position negativ ist oder ein I/O-Fehler auftritt.
 		 */
 		public void seek(long index) throws IOException;
 
@@ -135,8 +137,8 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Caches, dessen seine Elemente über einen Index identifiziert und
-	 * nachgeladen werden.
+	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung mehrerer Elemente, die über einen Index
+	 * identifiziert und nachgeladen werden können.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
@@ -148,24 +150,24 @@ public class Decoder {
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		static final class DecodeCachePage {
+		static final class DecodePoolPage {
 
 			/**
-			 * Dieses Feld speichert die Anzahl der Bits zur Adressierung der Elemente innerhalb einer {@link DecodeCachePage}
+			 * Dieses Feld speichert die Anzahl der Bits zur Adressierung der Elemente innerhalb einer {@link DecodePoolPage}
 			 * .
 			 */
 			static final int PAGE_BITS = 7;
 
 			/**
-			 * Dieses Feld speichert die maximale Anzahl der Elemente in einer {@link DecodeCachePage}.
+			 * Dieses Feld speichert die maximale Anzahl der Elemente in einer {@link DecodePoolPage}.
 			 */
-			static final int PAGE_SIZE = 1 << DecodeCachePage.PAGE_BITS;
+			static final int PAGE_SIZE = 1 << DecodePoolPage.PAGE_BITS;
 
 			/**
 			 * Dieses Feld speichert die Bitmaske zur Ermittlung des Index eines Elements innerhalb einer
-			 * {@link DecodeCachePage}.
+			 * {@link DecodePoolPage}.
 			 */
-			static final int PAGE_MASK = DecodeCachePage.PAGE_SIZE - 1;
+			static final int PAGE_MASK = DecodePoolPage.PAGE_SIZE - 1;
 
 			/**
 			 * Dieses Feld speichert die Anzahl der Elemente.
@@ -175,7 +177,7 @@ public class Decoder {
 			/**
 			 * Dieses Feld speichert die Elemente.
 			 */
-			final Object[] items = new Object[DecodeCachePage.PAGE_SIZE];
+			final Object[] items = new Object[DecodePoolPage.PAGE_SIZE];
 
 		}
 
@@ -186,7 +188,7 @@ public class Decoder {
 		 * @see DecodePool
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeCacheIterator<GItem> implements Iterator<GItem> {
+		static final class DecodePoolIterator<GItem> implements Iterator<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
@@ -194,9 +196,9 @@ public class Decoder {
 			final DecodePool<GItem> owner;
 
 			/**
-			 * Dieses Feld speichert die nächste {@link DecodeCachePage}.
+			 * Dieses Feld speichert die nächste {@link DecodePoolPage}.
 			 */
-			DecodeCachePage nextPage;
+			DecodePoolPage nextPage;
 
 			/**
 			 * Dieses Feld speichert das nächste Element.
@@ -204,7 +206,7 @@ public class Decoder {
 			GItem nextItem;
 
 			/**
-			 * Dieses Feld speichert den Index der nächsten {@link DecodeCachePage}.
+			 * Dieses Feld speichert den Index der nächsten {@link DecodePoolPage}.
 			 */
 			int nextPageIndex;
 
@@ -214,7 +216,7 @@ public class Decoder {
 			int nextItemIndex;
 
 			/**
-			 * Dieses Feld speichert den Index der letzten {@link DecodeCachePage}.
+			 * Dieses Feld speichert den Index der letzten {@link DecodePoolPage}.
 			 */
 			int lastPageIndex;
 
@@ -229,7 +231,7 @@ public class Decoder {
 			 * @param owner Besitzer.
 			 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 			 */
-			public DecodeCacheIterator(final DecodePool<GItem> owner) throws NullPointerException {
+			public DecodePoolIterator(final DecodePool<GItem> owner) throws NullPointerException {
 				if(owner == null) throw new NullPointerException("owner is null");
 				this.owner = owner;
 				this.nextPageIndex = -1;
@@ -241,12 +243,12 @@ public class Decoder {
 			}
 
 			/**
-			 * Diese Methode navigiert zur nächsten {@link DecodeCachePage}.
+			 * Diese Methode navigiert zur nächsten {@link DecodePoolPage}.
 			 */
 			void seekPage() {
-				final DecodeCachePage[] pages = this.owner.pages;
+				final DecodePoolPage[] pages = this.owner.pages;
 				for(int i = this.nextPageIndex + 1, size = pages.length; i < size; i++){
-					final DecodeCachePage page = pages[i];
+					final DecodePoolPage page = pages[i];
 					if(page != null){
 						this.nextPage = page;
 						this.nextPageIndex = i;
@@ -306,7 +308,7 @@ public class Decoder {
 			public void remove() {
 				final int lastPageIndex = this.lastPageIndex;
 				if(lastPageIndex < 0) throw new IllegalStateException();
-				final DecodeCachePage page = this.owner.pages[lastPageIndex];
+				final DecodePoolPage page = this.owner.pages[lastPageIndex];
 				if(page == null) return;
 				this.lastPageIndex = -1;
 				final int lastItemIndex = this.lastItemIndex;
@@ -328,7 +330,7 @@ public class Decoder {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeCacheGetAll<GItem> implements Get<GItem> {
+		static final class DecodePoolGetAll<GItem> implements Get<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
@@ -340,7 +342,7 @@ public class Decoder {
 			 * 
 			 * @param owner Besitzer.
 			 */
-			public DecodeCacheGetAll(final DecodePool<GItem> owner) {
+			public DecodePoolGetAll(final DecodePool<GItem> owner) {
 				this.owner = owner;
 			}
 
@@ -361,7 +363,7 @@ public class Decoder {
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GItem> Typ der Elemente.
 		 */
-		static final class DecodeCacheGetSection<GItem> implements Get<GItem> {
+		static final class DecodePoolGetSection<GItem> implements Get<GItem> {
 
 			/**
 			 * Dieses Feld speichert den Besitzer.
@@ -379,7 +381,7 @@ public class Decoder {
 			 * @param owner Besitzer.
 			 * @param indices Suchraum.
 			 */
-			public DecodeCacheGetSection(final DecodePool<GItem> owner, final int[] indices) {
+			public DecodePoolGetSection(final DecodePool<GItem> owner, final int[] indices) {
 				this.owner = owner;
 				this.indices = indices;
 			}
@@ -400,9 +402,9 @@ public class Decoder {
 		int size;
 
 		/**
-		 * Dieses Feld speichert die {@link DecodeCachePage}s.
+		 * Dieses Feld speichert die {@link DecodePoolPage}s.
 		 */
-		DecodeCachePage[] pages = {};
+		DecodePoolPage[] pages = {};
 
 		/**
 		 * Dieses Feld speichert die minimale Anzahl der Elemente, auf welche beim Bereinigen zurückgesetzt werden soll.
@@ -432,9 +434,9 @@ public class Decoder {
 		public GItem get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
-			final int pageIndex = index >> DecodeCachePage.PAGE_BITS;
-			final int itemIndex = index & DecodeCachePage.PAGE_MASK;
-			DecodeCachePage page = this.pages[pageIndex];
+			final int pageIndex = index >> DecodePoolPage.PAGE_BITS;
+			final int itemIndex = index & DecodePoolPage.PAGE_MASK;
+			DecodePoolPage page = this.pages[pageIndex];
 			GItem item;
 			if(page != null){
 				item = (GItem)page.items[itemIndex];
@@ -454,7 +456,7 @@ public class Decoder {
 				if(this.size >= this.maxSize){
 					this.compact();
 				}
-				page = new DecodeCachePage();
+				page = new DecodePoolPage();
 				this.pages[pageIndex] = page;
 			}
 			page.items[itemIndex] = item;
@@ -467,13 +469,14 @@ public class Decoder {
 		 * Diese Methode sucht binäre nach dem ersten Treffer des gegebenen {@link Comparable}s und gibt diesen oder
 		 * {@code null} zurück.
 		 * 
-		 * @see DecodeCacheGetAll
+		 * @see DecodePoolGetAll
 		 * @see Comparables#binarySearch(Get, Comparable, int, int)
 		 * @param comparable {@link Comparable}.
 		 * @return erster Treffer oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene {@link Comparable} {@code null} ist.
 		 */
-		public GItem find(final Comparable<? super GItem> comparable) {
-			final Get<GItem> get = new DecodeCacheGetAll<GItem>(this);
+		public GItem find(final Comparable<? super GItem> comparable) throws NullPointerException {
+			final Get<GItem> get = new DecodePoolGetAll<GItem>(this);
 			final int index = Comparables.binarySearch(get, comparable, 0, this.capacity);
 			if(index < 0) return null;
 			return get.get(index);
@@ -483,15 +486,17 @@ public class Decoder {
 		 * Diese Methode sucht binäre im gegebenen Suchraum nach dem ersten Treffer des gegebenen {@link Comparable}s und
 		 * gibt diesen oder {@code null} zurück.
 		 * 
-		 * @see DecodeCacheGetSection
+		 * @see DecodePoolGetSection
 		 * @see Comparables#binarySearch(Get, Comparable, int, int)
 		 * @param indices Suchraum.
 		 * @param comparable {@link Comparable}.
 		 * @return erster Treffer oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene {@link Comparable} bzw. das gegebene Index-Array {@code null} ist.
 		 */
-		public GItem find(final int[] indices, final Comparable<? super GItem> comparable) {
+		public GItem find(final int[] indices, final Comparable<? super GItem> comparable) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
 			if(indices.length == 0) return null;
-			final Get<GItem> get = new DecodeCacheGetSection<GItem>(this, indices);
+			final Get<GItem> get = new DecodePoolGetSection<GItem>(this, indices);
 			final int index = Comparables.binarySearch(get, comparable, 0, indices.length);
 			if(index < 0) return null;
 			return get.get(index);
@@ -534,10 +539,10 @@ public class Decoder {
 		public GItem clear(final int index) throws IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
-			final int pageIndex = index >> DecodeCachePage.PAGE_BITS;
-			final DecodeCachePage page = this.pages[pageIndex];
+			final int pageIndex = index >> DecodePoolPage.PAGE_BITS;
+			final DecodePoolPage page = this.pages[pageIndex];
 			if(page == null) return null;
-			final int itemIndex = index & DecodeCachePage.PAGE_MASK;
+			final int itemIndex = index & DecodePoolPage.PAGE_MASK;
 			final GItem item = (GItem)page.items[itemIndex];
 			if(item == null) return null;
 			page.items[itemIndex] = null;
@@ -549,16 +554,33 @@ public class Decoder {
 		}
 
 		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das {@code index}-te Element vorhanden ist.
+		 * 
+		 * @param index Index.
+		 * @return {@code true}, wenn das {@code index}-tes Element geladen ist.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public boolean exists(final int index) throws IndexOutOfBoundsException {
+			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
+			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
+			final int pageIndex = index >> DecodePoolPage.PAGE_BITS;
+			final DecodePoolPage page = this.pages[pageIndex];
+			if(page == null) return false;
+			final int itemIndex = index & DecodePoolPage.PAGE_MASK;
+			return page.items[itemIndex] == null;
+		}
+
+		/**
 		 * Diese Methode entfernt solange überflüssige Elemente, bis die aktuelle Anzahl der Elemente nicht mehr größer der
 		 * minimalen Anzahl ist.
 		 */
 		public void compact() {
 			int count = this.minSize - this.size;
 			if(count >= 0) return;
-			final DecodeCachePage[] pages = this.pages;
+			final DecodePoolPage[] pages = this.pages;
 			this.size = this.minSize;
 			for(int i = pages.length - 1; 0 <= i; i--){
-				final DecodeCachePage page = pages[i];
+				final DecodePoolPage page = pages[i];
 				if(page != null){
 					count += page.size;
 					if(count <= 0){
@@ -654,10 +676,10 @@ public class Decoder {
 			if(this.capacity == value) return;
 			if(value < 0) throw new IllegalArgumentException("value < 0");
 			this.capacity = value;
-			final int length = ((value + DecodeCachePage.PAGE_SIZE) - 1) / DecodeCachePage.PAGE_SIZE;
+			final int length = ((value + DecodePoolPage.PAGE_SIZE) - 1) / DecodePoolPage.PAGE_SIZE;
 			if(this.pages.length != length){
 				this.size = 0;
-				this.pages = new DecodeCachePage[length];
+				this.pages = new DecodePoolPage[length];
 			}else{
 				this.clear();
 			}
@@ -668,7 +690,7 @@ public class Decoder {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return new DecodeCacheIterator<GItem>(this);
+			return new DecodePoolIterator<GItem>(this);
 		}
 
 		/**
@@ -682,29 +704,29 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Datensatz, der von einem {@link DecodePool} erzeugt, aus einem
-	 * {@link DecodeSource} geladen und in einem {@link DecodeItemPool} verwaltet wird.
+	 * Diese Klasse implementiert einen abstrakten Datensatz, der von einem {@link DecodePool} erzeugt und verwaltet sowie
+	 * aus einer {@link DecodeSource} geladen wird.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class DecodeItem {
 
 		/**
-		 * Dieses Feld speichert den Index dieses Datensatzes im {@link DecodeItemPool}.
+		 * Dieses Feld speichert den Index dieses Datensatzes im {@link DecodePool}.
 		 */
 		protected final int index;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Index dieses Datensatzes im {@link DecodeItemPool}.
+		 * Dieser Konstrukteur initialisiert den Index dieses Datensatzes im {@link DecodePool}.
 		 * 
-		 * @param index Index dieses Datensatzes im {@link DecodeItemPool}.
+		 * @param index Index dieses Datensatzes im {@link DecodePool}.
 		 */
 		public DecodeItem(final int index) {
 			this.index = index;
 		}
 
 		/**
-		 * Diese Methode gibt den Index dieses Datensatzes im {@link DecodeItemPool} zurück.
+		 * Diese Methode gibt den Index dieses Datensatzes im {@link DecodePool} zurück.
 		 * 
 		 * @return Index dieses Datensatzes.
 		 */
@@ -748,18 +770,18 @@ public class Decoder {
 		protected final DecodeSource source;
 
 		/**
-		 * Dieses Feld speichert die Position im {@link DecodeSource}, an der die Daten dieses {@link DecodeItemPool}
+		 * Dieses Feld speichert die Position in der {@link DecodeSource}, an der die Daten dieses {@link DecodeItemPool}s
 		 * beginnen.
 		 */
 		protected final long sourceIndex;
 
 		/**
-		 * Dieses Feld speichert die Größe eines Elements.
+		 * Dieses Feld speichert die Größe eines Elements in der {@link DecodeSource}.
 		 */
 		protected final int itemSize;
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Elemente.
+		 * Dieses Feld speichert die Anzahl der Elemente in der {@link DecodeSource}.
 		 */
 		protected final int itemCount;
 
@@ -793,18 +815,39 @@ public class Decoder {
 			this.source.seek(this.sourceIndex + 4 + (index * this.itemSize));
 		}
 
+		/**
+		 * Diese Methode gibt die {@link DecodeSource} zurück.
+		 * 
+		 * @return {@link DecodeSource}.
+		 */
 		public DecodeSource source() {
 			return this.source;
 		}
 
+		/**
+		 * Diese Methode gibt die Position zurück, an der die Daten dieses {@link DecodeItemPool}s in der
+		 * {@link DecodeSource} beginnen.
+		 * 
+		 * @return Position, an der die Daten dieses {@link DecodeItemPool}s in der {@link DecodeSource} beginnen.
+		 */
 		public long sourceIndex() {
 			return this.sourceIndex;
 		}
 
+		/**
+		 * Diese Methode gibt die Größe eines Elements in der {@link DecodeSource} zurück.
+		 * 
+		 * @return Größe eines Elements in der {@link DecodeSource}.
+		 */
 		public int itemSize() {
 			return this.itemSize;
 		}
 
+		/**
+		 * Diese Methode gibt die Anzahl der Elemente in der {@link DecodeSource} zurück.
+		 * 
+		 * @return Anzahl der Elemente in der {@link DecodeSource}.
+		 */
 		public int itemCount() {
 			return this.itemCount;
 		}
@@ -829,12 +872,12 @@ public class Decoder {
 	public static abstract class DecodeListPool<GItem> extends DecodeItemPool<GItem> {
 
 		/**
-		 * Dieses Feld speichert die Größe eines Werts.
+		 * Dieses Feld speichert die Größe eines Werts in der {@link DecodeSource}.
 		 */
 		protected final int valueSize;
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Werte in den Elementen.
+		 * Dieses Feld speichert die Anzahl der Werte in der {@link DecodeSource}.
 		 */
 		protected final int valueCount;
 
@@ -865,10 +908,20 @@ public class Decoder {
 			this.source.seek(this.sourceIndex + 4 + (this.itemSize * this.itemCount) + 4 + (offset * this.valueSize));
 		}
 
+		/**
+		 * Diese Methode gibt die Größe eines Werts in der {@link DecodeSource} zurück.
+		 * 
+		 * @return Größe eines Werts in der {@link DecodeSource}.
+		 */
 		public int valueSize() {
 			return this.valueSize;
 		}
 
+		/**
+		 * Diese Methode gibt die Anzahl der Werte in der {@link DecodeSource} zurück.
+		 * 
+		 * @return Anzahl der Werte in der {@link DecodeSource}.
+		 */
 		public int valueCount() {
 			return this.valueCount;
 		}
@@ -912,18 +965,25 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeValue", this.index, this.value);
+			return "[" + this.index + "]" + Objects.toString(this.value);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DecodePool} der {@link DecodeValue}.
+	 * Diese Klasse implementiert den {@link DecodePool} der {@link DecodeValue}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class DecodeValuePool extends DecodeListPool<DecodeValue> {
 
+		/**
+		 * Diese Klasse implementiert das {@link Comparable} zur binären Suche eines {@link DecodeValue}s über seinen
+		 * {@link String}.
+		 * 
+		 * @see DecodeValue#value()
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
 		static final class DecodeValueComparable implements Comparable<DecodeValue> {
 
 			/**
@@ -950,15 +1010,23 @@ public class Decoder {
 
 		}
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle}.
+		 */
 		protected final DecodeGroupPool valueHash;
 
-		final int valueHashCount;
+		/**
+		 * Dieses Feld speichert die Anzahl der Elemente im {@link #valueHash()}.
+		 * 
+		 * @see DecodeGroupPool#itemCount()
+		 */
+		protected final int valueHashCount;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
+		 * Dieser Konstrukteur initialisiert {@link DecodeSource} sowie {@code Hash-Tabelle} und lädt die Header.
 		 * 
 		 * @param source {@link DecodeSource}.
-		 * @param valueHash
+		 * @param valueHash {@code Hash-Tabelle}.
 		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 		 */
@@ -966,46 +1034,6 @@ public class Decoder {
 			super(source, 1);
 			this.valueHash = valueHash;
 			this.valueHashCount = valueHash.itemCount;
-		}
-
-		/**
-		 * Diese Methode gibt das Ergebnis von {@link #findValue(String)} zurück und löst eine
-		 * {@link IllegalArgumentException} aus, wenn kein Datensatz gefunden wird.
-		 * 
-		 * @see DecodeValue#value
-		 * @see DecodeValuePool#findValue(String)
-		 * @param value {@link String}.
-		 * @return {@link DecodeValue}.
-		 * @throws IllegalArgumentException Wenn {@link #findValue(String)} {@code null} liefert.
-		 */
-		public DecodeValue getValue(final String value) throws IllegalArgumentException {
-			final DecodeValue item = this.findValue(value);
-			if(item == null) throw new IllegalArgumentException("value not found: " + value);
-			return item;
-		}
-
-		/**
-		 * Diese Methode sucht binäre nach dem {@link DecodeValue} mit dem gegebenen {@link String} und gibt diesen oder
-		 * {@code null} zurück. Die {@link DecodeValue} müssen dazum im {@link DecodeItemPool} nach ihrem {@link String}
-		 * aufsteigend sortiert sein.
-		 * 
-		 * @see DecodeValue#value
-		 * @param value {@link String}.
-		 * @return {@link DecodeValue} oder {@code null}.
-		 */
-		public DecodeValue findValue(final String value) {
-			if(this.itemCount == 0) return null;
-			if(this.valueHashCount == 0) return this.find(new DecodeValueComparable(value));
-			return this.findValue(this.valueHash.get(Coder.hashValue(value) % this.valueHashCount).indices, value);
-		}
-
-		public DecodeValue findValue(final int[] indices, final String value) {
-			if(indices.length == 0) return null;
-			return this.find(indices, new DecodeValueComparable(value));
-		}
-
-		public DecodeGroupPool getValueHash() {
-			return this.valueHash;
 		}
 
 		/**
@@ -1025,10 +1053,74 @@ public class Decoder {
 			}
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zurück.
+		 * 
+		 * @return {@code Hash-Tabelle}.
+		 */
+		public DecodeGroupPool valueHash() {
+			return this.valueHash;
+		}
+
+		/**
+		 * Diese Methode gibt das Ergebnis von {@link #findValue(String)} zurück und löst eine
+		 * {@link IllegalArgumentException} aus, wenn kein Datensatz gefunden wird.
+		 * 
+		 * @see #findValue(String)
+		 * @param value {@link String}.
+		 * @return {@link DecodeValue}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn {@link #findValue(String)} {@code null} liefert.
+		 */
+		public DecodeValue getValue(final String value) throws NullPointerException, IllegalArgumentException {
+			final DecodeValue item = this.findValue(value);
+			if(item == null) throw new IllegalArgumentException("value not found: " + value);
+			return item;
+		}
+
+		/**
+		 * Diese Methode sucht binäre nach dem {@link DecodeValue} mit dem gegebenen {@link String} und gibt diesen oder
+		 * {@code null} zurück. Wenn der {@link #valueHash()} nicht leer ist, wind nur im zum gegebenen {@link String}
+		 * ermittelten Index-Array gesucht.
+		 * 
+		 * @see Coder#hashValue(String)
+		 * @see Encoder#ValueComparator
+		 * @see DecodePool#find(Comparable)
+		 * @see DecodeValue#value()
+		 * @param value {@link String}.
+		 * @return {@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public DecodeValue findValue(final String value) throws NullPointerException {
+			if(value == null) throw new NullPointerException("value is null");
+			if(this.itemCount == 0) return null;
+			if(this.valueHashCount == 0) return this.find(new DecodeValueComparable(value));
+			return this.findValue(this.valueHash.get(Coder.hashValue(value) % this.valueHashCount).values, value);
+		}
+
+		/**
+		 * Diese Methode sucht im gegebenen Index-Array binäre nach dem {@link DecodeValue} mit dem gegebenen {@link String}
+		 * und gibt diesen oder {@code null} zurück.
+		 * 
+		 * @see Encoder#ValueComparator
+		 * @see DecodePool#find(int[], Comparable)
+		 * @see DecodeValue#value()
+		 * @param indices Index-Array.
+		 * @param value {@link String}.
+		 * @return {@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} bzw. das gegebene Index-Array {@code null} ist.
+		 */
+		public DecodeValue findValue(final int[] indices, final String value) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
+			if(value == null) throw new NullPointerException("value is null");
+			if(indices.length == 0) return null;
+			return this.find(indices, new DecodeValueComparable(value));
+		}
+
 	}
 
 	/**
-	 * Diese Klasse implementiert {@link DecodeItem} mit {@code URI} und {@code Name}.
+	 * Diese Klasse implementiert ein {@link DecodeItem} mit {@code URI} und {@code Name}.
 	 * 
 	 * @see Node#getLocalName()
 	 * @see Node#getNamespaceURI()
@@ -1038,15 +1130,11 @@ public class Decoder {
 
 		/**
 		 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
-		 * 
-		 * @see Node#getNamespaceURI()
 		 */
 		protected final int uri;
 
 		/**
 		 * Dieses Feld speichert den Index des {@code Name}-{@link DecodeValue}s.
-		 * 
-		 * @see Node#getLocalName()
 		 */
 		protected final int name;
 
@@ -1054,19 +1142,32 @@ public class Decoder {
 		 * Dieser Konstrukteur initialisiert die Indizes.
 		 * 
 		 * @param index Index.
-		 * @param uriChars Index des {@code URI}-{@link DecodeValue}s ({@link Node#getNamespaceURI()}).
-		 * @param nameChars Index des {@code Name}-{@link DecodeValue} ({@link Node#getLocalName()}).
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @param name Index des {@code Name}-{@link DecodeValue}s.
 		 */
-		public DecodeLabel(final int index, final int uriChars, final int nameChars) {
+		public DecodeLabel(final int index, final int uri, final int name) {
 			super(index);
-			this.uri = uriChars;
-			this.name = nameChars;
+			this.uri = uri;
+			this.name = name;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@code URI}-{@link DecodeValue}s zurück.
+		 * 
+		 * @see Node#getNamespaceURI()
+		 * @return Index des {@code URI}-{@link DecodeValue}s.
+		 */
 		public int uri() {
 			return this.uri;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@code Name}-{@link DecodeValue}s zurück.
+		 * 
+		 * @see Node#getPrefix()
+		 * @see Node#getLocalName()
+		 * @return Index des {@code Name}-{@link DecodeValue}s.
+		 */
 		public int name() {
 			return this.name;
 		}
@@ -1076,7 +1177,7 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeLabel", this.index, this.uri, this.name);
+			return Objects.toStringCall(false, true, "DecodeLabel", "index", this.index, "uri", this.uri, "name", this.name);
 		}
 
 	}
@@ -1088,144 +1189,105 @@ public class Decoder {
 	 */
 	public static class DecodeLabelPool extends DecodeItemPool<DecodeLabel> {
 
+		/**
+		 * Diese Klasse implementiert das {@link Comparable} zur binären Suche eines {@link DecodeLabel}s über den Index
+		 * seines {@code URI}-{@link DecodeValue}s.
+		 * 
+		 * @see DecodeLabel#uri()
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
 		static final class DecodeLabelUriComparable implements Comparable<DecodeLabel> {
 
-			private final int uri;
+			/**
+			 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
+			 */
+			final int uri;
 
-			DecodeLabelUriComparable(final int uri) {
+			/**
+			 * Dieser Konstrukteur initialisiert den Index des {@code URI}-{@link DecodeValue}s.
+			 * 
+			 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+			 */
+			public DecodeLabelUriComparable(final int uri) {
 				this.uri = uri;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public int compareTo(final DecodeLabel value) {
 				return Comparators.compare(this.uri, value.uri);
 			}
+
 		}
 
+		/**
+		 * Diese Klasse implementiert das {@link Comparable} zur binären Suche eines {@link DecodeLabel}s über die Indices
+		 * seiner {@code URI}- und {@code Name}-{@link DecodeValue}s.
+		 * 
+		 * @see DecodeLabel#uri()
+		 * @see DecodeLabel#name()
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
 		static final class DecodeLabelUriNameComparable implements Comparable<DecodeLabel> {
 
-			private final int uri;
+			/**
+			 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
+			 */
+			final int uri;
 
-			private final int name;
+			/**
+			 * Dieses Feld speichert den Index des {@code Name}-{@link DecodeValue}s.
+			 */
+			final int name;
 
-			DecodeLabelUriNameComparable(final int uri, final int name) {
+			/**
+			 * Dieser Konstrukteur initialisiert die Indizes.
+			 * 
+			 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+			 * @param name Index des {@code Name}-{@link DecodeValue}s.
+			 */
+			public DecodeLabelUriNameComparable(final int uri, final int name) {
 				this.uri = uri;
 				this.name = name;
 			}
 
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public int compareTo(final DecodeLabel input) {
 				final int comp = Comparators.compare(this.name, input.name);
 				if(comp != 0) return comp;
 				return Comparators.compare(this.uri, input.uri);
 			}
+
 		}
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle}.
+		 */
 		protected final DecodeGroupPool labelHash;
 
-		protected final boolean labelHashEnabled;
+		/**
+		 * Dieses Feld speichert die Anzahl der Elemente im {@link #labelHash()}.
+		 * 
+		 * @see DecodeGroupPool#itemCount()
+		 */
+		protected final int labelHashCount;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
+		 * Dieser Konstrukteur initialisiert {@link DecodeSource} sowie {@code Hash-Tabelle} und lädt die Header.
 		 * 
 		 * @param source {@link DecodeSource}.
-		 * @param hashPool
+		 * @param labelHash {@code Hash-Tabelle}.
 		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
 		public DecodeLabelPool(final DecodeSource source, final DecodeGroupPool labelHash) throws IOException {
 			super(source, 8);
 			this.labelHash = labelHash;
-			this.labelHashEnabled = labelHash.itemCount != 0;
-		}
-
-		/**
-		 * Diese Methode gibt das Ergebnis von {@link #findUri(int[], int)} zurück und löst eine
-		 * {@link IllegalArgumentException} aus, wenn kein Datensatz gefunden wird.
-		 * 
-		 * @see DecodeLabel#name
-		 * @see DecodeItemPool#find(int[], Comparable)
-		 * @param indices Index-Array.
-		 * @param uri {@code URI}-Index.
-		 * @return {@link DecodeLabel}.
-		 * @throws IllegalArgumentException Wenn {@link #findUri(int[], int)} {@code null} liefert.
-		 */
-		public DecodeLabel getUri(final int[] indices, final int uri) throws IllegalArgumentException {
-			final DecodeLabel item = this.findUri(indices, uri);
-			if(item == null) throw new IllegalArgumentException("uri not found: " + uri);
-			return item;
-		}
-
-		/**
-		 * Diese Methode sucht binär im gegebenen Index-Array nach dem {@link DecodeLabel} mit dem gegebenen {@code URI}
-		 * -Index und gibt diesen oder {@code null} zurück.
-		 * 
-		 * @see DecodeLabel#name
-		 * @see DecodeItemPool#find(int[], Comparable)
-		 * @param indices Index-Array.
-		 * @param uri {@code URI}-Index.
-		 * @return {@link DecodeLabel} oder {@code null}.
-		 */
-		public DecodeLabel findUri(final int[] indices, final int uri) {
-			if(indices.length == 0) return null;
-			return this.find(indices, new DecodeLabelUriComparable(uri));
-		}
-
-		/**
-		 * Diese Methode sucht linear im gegebenen Index-Array nach dem {@link DecodeLabel} mit dem gegebenen {@code Name}
-		 * -Index und gibt diesen oder {@code null} zurück.
-		 * 
-		 * @param indices Index-Array.
-		 * @see DecodeLabel#name
-		 * @param name {@code Name}-Index.
-		 * @return {@link DecodeLabel} oder {@code null}.
-		 */
-		public DecodeLabel findName(final int[] indices, final int name) {
-			if(this.itemCount == 0) return null;
-			for(int i = 0, size = indices.length; i < size; i++){
-				final DecodeLabel value = this.get(indices[i]);
-				if(value.name == name) return value;
-			}
-			return null;
-		}
-
-		/**
-		 * Diese Methode sucht binäre nach dem {@link DecodeLabel} mit den gegebenen {@code URI}- bzw. {@code Name} -Indices
-		 * und gibt diesen oder {@code null} zurück. Die {@link DecodeLabel} müssen dazum im {@link DecodeItemPool}
-		 * aufsteigend sortiert sein.
-		 * 
-		 * @see Encoder#LabelComparator
-		 * @see DecodeItem#index
-		 * @see DecodeLabel#uri
-		 * @see DecodeLabel#name
-		 * @param uri {@code URI}-Index.
-		 * @param name {@code Name}-Index.
-		 * @return {@link DecodeLabel} oder {@code null}.
-		 */
-		public DecodeLabel findLabel(final int uri, final int name) {
-			if(this.itemCount == 0) return null;
-			if(!this.labelHashEnabled) return this.find(new DecodeLabelUriNameComparable(uri, name));
-			final int index = Coder.hashLabel(uri, name) % this.labelHash.itemCount;
-			final DecodeGroup group = this.labelHash.get(index);
-			return this.findLabel(group.indices, uri, name);
-		}
-
-		/**
-		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeLabel} mit den gegebenen {@code URI}-
-		 * bzw. {@code Name}-Indices und gibt diesen oder {@code null} zurück. Die {@link DecodeLabel} müssen dazum im
-		 * {@link DecodeItemPool} aufsteigend sortiert sein.
-		 * 
-		 * @see Encoder#LabelComparator
-		 * @see DecodeItem#index
-		 * @see DecodeLabel#uri
-		 * @see DecodeLabel#name
-		 * @param indices Index-Array.
-		 * @param uri {@code URI}-Index.
-		 * @param name {@code Name}-Index.
-		 * @return {@link DecodeLabel} oder {@code null}.
-		 */
-		public DecodeLabel findLabel(final int[] indices, final int uri, final int name) {
-			if(indices.length == 0) return null;
-			return this.find(indices, new DecodeLabelUriNameComparable(uri, name));
+			this.labelHashCount = labelHash.itemCount;
 		}
 
 		/**
@@ -1242,6 +1304,109 @@ public class Decoder {
 			}
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zurück.
+		 * 
+		 * @return {@code Hash-Tabelle}.
+		 */
+		public DecodeGroupPool labelHash() {
+			return this.labelHash;
+		}
+
+		/**
+		 * Diese Methode gibt das Ergebnis von {@link #findUri(int[], int)} zurück und löst eine
+		 * {@link IllegalArgumentException} aus, wenn kein {@link DecodeLabel} gefunden wird.
+		 * 
+		 * @see DecodeLabelPool#findUri(int[], int)
+		 * @param indices Index-Array.
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel}.
+		 * @throws IllegalArgumentException Wenn {@link #findUri(int[], int)} {@code null} liefert.
+		 */
+		public DecodeLabel getUri(final int[] indices, final int uri) throws IllegalArgumentException {
+			final DecodeLabel item = this.findUri(indices, uri);
+			if(item == null) throw new IllegalArgumentException("uri not found: " + uri);
+			return item;
+		}
+
+		/**
+		 * Diese Methode sucht binär im gegebenen Index-Array nach dem {@link DecodeLabel} mit dem gegebenen Index des
+		 * {@code URI}-{@link DecodeValue}s und gibt dieses {@link DecodeLabel} oder {@code null} zurück.
+		 * 
+		 * @see Encoder#LabelComparator
+		 * @see DecodePool#find(int[], Comparable)
+		 * @see DecodeLabel#uri()
+		 * @param indices Index-Array.
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public DecodeLabel findUri(final int[] indices, final int uri) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
+			if(indices.length == 0) return null;
+			return this.find(indices, new DecodeLabelUriComparable(uri));
+		}
+
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array nach dem {@link DecodeLabel} mit dem gegebenen Index des
+		 * {@code Name}-{@link DecodeValue}s und gibt dieses {@link DecodeLabel} oder {@code null} zurück.
+		 * 
+		 * @see DecodeLabel#name()
+		 * @param indices Index-Array.
+		 * @see DecodeLabel#name
+		 * @param name Index des {@code Name}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 */
+		public DecodeLabel findName(final int[] indices, final int name) {
+			if(this.itemCount == 0) return null;
+			for(int i = 0, size = indices.length; i < size; i++){
+				final DecodeLabel value = this.get(indices[i]);
+				if(value.name == name) return value;
+			}
+			return null;
+		}
+
+		/**
+		 * Diese Methode sucht binäre nach dem {@link DecodeLabel} mit den gegebenen Indices der {@code URI}- und
+		 * {@code Name}-{@link DecodeValue}s und gibt dieses {@link DecodeLabel} oder {@code null} zurück. Wenn der
+		 * {@link #labelHash()} nicht leer ist, wind nur im zu den gegebenen Indices ermittelten Index-Array gesucht.
+		 * 
+		 * @see Coder#hashLabel(int, int)
+		 * @see Encoder#LabelComparator
+		 * @see DecodePool#find(Comparable)
+		 * @see DecodeLabel#uri()
+		 * @see DecodeLabel#name()
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @param name Index des {@code Name}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 */
+		public DecodeLabel findLabel(final int uri, final int name) {
+			if(this.itemCount == 0) return null;
+			if(this.labelHashCount == 0) return this.find(new DecodeLabelUriNameComparable(uri, name));
+			return this.findLabel(this.labelHash.get(Coder.hashLabel(uri, name) % this.labelHashCount).values, uri, name);
+		}
+
+		/**
+		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeLabel} mit den gegebenen {@code URI}-
+		 * bzw. {@code Name}-Indices und gibt diesen oder {@code null} zurück. Die {@link DecodeLabel} müssen dazum im
+		 * {@link DecodeItemPool} aufsteigend sortiert sein.
+		 * 
+		 * @see Encoder#LabelComparator
+		 * @see DecodePool#find(int[], Comparable)
+		 * @see DecodeLabel#uri()
+		 * @see DecodeLabel#name()
+		 * @param indices Index-Array.
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @param name Index des {@code Name}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public DecodeLabel findLabel(final int[] indices, final int uri, final int name) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
+			if(indices.length == 0) return null;
+			return this.find(indices, new DecodeLabelUriNameComparable(uri, name));
+		}
+
 	}
 
 	/**
@@ -1254,21 +1419,26 @@ public class Decoder {
 		/**
 		 * Dieses Feld speichert die Indices der Datensätze.
 		 */
-		protected final int[] indices;
+		protected final int[] values;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indices.
 		 * 
 		 * @param index Index dieses Datensatzes im {@link DecodeItemPool}.
-		 * @param indices Indices der Datensätze.
+		 * @param values Indices der Datensätze.
 		 */
-		public DecodeGroup(final int index, final int[] indices) {
+		public DecodeGroup(final int index, final int[] values) {
 			super(index);
-			this.indices = indices;
+			this.values = values;
 		}
 
+		/**
+		 * Diese Methode gibt die Indices der Datensätze zurück.
+		 * 
+		 * @return Indices der Datensätze.
+		 */
 		public int[] indices() {
-			return this.indices.clone();
+			return this.values.clone();
 		}
 
 		/**
@@ -1276,13 +1446,13 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeGroup", this.index, this.indices);
+			return Objects.toStringCall(true, true, "DecodeGroup", "index", this.index, "values", this.values);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DecodeListPool} für {@link DecodeGroup}s.
+	 * Diese Klasse implementiert den {@link DecodeListPool} der {@link DecodeGroup}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1317,7 +1487,7 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert das {@link Element}-{@link DecodeItem}.
+	 * Diese Klasse implementiert ein {@link DecodeItem} zur Abstraktion eines {@link Element}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1326,31 +1496,21 @@ public class Decoder {
 		/**
 		 * Dieses Feld speichert den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-
 		 * {@link DecodeValue}s.
-		 * 
-		 * @see Element#getLocalName()
-		 * @see Element#getNamespaceURI()
 		 */
 		protected final int label;
 
 		/**
-		 * Dieses Feld speichert den Index der {@link DecodeGroup} oder {@code -1}.
-		 * 
-		 * @see Element#lookupPrefix(String)
-		 * @see Element#lookupNamespaceURI(String)
+		 * Dieses Feld speichert den Index der {@code URI/Prefix}-{@link DecodeGroup} oder {@code -1}.
 		 */
 		protected final int xmlns;
 
 		/**
-		 * Dieses Feld speichert den Index der {@link DecodeGroup}.
-		 * 
-		 * @see Element#getChildNodes()
+		 * Dieses Feld speichert den Index der {@link DecodeGroup} der {@link Element#getChildNodes()}.
 		 */
 		protected final int children;
 
 		/**
-		 * Dieses Feld speichert den Index der {@link DecodeGroup}.
-		 * 
-		 * @see Element#getAttributes()
+		 * Dieses Feld speichert den Index der {@link DecodeGroup} der {@link Element#getAttributes()}.
 		 */
 		protected final int attributes;
 
@@ -1358,11 +1518,10 @@ public class Decoder {
 		 * Dieser Konstrukteur initialisiert die Indices.
 		 * 
 		 * @param index Index dieses Datensatzes im {@link DecodeItemPool}.
-		 * @param label Index des {@link DecodeLabel}s ({@link Element#getLocalName()}, {@link Element#getNamespaceURI()}).
-		 * @param xmlns Index des {@link DecodeGroup} ({@link Element#lookupPrefix(String)},
-		 *        {@link Element#lookupNamespaceURI(String)}).
-		 * @param children Index der {@link DecodeGroup} ({@link Element#getChildNodes()}).
-		 * @param attributes Index der {@link DecodeGroup} ({@link Element#getAttributes()}).
+		 * @param label Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 * @param xmlns Index der {@code URI/Prefix}-{@link DecodeGroup} oder {@code -1}.
+		 * @param children Index der {@link DecodeGroup} der {@link Element#getChildNodes()}.
+		 * @param attributes Index der {@link DecodeGroup} der {@link Element#getAttributes()}.
 		 */
 		public DecodeElement(final int index, final int label, final int xmlns, final int children, final int attributes) {
 			super(index);
@@ -1372,19 +1531,35 @@ public class Decoder {
 			this.attributes = attributes;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s
+		 * zurück.
+		 * 
+		 * @see Element#getNodeName()
+		 * @see Element#getLocalName()
+		 * @see Element#getNamespaceURI()
+		 * @return Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 */
 		public int label() {
 			return this.label;
 		}
 
+		/**
+		 * Diese Methode gibt den Index der {@code URI/Prefix}-{@link DecodeGroup} oder {@code -1} zurück.
+		 * 
+		 * @return Index der {@code URI/Prefix}-{@link DecodeGroup} oder {@code -1}.
+		 * @see Element#lookupPrefix(String)
+		 * @see Element#lookupNamespaceURI(String)
+		 */
 		public int xmlns() {
 			return this.xmlns;
 		}
 
 		/**
 		 * Diese Methode gibt den Index der {@link DecodeGroup} der {@link Element#getChildNodes()} zurück. Die Indices in
-		 * dieser {@link DecodeGroup} verweisen dann auf {@link DecodeValue}s bzw. {@link DecodeElement}s, wobei die Indices
-		 * der {@link DecodeElement} um die Anzahl der {@link DecodeValue}s im {@link DecodeDocument#getValuePool()}
-		 * verschoben sind.
+		 * dieser {@link DecodeGroup} verweisen auf {@link DecodeValue}s bzw. {@link DecodeElement}s, wobei die Indices der
+		 * {@link DecodeElement} um die Anzahl der {@link DecodeValue}s im {@link DecodeDocument#valuePool()} verschoben
+		 * sind.
 		 * 
 		 * @see DecodeAdapter#getOffset()
 		 * @return Index der {@link DecodeGroup} der {@link Element#getChildNodes()}.
@@ -1393,6 +1568,11 @@ public class Decoder {
 			return this.children;
 		}
 
+		/**
+		 * Diese Methode gibt den Index der {@link DecodeGroup} der {@link Element#getAttributes()} zurück.
+		 * 
+		 * @return Index der {@link DecodeGroup} der {@link Element#getAttributes()}.
+		 */
 		public int attributes() {
 			return this.attributes;
 		}
@@ -1402,7 +1582,11 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeElementNode", this.index, this.label, this.xmlns, this.children, this.attributes);
+			if(this.xmlns >= 0)
+				return Objects.toStringCall(false, true, "DecodeElement", "index", this.index, "label", this.label, "xmlns", this.xmlns, "attributes", this.attributes,
+					"children", this.children);
+			return Objects.toStringCall(false, true, "DecodeElement", "index", this.index, "name", this.label, "attributes", this.attributes, "children",
+				this.children);
 		}
 
 	}
@@ -1415,9 +1599,11 @@ public class Decoder {
 	public static class DecodeElementPool extends DecodeItemPool<DecodeElement> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link DecodeSource} und lädt die Header.
+		 * Dieser Konstrukteur initialisiert {@link DecodeSource} sowie {@code xmlns}-Aktivierung und lädt die Header. Die
+		 * {@code xmlns}-Aktivierung entscheidet über die Größe der Elemente in der {@link DecodeSource}.
 		 * 
 		 * @param source {@link DecodeSource}.
+		 * @param xmlnsEnabled {@code xmlns}-Aktivierung.
 		 * @throws IOException Wenn die gegebene {@link DecodeSource} eine {@link IOException} auslöst.
 		 */
 		public DecodeElementPool(final DecodeSource source, final boolean xmlnsEnabled) throws IOException {
@@ -1446,34 +1632,29 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert das {@link Attr}-{@link DecodeItem}.
+	 * Diese Klasse implementiert ein {@link DecodeItem} zur Abstraktion eines {@link Attr}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class DecodeAttribute extends DecodeItem {
 
 		/**
-		 * Dieses Feld speichert den Index des {@link DecodeLabel}s.
-		 * 
-		 * @see Attr#getLocalName()
-		 * @see Attr#getNamespaceURI()
+		 * /** Dieses Feld speichert den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-
+		 * {@link DecodeValue}s.
 		 */
 		protected final int label;
 
 		/**
 		 * Dieses Feld speichert den Index des {@code Value}-{@link DecodeValue}.
-		 * 
-		 * @see Attr#getNodeValue()
 		 */
 		protected final int value;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die Indizes.
 		 * 
-		 * @param index Index dieses Datensatzes im {@link DecodeItemPool}.
-		 * @param label Index des {@code Item}-{@link DecodeLabel}s ({@link Attr#getLocalName()},
-		 *        {@link Attr#getNamespaceURI()}).
-		 * @param value Index des {@code Value}-{@link DecodeValue} ({@link Attr#getNodeValue()}).
+		 * @param index Index dieses Datensatzes im {@link DecodePool}.
+		 * @param label Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 * @param value Index des {@code Value}-{@link DecodeValue}.
 		 */
 		public DecodeAttribute(final int index, final int label, final int value) {
 			super(index);
@@ -1481,10 +1662,25 @@ public class Decoder {
 			this.value = value;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s
+		 * zurück.
+		 * 
+		 * @see Attr#getNodeName()
+		 * @see Attr#getLocalName()
+		 * @see Attr#getNamespaceURI()
+		 * @return Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 */
 		public int label() {
 			return this.label;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@code Value}-{@link DecodeValue} zurück.
+		 * 
+		 * @see Attr#getNodeValue()
+		 * @return Index des {@code Value}-{@link DecodeValue}.
+		 */
 		public int value() {
 			return this.value;
 		}
@@ -1494,7 +1690,7 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("DecodeAttributeNode", this.index, this.label, this.value);
+			return Objects.toStringCall(false, true, "DecodeAttribute", "index", this.index, "label", this.label, "value", this.value);
 		}
 
 	}
@@ -1563,16 +1759,21 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeAttribute} mit dem gegebenen
-		 * {@code Label}-Index und gibt dieses oder {@code null} zurück. Die {@link DecodeAttribute} müssen dazum im
-		 * Index-Array aufsteigend sortiert sein.
+		 * Diese Methode sucht binäre im gegebenen Index-Array nach dem {@link DecodeAttribute} mit dem gegebenen Index des
+		 * {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s und gibt dieses
+		 * {@link DecodeAttribute} oder {@code null} zurück.
 		 * 
-		 * @see DecodeAttribute#getLabel()
+		 * @see Encoder#AttributeNameComparator
+		 * @see Encoder#AttributeLabelComparator
+		 * @see DecodePool#find(int[], Comparable)
+		 * @see DecodeAttribute#label()
 		 * @param indices Index-Array.
-		 * @param label {@code Label}-Index.
+		 * @param label Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
 		 * @return {@link DecodeAttribute} oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
-		public DecodeAttribute findLabel(final int[] indices, final int label) {
+		public DecodeAttribute findLabel(final int[] indices, final int label) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
 			if(indices.length == 0) return null;
 			return this.find(indices, new DecodeAttributeComparable(label));
 		}
@@ -1580,123 +1781,122 @@ public class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DecodePool} des {@link DecodeDocumentAdapter}s als Sammlung aller
-	 * {@link DecodePool}s, die zur Abbildung eines {@link Document}s verwendet werden.
+	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link DecodePool}s zur Abstraktion eines {@link Document}
+	 * s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class DecodeDocument {
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #uriPool()}.
+		 */
 		protected final DecodeGroupPool uriHash;
 
 		/**
-		 * Dieses Feld speichert den {@code UIR}-{@link DecodeValuePool}.
-		 * 
-		 * @see Node#getNamespaceURI()
+		 * Dieses Feld speichert den {@code UIR}-{@link DecodeValuePool} für {@link DecodeLabel#uri()}.
 		 */
 		protected final DecodeValuePool uriPool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #valuePool()}.
+		 */
 		protected final DecodeGroupPool valueHash;
 
 		/**
-		 * Dieses Feld speichert den {@code Value}-{@link DecodeValuePool}.
-		 * 
-		 * @see Node#getNodeValue()
+		 * Dieses Feld speichert den {@code Value}-{@link DecodeValuePool} für {@link DecodeDocument#elementChildrenPool()}
+		 * und {@link DecodeAttribute#value()}.
 		 */
 		protected final DecodeValuePool valuePool;
 
+		/**
+		 * Dieses Feld speichert die {@code xmlns}-Aktivierung.
+		 */
 		protected final boolean xmlnsEnabled;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #xmlnsNamePool()}.
+		 */
 		protected final DecodeGroupPool xmlnsNameHash;
 
 		/**
-		 * Dieses Feld speichert den {@code Prefix}-{@link DecodeValuePool}.
-		 * 
-		 * @see Node#getPrefix()
+		 * Dieses Feld speichert den {@code Prefix}-{@link DecodeValuePool} für {@link DecodeDocument#xmlnsLabelPool()}.
 		 */
 		protected final DecodeValuePool xmlnsNamePool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #xmlnsLabelPool()}.
+		 */
 		protected final DecodeGroupPool xmlnsLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Prefix}-{@link DecodeLabelPool}.
-		 * 
-		 * @see Node#getPrefix()
-		 * @see Node#getNamespaceURI()
+		 * Dieses Feld speichert den {@code URI/Prefix}-{@link DecodeLabelPool} für
+		 * {@link DecodeDocument#elementXmlnsPool()}.
 		 */
 		protected final DecodeLabelPool xmlnsLabelPool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #elementNamePool()}.
+		 */
 		protected final DecodeGroupPool elementNameHash;
 
 		/**
-		 * Dieses Feld speichert den {@code Element}-{@link DecodeValuePool}.
-		 * 
-		 * @see Element#getLocalName()
+		 * Dieses Feld speichert den {@code Name}-{@link DecodeValuePool} für {@link DecodeElement#label()}.
 		 */
 		protected final DecodeValuePool elementNamePool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #elementLabelPool()}.
+		 */
 		protected final DecodeGroupPool elementLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Element}-{@link DecodeLabelPool}.
-		 * 
-		 * @see Element#getLocalName()
-		 * @see Element#getNamespaceURI()
+		 * Dieses Feld speichert den {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeElement#label()}.
 		 */
 		protected final DecodeLabelPool elementLabelPool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #attributeNamePool()}.
+		 */
 		protected final DecodeGroupPool attributeNameHash;
 
 		/**
-		 * Dieses Feld speichert den {@code Attribute}-{@link DecodeValuePool}.
-		 * 
-		 * @see Attr#getLocalName()
+		 * Dieses Feld speichert den {@code Name}-{@link DecodeValuePool} für {@link DecodeAttribute#label()}.
 		 */
 		protected final DecodeValuePool attributeNamePool;
 
+		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #attributeLabelPool()}.
+		 */
 		protected final DecodeGroupPool attributeLabelHash;
 
 		/**
-		 * Dieses Feld speichert den {@code URI/Attribute}-{@link DecodeLabelPool}.
-		 * 
-		 * @see Attr#getLocalName()
-		 * @see Attr#getNamespaceURI()
+		 * Dieses Feld speichert den {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeAttribute#label()}.
 		 */
 		protected final DecodeLabelPool attributeLabelPool;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeGroupPool}.
-		 * 
-		 * @see Element#lookupPrefix(String)
-		 * @see Element#lookupNamespaceURI(String)
+		 * Dieses Feld speichert den {@link DecodeGroupPool} für {@link DecodeElement#xmlns()}.
 		 */
 		protected final DecodeGroupPool elementXmlnsPool;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeGroupPool}.
-		 * 
-		 * @see Element#getChildNodes()
+		 * Dieses Feld speichert den {@link DecodeGroupPool} für {@link DecodeElement#children()}.
 		 */
 		protected final DecodeGroupPool elementChildrenPool;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeGroupPool}.
-		 * 
-		 * @see Element#getAttributes()
+		 * Dieses Feld speichert den {@link DecodeGroupPool} für {@link DecodeElement#attributes()}.
 		 */
 		protected final DecodeGroupPool elementAttributesPool;
 
 		/**
 		 * Dieses Feld speichert den {@link DecodeElementPool}.
-		 * 
-		 * @see Element
 		 */
 		protected final DecodeElementPool elementNodePool;
 
 		/**
 		 * Dieses Feld speichert den {@link DecodeAttributePool}.
-		 * 
-		 * @see Attr
 		 */
 		protected final DecodeAttributePool attributeNodePool;
 
@@ -1738,94 +1938,244 @@ public class Decoder {
 			this.documentElement = Decoder.readInts(source, 1)[0];
 		}
 
+		/**
+		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen
+		 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
+		 * {@code Prefix}.
+		 * 
+		 * @see Node#getPrefix()
+		 * @see Node#getLocalName()
+		 * @see Node#getNamespaceURI()
+		 * @return {@code xmlns}-Aktivierung.
+		 */
 		public boolean isXmlnsEnabled() {
 			return this.xmlnsEnabled;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #uriPool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #uriPool()}.
+		 */
 		public DecodeGroupPool uriHash() {
 			return this.uriHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code UIR}-{@link DecodeValuePool} für {@link DecodeLabel#uri()} zurück.
+		 * 
+		 * @see Node#getNamespaceURI()
+		 * @return {@code UIR}-{@link DecodeValuePool} für {@link DecodeLabel#uri()}.
+		 */
 		public DecodeValuePool uriPool() {
 			return this.uriPool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #valuePool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #valuePool()}.
+		 */
 		public DecodeGroupPool valueHash() {
 			return this.valueHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code Value}-{@link DecodeValuePool} für {@link DecodeDocument#elementChildrenPool()} und
+		 * {@link DecodeAttribute#value()} zurück.
+		 * 
+		 * @see Text#getNodeValue()
+		 * @see Attr#getNodeValue()
+		 * @return {@code Value}-{@link DecodeValuePool} für {@link DecodeDocument#elementChildrenPool()} und
+		 *         {@link DecodeAttribute#value()}.
+		 */
 		public DecodeValuePool valuePool() {
 			return this.valuePool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #xmlnsNamePool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #xmlnsNamePool()}.
+		 */
 		public DecodeGroupPool xmlnsNameHash() {
 			return this.xmlnsNameHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code Prefix}-{@link DecodeValuePool} für {@link DecodeDocument#xmlnsLabelPool()} zurück.
+		 * 
+		 * @see Node#getPrefix()
+		 * @return {@code Prefix}-{@link DecodeValuePool} für {@link DecodeDocument#xmlnsLabelPool()}.
+		 */
 		public DecodeValuePool xmlnsNamePool() {
 			return this.xmlnsNamePool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #xmlnsLabelPool()} zurück.
+		 * 
+		 * @see DecodeLabelPool#findLabel(int, int)
+		 * @return {@code Hash-Tabelle} zu {@link #xmlnsLabelPool()}.
+		 */
 		public DecodeGroupPool xmlnsLabelHash() {
 			return this.xmlnsLabelHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code URI/Prefix}-{@link DecodeLabelPool} für {@link DecodeDocument#elementXmlnsPool()}
+		 * zurück.
+		 * 
+		 * @see Node#getPrefix()
+		 * @see Node#getNamespaceURI()
+		 * @return {@code URI/Prefix}-{@link DecodeLabelPool} für {@link DecodeDocument#elementXmlnsPool()}.
+		 */
 		public DecodeLabelPool xmlnsLabelPool() {
 			return this.xmlnsLabelPool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #elementNamePool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #elementNamePool()}.
+		 */
 		public DecodeGroupPool elementNameHash() {
 			return this.elementNameHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code Name}-{@link DecodeValuePool} für {@link DecodeElement#label()} zurück.
+		 * 
+		 * @see Element#getNodeName()
+		 * @see Element#getLocalName()
+		 * @return {@code Name}-{@link DecodeValuePool} für {@link DecodeElement#label()}.
+		 */
 		public DecodeValuePool elementNamePool() {
 			return this.elementNamePool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #elementLabelPool()} zurück.
+		 * 
+		 * @see DecodeLabelPool#findLabel(int, int)
+		 * @return {@code Hash-Tabelle} zu {@link #elementLabelPool()}.
+		 */
 		public DecodeGroupPool elementLabelHash() {
 			return this.elementLabelHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeElement#label()} zurück.
+		 * 
+		 * @see Element#getLocalName()
+		 * @see Element#getNamespaceURI()
+		 * @return {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeElement#label()}.
+		 */
 		public DecodeLabelPool elementLabelPool() {
 			return this.elementLabelPool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #attributeNamePool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #attributeNamePool()}.
+		 */
 		public DecodeGroupPool attributeNameHash() {
 			return this.attributeNameHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code Name}-{@link DecodeValuePool} für {@link DecodeAttribute#label()} zurück.
+		 * 
+		 * @see Attr#getNodeName()
+		 * @see Attr#getLocalName()
+		 * @return {@code Name}-{@link DecodeValuePool} für {@link DecodeAttribute#label()}.
+		 */
 		public DecodeValuePool attributeNamePool() {
 			return this.attributeNamePool;
 		}
 
+		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #attributeLabelPool()} zurück.
+		 * 
+		 * @see DecodeLabelPool#findLabel(int, int)
+		 * @return {@code Hash-Tabelle} zu {@link #attributeLabelPool()}.
+		 */
 		public DecodeGroupPool attributeLabelHash() {
 			return this.attributeLabelHash;
 		}
 
+		/**
+		 * Diese Methode gibt den {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeAttribute#label()} zurück.
+		 * 
+		 * @see Attr#getLocalName()
+		 * @see Attr#getNamespaceURI()
+		 * @return {@code URI/Name}-{@link DecodeLabelPool} für {@link DecodeAttribute#label()}.
+		 */
 		public DecodeLabelPool attributeLabelPool() {
 			return this.attributeLabelPool;
 		}
 
+		/**
+		 * Diese Methode gibt den {@link DecodeGroupPool} für {@link DecodeElement#xmlns()} zurück.
+		 * 
+		 * @see Element#lookupPrefix(String)
+		 * @see Element#lookupNamespaceURI(String)
+		 * @return {@link DecodeGroupPool} für {@link DecodeElement#xmlns()}.
+		 */
 		public DecodeGroupPool elementXmlnsPool() {
 			return this.elementXmlnsPool;
 		}
 
+		/**
+		 * Diese Methode gibt den {@link DecodeGroupPool} für {@link DecodeElement#children()} zurück.
+		 * 
+		 * @see Element#getChildNodes()
+		 * @return {@link DecodeGroupPool} für {@link DecodeElement#children()}.
+		 */
 		public DecodeGroupPool elementChildrenPool() {
 			return this.elementChildrenPool;
 		}
 
+		/**
+		 * Diese Methode gibt den {@link DecodeGroupPool} für {@link DecodeElement#attributes()} zurück.
+		 * 
+		 * @see Element#getAttributes()
+		 * @return {@link DecodeGroupPool} für {@link DecodeElement#attributes()}.
+		 */
 		public DecodeGroupPool elementAttributesPool() {
 			return this.elementAttributesPool;
 		}
 
+		/**
+		 * Diese Methode gibt den {@link DecodeElementPool} zurück.
+		 * 
+		 * @return {@link DecodeElementPool}.
+		 */
 		public DecodeElementPool elementNodePool() {
 			return this.elementNodePool;
 		}
 
+		/**
+		 * Diese Methode gibt den {@link DecodeAttributePool} zurück.
+		 * 
+		 * @return {@link DecodeAttributePool}.
+		 */
 		public DecodeAttributePool attributeNodePool() {
 			return this.attributeNodePool;
 		}
 
+		/**
+		 * Diese Methode gibt den Index des {@link DecodeElement}s für {@link Document#getDocumentElement()} zurück.
+		 * 
+		 * @see Document#getDocumentElement()
+		 * @return Index des {@link DecodeElement}s für {@link Document#getDocumentElement()}.
+		 */
 		public int documentElement() {
 			return this.documentElement;
 		}
@@ -1835,11 +2185,22 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "DecodeDocument", "uriHash", this.uriHash, "uriPool", this.uriPool, "valueHash", this.valueHash, "valuePool",
-				this.valuePool, "xmlnsNameCache", this.xmlnsNamePool, "xmlnsLabelCache", this.xmlnsLabelPool, "elementNodeCache", this.elementNodePool,
-				"elementNameCache", this.elementNamePool, "elementLabelCache", this.elementLabelPool, "elementXmlnsCache", this.elementXmlnsPool,
-				"elementChildrenCache", this.elementChildrenPool, "elementAttributesCache", this.elementAttributesPool, "attributeNodeCache", this.attributeNodePool,
-				"attributeNameCache", this.attributeNamePool, "attributeLabelCache", this.attributeLabelPool, "documentElement", this.documentElement);
+			return Objects.toStringCall(true, true, "DecodeDocument", //
+				"uriPool", this.uriPool, //
+				"valuePool", this.valuePool, //
+				"xmlnsNamePool", this.xmlnsNamePool, //
+				"xmlnsLabelPool", this.xmlnsLabelPool, //
+				"elementNamePool", this.elementNamePool, //
+				"elementLabelPool", this.elementLabelPool, //
+				"attributeNamePool", this.attributeNamePool, //
+				"attributeLabelPool", this.attributeLabelPool, //
+				"elementXmlnsPool", this.elementXmlnsPool, //
+				"elementChildrenPool", this.elementChildrenPool, //
+				"elementAttributesPool", this.elementAttributesPool, //
+				"elementNodePool", this.elementNodePool, //
+				"attributeNodePool", this.attributeNodePool, //
+				"documentElement", this.documentElement //
+				);
 		}
 
 	}
@@ -1909,6 +2270,9 @@ public class Decoder {
 		 */
 		protected final DecodeDocument document;
 
+		/**
+		 * Dieses Feld speichert die {@code xmlns}-Aktivierung.
+		 */
 		protected final boolean xmlnsEnabled;
 
 		/**
@@ -1925,8 +2289,8 @@ public class Decoder {
 
 		/**
 		 * Diese Methode gibt die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der {@link DecodeGroup}
-		 * zu {@link DecodeElement#getChildren()} zurück. Der Wert entspricht der Anzahl der {@link DecodeValue}s in
-		 * {@link DecodeDocument#getValuePool()}.
+		 * zu {@link DecodeElement#children()} zurück. Der Wert entspricht der Anzahl der {@link DecodeValue}s in
+		 * {@link DecodeDocument#valuePool()}.
 		 * 
 		 * @see #elementGetChildNodesItem(DecodeNodeAdapter, int, int)
 		 * @return Verschiebung des Indexes der {@link DecodeElement}s.
@@ -1985,7 +2349,7 @@ public class Decoder {
 			final DecodeElement element = this.document.elementNodePool.get(index);
 			final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
 			final DecodeLabel nodeLabel = this.document.elementLabelPool.get(element.label);
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, nodeLabel.uri);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.values, nodeLabel.uri);
 			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
@@ -2004,7 +2368,7 @@ public class Decoder {
 				final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(elementNode.xmlns);
 				final DecodeLabel elementLabel = this.document.elementLabelPool.get(elementNode.label);
 				final DecodeValue elementLabelName = this.document.elementNamePool.get(elementLabel.name);
-				final DecodeLabel elementXmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, elementLabel.uri);
+				final DecodeLabel elementXmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.values, elementLabel.uri);
 				final DecodeValue elementXmlnsLabelName = this.document.xmlnsNamePool.get(elementXmlnsLabel.name);
 				final String elementXmlnsLabelNameValue = elementXmlnsLabelName.value;
 				if(elementXmlnsLabelNameValue.isEmpty()) return elementLabelName.value;
@@ -2070,7 +2434,7 @@ public class Decoder {
 		public void elementGetTextContent(final StringBuffer target, final int index) {
 			final DecodeElement element = this.document.elementNodePool.get(index);
 			final DecodeGroup children = this.document.elementChildrenPool.get(element.children);
-			for(final int index2: children.indices){
+			for(final int index2: children.values){
 				final int index3 = index2 - this.offset;
 				if(index3 < 0){
 					target.append(this.textGetData(index2));
@@ -2155,7 +2519,7 @@ public class Decoder {
 		public DecodeChildAdapter elementGetFirstChild(final DecodeElementAdapter parent) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
-			final int[] indices = elementChildren.indices;
+			final int[] indices = elementChildren.values;
 			if(indices.length == 0) return null;
 			return this.elementGetChildNodesItem(parent, indices[0], 0);
 		}
@@ -2169,7 +2533,7 @@ public class Decoder {
 		public DecodeChildAdapter elementGetLastChild(final DecodeElementAdapter parent) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
-			final int[] indices = elementChildren.indices;
+			final int[] indices = elementChildren.values;
 			final int index = indices.length - 1;
 			if(index < 0) return null;
 			return this.elementGetChildNodesItem(parent, indices[index], index);
@@ -2184,7 +2548,7 @@ public class Decoder {
 		public boolean elementHasChildNodes(final int index) {
 			final DecodeElement element = this.document.elementNodePool.get(index);
 			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
-			return elementChildren.indices.length != 0;
+			return elementChildren.values.length != 0;
 		}
 
 		/**
@@ -2196,7 +2560,7 @@ public class Decoder {
 		public DecodeElementChildrenAdapter elementGetChildNodes(final DecodeElementAdapter parent) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementChildren = this.document.elementChildrenPool.get(element.children);
-			return new DecodeElementChildrenAdapter(parent, elementChildren.indices);
+			return new DecodeElementChildrenAdapter(parent, elementChildren.values);
 		}
 
 		/**
@@ -2247,7 +2611,7 @@ public class Decoder {
 		public boolean elementHasAttribute(final int index, final String uri, final String name) {
 			final DecodeElement elementNode = this.document.elementNodePool.get(index);
 			final DecodeGroup attributeGroup = this.document.elementAttributesPool.get(elementNode.attributes);
-			if(attributeGroup.indices.length == 0) return false;
+			if(attributeGroup.values.length == 0) return false;
 			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
 				if(uriChars == null) return false;
@@ -2255,12 +2619,12 @@ public class Decoder {
 				if(nameChars == null) return false;
 				final DecodeLabel attributeLabel = this.document.attributeLabelPool.findLabel(uriChars.index, nameChars.index);
 				if(attributeLabel == null) return false;
-				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeLabel.index);
+				final DecodeAttribute attribute = this.document.attributeNodePool.findLabel(attributeGroup.values, attributeLabel.index);
 				return attribute != null;
 			}else{
 				final DecodeValue attributeName = this.document.attributeNamePool.findValue(name);
 				if(attributeName == null) return false;
-				final DecodeAttribute attributeNode = this.document.attributeNodePool.findLabel(attributeGroup.indices, attributeName.index);
+				final DecodeAttribute attributeNode = this.document.attributeNodePool.findLabel(attributeGroup.values, attributeName.index);
 				return attributeNode != null;
 			}
 		}
@@ -2276,7 +2640,7 @@ public class Decoder {
 		public String elementGetAttribute(final int index, final String uri, final String name) {
 			final DecodeElement element = this.document.elementNodePool.get(index);
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
-			final int[] indices = elementAttributes.indices;
+			final int[] indices = elementAttributes.values;
 			if(indices.length == 0) return "";
 			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
@@ -2333,7 +2697,7 @@ public class Decoder {
 		public DecodeAttributeAdapter elementGetAttributesNamedItem(final DecodeElementAdapter parent, final String uri, final String name) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
-			final int[] indices = elementAttributes.indices;
+			final int[] indices = elementAttributes.values;
 			if(indices.length == 0) return null;
 			if(this.xmlnsEnabled){
 				final DecodeValue uriChars = this.document.uriPool.findValue(uri);
@@ -2363,7 +2727,7 @@ public class Decoder {
 		public boolean elementHasAttributes(final DecodeElementAdapter parent) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
-			return elementAttributes.indices.length != 0;
+			return elementAttributes.values.length != 0;
 		}
 
 		/**
@@ -2375,7 +2739,7 @@ public class Decoder {
 		public DecodeElementAttributesAdapter elementGetAttributes(final DecodeElementAdapter parent) {
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementAttributes = this.document.elementAttributesPool.get(element.attributes);
-			return new DecodeElementAttributesAdapter(parent, elementAttributes.indices);
+			return new DecodeElementAttributesAdapter(parent, elementAttributes.values);
 		}
 
 		/**
@@ -2392,7 +2756,7 @@ public class Decoder {
 			if(uriChars == null) return null;
 			final DecodeElement node = this.document.elementNodePool.get(index);
 			final DecodeGroup nodeXmlns = this.document.elementXmlnsPool.get(node.xmlns);
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(nodeXmlns.indices, uriChars.index);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(nodeXmlns.values, uriChars.index);
 			if(xmlnsLabel == null) return null;
 			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			return xmlnsChars.value;
@@ -2412,7 +2776,7 @@ public class Decoder {
 			if(nameChars == null) return null;
 			final DecodeElement node = this.document.elementNodePool.get(index);
 			final DecodeGroup nodeXmlns = this.document.elementXmlnsPool.get(node.xmlns);
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(nodeXmlns.indices, nameChars.index);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(nodeXmlns.values, nameChars.index);
 			if(xmlnsLabel == null) return null;
 			final DecodeValue uriChars = this.document.uriPool.get(xmlnsLabel.uri);
 			return uriChars.value;
@@ -2432,7 +2796,7 @@ public class Decoder {
 			if(attributeLabel.uri == 0) return null;
 			final DecodeElement element = this.document.elementNodePool.get(parent.index);
 			final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.values, attributeLabel.uri);
 			final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 			final String xmlnsValue = xmlnsChars.value;
 			if(xmlnsValue.isEmpty()) return null;
@@ -2454,7 +2818,7 @@ public class Decoder {
 				if(attributeLabel.uri == 0) return attributeChars.value;
 				final DecodeElement element = this.document.elementNodePool.get(parent.index);
 				final DecodeGroup elementXmlns = this.document.elementXmlnsPool.get(element.xmlns);
-				final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.indices, attributeLabel.uri);
+				final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.getUri(elementXmlns.values, attributeLabel.uri);
 				final DecodeValue xmlnsChars = this.document.xmlnsNamePool.get(xmlnsLabel.name);
 				final String xmlnsValue = xmlnsChars.value;
 				if(xmlnsValue.isEmpty()) return attributeChars.value;
@@ -3493,7 +3857,7 @@ public class Decoder {
 		/**
 		 * Diese Methode gibt die Indices der {@link DecodeValue}s bzw. {@link DecodeElement}s zurück.
 		 * 
-		 * @see DecodeElement#getChildren()
+		 * @see DecodeElement#children()
 		 * @return Indices der {@link DecodeValue}s bzw. {@link DecodeElement}s.
 		 */
 		public int[] getChildIndices() {
@@ -4570,7 +4934,7 @@ public class Decoder {
 		protected final void collectChildren(final DecodeElementAdapter parent) {
 			final DecodeElement elementNode = this.cache.elementNodePool.get(parent.index);
 			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(elementNode.children);
-			final int[] indices = elementChildren.indices;
+			final int[] indices = elementChildren.values;
 			final int count = indices.length;
 			if(count == 0) return;
 			for(int child = 0, offset = this.offset; child < count; child++){
@@ -4593,7 +4957,7 @@ public class Decoder {
 		 */
 		protected final void collectDescendant(final DecodeElementAdapter parent, final DecodeElement element) {
 			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
-			final int[] indices = elementChildren.indices;
+			final int[] indices = elementChildren.values;
 			final int count = indices.length;
 			if(count == 0) return;
 			for(int child = 0, offset = this.offset; child < count; child++){

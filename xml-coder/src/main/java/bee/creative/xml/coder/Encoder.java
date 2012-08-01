@@ -496,24 +496,20 @@ public class Encoder {
 	public static class EncodeLabel extends EncodeItem {
 
 		/**
-		 * Dieses Feld speichert die {@code URI}.
-		 * 
-		 * @see Node#getNamespaceURI()
+		 * Dieses Feld speichert den {@code URI}.
 		 */
 		protected final EncodeValue uri;
 
 		/**
 		 * Dieses Feld speichert den {@code Name}.
-		 * 
-		 * @see Node#getLocalName()
 		 */
 		protected final EncodeValue name;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@code URI} und {@code Name}.
 		 * 
-		 * @param uri {@code URI} ({@link Node#getNamespaceURI()}).
-		 * @param name {@code Name} ({@link Node#getLocalName()}).
+		 * @param uri {@code URI}.
+		 * @param name {@code Name}.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public EncodeLabel(final EncodeValue uri, final EncodeValue name) throws NullPointerException {
@@ -914,7 +910,7 @@ public class Encoder {
 		@Override
 		public String toString() {
 			if(this.name == null)
-				return Objects.toStringCall(false, true, "EncodeElement", "index", this.index, "label", this.label, "spaces", this.xmlns.index, "attributes",
+				return Objects.toStringCall(false, true, "EncodeElement", "index", this.index, "label", this.label, "xmlns", this.xmlns.index, "attributes",
 					this.attributes.index, "children", this.children.index);
 			return Objects.toStringCall(false, true, "EncodeElement", "index", this.index, "name", this.name, "attributes", this.attributes.index, "children",
 				this.children.index);
@@ -1277,7 +1273,8 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert die Abstraktion eines {@link Document}s.
+	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link EncodePool}s zur Abstraktion eines {@link Document}
+	 * s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1546,6 +1543,29 @@ public class Encoder {
 		 */
 		public EncodeElement documentElement() {
 			return this.documentElement;
+		}
+
+		/**
+		 * {@inheritDoc}
+		*/
+		@Override
+		public String toString() {
+			return Objects.toStringCall(true, true, "EncodeDocument", //
+				"uriPool", this.uriPool, //
+				"valuePool", this.valuePool, //
+				"xmlnsNamePool", this.xmlnsNamePool, //
+				"xmlnsLabelPool", this.xmlnsLabelPool, //
+				"elementNamePool", this.elementNamePool, //
+				"elementLabelPool", this.elementLabelPool, //
+				"attributeNamePool", this.attributeNamePool, //
+				"attributeLabelPool", this.attributeLabelPool, //
+				"elementXmlnsPool", this.elementXmlnsPool, //
+				"elementChildrenPool", this.elementChildrenPool, //
+				"elementAttributesPool", this.elementAttributesPool, //
+				"elementNodePool", this.elementNodePool, //
+				"attributeNodePool", this.attributeNodePool, //
+				"documentElement", this.documentElement //
+				);
 		}
 
 	}
