@@ -2561,27 +2561,27 @@ public class Encoder {
 	public void encode(final EncodeDocument source, final EncodeTarget target) throws IOException, NullPointerException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(target == null) throw new NullPointerException("target is null");
-		final List<EncodeValue> uriPool = Encoder.compilePool(source.uriPool, 0, Encoder.ValueComparator);
+		final List<EncodeValue> uriPool = Encoder.compilePool(source.uriPool(), 0, Encoder.ValueComparator);
 		final List<EncodeGroup> uriHash = Encoder.cimpileHash(uriPool, this.uriHashEnabled, Encoder.ValueHasher);
-		final List<EncodeValue> valuePool = Encoder.compilePool(source.valuePool, 0, Encoder.ValueComparator);
+		final List<EncodeValue> valuePool = Encoder.compilePool(source.valuePool(), 0, Encoder.ValueComparator);
 		final List<EncodeGroup> valueHash = Encoder.cimpileHash(valuePool, this.valueHashEnabled, Encoder.ValueHasher);
-		final List<EncodeValue> xmlnsNamePool = Encoder.compilePool(source.xmlnsNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeValue> xmlnsNamePool = Encoder.compilePool(source.xmlnsNamePool(), 0, Encoder.ValueComparator);
 		final List<EncodeGroup> xmlnsNameHash = Encoder.cimpileHash(xmlnsNamePool, this.xmlnsNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> xmlnsLabelPool = Encoder.compilePool(source.xmlnsLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeLabel> xmlnsLabelPool = Encoder.compilePool(source.xmlnsLabelPool(), 0, Encoder.LabelComparator);
 		final List<EncodeGroup> xmlnsLabelHash = Encoder.cimpileHash(xmlnsLabelPool, this.xmlnsLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeValue> elementNamePool = Encoder.compilePool(source.elementNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeValue> elementNamePool = Encoder.compilePool(source.elementNamePool(), 0, Encoder.ValueComparator);
 		final List<EncodeGroup> elementNameHash = Encoder.cimpileHash(elementNamePool, this.elementNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> elementLabelPool = Encoder.compilePool(source.elementLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeLabel> elementLabelPool = Encoder.compilePool(source.elementLabelPool(), 0, Encoder.LabelComparator);
 		final List<EncodeGroup> elementLabelHash = Encoder.cimpileHash(elementLabelPool, this.elementLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeValue> attributeNamePool = Encoder.compilePool(source.attributeNamePool, 0, Encoder.ValueComparator);
+		final List<EncodeValue> attributeNamePool = Encoder.compilePool(source.attributeNamePool(), 0, Encoder.ValueComparator);
 		final List<EncodeGroup> attributeNameHash = Encoder.cimpileHash(attributeNamePool, this.attributeNameHashEnabled, Encoder.ValueHasher);
-		final List<EncodeLabel> attributeLabelPool = Encoder.compilePool(source.attributeLabelPool, 0, Encoder.LabelComparator);
+		final List<EncodeLabel> attributeLabelPool = Encoder.compilePool(source.attributeLabelPool(), 0, Encoder.LabelComparator);
 		final List<EncodeGroup> attributeLabelHash = Encoder.cimpileHash(attributeLabelPool, this.attributeLabelHashEnabled, Encoder.LabelHasher);
-		final List<EncodeGroup> elementXmlnsPool = Encoder.compilePool(source.elementXmlnsPool, 0, Encoder.IndexComparator);
-		final List<EncodeGroup> elementChildrenPool = Encoder.compilePool(source.elementChildrenPool, 0, Encoder.IndexComparator);
-		final List<EncodeGroup> elementAttributesPool = Encoder.compilePool(source.elementAttributesPool, 0, Encoder.IndexComparator);
-		final List<EncodeElement> elementNodePool = Encoder.compilePool(source.elementNodePool, valuePool.size(), Encoder.IndexComparator);
-		final List<EncodeAttribute> attributeNodePool = Encoder.compilePool(source.attributeNodePool, 0, Encoder.IndexComparator);
+		final List<EncodeGroup> elementXmlnsPool = Encoder.compilePool(source.elementXmlnsPool(), 0, Encoder.IndexComparator);
+		final List<EncodeGroup> elementChildrenPool = Encoder.compilePool(source.elementChildrenPool(), 0, Encoder.IndexComparator);
+		final List<EncodeGroup> elementAttributesPool = Encoder.compilePool(source.elementAttributesPool(), 0, Encoder.IndexComparator);
+		final List<EncodeElement> elementNodePool = Encoder.compilePool(source.elementNodePool(), valuePool.size(), Encoder.IndexComparator);
+		final List<EncodeAttribute> attributeNodePool = Encoder.compilePool(source.attributeNodePool(), 0, Encoder.IndexComparator);
 		Encoder.writeLists(target, uriHash);
 		Encoder.writeLists(target, uriPool);
 		Encoder.writeLists(target, valueHash);
@@ -2603,7 +2603,7 @@ public class Encoder {
 		Encoder.writeLists(target, elementAttributesPool);
 		Encoder.writeItems(target, elementNodePool);
 		Encoder.writeItems(target, attributeNodePool);
-		Encoder.writeInts(target, source.documentElement.index - valuePool.size());
+		Encoder.writeInts(target, source.documentElement().index() - valuePool.size());
 	}
 
 	/**
@@ -2643,7 +2643,7 @@ public class Encoder {
 		if(reader == null) throw new NullPointerException("reader is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(target == null) throw new NullPointerException("target is null");
-		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.xmlnsEnabled);
+		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.isXmlnsEnabled());
 		reader.setContentHandler(adapter);
 		reader.parse(source);
 	}
