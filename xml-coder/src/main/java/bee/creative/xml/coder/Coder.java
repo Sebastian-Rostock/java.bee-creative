@@ -31,6 +31,10 @@ public class Coder {
 	 */
 	static final Charset CHARSET = Charset.forName("UTF-8");
 
+	static final String MESSAGE_NULL_VALUE = "value is null";
+
+	static final String MESSAGE_NULL_INDICES = "indices is null";
+
 	/**
 	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link String}s zurück, der in den
 	 * {@code Hash}es des {@link DecodeDocument}s verwendet werden.
@@ -47,7 +51,7 @@ public class Coder {
 	 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
 	 */
 	public static int hashValue(final String value) throws NullPointerException {
-		if(value == null) throw new NullPointerException("value is null");
+		if(value == null) throw new NullPointerException(MESSAGE_NULL_VALUE);
 		int hash = 0x811C9DC5;
 		for(int i = 0, length = value.length(); i < length; i++){
 			hash = (hash * 0x01000193) ^ value.charAt(i);
@@ -83,7 +87,7 @@ public class Coder {
 	 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
 	 */
 	public static byte[] encodeChars(final String value) throws NullPointerException {
-		if(value == null) throw new NullPointerException("value is null");
+		if(value == null) throw new NullPointerException(MESSAGE_NULL_VALUE);
 		return value.getBytes(Coder.CHARSET);
 	}
 
@@ -96,7 +100,7 @@ public class Coder {
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
 	 */
 	public static byte[] encodeIndices(final int... value) throws NullPointerException {
-		if(value == null) throw new NullPointerException("value is null");
+		if(value == null) throw new NullPointerException(MESSAGE_NULL_VALUE);
 		final int length = value.length << 2;
 		if(length == 0) return Coder.VOID_BYTES;
 		final byte[] array = new byte[length];
@@ -113,7 +117,7 @@ public class Coder {
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
 	 */
 	public static String decodeChars(final byte[] value) throws NullPointerException {
-		if(value == null) throw new NullPointerException("value is null");
+		if(value == null) throw new NullPointerException(MESSAGE_NULL_VALUE);
 		return new String(value, Coder.CHARSET);
 	}
 
@@ -126,7 +130,7 @@ public class Coder {
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
 	 */
 	public static int[] decodeIndices(final byte... value) throws NullPointerException {
-		if(value == null) throw new NullPointerException("value is null");
+		if(value == null) throw new NullPointerException(MESSAGE_NULL_VALUE);
 		final int length = value.length >> 2;
 		if(length == 0) return Coder.VOID_INTS;
 		final int[] array = new int[length];

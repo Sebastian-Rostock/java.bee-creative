@@ -409,7 +409,7 @@ public class Encoder {
 		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
 		 */
 		public EncodeValue(final String value) throws NullPointerException {
-			if(value == null) throw new NullPointerException("value is null");
+			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
 			this.value = value;
 		}
 
@@ -666,7 +666,7 @@ public class Encoder {
 		 * @throws NullPointerException Wenn die gegebene {@link EncodeItem}-{@link List} {@code null} ist oder enthält.
 		 */
 		public EncodeGroup(final List<? extends EncodeItem> value) throws NullPointerException {
-			if(value == null) throw new NullPointerException("value is null");
+			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
 			if(value.contains(null)) throw new NullPointerException("value contains null");
 			this.values = new ArrayList<EncodeItem>(value);
 		}
@@ -1099,7 +1099,7 @@ public class Encoder {
 		 */
 		public EncodeAttribute(final EncodeValue name, final EncodeValue value) throws NullPointerException {
 			if(name == null) throw new NullPointerException("name is null");
-			if(value == null) throw new NullPointerException("value is null");
+			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
 			this.name = name;
 			this.label = null;
 			this.value = value;
@@ -1114,7 +1114,7 @@ public class Encoder {
 		 */
 		public EncodeAttribute(final EncodeLabel label, final EncodeValue value) throws NullPointerException {
 			if(label == null) throw new NullPointerException("label is null");
-			if(value == null) throw new NullPointerException("value is null");
+			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
 			this.name = null;
 			this.label = label;
 			this.value = value;
