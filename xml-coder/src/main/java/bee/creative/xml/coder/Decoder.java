@@ -2430,7 +2430,7 @@ public class Decoder {
 		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der
 		 * {@link DecodeGroup}. Der Wert entspricht der Anzahl der {@link DecodeValue}s in {@link DecodeDocument#valuePool}.
 		 * 
-		 * @see #getElementChild(DecodeNodeAdapter, int, int)
+		 * @see #getChild(DecodeNodeAdapter, int, int)
 		 */
 		protected final int offset;
 
@@ -2449,8 +2449,6 @@ public class Decoder {
 		 */
 		protected final boolean xmlnsEnabled;
 
-		protected final int voidUriIndex;
-
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link DecodeDocument}.
 		 * 
@@ -2461,8 +2459,6 @@ public class Decoder {
 			this.document = document;
 			this.xmlnsEnabled = document.xmlnsEnabled;
 			this.documentAdapter = new DecodeDocumentAdapter(this);
-			final DecodeValue voidUri = document.uriPool.findValue("");
-			this.voidUriIndex = ((voidUri == null) ? -1 : voidUri.index);
 		}
 
 		/**
@@ -2470,10 +2466,10 @@ public class Decoder {
 		 * zu {@link DecodeElement#children()} zurück. Der Wert entspricht der Anzahl der {@link DecodeValue}s in
 		 * {@link DecodeDocument#valuePool()}.
 		 * 
-		 * @see #getElementChild(DecodeNodeAdapter, int, int)
+		 * @see #getChild(DecodeNodeAdapter, int, int)
 		 * @return Verschiebung des Indexes der {@link DecodeElement}s.
 		 */
-		public int offset() {
+		public final int offset() {
 			return this.offset;
 		}
 
@@ -2608,7 +2604,7 @@ public class Decoder {
 		 * @return Index des ersten Treffers oder {@code -1}.
 		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
-		public int childIndex(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
+		public final int childIndex(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) throws NullPointerException {
 			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
 			return this.childIndex_(childNodeIndices, childLabelIndex, childIndex);
 		}
@@ -2625,28 +2621,43 @@ public class Decoder {
 		 * @return Index des ersten Treffers oder {@code -1}.
 		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
-		public int childIndex(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) throws NullPointerException {
+		public final int childIndex(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) throws NullPointerException {
 			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
 			return this.childIndex_(childNodeIndices, childLabelItem, childIndex);
 		}
 
 		/**
-		 * Diese Methode gibt das zurück.
+		 * Diese Methode sucht linear im gegebenen Index-Array ab der gegebenen Position nach dem {@link DecodeElement} mit
+		 * dem gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dessen Position oder {@code -1} zurück.
 		 * 
-		 * @see DecodeAdapter#childIndex(int[], DecodeItem, int)
+		 * @see DecodeElement#label()
 		 * @see DecodeAdapter#elementLabel(String, String)
-		 * @param childNodeIndices
-		 * @param childUriString
-		 * @param childNameString
-		 * @param childIndex
-		 * @return
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childUriString {@code URI}.
+		 * @param childNameString {@code Name}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
-		public int childIndex(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
+		public final int childIndex(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex)
+			throws NullPointerException {
 			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
 			return this.childIndex_(childNodeIndices, this.elementLabel(childUriString, childNameString), childIndex);
 		}
 
-		private int childIndex_(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array ab der gegebenen Position nach dem {@link DecodeElement} mit
+		 * dem gegebenen {@link DecodeElement#label()} und gibt dessen Position oder {@code -1} zurück. Wenn das gegebene
+		 * {@link DecodeItem} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeElement#label()
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childLabelIndex {@link DecodeElement#label()}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		private final int childIndex_(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) throws NullPointerException {
 			for(int index = childIndex, size = childNodeIndices.length; index < size; index++){
 				final int childNodeIndex = childNodeIndices[index] - this.offset;
 				if(childNodeIndex >= 0){
@@ -2657,7 +2668,19 @@ public class Decoder {
 			return -1;
 		}
 
-		private int childIndex_(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array ab der gegebenen Position nach dem {@link DecodeElement} mit
+		 * dem gegebenen {@link DecodeItem} als {@link DecodeElement#label()} und gibt dessen Position oder {@code -1}
+		 * zurück. Wenn das gegebene {@link DecodeItem} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeElement#label()
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childLabelItem {@link DecodeItem} des {@link DecodeElement#label()}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		private final int childIndex_(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) throws NullPointerException {
 			if(childLabelItem == null) return -1;
 			return this.childIndex_(childNodeIndices, childLabelItem.index, childIndex);
 		}
@@ -3209,38 +3232,360 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link Element#hasAttributeNS(String, String)}.
+		 * Diese Methode implementiert {@link NodeList#item(int)} für {@link Element#getChildNodes()}.
 		 * 
-		 * @see DecodeAdapter#attributeLabel(String, String)
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @param attributeUriString {@code URI} ({@link Attr#getNamespaceURI()}).
-		 * @param attributeNameString {@code Name} ({@link Attr#getLocalName()}).
-		 * @return {@link Element#hasAttributeNS(String, String)}.
+		 * @see DecodeAdapter#offset()
+		 * @param parentAdapter {@code Parent}-{@link DecodeNodeAdapter}.
+		 * @param nodeIndex Index des {@link DecodeValue}s bzw. des {@link DecodeElement}s plus
+		 *        {@link DecodeAdapter#offset()}.
+		 * @param childIndex Index des {@code Child}-{@link Node}s in {@link Node#getChildNodes()}.
+		 * @return {@code Child}-{@link Node} als {@link DecodeTextAdapter} bzw. {@link DecodeElementAdapter}.
 		 */
-		public final boolean hasAttribute(final int elementNodeIndex, final String attributeUriString, final String attributeNameString) {
-			return this.hasAttribute(this.elementAttributes(this.elementNode(elementNodeIndex)).values, attributeUriString, attributeNameString);
+		public final DecodeChildAdapter getChild(final DecodeNodeAdapter parentAdapter, final int nodeIndex, final int childIndex) {
+			if(nodeIndex < this.offset) return new DecodeTextAdapter(parentAdapter, nodeIndex, childIndex);
+			return new DecodeElementAdapter(parentAdapter, nodeIndex - this.offset, childIndex);
 		}
 
-		public final boolean hasAttribute(final int[] attributeNodeIndices, final String attributeUriString, final String attributeNameString) {
-			return (attributeNodeIndices.length != 0)
-				&& (this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString)) != null);
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parentAdapter, final int childLabelIndex, final int childIndex) {
+			if(childIndex < 0) return null;
+			return this.getChildNode(parentAdapter, this.elementChildren(this.elementNode(parentAdapter.index)).values, childLabelIndex, childIndex);
 		}
 
-		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentAdapter, final String attributeUriString,
-			final String attributeNameString) {
-			return this
-				.getAttributeNode(parentAdapter, this.elementAttributes(this.elementNode(parentAdapter.index)).values, attributeUriString, attributeNameString);
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parentAdapter, final DecodeItem childLabelItem, final int childIndex) {
+			if((childIndex < 0) || (childLabelItem == null)) return null;
+			return this.getChildNode(parentAdapter, this.elementChildren(this.elementNode(parentAdapter.index)).values, childLabelItem.index, childIndex);
 		}
 
-		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentAdapter, final int[] attributeNodeIndices,
-			final String attributeUriString, final String attributeNameString) {
-			if(attributeNodeIndices.length == 0) return null;
-			final DecodeAttribute attributeNode = this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString));
-			if(attributeNode == null) return null;
-			return new DecodeAttributeAdapter(parentAdapter, attributeNode.index);
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parentAdapter, final String childUriString, final String childNameString,
+			final int childIndex) {
+			if(childIndex < 0) return null;
+			return this.getChildNode(parentAdapter, this.elementChildren(this.elementNode(parentAdapter.index)).values, childUriString, childNameString, childIndex);
 		}
 
-		static int A;
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array der {@link DecodeElementAdapter#getChildNodes()} ab der
+		 * gegebenen Position nach dem {@link DecodeElementAdapter} mit dem gegebenen {@link DecodeElement#label()} und gibt
+		 * dieses oder {@code null} zurück.
+		 * 
+		 * @param parentAdapter {@code Parent}-{@link DecodeElementAdapter}.
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childLabelIndex {@link DecodeElement#label()}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return {@link DecodeElementAdapter} oder {@code null}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parentAdapter, final int[] childNodeIndices, final int childLabelIndex,
+			final int childIndex) throws NullPointerException {
+			if(childIndex < 0) return null;
+			return this.getChildNode_(parentAdapter, childNodeIndices, this.childIndex(childNodeIndices, childLabelIndex, childIndex));
+		}
+
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parentAdapter, final int[] childNodeIndices, final DecodeItem childLabelItem,
+			final int childIndex) {
+			if((childIndex < 0) || (childLabelItem == null)) return null;
+			return this.getChildNode_(parentAdapter, childNodeIndices, this.childIndex(childNodeIndices, childLabelItem.index, childIndex));
+		}
+
+		public DecodeElementAdapter getChildNode(final DecodeElementAdapter parent, final int[] childNodeIndices, final String childUriString,
+			final String childNameString, final int childIndex) {
+			if(childIndex < 0) return null;
+			return this.getChildNode_(parent, childNodeIndices, this.childIndex(childNodeIndices, childUriString, childNameString, childIndex));
+		}
+
+		private final DecodeElementAdapter getChildNode_(final DecodeElementAdapter parent, final int[] childNodeIndices, final int childIndex) {
+			if(childIndex < 0) return null;
+			return new DecodeElementAdapter(parent, childNodeIndices[childIndex] - this.offset, childIndex);
+		}
+
+		public final String getChildContent(final int elementNodeIndex, final int childLabelIndex, final int childIndex) {
+			return this.getChildContent(this.elementNode(elementNodeIndex), childLabelIndex, childIndex);
+		}
+
+		public final String getChildContent(final int elementNodeIndex, final DecodeItem childLabelItem, final int childIndex) {
+			if(childLabelItem == null) return "";
+			return this.getChildContent(elementNodeIndex, childLabelItem.index, childIndex);
+		}
+
+		public final String getChildContent(final int elementNodeIndex, final String childUriString, final String childNameString, final int childIndex) {
+			return this.getChildContent(this.elementNode(elementNodeIndex), childUriString, childNameString, childIndex);
+		}
+
+		public final String getChildContent(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
+			return this.getChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelIndex, childIndex));
+		}
+
+		public final String getChildContent(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
+			return this.getChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelItem, childIndex));
+		}
+
+		public final String getChildContent(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
+			return this.getChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childUriString, childNameString, childIndex));
+		}
+
+		public final String getChildContent(final DecodeElement elementNode, final int childLabelIndex, final int childIndex) {
+			return this.getChildContent(this.elementChildren(elementNode).values, childLabelIndex, childIndex);
+		}
+
+		public final String getChildContent(final DecodeElement elementNode, final DecodeItem childLabelItem, final int childIndex) {
+			if(childLabelItem == null) return "";
+			return this.getChildContent(elementNode, childLabelItem.index, childIndex);
+		}
+
+		public final String getChildContent(final DecodeElement elementNode, final String childUriString, final String childNameString, final int childIndex) {
+			return this.getChildContent(this.elementChildren(elementNode).values, childUriString, childNameString, childIndex);
+		}
+
+		private final String getChildContent_(final int[] childNodeIndices, final int childIndex) {
+			if(childIndex < 0) return "";
+			return this.getElementContent(childNodeIndices[childIndex] - this.offset);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#hasChildNodes()}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @return {@link Element#hasChildNodes()}.
+		 */
+		public final boolean hasChildNodes(final int elementNodeIndex) {
+			return this.hasChildNodes(this.elementNode(elementNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#hasChildNodes()}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link Element#hasChildNodes()}.
+		 */
+		public final boolean hasChildNodes(final DecodeElement elementNode) {
+			return this.elementChildren(elementNode).values.length != 0;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getChildNodes()}.
+		 * 
+		 * @param elementAdapter {@link DecodeElementAdapter}.
+		 * @return {@link Element#getChildNodes()}.
+		 */
+		public final DecodeElementChildrenAdapter getChildNodes(final DecodeElementAdapter elementAdapter) {
+			return new DecodeElementChildrenAdapter(elementAdapter, this.elementChildren(this.elementNode(elementAdapter.index)).values);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getFirstChild()}.
+		 * 
+		 * @param elementAdapter {@link DecodeElementAdapter}.
+		 * @return {@link Element#getFirstChild()}.
+		 */
+		public final DecodeChildAdapter getFirstChild(final DecodeElementAdapter elementAdapter) {
+			final int[] indices = this.elementChildren(this.elementNode(elementAdapter.index)).values;
+			if(indices.length == 0) return null;
+			return this.getChild(elementAdapter, indices[0], 0);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getLastChild()}.
+		 * 
+		 * @param elementAdapter {@code Parent}-{@link DecodeElementAdapter}.
+		 * @return {@link Element#getLastChild()}.
+		 */
+		public final DecodeChildAdapter getLastChild(final DecodeElementAdapter elementAdapter) {
+			final int[] indices = this.elementChildren(this.elementNode(elementAdapter.index)).values;
+			final int index = indices.length - 1;
+			if(index < 0) return null;
+			return this.getChild(elementAdapter, indices[index], index);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getPrefix()}.
+		 * 
+		 * @see DecodeAdapter#elementNode(int)
+		 * @see DecodeAdapter#getElementPrefix(DecodeElement)
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @return {@link Element#getPrefix()}.
+		 */
+		public final String getElementPrefix(final int elementNodeIndex) {
+			return this.getElementPrefix(this.elementNode(elementNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getPrefix()}.
+		 * 
+		 * @see DecodeAdapter#elementLabel(int)
+		 * @see DecodeAdapter#lookupPrefix(DecodeElement, int)
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link Element#getPrefix()}.
+		 */
+		public final String getElementPrefix(final DecodeElement elementNode) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupPrefix_(this.elementXmlns(elementNode).values, this.elementLabel(elementNode.label).uri);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getLocalName()}.
+		 * 
+		 * @see DecodeAdapter#elementNode(int)
+		 * @see DecodeAdapter#getElementLocalName(DecodeElement)
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @return {@link Element#getLocalName()}.
+		 */
+		public final String getElementLocalName(final int elementNodeIndex) {
+			return this.getElementLocalName(this.elementNode(elementNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getLocalName()}.
+		 * 
+		 * @see DecodeAdapter#elementName(DecodeLabel)
+		 * @see DecodeAdapter#elementLabel(int)
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link Element#getLocalName()}.
+		 */
+		public final String getElementLocalName(final DecodeElement elementNode) {
+			if(this.xmlnsEnabled) return this.elementName(this.elementLabel(elementNode.label)).value;
+			return this.elementName(elementNode.label).value;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getNamespaceURI()}.
+		 * 
+		 * @see DecodeAdapter#elementNode(int)
+		 * @see DecodeAdapter#getElementNamespaceURI(DecodeElement)
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @return {@link Element#getNamespaceURI()}.
+		 */
+		public final String getElementNamespaceURI(final int elementNodeIndex) {
+			return this.getElementNamespaceURI(this.elementNode(elementNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getNamespaceURI()}.
+		 * 
+		 * @see DecodeAdapter#elementUri(DecodeLabel)
+		 * @see DecodeAdapter#elementLabel(int)
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link Element#getNamespaceURI()}.
+		 */
+		public final String getElementNamespaceURI(final DecodeElement elementNode) {
+			if(!this.xmlnsEnabled) return null;
+			final String value = this.elementUri(this.elementLabel(elementNode.label)).value;
+			if(value.isEmpty()) return null;
+			return value;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getNodeName()}.
+		 * 
+		 * @see DecodeAdapter#elementNode(int)
+		 * @see DecodeAdapter#getElementNodeName(DecodeElement)
+		 * @param index Index des {@link DecodeElement}s.
+		 * @return {@link Element#getNodeName()}.
+		 */
+		public final String getElementNodeName(final int index) {
+			return this.getElementNodeName(this.elementNode(index));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getNodeName()}.
+		 * 
+		 * @see DecodeAdapter#elementName(int)
+		 * @see DecodeAdapter#elementLabel(int)
+		 * @see DecodeAdapter#lookupPrefix(DecodeElement, int)
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link Element#getNodeName()}.
+		 */
+		public final String getElementNodeName(final DecodeElement elementNode) {
+			if(!this.xmlnsEnabled) return this.elementName(elementNode.label).value;
+			final DecodeLabel elementLabel = this.elementLabel(elementNode.label);
+			final String xmlnsName = this.lookupPrefix_(this.elementXmlns(elementNode).values, elementLabel.uri);
+			final String elementName = this.elementName(elementLabel.name).value;
+			if(xmlnsName == null) return elementName;
+			return xmlnsName + ":" + elementName;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getTextContent()}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @return {@link Element#getTextContent()}.
+		 */
+		public final String getElementContent(final int elementNodeIndex) {
+			final StringBuffer buffer = new StringBuffer();
+			this.getElementContent(elementNodeIndex, buffer);
+			return buffer.toString();
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getTextContent()}.
+		 * 
+		 * @param buffer {@link Element#getTextContent()}.
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 */
+		public final void getElementContent(final int elementNodeIndex, final StringBuffer buffer) {
+			final DecodeGroup elementChildren = this.elementChildren(this.elementNode(elementNodeIndex));
+			for(final int childIndex: elementChildren.values){
+				final int index = childIndex - this.offset;
+				if(index < 0){
+					buffer.append(this.textValue(childIndex).value);
+				}else{
+					this.getElementContent(index, buffer);
+				}
+			}
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#getElementsByTagNameNS(String, String)} bzw.
+		 * {@link Document#getElementsByTagNameNS(String, String)}.
+		 * 
+		 * @see DecodeCollector#MODE_CHILDREN
+		 * @see DecodeCollector#MODE_DESCENDANT
+		 * @see DecodeCollector#MODE_DESCENDANT_SELF
+		 * @see DecodeCollector#collect(DecodeElementAdapter, int)
+		 * @see DecodeAdapter#elementUri(DecodeLabel)
+		 * @see DecodeAdapter#elementName(String)
+		 * @see DecodeAdapter#elementLabel(int, int)
+		 * @param parentAdapter {@code Parent}-{@link DecodeElementAdapter}
+		 * @param elementUriString {@code URI}.
+		 * @param elementNameString {@code Name}.
+		 * @param mode Modus der Suche.
+		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw.
+		 *         {@link Document#getElementsByTagNameNS(String, String)}.
+		 */
+		public final ElementList getElements(final DecodeElementAdapter parentAdapter, final String elementUriString, final String elementNameString, final int mode) {
+			final DecodeCollector collector;
+			if(this.xmlnsEnabled){
+				if("*".equals(elementUriString)){
+					if("*".equals(elementNameString)){
+						collector = new DecodeCollector(this);
+					}else{
+						final DecodeValue elementName = this.elementName(elementNameString);
+						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+						collector = new DecodeNameCollector(this, elementName.index);
+					}
+				}else{
+					final DecodeValue elementUri = this.elementUri(elementUriString);
+					if(elementUri == null) return DecodeAdapter.VOID_NODE_LIST;
+					if("*".equals(elementNameString)){
+						collector = new DecodeUriCollector(this, elementUri.index);
+					}else{
+						final DecodeValue elementName = this.elementName(elementNameString);
+						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+						final DecodeLabel elementlLabel = this.elementLabel(elementUri.index, elementName.index);
+						if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
+						collector = new DecodeLabelCollector(this, elementlLabel.index);
+					}
+				}
+			}else{
+				if("*".equals(elementNameString)){
+					collector = new DecodeCollector(this);
+				}else{
+					final DecodeValue elementName = this.elementName(elementNameString);
+					if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
+					collector = new DecodeLabelCollector(this, elementName.index);
+				}
+			}
+			collector.collect(parentAdapter, mode);
+			return collector;
+		}
 
 		public final String getAttributePrefix(final int parentIndex, final int attributeNodeIndex) {
 			if(!this.xmlnsEnabled) return null;
@@ -3322,6 +3667,83 @@ public class Decoder {
 			return value;
 		}
 
+		/**
+		 * Diese Methode implementiert {@link Attr#getNodeValue()}.
+		 * 
+		 * @see DecodeAdapter#attributeNode(int)
+		 * @see DecodeAdapter#getAttributeValue(DecodeAttribute)
+		 * @param attributeIndex Index des {@link DecodeAttribute}s.
+		 * @return {@link Attr#getNodeValue()}.
+		 */
+		public final String getAttributeValue(final int attributeIndex) {
+			return this.getAttributeValue(this.attributeNode(attributeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Attr#getNodeValue()}.
+		 * 
+		 * @see DecodeAdapter#string(DecodeValue)
+		 * @see DecodeAdapter#attributeValue(int)
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link Attr#getNodeValue()}.
+		 */
+		public final String getAttributeValue(final DecodeAttribute attributeNode) {
+			final DecodeValue attributeValue = this.attributeValue(attributeNode);
+			if(attributeValue == null) return "";
+			return attributeValue.value;
+		}
+
+		public final String getAttributeValue(final int parentIndex, final int attributeLabelIndex) {
+			return this.getAttributeValue(this.elementNode(parentIndex), attributeLabelIndex);
+		}
+
+		public final String getAttributeValue(final int parentIndex, final DecodeItem attributeLabelItem) {
+			return this.getAttributeValue(this.elementNode(parentIndex), attributeLabelItem);
+		}
+
+		public final String getAttributeValue(final int parentIndex, final String attributeUriString, final String attributeNameString) {
+			return this.getAttributeValue(this.elementNode(parentIndex), attributeUriString, attributeNameString);
+		}
+
+		public final String getAttributeValue(final int[] attributeNodeIndices, final int attributeLabelIndex) {
+			return this.getAttributeValue(this.attributeNode(attributeNodeIndices, attributeLabelIndex));
+		}
+
+		public final String getAttributeValue(final int[] attributeNodeIndices, final DecodeItem attributeLabelItem) {
+			return this.getAttributeValue(this.attributeNode(attributeNodeIndices, attributeLabelItem));
+		}
+
+		public final String getAttributeValue(final int[] attributeNodeIndices, final String attributeUriString, final String attributeNameString) {
+			if(attributeNodeIndices.length == 0) return "";
+			return this.getAttributeValue(this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString)));
+		}
+
+		public final String getAttributeValue(final DecodeElement parentNode, final int attributeLabelIndex) {
+			return this.getAttributeValue(this.elementAttributes(parentNode).values, attributeLabelIndex);
+		}
+
+		public final String getAttributeValue(final DecodeElement parentNode, final DecodeItem attributeLabelItem) {
+			return this.getAttributeValue(this.elementAttributes(parentNode).values, attributeLabelItem);
+		}
+
+		public final String getAttributeValue(final DecodeElement parentNode, final String attributeUri, final String attributeName) {
+			return this.getAttributeValue(this.elementAttributes(parentNode).values, attributeUri, attributeName);
+		}
+
+		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentAdapter, final String attributeUriString,
+			final String attributeNameString) {
+			return this
+				.getAttributeNode(parentAdapter, this.elementAttributes(this.elementNode(parentAdapter.index)).values, attributeUriString, attributeNameString);
+		}
+
+		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentAdapter, final int[] attributeNodeIndices,
+			final String attributeUriString, final String attributeNameString) {
+			if(attributeNodeIndices.length == 0) return null;
+			final DecodeAttribute attributeNode = this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString));
+			if(attributeNode == null) return null;
+			return new DecodeAttributeAdapter(parentAdapter, attributeNode.index);
+		}
+
 		public final String getAttributeNodeName(final int parentIndex, final int attributeNodeIndex) {
 			return this.getAttributeNodeName(parentIndex, this.attributeNode(attributeNodeIndex));
 		}
@@ -3353,96 +3775,21 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link Attr#getNodeValue()}.
+		 * Diese Methode implementiert {@link Element#hasAttributeNS(String, String)}.
 		 * 
-		 * @see DecodeAdapter#attributeNode(int)
-		 * @see DecodeAdapter#getAttributeNodeValue(DecodeAttribute)
-		 * @param attributeIndex Index des {@link DecodeAttribute}s.
-		 * @return {@link Attr#getNodeValue()}.
-		 */
-		public final String getAttributeNodeValue(final int attributeIndex) {
-			return this.getAttributeNodeValue(this.attributeNode(attributeIndex));
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Attr#getNodeValue()}.
-		 * 
-		 * @see DecodeAdapter#string(DecodeValue)
-		 * @see DecodeAdapter#attributeValue(int)
-		 * @param attributeNode {@link DecodeAttribute}.
-		 * @return {@link Attr#getNodeValue()}.
-		 */
-		public final String getAttributeNodeValue(final DecodeAttribute attributeNode) {
-			final DecodeValue attributeValue = this.attributeValue(attributeNode);
-			if(attributeValue == null) return "";
-			return attributeValue.value;
-		}
-
-		public final String getAttributeNodeValue(final int parentIndex, final int attributeLabelIndex) {
-			return this.getAttributeNodeValue(this.elementNode(parentIndex), attributeLabelIndex);
-		}
-
-		public final String getAttributeNodeValue(final int parentIndex, final DecodeItem attributeLabelItem) {
-			return this.getAttributeNodeValue(this.elementNode(parentIndex), attributeLabelItem);
-		}
-
-		public final String getAttributeNodeValue(final int parentIndex, final String attributeUriString, final String attributeNameString) {
-			return this.getAttributeNodeValue(this.elementNode(parentIndex), attributeUriString, attributeNameString);
-		}
-
-		public final String getAttributeNodeValue(final int[] attributeNodeIndices, final int attributeLabelIndex) {
-			return this.getAttributeNodeValue(this.attributeNode(attributeNodeIndices, attributeLabelIndex));
-		}
-
-		public final String getAttributeNodeValue(final int[] attributeNodeIndices, final DecodeItem attributeLabelItem) {
-			return this.getAttributeNodeValue(this.attributeNode(attributeNodeIndices, attributeLabelItem));
-		}
-
-		public final String getAttributeNodeValue(final int[] attributeNodeIndices, final String attributeUriString, final String attributeNameString) {
-			if(attributeNodeIndices.length == 0) return "";
-			return this.getAttributeNodeValue(this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString)));
-		}
-
-		public final String getAttributeNodeValue(final DecodeElement parentNode, final int attributeLabelIndex) {
-			return this.getAttributeNodeValue(this.elementAttributes(parentNode).values, attributeLabelIndex);
-		}
-
-		public final String getAttributeNodeValue(final DecodeElement parentNode, final DecodeItem attributeLabelItem) {
-			return this.getAttributeNodeValue(this.elementAttributes(parentNode).values, attributeLabelItem);
-		}
-
-		public final String getAttributeNodeValue(final DecodeElement parentNode, final String attributeUri, final String attributeName) {
-			return this.getAttributeNodeValue(this.elementAttributes(parentNode).values, attributeUri, attributeName);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#hasChildNodes()}.
-		 * 
+		 * @see DecodeAdapter#attributeLabel(String, String)
 		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @return {@link Element#hasChildNodes()}.
+		 * @param attributeUriString {@code URI} ({@link Attr#getNamespaceURI()}).
+		 * @param attributeNameString {@code Name} ({@link Attr#getLocalName()}).
+		 * @return {@link Element#hasAttributeNS(String, String)}.
 		 */
-		public final boolean hasChildren(final int elementNodeIndex) {
-			return this.hasChildren(this.elementNode(elementNodeIndex));
+		public final boolean hasAttribute(final int elementNodeIndex, final String attributeUriString, final String attributeNameString) {
+			return this.hasAttribute(this.elementAttributes(this.elementNode(elementNodeIndex)).values, attributeUriString, attributeNameString);
 		}
 
-		/**
-		 * Diese Methode implementiert {@link Element#hasChildNodes()}.
-		 * 
-		 * @param elementNode {@link DecodeElement}.
-		 * @return {@link Element#hasChildNodes()}.
-		 */
-		public final boolean hasChildren(final DecodeElement elementNode) {
-			return this.elementChildren(elementNode).values.length != 0;
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getChildNodes()}.
-		 * 
-		 * @param elementAdapter {@link DecodeElementAdapter}.
-		 * @return {@link Element#getChildNodes()}.
-		 */
-		public final DecodeElementChildrenAdapter getChildren(final DecodeElementAdapter elementAdapter) {
-			return new DecodeElementChildrenAdapter(elementAdapter, this.elementChildren(this.elementNode(elementAdapter.index)).values);
+		public final boolean hasAttribute(final int[] attributeNodeIndices, final String attributeUriString, final String attributeNameString) {
+			return (attributeNodeIndices.length != 0)
+				&& (this.attributeNode(attributeNodeIndices, this.attributeLabel(attributeUriString, attributeNameString)) != null);
 		}
 
 		/**
@@ -3479,343 +3826,121 @@ public class Decoder {
 			return new DecodeElementAttributesAdapter(elementAdapter, this.elementAttributes(this.elementNode(elementAdapter.index)).values);
 		}
 
-		static int Z;
-
 		/**
-		 * Diese Methode implementiert {@link Element#getPrefix()}.
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
 		 * 
-		 * @see DecodeAdapter#elementNode(int)
-		 * @see DecodeAdapter#getElementPrefix(DecodeElement)
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @return {@link Element#getPrefix()}.
-		 */
-		public final String getElementPrefix(final int elementNodeIndex) {
-			return this.getElementPrefix(this.elementNode(elementNodeIndex));
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getPrefix()}.
-		 * 
-		 * @see DecodeAdapter#elementLabel(int)
-		 * @see DecodeAdapter#lookupPrefix(DecodeElement, int)
-		 * @param elementNode {@link DecodeElement}.
-		 * @return {@link Element#getPrefix()}.
-		 */
-		public final String getElementPrefix(final DecodeElement elementNode) {
-			if(!this.xmlnsEnabled) return null;
-			return this.lookupPrefix_(this.elementXmlns(elementNode).values, this.elementLabel(elementNode.label).uri);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getLocalName()}.
-		 * 
-		 * @see DecodeAdapter#elementNode(int)
-		 * @see DecodeAdapter#getElementLocalName(DecodeElement)
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @return {@link Element#getLocalName()}.
-		 */
-		public final String getElementLocalName(final int elementNodeIndex) {
-			return this.getElementLocalName(this.elementNode(elementNodeIndex));
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getLocalName()}.
-		 * 
-		 * @see DecodeAdapter#string(DecodeValue)
-		 * @see DecodeAdapter#elementName(DecodeLabel)
-		 * @see DecodeAdapter#elementLabel(int)
-		 * @param elementNode {@link DecodeElement}.
-		 * @return {@link Element#getLocalName()}.
-		 */
-		public final String getElementLocalName(final DecodeElement elementNode) {
-			if(this.xmlnsEnabled) return this.elementName(this.elementLabel(elementNode.label)).value;
-			return this.elementName(elementNode.label).value;
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getNamespaceURI()}.
-		 * 
-		 * @see DecodeAdapter#elementNode(int)
-		 * @see DecodeAdapter#getElementNamespaceURI(DecodeElement)
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @return {@link Element#getNamespaceURI()}.
-		 */
-		public final String getElementNamespaceURI(final int elementNodeIndex) {
-			return this.getElementNamespaceURI(this.elementNode(elementNodeIndex));
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getNamespaceURI()}.
-		 * 
-		 * @see DecodeAdapter#string(DecodeValue)
-		 * @see DecodeAdapter#elementUri(DecodeLabel)
-		 * @see DecodeAdapter#elementLabel(int)
-		 * @param elementNode {@link DecodeElement}.
-		 * @return {@link Element#getNamespaceURI()}.
-		 */
-		public final String getElementNamespaceURI(final DecodeElement elementNode) {
-			if(!this.xmlnsEnabled) return null;
-			final String value = this.elementUri(this.elementLabel(elementNode.label)).value;
-			if(value.isEmpty()) return null;
-			return value;
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getNodeName()}.
-		 * 
-		 * @see DecodeAdapter#elementNode(int)
-		 * @see DecodeAdapter#getElementNodeName(DecodeElement)
-		 * @param index Index des {@link DecodeElement}s.
-		 * @return {@link Element#getNodeName()}.
-		 */
-		public final String getElementNodeName(final int index) {
-			return this.getElementNodeName(this.elementNode(index));
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getNodeName()}.
-		 * 
-		 * @see DecodeAdapter#elementName(int)
-		 * @see DecodeAdapter#elementLabel(int)
-		 * @see DecodeAdapter#lookupPrefix(DecodeElement, int)
-		 * @param elementNode {@link DecodeElement}.
-		 * @return {@link Element#getNodeName()}.
-		 */
-		public final String getElementNodeName(final DecodeElement elementNode) {
-			if(!this.xmlnsEnabled) return this.elementName(elementNode.label).value;
-			final DecodeLabel elementLabel = this.elementLabel(elementNode.label);
-			final String xmlnsName = this.lookupPrefix_(this.elementXmlns(elementNode).values, elementLabel.uri);
-			final String elementName = this.elementName(elementLabel.name).value;
-			if(xmlnsName == null) return elementName;
-			return xmlnsName + ":" + elementName;
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getTextContent()}.
-		 * 
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @return {@link Element#getTextContent()}.
-		 */
-		public final String getElementTextContent(final int elementNodeIndex) {
-			final StringBuffer buffer = new StringBuffer();
-			this.getElementTextContent(elementNodeIndex, buffer);
-			return buffer.toString();
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getTextContent()}.
-		 * 
-		 * @param buffer {@link Element#getTextContent()}.
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 */
-		public final void getElementTextContent(final int elementNodeIndex, final StringBuffer buffer) {
-			final DecodeGroup elementChildren = this.elementChildren(this.elementNode(elementNodeIndex));
-			for(final int childIndex: elementChildren.values){
-				final int index = childIndex - this.offset;
-				if(index < 0){
-					buffer.append(this.textValue(childIndex).value);
-				}else{
-					this.getElementTextContent(index, buffer);
-				}
-			}
-		}
-
-		/**
-		 * Diese Methode implementiert {@link NodeList#item(int)} für {@link Element#getChildNodes()}.
-		 * 
-		 * @see DecodeAdapter#offset()
-		 * @param parentAdapter {@code Parent}-{@link DecodeNodeAdapter}.
-		 * @param nodeIndex Index des {@link DecodeValue}s bzw. des {@link DecodeElement}s plus
-		 *        {@link DecodeAdapter#offset()}.
-		 * @param childIndex Index des {@code Child}-{@link Node}s in {@link Node#getChildNodes()}.
-		 * @return {@code Child}-{@link Node} als {@link DecodeTextAdapter} bzw. {@link DecodeElementAdapter}.
-		 */
-		public final DecodeChildAdapter getElementChild(final DecodeNodeAdapter parentAdapter, final int nodeIndex, final int childIndex) {
-			if(nodeIndex < this.offset) return new DecodeTextAdapter(parentAdapter, nodeIndex, childIndex);
-			return new DecodeElementAdapter(parentAdapter, nodeIndex - this.offset, childIndex);
-		}
-
-		public DecodeElementAdapter getElementChildNode(final DecodeElementAdapter parentAdapter, final String uri, final String name, final int child) {
-			if(child < 0) return null;
-			return this.getElementChildNode(parentAdapter, this.elementChildren(this.elementNode(parentAdapter.index)).values, uri, name, child);
-		}
-
-		public DecodeElementAdapter getElementChildNode(final DecodeElementAdapter parent, final int[] values, final String uri, final String name, final int child) {
-			final int child2 = this.childIndex(values, uri, name, child);
-			if(child2 < 0) return null;
-			return new DecodeElementAdapter(parent, values[child2] - this.offset, child2);
-		}
-
-		public final String getElementChildContent(final int elementNodeIndex, final int childLabelIndex, final int childIndex) {
-			return this.getElementChildContent(this.elementNode(elementNodeIndex), childLabelIndex, childIndex);
-		}
-
-		public final String getElementChildContent(final int elementNodeIndex, final DecodeItem childLabelItem, final int childIndex) {
-			if(childLabelItem == null) return "";
-			return this.getElementChildContent(elementNodeIndex, childLabelItem.index, childIndex);
-		}
-
-		public final String getElementChildContent(final int elementNodeIndex, final String childUriString, final String childNameString, final int childIndex) {
-			return this.getElementChildContent(this.elementNode(elementNodeIndex), childUriString, childNameString, childIndex);
-		}
-
-		public final String getElementChildContent(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelIndex, childIndex));
-		}
-
-		public final String getElementChildContent(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelItem, childIndex));
-		}
-
-		public String getElementChildContent(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childUriString, childNameString, childIndex));
-		}
-
-		public final String getElementChildContent(final DecodeElement elementNode, final int childLabelIndex, final int childIndex) {
-			return this.getElementChildContent(this.elementChildren(elementNode).values, childLabelIndex, childIndex);
-		}
-
-		public final String getElementChildContent(final DecodeElement elementNode, final DecodeItem childLabelItem, final int childIndex) {
-			if(childLabelItem == null) return "";
-			return this.getElementChildContent(elementNode, childLabelItem.index, childIndex);
-		}
-
-		public String getElementChildContent(final DecodeElement elementNode, final String childUriString, final String childNameString, final int childIndex) {
-			return this.getElementChildContent(this.elementChildren(elementNode).values, childUriString, childNameString, childIndex);
-		}
-
-		private final String getElementChildContent_(final int[] childNodeIndices, final int childIndex) {
-			if(childIndex < 0) return "";
-			return this.getElementTextContent(childNodeIndices[childIndex] - this.offset);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getFirstChild()}.
-		 * 
-		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @return {@link Element#getFirstChild()}.
-		 */
-		public DecodeChildAdapter getElementFirstChild(final DecodeElementAdapter parent) {
-			final int[] indices = this.elementChildren(this.elementNode(parent.index)).values;
-			if(indices.length == 0) return null;
-			return this.getElementChild(parent, indices[0], 0);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getLastChild()}.
-		 * 
-		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
-		 * @return {@link Element#getLastChild()}.
-		 */
-		public DecodeChildAdapter getElementLastChild(final DecodeElementAdapter parent) {
-			final int[] indices = this.elementChildren(this.elementNode(parent.index)).values;
-			final int index = indices.length - 1;
-			if(index < 0) return null;
-			return this.getElementChild(parent, indices[index], index);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#getElementsByTagNameNS(String, String)} bzw.
-		 * {@link Document#getElementsByTagNameNS(String, String)}.
-		 * 
-		 * @see DecodeCollector#MODE_CHILDREN
-		 * @see DecodeCollector#MODE_DESCENDANT
-		 * @see DecodeCollector#MODE_DESCENDANT_SELF
-		 * @see DecodeCollector#collect(DecodeElementAdapter, int)
-		 * @param parent {@code Parent}-{@link DecodeElementAdapter}
-		 * @param uri {@code Name} ({@link Element#getNamespaceURI()}).
-		 * @param name {@code Name} ({@link Element#getLocalName()}).
-		 * @param mode Modus der Suche.
-		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw.
-		 *         {@link Document#getElementsByTagNameNS(String, String)}.
-		 */
-		public ElementList elementGetElementsByTagName(final DecodeElementAdapter parent, final String uri, final String name, final int mode) {
-			final DecodeCollector collector;
-			if(this.xmlnsEnabled){
-				if("*".equals(uri)){
-					if("*".equals(name)){
-						collector = new DecodeCollector(this);
-					}else{
-						final DecodeValue elementName = this.document.elementNamePool.findValue(name);
-						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-						collector = new DecodeNameCollector(this, elementName.index);
-					}
-				}else{
-					final DecodeValue elementUri = this.document.uriPool.findValue(uri);
-					if(elementUri == null) return DecodeAdapter.VOID_NODE_LIST;
-					if("*".equals(name)){
-						collector = new DecodeUriCollector(this, elementUri.index);
-					}else{
-						final DecodeValue elementName = this.document.elementNamePool.findValue(name);
-						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-						final DecodeLabel elementlLabel = this.document.elementLabelPool.findLabel(elementUri.index, elementName.index);
-						if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
-						collector = new DecodeLabelCollector(this, elementlLabel.index);
-					}
-				}
-			}else{
-				if("*".equals(name)){
-					collector = new DecodeCollector(this);
-				}else{
-					final DecodeValue elementName = this.document.elementNamePool.findValue(name);
-					if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-					collector = new DecodeLabelCollector(this, elementName.index);
-				}
-			}
-			collector.collect(parent, mode);
-			return collector;
-		}
-
-		/**
 		 * @param elementNodeIndex Index des {@link DecodeElement}s.
 		 * @param xmlnsUriIndex Index des {@code URI}-{@link DecodeValue}s.
-		 * @return
+		 * @return {@link Element#lookupPrefix(String)}.
 		 */
-		public String lookupPrefix(final int elementNodeIndex, final int xmlnsUriIndex) {
+		public final String lookupPrefix(final int elementNodeIndex, final int xmlnsUriIndex) {
 			if(!this.xmlnsEnabled) return null;
 			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsUriIndex);
 		}
 
-		public String lookupPrefix(final int elementNodeIndex, final String xmlnsUriString) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsUriString {@code URI}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final int elementNodeIndex, final String xmlnsUriString) {
 			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
 			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, this.uri(xmlnsUriString));
 		}
 
-		public String lookupPrefix(final int elementNodeIndex, final DecodeValue xmlnsUri) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsUri {@code URI}-{@link DecodeValue}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final int elementNodeIndex, final DecodeValue xmlnsUri) {
 			if(!this.xmlnsEnabled || (xmlnsUri == null)) return null;
 			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsUri.index);
 		}
 
-		public String lookupPrefix(final int[] xmlnsLabelIndices, final int xmlnsUriIndex) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsUriIndex Index des {@code URI}-{@link DecodeValue}s.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final int[] xmlnsLabelIndices, final int xmlnsUriIndex) {
 			if(!this.xmlnsEnabled) return null;
 			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUriIndex);
 		}
 
-		public String lookupPrefix(final int[] xmlnsLabelIndices, final String xmlnsUriString) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsUriString {@code URI}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final int[] xmlnsLabelIndices, final String xmlnsUriString) {
 			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
 			return this.lookupPrefix_(xmlnsLabelIndices, this.uri(xmlnsUriString));
 		}
 
-		public String lookupPrefix(final int[] xmlnsLabelIndices, final DecodeValue xmlnsUri) {
-			if(!this.xmlnsEnabled || xmlnsUri == null) return null;
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsUri {@code URI}-{@link DecodeValue}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final int[] xmlnsLabelIndices, final DecodeValue xmlnsUri) {
+			if(!this.xmlnsEnabled || (xmlnsUri == null)) return null;
 			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUri.index);
 		}
 
-		public String lookupPrefix(final DecodeElement elementNode, final int xmlnsUriIndex) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsUriIndex Index des {@code URI}-{@link DecodeValue}s.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final DecodeElement elementNode, final int xmlnsUriIndex) {
 			if(!this.xmlnsEnabled) return null;
 			return this.lookupPrefix_(this.elementXmlns(elementNode).values, xmlnsUriIndex);
 		}
 
-		public String lookupPrefix(final DecodeElement elementNode, final String xmlnsUriString) {
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsUriString {@code URI}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final DecodeElement elementNode, final String xmlnsUriString) {
 			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
 			return this.lookupPrefix_(this.elementXmlns(elementNode).values, this.uri(xmlnsUriString));
 		}
 
-		public String lookupPrefix(final DecodeElement elementNode, final DecodeValue xmlnsUri) {
-			if(!this.xmlnsEnabled || xmlnsUri == null) return null;
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsUri {@code URI}-{@link DecodeValue}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
+		public final String lookupPrefix(final DecodeElement elementNode, final DecodeValue xmlnsUri) {
+			if(!this.xmlnsEnabled || (xmlnsUri == null)) return null;
 			return this.lookupPrefix_(this.elementXmlns(elementNode).values, xmlnsUri.index);
 		}
 
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsUriIndex Index des {@code URI}-{@link DecodeValue}s.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
 		private final String lookupPrefix_(final int[] xmlnsLabelIndices, final int xmlnsUriIndex) {
 			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(xmlnsLabelIndices, xmlnsUriIndex);
 			if(xmlnsLabel == null) return null;
@@ -3824,6 +3949,13 @@ public class Decoder {
 			return value;
 		}
 
+		/**
+		 * Diese Methode implementiert {@link Element#lookupPrefix(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsUri {@code URI}-{@link DecodeValue}.
+		 * @return {@link Element#lookupPrefix(String)}.
+		 */
 		private final String lookupPrefix_(final int[] xmlnsLabelIndices, final DecodeValue xmlnsUri) {
 			if(xmlnsUri == null) return null;
 			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUri.index);
@@ -3834,7 +3966,7 @@ public class Decoder {
 		 * 
 		 * @param elementNodeIndex Index des {@link DecodeElement}s.
 		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int elementNodeIndex, final int xmlnsNameIndex) {
 			if(!this.xmlnsEnabled) return null;
@@ -3846,7 +3978,7 @@ public class Decoder {
 		 * 
 		 * @param elementNodeIndex Index des {@link DecodeElement}s.
 		 * @param xmlnsNameString {@code Prefix}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int elementNodeIndex, final String xmlnsNameString) {
 			if(!this.xmlnsEnabled) return null;
@@ -3858,7 +3990,7 @@ public class Decoder {
 		 * 
 		 * @param elementNodeIndex Index des {@link DecodeElement}s.
 		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int elementNodeIndex, final DecodeValue xmlnsName) {
 			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
@@ -3870,7 +4002,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final int xmlnsNameIndex) {
 			if(!this.xmlnsEnabled || (xmlnsLabelIndices.length == 0)) return null;
@@ -3882,7 +4014,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsNameString {@code Prefix}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final String xmlnsNameString) {
 			if(!this.xmlnsEnabled) return null;
@@ -3894,7 +4026,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final DecodeValue xmlnsName) {
 			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
@@ -3906,7 +4038,7 @@ public class Decoder {
 		 * 
 		 * @param elementNode {@link DecodeElement}.
 		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final DecodeElement elementNode, final int xmlnsNameIndex) {
 			if(!this.xmlnsEnabled) return null;
@@ -3918,7 +4050,7 @@ public class Decoder {
 		 * 
 		 * @param elementNode {@link DecodeElement}.
 		 * @param xmlnsNameString {@code Prefix}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final DecodeElement elementNode, final String xmlnsNameString) {
 			if(!this.xmlnsEnabled) return null;
@@ -3930,7 +4062,7 @@ public class Decoder {
 		 * 
 		 * @param elementNode {@link DecodeElement}.
 		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		public final String lookupNamespaceURI(final DecodeElement elementNode, final DecodeValue xmlnsName) {
 			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
@@ -3942,7 +4074,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final int xmlnsNameIndex) {
 			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(xmlnsLabelIndices, xmlnsNameIndex);
@@ -3955,7 +4087,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsNameString {@code Prefix}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final String xmlnsNameString) {
 			if(xmlnsLabelIndices.length == 0) return null;
@@ -3968,7 +4100,7 @@ public class Decoder {
 		 * 
 		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
 		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
-		 * @return {@code URI} oder {@code null}.
+		 * @return {@link Element#lookupNamespaceURI(String)}.
 		 */
 		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final DecodeValue xmlnsName) {
 			if(xmlnsName == null) return null;
@@ -4679,7 +4811,7 @@ public class Decoder {
 		 */
 		@Override
 		public DecodeChildAdapter getFirstChild() {
-			return this.adapter().getElementFirstChild(this);
+			return this.adapter().getFirstChild(this);
 		}
 
 		/**
@@ -4687,7 +4819,7 @@ public class Decoder {
 		 */
 		@Override
 		public DecodeChildAdapter getLastChild() {
-			return this.adapter().getElementLastChild(this);
+			return this.adapter().getLastChild(this);
 		}
 
 		/**
@@ -4719,7 +4851,7 @@ public class Decoder {
 		 * @return erstes gefundenes {@code Child}-{@link Element} oder {@code null}.
 		 */
 		public DecodeElementAdapter getChildNodeNS(final String uri, final String name, final int child) {
-			return this.adapter().getElementChildNode(this, uri, name, child);
+			return this.adapter().getChildNode(this, uri, name, child);
 		}
 
 		/**
@@ -4727,7 +4859,7 @@ public class Decoder {
 		 */
 		@Override
 		public boolean hasChildNodes() {
-			return this.adapter().hasChildren(this.index);
+			return this.adapter().hasChildNodes(this.index);
 		}
 
 		/**
@@ -4735,7 +4867,7 @@ public class Decoder {
 		 */
 		@Override
 		public DecodeElementChildrenAdapter getChildNodes() {
-			return this.adapter().getChildren(this);
+			return this.adapter().getChildNodes(this);
 		}
 
 		/**
@@ -4769,7 +4901,7 @@ public class Decoder {
 		 * @return Textwert des ersten gefundenen {@code Child}-{@link Element}s oder {@code ""}.
 		 */
 		public String getChildContentNS(final String uri, final String name, final int child) {
-			return this.adapter().getElementChildContent(this.index, uri, name, child);
+			return this.adapter().getChildContent(this.index, uri, name, child);
 		}
 
 		/**
@@ -4817,7 +4949,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getAttributeNS(final String uri, final String name) throws DOMException {
-			return this.adapter().getAttributeNodeValue(this.index, uri, name);
+			return this.adapter().getAttributeValue(this.index, uri, name);
 		}
 
 		/**
@@ -4897,7 +5029,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getTextContent() throws DOMException {
-			return this.adapter().getElementTextContent(this.index);
+			return this.adapter().getElementContent(this.index);
 		}
 
 		/**
@@ -4969,7 +5101,7 @@ public class Decoder {
 		 */
 		@Override
 		public ElementList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
-			return this.adapter().elementGetElementsByTagName(this, uri, name, DecodeCollector.MODE_DESCENDANT);
+			return this.adapter().getElements(this, uri, name, DecodeCollector.MODE_DESCENDANT);
 		}
 
 		/**
@@ -5078,7 +5210,7 @@ public class Decoder {
 			if(index < 0) return null;
 			final int[] indices = this.indices;
 			if(index >= indices.length) return null;
-			return this.parent.adapter().getElementChild(this.parent, indices[index], index);
+			return this.parent.adapter().getChild(this.parent, indices[index], index);
 		}
 
 		/**
@@ -5118,7 +5250,7 @@ public class Decoder {
 		 * @return erstes gefundenes {@link Element} oder {@code null}.
 		 */
 		public DecodeElementAdapter getNamedItemNS(final String uri, final String name, final int child) {
-			return this.parent.adapter().getElementChildNode(this.parent, this.indices, uri, name, child);
+			return this.parent.adapter().getChildNode(this.parent, this.indices, uri, name, child);
 		}
 
 		/**
@@ -5401,7 +5533,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getNodeValue() throws DOMException {
-			return this.adapter().getAttributeNodeValue(this.index);
+			return this.adapter().getAttributeValue(this.index);
 		}
 
 		/**
@@ -5834,7 +5966,7 @@ public class Decoder {
 		 */
 		@Override
 		public ElementList getElementsByTagNameNS(final String uri, final String name) {
-			return this.adapter().elementGetElementsByTagName(this.documentElement, uri, name, DecodeCollector.MODE_DESCENDANT_SELF);
+			return this.adapter().getElements(this.documentElement, uri, name, DecodeCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**
