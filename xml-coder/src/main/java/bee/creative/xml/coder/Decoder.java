@@ -36,6 +36,7 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Objects;
+import bee.creative.xml.coder.Decoder.DecodeValue;
 import bee.creative.xml.coder.Encoder.EncodeAttribute;
 import bee.creative.xml.coder.Encoder.EncodeElement;
 
@@ -2506,31 +2507,6 @@ public class Decoder {
 		/**
 		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#valuePool()} zurück.
 		 * 
-		 * @see DecodeAdapter#value(int)
-		 * @param textValueIndex Index.
-		 * @return {@code index}-ter {@link DecodeValue}.
-		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
-		 */
-		public final DecodeValue textValue(final int textValueIndex) {
-			return this.value(textValueIndex);
-		}
-
-		/**
-		 * Diese Methode sucht binäre im {@link DecodeDocument#valuePool()} nach dem {@link DecodeValue} mit dem gegebenen
-		 * {@link String} und gibt diesen oder {@code null} zurück.
-		 * 
-		 * @see DecodeAdapter#value(String)
-		 * @param textValueString {@link String}.
-		 * @return {@link DecodeValue} oder {@code null}.
-		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
-		 */
-		public final DecodeValue textValue(final String textValueString) {
-			return this.value(textValueString);
-		}
-
-		/**
-		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#valuePool()} zurück.
-		 * 
 		 * @see DecodeDocument#valuePool()
 		 * @see DecodeValuePool#get(int)
 		 * @param valueIndex Index.
@@ -2553,11 +2529,6 @@ public class Decoder {
 		 */
 		public final DecodeValue value(final String valueString) throws NullPointerException {
 			return this.document.valuePool.findValue(valueString);
-		}
-
-		public final String string(final DecodeValue value) {
-			if(value == null) return null;
-			return value.value;
 		}
 
 		/**
@@ -2587,35 +2558,185 @@ public class Decoder {
 			return this.document.xmlnsNamePool.findValue(xmlnsNameString);
 		}
 
-		public DecodeLabel xmlnsLabel(final int xmlnsLabelIndex) {
+		/**
+		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#xmlnsLabelPool()} zurück.
+		 * 
+		 * @see DecodeDocument#xmlnsLabelPool()
+		 * @see DecodeValuePool#get(int)
+		 * @param xmlnsLabelIndex Index.
+		 * @return {@code index}-ter {@link DecodeValue}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeLabel xmlnsLabel(final int xmlnsLabelIndex) {
 			return this.document.xmlnsLabelPool.get(xmlnsLabelIndex);
 		}
 
-		public DecodeLabel xmlnsLabel(final int xmlnsUriIndex, final int xmlnsNameIndex) {
-			return this.document.xmlnsLabelPool.findLabel(xmlnsUriIndex, xmlnsNameIndex);
+		/**
+		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#valuePool()} zurück.
+		 * 
+		 * @see DecodeAdapter#value(int)
+		 * @param textValueIndex Index.
+		 * @return {@code index}-ter {@link DecodeValue}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeValue textValue(final int textValueIndex) {
+			return this.value(textValueIndex);
 		}
 
+		/**
+		 * Diese Methode sucht binäre im {@link DecodeDocument#valuePool()} nach dem {@link DecodeValue} mit dem gegebenen
+		 * {@link String} und gibt diesen oder {@code null} zurück.
+		 * 
+		 * @see DecodeAdapter#value(String)
+		 * @param textValueString {@link String}.
+		 * @return {@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public final DecodeValue textValue(final String textValueString) {
+			return this.value(textValueString);
+		}
+
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array ab der gegebenen Position nach dem {@link DecodeElement} mit
+		 * dem gegebenen {@link DecodeElement#label()} und gibt dessen Position oder {@code -1} zurück. Wenn das gegebene
+		 * {@link DecodeItem} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeElement#label()
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childLabelIndex {@link DecodeElement#label()}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public int childIndex(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
+			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
+			return this.childIndex_(childNodeIndices, childLabelIndex, childIndex);
+		}
+
+		/**
+		 * Diese Methode sucht linear im gegebenen Index-Array ab der gegebenen Position nach dem {@link DecodeElement} mit
+		 * dem gegebenen {@link DecodeItem} als {@link DecodeElement#label()} und gibt dessen Position oder {@code -1}
+		 * zurück. Wenn das gegebene {@link DecodeItem} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeElement#label()
+		 * @param childNodeIndices Index-Array der {@link DecodeElement#children()}.
+		 * @param childLabelItem {@link DecodeItem} des {@link DecodeElement#label()}.
+		 * @param childIndex Index als Beginn der linearen Suche.
+		 * @return Index des ersten Treffers oder {@code -1}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public int childIndex(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) throws NullPointerException {
+			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
+			return this.childIndex_(childNodeIndices, childLabelItem, childIndex);
+		}
+
+		/**
+		 * Diese Methode gibt das zurück.
+		 * 
+		 * @see DecodeAdapter#childIndex(int[], DecodeItem, int)
+		 * @see DecodeAdapter#elementLabel(String, String)
+		 * @param childNodeIndices
+		 * @param childUriString
+		 * @param childNameString
+		 * @param childIndex
+		 * @return
+		 */
+		public int childIndex(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
+			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
+			return this.childIndex_(childNodeIndices, this.elementLabel(childUriString, childNameString), childIndex);
+		}
+
+		private int childIndex_(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
+			for(int index = childIndex, size = childNodeIndices.length; index < size; index++){
+				final int childNodeIndex = childNodeIndices[index] - this.offset;
+				if(childNodeIndex >= 0){
+					final DecodeElement elementNode = this.elementNode(childNodeIndex);
+					if(elementNode.label == childLabelIndex) return index;
+				}
+			}
+			return -1;
+		}
+
+		private int childIndex_(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
+			if(childLabelItem == null) return -1;
+			return this.childIndex_(childNodeIndices, childLabelItem.index, childIndex);
+		}
+
+		/**
+		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#uriPool()} zurück.
+		 * 
+		 * @see DecodeAdapter#uri(int)
+		 * @param elementUriIndex Index.
+		 * @return {@code index}-ter {@link DecodeValue}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
 		public final DecodeValue elementUri(final int elementUriIndex) {
 			return this.uri(elementUriIndex);
 		}
 
+		/**
+		 * Diese Methode sucht binäre im {@link DecodeDocument#uriPool()} nach dem {@link DecodeValue} mit dem gegebenen
+		 * {@link String} und gibt diesen oder {@code null} zurück.
+		 * 
+		 * @see DecodeAdapter#uri(String)
+		 * @param elementUriString {@link String}.
+		 * @return {@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
 		public final DecodeValue elementUri(final String elementUriString) {
 			return this.uri(elementUriString);
 		}
 
+		/**
+		 * Diese Methode gibt den via {@link DecodeLabel#uri()} referenzierten {@link DecodeValue} oder {@code null} zurück.
+		 * Wenn das gegebene {@link DecodeLabel} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeAdapter#elementUri(int)
+		 * @param elementLabel {@link DecodeLabel}.
+		 * @return {@link DecodeValue} zu {@link DecodeLabel#uri()} oder {@code null}.
+		 * @throws IndexOutOfBoundsException Wenn {@link DecodeLabel#uri()} ein ungültiger Index ist.
+		 */
 		public final DecodeValue elementUri(final DecodeLabel elementLabel) {
 			if(elementLabel == null) return null;
 			return this.elementUri(elementLabel.uri);
 		}
 
-		public final DecodeValue elementName(final int nameIndex) {
-			return this.document.elementNamePool.get(nameIndex);
+		/**
+		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#elementNamePool()} zurück.
+		 * 
+		 * @see DecodeDocument#elementNamePool()
+		 * @see DecodeValuePool#get(int)
+		 * @param elementNameIndex Index.
+		 * @return {@code index}-ter {@link DecodeValue}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeValue elementName(final int elementNameIndex) {
+			return this.document.elementNamePool.get(elementNameIndex);
 		}
 
-		public final DecodeValue elementName(final String nameString) {
-			return this.document.elementNamePool.findValue(nameString);
+		/**
+		 * Diese Methode sucht binäre im {@link DecodeDocument#elementNamePool()} nach dem {@link DecodeValue} mit dem
+		 * gegebenen {@link String} und gibt diesen oder {@code null} zurück.
+		 * 
+		 * @see DecodeDocument#elementNamePool()
+		 * @see DecodeValuePool#findValue(String)
+		 * @param elementNameString {@link String}.
+		 * @return {@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public final DecodeValue elementName(final String elementNameString) {
+			return this.document.elementNamePool.findValue(elementNameString);
 		}
 
+		/**
+		 * Diese Methode gibt den via {@link DecodeLabel#name()} referenzierten {@link DecodeValue} oder {@code null}
+		 * zurück. Wenn das gegebene {@link DecodeLabel} {@code null} ist, wird {@code null} zurück gegeben.
+		 * 
+		 * @see DecodeAdapter#elementName(int)
+		 * @param elementLabel {@link DecodeLabel}.
+		 * @return {@link DecodeValue} zu {@link DecodeLabel#name()} oder {@code null}.
+		 * @throws IndexOutOfBoundsException Wenn {@link DecodeLabel#name()} ein ungültiger Index ist.
+		 */
 		public final DecodeValue elementName(final DecodeLabel elementLabel) {
 			if(elementLabel == null) return null;
 			return this.elementName(elementLabel.name);
@@ -2635,38 +2756,89 @@ public class Decoder {
 			return this.document.elementNodePool.get(elementNodeIndex);
 		}
 
-		public DecodeLabel elementLabel(final int elementLabelIndex) {
+		/**
+		 * Diese Methode gibt den {@code index}-ten {@link DecodeValue} aus {@link DecodeDocument#elementLabelPool()}
+		 * zurück.
+		 * 
+		 * @see DecodeDocument#elementLabelPool()
+		 * @see DecodeLabelPool#get(int)
+		 * @param elementLabelIndex Index.
+		 * @return {@code index}-ter {@link DecodeValue}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeLabel elementLabel(final int elementLabelIndex) {
 			return this.document.elementLabelPool.get(elementLabelIndex);
 		}
 
-		public DecodeItem elementLabel(final DecodeElement elementNode) {
+		/**
+		 * Diese Methode gibt da via {@link DecodeElement#label()} referenzierte {@code URI/Name}-{@link DecodeLabel} bzw.
+		 * den {@code Name}-{@link DecodeValue} oder {@code null} zurück. Wenn das gegebene {@link DecodeElement}
+		 * {@code null} ist, wird {@code null} zurück gegeben. Wenn {@link DecodeDocument#isXmlnsEnabled()} {@code false}
+		 * ist, wird der Index an {@link DecodeAdapter#elementName(int)} delegiert. Anderenfalls wird er an
+		 * {@link DecodeAdapter#elementLabel(int)} delegiert.
+		 * 
+		 * @see DecodeAdapter#elementName(int)
+		 * @see DecodeAdapter#elementLabel(int)
+		 * @param elementNode {@link DecodeElement}.
+		 * @return {@link DecodeItem} zu {@link DecodeElement#label()} oder {@code null}.
+		 * @throws IndexOutOfBoundsException Wenn {@link DecodeElement#label()} ein ungültiger Index ist.
+		 */
+		public final DecodeItem elementLabel(final DecodeElement elementNode) {
 			if(elementNode == null) return null;
 			if(!this.xmlnsEnabled) return this.elementName(elementNode.label);
 			return this.elementLabel(elementNode.label);
 		}
 
-		public DecodeLabel elementLabel(final int elementUriIndex, final int elementNameIndex) {
+		/**
+		 * Diese Methode sucht binäre im {@link DecodeDocument#elementLabelPool()} nach dem {@link DecodeLabel} mit den
+		 * gegebenen Indices der {@code URI}- und {@code Name}-{@link DecodeValue}s und gibt dieses oder {@code null}
+		 * zurück.
+		 * 
+		 * @see DecodeLabel#uri()
+		 * @see DecodeLabel#name()
+		 * @see DecodeLabelPool#findLabel(int, int)
+		 * @param elementUriIndex Index des {@code URI}-{@link DecodeValue}s.
+		 * @param elementNameIndex Index des {@code Name}-{@link DecodeValue}s.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 */
+		public final DecodeLabel elementLabel(final int elementUriIndex, final int elementNameIndex) {
 			return this.document.elementLabelPool.findLabel(elementUriIndex, elementNameIndex);
 		}
 
 		/**
-		 * Diese Methode gibt das via {@link DecodeElement#label()} referenzierte {@code URI/Name}-{@link DecodeLabel} bzw.
-		 * den {@code Name}-{@link DecodeValue} mit der gegebenen {@code URI} und dem gegebenen {@code Name} zurück.
+		 * Diese Methode sucht binäre im {@link DecodeDocument#elementLabelPool()} nach dem {@code URI/Name}-
+		 * {@link DecodeLabel} bzw. im {@link DecodeDocument#elementNamePool()} den {@code Name}-{@link DecodeValue} mit den
+		 * gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dieses oder {@code null} zurück. Wenn
+		 * {@link DecodeDocument#isXmlnsEnabled()} {@code false} ist, wird nur nach dem {@code Name}-{@link DecodeValue}
+		 * gesucht. Anderenfalls wird nach dme {@code URI/Name}-{@link DecodeLabel} gesucht.
 		 * 
-		 * @see Element#getNodeName()
-		 * @see Element#getLocalName()
-		 * @see Element#getNamespaceURI()
+		 * @see DecodeAdapter#elementUri(String)
+		 * @see DecodeAdapter#elementName(String)
+		 * @see DecodeAdapter#elementLabel(DecodeValue, DecodeValue)
 		 * @param elementUriString {@code URI}.
 		 * @param elementNameString {@code Name}.
 		 * @return {@code URI/Name}-{@link DecodeLabel} bzw. des {@code Name}-{@link DecodeValue} oder {@code null}.
+		 * @throws NullPointerException Wenn einer der gegebenen {@link String}s {@code null} ist.
 		 */
-		public DecodeItem elementLabel(final String elementUriString, final String elementNameString) {
+		public final DecodeItem elementLabel(final String elementUriString, final String elementNameString) {
 			final DecodeValue elementName = this.elementName(elementNameString);
 			if(!this.xmlnsEnabled || (elementName == null)) return elementName;
 			return this.elementLabel(this.elementUri(elementUriString), elementName);
 		}
 
-		public DecodeLabel elementLabel(final DecodeValue elementUri, final DecodeValue elementName) {
+		/**
+		 * Diese Methode sucht binäre im {@link DecodeDocument#attributeLabelPool()} nach dem {@link DecodeLabel} mit
+		 * Referenzen auf die gegebenen {@code URI}- und {@code Name}-{@link DecodeValue}s und gibt dieses oder {@code null}
+		 * zurück. Wenn einer der gegebenen {@link DecodeValue}s {@code null} ist, wird {@code null} zurück gegeben
+		 * 
+		 * @see DecodeLabel#uri()
+		 * @see DecodeLabel#name()
+		 * @see DecodeAdapter#elementLabel(int, int)
+		 * @param elementUri {@code URI}-{@link DecodeValue}.
+		 * @param elementName {@code Name}-{@link DecodeValue}.
+		 * @return {@link DecodeLabel} oder {@code null}.
+		 */
+		public final DecodeLabel elementLabel(final DecodeValue elementUri, final DecodeValue elementName) {
 			if((elementUri == null) || (elementName == null)) return null;
 			return this.elementLabel(elementUri.index, elementName.index);
 		}
@@ -2752,47 +2924,6 @@ public class Decoder {
 		public final DecodeGroup elementAttributes(final DecodeElement elementNode) throws IndexOutOfBoundsException {
 			if(elementNode == null) return null;
 			return this.elementAttributes(elementNode.attributes);
-		}
-
-		public int elementChildIndex(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
-			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
-			return this.elementChildIndex_(childNodeIndices, childLabelIndex, childIndex);
-		}
-
-		public int elementChildIndex(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
-			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
-			return this.elementChildIndex_(childNodeIndices, childLabelItem, childIndex);
-		}
-
-		public int elementChildIndex(final int[] childNodeIndices, final int childUriIndex, final int childNameIndex, final int childIndex) {
-			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
-			return this.elementChildIndex_(childNodeIndices, this.elementLabel(childUriIndex, childNameIndex), childIndex);
-		}
-
-		public int elementChildIndex(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
-			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
-			return this.elementChildIndex_(childNodeIndices, this.elementLabel(childUriString, childNameString), childIndex);
-		}
-
-		public int elementChildIndex(final int[] childNodeIndices, final DecodeValue childUri, final DecodeValue childName, final int childIndex) {
-			if((childIndex < 0) || (childIndex >= childNodeIndices.length)) return -1;
-			return this.elementChildIndex_(childNodeIndices, this.elementLabel(childUri, childName), childIndex);
-		}
-
-		private int elementChildIndex_(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
-			for(int i = childIndex, size = childNodeIndices.length; i < size; i++){
-				final int index = childNodeIndices[i] - this.offset;
-				if(index >= 0){
-					final DecodeElement elementNode = this.elementNode(index);
-					if(elementNode.label == childLabelIndex) return i;
-				}
-			}
-			return -1;
-		}
-
-		private int elementChildIndex_(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
-			if(childLabelItem == null) return -1;
-			return this.elementChildIndex_(childNodeIndices, childLabelItem.index, childIndex);
 		}
 
 		/**
@@ -2898,7 +3029,7 @@ public class Decoder {
 		 * @see DecodeAttribute#label()
 		 * @see DecodeAttributePool#findLabel(int[], int)
 		 * @param attributeNodeIndices Index-Array.
-		 * @param attributeLabelIndex Index des {@link DecodeAttribute#label()}.
+		 * @param attributeLabelIndex {@link DecodeAttribute#label()}.
 		 * @return {@link DecodeAttribute} oder {@code null}.
 		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
@@ -2948,7 +3079,7 @@ public class Decoder {
 		 * @see DecodeAdapter#attributeLabel(int)
 		 * @param attributeNode {@link DecodeAttribute}.
 		 * @return {@link DecodeItem} zu {@link DecodeAttribute#label()} oder {@code null}.
-		 * @throws IndexOutOfBoundsException Wenn {@link DecodeAttribute#value()} ein ungültiger Index ist.
+		 * @throws IndexOutOfBoundsException Wenn {@link DecodeAttribute#label()} ein ungültiger Index ist.
 		 */
 		public final DecodeItem attributeLabel(final DecodeAttribute attributeNode) {
 			if(attributeNode == null) return null;
@@ -2973,11 +3104,11 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode sucht binäre nach dem {@code URI/Name}-{@link DecodeLabel} bzw. den {@code Name}-
-		 * {@link DecodeValue} mit den gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dieses oder
-		 * {@code null} zurück. Wenn {@link DecodeDocument#isXmlnsEnabled()} {@code false} ist, wird nur nach dem
-		 * {@code Name}-{@link DecodeValue} gesucht. Anderenfalls wird nach dme {@code URI/Name}-{@link DecodeLabel}
-		 * gesucht.
+		 * Diese Methode sucht binäre im {@link DecodeDocument#attributeLabelPool()} nach dem {@code URI/Name}-
+		 * {@link DecodeLabel} bzw. im {@link DecodeDocument#attributeNamePool()} den {@code Name}-{@link DecodeValue} mit
+		 * den gegebenen {@code URI}- und {@code Name}- {@link String}s und gibt dieses oder {@code null} zurück. Wenn
+		 * {@link DecodeDocument#isXmlnsEnabled()} {@code false} ist, wird nur nach dem {@code Name}-{@link DecodeValue}
+		 * gesucht. Anderenfalls wird nach dme {@code URI/Name}-{@link DecodeLabel} gesucht.
 		 * 
 		 * @see DecodeAdapter#attributeUri(String)
 		 * @see DecodeAdapter#attributeName(String)
@@ -3081,13 +3212,13 @@ public class Decoder {
 		 * Diese Methode implementiert {@link Element#hasAttributeNS(String, String)}.
 		 * 
 		 * @see DecodeAdapter#attributeLabel(String, String)
-		 * @param parentNodeIndex Index des {@link DecodeElement}s.
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
 		 * @param attributeUriString {@code URI} ({@link Attr#getNamespaceURI()}).
 		 * @param attributeNameString {@code Name} ({@link Attr#getLocalName()}).
 		 * @return {@link Element#hasAttributeNS(String, String)}.
 		 */
-		public final boolean hasAttribute(final int parentIndex, final String attributeUriString, final String attributeNameString) {
-			return this.hasAttribute(this.elementAttributes(this.elementNode(parentIndex)).values, attributeUriString, attributeNameString);
+		public final boolean hasAttribute(final int elementNodeIndex, final String attributeUriString, final String attributeNameString) {
+			return this.hasAttribute(this.elementAttributes(this.elementNode(elementNodeIndex)).values, attributeUriString, attributeNameString);
 		}
 
 		public final boolean hasAttribute(final int[] attributeNodeIndices, final String attributeUriString, final String attributeNameString) {
@@ -3132,7 +3263,7 @@ public class Decoder {
 		}
 
 		private final String getAttributePrefix_(final DecodeElement parentNode, final DecodeAttribute attributeNode) {
-			return this._lookupPrefix(parentNode, this.attributeLabel(attributeNode.label).uri);
+			return this.lookupPrefix_(this.elementXmlns(parentNode).values, this.attributeLabel(attributeNode.label).uri);
 		}
 
 		/**
@@ -3158,8 +3289,8 @@ public class Decoder {
 		 * @return {@link Attr#getLocalName()}.
 		 */
 		public final String getAttributeLocalName(final DecodeAttribute attributeNode) {
-			if(this.xmlnsEnabled) return this.string(this.attributeName(this.attributeLabel(attributeNode.label)));
-			return this.string(this.attributeName(attributeNode.label));
+			if(this.xmlnsEnabled) return this.attributeName(this.attributeLabel(attributeNode.label)).value;
+			return this.attributeName(attributeNode.label).value;
 		}
 
 		/**
@@ -3186,7 +3317,7 @@ public class Decoder {
 		 */
 		public final String getAttributeNamespaceURI(final DecodeAttribute attributeNode) {
 			if(!this.xmlnsEnabled) return null;
-			final String value = this.string(this.attributeUri(this.attributeLabel(attributeNode.label)));
+			final String value = this.attributeUri(this.attributeLabel(attributeNode.label)).value;
 			if(value.isEmpty()) return null;
 			return value;
 		}
@@ -3210,13 +3341,13 @@ public class Decoder {
 		}
 
 		private final String getAttributeNodeName_(final DecodeAttribute attributeNode) {
-			return this.string(this.attributeName(attributeNode.label));
+			return this.attributeName(attributeNode.label).value;
 		}
 
 		private final String getAttributeNodeName_(final DecodeElement parentNode, final DecodeAttribute attributeNode) {
 			final DecodeLabel attributeLabel = this.attributeLabel(attributeNode.label);
-			final String xmlnsName = this._lookupPrefix(parentNode, attributeLabel.uri);
-			final String attributeName = this.string(this.attributeName(attributeLabel.name));
+			final String xmlnsName = this.lookupPrefix_(this.elementXmlns(parentNode).values, attributeLabel.uri);
+			final String attributeName = this.attributeName(attributeLabel.name).value;
 			if(xmlnsName == null) return attributeName;
 			return xmlnsName + ":" + attributeName;
 		}
@@ -3372,7 +3503,7 @@ public class Decoder {
 		 */
 		public final String getElementPrefix(final DecodeElement elementNode) {
 			if(!this.xmlnsEnabled) return null;
-			return this._lookupPrefix(elementNode, this.elementLabel(elementNode.label).uri);
+			return this.lookupPrefix_(this.elementXmlns(elementNode).values, this.elementLabel(elementNode.label).uri);
 		}
 
 		/**
@@ -3397,8 +3528,8 @@ public class Decoder {
 		 * @return {@link Element#getLocalName()}.
 		 */
 		public final String getElementLocalName(final DecodeElement elementNode) {
-			if(this.xmlnsEnabled) return this.string(this.elementName(this.elementLabel(elementNode.label)));
-			return this.string(this.elementName(elementNode.label));
+			if(this.xmlnsEnabled) return this.elementName(this.elementLabel(elementNode.label)).value;
+			return this.elementName(elementNode.label).value;
 		}
 
 		/**
@@ -3424,7 +3555,7 @@ public class Decoder {
 		 */
 		public final String getElementNamespaceURI(final DecodeElement elementNode) {
 			if(!this.xmlnsEnabled) return null;
-			final String value = this.string(this.elementUri(this.elementLabel(elementNode.label)));
+			final String value = this.elementUri(this.elementLabel(elementNode.label)).value;
 			if(value.isEmpty()) return null;
 			return value;
 		}
@@ -3451,10 +3582,10 @@ public class Decoder {
 		 * @return {@link Element#getNodeName()}.
 		 */
 		public final String getElementNodeName(final DecodeElement elementNode) {
-			if(!this.xmlnsEnabled) return this.string(this.elementName(elementNode.label));
+			if(!this.xmlnsEnabled) return this.elementName(elementNode.label).value;
 			final DecodeLabel elementLabel = this.elementLabel(elementNode.label);
-			final String xmlnsName = this._lookupPrefix(elementNode, elementLabel.uri);
-			final String elementName = this.string(this.elementName(elementLabel.name));
+			final String xmlnsName = this.lookupPrefix_(this.elementXmlns(elementNode).values, elementLabel.uri);
+			final String elementName = this.elementName(elementLabel.name).value;
 			if(xmlnsName == null) return elementName;
 			return xmlnsName + ":" + elementName;
 		}
@@ -3510,7 +3641,7 @@ public class Decoder {
 		}
 
 		public DecodeElementAdapter getElementChildNode(final DecodeElementAdapter parent, final int[] values, final String uri, final String name, final int child) {
-			final int child2 = this.elementChildIndex(values, uri, name, child);
+			final int child2 = this.childIndex(values, uri, name, child);
 			if(child2 < 0) return null;
 			return new DecodeElementAdapter(parent, values[child2] - this.offset, child2);
 		}
@@ -3529,15 +3660,15 @@ public class Decoder {
 		}
 
 		public final String getElementChildContent(final int[] childNodeIndices, final int childLabelIndex, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.elementChildIndex(childNodeIndices, childLabelIndex, childIndex));
+			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelIndex, childIndex));
 		}
 
 		public final String getElementChildContent(final int[] childNodeIndices, final DecodeItem childLabelItem, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.elementChildIndex(childNodeIndices, childLabelItem, childIndex));
+			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childLabelItem, childIndex));
 		}
 
 		public String getElementChildContent(final int[] childNodeIndices, final String childUriString, final String childNameString, final int childIndex) {
-			return this.getElementChildContent_(childNodeIndices, this.elementChildIndex(childNodeIndices, childUriString, childNameString, childIndex));
+			return this.getElementChildContent_(childNodeIndices, this.childIndex(childNodeIndices, childUriString, childNameString, childIndex));
 		}
 
 		public final String getElementChildContent(final DecodeElement elementNode, final int childLabelIndex, final int childIndex) {
@@ -3635,70 +3766,213 @@ public class Decoder {
 			return collector;
 		}
 
-		private String _lookupPrefix(final int[] xmlnsIndices, final int uriIndex) {
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(xmlnsIndices, uriIndex);
+		/**
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsUriIndex Index des {@code URI}-{@link DecodeValue}s.
+		 * @return
+		 */
+		public String lookupPrefix(final int elementNodeIndex, final int xmlnsUriIndex) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsUriIndex);
+		}
+
+		public String lookupPrefix(final int elementNodeIndex, final String xmlnsUriString) {
+			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
+			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, this.uri(xmlnsUriString));
+		}
+
+		public String lookupPrefix(final int elementNodeIndex, final DecodeValue xmlnsUri) {
+			if(!this.xmlnsEnabled || (xmlnsUri == null)) return null;
+			return this.lookupPrefix_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsUri.index);
+		}
+
+		public String lookupPrefix(final int[] xmlnsLabelIndices, final int xmlnsUriIndex) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUriIndex);
+		}
+
+		public String lookupPrefix(final int[] xmlnsLabelIndices, final String xmlnsUriString) {
+			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
+			return this.lookupPrefix_(xmlnsLabelIndices, this.uri(xmlnsUriString));
+		}
+
+		public String lookupPrefix(final int[] xmlnsLabelIndices, final DecodeValue xmlnsUri) {
+			if(!this.xmlnsEnabled || xmlnsUri == null) return null;
+			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUri.index);
+		}
+
+		public String lookupPrefix(final DecodeElement elementNode, final int xmlnsUriIndex) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupPrefix_(this.elementXmlns(elementNode).values, xmlnsUriIndex);
+		}
+
+		public String lookupPrefix(final DecodeElement elementNode, final String xmlnsUriString) {
+			if(!this.xmlnsEnabled || (xmlnsUriString == null) || xmlnsUriString.isEmpty()) return null;
+			return this.lookupPrefix_(this.elementXmlns(elementNode).values, this.uri(xmlnsUriString));
+		}
+
+		public String lookupPrefix(final DecodeElement elementNode, final DecodeValue xmlnsUri) {
+			if(!this.xmlnsEnabled || xmlnsUri == null) return null;
+			return this.lookupPrefix_(this.elementXmlns(elementNode).values, xmlnsUri.index);
+		}
+
+		private final String lookupPrefix_(final int[] xmlnsLabelIndices, final int xmlnsUriIndex) {
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findUri(xmlnsLabelIndices, xmlnsUriIndex);
 			if(xmlnsLabel == null) return null;
-			final DecodeValue xmlnsName = this.xmlnsName(xmlnsLabel.name);
-			if(xmlnsName == null) return null;
-			final String value = xmlnsName.value;
+			final String value = this.xmlnsName(xmlnsLabel.name).value;
 			if(value.isEmpty()) return null;
 			return value;
 		}
 
-		private String _lookupPrefix(final DecodeElement elementNode, final int uriIndex) {
-			final DecodeGroup elementXmlns = this.elementXmlns(elementNode);
-			return this._lookupPrefix(elementXmlns.values, uriIndex);
+		private final String lookupPrefix_(final int[] xmlnsLabelIndices, final DecodeValue xmlnsUri) {
+			if(xmlnsUri == null) return null;
+			return this.lookupPrefix_(xmlnsLabelIndices, xmlnsUri.index);
 		}
 
 		/**
-		 * @param elementNodeIndex Index des {@link DecodeElement}s.
-		 * @param uriIndex Index des {@code URI}-{@link DecodeValue}s.
-		 * @return
-		 */
-		public String lookupPrefix(final int elementNodeIndex, final int uriIndex) {
-			if(!this.xmlnsEnabled) return null;
-			return this._lookupPrefix(this.elementNode(elementNodeIndex), uriIndex);
-		}
-
-		public String lookupPrefix(final int elementNodeIndex, final String uriString) {
-			if(!this.xmlnsEnabled) return null;
-			final DecodeValue uriValue = this.uri(uriString);
-			if(uriValue == null) return null;
-			return this._lookupPrefix(this.elementNode(elementNodeIndex), uriValue.index);
-		}
-
-		public String lookupPrefix(final int elementNodeIndex, final DecodeValue uriValue) {
-			if(!this.xmlnsEnabled || (uriValue == null)) return null;
-			return this._lookupPrefix(this.elementNode(elementNodeIndex), uriValue.index);
-		}
-
-		public String lookupPrefix(final DecodeElement elementNode, final int uriIndex) {
-			if(!this.xmlnsEnabled) return null;
-			return this._lookupPrefix(elementNode, uriIndex);
-		}
-
-		public String lookupPrefix(final DecodeElement elementNode, final String uriString) {
-			if(!this.xmlnsEnabled) return null;
-			final DecodeValue uriValue = this.uri(uriString);
-			if(uriValue == null) return null;
-			return this._lookupPrefix(elementNode, uriValue.index);
-		}
-
-		/**
-		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)} und gibt die {@code URI} zum gegebenen
-		 * {@code Prefix} oder {@code null} zurück.
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
 		 * 
-		 * @param index Index des {@link DecodeElement}s.
-		 * @param name {@code Prefix}.
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
 		 * @return {@code URI} oder {@code null}.
 		 */
-		public String lookupNamespaceURI(final int index, final String name) {
+		public final String lookupNamespaceURI(final int elementNodeIndex, final int xmlnsNameIndex) {
 			if(!this.xmlnsEnabled) return null;
-			final DecodeValue xmlnsName = this.xmlnsName(name);
-			if(xmlnsName == null) return null;
-			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(this.elementXmlns(this.elementNode(index)).values, xmlnsName.index);
+			return this.lookupNamespaceURI_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsNameIndex);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsNameString {@code Prefix}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final int elementNodeIndex, final String xmlnsNameString) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupNamespaceURI_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsNameString);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param elementNodeIndex Index des {@link DecodeElement}s.
+		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final int elementNodeIndex, final DecodeValue xmlnsName) {
+			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
+			return this.lookupNamespaceURI_(this.elementXmlns(this.elementNode(elementNodeIndex)).values, xmlnsName.index);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final int xmlnsNameIndex) {
+			if(!this.xmlnsEnabled || (xmlnsLabelIndices.length == 0)) return null;
+			return this.lookupNamespaceURI_(xmlnsLabelIndices, xmlnsNameIndex);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsNameString {@code Prefix}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final String xmlnsNameString) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupNamespaceURI_(xmlnsLabelIndices, xmlnsNameString);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final int[] xmlnsLabelIndices, final DecodeValue xmlnsName) {
+			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
+			return this.lookupNamespaceURI_(xmlnsLabelIndices, xmlnsName.index);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final DecodeElement elementNode, final int xmlnsNameIndex) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupNamespaceURI_(this.elementXmlns(elementNode).values, xmlnsNameIndex);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsNameString {@code Prefix}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final DecodeElement elementNode, final String xmlnsNameString) {
+			if(!this.xmlnsEnabled) return null;
+			return this.lookupNamespaceURI_(this.elementXmlns(elementNode).values, xmlnsNameString);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param elementNode {@link DecodeElement}.
+		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		public final String lookupNamespaceURI(final DecodeElement elementNode, final DecodeValue xmlnsName) {
+			if(!this.xmlnsEnabled || (xmlnsName == null)) return null;
+			return this.lookupNamespaceURI_(this.elementXmlns(elementNode).values, xmlnsName.index);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsNameIndex Index des {@code Prefix}-{@link DecodeValue}s.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final int xmlnsNameIndex) {
+			final DecodeLabel xmlnsLabel = this.document.xmlnsLabelPool.findName(xmlnsLabelIndices, xmlnsNameIndex);
 			if(xmlnsLabel == null) return null;
-			return this.string(this.uri(xmlnsLabel.uri));
+			return this.uri(xmlnsLabel.uri).value;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsNameString {@code Prefix}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final String xmlnsNameString) {
+			if(xmlnsLabelIndices.length == 0) return null;
+			if(xmlnsNameString == null) return this.lookupNamespaceURI_(xmlnsLabelIndices, this.xmlnsName(XMLConstants.DEFAULT_NS_PREFIX));
+			return this.lookupNamespaceURI_(xmlnsLabelIndices, this.xmlnsName(xmlnsNameString));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link Element#lookupNamespaceURI(String)}.
+		 * 
+		 * @param xmlnsLabelIndices Indices der {Xmlns}-{@link DecodeLabel}s.
+		 * @param xmlnsName {@code Prefix}-{@link DecodeValue}.
+		 * @return {@code URI} oder {@code null}.
+		 */
+		private final String lookupNamespaceURI_(final int[] xmlnsLabelIndices, final DecodeValue xmlnsName) {
+			if(xmlnsName == null) return null;
+			return this.lookupNamespaceURI_(xmlnsLabelIndices, xmlnsName.index);
 		}
 
 		/**
@@ -4679,7 +4953,7 @@ public class Decoder {
 		 */
 		@Override
 		public boolean isDefaultNamespace(final String uri) {
-			return uri.equals(this.lookupNamespaceURI(XMLConstants.NULL_NS_URI));
+			return uri.equals(this.lookupNamespaceURI(XMLConstants.DEFAULT_NS_PREFIX));
 		}
 
 		/**
