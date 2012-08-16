@@ -35,13 +35,9 @@ import bee.creative.util.Unique;
 import bee.creative.xml.coder.Decoder.DecodeDocument;
 
 /**
- * Diese Klasse implementiert Klassen und Methoden zur Kodierung eines XML-Dokuments in eine optimierte binäre
- * Darstellung.
+ * Diese Klasse implementiert Klassen und Methoden zur Kodierung eines XML-Dokuments in eine optimierte binäre Darstellung.
  * <p>
- * Als Eingabe werden ein {@link XMLReader} und eine {@link InputSource} verwendet, wobei das
- * {@link EncodeDocumentHandler} als {@link ContentHandler} die vom {@link XMLReader} gelesenen Daten aufnimmt. Die
- * eingelesenen Daten des {@link EncodeDocumentHandler}s werden anschließend unter beachtung der Optionen des
- * {@link Encoder}s in ein {@link EncodeTarget} gespeichert.
+ * Als Eingabe werden ein {@link XMLReader} und eine {@link InputSource} verwendet, wobei das {@link EncodeDocumentHandler} als {@link ContentHandler} die vom {@link XMLReader} gelesenen Daten aufnimmt. Die eingelesenen Daten des {@link EncodeDocumentHandler}s werden anschließend unter beachtung der Optionen des {@link Encoder}s in ein {@link EncodeTarget} gespeichert.
  * 
  * @see Decoder
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -56,9 +52,7 @@ public class Encoder {
 	public static interface EncodeTarget {
 
 		/**
-		 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array ab dem gegebenen
-		 * Index in die Ausgabe an deren aktuelle Schreibposition und setzt diese Schreibposition anschließend an das Ende
-		 * des soeben geschriebenen Datenbereiches.
+		 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array ab dem gegebenen Index in die Ausgabe an deren aktuelle Schreibposition und setzt diese Schreibposition anschließend an das Ende des soeben geschriebenen Datenbereiches.
 		 * 
 		 * @see DataOutput#write(byte[], int, int)
 		 * @param array {@code byte}-Array.
@@ -128,11 +122,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link Hash}-{@code Set}. Wenn das via {@link #get(EncodeItem)} zu einem
-	 * gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente} Element ermittelt werden konnte, werden
-	 * dieses als Rückgabewert verwendet und dessen Wiederverwendung via {@link #reuse(EncodeItem)} signalisiert. Das
-	 * Einfügen eines neuen Elements wird dagegen mit {@link #insert(EncodeItem)} angezeigt. Die Implementation ähnelt
-	 * einem {@link Unique}, jedoch mit deutlich geringere Speicherlast.
+	 * Diese Klasse implementiert ein abstraktes {@link Hash}-{@code Set}. Wenn das via {@link #get(EncodeItem)} zu einem gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente} Element ermittelt werden konnte, werden dieses als Rückgabewert verwendet und dessen Wiederverwendung via {@link #reuse(EncodeItem)} signalisiert. Das Einfügen eines neuen Elements wird dagegen mit {@link #insert(EncodeItem)} angezeigt. Die Implementation ähnelt einem {@link Unique}, jedoch mit deutlich geringere Speicherlast.
 	 * 
 	 * @see Hash
 	 * @see Unique
@@ -222,8 +212,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Elements zurück. Das Element ist nie
-		 * {@code null}.
+		 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Elements zurück. Das Element ist nie {@code null}.
 		 * 
 		 * @param input Element.
 		 * @return {@link Object#hashCode() Streuwert}.
@@ -251,8 +240,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Elemente zurück. Die Elemente sind
-		 * nie {@code null}.
+		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Elemente zurück. Die Elemente sind nie {@code null}.
 		 * 
 		 * @param input1 Element 1.
 		 * @param input2 Element 2.
@@ -261,11 +249,7 @@ public class Encoder {
 		protected abstract boolean equals(final GItem input1, final GItem input2);
 
 		/**
-		 * Diese Methode gibt das einzigartige, zum gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente}
-		 * Element zurück. Wenn ein solches Element gefunden wurde, wird dessen Wiederverwendung via
-		 * {@link #reuse(EncodeItem)} signalisiert. Sollte dagegen kein {@link #equals(EncodeItem, EncodeItem) äquivalentes}
-		 * Element gefunden werden, werden das gegebene Element in den {@link EncodePool} eingefügt, das Einfügen mit
-		 * {@link #insert(EncodeItem)} angezeigt und das Element zurück gegeben.
+		 * Diese Methode gibt das einzigartige, zum gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente} Element zurück. Wenn ein solches Element gefunden wurde, wird dessen Wiederverwendung via {@link #reuse(EncodeItem)} signalisiert. Sollte dagegen kein {@link #equals(EncodeItem, EncodeItem) äquivalentes} Element gefunden werden, werden das gegebene Element in den {@link EncodePool} eingefügt, das Einfügen mit {@link #insert(EncodeItem)} angezeigt und das Element zurück gegeben.
 		 * 
 		 * @see #hash(EncodeItem)
 		 * @see #equals(EncodeItem, EncodeItem)
@@ -331,8 +315,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Datensatz mit Index, der als Element in einem {@link EncodePool}
-	 * verwendet werden kann.
+	 * Diese Klasse implementiert einen abstrakten Datensatz mit Index, der als Element in einem {@link EncodePool} verwendet werden kann.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -347,8 +330,7 @@ public class Encoder {
 		EncodeItem next;
 
 		/**
-		 * Dieses Feld speichert beim Aufbau der {@link EncodePool}s die absolute Häufigkeit und beim Speichern den Index
-		 * des Datensatzes.
+		 * Dieses Feld speichert beim Aufbau der {@link EncodePool}s die absolute Häufigkeit und beim Speichern den Index des Datensatzes.
 		 */
 		protected int index = 1;
 
@@ -362,8 +344,7 @@ public class Encoder {
 		public abstract void write(final EncodeTarget target) throws IOException, NullPointerException;
 
 		/**
-		 * Diese Methode gibt den Index des Datensatzes zurück. Beim Aufbau des {@link EncodePool}s entspricht dieser der
-		 * absoluten Häufigkeit des Datensatzes im eingelesenen XML-Dokument.
+		 * Diese Methode gibt den Index des Datensatzes zurück. Beim Aufbau des {@link EncodePool}s entspricht dieser der absoluten Häufigkeit des Datensatzes im eingelesenen XML-Dokument.
 		 * 
 		 * @return Index des Datensatzes.
 		 */
@@ -374,8 +355,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Datensatz mit Index und mehreren Werten, der als Element in einem
-	 * {@link EncodePool} verwendet werden kann.
+	 * Diese Klasse implementiert einen abstrakten Datensatz mit Index und mehreren Werten, der als Element in einem {@link EncodePool} verwendet werden kann.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -400,17 +380,17 @@ public class Encoder {
 		/**
 		 * Dieses Feld speichert den {@link String}.
 		 */
-		protected final String value;
+		protected final String string;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link String}.
 		 * 
-		 * @param value {@link String}.
+		 * @param string {@link String}.
 		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
 		 */
-		public EncodeValue(final String value) throws NullPointerException {
-			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
-			this.value = value;
+		public EncodeValue(final String string) throws NullPointerException {
+			if(string == null) throw new NullPointerException("string is null");
+			this.string = string;
 		}
 
 		/**
@@ -418,8 +398,8 @@ public class Encoder {
 		 * 
 		 * @return {@link String}.
 		 */
-		public String value() {
-			return this.value;
+		public String string() {
+			return this.string;
 		}
 
 		/**
@@ -427,7 +407,7 @@ public class Encoder {
 		 */
 		@Override
 		public int length() {
-			return Coder.encodeChars(this.value).length;
+			return Coder.encodeChars(this.string).length;
 		}
 
 		/**
@@ -435,7 +415,7 @@ public class Encoder {
 		 */
 		@Override
 		public void write(final EncodeTarget target) throws IOException, NullPointerException {
-			final byte[] bytes = Coder.encodeChars(this.value);
+			final byte[] bytes = Coder.encodeChars(this.string);
 			target.write(bytes, 0, bytes.length);
 		}
 
@@ -444,7 +424,7 @@ public class Encoder {
 		 */
 		@Override
 		public String toString() {
-			return "[" + this.index + "]" + Objects.toString(this.value);
+			return "[" + this.index + "]" + Objects.toString(this.string);
 		}
 
 	}
@@ -461,7 +441,7 @@ public class Encoder {
 		 */
 		@Override
 		protected int hash(final EncodeValue input) {
-			return Objects.hash(input.value);
+			return Objects.hash(input.string);
 		}
 
 		/**
@@ -469,13 +449,13 @@ public class Encoder {
 		 */
 		@Override
 		protected boolean equals(final EncodeValue input1, final EncodeValue input2) {
-			return input1.value.equals(input2.value);
+			return input1.string.equals(input2.string);
 		}
 
 		/**
 		 * Diese Methode gibt den einzigartigen {@link EncodeValue} zum gegebenen {@code String} zurück.
 		 * 
-		 * @see EncodeValue#value()
+		 * @see EncodeValue#string()
 		 * @param value {@code String}.
 		 * @return einzigartiger {@link EncodeValue}.
 		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
@@ -649,7 +629,7 @@ public class Encoder {
 		/**
 		 * Dieses Feld speichert die {@link EncodeItem}-{@link List}.
 		 */
-		protected final List<EncodeItem> values;
+		protected final List<EncodeItem> items;
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList}.
@@ -659,16 +639,15 @@ public class Encoder {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList} und den
-		 * gegebenen {@link EncodeItem}s.
+		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList} und den gegebenen {@link EncodeItem}s.
 		 * 
-		 * @param value {@link EncodeItem}-{@link List}.
+		 * @param items {@link EncodeItem}-{@link List}.
 		 * @throws NullPointerException Wenn die gegebene {@link EncodeItem}-{@link List} {@code null} ist oder enthält.
 		 */
-		public EncodeGroup(final List<? extends EncodeItem> value) throws NullPointerException {
-			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
-			if(value.contains(null)) throw new NullPointerException("value contains null");
-			this.values = new ArrayList<EncodeItem>(value);
+		public EncodeGroup(final List<? extends EncodeItem> items) throws NullPointerException {
+			if(items == null) throw new NullPointerException("items is null");
+			if(items.contains(null)) throw new NullPointerException("items contains null");
+			this.items = new ArrayList<EncodeItem>(items);
 		}
 
 		/**
@@ -677,8 +656,8 @@ public class Encoder {
 		 * @see Collections#unmodifiableList(List)
 		 * @return {@link EncodeItem}-{@link List}.
 		 */
-		public List<EncodeItem> values() {
-			return Collections.unmodifiableList(this.values);
+		public List<EncodeItem> items() {
+			return Collections.unmodifiableList(this.items);
 		}
 
 		/**
@@ -686,7 +665,7 @@ public class Encoder {
 		 */
 		@Override
 		public int length() {
-			return this.values.size();
+			return this.items.size();
 		}
 
 		/**
@@ -694,7 +673,7 @@ public class Encoder {
 		 */
 		@Override
 		public void write(final EncodeTarget target) throws IOException, NullPointerException {
-			Encoder.writeIndices(target, this.values);
+			Encoder.writeIndices(target, this.items);
 		}
 
 		/**
@@ -702,7 +681,7 @@ public class Encoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "EncodeGroup", "index", this.index, "values", this.values);
+			return Objects.toStringCall(true, true, "EncodeGroup", "index", this.index, "values", this.items);
 		}
 
 	}
@@ -719,7 +698,7 @@ public class Encoder {
 		 */
 		@Override
 		protected int hash(final EncodeGroup input) {
-			return Objects.hash(input.values);
+			return Objects.hash(input.items);
 		}
 
 		/**
@@ -727,13 +706,13 @@ public class Encoder {
 		 */
 		@Override
 		protected boolean equals(final EncodeGroup input1, final EncodeGroup input2) {
-			return input1.values.equals(input2.values);
+			return input1.items.equals(input2.items);
 		}
 
 		/**
 		 * Diese Methode gibt die einzigartige {@link EncodeGroup} mit den gegebenen {@link EncodeItem}s zurück.
 		 * 
-		 * @see EncodeGroup#values()
+		 * @see EncodeGroup#items()
 		 * @param value {@link EncodeItem}-{@link List}.
 		 * @return einzigartige {@link EncodeGroup}.
 		 * @throws NullPointerException Wenn die gegebene {@link EncodeItem}-{@link List} {@code null} ist oder enthält.
@@ -858,9 +837,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@link EncodeGroup} der {@code URI/Prefix}-{@link EncodeLabel}s oder {@code null} zurück.
-		 * Die Elemente dieser {@link EncodeGroup} sind primär nach {@link EncodeLabel#uri()} und sekundär nach
-		 * {@link EncodeLabel#name()} aufsteigend sortiert.
+		 * Diese Methode gibt die {@link EncodeGroup} der {@code URI/Prefix}-{@link EncodeLabel}s oder {@code null} zurück. Die Elemente dieser {@link EncodeGroup} sind primär nach {@link EncodeLabel#uri()} und sekundär nach {@link EncodeLabel#name()} aufsteigend sortiert.
 		 * 
 		 * @see Element#lookupPrefix(String)
 		 * @see Element#lookupNamespaceURI(String)
@@ -881,9 +858,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@link EncodeGroup} der {@code Attributes} zurück. Die Elemente dieser {@link EncodeGroup}
-		 * sind nach {@link EncodeAttribute#name()} bzw. primär nach {@link EncodeLabel#name()} und sekundär nach
-		 * {@link EncodeLabel#uri()} des {@link EncodeAttribute#label()} aufsteigend sortiert.
+		 * Diese Methode gibt die {@link EncodeGroup} der {@code Attributes} zurück. Die Elemente dieser {@link EncodeGroup} sind nach {@link EncodeAttribute#name()} bzw. primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} des {@link EncodeAttribute#label()} aufsteigend sortiert.
 		 * 
 		 * @see Element#getAttributes()
 		 * @return {@link EncodeGroup} der {@code Attributes}.
@@ -1099,7 +1074,7 @@ public class Encoder {
 		 */
 		public EncodeAttribute(final EncodeValue name, final EncodeValue value) throws NullPointerException {
 			if(name == null) throw new NullPointerException("name is null");
-			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
+			if(value == null) throw new NullPointerException("value is null");
 			this.name = name;
 			this.label = null;
 			this.value = value;
@@ -1114,7 +1089,7 @@ public class Encoder {
 		 */
 		public EncodeAttribute(final EncodeLabel label, final EncodeValue value) throws NullPointerException {
 			if(label == null) throw new NullPointerException("label is null");
-			if(value == null) throw new NullPointerException(Coder.MESSAGE_NULL_VALUE);
+			if(value == null) throw new NullPointerException("value is null");
 			this.name = null;
 			this.label = label;
 			this.value = value;
@@ -1273,8 +1248,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link EncodePool}s zur Abstraktion eines {@link Document}
-	 * s.
+	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link EncodePool}s zur Abstraktion eines {@link Document} s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1286,14 +1260,12 @@ public class Encoder {
 		protected final EncodeValuePool uriPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeAttribute#value()} und
-		 * {@link EncodeElement#children()}.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeAttribute#value()} und {@link EncodeElement#children()}.
 		 */
 		protected final EncodeValuePool valuePool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeLabel#name()} bei
-		 * {@link EncodeElement#xmlns()}.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeLabel#name()} bei {@link EncodeElement#xmlns()}.
 		 */
 		protected final EncodeValuePool xmlnsNamePool;
 
@@ -1303,8 +1275,7 @@ public class Encoder {
 		protected final EncodeLabelPool xmlnsLabelPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeElement#name()} bzw.
-		 * {@link EncodeLabel#name()} bei {@link EncodeElement#label()}.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeElement#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeElement#label()}.
 		 */
 		protected final EncodeValuePool elementNamePool;
 
@@ -1314,8 +1285,7 @@ public class Encoder {
 		protected final EncodeLabelPool elementLabelPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw.
-		 * {@link EncodeLabel#name()} bei {@link EncodeAttribute#label()}.
+		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeAttribute#label()}.
 		 */
 		protected final EncodeValuePool attributeNamePool;
 
@@ -1340,8 +1310,7 @@ public class Encoder {
 		protected final EncodeGroupPool elementAttributesPool;
 
 		/**
-		 * Dieses Feld speichert den {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und
-		 * {@link EncodeElement#children()}.
+		 * Dieses Feld speichert den {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und {@link EncodeElement#children()}.
 		 */
 		protected final EncodeElementPool elementNodePool;
 
@@ -1377,8 +1346,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeLabel#uri()} zurück. Im {@link EncodeTarget}
-		 * werden diese nach ihrem {@link EncodeValue#value()} aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeLabel#uri()} zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#string()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 * @return {@link EncodeValuePool} für {@link EncodeLabel#uri()}.
@@ -1388,9 +1356,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttribute#value()} und
-		 * {@link EncodeElement#children()} zurück. Im {@link EncodeTarget} werden diese nach ihrem
-		 * {@link EncodeValue#value()} aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttribute#value()} und {@link EncodeElement#children()} zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#string()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Text#getNodeValue()
 		 * @see Attr#getNodeValue()
@@ -1401,9 +1367,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeLabel#name()} bei {@link EncodeElement#xmlns()}
-		 * zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#value()} aufsteigend sortiert
-		 * gespeichert.
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeLabel#name()} bei {@link EncodeElement#xmlns()} zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#string()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getPrefix()
 		 * @return {@link EncodeValuePool} für {@link EncodeLabel#name()} bei {@link EncodeElement#xmlns()}.
@@ -1413,9 +1377,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeElement#xmlns()} zurück. Im {@link EncodeTarget}
-		 * werden diese primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} aufsteigend
-		 * sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeElement#xmlns()} zurück. Im {@link EncodeTarget} werden diese primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#getNamespaceURI()
 		 * @see Node#getPrefix()
@@ -1426,23 +1388,18 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeElement#name()} bzw. {@link EncodeLabel#name()}
-		 * bei {@link EncodeElement#label()} zurück. Im {@link EncodeTarget} werden diese nach ihrem
-		 * {@link EncodeValue#value()} aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeElement#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeElement#label()} zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#string()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getNodeName()
 		 * @see Element#getLocalName()
-		 * @return {@link EncodeValuePool} für {@link EncodeElement#name()} bzw. {@link EncodeLabel#name()} bei
-		 *         {@link EncodeElement#label()}.
+		 * @return {@link EncodeValuePool} für {@link EncodeElement#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeElement#label()}.
 		 */
 		public EncodeValuePool elementNamePool() {
 			return this.elementNamePool;
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeElement#label()} zurück. Im {@link EncodeTarget}
-		 * werden diese primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} aufsteigend
-		 * sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeElement#label()} zurück. Im {@link EncodeTarget} werden diese primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Element#getNamespaceURI()
@@ -1453,23 +1410,18 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw. {@link EncodeLabel#name()}
-		 * bei {@link EncodeAttribute#label()} zurück. Im {@link EncodeTarget} werden diese nach ihrem
-		 * {@link EncodeValue#value()} aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeAttribute#label()} zurück. Im {@link EncodeTarget} werden diese nach ihrem {@link EncodeValue#string()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Attr#getNodeName()
 		 * @see Attr#getLocalName()
-		 * @return {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw. {@link EncodeLabel#name()} bei
-		 *         {@link EncodeAttribute#label()}.
+		 * @return {@link EncodeValuePool} für {@link EncodeAttribute#name()} bzw. {@link EncodeLabel#name()} bei {@link EncodeAttribute#label()}.
 		 */
 		public EncodeValuePool attributeNamePool() {
 			return this.attributeNamePool;
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeAttribute#label()} zurück. Im
-		 * {@link EncodeTarget} werden diese primär nach {@link EncodeLabel#name()} und sekundär nach
-		 * {@link EncodeLabel#uri()} aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeLabelPool} für {@link EncodeAttribute#label()} zurück. Im {@link EncodeTarget} werden diese primär nach {@link EncodeLabel#name()} und sekundär nach {@link EncodeLabel#uri()} aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Attr#getLocalName()
 		 * @see Attr#getNamespaceURI()
@@ -1480,8 +1432,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#xmlns()} zurück. Im {@link EncodeTarget}
-		 * werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#xmlns()} zurück. Im {@link EncodeTarget} werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Node#lookupPrefix(String)
 		 * @see Node#lookupNamespaceURI(String)
@@ -1492,8 +1443,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#children()} zurück. Im
-		 * {@link EncodeTarget} werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#children()} zurück. Im {@link EncodeTarget} werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getChildNodes()
 		 * @return {@link EncodeGroupPool} für {@link EncodeElement#children()}.
@@ -1503,8 +1453,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#attributes()} zurück. Im
-		 * {@link EncodeTarget} werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
+		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link EncodeElement#attributes()} zurück. Im {@link EncodeTarget} werden diese nach ihrer Häufigkeit aufsteigend sortiert gespeichert.
 		 * 
 		 * @see Element#getAttributes()
 		 * @return {@link EncodeGroupPool} für {@link EncodeElement#attributes()}.
@@ -1514,12 +1463,10 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und
-		 * {@link EncodeElement#children()} zurück.
+		 * Diese Methode gibt den {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und {@link EncodeElement#children()} zurück.
 		 * 
 		 * @see Element
-		 * @return {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und
-		 *         {@link EncodeElement#children()}.
+		 * @return {@link EncodeElementPool} für {@link EncodeDocument#documentElement()} und {@link EncodeElement#children()}.
 		 */
 		public EncodeElementPool elementNodePool() {
 			return this.elementNodePool;
@@ -1571,16 +1518,14 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link ContentHandler} zum Einlsenen eines {@link Document}s mit Hilfe eines
-	 * {@link XMLReader}s.
+	 * Diese Klasse implementiert den {@link ContentHandler} zum Einlsenen eines {@link Document}s mit Hilfe eines {@link XMLReader}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class EncodeDocumentHandler implements ContentHandler {
 
 		/**
-		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als
-		 * {@link EncodeLabel}s während des Einlesens eines {@link Document}s.
+		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als {@link EncodeLabel}s während des Einlesens eines {@link Document}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
@@ -1624,8 +1569,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Inhalte eine {@link Element}s während des Einlesens
-		 * eines {@link Document}s.
+		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Inhalte eine {@link Element}s während des Einlesens eines {@link Document}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
@@ -1722,8 +1666,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link XmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix} oder
-		 * {@code null}.
+		 * Dieses Feld speichert den {@link XmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix} oder {@code null}.
 		 */
 		protected XmlnsStack xmlnsStack;
 
@@ -1766,9 +1709,7 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen
-		 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
-		 * {@code Prefix}.
+		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
 		 * 
 		 * @see EncodeLabel#uri()
 		 * @see EncodeLabel#name()
@@ -1828,7 +1769,7 @@ public class Encoder {
 			for(final EncodeItem oldNode: oldChildren){
 				if(oldNode instanceof EncodeValue){
 					final EncodeValue textChildNode = (EncodeValue)oldNode;
-					textValue.append(textChildNode.value);
+					textValue.append(textChildNode.string);
 				}else{
 					if(textValue.length() != 0){
 						newChildren.add(valuePool.unique(textValue.toString()));
@@ -1952,8 +1893,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
-	 * {@link EncodeValue}s.
+	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von {@link EncodeValue}s.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see Encoder#compilePool(EncodePool, int, Comparator)
@@ -1962,14 +1902,13 @@ public class Encoder {
 
 		@Override
 		public int compareTo(final EncodeValue value) {
-			return Coder.hashValue(value.value);
+			return Coder.hashValue(value.string);
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von
-	 * {@link EncodeLabel}s.
+	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von {@link EncodeLabel}s.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see Encoder#compilePool(EncodePool, int, Comparator)
@@ -1984,8 +1923,7 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeItem}s nach ihrem
-	 * {@link EncodeItem#index()}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeItem}s nach ihrem {@link EncodeItem#index()}.
 	 */
 	protected static final Comparator<EncodeItem> IndexComparator = new Comparator<EncodeItem>() {
 
@@ -1997,9 +1935,7 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach
-	 * ihrem {@link EncodeLabel#name()} und sekundär nach ihrer {@link EncodeLabel#uri()} via
-	 * {@link Encoder#IndexComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach ihrem {@link EncodeLabel#name()} und sekundär nach ihrer {@link EncodeLabel#uri()} via {@link Encoder#IndexComparator}.
 	 */
 	protected static final Comparator<EncodeLabel> LabelComparator = new Comparator<EncodeLabel>() {
 
@@ -2013,22 +1949,19 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeValue}s nach ihrem
-	 * {@link EncodeValue#value()}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeValue}s nach ihrem {@link EncodeValue#string()}.
 	 */
 	protected static final Comparator<EncodeValue> ValueComparator = new Comparator<EncodeValue>() {
 
 		@Override
 		public int compare(final EncodeValue o1, final EncodeValue o2) {
-			return Comparators.compare(o1.value, o2.value);
+			return Comparators.compare(o1.string, o2.string);
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach
-	 * ihrer {@link EncodeLabel#uri()} und sekundär nach ihrem {@link EncodeLabel#name()} via
-	 * {@link Encoder#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeLabel}s primär nach ihrer {@link EncodeLabel#uri()} und sekundär nach ihrem {@link EncodeLabel#name()} via {@link Encoder#ValueComparator}.
 	 */
 	protected static final Comparator<EncodeLabel> XmlnsComparator = new Comparator<EncodeLabel>() {
 
@@ -2042,8 +1975,7 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s nach ihrem
-	 * {@link EncodeAttribute#name()} via {@link Encoder#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s nach ihrem {@link EncodeAttribute#name()} via {@link Encoder#ValueComparator}.
 	 */
 	protected static final Comparator<EncodeAttribute> AttributeNameComparator = new Comparator<EncodeAttribute>() {
 
@@ -2055,9 +1987,7 @@ public class Encoder {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s primär nach
-	 * dem {@link EncodeLabel#name()} und sekundär nach der {@link EncodeLabel#uri()} der {@link EncodeAttribute#label()}
-	 * via {@link Encoder#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttribute}s primär nach dem {@link EncodeLabel#name()} und sekundär nach der {@link EncodeLabel#uri()} der {@link EncodeAttribute#label()} via {@link Encoder#ValueComparator}.
 	 */
 	protected static final Comparator<EncodeAttribute> AttributeLabelComparator = new Comparator<EncodeAttribute>() {
 
@@ -2078,8 +2008,7 @@ public class Encoder {
 	 * @param target {@link EncodeTarget}.
 	 * @param values {@code int}-Array.
 	 * @throws IOException Wenn das gegebene {@link EncodeTarget} eine {@link IOException} auslöst.
-	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. das gegebene {@code int}-Array
-	 *         {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. das gegebene {@code int}-Array {@code null} ist.
 	 */
 	protected static void writeInts(final EncodeTarget target, final int... values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
@@ -2089,8 +2018,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt die Anzahl der gegebenen {@link EncodeItem}s sowie jedes der {@link EncodeItem}s in das
-	 * gegebene {@link EncodeTarget}.
+	 * Diese Methode schreibt die Anzahl der gegebenen {@link EncodeItem}s sowie jedes der {@link EncodeItem}s in das gegebene {@link EncodeTarget}.
 	 * 
 	 * <pre>N|item1|...|itemN</pre>
 	 * 
@@ -2099,8 +2027,7 @@ public class Encoder {
 	 * @param target {@link EncodeTarget}.
 	 * @param values {@link EncodeItem}-{@link List}.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
-	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}-
-	 *         {@link List} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}- {@link List} {@code null} ist.
 	 */
 	protected static void writeItems(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
@@ -2112,8 +2039,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode speichert dia Anzahl der gegebenen {@link EncodeList}s ihre aufsummierten Längen, die Summe aller
-	 * Längen, sowie jedes der {@link EncodeItem} in das gegebene {@link EncodeTarget}.
+	 * Diese Methode speichert dia Anzahl der gegebenen {@link EncodeList}s ihre aufsummierten Längen, die Summe aller Längen, sowie jedes der {@link EncodeItem} in das gegebene {@link EncodeTarget}.
 	 * 
 	 * <pre>size|offset[0]|...|offset[size]|values[0]|...|values[size-1]
 	 * offset[0] = 0
@@ -2124,8 +2050,7 @@ public class Encoder {
 	 * @param target {@link EncodeTarget}.
 	 * @param values {@link EncodeList}-{@link List}.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
-	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeList}-
-	 *         {@link List} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeList}- {@link List} {@code null} ist.
 	 */
 	protected static void writeLists(final EncodeTarget target, final List<? extends EncodeList> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
@@ -2153,8 +2078,7 @@ public class Encoder {
 	 * @param target {@link EncodeTarget}.
 	 * @param values {@link EncodeItem}-{@link List}.
 	 * @throws IOException Wenn das {@link EncodeTarget} eine {@link IOException} auslöst.
-	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}-
-	 *         {@link List} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene {@link EncodeTarget} bzw. die gegebene {@link EncodeItem}- {@link List} {@code null} ist.
 	 */
 	protected static void writeIndices(final EncodeTarget target, final List<? extends EncodeItem> values) throws IOException, NullPointerException {
 		if(target == null) throw new NullPointerException("target is null");
@@ -2169,10 +2093,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode fügt alle Elemente des gegebenen {@link EncodePool}s in eine neue {@link List} ein, sortiert diese
-	 * {@link List} mit dem gegebenen {@link Comparator}, setzt den Index der Elemente unter Beachtung der gegebenen
-	 * Verschiebung, entfernt alle Elemente aus dem {@link EncodePool} und gibt die {@link List} zurück. Der Index des
-	 * {@code i}-ten Elements ergibt sich aus:
+	 * Diese Methode fügt alle Elemente des gegebenen {@link EncodePool}s in eine neue {@link List} ein, sortiert diese {@link List} mit dem gegebenen {@link Comparator}, setzt den Index der Elemente unter Beachtung der gegebenen Verschiebung, entfernt alle Elemente aus dem {@link EncodePool} und gibt die {@link List} zurück. Der Index des {@code i}-ten Elements ergibt sich aus:
 	 * 
 	 * <pre>values[i].index = i + offset</pre>
 	 * 
@@ -2184,8 +2105,7 @@ public class Encoder {
 	 * @param offset Verschiebung der Indizes.
 	 * @param helper {@link Comparator} zum Sortieren.
 	 * @return {@link EncodeItem}-{@link List}.
-	 * @throws NullPointerException Wenn der gegebene {@link EncodePool} bzw. der gegebene {@link Comparator} {@code null}
-	 *         ist.
+	 * @throws NullPointerException Wenn der gegebene {@link EncodePool} bzw. der gegebene {@link Comparator} {@code null} ist.
 	 */
 	protected static <GItem extends EncodeItem> List<GItem> compilePool(final EncodePool<? extends GItem> values, final int offset,
 		final Comparator<? super GItem> helper) throws NullPointerException {
@@ -2202,9 +2122,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link List} aus {@link EncodeGroup}s als {@code Hash-Table} für die gegebenen Elemente
-	 * und gibt diese zurück. Der {@link Object#hashCode() Streuwert} der Elemente wird mit Hilfe des gegebenen
-	 * {@link Comparable}s berechnet.
+	 * Diese Methode erzeugt eine {@link List} aus {@link EncodeGroup}s als {@code Hash-Table} für die gegebenen Elemente und gibt diese zurück. Der {@link Object#hashCode() Streuwert} der Elemente wird mit Hilfe des gegebenen {@link Comparable}s berechnet.
 	 * 
 	 * @see #ValueHasher
 	 * @see #LabelHasher
@@ -2234,7 +2152,7 @@ public class Encoder {
 		for(int i = 0; i < size; i++){
 			final GItem value = values.get(i);
 			final int index = helper.compareTo(value) & count;
-			list.get(index).values.add(value);
+			list.get(index).items.add(value);
 		}
 		return list;
 	}
@@ -2291,9 +2209,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen
-	 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
-	 * {@code Prefix}.
+	 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
 	 * 
 	 * @see Node#getPrefix()
 	 * @see Node#getLocalName()
@@ -2305,9 +2221,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code xmlns}-Aktivierung. Wenn diese Option {@code true} ist, besitzen
-	 * {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen
-	 * {@code Prefix}.
+	 * Diese Methode setzt die {@code xmlns}-Aktivierung. Wenn diese Option {@code true} ist, besitzen {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
 	 * 
 	 * @see Node#getPrefix()
 	 * @see Node#getLocalName()
@@ -2319,8 +2233,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code URI-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code URI-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#uriHash()
@@ -2331,8 +2244,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code URI-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code URI-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#uriHash()
@@ -2343,8 +2255,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Value-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Value-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#valueHash()
@@ -2355,8 +2266,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Value-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Value-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#valueHash()
@@ -2367,8 +2277,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Xmlns-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Xmlns-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#xmlnsNameHash()
@@ -2379,8 +2288,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Xmlns-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Xmlns-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#xmlnsNameHash()
@@ -2391,8 +2299,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Xmlns-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Xmlns-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#xmlnsLabelHash()
@@ -2403,8 +2310,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Xmlns-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Xmlns-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsLabelPool()} eine {@code Xmlns-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#xmlnsLabelHash()
@@ -2415,8 +2321,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Element-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Element-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#elementNameHash()
@@ -2427,8 +2332,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Element-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Element-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#elementNameHash()
@@ -2439,8 +2343,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Element-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Element-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#elementLabelHash()
@@ -2451,8 +2354,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Element-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Element-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementLabelPool()} eine {@code Element-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#elementLabelHash()
@@ -2463,8 +2365,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Attribute-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Attribute-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#attributeNameHash()
@@ -2475,8 +2376,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Attribute-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Attribute-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashValue(String)
 	 * @see DecodeDocument#attributeNameHash()
@@ -2487,8 +2387,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Attribute-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird
-	 * für {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Attribute-Label-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#attributeLabelHash()
@@ -2499,8 +2398,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Attribute-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für
-	 * {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Attribute-Label-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeLabelPool()} eine {@code Attribute-Label-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashLabel(int, int)
 	 * @see DecodeDocument#attributeLabelHash()
@@ -2511,14 +2409,12 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode kodiert das im {@code Source}-{@link File} gegebene XML-Dokument in eine optimierte binäre
-	 * Darstellung und speichert diese im {@code Target}-{@link File}.
+	 * Diese Methode kodiert das im {@code Source}-{@link File} gegebene XML-Dokument in eine optimierte binäre Darstellung und speichert diese im {@code Target}-{@link File}.
 	 * 
 	 * @see #encode(XMLReader, InputSource, EncodeTarget)
 	 * @param source {@code Source}-{@link File}.
 	 * @param target {@code Target}-{@link File}.
-	 * @throws IOException Wenn die verwendete {@link InputSource} bzw. das verwendete {@link EncodeTarget} eine
-	 *         {@link IOException} auslöst.
+	 * @throws IOException Wenn die verwendete {@link InputSource} bzw. das verwendete {@link EncodeTarget} eine {@link IOException} auslöst.
 	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
@@ -2529,8 +2425,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues
-	 * {@link EncodeDocument} ein und gibt dieses zurück.
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und gibt dieses zurück.
 	 * 
 	 * @see #encode(XMLReader, InputSource, EncodeDocument)
 	 * @param reader {@link XMLReader}.
@@ -2607,8 +2502,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues
-	 * {@link EncodeDocument} ein und speichert dessen in das gegebene {@link EncodeTarget}.
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und speichert dessen in das gegebene {@link EncodeTarget}.
 	 * 
 	 * @see #encode(XMLReader, InputSource)
 	 * @see #encode(EncodeDocument, EncodeTarget)
@@ -2627,8 +2521,7 @@ public class Encoder {
 	}
 
 	/**
-	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in das gegebene
-	 * {@link EncodeDocument} ein.
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in das gegebene {@link EncodeDocument} ein.
 	 * 
 	 * @see XMLReader#setContentHandler(ContentHandler)
 	 * @see XMLReader#parse(InputSource)
