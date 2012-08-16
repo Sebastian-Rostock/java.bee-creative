@@ -2218,24 +2218,24 @@ public class Decoder {
 	public static class DecodeAdapter {
 
 		/**
-		 * Diese Klasse implementiert das {@link Comparable} zur binären Suche eine {@link DecodeAttribute} mit einem bestimmten {@code Label}-Index.
+		 * Diese Klasse implementiert das {@link Comparable} für {@link DecodeAdapter#__attributeNode(int[], int)}.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		static final class AttributeNodeLabelComparable implements Comparable<DecodeAttribute> {
+		static class AttributeLabelComparable implements Comparable<DecodeAttribute> {
 
 			/**
-			 * Dieses Feld speichert den {@code Label}-Index.
+			 * Dieses Feld speichert den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}- {@link DecodeValue}s.
 			 */
-			final int label;
+			final int labelIndex;
 
 			/**
-			 * Dieser Konstrukteur initialisiert den {@code Label}-Index.
+			 * Dieser Konstrukteur initialisiert den Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}- {@link DecodeValue}s.
 			 * 
-			 * @param label {@code Label}-Index.
+			 * @param labelIndex Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}- {@link DecodeValue}s.
 			 */
-			public AttributeNodeLabelComparable(final int label) {
-				this.label = label;
+			public AttributeLabelComparable(final int labelIndex) {
+				this.labelIndex = labelIndex;
 			}
 
 			/**
@@ -2243,18 +2243,23 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeAttribute value) {
-				return Comparators.compare(this.label, value.label);
+				return Comparators.compare(this.labelIndex, value.label);
 			}
 
 		}
 
-		static class AttributeNodeNameComparable implements Comparable<DecodeAttribute> {
+		/**
+		 * Diese Klasse implementiert ein {@link Comparable} für {@link DecodeAdapter#__attributeNode(int[], String, String)}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static class AttributeNameComparable implements Comparable<DecodeAttribute> {
 
 			final DecodeValuePool namePool;
 
 			final String nameString;
 
-			public AttributeNodeNameComparable(final DecodeAdapter adapter, final String nameString) {
+			public AttributeNameComparable(final DecodeAdapter adapter, final String nameString) {
 				this.namePool = adapter.documentNode.attributeNamePool;
 				this.nameString = nameString;
 			}
@@ -2269,7 +2274,12 @@ public class Decoder {
 
 		}
 
-		static class AttributeNodeUriNameComparable extends AttributeNodeNameComparable {
+		/**
+		 * Diese Klasse implementiert ein {@link Comparable} für {@link DecodeAdapter#__attributeNode(int[], String, String)}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static class AttributeUriNameComparable extends AttributeNameComparable {
 
 			final DecodeValuePool uriPool;
 
@@ -2277,7 +2287,7 @@ public class Decoder {
 
 			final DecodeLabelPool labelPool;
 
-			public AttributeNodeUriNameComparable(final DecodeAdapter adapter, final String uriString, final String nameString) {
+			public AttributeUriNameComparable(final DecodeAdapter adapter, final String uriString, final String nameString) {
 				super(adapter, nameString);
 				this.uriPool = adapter.documentNode.uriPool;
 				this.labelPool = adapter.documentNode.attributeLabelPool;
@@ -2410,7 +2420,7 @@ public class Decoder {
 		 * @return Indices der {@link DecodeElement#children()}.
 		 * @throws NullPointerException Wenn das gegebene {@link DecodeElement} {@code null} ist.
 		 */
-		private final int[] __children(final DecodeElement elementNode) throws NullPointerException {
+		final int[] __children(final DecodeElement elementNode) throws NullPointerException {
 			return this.__elementChildren(elementNode.children).indices;
 		}
 
@@ -2741,7 +2751,7 @@ public class Decoder {
 		 */
 		public final DecodeAttribute __attributeNode(final int[] indices, final int attributeLabelIndex) throws NullPointerException {
 			if(indices.length == 0) return null;
-			return this.documentNode.attributeNodePool.find(indices, new AttributeNodeLabelComparable(attributeLabelIndex));
+			return this.documentNode.attributeNodePool.find(indices, new AttributeLabelComparable(attributeLabelIndex));
 		}
 
 		/**
@@ -2756,8 +2766,8 @@ public class Decoder {
 		public final DecodeAttribute __attributeNode(final int[] indices, final String attributeUriString, final String attributeNameString)
 			throws NullPointerException {
 			if(indices.length == 0) return null;
-			if(!this.xmlnsEnabled) return this.documentNode.attributeNodePool.find(indices, new AttributeNodeNameComparable(this, attributeNameString));
-			return this.documentNode.attributeNodePool.find(indices, new AttributeNodeUriNameComparable(this, attributeUriString, attributeNameString));
+			if(!this.xmlnsEnabled) return this.documentNode.attributeNodePool.find(indices, new AttributeNameComparable(this, attributeNameString));
+			return this.documentNode.attributeNodePool.find(indices, new AttributeUriNameComparable(this, attributeUriString, attributeNameString));
 		}
 
 		/**
@@ -3150,20 +3160,20 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getElementsByTagNameNS(String, String)} bzw. {@link Document#getElementsByTagNameNS(String, String)}.
 		 * 
-		 * @see DecodeCollector
-		 * @see DecodeCollector#MODE_CHILDREN
-		 * @see DecodeCollector#MODE_DESCENDANT
-		 * @see DecodeCollector#MODE_DESCENDANT_SELF
+		 * @see DecodeElementCollector
+		 * @see DecodeElementCollector#MODE_CHILDREN
+		 * @see DecodeElementCollector#MODE_DESCENDANT
+		 * @see DecodeElementCollector#MODE_DESCENDANT_SELF
 		 * @param parentNode {@code Parent}-{@link DecodeElementAdapter}.
 		 * @param elementLabelIndex Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
 		 * @param mode Modus der Suche.
 		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw. {@link Document#getElementsByTagNameNS(String, String)}.
 		 * @throws NullPointerException Wenn der gegebene {@link DecodeElementAdapter} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der gegebene Modul ungültig ist.
+		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public final ElementList __getElementByLabel(final DecodeElementAdapter parentNode, final int elementLabelIndex, final int mode)
+		public final ElementList __getElementsByLabel(final DecodeElementAdapter parentNode, final int elementLabelIndex, final int mode)
 			throws NullPointerException, IllegalArgumentException {
-			final DecodeCollector collector = new DecodeLabelCollector(this, elementLabelIndex);
+			final DecodeElementCollector collector = new DecodeElementLabelCollector(this, elementLabelIndex);
 			collector.collect(parentNode, mode);
 			return collector;
 		}
@@ -3171,48 +3181,50 @@ public class Decoder {
 		/**
 		 * Diese Methode implementiert {@link Element#getElementsByTagNameNS(String, String)} bzw. {@link Document#getElementsByTagNameNS(String, String)}.
 		 * 
-		 * @see DecodeCollector
-		 * @see DecodeCollector#MODE_CHILDREN
-		 * @see DecodeCollector#MODE_DESCENDANT
-		 * @see DecodeCollector#MODE_DESCENDANT_SELF
+		 * @see DecodeElementCollector
+		 * @see DecodeElementCollector#MODE_CHILDREN
+		 * @see DecodeElementCollector#MODE_DESCENDANT
+		 * @see DecodeElementCollector#MODE_DESCENDANT_SELF
 		 * @param parentNode {@code Parent}-{@link DecodeElementAdapter}.
 		 * @param elementUriString {@code URI}-{@link String}.
 		 * @param elementNameString {@code Name}-{@link String}.
 		 * @param mode Modus der Suche.
 		 * @return {@link Element#getElementsByTagNameNS(String, String)} bzw. {@link Document#getElementsByTagNameNS(String, String)}.
+		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public final ElementList getElementByUriName(final DecodeElementAdapter parentNode, final String elementUriString, final String elementNameString,
-			final int mode) {
-			final DecodeCollector collector;
+		public final ElementList __getElementsByUriName(final DecodeElementAdapter parentNode, final String elementUriString, final String elementNameString,
+			final int mode) throws NullPointerException, IllegalArgumentException {
+			final DecodeElementCollector collector;
 			if(this.xmlnsEnabled){
 				if("*".equals(elementUriString)){
 					if("*".equals(elementNameString)){
-						collector = new DecodeCollector(this);
+						collector = new DecodeElementCollector(this);
 					}else{
 						final DecodeValue elementName = this.__elementName(elementNameString);
 						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-						collector = new DecodeNameCollector(this, elementName.index);
+						collector = new ElementDecodeNameCollector(this, elementName.index);
 					}
 				}else{
 					final DecodeValue elementUri = this.__uri(elementUriString);
 					if(elementUri == null) return DecodeAdapter.VOID_NODE_LIST;
 					if("*".equals(elementNameString)){
-						collector = new DecodeUriCollector(this, elementUri.index);
+						collector = new DecodeElementUriCollector(this, elementUri.index);
 					}else{
 						final DecodeValue elementName = this.__elementName(elementNameString);
 						if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
 						final DecodeLabel elementlLabel = this.__elementLabel(elementUri.index, elementName.index);
 						if(elementlLabel == null) return DecodeAdapter.VOID_NODE_LIST;
-						collector = new DecodeLabelCollector(this, elementlLabel.index);
+						collector = new DecodeElementLabelCollector(this, elementlLabel.index);
 					}
 				}
 			}else{
 				if("*".equals(elementNameString)){
-					collector = new DecodeCollector(this);
+					collector = new DecodeElementCollector(this);
 				}else{
 					final DecodeValue elementName = this.__elementName(elementNameString);
 					if(elementName == null) return DecodeAdapter.VOID_NODE_LIST;
-					collector = new DecodeLabelCollector(this, elementName.index);
+					collector = new DecodeElementLabelCollector(this, elementName.index);
 				}
 			}
 			collector.collect(parentNode, mode);
@@ -3305,7 +3317,7 @@ public class Decoder {
 		 * @throws NullPointerException Wenn das gegebene {@link DecodeAttribute} {@code null} ist.
 		 */
 		public final String __getAttributeLocalName(final DecodeAttribute attributeNode) throws NullPointerException {
-			if(!this.xmlnsEnabled) return this.getAttributeNodeName_(attributeNode);
+			if(!this.xmlnsEnabled) return this.__getAttributeNodeName_(attributeNode);
 			return this.__attributeName(this.__attributeLabel(attributeNode.label).name).string;
 		}
 
@@ -3317,7 +3329,8 @@ public class Decoder {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final String __getAttributeNamespaceURI(final int attributeNodeIndex) throws IndexOutOfBoundsException {
-			return this.__getAttributeNamespaceURI(this.__attributeNode(attributeNodeIndex));
+			if(!this.xmlnsEnabled) return null;
+			return this.__getAttributeNamespaceURI_(this.__attributeNode(attributeNodeIndex));
 		}
 
 		/**
@@ -3329,9 +3342,101 @@ public class Decoder {
 		 */
 		public final String __getAttributeNamespaceURI(final DecodeAttribute attributeNode) throws NullPointerException {
 			if(!this.xmlnsEnabled) return null;
+			return this.__getAttributeNamespaceURI_(attributeNode);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNamespaceURI()}.
+		 * 
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link DecodeAttributeAdapter#getNamespaceURI()}.
+		 * @throws NullPointerException Wenn das gegebene {@link DecodeAttribute} {@code null} ist.
+		 */
+		private final String __getAttributeNamespaceURI_(final DecodeAttribute attributeNode) throws NullPointerException {
 			final String uriString = this.__uri(this.__attributeLabel(attributeNode.label).uri).string;
 			if(uriString.isEmpty()) return null;
 			return uriString;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param parentIndex Index des {@code Parent}-{@link DecodeElement}s.
+		 * @param attributeNodeIndex Index des {@link DecodeAttribute}s.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws IndexOutOfBoundsException Wenn einer der gegebenen Indices ungültig ist.
+		 */
+		public final String __getAttributeNodeName(final int parentIndex, final int attributeNodeIndex) throws IndexOutOfBoundsException {
+			return this.__getAttributeNodeName(parentIndex, this.__attributeNode(attributeNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param parentIndex Index des {@code Parent}-{@link DecodeElement}s.
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws NullPointerException Wenn das gegebene {@link DecodeAttribute} {@code null} ist.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final String __getAttributeNodeName(final int parentIndex, final DecodeAttribute attributeNode) throws NullPointerException,
+			IndexOutOfBoundsException {
+			if(!this.xmlnsEnabled) return this.__getAttributeNodeName_(attributeNode);
+			return this.__getAttributeNodeName_(this.__elementNode(parentIndex), attributeNode);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param parentNode {@code Parent}-{@link DecodeElement}.
+		 * @param attributeNodeIndex Index des {@link DecodeAttribute}s.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws NullPointerException Wenn das gegebene {@link DecodeElement} {@code null} ist.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final String __getAttributeNodeName(final DecodeElement parentNode, final int attributeNodeIndex) throws NullPointerException,
+			IndexOutOfBoundsException {
+			return this.__getAttributeNodeName(parentNode, this.__attributeNode(attributeNodeIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param parentNode {@code Parent}-{@link DecodeElement}.
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public final String __getAttributeNodeName(final DecodeElement parentNode, final DecodeAttribute attributeNode) throws NullPointerException {
+			if(!this.xmlnsEnabled) return this.__getAttributeNodeName_(attributeNode);
+			return this.__getAttributeNodeName_(parentNode, attributeNode);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws NullPointerException Wenn das gegebene {@link DecodeAttribute} {@code null} ist.
+		 */
+		private final String __getAttributeNodeName_(final DecodeAttribute attributeNode) throws NullPointerException {
+			return this.__attributeName(attributeNode.label).string;
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeAttributeAdapter#getNodeName()}.
+		 * 
+		 * @param parentNode {@code Parent}-{@link DecodeElement}.
+		 * @param attributeNode {@link DecodeAttribute}.
+		 * @return {@link DecodeAttributeAdapter#getNodeName()}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		private final String __getAttributeNodeName_(final DecodeElement parentNode, final DecodeAttribute attributeNode) throws NullPointerException {
+			final DecodeLabel attributeLabel = this.__attributeLabel(attributeNode.label);
+			final String xmlnsName = this.lookupPrefix_(this.__xmlns(parentNode), attributeLabel.uri);
+			final String attributeName = this.__attributeName(attributeLabel.name).string;
+			if(xmlnsName == null) return attributeName;
+			return xmlnsName + ":" + attributeName;
 		}
 
 		/**
@@ -3357,16 +3462,42 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link DecodeElementAdapter#getAttributeNS(String, String)}.
+		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#__attributeNode(int[], int) attributeNode}{@code (...)} nach einem {@link DecodeAttribute} mit den gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dessen Wert oder {@code ""} zurück.
 		 * 
+		 * @see DecodeAdapter#__getAttributeValueByLabel(int[], int)
 		 * @param parentIndex Index des {@code Parent}-{@link DecodeElement}s.
-		 * @param attributeUriString {@code URI}.
-		 * @param attributeNameString {@code Name}.
-		 * @return {@link DecodeElementAdapter#getAttributeNS(String, String)}.
+		 * @param attributeLabelIndex Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 * @return Wert oder {@code ""}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index des {@code Parent}-{@link DecodeElement}s ungültig ist.
+		 */
+		public final String __getAttributeValueByLabel(final int parentIndex, final int attributeLabelIndex) throws IndexOutOfBoundsException {
+			return this.__getAttributeValueByLabel(this.__attributes(parentIndex), attributeLabelIndex);
+		}
+
+		/**
+		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#__attributeNode(int[], int) attributeNode}{@code (indices, attributeLabelIndex)} nach einem {@link DecodeAttribute} mit den gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dessen Wert oder {@code ""} zurück.
+		 * 
+		 * @param indices Index-Array der {@link DecodeElement#attributes()}.
+		 * @param attributeLabelIndex Index des {@code URI/Name}-{@link DecodeLabel}s bzw. des {@code Name}-{@link DecodeValue}s.
+		 * @return Wert oder {@code ""}.
+		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 */
+		public final String __getAttributeValueByLabel(final int[] indices, final int attributeLabelIndex) throws NullPointerException {
+			return this.__getAttributeValueBy_(this.__attributeNode(indices, attributeLabelIndex));
+		}
+
+		/**
+		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#__attributeNode(int[], String, String) attributeNode}{@code (...)} nach einem {@link DecodeAttribute} mit den gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dessen Wert oder {@code ""} zurück.
+		 * 
+		 * @see DecodeAdapter#__getAttributeValueByUriName(int[], String, String)
+		 * @param parentIndex Index des {@code Parent}-{@link DecodeElement}s.
+		 * @param attributeUriString {@code URI}-{@link String}.
+		 * @param attributeNameString {@code Name}-{@link String}.
+		 * @return Wert oder {@code ""}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link String}s {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
-		public final String getAttributeValue(final int parentIndex, final String attributeUriString, final String attributeNameString)
+		public final String __getAttributeValueByUriName(final int parentIndex, final String attributeUriString, final String attributeNameString)
 			throws NullPointerException, IndexOutOfBoundsException {
 			return this.__getAttributeValueByUriName(this.__attributes(parentIndex), attributeUriString, attributeNameString);
 		}
@@ -3375,12 +3506,13 @@ public class Decoder {
 		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#__attributeNode(int[], String, String) attributeNode}{@code (indices, attributeUriString, attributeNameString)} nach einem {@link DecodeAttribute} mit den gegebenen {@code URI}- und {@code Name}-{@link String}s und gibt dessen Wert oder {@code ""} zurück.
 		 * 
 		 * @param indices Index-Array der {@link DecodeElement#attributes()}.
-		 * @param attributeUriString {@code URI}.
-		 * @param attributeNameString {@code Name}.
+		 * @param attributeUriString {@code URI}-{@link String}.
+		 * @param attributeNameString {@code Name}-{@link String}.
 		 * @return Wert oder {@code ""}.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public final String __getAttributeValueByUriName(final int[] indices, final String attributeUriString, final String attributeNameString) {
+		public final String __getAttributeValueByUriName(final int[] indices, final String attributeUriString, final String attributeNameString)
+			throws NullPointerException {
 			return this.__getAttributeValueBy_(this.__attributeNode(indices, attributeUriString, attributeNameString));
 		}
 
@@ -3399,11 +3531,11 @@ public class Decoder {
 		 * Diese Methode implementiert {@link DecodeElementAttributesAdapter#item(int)}.
 		 * 
 		 * @param parentNode {@code Parent}-{@link DecodeElementAdapter}.
-		 * @param attributeNodeIndex Index des {@link DecodeValue}s bzw. des {@link DecodeElement}s {@code +} {@link DecodeAdapter#__childOffset() childOffset}{@code ()}.
-		 * @param childIndex Index des {@link DecodeChildAdapter}s im {@link DecodeElementChildrenAdapter}.
-		 * @return {@link DecodeTextAdapter} bzw. {@link DecodeElementAdapter}.
+		 * @param attributeNodeIndex Index des {@link DecodeAttribute}s.
+		 * @return {@link DecodeElementAttributesAdapter#item(int)}.
+		 * @throws NullPointerException Wenn der gegebene {@code Parent}-{@link DecodeElementAdapter} {@code null} ist.
 		 */
-		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentNode, final int attributeNodeIndex) {
+		public final DecodeAttributeAdapter __getAttributeNode(final DecodeElementAdapter parentNode, final int attributeNodeIndex) throws NullPointerException {
 			return new DecodeAttributeAdapter(parentNode, attributeNodeIndex);
 		}
 
@@ -3414,12 +3546,12 @@ public class Decoder {
 		 * @param indices Index-Array der {@link DecodeElement#children()}.
 		 * @param attributeIndex Index des {@link DecodeAttributeAdapter}s im Index-Array.
 		 * @return {@link DecodeAttributeAdapter} oder {@code null}.
-		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@code Parent}-{@link DecodeElementAdapter} bzw. das gegebene Index-Array {@code null} ist.
 		 */
-		public final DecodeAttributeAdapter getAttributeNode(final DecodeElementAdapter parentNode, final int[] indices, final int attributeIndex)
+		public final DecodeAttributeAdapter __getAttributeNode(final DecodeElementAdapter parentNode, final int[] indices, final int attributeIndex)
 			throws NullPointerException {
 			if((attributeIndex < 0) || (attributeIndex >= indices.length)) return null;
-			return this.getAttributeNode(parentNode, indices[attributeIndex]);
+			return this.__getAttributeNode(parentNode, indices[attributeIndex]);
 		}
 
 		public final DecodeAttributeAdapter getAttributeNodeByUriName(final DecodeElementAdapter parentAdapter, final String attributeUri,
@@ -3433,36 +3565,6 @@ public class Decoder {
 			final DecodeAttribute attributeNode = this.__attributeNode(attributeNodeIndices, attributeUri, attributeName);
 			if(attributeNode == null) return null;
 			return new DecodeAttributeAdapter(parentAdapter, attributeNode.index);
-		}
-
-		public final String getAttributeNodeName(final int parentIndex, final int attributeNodeIndex) {
-			return this.getAttributeNodeName(parentIndex, this.__attributeNode(attributeNodeIndex));
-		}
-
-		public final String getAttributeNodeName(final int parentIndex, final DecodeAttribute attributeNode) {
-			if(!this.xmlnsEnabled) return this.getAttributeNodeName_(attributeNode);
-			return this.getAttributeNodeName_(this.__elementNode(parentIndex), attributeNode);
-		}
-
-		public final String getAttributeNodeName(final DecodeElement parentNode, final int attributeNodeIndex) {
-			return this.getAttributeNodeName(parentNode, this.__attributeNode(attributeNodeIndex));
-		}
-
-		public final String getAttributeNodeName(final DecodeElement parentNode, final DecodeAttribute attributeNode) {
-			if(!this.xmlnsEnabled) return this.getAttributeNodeName_(attributeNode);
-			return this.getAttributeNodeName_(parentNode, attributeNode);
-		}
-
-		private final String getAttributeNodeName_(final DecodeAttribute attributeNode) {
-			return this.__attributeName(attributeNode.label).string;
-		}
-
-		private final String getAttributeNodeName_(final DecodeElement parentNode, final DecodeAttribute attributeNode) {
-			final DecodeLabel attributeLabel = this.__attributeLabel(attributeNode.label);
-			final String xmlnsName = this.lookupPrefix_(this.__xmlns(parentNode), attributeLabel.uri);
-			final String attributeName = this.__attributeName(attributeLabel.name).string;
-			if(xmlnsName == null) return attributeName;
-			return xmlnsName + ":" + attributeName;
 		}
 
 		/**
@@ -4218,8 +4320,10 @@ public class Decoder {
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
 		 * @param index Index des {@link DecodeItem}s.
 		 * @param child {@code Child-Index}.
+		 * @throws NullPointerException Wenn der gegebene {@code Parent}-{@link DecodeNodeAdapter} {@code null} ist.
 		 */
-		public DecodeChildAdapter(final DecodeNodeAdapter parent, final int index, final int child) {
+		public DecodeChildAdapter(final DecodeNodeAdapter parent, final int index, final int child) throws NullPointerException {
+			if(parent == null) throw new NullPointerException();
 			this.parent = parent;
 			this.index = index;
 			this.child = child;
@@ -4539,7 +4643,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getAttributeNS(final String uri, final String name) throws DOMException {
-			return this.adapter().getAttributeValue(this.index, uri, name);
+			return this.adapter().__getAttributeValueByUriName(this.index, uri, name);
 		}
 
 		/**
@@ -4691,7 +4795,7 @@ public class Decoder {
 		 */
 		@Override
 		public ElementList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
-			return this.adapter().getElementByUriName(this, uri, name, DecodeCollector.MODE_DESCENDANT);
+			return this.adapter().__getElementsByUriName(this, uri, name, DecodeElementCollector.MODE_DESCENDANT);
 		}
 
 		/**
@@ -4766,8 +4870,10 @@ public class Decoder {
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
 		 * @param indices Indices der {@link DecodeValue}s und {@link DecodeElement}s.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public DecodeElementChildrenAdapter(final DecodeElementAdapter parent, final int[] indices) {
+		public DecodeElementChildrenAdapter(final DecodeElementAdapter parent, final int[] indices) throws NullPointerException {
+			if((parent == null) || (indices == null)) throw new NullPointerException();
 			this.parent = parent;
 			this.indices = indices;
 		}
@@ -4896,8 +5002,10 @@ public class Decoder {
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
 		 * @param indices Indices der {@link DecodeAttribute}s.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public DecodeElementAttributesAdapter(final DecodeElementAdapter parent, final int[] indices) {
+		public DecodeElementAttributesAdapter(final DecodeElementAdapter parent, final int[] indices) throws NullPointerException {
+			if((parent == null) || (indices == null)) throw new NullPointerException();
 			this.parent = parent;
 			this.indices = indices;
 		}
@@ -4925,7 +5033,7 @@ public class Decoder {
 		 */
 		@Override
 		public DecodeAttributeAdapter item(final int index) {
-			return this.parent.adapter().getAttributeNode(this.parent, this.indices, index);
+			return this.parent.adapter().__getAttributeNode(this.parent, this.indices, index);
 		}
 
 		/**
@@ -5043,8 +5151,10 @@ public class Decoder {
 		 * 
 		 * @param parent {@code Parent}-{@link DecodeElementAdapter}.
 		 * @param index {@link DecodeAttribute}-{@code Index}.
+		 * @throws NullPointerException Wenn der gegebene {@code Parent}-{@link DecodeElementAdapter} {@code null} ist.
 		 */
-		public DecodeAttributeAdapter(final DecodeElementAdapter parent, final int index) {
+		public DecodeAttributeAdapter(final DecodeElementAdapter parent, final int index) throws NullPointerException {
+			if(parent == null) throw new NullPointerException();
 			this.parent = parent;
 			this.index = index;
 		}
@@ -5104,7 +5214,7 @@ public class Decoder {
 		 */
 		@Override
 		public String getNodeName() {
-			return this.adapter().getAttributeNodeName(this.parent.index, this.index);
+			return this.adapter().__getAttributeNodeName(this.parent.index, this.index);
 		}
 
 		/**
@@ -5364,8 +5474,9 @@ public class Decoder {
 		 * Dieser Konstrukteur initialisiert den {@link DecodeAdapter}.
 		 * 
 		 * @param adapter {@link DecodeAdapter}.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeAdapter} {@code null} ist.
 		 */
-		public DecodeDocumentAdapter(final DecodeAdapter adapter) {
+		public DecodeDocumentAdapter(final DecodeAdapter adapter) throws NullPointerException {
 			this.adapter = adapter;
 			this.documentElement = new DecodeElementAdapter(this, adapter.documentNode.documentElement, 0);
 		}
@@ -5544,7 +5655,7 @@ public class Decoder {
 		 */
 		@Override
 		public ElementList getElementsByTagNameNS(final String uri, final String name) {
-			return this.adapter().getElementByUriName(this.documentElement, uri, name, DecodeCollector.MODE_DESCENDANT_SELF);
+			return this.adapter().__getElementsByUriName(this.documentElement, uri, name, DecodeElementCollector.MODE_DESCENDANT_SELF);
 		}
 
 		/**
@@ -5814,7 +5925,7 @@ public class Decoder {
 	 * @see Document#getElementsByTagNameNS(String, String)
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeCollector implements Filter<DecodeElement>, ElementList {
+	public static class DecodeElementCollector implements Filter<DecodeElement>, ElementList {
 
 		/**
 		 * Dieses Feld speichert den Modus für die Suche auf den {@link DecodeElement#children()} eines gegebenen {@link DecodeElementAdapter}s.
@@ -5832,48 +5943,47 @@ public class Decoder {
 		public static final int MODE_DESCENDANT_SELF = 2;
 
 		/**
-		 * Dieses Feld speichert den {@link DecodeDocument}.
+		 * Dieses Feld speichert den {@link DecodeAdapter}.
 		 */
-		public final DecodeDocument cache;
+		protected final DecodeAdapter adapter;
 
 		/**
-		 * Dieses Feld speichert die Verschiebung des Indexes der {@link DecodeElement}s in den Indices der {@link DecodeGroup}. Der Wert entspricht der Anzahl der {@link DecodeValue}s.
+		 * Dieses Feld speichert {@link DecodeAdapter#__childOffset()}.
 		 */
-		public final int offset;
+		protected final int childOffset;
 
 		/**
 		 * Dieses Feld speichert die Ergebnisse der Suche.
 		 */
-		public final List<DecodeElementAdapter> results;
+		protected final List<DecodeElementAdapter> elements;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link DecodeCollector} mit den Daten des {@link DecodeAdapter}s.
+		 * Dieser Konstrukteur initialisiert den {@link DecodeElementCollector} mit den Daten des {@link DecodeAdapter}s.
 		 * 
 		 * @param adapter {@link DecodeAdapter}.
 		 */
-		public DecodeCollector(final DecodeAdapter adapter) {
-			this.cache = adapter.documentNode;
-			this.offset = adapter.childOffset;
-			this.results = new ArrayList<DecodeElementAdapter>();
+		public DecodeElementCollector(final DecodeAdapter adapter) {
+			this.adapter = adapter;
+			this.childOffset = adapter.childOffset;
+			this.elements = new ArrayList<DecodeElementAdapter>();
 		}
 
 		/**
-		 * Diese Methode Sucht in den {@link DecodeGroup} des gegebenen {@link DecodeElement}s nach {@link DecodeElement}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die {@link DecodeElementAdapter} der Treffer in die {@link List} {@link #results}.
+		 * Diese Methode Sucht in den {@link DecodeGroup} des gegebenen {@link DecodeElement}s nach {@link DecodeElement}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die {@link DecodeElementAdapter} der Treffer in die {@link List} {@link #elements}.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
 		 */
 		protected final void collectChildren(final DecodeElementAdapter parent) {
-			final DecodeElement elementNode = this.cache.elementNodePool.get(parent.index);
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(elementNode.children);
-			final int[] indices = elementChildren.indices;
+			final DecodeElement elementNode = this.adapter.__elementNode(parent.index);
+			final int[] indices = this.adapter.__children(elementNode);
 			final int count = indices.length;
 			if(count == 0) return;
-			for(int child = 0, offset = this.offset; child < count; child++){
+			for(int child = 0, offset = this.childOffset; child < count; child++){
 				final int index = indices[child] - offset;
 				if(index >= 0){
-					final DecodeElement childNode = this.cache.elementNodePool.get(index);
+					final DecodeElement childNode = this.adapter.__elementNode(index);
 					if(this.accept(childNode)){
-						this.results.add(new DecodeElementAdapter(parent, index, child));
+						this.elements.add(new DecodeElementAdapter(parent, index, child));
 					}
 				}
 			}
@@ -5886,11 +5996,10 @@ public class Decoder {
 		 * @param element {@link DecodeElement}.
 		 */
 		protected final void collectDescendant(final DecodeElementAdapter parent, final DecodeElement element) {
-			final DecodeGroup elementChildren = this.cache.elementChildrenPool.get(element.children);
-			final int[] indices = elementChildren.indices;
+			final int[] indices = this.adapter.__children(element);
 			final int count = indices.length;
 			if(count == 0) return;
-			for(int child = 0, offset = this.offset; child < count; child++){
+			for(int child = 0, offset = this.childOffset; child < count; child++){
 				final int index = indices[child] - offset;
 				if(index >= 0){
 					this.collectDescendantSelf(new DecodeElementAdapter(parent, index, child));
@@ -5899,14 +6008,14 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode fügt den gegebenen {@link DecodeElementAdapter}s nur dann in die Ergebnis {@link List} {@link #results} ein, wenn dieser via {@link #accept(DecodeElement)} akzeptiert wird. Anschließend wird {@link #collectDescendant(DecodeElementAdapter, DecodeElement)} aufgerufen.
+		 * Diese Methode fügt den gegebenen {@link DecodeElementAdapter}s nur dann in die Ergebnis {@link List} {@link #elements} ein, wenn dieser via {@link #accept(DecodeElement)} akzeptiert wird. Anschließend wird {@link #collectDescendant(DecodeElementAdapter, DecodeElement)} aufgerufen.
 		 * 
 		 * @param parent {@link DecodeElementAdapter}.
 		 */
 		protected final void collectDescendantSelf(final DecodeElementAdapter parent) {
-			final DecodeElement element = this.cache.elementNodePool.get(parent.index);
+			final DecodeElement element = this.adapter.__elementNode(parent.index);
 			if(this.accept(element)){
-				this.results.add(parent);
+				this.elements.add(parent);
 			}
 			this.collectDescendant(parent, element);
 		}
@@ -5915,7 +6024,7 @@ public class Decoder {
 		 * Diese Methode leert die Ergebnisse.
 		 */
 		public void clear() {
-			this.results.clear();
+			this.elements.clear();
 		}
 
 		/**
@@ -5927,14 +6036,14 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach {@link Element}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die Treffer in die {@link List} {@link #results}. Der Modus entscheiden hierbei, ob die Suche rekursiv ist und ob sie den gegebenen {@link DecodeElementAdapter} mit einbezieht.
+		 * Diese Methode Sucht in den {@link Element#getChildNodes()} des gegebenen {@link DecodeElementAdapter}s nach {@link Element}s, die von der Methode {@link #accept(DecodeElement)} akzeptiert werden und speichert die Treffer in die {@link List} {@link #elements}. Der Modus entscheiden hierbei, ob die Suche rekursiv ist und ob sie den gegebenen {@link DecodeElementAdapter} mit einbezieht.
 		 * 
 		 * @see #MODE_CHILDREN
 		 * @see #MODE_DESCENDANT
 		 * @see #MODE_DESCENDANT_SELF
 		 * @param parent {@link DecodeElementAdapter}.
 		 * @param mode Modus der Suche.
-		 * @throws IllegalArgumentException Wenn der gegebene Modul ungültig ist.
+		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
 		public void collect(final DecodeElementAdapter parent, final int mode) throws IllegalArgumentException {
 			switch(mode){
@@ -5942,7 +6051,7 @@ public class Decoder {
 					this.collectChildren(parent);
 					break;
 				case MODE_DESCENDANT:
-					this.collectDescendant(parent, this.cache.elementNodePool.get(parent.index));
+					this.collectDescendant(parent, this.adapter.__elementNode(parent.index));
 					break;
 				case MODE_DESCENDANT_SELF:
 					this.collectDescendantSelf(parent);
@@ -5957,8 +6066,8 @@ public class Decoder {
 		 */
 		@Override
 		public DecodeElementAdapter item(final int index) {
-			if((index < 0) || (index >= this.results.size())) return null;
-			return this.results.get(index);
+			if((index < 0) || (index >= this.elements.size())) return null;
+			return this.elements.get(index);
 		}
 
 		/**
@@ -5966,7 +6075,16 @@ public class Decoder {
 		 */
 		@Override
 		public int getLength() {
-			return this.results.size();
+			return this.elements.size();
+		}
+
+		/**
+		 * Diese Methode gibt die Ergebnisse der Suche als {@link List} zurück.
+		 * 
+		 * @return Ergebnisse der Suche als {@link List}.
+		 */
+		public List<DecodeElementAdapter> getElements() {
+			return this.elements;
 		}
 
 		/**
@@ -5974,18 +6092,18 @@ public class Decoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, this.getClass().getSimpleName(), this.results);
+			return Objects.toStringCall(true, this.getClass().getSimpleName(), this.elements);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link DecodeCollector}, der die {@link Element}s an Hand ihrer {@code URI} filtert.
+	 * Diese Klasse implementiert einen {@link DecodeElementCollector}, der die {@link Element}s an Hand ihrer {@code URI} filtert.
 	 * 
 	 * @see Element#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeUriCollector extends DecodeCollector {
+	public static class DecodeElementUriCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index der {@code URI}-{@link DecodeValue}.
@@ -6001,7 +6119,7 @@ public class Decoder {
 		 * @param adapter {@link DecodeAdapter}.
 		 * @param uri Index der {@code URI}-{@link DecodeValue}.
 		 */
-		public DecodeUriCollector(final DecodeAdapter adapter, final int uri) {
+		public DecodeElementUriCollector(final DecodeAdapter adapter, final int uri) {
 			super(adapter);
 			this.uri = uri;
 		}
@@ -6011,19 +6129,19 @@ public class Decoder {
 		 */
 		@Override
 		public boolean accept(final DecodeElement element) {
-			final DecodeLabel elementLabel = this.cache.elementLabelPool.get(element.label);
+			final DecodeLabel elementLabel = this.adapter.__elementLabel(element.label);
 			return elementLabel.uri == this.uri;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link DecodeCollector}, der die {@link Element}s an Hand ihres {@code Name} filtert.
+	 * Diese Klasse implementiert einen {@link DecodeElementCollector}, der die {@link Element}s an Hand ihres {@code Name} filtert.
 	 * 
 	 * @see Element#getLocalName()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeNameCollector extends DecodeCollector {
+	public static class ElementDecodeNameCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index der {@code Name}-{@link DecodeValue}.
@@ -6039,7 +6157,7 @@ public class Decoder {
 		 * @param adapter {@link DecodeAdapter}.
 		 * @param name Index der {@code Name}-{@link DecodeValue}.
 		 */
-		public DecodeNameCollector(final DecodeAdapter adapter, final int name) {
+		public ElementDecodeNameCollector(final DecodeAdapter adapter, final int name) {
 			super(adapter);
 			this.name = name;
 		}
@@ -6049,20 +6167,20 @@ public class Decoder {
 		 */
 		@Override
 		public boolean accept(final DecodeElement element) {
-			final DecodeLabel elementLabel = this.cache.elementLabelPool.get(element.label);
+			final DecodeLabel elementLabel = this.adapter.__elementLabel(element.label);
 			return elementLabel.name == this.name;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link DecodeCollector}, der die {@link Element}s an Hand ihrer {@code URI} und ihres {@code Name} filtert.
+	 * Diese Klasse implementiert einen {@link DecodeElementCollector}, der die {@link Element}s an Hand ihrer {@code URI} und ihres {@code Name} filtert.
 	 * 
 	 * @see Element#getLocalName()
 	 * @see Element#getNamespaceURI()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class DecodeLabelCollector extends DecodeCollector {
+	public static class DecodeElementLabelCollector extends DecodeElementCollector {
 
 		/**
 		 * Dieses Feld speichert den Index des {@code Element}-{@link DecodeLabel}s.
@@ -6080,7 +6198,7 @@ public class Decoder {
 		 * @param adapter {@link DecodeAdapter}.
 		 * @param label Index des {@code Element}-{@link DecodeLabel}s.
 		 */
-		public DecodeLabelCollector(final DecodeAdapter adapter, final int label) {
+		public DecodeElementLabelCollector(final DecodeAdapter adapter, final int label) {
 			super(adapter);
 			this.label = label;
 		}
