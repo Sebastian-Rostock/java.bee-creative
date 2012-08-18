@@ -36,8 +36,6 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
 import bee.creative.util.Filter;
 import bee.creative.util.Objects;
-import bee.creative.xml.coder.Encoder.EncodeAttribute;
-import bee.creative.xml.coder.Encoder.EncodeElement;
 
 /**
  * Diese Klasse implementiert Methoden zur Dekodierung eines XML-Dokuments aus der von einem {@link Encoder} erzeugten, optimierten, binären Darstellung.
@@ -436,7 +434,7 @@ public class Decoder {
 		/**
 		 * Dieses Feld speichert die maximale Anzahl.
 		 */
-		int maxSize = 256;
+		int maxSize = 128;
 
 		/**
 		 * Dieses Feld speichert die Kapazität.
@@ -1069,21 +1067,6 @@ public class Decoder {
 		}
 
 		/**
-		 * Diese Methode gibt das Ergebnis von {@link #findValue(String)} zurück und löst eine {@link IllegalArgumentException} aus, wenn kein Datensatz gefunden wird.
-		 * 
-		 * @see #findValue(String)
-		 * @param value {@link String}.
-		 * @return {@link DecodeValue}.
-		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn {@link #findValue(String)} {@code null} liefert.
-		 */
-		public DecodeValue getValue(final String value) throws NullPointerException, IllegalArgumentException {
-			final DecodeValue item = this.findValue(value);
-			if(item == null) throw new IllegalArgumentException("value not found: " + value);
-			return item;
-		}
-
-		/**
 		 * Diese Methode sucht binäre nach dem {@link DecodeValue} mit dem gegebenen {@link String} und gibt diesen oder {@code null} zurück. Wenn der {@link #valueHash()} nicht leer ist, wind nur im zum gegebenen {@link String} ermittelten Index-Array gesucht.
 		 * 
 		 * @see Coder#hashValue(String)
@@ -1112,7 +1095,7 @@ public class Decoder {
 		 * @throws NullPointerException Wenn der gegebene {@link String} bzw. das gegebene Index-Array {@code null} ist.
 		 */
 		public DecodeValue findValue(final int[] indices, final String value) throws NullPointerException {
-			if(indices.length == 0) return null;
+			if((this.itemCount == 0) || (indices.length == 0)) return null;
 			return this.find(indices, new DecodeValueComparable(value));
 		}
 
@@ -1343,7 +1326,7 @@ public class Decoder {
 		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
 		 */
 		public DecodeLabel findLabel(final int[] indices, final int uri, final int name) throws NullPointerException {
-			if(indices.length == 0) return null;
+			if((this.itemCount == 0) || (indices.length == 0)) return null;
 			return this.find(indices, new DecodeLabelUriNameComparable(uri, name));
 		}
 
@@ -1949,6 +1932,23 @@ public class Decoder {
 		protected final DecodeAttributePool attributeNodePool;
 
 		/**
+		 * Dieses Feld speichert die {@code Hash-Tabelle} zu {@link #navigationPathPool()}.
+		 */
+		protected final DecodeGroupPool navigationPathHash;
+
+		/**
+		 * Dieses Feld speichert die Anzahl der Elemente im {@link #navigationPathHash()} minus {@code 1}.
+		 * 
+		 * @see DecodeGroupPool#itemCount()
+		 */
+		protected final int navigationPathHashMask;
+
+		/**
+		 * Dieses Feld speichert den {@link DecodeGroupPool} für {@link Document#getElementById(String)}.
+		 */
+		protected final DecodeGroupPool navigationPathPool;
+
+		/**
 		 * Dieses Feld speichert den Index des {@link DecodeElement}s für {@link Document#getDocumentElement()}.
 		 */
 		protected final int documentElement;
@@ -1983,11 +1983,98 @@ public class Decoder {
 			this.elementAttributesPool = new DecodeGroupPool(source);
 			this.elementNodePool = new DecodeElementPool(source, this.xmlnsEnabled);
 			this.attributeNodePool = new DecodeAttributePool(source);
+			this.navigationPathHash = new DecodeGroupPool(source);
+			this.navigationPathHashMask = this.navigationPathHash.itemCount - 1;
+			if((this.navigationPathHashMask & this.navigationPathHash.itemCount) != 0)
+				throw new IOException(new IllegalArgumentException("navigationPathHash.itemCount is no power of two"));
+			this.navigationPathPool = new DecodeGroupPool(source);
 			this.documentElement = Decoder.readInts(source, 1)[0];
 		}
 
 		/**
-		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
+		 * Diese Methode gibt das Array aller {@link DecodePool}s zurück.
+		 * 
+		 * @see DecodeDocument#setMinSize(int)
+		 * @see DecodeDocument#setMaxSize(int)
+		 * @return Array aller {@link DecodePool}s.
+		 */
+		final DecodePool<?>[] pools() {
+			return new DecodePool<?>[]{this.uriHash, this.uriPool, this.valueHash, this.valuePool, this.xmlnsNameHash, this.xmlnsNamePool, this.xmlnsLabelHash,
+				this.xmlnsLabelPool, this.elementNameHash, this.elementNamePool, this.elementLabelHash, this.elementLabelPool, this.attributeNameHash,
+				this.attributeNamePool, this.attributeLabelHash, this.attributeLabelPool, this.elementXmlnsPool, this.elementChildrenPool, this.elementAttributesPool,
+				this.elementNodePool, this.attributeNodePool};
+		}
+
+		/**
+		 * Diese Methode setzt die minimale Anzahl der Elemente aller {@link DecodePool}s.
+		 * 
+		 * @see DecodePool#getMinSize()
+		 * @see DecodeDocument#uriHash()
+		 * @see DecodeDocument#uriPool()
+		 * @see DecodeDocument#valueHash()
+		 * @see DecodeDocument#valuePool()
+		 * @see DecodeDocument#xmlnsNameHash()
+		 * @see DecodeDocument#xmlnsNamePool()
+		 * @see DecodeDocument#xmlnsLabelHash()
+		 * @see DecodeDocument#xmlnsLabelPool()
+		 * @see DecodeDocument#elementNameHash()
+		 * @see DecodeDocument#elementNamePool()
+		 * @see DecodeDocument#elementLabelHash()
+		 * @see DecodeDocument#elementLabelPool()
+		 * @see DecodeDocument#attributeNameHash()
+		 * @see DecodeDocument#attributeNamePool()
+		 * @see DecodeDocument#attributeLabelHash()
+		 * @see DecodeDocument#attributeLabelPool()
+		 * @see DecodeDocument#elementXmlnsPool()
+		 * @see DecodeDocument#elementChildrenPool()
+		 * @see DecodeDocument#elementAttributesPool()
+		 * @see DecodeDocument#elementNodePool()
+		 * @see DecodeDocument#attributeNodePool()
+		 * @param value minimale Anzahl der Elemente.
+		 * @throws IllegalArgumentException Wenn die gegebene minimale Anzahl der Elemente kleiner als {@code 0} ist.
+		 */
+		public void setMinSize(final int value) throws IllegalArgumentException {
+			for(final DecodePool<?> pool: this.pools()){
+				pool.setMinSize(value);
+			}
+		}
+
+		/**
+		 * Diese Methode setzt die maximale Anzahl der Elemente aller {@link DecodePool}s.
+		 * 
+		 * @see DecodePool#getMaxSize()
+		 * @see DecodeDocument#uriHash()
+		 * @see DecodeDocument#uriPool()
+		 * @see DecodeDocument#valueHash()
+		 * @see DecodeDocument#valuePool()
+		 * @see DecodeDocument#xmlnsNameHash()
+		 * @see DecodeDocument#xmlnsNamePool()
+		 * @see DecodeDocument#xmlnsLabelHash()
+		 * @see DecodeDocument#xmlnsLabelPool()
+		 * @see DecodeDocument#elementNameHash()
+		 * @see DecodeDocument#elementNamePool()
+		 * @see DecodeDocument#elementLabelHash()
+		 * @see DecodeDocument#elementLabelPool()
+		 * @see DecodeDocument#attributeNameHash()
+		 * @see DecodeDocument#attributeNamePool()
+		 * @see DecodeDocument#attributeLabelHash()
+		 * @see DecodeDocument#attributeLabelPool()
+		 * @see DecodeDocument#elementXmlnsPool()
+		 * @see DecodeDocument#elementChildrenPool()
+		 * @see DecodeDocument#elementAttributesPool()
+		 * @see DecodeDocument#elementNodePool()
+		 * @see DecodeDocument#attributeNodePool()
+		 * @param value maximale Anzahl der Elemente.
+		 * @throws IllegalArgumentException Wenn die gegebene maximale Anzahl der Elemente kleiner als {@code 0} ist.
+		 */
+		public void setMaxSize(final int value) {
+			for(final DecodePool<?> pool: this.pools()){
+				pool.setMaxSize(value);
+			}
+		}
+
+		/**
+		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen {@link DecodeElement}s und {@link DecodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
 		 * 
 		 * @see Node#getPrefix()
 		 * @see Node#getLocalName()
@@ -2214,6 +2301,27 @@ public class Decoder {
 		}
 
 		/**
+		 * Diese Methode gibt die {@code Hash-Tabelle} zu {@link #navigationPathPool()} zurück.
+		 * 
+		 * @see DecodeValuePool#findValue(String)
+		 * @return {@code Hash-Tabelle} zu {@link #navigationPathPool()}.
+		 */
+		public DecodeGroupPool navigationPathHash() {
+			return this.navigationPathHash;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link DecodeGroupPool} für {@link Document#getElementById(String)} zurück. Der erste Index jeder {@link DecodeGroup} referenziert den {@link DecodeValue} mit der {@code ID} des {@link Element}s und die anderen Indices beschriben die {@code Child}-{@link Node}-Indices zur Navigation beginnend bei {@link Document}{@code .}{@link DecodeDocumentNodeAdapter#getDocumentElement() getDocumentElement}{@code ()}.
+		 * 
+		 * @see Attr#isId()
+		 * @see Document#getElementById(String)
+		 * @return {@link DecodeGroupPool} für {@link Document#getElementById(String)}.
+		 */
+		public DecodeGroupPool navigationPathPool() {
+			return this.navigationPathPool;
+		}
+
+		/**
 		 * Diese Methode gibt den Index des {@link DecodeElement}s für {@link Document#getDocumentElement()} zurück.
 		 * 
 		 * @see Document#getDocumentElement()
@@ -2242,6 +2350,7 @@ public class Decoder {
 				"elementAttributesPool", this.elementAttributesPool, //
 				"elementNodePool", this.elementNodePool, //
 				"attributeNodePool", this.attributeNodePool, //
+				"navigationPathPool", this.navigationPathPool, //
 				"documentElement", this.documentElement //
 				);
 		}
@@ -2263,14 +2372,14 @@ public class Decoder {
 		static class XmlnsUriIndexComparable implements Comparable<DecodeLabel> {
 
 			/**
-			 * Dieses Feld speichert den Index des {@code URI }-{@link DecodeValue}s.
+			 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
 			 */
 			final int uriIndex;
 
 			/**
-			 * Dieser Konstrukteur initialisiert den Index des {@code URI }-{@link DecodeValue}s.
+			 * Dieser Konstrukteur initialisiert den Index des {@code URI}-{@link DecodeValue}s.
 			 * 
-			 * @param uriIndex Index des {@code URI }-{@link DecodeValue}s.
+			 * @param uriIndex Index des {@code URI}-{@link DecodeValue}s.
 			 */
 			public XmlnsUriIndexComparable(final int uriIndex) {
 				this.uriIndex = uriIndex;
@@ -2280,8 +2389,8 @@ public class Decoder {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public int compareTo(final DecodeLabel xmlnsLabel) {
-				return Comparators.compare(this.uriIndex, xmlnsLabel.uri);
+			public int compareTo(final DecodeLabel value) {
+				return Comparators.compare(this.uriIndex, value.uri);
 			}
 
 		}
@@ -2320,8 +2429,8 @@ public class Decoder {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public int compareTo(final DecodeLabel xmlnsLabel) {
-				return Comparators.compare(this.uriString, this.uriPool.get(xmlnsLabel.uri).string);
+			public int compareTo(final DecodeLabel value) {
+				return Comparators.compare(this.uriString, this.uriPool.get(value.uri).string);
 			}
 
 		}
@@ -2439,11 +2548,82 @@ public class Decoder {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public int compareTo(final DecodeAttribute attributeNode) {
-				final DecodeLabel attributeLabel = this.labelPool.get(attributeNode.label);
+			public int compareTo(final DecodeAttribute value) {
+				final DecodeLabel attributeLabel = this.labelPool.get(value.label);
 				final int comp = Comparators.compare(this.nameString, this.namePool.get(attributeLabel.name).string);
 				if(comp != 0) return comp;
 				return Comparators.compare(this.uriString, this.uriPool.get(attributeLabel.uri).string);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert das {@link Comparable} für {@link DecodeAdapter#navigationPath(int[], int)}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static class NavigationPathIdIndexComparable implements Comparable<DecodeGroup> {
+
+			/**
+			 * Dieses Feld speichert den Index des {@code URI }-{@link DecodeValue}s.
+			 */
+			final int idIndex;
+
+			/**
+			 * Dieser Konstrukteur initialisiert den Index des {@code ID}-{@link DecodeValue}s.
+			 * 
+			 * @param idIndex Index des {@code ID}-{@link DecodeValue}s.
+			 */
+			public NavigationPathIdIndexComparable(final int idIndex) {
+				this.idIndex = idIndex;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int compareTo(final DecodeGroup value) {
+				return Comparators.compare(this.idIndex, value.indices[0]);
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert das {@link Comparable} für {@link DecodeAdapter#navigationPath(int[], String)}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		static final class NavigationPathIdStringComparable implements Comparable<DecodeGroup> {
+
+			/**
+			 * Dieses Feld speichert {@link DecodeDocument#valuePool()}.
+			 */
+			final DecodeValuePool valuePool;
+
+			/**
+			 * Dieses Feld speichert den {@code ID}-{@link String}.
+			 */
+			final String idString;
+
+			/**
+			 * Dieser Konstrukteur initialisiert {@link DecodeAdapter} und {@code ID}-{@link String}.
+			 * 
+			 * @param adapter {@link DecodeAdapter}.
+			 * @param idString {@code ID}-{@link String}.
+			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+			 */
+			public NavigationPathIdStringComparable(final DecodeAdapter adapter, final String idString) throws NullPointerException {
+				if(idString == null) throw new NullPointerException();
+				this.valuePool = adapter.documentNode.valuePool;
+				this.idString = idString;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int compareTo(final DecodeGroup value) {
+				return Comparators.compare(this.idString, this.valuePool.get(value.indices[0]).string);
 			}
 
 		}
@@ -2507,18 +2687,19 @@ public class Decoder {
 		/**
 		 * Dieses Feld speichert den {@link DecodeDocumentNodeAdapter}.
 		 */
-		protected final DecodeDocumentNodeAdapter documentAdapter;
+		protected final DecodeDocumentNodeAdapter documentNodeAdapter;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link DecodeDocument}.
 		 * 
 		 * @param document {@link DecodeDocument}.
+		 * @throws NullPointerException Wenn das gegebene {@link DecodeDocument} {@code null} ist.
 		 */
-		public DecodeAdapter(final DecodeDocument document) {
+		public DecodeAdapter(final DecodeDocument document) throws NullPointerException {
 			this.childOffset = document.valuePool.itemCount;
 			this.documentNode = document;
 			this.xmlnsEnabled = document.xmlnsEnabled;
-			this.documentAdapter = new DecodeDocumentNodeAdapter(this);
+			this.documentNodeAdapter = new DecodeDocumentNodeAdapter(this);
 		}
 
 		/**
@@ -2701,7 +2882,7 @@ public class Decoder {
 		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#elementXmlnsPool() elementXmlnsPool}{@code ().}{@link DecodeGroupPool#get(int) get}{@code (elementXmlnsIndex)} zurück.
 		 * 
 		 * @param elementXmlnsIndex Index.
-		 * @return {@link DecodeValue}.
+		 * @return {@link DecodeGroup}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final DecodeGroup elementXmlns(final int elementXmlnsIndex) throws IndexOutOfBoundsException {
@@ -2712,7 +2893,7 @@ public class Decoder {
 		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#elementXmlnsPool() elementXmlnsPool}{@code ().}{@link DecodeGroupPool#get(int) get}{@code (elementChildrenIndex)} zurück.
 		 * 
 		 * @param elementChildrenIndex Index.
-		 * @return {@link DecodeValue}.
+		 * @return {@link DecodeGroup}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final DecodeGroup elementChildren(final int elementChildrenIndex) throws IndexOutOfBoundsException {
@@ -2723,7 +2904,7 @@ public class Decoder {
 		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#elementXmlnsPool() elementXmlnsPool}{@code ().}{@link DecodeGroupPool#get(int) get}{@code (elementAttributesIndex)} zurück.
 		 * 
 		 * @param elementAttributesIndex Index.
-		 * @return {@link DecodeValue}.
+		 * @return {@link DecodeGroup}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final DecodeGroup elementAttributes(final int elementAttributesIndex) throws IndexOutOfBoundsException {
@@ -2734,7 +2915,7 @@ public class Decoder {
 		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#elementNodePool() elementNodePool}{@code ().}{@link DecodeElementPool#get(int) get}{@code (elementNodeIndex)} zurück.
 		 * 
 		 * @param elementNodeIndex Index.
-		 * @return {@link DecodeValue}.
+		 * @return {@link DecodeElement}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final DecodeElement elementNode(final int elementNodeIndex) throws IndexOutOfBoundsException {
@@ -2745,11 +2926,22 @@ public class Decoder {
 		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#attributeNodePool() attributeNodePool}{@code ().}{@link DecodeAttributePool#get(int) get}{@code (attributeNodeIndex)} zurück.
 		 * 
 		 * @param attributeNodeIndex Index.
-		 * @return {@link DecodeValue}.
+		 * @return {@link DecodeAttribute}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public final DecodeAttribute attributeNode(final int attributeNodeIndex) throws IndexOutOfBoundsException {
 			return this.documentNode.attributeNodePool.get(attributeNodeIndex);
+		}
+
+		/**
+		 * Diese Methode gibt das Ergebnis von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#navigationPathPool() navigationPathPool}{@code ().}{@link DecodeGroupPool#get(int) get}{@code (navigationPathIndex)} zurück.
+		 * 
+		 * @param navigationPathIndex Index.
+		 * @return {@link DecodeGroup}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeGroup navigationPath(final int navigationPathIndex) throws IndexOutOfBoundsException {
+			return this.documentNode.navigationPathPool.get(navigationPathIndex);
 		}
 
 		/**
@@ -2856,12 +3048,54 @@ public class Decoder {
 		}
 
 		/**
+		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#navigationPathPool() navigationPathPool}{@code ().}{@link DecodeGroupPool#find(int[], Comparable) find}{@code (...)} nach der {@link DecodeGroup} mit dem gegebenen Index des {@code ID}-{@link DecodeValue}s als erstes Element seiner {@link DecodeGroup#indices()} und gibt diese oder {@code null} zurück. Wenn das gegebene Index-Array {@code null} ist, wird in allen Elementen von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#navigationPathPool() navigationPool}{@code ()} gesucht.
+		 * 
+		 * @see Attr#isId()
+		 * @see Document#getElementById(String)
+		 * @param indices Index-Array oder {@code null}.
+		 * @param idIndex Index des {@code ID}-{@link DecodeValue}s.
+		 * @return {@link DecodeGroup} oder {@code null}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public final DecodeGroup navigationPath(final int[] indices, final int idIndex) throws IndexOutOfBoundsException {
+			final DecodeGroupPool navigationPathPool = this.documentNode.navigationPathPool;
+			if(navigationPathPool.itemCount == 0) return null;
+			if(indices == null) return this.navigationPath(null, this.value(idIndex).string);
+			if(indices.length == 0) return null;
+			return navigationPathPool.find(indices, new NavigationPathIdIndexComparable(idIndex));
+		}
+
+		/**
+		 * Diese Methode sucht via {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#navigationPathPool() navigationPathPool}{@code ().}{@link DecodeGroupPool#find(int[], Comparable) find}{@code (...)} nach der {@link DecodeGroup} mit dem gegebenen {@code ID}-{@link DecodeValue}s als erste Referenz seiner {@link DecodeGroup#indices()} und gibt diese oder {@code null} zurück. Wenn das gegebene Index-Array {@code null} ist, wird in allen Elementen von {@code this.}{@link DecodeAdapter#documentNode() documentNode}{@code ().}{@link DecodeDocument#navigationPathPool() navigationPool}{@code ()} gesucht.
+		 * 
+		 * @see Attr#isId()
+		 * @see Document#getElementById(String)
+		 * @param indices Index-Array oder {@code null}.
+		 * @param idString {@code ID}-{@link String}.
+		 * @return {@link DecodeGroup} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public final DecodeGroup navigationPath(final int[] indices, final String idString) throws NullPointerException {
+			final DecodeGroupPool navigationPathPool = this.documentNode.navigationPathPool;
+			if(navigationPathPool.itemCount == 0) return null;
+			if(indices == null){
+				final int navigationPathHashMask = this.documentNode.navigationPathHashMask;
+				if(navigationPathHashMask < 0) return navigationPathPool.find(new NavigationPathIdStringComparable(this, idString));
+				final int[] indices2 = this.documentNode.navigationPathHash.get(Coder.hashValue(idString) & navigationPathHashMask).indices;
+				if(indices2.length == 0) return null;
+				return navigationPathPool.find(indices2, new NavigationPathIdStringComparable(this, idString));
+			}
+			if(indices.length == 0) return null;
+			return navigationPathPool.find(indices, new NavigationPathIdStringComparable(this, idString));
+		}
+
+		/**
 		 * Diese Methode implementiert {@link DecodeNodeAdapter#getOwnerDocument()}.
 		 * 
 		 * @return {@link DecodeNodeAdapter#getOwnerDocument()}.
 		 */
-		public final DecodeDocumentNodeAdapter getNodeOwnerDocument() {
-			return this.documentAdapter;
+		public final DecodeDocumentNodeAdapter getOwnerDocument() {
+			return this.documentNodeAdapter;
 		}
 
 		/**
@@ -2900,11 +3134,26 @@ public class Decoder {
 		 * Diese Methode implementiert {@link DecodeChildNodesAdapter#item(int)}.
 		 * 
 		 * @param parentNode {@code Parent}-{@link DecodeElementNodeAdapter}.
+		 * @param childIndex Index des {@link DecodeChildNodeAdapter}s.
+		 * @return {@link DecodeTextNodeAdapter} bzw. {@link DecodeElementNodeAdapter} oder {@code null}.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeElementNodeAdapter} {@code null} ist.
+		 */
+		public final DecodeChildNodeAdapter getChildNode(final DecodeElementNodeAdapter parentNode, final int childIndex) throws NullPointerException {
+			if(childIndex < 0) return null;
+			return this.getChildNode(parentNode, this.children(parentNode.index), childIndex);
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeChildNodesAdapter#item(int)}.
+		 * 
+		 * @param parentNode {@code Parent}-{@link DecodeElementNodeAdapter}.
 		 * @param nodeIndex Index des {@link DecodeValue}s bzw. des {@link DecodeElement}s {@code +} {@link DecodeAdapter#childOffset() childOffset}{@code ()}.
 		 * @param childIndex Index des {@link DecodeChildNodeAdapter}s im {@link DecodeChildNodesAdapter}.
 		 * @return {@link DecodeTextNodeAdapter} bzw. {@link DecodeElementNodeAdapter}.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeElementNodeAdapter} {@code null} ist.
 		 */
-		public final DecodeChildNodeAdapter getChildNode(final DecodeElementNodeAdapter parentNode, final int nodeIndex, final int childIndex) {
+		public final DecodeChildNodeAdapter getChildNode(final DecodeElementNodeAdapter parentNode, final int nodeIndex, final int childIndex)
+			throws NullPointerException {
 			if(nodeIndex < this.childOffset) return new DecodeTextNodeAdapter(parentNode, nodeIndex, childIndex);
 			return new DecodeElementNodeAdapter(parentNode, nodeIndex - this.childOffset, childIndex);
 		}
@@ -2916,7 +3165,7 @@ public class Decoder {
 		 * @param indices Index-Array der {@link DecodeElement#children()}.
 		 * @param childIndex Index des {@link DecodeChildNodeAdapter}s im Index-Array.
 		 * @return {@link DecodeTextNodeAdapter} bzw. {@link DecodeElementNodeAdapter} oder {@code null}.
-		 * @throws NullPointerException Wenn das gegebene Index-Array {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeElementNodeAdapter} bzw. das gegebene Index-Array {@code null} ist.
 		 */
 		public final DecodeChildNodeAdapter getChildNode(final DecodeElementNodeAdapter parentNode, final int[] indices, final int childIndex)
 			throws NullPointerException {
@@ -3295,6 +3544,47 @@ public class Decoder {
 					this.getElementContent(index, buffer);
 				}
 			}
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeDocumentNodeAdapter#getElementById(String)}.
+		 * 
+		 * @see Attr#isId()
+		 * @param elementIdIndex Index des {@code ID}-{@link DecodeValue}s.
+		 * @return {@link DecodeDocumentNodeAdapter#getElementById(String)}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public final DecodeElementNodeAdapter getElementById(final int elementIdIndex) throws NullPointerException {
+			return this.getElementById_(this.navigationPath(null, elementIdIndex));
+		}
+
+		/**
+		 * Diese Methode implementiert {@link DecodeDocumentNodeAdapter#getElementById(String)}.
+		 * 
+		 * @see Attr#isId()
+		 * @param elementIdString {@code ID}-{@link String}.
+		 * @return {@link DecodeDocumentNodeAdapter#getElementById(String)}.
+		 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+		 */
+		public final DecodeElementNodeAdapter getElementById(final String elementIdString) throws NullPointerException {
+			return this.getElementById_(this.navigationPath(null, elementIdString));
+		}
+
+		/**
+		 * Diese Methode navigiert der gegebenen {@link DecodeGroup} entsprechend zu einem {@link DecodeElementNodeAdapter} und gibt diesen oder {@code null} zurück. Bis auf den ersten Index beschreiben die Indices der {@link DecodeGroup} die {@code Child}-{@link Node}-Indices zur Navigation beginnend bei {@code this.}{@link DecodeAdapter#getOwnerDocument() getOwnerDocument}{@code ().}{@link DecodeDocumentNodeAdapter#getDocumentElement() getDocumentElement}{@code ()}.
+		 * 
+		 * @see DecodeDocument#navigationPathPool()
+		 * @param navigationPath {@link DecodeGroup} als Navigationspfad oder {@code null}.
+		 * @return {@link DecodeElementNodeAdapter} oder {@code null}.
+		 */
+		final DecodeElementNodeAdapter getElementById_(final DecodeGroup navigationPath) {
+			if(navigationPath == null) return null;
+			final int[] indices = navigationPath.indices;
+			DecodeElementNodeAdapter elementNode = this.documentNodeAdapter.documentElement;
+			for(int i = 1, size = indices.length; i < size; i++){
+				elementNode = elementNode.getChildNode(indices[i]).asElement();
+			}
+			return elementNode;
 		}
 
 		/**
@@ -4373,7 +4663,7 @@ public class Decoder {
 		 */
 		@Override
 		public Document getOwnerDocument() {
-			return this.adapter().getNodeOwnerDocument();
+			return this.adapter().getOwnerDocument();
 		}
 
 		/**
@@ -4446,8 +4736,9 @@ public class Decoder {
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
 		 * @param index Index des {@link DecodeValue}s.
 		 * @param child {@code Child-Index}.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeNodeAdapter} {@code null} ist.
 		 */
-		public DecodeTextNodeAdapter(final DecodeNodeAdapter parent, final int index, final int child) {
+		public DecodeTextNodeAdapter(final DecodeNodeAdapter parent, final int index, final int child) throws NullPointerException {
 			super(parent, index, child);
 		}
 
@@ -4678,7 +4969,7 @@ public class Decoder {
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
 		 * @param index Index des {@link DecodeItem}s.
 		 * @param child {@code Child-Index}.
-		 * @throws NullPointerException Wenn der gegebene {@code Parent}-{@link DecodeNodeAdapter} {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeNodeAdapter} {@code null} ist.
 		 */
 		public DecodeChildNodeAdapter(final DecodeNodeAdapter parent, final int index, final int child) throws NullPointerException {
 			if(parent == null) throw new NullPointerException();
@@ -4920,8 +5211,9 @@ public class Decoder {
 		 * @param parent {@code Parent}-{@link DecodeNodeAdapter}.
 		 * @param index Index des {@link DecodeElement}s.
 		 * @param child {@code Child-Index}.
+		 * @throws NullPointerException Wenn der gegebene {@link DecodeNodeAdapter} {@code null} ist.
 		 */
-		public DecodeElementNodeAdapter(final DecodeNodeAdapter parent, final int index, final int child) {
+		public DecodeElementNodeAdapter(final DecodeNodeAdapter parent, final int index, final int child) throws NullPointerException {
 			super(parent, index, child);
 		}
 
@@ -5012,6 +5304,17 @@ public class Decoder {
 		@Override
 		public DecodeChildNodeAdapter getLastChild() {
 			return this.adapter().getChildNodeLast(this);
+		}
+
+		/**
+		 * Diese Methode gibt den {@code index}-te {@link DecodeChildNodeAdapter} oder {@code null} zurück.
+		 * 
+		 * @see DecodeChildNodesAdapter#item(int)
+		 * @param index Index.
+		 * @return {@code index}-ter {@link DecodeChildNodeAdapter} oder {@code null}.
+		 */
+		public DecodeChildNodeAdapter getChildNode(final int index) {
+			return this.adapter().getChildNode(this, index);
 		}
 
 		/**
@@ -5997,7 +6300,7 @@ public class Decoder {
 		 */
 		@Override
 		public Element getElementById(final String elementId) {
-			return null;
+			return this.adapter().getElementById(elementId);
 		}
 
 		/**
@@ -6627,14 +6930,14 @@ public class Decoder {
 	/**
 	 * Diese Methode liest die gegebene {@link DecodeSource} in einen neuen {@link DecodeAdapter} ein und gibt dessen {@link DecodeDocumentNodeAdapter} zurück.
 	 * 
-	 * @see DecodeAdapter#getNodeOwnerDocument()
+	 * @see DecodeAdapter#getOwnerDocument()
 	 * @param source {@link DecodeSource}.
 	 * @return {@link DecodeDocumentNodeAdapter}.
 	 * @throws IOException Wenn das {@link DecodeSource} eine {@link IOException} auslöst.
 	 * @throws NullPointerException Wenn die gegebene {@link DecodeSource} {@code null} ist.
 	 */
 	public DecodeDocumentNodeAdapter decode(final DecodeSource source) throws IOException {
-		return new DecodeAdapter(new DecodeDocument(source)).getNodeOwnerDocument();
+		return new DecodeAdapter(new DecodeDocument(source)).getOwnerDocument();
 	}
 
 }

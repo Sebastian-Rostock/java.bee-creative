@@ -3,8 +3,10 @@ package bee.creative.xml.coder;
 import java.nio.charset.Charset;
 import bee.creative.array.ArrayCopy;
 import bee.creative.xml.coder.Decoder.DecodeDocument;
+import bee.creative.xml.coder.Decoder.DecodeItem;
 import bee.creative.xml.coder.Decoder.DecodeLabel;
 import bee.creative.xml.coder.Decoder.DecodeValue;
+import bee.creative.xml.coder.Encoder.EncodeItem;
 import bee.creative.xml.coder.Encoder.EncodeLabel;
 import bee.creative.xml.coder.Encoder.EncodeValue;
 
@@ -31,7 +33,20 @@ public class Coder {
 	static final Charset CHARSET = Charset.forName("UTF-8");
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link String}s zurück, der in den {@code Hash}es des {@link DecodeDocument}s verwendet werden.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Indexes zurück.
+	 * 
+	 * @see EncodeItem#index()
+	 * @see DecodeItem#index()
+	 * @see DecodeDocument#navigationPathHash()
+	 * @param index Index.
+	 * @return {@link Object#hashCode() Streuwert} des Indexes.
+	 */
+	public static int hashIndex(final int index) {
+		return index * 0x01000193;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link String}s zurück.
 	 * 
 	 * @see EncodeValue#string()
 	 * @see DecodeValue#string()
@@ -53,7 +68,7 @@ public class Coder {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Indices zurück, der in den {@code Hash}es des {@link DecodeDocument}s verwendet werden.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Indices zurück.
 	 * 
 	 * @see EncodeLabel#uri()
 	 * @see EncodeLabel#name()
