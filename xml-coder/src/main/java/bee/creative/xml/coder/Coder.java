@@ -46,28 +46,6 @@ public class Coder {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link String}s zurück.
-	 * 
-	 * @see EncodeValue#string()
-	 * @see DecodeValue#string()
-	 * @see DecodeDocument#uriHash()
-	 * @see DecodeDocument#valueHash()
-	 * @see DecodeDocument#xmlnsNameHash()
-	 * @see DecodeDocument#elementNameHash()
-	 * @see DecodeDocument#attributeNameHash()
-	 * @param value {@link String}.
-	 * @return {@link Object#hashCode() Streuwert} des {@link String}s.
-	 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
-	 */
-	public static int hashValue(final String value) throws NullPointerException {
-		int hash = 0x811C9DC5;
-		for(int i = 0, length = value.length(); i < length; i++){
-			hash = (hash * 0x01000193) ^ value.charAt(i);
-		}
-		return hash;
-	}
-
-	/**
 	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Indices zurück.
 	 * 
 	 * @see EncodeLabel#uri()
@@ -83,6 +61,34 @@ public class Coder {
 	 */
 	public static int hashLabel(final int uri, final int name) {
 		return (uri * 23) ^ (name * 97);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link String}s zurück.
+	 * 
+	 * <pre>int hash = 0x811C9DC5;
+for(int i = 0, length = value.length(); i < length; i++){
+	hash = (hash * 0x01000193) ^ value.charAt(i);
+}
+return hash;</pre>
+	 * 
+	 * @see EncodeValue#string()
+	 * @see DecodeValue#string()
+	 * @see DecodeDocument#uriHash()
+	 * @see DecodeDocument#valueHash()
+	 * @see DecodeDocument#xmlnsNameHash()
+	 * @see DecodeDocument#elementNameHash()
+	 * @see DecodeDocument#attributeNameHash()
+	 * @param value {@link String}.
+	 * @return {@link Object#hashCode() Streuwert} des {@link String}s.
+	 * @throws NullPointerException Wenn der gegebene {@link String} {@code null} ist.
+	 */
+	public static int hashString(final String value) throws NullPointerException {
+		int hash = 0x811C9DC5;
+		for(int i = 0, length = value.length(); i < length; i++){
+			hash = (hash * 0x01000193) ^ value.charAt(i);
+		}
+		return hash;
 	}
 
 	/**

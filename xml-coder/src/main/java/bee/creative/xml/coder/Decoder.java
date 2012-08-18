@@ -451,8 +451,7 @@ public class Decoder {
 		 */
 		@SuppressWarnings ("unchecked")
 		public GItem get(final int index) throws NullPointerException, IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
-			if(index >= this.capacity) throw new IndexOutOfBoundsException("index >= capacity");
+			if(index >= this.capacity) throw new IndexOutOfBoundsException( );
 			final int pageIndex = index >> DecodePoolPage.PAGE_BITS;
 			final int itemIndex = index & DecodePoolPage.PAGE_MASK;
 			DecodePoolPage page = this.pages[pageIndex];
@@ -1069,7 +1068,7 @@ public class Decoder {
 		/**
 		 * Diese Methode sucht binäre nach dem {@link DecodeValue} mit dem gegebenen {@link String} und gibt diesen oder {@code null} zurück. Wenn der {@link #valueHash()} nicht leer ist, wind nur im zum gegebenen {@link String} ermittelten Index-Array gesucht.
 		 * 
-		 * @see Coder#hashValue(String)
+		 * @see Coder#hashString(String)
 		 * @see Encoder#ValueComparator
 		 * @see DecodePool#find(Comparable)
 		 * @see DecodeValue#string()
@@ -1080,7 +1079,7 @@ public class Decoder {
 		public DecodeValue findValue(final String value) throws NullPointerException {
 			if(this.itemCount == 0) return null;
 			if(this.valueHashMask < 0) return this.find(new DecodeValueComparable(value));
-			return this.findValue(this.valueHash.get(Coder.hashValue(value) & this.valueHashMask).indices, value);
+			return this.findValue(this.valueHash.get(Coder.hashString(value) & this.valueHashMask).indices, value);
 		}
 
 		/**
@@ -3081,7 +3080,7 @@ public class Decoder {
 			if(indices == null){
 				final int navigationPathHashMask = this.documentNode.navigationPathHashMask;
 				if(navigationPathHashMask < 0) return navigationPathPool.find(new NavigationPathIdStringComparable(this, idString));
-				final int[] indices2 = this.documentNode.navigationPathHash.get(Coder.hashValue(idString) & navigationPathHashMask).indices;
+				final int[] indices2 = this.documentNode.navigationPathHash.get(Coder.hashString(idString) & navigationPathHashMask).indices;
 				if(indices2.length == 0) return null;
 				return navigationPathPool.find(indices2, new NavigationPathIdStringComparable(this, idString));
 			}

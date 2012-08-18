@@ -1753,36 +1753,49 @@ public class Encoder {
 		protected final boolean xmlnsEnabled;
 
 		/**
+		 * Dieses Feld speichert die {@code Navigation-Path}-Aktivierung.
+		 */
+		protected final boolean navigationPathEnabled;
+
+		/**
 		 * Dieser Konstrukteur initialisiert das {@link EncodeDocument} und die {@code xmlns}-Aktivierung.
 		 * 
 		 * @see #isXmlnsEnabled()
+		 * @see #isNavigationPathEnabled()
 		 * @param document {@link EncodeDocument}.
 		 * @param xmlnsEnabled {@code xmlns}-Aktivierung.
+		 * @param navigationPathEnabled {@code Navigation-Path}-Aktivierung.
 		 * @throws NullPointerException Wenn das gegebene {@link EncodeDocument} {@code null} ist.
 		 */
-		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled) throws NullPointerException {
+		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled, final boolean navigationPathEnabled) throws NullPointerException {
 			if(document == null) throw new NullPointerException();
 			this.document = document;
 			this.cursorStack = new CursorStack();
 			this.xmlnsEnabled = xmlnsEnabled;
+			this.navigationPathEnabled = navigationPathEnabled;
 			if(!xmlnsEnabled) return;
 			this.startPrefixMapping(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
 			this.startPrefixMapping(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.NULL_NS_URI);
 		}
 
 		/**
-		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück. Wenn diese Option {@code true} ist, besitzen {@link EncodeElement}s und {@link EncodeAttribute}s neben einem {@code Name} auch eine {@code URI} und einen {@code Prefix}.
+		 * Diese Methode gibt die {@code xmlns}-Aktivierung zurück.
 		 * 
-		 * @see EncodeLabel#uri()
-		 * @see EncodeLabel#name()
-		 * @see EncodeElement#name()
-		 * @see EncodeElement#label()
-		 * @see EncodeAttribute#name()
-		 * @see EncodeAttribute#label()
+		 * @see Encoder#isXmlnsEnabled()
 		 * @return {@code xmlns}-Aktivierung.
 		 */
 		public boolean isXmlnsEnabled() {
 			return this.xmlnsEnabled;
+		}
+
+		/**
+		 * Diese Methode gibt die {@code Navigation-Path}-Aktivierung zurück.
+		 * 
+		 * @see Encoder#isNavigationPathEnabled()
+		 * @return {@code Navigation-Path}-Aktivierung.
+		 */
+		public boolean isNavigationPathEnabled() {
+			return this.navigationPathEnabled;
 		}
 
 		/**
@@ -1848,12 +1861,14 @@ public class Encoder {
 				(this.xmlnsEnabled ? this.document.elementNodePool.unique(cursor.uri, cursor.name, cursor.xmlns, nextChildren, cursor.attributes)
 					: this.document.elementNodePool.unique(cursor.name, nextChildren, cursor.attributes));
 			nextCursor.children.add(elementNode);
-			if(cursor.id != null){
-				cursor.navigations.add(new EncodeGroup(Arrays.asList(cursor.id)));
-			}
-			for(final EncodeGroup navigation: cursor.navigations){
-				navigation.items.add(elementNode);
-				nextCursor.navigations.add(navigation);
+			if(this.navigationPathEnabled){
+				if(cursor.id != null){
+					cursor.navigations.add(new EncodeGroup(Arrays.asList(cursor.id)));
+				}
+				for(final EncodeGroup navigation: cursor.navigations){
+					navigation.items.add(elementNode);
+					nextCursor.navigations.add(navigation);
+				}
 			}
 			this.cursorStack = nextCursor;
 		}
@@ -1892,12 +1907,12 @@ public class Encoder {
 					(this.xmlnsEnabled ? attributeNodePool.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)) : attributeNodePool.unique(
 						atts.getLocalName(i), atts.getValue(i)));
 				attributes.add(attributeNode);
-				if("ID".equals(atts.getType(i))){
+				if(this.navigationPathEnabled && Objects.equals("ID", atts.getType(i))){
 					id = attributeNode.value;
 				}
 			}
 			if(size > 1){
-				Collections.sort(attributes, Encoder.AttributeNameComparator);
+				Collections.sort(attributes, (this.xmlnsEnabled ? Encoder.AttributeLabelComparator : Encoder.AttributeNameComparator));
 			}
 			this.cursorStack =
 				(this.xmlnsEnabled ? new CursorStack(id, uri, name, this.xmlnsCache, attributes, this.cursorStack) : new CursorStack(id, name, attributes,
@@ -1992,14 +2007,14 @@ public class Encoder {
 	/**
 	 * Dieses Feld speichert das {@link Comparable} zur Berechnung des {@link Object#hashCode() Streuwerts} von {@link EncodeValue}s.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see Encoder#compilePool(EncodePool, int, Comparator)
 	 */
 	protected static final Comparable<EncodeValue> ValueHasher = new Comparable<EncodeValue>() {
 
 		@Override
 		public int compareTo(final EncodeValue value) {
-			return Coder.hashValue(value.string);
+			return Coder.hashString(value.string);
 		}
 
 	};
@@ -2330,7 +2345,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code URI-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see Encoder#isXmlnsEnabled()
 	 * @see DecodeDocument#uriHash()
 	 * @return {@code URI-Hash}-Aktivierung.
@@ -2342,7 +2357,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code URI-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#uriPool()} eine {@code URI-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see Encoder#isXmlnsEnabled()
 	 * @see DecodeDocument#uriHash()
 	 * @param value {@code URI-Hash}-Aktivierung.
@@ -2354,7 +2369,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code Value-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#valueHash()
 	 * @return {@code Value-Hash}-Aktivierung.
 	 */
@@ -2365,7 +2380,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code Value-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#valuePool()} eine {@code Value-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#valueHash()
 	 * @param value {@code Value-Hash}-Aktivierung.
 	 */
@@ -2400,7 +2415,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code Xmlns-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see Encoder#isXmlnsEnabled()
 	 * @see DecodeDocument#xmlnsNameHash()
 	 * @return {@code Xmlns-Name-Hash}-Aktivierung.
@@ -2412,7 +2427,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code Xmlns-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#xmlnsNamePool()} eine {@code Xmlns-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see Encoder#isXmlnsEnabled()
 	 * @see DecodeDocument#xmlnsNameHash()
 	 * @param value {@code Xmlns-Name-Hash}-Aktivierung.
@@ -2448,7 +2463,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code Element-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#elementNameHash()
 	 * @return {@code Element-Name-Hash}-Aktivierung.
 	 */
@@ -2459,7 +2474,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code Element-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#elementNamePool()} eine {@code Element-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#elementNameHash()
 	 * @param value {@code Element-Name-Hash}-Aktivierung.
 	 */
@@ -2494,7 +2509,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code Attribute-Name-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#attributeNameHash()
 	 * @return {@code Attribute-Name-Hash}-Aktivierung.
 	 */
@@ -2505,7 +2520,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code Attribute-Name-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#attributeNamePool()} eine {@code Attribute-Name-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#attributeNameHash()
 	 * @param value {@code Attribute-Name-Hash}-Aktivierung.
 	 */
@@ -2564,7 +2579,7 @@ public class Encoder {
 	/**
 	 * Diese Methode gibt die {@code Navigation-Path-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#navigationPathPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#navigationPathHash()
 	 * @return {@code Navigation-Path-Hash}-Aktivierung.
 	 */
@@ -2575,7 +2590,7 @@ public class Encoder {
 	/**
 	 * Diese Methode setzt die {@code Navigation-Path-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#navigationPathPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
 	 * 
-	 * @see Coder#hashValue(String)
+	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#navigationPathHash()
 	 * @param value {@code Navigation-Path-Hash}-Aktivierung.
 	 */
@@ -2715,7 +2730,7 @@ public class Encoder {
 		if(reader == null) throw new NullPointerException("reader is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(target == null) throw new NullPointerException("target is null");
-		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.isXmlnsEnabled());
+		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.isXmlnsEnabled(), this.isNavigationPathEnabled());
 		reader.setContentHandler(adapter);
 		reader.parse(source);
 	}
