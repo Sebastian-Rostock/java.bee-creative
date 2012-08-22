@@ -1197,7 +1197,7 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeLabel value) {
-				return Comparators.compare(this.uri, value.uri);
+				return this.uri- value.uri;
 			}
 
 		}
@@ -1237,9 +1237,9 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeLabel input) {
-				final int comp = Comparators.compare(this.name, input.name);
+				final int comp = this.name- input.name;
 				if(comp != 0) return comp;
-				return Comparators.compare(this.uri, input.uri);
+				return this.uri- input.uri;
 			}
 
 		}
@@ -2389,7 +2389,7 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeLabel value) {
-				return Comparators.compare(this.uriIndex, value.uri);
+				return this.uriIndex- value.uri;
 			}
 
 		}
@@ -2460,7 +2460,7 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeAttribute value) {
-				return Comparators.compare(this.labelIndex, value.label);
+				return this.labelIndex- value.label;
 			}
 
 		}
@@ -2582,7 +2582,7 @@ public class Decoder {
 			 */
 			@Override
 			public int compareTo(final DecodeGroup value) {
-				return Comparators.compare(this.idIndex, value.indices[0]);
+				return this.idIndex- value.indices[0];
 			}
 
 		}

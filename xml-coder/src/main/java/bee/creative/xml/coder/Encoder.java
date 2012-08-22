@@ -120,6 +120,152 @@ public class Encoder {
 			this.file.write(values, offset, count);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("EncodeTargetFile");
+		}
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Element}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface EncodeElementPath extends EncodeNavigationPath {
+
+		/**
+		 * Diese Methode gibt die {@code URI} des {@link Element}s zurück.
+		 * 
+		 * @see Element#getNamespaceURI()
+		 * @return {@code URI} des {@link Element}s.
+		 */
+		public String elementUri();
+
+		/**
+		 * Diese Methode gibt den {@code Name} des {@link Element}s zurück.
+		 * 
+		 * @see Element#getLocalName()
+		 * @return {@code Name} des {@link Element}s.
+		 */
+		public String elementName();
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Attr}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface EncodeAttributePath extends EncodeNavigationPath {
+
+		/**
+		 * Diese Methode gibt die {@code URI} des {@link Attr}s zurück.
+		 * 
+		 * @see Attr#getNamespaceURI()
+		 * @see Attributes#getURI(int)
+		 * @return {@code URI} des {@link Attr}s.
+		 */
+		public String attributeUri();
+
+		/**
+		 * Diese Methode gibt den {@code Name} des {@link Attr}s zurück.
+		 * 
+		 * @see Attr#getLocalName()
+		 * @see Attributes#getLocalName(int)
+		 * @return {@code Name} des {@link Attr}s.
+		 */
+		public String attributeName();
+
+		/**
+		 * Diese Methode gibt den {@code Type} des {@link Attr}s zurück.
+		 * 
+		 * @see Attr#getSchemaTypeInfo()
+		 * @see Attributes#getType(int)
+		 * @return {@code Type} des {@link Attr}s.
+		 */
+		public String attributeType();
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert den Navifationspfad beim Einlesen eines {@link Document}s, bestehend aus {@code URI}s und {@code Name}s der {@link Element}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface EncodeNavigationPath {
+
+		/**
+		 * Diese Methode gibt die {@code URI} des {@code index}-ten {@link Element}s im Navifationspfad zurück.
+		 * 
+		 * @param index Index.
+		 * @return {@code URI} des {@code index}-ten {@link Element}s im Navifationspfad.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public String pathUri(int index) throws IndexOutOfBoundsException;
+
+		/**
+		 * Diese Methode gibt die {@code URI}s der {@link Element}s im Navifationspfad als unveränderliche {@link List} zurück.
+		 * 
+		 * @see Element#getNamespaceURI()
+		 * @see Collections#unmodifiableList(List)
+		 * @return {@code Path}-{@code URI}-{@link List}.
+		 */
+		public List<String> pathUris();
+
+		/**
+		 * Diese Methode gibt den {@code Name} des {@code index}-ten {@link Element}s im Navifationspfad zurück.
+		 * 
+		 * @param index Index.
+		 * @return {@code Name} des {@code index}-ten {@link Element}s im Navifationspfad.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
+		 */
+		public String pathName(int index) throws IndexOutOfBoundsException;
+
+		/**
+		 * Diese Methode gibt die {@code Name}s der {@link Element}s im Navifationspfad als unveränderliche {@link List} zurück.
+		 * 
+		 * @see Element#getLocalName()
+		 * @see Collections#unmodifiableList(List)
+		 * @return {@code Path}-{@code Name}-{@link List}.
+		 */
+		public List<String> pathNames();
+
+		/**
+		 * Diese Methode gibt die Länge des Navifationspfads, d.h. die Anzahl seiner {@link Element}s zurück.
+		 * 
+		 * @return Länge des Navifationspfads.
+		 */
+		public int pathLength();
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert einen Filter zur Erkennung der {@code ID}-{@link Attr}s bzw. -{@link Element}s, die für die erzeugung des {@link EncodeDocument#navigationPathPool()} verwendet werden.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface EncodeNavigationPathFilter {
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeElementPath} beschriebene {@link Element} als {@code ID} des Navifationspfads verwendet werden soll.
+		 * 
+		 * @param elementPath {@link EncodeElementPath}.
+		 * @return {@code true}, wenn das {@link Element} die {@code ID} des Navifationspfads enthält.
+		 */
+		public boolean isId(EncodeElementPath elementPath);
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeAttributePath} beschriebene {@link Attr} als {@code ID} des Navifationspfads verwendet werden soll.
+		 * 
+		 * @param attributePath {@link EncodeAttributePath}.
+		 * @return {@code true}, wenn das {@link Attr} die {@code ID} des Navifationspfads enthält.
+		 */
+		public boolean isId(EncodeAttributePath attributePath);
+
 	}
 
 	/**
@@ -1578,6 +1724,296 @@ public class Encoder {
 	public static class EncodeDocumentHandler implements ContentHandler {
 
 		/**
+		 * Diese Klasse implementiert einen {@link EncodeElementPath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} sowie ein gegebenes {@link EncodeElement} delegieren.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected static final class ElementPath extends NavigationPath implements EncodeElementPath {
+
+			/**
+			 * Dieses Feld speichert das {@link EncodeElement}.
+			 */
+			protected final EncodeElement element;
+
+			/**
+			 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath} und {@link EncodeElement}.
+			 * 
+			 * @param path {@link EncodeNavigationPath}.
+			 * @param element {@link EncodeElement}.
+			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+			 */
+			public ElementPath(final EncodeNavigationPath path, final EncodeElement element) throws NullPointerException {
+				super(path);
+				if(element == null) throw new NullPointerException();
+				this.element = element;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String elementUri() {
+				return ((this.element.name == null) ? this.element.label.uri.string : "");
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String elementName() {
+				return ((this.element.name == null) ? this.element.label.name.string : this.element.name.string);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall("ElementPath", this.pathNames(), this.elementName());
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert einen {@link EncodeAttributePath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} sowie gegebene {@link Attributes} delegieren.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected static final class AttributePath extends NavigationPath implements EncodeAttributePath {
+
+			/**
+			 * Dieses Feld speichert die {@link Attributes}.
+			 */
+			protected final Attributes atts;
+
+			/**
+			 * Dieses Feld speichert den Index.
+			 */
+			protected final int index;
+
+			/**
+			 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath}, {@link Attributes} und Index.
+			 * 
+			 * @param path {@link EncodeNavigationPath}.
+			 * @param atts {@link Attributes}.
+			 * @param index Index.
+			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+			 */
+			public AttributePath(final EncodeNavigationPath path, final Attributes atts, final int index) throws NullPointerException {
+				super(path);
+				if(atts == null) throw new NullPointerException();
+				this.atts = atts;
+				this.index = index;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String attributeUri() {
+				return this.atts.getURI(this.index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String attributeName() {
+				return this.atts.getLocalName(this.index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String attributeType() {
+				return this.atts.getType(this.index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall("AttributePath", this.pathNames(), this.attributeName());
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert einen abstrakten {@link EncodeNavigationPath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} delegieren.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected static abstract class NavigationPath implements EncodeNavigationPath {
+
+			/**
+			 * Dieses Feld speichert den {@link EncodeNavigationPath}.
+			 */
+			protected final EncodeNavigationPath path;
+
+			/**
+			 * Dieser Konstrukteur initialisiert den {@link EncodeNavigationPath}.
+			 * 
+			 * @param path {@link EncodeNavigationPath}.
+			 * @throws NullPointerException Wenn der gegebene {@link EncodeNavigationPath} {@code null} ist.
+			 */
+			public NavigationPath(final EncodeNavigationPath path) throws NullPointerException {
+				if(path == null) throw new NullPointerException();
+				this.path = path;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public final String pathUri(final int index) throws IndexOutOfBoundsException {
+				return this.path.pathUri(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public final List<String> pathUris() {
+				return this.path.pathUris();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public final String pathName(final int index) throws IndexOutOfBoundsException {
+				return this.path.pathName(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public final List<String> pathNames() {
+				return this.path.pathNames();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public final int pathLength() {
+				return this.path.pathLength();
+			}
+
+		}
+
+		/**
+		 * Diese Klasse implementiert den dynamischen {@link EncodeNavigationPath}, der während des Einlesens vom {@link EncodeDocumentHandler} angepasst wird.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		protected static final class NavigationStack implements EncodeNavigationPath {
+
+			/**
+			 * Dieses Feld speichert die unveränderliche {@link List} der {@code URI}s.
+			 */
+			protected final List<String> pathUris;
+
+			/**
+			 * Dieses Feld speichert die {@link List} der {@code URI}s.
+			 */
+			protected final List<String> pathUriStack;
+
+			/**
+			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Name}s.
+			 */
+			protected final List<String> pathNames;
+
+			/**
+			 * Dieses Feld speichert die {@link List} der {@code Name}s.
+			 */
+			protected final List<String> pathNameStack;
+
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link List}s.
+			 */
+			public NavigationStack() {
+				this.pathUriStack = new ArrayList<String>();
+				this.pathUris = Collections.unmodifiableList(this.pathUriStack);
+				this.pathNameStack = new ArrayList<String>();
+				this.pathNames = Collections.unmodifiableList(this.pathNameStack);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String pathUri(final int index) throws IndexOutOfBoundsException {
+				return this.pathUriStack.get(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public List<String> pathUris() {
+				return this.pathUris;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String pathName(final int index) throws IndexOutOfBoundsException {
+				return this.pathNameStack.get(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public List<String> pathNames() {
+				return this.pathNames;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int pathLength() {
+				return this.pathUriStack.size();
+			}
+
+			/**
+			 * Diese Methode fügt das gegebene Segmant aus {@code URI} und {@code Name} an das Ende des Navigationspfads an.
+			 * 
+			 * @param pathUri {@code URI}.
+			 * @param pathName {@code Name}.
+			 */
+			public void append(final String pathUri, final String pathName) {
+				final int index = this.pathLength();
+				this.pathUriStack.add(index, pathUri);
+				this.pathNameStack.add(index, pathName);
+			}
+
+			/**
+			 * Diese Methode entfernt das letzte Segment des Navigationspfads.
+			 */
+			public void remove() {
+				final int index = this.pathLength() - 1;
+				this.pathUriStack.remove(index);
+				this.pathNameStack.remove(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall("NavigationStack", this.pathNames);
+			}
+
+		}
+
+		/**
 		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code URI} und {@code Prefix} als {@link EncodeLabel}s während des Einlesens eines {@link Document}s.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -1631,7 +2067,7 @@ public class Encoder {
 			/**
 			 * Dieses Feld speichert die {@code ID} oder {@code null}.
 			 */
-			protected final EncodeValue id;
+			protected EncodeValue id;
 
 			/**
 			 * Dieses Feld speichert die {@code URI} oder {@code null}.
@@ -1728,6 +2164,11 @@ public class Encoder {
 		}
 
 		/**
+		 * Dieses Feld speichert den {@link NavigationStack} für den aktuellen Navigationspfad und den {@link EncodeNavigationPathFilter}.
+		 */
+		protected final NavigationStack pathStack;
+
+		/**
 		 * Dieses Feld speichert den {@link XmlnsStack} für die aktuellen Paare aus {@code URI} und {@code Prefix} oder {@code null}.
 		 */
 		protected XmlnsStack xmlnsStack;
@@ -1753,26 +2194,28 @@ public class Encoder {
 		protected final boolean xmlnsEnabled;
 
 		/**
-		 * Dieses Feld speichert die {@code Navigation-Path}-Aktivierung.
+		 * Dieses Feld speichert den {@link EncodeNavigationPathFilter} oder {@code null}.
 		 */
-		protected final boolean navigationPathEnabled;
+		protected final EncodeNavigationPathFilter navigationPathFilter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link EncodeDocument} und die {@code xmlns}-Aktivierung.
+		 * Dieser Konstrukteur initialisiert das {@link EncodeDocument}, {@code xmlns}-Aktivierung und {@link EncodeNavigationPathFilter}.
 		 * 
 		 * @see #isXmlnsEnabled()
 		 * @see #isNavigationPathEnabled()
 		 * @param document {@link EncodeDocument}.
 		 * @param xmlnsEnabled {@code xmlns}-Aktivierung.
-		 * @param navigationPathEnabled {@code Navigation-Path}-Aktivierung.
+		 * @param navigationPathFilter {@link EncodeNavigationPathFilter} oder {@code null}.
 		 * @throws NullPointerException Wenn das gegebene {@link EncodeDocument} {@code null} ist.
 		 */
-		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled, final boolean navigationPathEnabled) throws NullPointerException {
+		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled, final EncodeNavigationPathFilter navigationPathFilter)
+			throws NullPointerException {
 			if(document == null) throw new NullPointerException();
 			this.document = document;
+			this.pathStack = new NavigationStack();
 			this.cursorStack = new CursorStack();
 			this.xmlnsEnabled = xmlnsEnabled;
-			this.navigationPathEnabled = navigationPathEnabled;
+			this.navigationPathFilter = navigationPathFilter;
 			if(!xmlnsEnabled) return;
 			this.startPrefixMapping(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
 			this.startPrefixMapping(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.NULL_NS_URI);
@@ -1789,13 +2232,22 @@ public class Encoder {
 		}
 
 		/**
-		 * Diese Methode gibt die {@code Navigation-Path}-Aktivierung zurück.
+		 * Diese Methode gibt den aktuellen Navifationspfad zurück.
 		 * 
-		 * @see Encoder#isNavigationPathEnabled()
-		 * @return {@code Navigation-Path}-Aktivierung.
+		 * @return {@link EncodeNavigationPath}.
 		 */
-		public boolean isNavigationPathEnabled() {
-			return this.navigationPathEnabled;
+		public EncodeNavigationPath getNavigationPath() {
+			return this.pathStack;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeNavigationPathFilter} oder {@code null} zurück. Wenn er {@code null} ist, wird der {@link EncodeDocument#navigationPathPool()} nicht befüllt.
+		 * 
+		 * @see Encoder#getNavigationPathFilter()
+		 * @return {@link EncodeNavigationPathFilter} oder {@code null}.
+		 */
+		public EncodeNavigationPathFilter getNavigationPathFilter() {
+			return this.navigationPathFilter;
 		}
 
 		/**
@@ -1843,15 +2295,23 @@ public class Encoder {
 			final EncodeValuePool valuePool = this.document.valuePool;
 			for(final EncodeItem oldNode: children){
 				if(oldNode instanceof EncodeValue){
-					final EncodeValue textChildNode = (EncodeValue)oldNode;
-					textValue.append(textChildNode.string);
+					final EncodeValue textNode = (EncodeValue)oldNode;
+					textValue.append(textNode.string);
 				}else{
 					if(textValue.length() != 0){
 						nextChildren.add(valuePool.unique(textValue.toString()));
 						textValue.setLength(0);
 					}
-					final EncodeElement elementChildNode = (EncodeElement)oldNode;
-					nextChildren.add(elementChildNode);
+					final EncodeElement elementNode = (EncodeElement)oldNode;
+					nextChildren.add(elementNode);
+					if((this.navigationPathFilter != null) && (cursor.id == null)){
+						final EncodeElementPath elementPath = new ElementPath(this.pathStack, elementNode);
+						if(this.navigationPathFilter.isId(elementPath)){
+							final List<EncodeItem> items = elementNode.children.items;
+							if(items.size() != 1) throw new IllegalArgumentException("");
+							cursor.id = (EncodeValue)items.get(0);
+						}
+					}
 				}
 			}
 			if(textValue.length() != 0){
@@ -1861,7 +2321,7 @@ public class Encoder {
 				(this.xmlnsEnabled ? this.document.elementNodePool.unique(cursor.uri, cursor.name, cursor.xmlns, nextChildren, cursor.attributes)
 					: this.document.elementNodePool.unique(cursor.name, nextChildren, cursor.attributes));
 			nextCursor.children.add(elementNode);
-			if(this.navigationPathEnabled){
+			if(this.navigationPathFilter != null){
 				if(cursor.id != null){
 					cursor.navigations.add(new EncodeGroup(Arrays.asList(cursor.id)));
 				}
@@ -1870,6 +2330,7 @@ public class Encoder {
 					nextCursor.navigations.add(navigation);
 				}
 			}
+			this.pathStack.remove();
 			this.cursorStack = nextCursor;
 		}
 
@@ -1898,6 +2359,7 @@ public class Encoder {
 				}
 				this.xmlnsCache = xmlns;
 			}
+			this.pathStack.append(uri, name);
 			EncodeValue id = null;
 			final int size = atts.getLength();
 			final List<EncodeAttribute> attributes = new ArrayList<EncodeAttribute>(size);
@@ -1907,8 +2369,11 @@ public class Encoder {
 					(this.xmlnsEnabled ? attributeNodePool.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)) : attributeNodePool.unique(
 						atts.getLocalName(i), atts.getValue(i)));
 				attributes.add(attributeNode);
-				if(this.navigationPathEnabled && Objects.equals("ID", atts.getType(i))){
-					id = attributeNode.value;
+				if((this.navigationPathFilter != null) && (id == null)){
+					final EncodeAttributePath attributePath = new AttributePath(this.pathStack, atts, i);
+					if(this.navigationPathFilter.isId(attributePath)){
+						id = attributeNode.value;
+					}
 				}
 			}
 			if(size > 1){
@@ -2041,7 +2506,7 @@ public class Encoder {
 
 		@Override
 		public int compare(final EncodeItem o1, final EncodeItem o2) {
-			return Comparators.compare(o1.index, o2.index);
+			return o1.index - o2.index;
 		}
 
 	};
@@ -2120,6 +2585,25 @@ public class Encoder {
 			final int comp = Encoder.ValueComparator.compare(value1.label.name, value2.label.name);
 			if(comp != 0) return comp;
 			return Encoder.ValueComparator.compare(value1.label.uri, value2.label.uri);
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link EncodeNavigationPathFilter}, der die {@code ID}-{@link Attr}s an ihrem {@code Type} erkennt.
+	 * 
+	 * @see EncodeAttributePath#attributeType()
+	 */
+	protected static final EncodeNavigationPathFilter NavigationPathFilter = new EncodeNavigationPathFilter() {
+
+		@Override
+		public boolean isId(final EncodeAttributePath attributePath) {
+			return "ID".equals(attributePath.attributeType());
+		}
+
+		@Override
+		public boolean isId(final EncodeElementPath elementPath) {
+			return false;
 		}
 
 	};
@@ -2335,6 +2819,11 @@ public class Encoder {
 	 * Dieses Feld speichert die {@code Navigation-Path-Hash}-Aktivierung.
 	 */
 	protected boolean navigationPathHashEnabled = true;
+
+	/**
+	 * Dieses Feld speichert den {@link EncodeNavigationPathFilter}.
+	 */
+	protected EncodeNavigationPathFilter navigationPathFilter = Encoder.NavigationPathFilter;
 
 	/**
 	 * Dieser Konstrukteur initialisiert den {@link Encoder} und aktiviert alle Optionen.
@@ -2553,6 +3042,25 @@ public class Encoder {
 	}
 
 	/**
+	 * Diese Methode gibt den {@link EncodeNavigationPathFilter} zurück.
+	 * 
+	 * @return {@link EncodeNavigationPathFilter}.
+	 */
+	public EncodeNavigationPathFilter getNavigationPathFilter() {
+		return this.navigationPathFilter;
+	}
+
+	/**
+	 * Diese Methode setzt den {@link EncodeNavigationPathFilter}. Wenn der gegebene {@link EncodeNavigationPathFilter} {@code null} ist, wird der Standardfilter verwendet, der die {@code ID}-{@link Attr}s an ihrem {@code Type} erkennt.
+	 * 
+	 * @see EncodeAttributePath#attributeType()
+	 * @param value {@link EncodeNavigationPathFilter} oder {@code null}.
+	 */
+	public void setNavigationPathFilter(final EncodeNavigationPathFilter value) {
+		this.navigationPathFilter = ((value == null) ? Encoder.NavigationPathFilter : value);
+	}
+
+	/**
 	 * Diese Methode gibt die {@code Navigation-Path}-Aktivierung zurück. Wenn diese Option {@code true} ist, werden Navigationsdaten für {@link EncodeDocument#navigationPathPool()} erzeugt.
 	 * 
 	 * @see Attr#isId()
@@ -2730,7 +3238,7 @@ public class Encoder {
 		if(reader == null) throw new NullPointerException("reader is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(target == null) throw new NullPointerException("target is null");
-		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.isXmlnsEnabled(), this.isNavigationPathEnabled());
+		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.xmlnsEnabled, (this.navigationPathEnabled ? this.navigationPathFilter : null));
 		reader.setContentHandler(adapter);
 		reader.parse(source);
 	}
