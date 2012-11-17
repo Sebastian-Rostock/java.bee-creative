@@ -1,6 +1,8 @@
 package bee.creative.xml.coder;
 
 import java.io.DataOutput;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,56 +30,60 @@ import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+import bee.creative.array.ArraySection;
+import bee.creative.array.CompactIntegerArray;
+import bee.creative.array.CompactObjectArray;
+import bee.creative.array.ObjectArraySection;
 import bee.creative.util.Comparators;
 import bee.creative.util.Hash;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
-import bee.creative.util.Strings;
 import bee.creative.util.Unique;
 import bee.creative.xml.coder.Decoder.DecodeDocument;
+import bee.creative.xml.coder.Encoder.EncodeTarget;
+import bee.creative.xml.coder.Encoder.EncodeTargetFile;
 
 /**
  * Diese Klasse implementiert Klassen und Methoden zur Kodierung eines XML-Dokuments in eine optimierte binäre Darstellung.
  * <p>
+ * Der aufbau eines {@link EncodeDocument}s kann mit Hilfe des {@link EncodeDocumentBuilder}s oder über einen {@link EncodeDocumentHandler} und einen {@link XMLReader} erfolgen.
+ * <p>
  * Als Eingabe werden ein {@link XMLReader} und eine {@link InputSource} verwendet, wobei das {@link EncodeDocumentHandler} als {@link ContentHandler} die vom {@link XMLReader} gelesenen Daten aufnimmt. Die eingelesenen Daten des {@link EncodeDocumentHandler}s werden anschließend unter beachtung der Optionen des {@link Encoder2}s in ein {@link EncodeTarget} gespeichert.
+ * <p>
  * 
  * @see Decoder
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Encoder2 {
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws NullPointerException, IOException, SAXException {
 
-		final EncodeDocument document = new EncodeDocument();
-
-		final EncodeValue uri = document.xmlnsUriPool.unique("test-uri");
-		final EncodeValue name = document.elementNamePool.unique("test-name");
-		final EncodeValue prefix = document.xmlnsPrefixPool.unique("test-prefix");
-		final EncodeGroup lu = new EncodeGroup();
-		final EncodeGroup lp = new EncodeGroup();
-		final EncodeGroup as = new EncodeGroup();
-		final EncodeGroup cs = new EncodeGroup();
-
-		final EncodeElementLabel elementLabel = new EncodeElementLabel(uri, name, prefix, lu, lp);
-
-		final EncodeElementNode elementNode = new EncodeElementNode(elementLabel, cs, as);
-
-		System.out.println(elementNode);
+		final Encoder2 encoder2 = new Encoder2();
+		encoder2.setXmlnsEnabled(true);
+		encoder2.encode(new File("D:\\projects\\java\\bee-creative\\xml-coder\\src\\main\\java\\cds.xml"), new File("cds.bin"));
 
 		final EncodeDocumentBuilder builder = new EncodeDocumentBuilder();
 
 		builder //
-			.createComment("Comment") //
 			.createInstruction("Instruction", "InstructionParams") //
 
 			.createElement("default-uri", "name") //
+			.createId("LALA") //
+			.createComment("Comment") //
+			.createText("TEXT") //
 			.createXmlns("default-uri", "") //
 			.createXmlns("http://www.w3.org/XML/1998/namespace", "devXml") //
 			.createReference("F") //
-			.commit();
+			.createInstruction("ins", "sdsd") //
+			.createElement("test") //
+			.createId("LALO") //
+		;
+		// .commit()
+		// .commit();
 
-		System.out.println(builder.document);
+		System.out.println(builder.commit());
 		// element: 1
 		// text:
 		// PI:
@@ -89,7 +96,7 @@ public class Encoder2 {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface EncodeTarget {
+	public static interface EncodeTarget_ {
 
 		/**
 		 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array ab dem gegebenen Index in die Ausgabe an deren aktuelle Schreibposition und setzt diese Schreibposition anschließend an das Ende des soeben geschriebenen Datenbereiches.
@@ -105,11 +112,46 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Element}s.
+	 * Diese Klasse implementiert definiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Element}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface EncodeElementPath extends EncodeNavigationPath {
+	public static class EncodeElementPath extends EncodeNavigationPath {
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeNavigationPath}.
+		 */
+		protected final EncodeNavigationPath path;
+
+		protected final int index;
+
+		/**
+		 * Dieses Feld speichert das {@link EncodeElementNode}.
+		 */
+		protected final EncodeElementNode element;
+
+		/**
+		 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath} und {@link EncodeElementNode}.
+		 * 
+		 * @param path {@link EncodeNavigationPath}.
+		 * @param element {@link EncodeElementNode}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeElementPath(final EncodeNavigationPath path, final int index, final EncodeElementNode element) throws NullPointerException {
+			if(path == null) throw new NullPointerException();
+			if(element == null) throw new NullPointerException();
+			this.path = path;
+			this.index = index;
+			this.element = element;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected EncodeNavigationPath path() {
+			return this.path;
+		}
 
 		/**
 		 * Diese Methode gibt die {@code Uri} des {@link Element}s zurück.
@@ -117,7 +159,19 @@ public class Encoder2 {
 		 * @see Element#getNamespaceURI()
 		 * @return {@code Uri} des {@link Element}s.
 		 */
-		public String elementUri();
+		public String elementUri() {
+			return this.element.label.uri.string;
+		}
+
+		/**
+		 * Diese Methode gibt den {@code Child}-Index des {@link Element}s zurück, den dieses in den {@link Node#getChildNodes()} seines {@code Eltern}-{@link Node}s hat.
+		 * 
+		 * @see Node#getChildNodes()
+		 * @return {@code Child}-Index des {@link Element}s.
+		 */
+		public int elementIndex() {
+			return this.index;
+		}
 
 		/**
 		 * Diese Methode gibt den {@code Name} des {@link Element}s zurück.
@@ -125,16 +179,65 @@ public class Encoder2 {
 		 * @see Element#getLocalName()
 		 * @return {@code Name} des {@link Element}s.
 		 */
-		public String elementName();
+		public String elementName() {
+			return this.element.label.name.string;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("EncodeElementPath", this.pathNames(), this.elementName());
+		}
 
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Attr}s.
+	 * Diese Klasse implementiert Methoden zum Zugriff auf den aktuellen Navifationspfad beim Einlesen eines {@link Attr}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface EncodeAttributePath extends EncodeNavigationPath {
+	public static class EncodeAttributePath extends EncodeNavigationPath {
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeNavigationPath}.
+		 */
+		protected final EncodeNavigationPath path;
+
+		/**
+		 * Dieses Feld speichert die {@link Attributes}.
+		 */
+		protected final Attributes atts;
+
+		/**
+		 * Dieses Feld speichert den Index.
+		 */
+		protected final int index;
+
+		/**
+		 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath}, {@link Attributes} und Index.
+		 * 
+		 * @param path {@link EncodeNavigationPath}.
+		 * @param atts {@link Attributes}.
+		 * @param index Index.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeAttributePath(final EncodeNavigationPath path, final Attributes atts, final int index) throws NullPointerException {
+			if(path == null) throw new NullPointerException();
+			if(atts == null) throw new NullPointerException();
+			this.path = path;
+			this.atts = atts;
+			this.index = index;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected EncodeNavigationPath path() {
+			return this.path;
+		}
 
 		/**
 		 * Diese Methode gibt die {@code Uri} des {@link Attr}s zurück.
@@ -143,7 +246,9 @@ public class Encoder2 {
 		 * @see Attributes#getURI(int)
 		 * @return {@code Uri} des {@link Attr}s.
 		 */
-		public String attributeUri();
+		public String attributeUri() {
+			return this.atts.getURI(this.index);
+		}
 
 		/**
 		 * Diese Methode gibt den {@code Name} des {@link Attr}s zurück.
@@ -152,7 +257,9 @@ public class Encoder2 {
 		 * @see Attributes#getLocalName(int)
 		 * @return {@code Name} des {@link Attr}s.
 		 */
-		public String attributeName();
+		public String attributeName() {
+			return this.atts.getLocalName(this.index);
+		}
 
 		/**
 		 * Diese Methode gibt den {@code Type} des {@link Attr}s zurück.
@@ -161,16 +268,33 @@ public class Encoder2 {
 		 * @see Attributes#getType(int)
 		 * @return {@code Type} des {@link Attr}s.
 		 */
-		public String attributeType();
+		public String attributeType() {
+			return this.atts.getType(this.index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("EncodeAttributePath", this.pathNames(), this.attributeName());
+		}
 
 	}
 
 	/**
-	 * Diese Schnittstelle definiert den Navifationspfad beim Einlesen eines {@link Document}s, bestehend aus {@code Uri}s und {@code Name}s der {@link Element}s.
+	 * Diese abstrakte Klasse definiert den Navifationspfad beim Einlesen eines {@link Document}s, bestehend aus {@code Uri}s und {@code Name}s von {@link Element}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface EncodeNavigationPath {
+	public static abstract class EncodeNavigationPath {
+
+		/**
+		 * Diese Methode gibt den {@link EncodeNavigationPath} zurück, an dessen Methoden alle Aufrufe delegiert werden.
+		 * 
+		 * @return {@link EncodeNavigationPath}.
+		 */
+		protected abstract EncodeNavigationPath path();
 
 		/**
 		 * Diese Methode gibt die {@code Uri} des {@code index}-ten {@link Element}s im Navifationspfad zurück.
@@ -179,16 +303,20 @@ public class Encoder2 {
 		 * @return {@code Uri} des {@code index}-ten {@link Element}s im Navifationspfad.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
-		public String pathUri(int index) throws IndexOutOfBoundsException;
+		public String pathUri(final int index) throws IndexOutOfBoundsException {
+			return this.path().pathUri(index);
+		}
 
 		/**
 		 * Diese Methode gibt die {@code Uri}s der {@link Element}s im Navifationspfad als unveränderliche {@link List} zurück.
 		 * 
 		 * @see Element#getNamespaceURI()
 		 * @see Collections#unmodifiableList(List)
-		 * @return {@code Path}-{@code Uri}-{@link List}.
+		 * @return {@code Uri}-{@link List}.
 		 */
-		public List<String> pathUris();
+		public List<String> pathUris() {
+			return this.path().pathUris();
+		}
 
 		/**
 		 * Diese Methode gibt den {@code Name} des {@code index}-ten {@link Element}s im Navifationspfad zurück.
@@ -197,48 +325,78 @@ public class Encoder2 {
 		 * @return {@code Name} des {@code index}-ten {@link Element}s im Navifationspfad.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
-		public String pathName(int index) throws IndexOutOfBoundsException;
+		public String pathName(final int index) throws IndexOutOfBoundsException {
+			return this.path().pathName(index);
+		}
 
 		/**
 		 * Diese Methode gibt die {@code Name}s der {@link Element}s im Navifationspfad als unveränderliche {@link List} zurück.
 		 * 
 		 * @see Element#getLocalName()
 		 * @see Collections#unmodifiableList(List)
-		 * @return {@code Path}-{@code Name}-{@link List}.
+		 * @return {@code Name}-{@link List}.
 		 */
-		public List<String> pathNames();
+		public List<String> pathNames() {
+			return this.path().pathNames();
+		}
 
 		/**
-		 * Diese Methode gibt die Länge des Navifationspfads, d.h. die Anzahl seiner {@link Element}s zurück.
+		 * Diese Methode gibt den {@code Child}-Index des {@code index}-ten {@link Element}s im Navifationspfad zurück, den dieses {@link Element} in den {@link Node#getChildNodes()} seines {@code Eltern}-{@link Node}s hat.
 		 * 
-		 * @return Länge des Navifationspfads.
+		 * @param index Index.
+		 * @return {@code Child}-Index des {@code index}-ten {@link Element}s im Navifationspfad.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
-		public int pathLength();
+		public int pathIndex(final int index) throws IndexOutOfBoundsException {
+			return this.path().pathIndex(index);
+		}
+
+		/**
+		 * Diese Methode gibt die {@code Child}-Indices der {@link Element}s im Navifationspfad als unveränderliche {@link List} zurück. Der {@code Child}-Index ist die Position eines {@link Element}s in den {@link Node#getChildNodes()} seines {@code Eltern}-{@link Node}s.
+		 * 
+		 * @see Node#getChildNodes()
+		 * @see Collections#unmodifiableList(List)
+		 * @return {@code Child}-Index-{@link List}.
+		 */
+		public List<Integer> pathIndices() {
+			return this.path().pathIndices();
+		}
+
+		/**
+		 * Diese Methode gibt die Länge des Navigationspfads, d.h. die Anzahl seiner {@link Element}s zurück.
+		 * 
+		 * @return Länge des Navigationspfads.
+		 */
+		public int pathLength() {
+			return this.path().pathLength();
+		}
 
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen Filter zur Erkennung der {@code ID}-{@link Attr}s bzw. -{@link Element}s, die für die erzeugung des {@link EncodeDocument#getNavigationPathPool()} verwendet werden.
+	 * Diese Schnittstelle definiert einen Filter zur Erkennung der {@code ID}-{@link Attr}s bzw. -{@link Element}s, die für die erzeugung des {@link EncodeDocument#getNavigationEntryPool()} verwendet werden.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface EncodeNavigationPathFilter {
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeElementPath} beschriebene {@link Element} als {@code ID} des Navifationspfads verwendet werden soll.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeElementPath} beschriebene {@link Element} als {@code ID} des Navigationspfads verwendet werden soll.
 		 * 
 		 * @param elementPath {@link EncodeElementPath}.
-		 * @return {@code true}, wenn das {@link Element} die {@code ID} des Navifationspfads enthält.
+		 * @return {@code true}, wenn das {@link Element} die {@code ID} des Navigationspfads enthält.
 		 */
 		public boolean isId(EncodeElementPath elementPath);
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeAttributePath} beschriebene {@link Attr} als {@code ID} des Navifationspfads verwendet werden soll.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das im gegebenen {@link EncodeAttributePath} beschriebene {@link Attr} als {@code ID} des Navigationspfads verwendet werden soll.
 		 * 
 		 * @param attributePath {@link EncodeAttributePath}.
-		 * @return {@code true}, wenn das {@link Attr} die {@code ID} des Navifationspfads enthält.
+		 * @return {@code true}, wenn das {@link Attr} die {@code ID} des Navigationspfads enthält.
 		 */
 		public boolean isId(EncodeAttributePath attributePath);
+
+		public Iterable<String> getIds(EncodeNavigationPath navigationPath);
 
 	}
 
@@ -251,9 +409,9 @@ public class Encoder2 {
 	 */
 	static void write(final EncodeItem source, final EncodeTarget target) throws IOException, NullPointerException {
 		switch(source.getType()){
-			case EncodeItem.TYPE_INDEX:{
-				final EncodeIndex item = (EncodeIndex)source;
-				Encoder2.writeInts(target, item.index);
+			case EncodeItem.TYPE_INDICES:{
+				final EncodeIndices item = (EncodeIndices)source;
+				Encoder2.writeInts(target, item.indices.toArray());
 				break;
 			}
 			case EncodeItem.TYPE_VALUE:{
@@ -264,7 +422,7 @@ public class Encoder2 {
 			}
 			case EncodeItem.TYPE_GROUP:{
 				final EncodeGroup item = (EncodeGroup)source;
-				Encoder2.writeIndices(target, item.items);
+				Encoder2.writeIndices(target, item.items.values());
 				break;
 			}
 			case EncodeItem.TYPE_XMLNS_LABEL:{
@@ -308,37 +466,69 @@ public class Encoder2 {
 	public static abstract class EncodeItem {
 
 		/**
-		 * Dieses Feld speichert den Typ von {@link EncodeIndex}.
-		 */
-		public static final int TYPE_INDEX = 1;
-
-		/**
 		 * Dieses Feld speichert den Typ von {@link EncodeValue}.
 		 */
-		public static final int TYPE_VALUE = 2;
+		public static final int TYPE_VALUE = 1;
 
 		/**
 		 * Dieses Feld speichert den Typ von {@link EncodeGroup}.
 		 */
-		public static final int TYPE_GROUP = 3;
+		public static final int TYPE_GROUP = 2;
 
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeIndices}.
+		 */
+		public static final int TYPE_INDICES = 3;
+
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeXmlnsLabel}.
+		 */
 		public static final int TYPE_XMLNS_LABEL = 4;
 
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeElementLabel}.
+		 */
 		public static final int TYPE_ELEMENT_LABEL = 5;
 
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeAttributeLabel}.
+		 */
 		public static final int TYPE_ATTRIBUTE_LABEL = 6;
 
-		public static final int TYPE_TEXT_NODE = 7;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeNavigationEntry}.
+		 */
+		public static final int TYPE_NAVIGATION_ENTRY = 7;
 
-		public static final int TYPE_ELEMENT_NODE = 8;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeTextNode}.
+		 */
+		public static final int TYPE_TEXT_NODE = 8;
 
-		public static final int TYPE_COMMENT_NODE = 9;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeElementNode}.
+		 */
+		public static final int TYPE_ELEMENT_NODE = 9;
 
-		public static final int TYPE_REFERENCE_NODE = 10;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeCommentNode}.
+		 */
+		public static final int TYPE_COMMENT_NODE = 10;
 
-		public static final int TYPE_ATTRIBUTE_NODE = 11;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeReferenceNode}.
+		 */
+		public static final int TYPE_REFERENCE_NODE = 11;
 
-		public static final int TYPE_INSTRUCTION_NODE = 12;
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeAttributeNode}.
+		 */
+		public static final int TYPE_ATTRIBUTE_NODE = 12;
+
+		/**
+		 * Dieses Feld speichert den Typ von {@link EncodeInstructionNode}.
+		 */
+		public static final int TYPE_INSTRUCTION_NODE = 13;
 
 		/**
 		 * Dieses Feld speichert das nächste {@link EncodeItem} im {@link EncodePool}.
@@ -346,7 +536,7 @@ public class Encoder2 {
 		 * @see EncodePool#getEntryNext(EncodeItem)
 		 * @see EncodePool#setEntryNext(EncodeItem, EncodeItem)
 		 */
-		EncodeItem next;
+		EncodeItem next = this;
 
 		/**
 		 * Dieses Feld speichert den Index des Datensatzes.
@@ -376,6 +566,58 @@ public class Encoder2 {
 		 */
 		public void setIndex(final int index) {
 			this.index = index;
+		}
+
+		public EncodeValue asValue() {
+			return null;
+		}
+
+		public EncodeGroup asGroup() {
+			return null;
+		}
+
+		public EncodeIndices asIndices() {
+			return null;
+		}
+
+		public EncodeXmlnsLabel asXmlnsLabel() {
+			return null;
+		}
+
+		public EncodeElementLabel asElementLabel() {
+			return null;
+		}
+
+		public EncodeAttributeLabel asAttributeLabel() {
+			return null;
+		}
+
+		public EncodeNavigationEntry asNavigationEntry() {
+			return null;
+		}
+
+		public EncodeTextNode asTextNode() {
+			return null;
+		}
+
+		public EncodeElementNode asElementNode() {
+			return null;
+		}
+
+		public EncodeCommentNode asCommentNode() {
+			return null;
+		}
+
+		public EncodeReferenceNode asReferenceNode() {
+			return null;
+		}
+
+		public EncodeAttributeNode asAttributeNode() {
+			return null;
+		}
+
+		public EncodeInstructionNode asInstructionNode() {
+			return null;
 		}
 
 	}
@@ -510,17 +752,33 @@ public class Encoder2 {
 		 * @param key Element.
 		 * @return einzigartiges, {@link #equals(EncodeItem, EncodeItem) äquivalentes} Element.
 		 * @throws NullPointerException Wenn das gegebene Element {@code null} ist.
+		 * @throws IllegalArgumentException Wenn das gegebene Element eingefügt werden müsste, aber bereits von einem {@link EncodePool} verwaltet wird.
 		 */
-		public GItem get(final GItem key) throws NullPointerException {
+		public GItem get(final GItem key) throws NullPointerException, IllegalArgumentException {
 			if(key == null) throw new NullPointerException();
 			final GItem value = this.findEntry(key);
 			if(value == null){
+				if(key.next != key) throw new IllegalArgumentException("item managed elsewhere");
 				this.insert(key);
 				this.appendEntry(key, key, true);
 				return key;
 			}
 			this.reuse(value);
 			return value;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalente} zu einem Element dieses {@link EncodePool}s ist.
+		 * 
+		 * @see #hash(EncodeItem)
+		 * @see #equals(EncodeItem, EncodeItem)
+		 * @param key Element.
+		 * @return {@code true}, wenn ein zum gegebenen Element {@link #equals(EncodeItem, EncodeItem) äquivalentes} enthalten ist.
+		 * @throws NullPointerException Wenn das gegebene Element {@code null} ist.
+		 */
+		public boolean contains(final GItem key) throws NullPointerException {
+			if(key == null) throw new NullPointerException();
+			return this.findEntry(key) != null;
 		}
 
 		/**
@@ -574,40 +832,6 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link EncodeList} zur Abstraktion der Position eines Kindknoten.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class EncodeIndex extends EncodeItem {
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Index.
-		 * 
-		 * @param index Index.
-		 */
-		public EncodeIndex(final int index) {
-			this.index = index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int getType() {
-			return EncodeItem.TYPE_INDEX;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return String.valueOf(this.index);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine {@link EncodeList} zur Abstraktion eines {@link String}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -617,7 +841,7 @@ public class Encoder2 {
 		/**
 		 * Dieses Feld speichert den {@link String}.
 		 */
-		protected String string;
+		protected final String string;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link String}.
@@ -653,6 +877,14 @@ public class Encoder2 {
 		@Override
 		public int getLength() {
 			return Coder.encodeChars(this.string).length;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeValue asValue() {
+			return this;
 		}
 
 		/**
@@ -713,19 +945,84 @@ public class Encoder2 {
 	public static class EncodeGroup extends EncodeList {
 
 		/**
-		 * Dieses Feld speichert die {@link EncodeItem}-{@link List}.
+		 * Diese Klasse implementiert das {@link EncodeItem}-{@link CompactObjectArray}.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected final List<EncodeItem> items;
+		protected static final class EncodeItemArray extends CompactObjectArray<EncodeItem> {
 
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList}.
-		 */
-		public EncodeGroup() {
-			this.items = new ArrayList<EncodeItem>(0);
+			/**
+			 * Diese Klasse implementiert die {@link ArraySection} zu {@link EncodeItemArray}.
+			 * 
+			 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+			 */
+			protected static final class EncodeItemArraySection extends CompactObjectArraySection<EncodeItem> {
+
+				/**
+				 * Dieser Konstrukteur initialisiert den Besitzer.
+				 * 
+				 * @param owner Besitzer.
+				 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+				 */
+				public EncodeItemArraySection(final EncodeItemArray owner) throws NullPointerException {
+					super(owner);
+				}
+
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				protected boolean equals(final EncodeItem[] array1, final EncodeItem[] array2, final int index1, final int index2) {
+					return array1[index1] == array2[index2];
+				}
+
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int compare(final EncodeItem o1, final EncodeItem o2) {
+				return o1.index - o2.index;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected EncodeItem[] newArray(final int length) {
+				return new EncodeItem[length];
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public ObjectArraySection<EncodeItem> section() {
+				return new EncodeItemArraySection(this);
+			}
+
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}-{@link List} mit einer neuen {@link ArrayList} und den gegebenen {@link EncodeItem}s.
+		 * Dieses Feld speichert die {@link EncodeItem}-{@link List}.
+		 */
+		protected final CompactObjectArray<EncodeItem> items = new EncodeItemArray();
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}s.
+		 * 
+		 * @param items {@link EncodeItem}-{@code Array}.
+		 * @throws NullPointerException Wenn das gegebene {@link EncodeItem}-{@code Array} {@code null} ist oder enthält.
+		 */
+		public EncodeGroup(final EncodeItem... items) {
+			if(items == null) throw new NullPointerException("items is null");
+			if(Arrays.asList(items).contains(null)) throw new NullPointerException("items contains null");
+			this.items.add(items);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@link EncodeItem}s.
 		 * 
 		 * @param items {@link EncodeItem}-{@link List}.
 		 * @throws NullPointerException Wenn die gegebene {@link EncodeItem}-{@link List} {@code null} ist oder enthält.
@@ -733,7 +1030,7 @@ public class Encoder2 {
 		public EncodeGroup(final List<? extends EncodeItem> items) throws NullPointerException {
 			if(items == null) throw new NullPointerException("items is null");
 			if(items.contains(null)) throw new NullPointerException("items contains null");
-			this.items = new ArrayList<EncodeItem>(items);
+			this.items.values().addAll(items);
 		}
 
 		/**
@@ -751,7 +1048,7 @@ public class Encoder2 {
 		 * @return {@link EncodeItem}-{@link List}.
 		 */
 		public List<EncodeItem> getItems() {
-			return Collections.unmodifiableList(this.items);
+			return Collections.unmodifiableList(this.items.values());
 		}
 
 		/**
@@ -766,8 +1063,16 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeGroup asGroup() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
-			return Strings.join(" ", this.items);
+			return Objects.toString(this.items);
 		}
 
 	}
@@ -792,15 +1097,7 @@ public class Encoder2 {
 		 */
 		@Override
 		protected boolean equals(final EncodeGroup input1, final EncodeGroup input2) {
-			if(input1 == input2) return true;
-			final List<?> items1 = input1.items, items2 = input2.items;
-			if(items1.size() != items2.size()) return false;
-			final Iterator<?> iterator1 = items1.iterator(), iterator2 = items2.iterator();
-			while(iterator1.hasNext()){
-				if(!iterator2.hasNext()) return false; // nur bei fehlerhafter size!
-				if(iterator1.next() != iterator2.next()) return false;
-			}
-			return !iterator2.hasNext();
+			return input1.items.equals(input2.items);
 		}
 
 		/**
@@ -814,6 +1111,135 @@ public class Encoder2 {
 		 */
 		public EncodeGroup unique(final List<? extends EncodeItem> value) throws NullPointerException {
 			return this.get(new EncodeGroup(value));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link EncodeItem} zur Abstraktion eines Navigationspfades mit Id.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeIndices extends EncodeList {
+
+		/**
+		 * Dieses Feld speichert die {@link EncodeItem}-{@link List}.
+		 */
+		protected final CompactIntegerArray indices = new CompactIntegerArray();
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@code Indices}.
+		 * 
+		 * @param indices {@code Indices}.
+		 * @throws NullPointerException Wenn die gegebenen {@code Indices} {@code null} sind.
+		 */
+		public EncodeIndices(final int... indices) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
+			this.indices.add(indices);
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert die {@code Indices}.
+		 * 
+		 * @param indices {@link Integer}-{@link List}.
+		 * @throws NullPointerException Wenn die gegebene {@link Integer}-{@link List} {@code null} ist oder enthält.
+		 */
+		public EncodeIndices(final List<Integer> indices) throws NullPointerException {
+			if(indices == null) throw new NullPointerException("indices is null");
+			if(indices.contains(null)) throw new NullPointerException("indices contains null");
+			this.indices.values().addAll(indices);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getType() {
+			return EncodeItem.TYPE_INDICES;
+		}
+
+		/**
+		 * Diese Methode gibt die {@code Index}-{@link List} zurück.
+		 * 
+		 * @return {@code Index}-{@link List}.
+		 */
+		public List<Integer> getIndices() {
+			return Collections.unmodifiableList(this.indices.values());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getLength() {
+			return this.indices.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeIndices asIndices() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toString(this.indices);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link EncodePool} der {@link EncodeIndices}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeIndicesPool extends EncodePool<EncodeIndices> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int hash(final EncodeIndices input) {
+			return Objects.hash(input.indices);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected boolean equals(final EncodeIndices input1, final EncodeIndices input2) {
+			return input1.indices.equals(input2.indices);
+		}
+
+		/**
+		 * Diese Methode gibt die einzigartigen {@link EncodeIndices} mit der gegebenen {@code Indices} zurück.
+		 * 
+		 * @see EncodeIndices#EncodeIndices(int...)
+		 * @see EncodeIndicesPool#get(EncodeIndices)
+		 * @param indices {@code Indices}.
+		 * @return einzigartige {@link EncodeIndices}.
+		 * @throws NullPointerException Wenn die gegebenen {@code Indices} {@code null} sind.
+		 */
+		public EncodeIndices unique(final int... indices) throws NullPointerException {
+			return this.get(new EncodeIndices(indices));
+		}
+
+		/**
+		 * Diese Methode gibt die einzigartigen {@link EncodeIndices} mit der gegebenen {@code Indices} zurück.
+		 * 
+		 * @see EncodeIndices#EncodeIndices(List)
+		 * @see EncodeIndicesPool#get(EncodeIndices)
+		 * @param indices {@code Indices}.
+		 * @return einzigartige {@link EncodeIndices}.
+		 * @throws NullPointerException Wenn die gegebenen {@code Indices} {@code null} sind oder enthalten.
+		 */
+		public EncodeIndices unique(final List<Integer> indices) throws NullPointerException {
+			return this.get(new EncodeIndices(indices));
 		}
 
 	}
@@ -883,6 +1309,14 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeXmlnsLabel asXmlnsLabel() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			if(this.prefix.string.isEmpty()) return "xmlns=\"" + this.uri + "\"";
 			return "xmlns:" + this.prefix + "=\"" + this.uri + "\"";
@@ -925,6 +1359,412 @@ public class Encoder2 {
 		 */
 		public EncodeXmlnsLabel unique(final EncodeValue uri, final EncodeValue prefix) throws NullPointerException {
 			return this.get(new EncodeXmlnsLabel(uri, prefix));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code Uri} und {@code Prefix} als während des Einlesens oder Aufbauens eines {@link EncodeDocument}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeXmlnsBuilder {
+
+		/**
+		 * Dieses Feld speichert den {@code Eltern}-{@link EncodeXmlnsBuilder} oder {@code null}.
+		 */
+		protected EncodeXmlnsBuilder parent;
+
+		/**
+		 * Dieses Feld speichert das {@link EncodeDocument}.
+		 */
+		protected final EncodeDocument document;
+
+		/**
+		 * Dieses Feld speichert die {@code Prefix}-{@code Uri}-{@link Map} oder {@code null}.
+		 */
+		protected Map<String, String> lookupUriMap;
+
+		/**
+		 * Dieses Feld speichert die {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupUriMap} oder {@code null}.
+		 */
+		protected List<EncodeXmlnsLabel> lookupUriList;
+
+		/**
+		 * Dieses Feld speichert die {@code Uri}-{@code Prefix}-{@link Map} oder {@code null}.
+		 */
+		protected Map<String, String> lookupPrefixMap;
+
+		/**
+		 * Dieses Feld speichert die {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupPrefixMap} oder {@code null}.
+		 */
+		protected List<EncodeXmlnsLabel> lookupPrefixList;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@code Eltern}-{@link EncodeXmlnsBuilder}. Als {@link EncodeDocument} wird das des {@code Eltern}-{@link EncodeXmlnsBuilder}s verwendet.
+		 * 
+		 * @see #append(String, String)
+		 * @param parent {@code Eltern}-{@link EncodeXmlnsBuilder}.
+		 * @throws NullPointerException Wenn der gegebene {@link EncodeXmlnsBuilder} {@code null} ist.
+		 */
+		public EncodeXmlnsBuilder(final EncodeXmlnsBuilder parent) throws NullPointerException {
+			if(parent == null) throw new NullPointerException();
+			this.parent = parent;
+			this.document = parent.document;
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link EncodeDocument}.
+		 * 
+		 * @param document {@link EncodeDocument}.
+		 * @throws NullPointerException Wenn das gegebene {@link EncodeDocument} {@code null} ist.
+		 */
+		public EncodeXmlnsBuilder(final EncodeDocument document) throws NullPointerException {
+			if(document == null) throw new NullPointerException("document is null");
+			this.parent = null;
+			this.document = document;
+		}
+
+		/**
+		 * Diese Methode gibt das {@link Iterable} über alle {@code Prefix}es zurück, wobei {@code Prefix}e auch mehrfach vorkommen können.
+		 * 
+		 * @return {@code Prefix}-{@link Iterable}.
+		 */
+		private Iterable<String> prefixes() {
+			final Map<String, String> lookupUriMap = this.lookupUriMap;
+			final EncodeXmlnsBuilder parent = this.parent;
+			if(lookupUriMap != null){
+				if(parent != null) return Iterables.chainedIterable(parent.prefixes(), lookupUriMap.keySet());
+				return lookupUriMap.keySet();
+			}
+			if(parent != null) return parent.prefixes();
+			return Iterables.voidIterable();
+		}
+
+		/**
+		 * Diese Methode erzeugt beide {@link Map}s.
+		 */
+		private void createMaps() {
+			this.lookupUriMap = new LinkedHashMap<String, String>(1);
+			this.lookupPrefixMap = new LinkedHashMap<String, String>(1);
+		}
+
+		/**
+		 * Diese Methode fügt das gegebene {@code Uri/Prefix}-Paar in die {@link Map}s ein.
+		 * 
+		 * @param uri {@code Uri}.
+		 * @param prefix {@code Prefix}.
+		 */
+		private void updateMaps(final String uri, final String prefix) {
+			this.lookupUriMap.put(prefix, uri);
+			this.lookupPrefixMap.put(uri, prefix);
+		}
+
+		/**
+		 * Diese Methode erzeugt die beiden {@link List}s der {@code Uri/Prefix}-Paare, sofern diese notwendig ist.
+		 */
+		private void updateLists() {
+			if(this.lookupUriList != null) return;
+			if(this.lookupUriMap == null){
+				if(this.parent == null){
+					this.lookupUriList = Collections.emptyList();
+					this.lookupPrefixList = Collections.emptyList();
+				}else{
+					this.parent.updateLists();
+					this.lookupUriList = this.parent.lookupUriList;
+					this.lookupPrefixList = this.parent.lookupPrefixList;
+				}
+				return;
+			}
+			final EncodeDocument document = this.document;
+			final Map<String, String> lookupUriMap = new LinkedHashMap<String, String>();
+			final Map<String, String> lookupPrefixMap = new LinkedHashMap<String, String>();
+			final ArrayList<EncodeXmlnsLabel> lookupUriList = new ArrayList<EncodeXmlnsLabel>();
+			final ArrayList<EncodeXmlnsLabel> lookupPrefixList = new ArrayList<EncodeXmlnsLabel>();
+			for(final String xmlnsPrefix: this.prefixes()){
+				final String xmlnsUri = this.lookupUri(xmlnsPrefix);
+				lookupUriMap.put(xmlnsPrefix, xmlnsUri);
+			}
+			for(final Entry<String, String> xmlnsEntry: lookupUriMap.entrySet()){
+				final String xmlnsUri = xmlnsEntry.getValue();
+				final String xmlnsPrefix = xmlnsEntry.getKey();
+				final EncodeXmlnsLabel xmlnsLabel =
+					document.xmlnsLabelPool.unique(document.xmlnsUriPool.unique(xmlnsUri), document.xmlnsPrefixPool.unique(xmlnsPrefix));
+				lookupUriList.add(xmlnsLabel);
+				lookupPrefixMap.put(xmlnsUri, this.lookupPrefix(xmlnsUri));
+			}
+			lookupUriList.trimToSize();
+			for(final Entry<String, String> xmlnsEntry: lookupPrefixMap.entrySet()){
+				final String xmlnsUri = xmlnsEntry.getKey();
+				final String xmlnsPrefix = xmlnsEntry.getValue();
+				final EncodeXmlnsLabel xmlnsLabel =
+					document.xmlnsLabelPool.unique(document.xmlnsUriPool.unique(xmlnsUri), document.xmlnsPrefixPool.unique(xmlnsPrefix));
+				lookupPrefixList.add(xmlnsLabel);
+			}
+			lookupPrefixList.trimToSize();
+			Collections.sort(lookupUriList, Encoder2.XmlnsPrefixUriComparator);
+			Collections.sort(lookupPrefixList, Encoder2.XmlnsUriPrefixComparator);
+			this.lookupUriList = lookupUriList;
+			this.lookupPrefixList = lookupPrefixList;
+		}
+
+		/**
+		 * Diese Methode setzt beide {@link List}s auf {@code null}.
+		 */
+		private void removeLists() {
+			this.lookupUriList = null;
+			this.lookupPrefixList = null;
+		}
+
+		/**
+		 * Diese Methode ordnet dem gegebenen {@code Prefix} die gegebene {@code Uri} zu.
+		 * 
+		 * @see EncodeElementNodeBuilder#createXmlns(String, String)
+		 * @param uri {@code Uri}.
+		 * @param prefix {@code Prefix}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalArgumentException Wenn dem {@code Prefix} bereits eine andere {@code Uri} zugeordnet ist.
+		 */
+		public void create(final String uri, final String prefix) throws NullPointerException, IllegalArgumentException {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(prefix == null) throw new NullPointerException("prefix is null");
+			if(uri.equals(this.lookupUri(prefix))) return;
+			if(this.lookupUriMap == null){
+				this.createMaps();
+			}else if(this.lookupUriMap.containsKey(prefix)) throw new IllegalArgumentException("prefix already exists");
+			this.updateMaps(uri, prefix);
+			this.removeLists();
+		}
+
+		/**
+		 * Diese Methode ordnet dem gegebenen {@code Prefix} die gegebene {@code Uri} zu und gibt {@code this} bzw. einen neuen {@link EncodeXmlnsBuilder} zurück. Ein neuer {@link EncodeXmlnsBuilder} wird nur dann zurück gegeben, wenn dem {@code Prefix} in diesem {@link EncodeXmlnsBuilder} bereits eine {@code Uri} zugeordnet ist.
+		 * 
+		 * @see EncodeDocumentHandler#startPrefixMapping(String, String)
+		 * @param uri {@code Uri}.
+		 * @param prefix {@code Prefix}.
+		 * @return {@code this} oder ein neuer {@link EncodeXmlnsBuilder}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeXmlnsBuilder append(final String uri, final String prefix) throws NullPointerException {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(prefix == null) throw new NullPointerException("prefix is null");
+			if(this.lookupUriMap == null){
+				this.createMaps();
+			}else if(this.lookupUriMap.containsKey(prefix)){
+				final EncodeXmlnsBuilder builder = new EncodeXmlnsBuilder(this);
+				builder.createMaps();
+				builder.updateMaps(uri, prefix);
+				return builder;
+			}
+			this.updateMaps(uri, prefix);
+			this.removeLists();
+			return this;
+		}
+
+		/**
+		 * Diese Methode entfernt die letzte Zuordnung des gegebenen {@code Prefix}es und gibt {@code this} bzw. den {@code Eltern}-{@link EncodeXmlnsBuilder} zurück. Der {@code Eltern}-{@link EncodeXmlnsBuilder} wird nur dann zurück gegeben, dieser {@link EncodeXmlnsBuilder} durch das Entfernen der Zuordnung leer geworden ist.
+		 * 
+		 * @see EncodeDocumentHandler#endPrefixMapping(String)
+		 * @param prefix {@code Prefix}.
+		 * @return {@code this} oder {@code Eltern}-{@link EncodeXmlnsBuilder}.
+		 */
+		public EncodeXmlnsBuilder remove(final String prefix) {
+			final EncodeXmlnsBuilder parent = this.parent;
+			final Map<String, String> lookupUriMap = this.lookupUriMap;
+			if(lookupUriMap != null){
+				final String uri = lookupUriMap.remove(prefix);
+				if(uri != null){
+					final Map<String, String> lookupPrefixMap = this.lookupPrefixMap;
+					lookupPrefixMap.remove(uri);
+					for(final Entry<String, String> entry: lookupUriMap.entrySet()){
+						if(uri.equals(entry.getValue())){
+							lookupPrefixMap.put(uri, entry.getKey());
+						}
+					}
+					this.removeLists();
+					if((parent == null) || !lookupUriMap.isEmpty()) return this;
+					return parent;
+				}
+			}
+			if(parent == null) return this;
+			this.parent = parent.remove(prefix);
+			return this;
+		}
+
+		/**
+		 * Diese Methode gibt die dem gegebenen {@code Prefix} zugeordnete {@code Uri} oder {@code null} zurück. Als Suchraum gelten dieser und der {@code Eltern}-{@link EncodeXmlnsBuilder}.
+		 * 
+		 * @param prefix {@code Prefix}.
+		 * @return {@code Uri} oder {@code null}.
+		 */
+		public String lookupUri(final String prefix) {
+			if(prefix == null) return null;
+			final Map<String, String> lookupUriMap = this.lookupUriMap;
+			if(lookupUriMap != null){
+				final String uri = lookupUriMap.get(prefix);
+				if(uri != null) return uri;
+			}
+			final EncodeXmlnsBuilder parent = this.parent;
+			if(parent != null) return parent.lookupUri(prefix);
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt die {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupUri(String)} zurück.
+		 * 
+		 * @see EncodeElementLabel#getLookupUriList()
+		 * @return {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupUri(String)}.
+		 */
+		public List<EncodeXmlnsLabel> lookupUriList() {
+			this.updateLists();
+			return this.lookupUriList;
+		}
+
+		/**
+		 * Diese Methode gibt den zuletzt der gegebenen {@code Uri} zugeordnete {@code Prefix} oder {@code null} zurück. Als Suchraum gelten dieser und der {@code Eltern}-{@link EncodeXmlnsBuilder}.
+		 * 
+		 * @param uri {@code Uri}.
+		 * @return {@code Prefix} oder {@code null}.
+		 */
+		public String lookupPrefix(final String uri) {
+			if(uri == null) return null;
+			final Map<String, String> lookupPrefixMap = this.lookupPrefixMap;
+			if(lookupPrefixMap != null){
+				final String prefix = lookupPrefixMap.get(uri);
+				if(prefix != null) return prefix;
+			}
+			final EncodeXmlnsBuilder parent = this.parent;
+			if(parent != null) return parent.lookupPrefix(uri);
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt die {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupPrefix(String)} zurück.
+		 * 
+		 * @see EncodeElementLabel#getLookupPrefixList()
+		 * @return {@link List} der {@link EncodeXmlnsLabel}s zu {@link #lookupPrefix(String)}.
+		 */
+		public List<EncodeXmlnsLabel> lookupPrefixList() {
+			this.updateLists();
+			return this.lookupPrefixList;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link EncodeItem} zur Abstraktion eines Navigationspfades mit Id.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeNavigationEntry extends EncodeItem {
+
+		/**
+		 * Dieses Feld speichert die {@code Id}.
+		 */
+		protected final EncodeValue id;
+
+		/**
+		 * Dieses Feld speichert die {@code Indices}.
+		 */
+		protected final EncodeIndices indices;
+
+		/**
+		 * Dieser Konstrukteur initialisiert {@code Id} und {@code Indices}.
+		 * 
+		 * @param id {@code Id}.
+		 * @param indices {@code Indices}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeNavigationEntry(final EncodeValue id, final EncodeIndices indices) throws NullPointerException {
+			if(id == null) throw new NullPointerException("id is null");
+			if(indices == null) throw new NullPointerException("indices is null");
+			this.id = id;
+			this.indices = indices;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getType() {
+			return EncodeItem.TYPE_NAVIGATION_ENTRY;
+		}
+
+		/**
+		 * Diese Methode gibt die {@code Id} zurück.
+		 * 
+		 * @see Document#getElementById(String)
+		 * @see EncodeDocument#getNavigationEntryPool()
+		 * @return {@code Id}.
+		 */
+		public EncodeValue getId() {
+			return this.id;
+		}
+
+		/**
+		 * Diese Methode gibt die {@code Indices} zurück.
+		 * 
+		 * @see Document#getElementById(String)
+		 * @see EncodeDocument#getNavigationEntryPool()
+		 * @return {@code Indices}.
+		 */
+		public EncodeIndices getIndices() {
+			return this.indices;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeNavigationEntry asNavigationEntry() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this.id.string, this.indices);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link EncodePool} der {@link EncodeNavigationEntry}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeNavigationEntryPool extends EncodePool<EncodeNavigationEntry> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int hash(final EncodeNavigationEntry input) {
+			return Objects.hash(input.id.string);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected boolean equals(final EncodeNavigationEntry input1, final EncodeNavigationEntry input2) {
+			return Objects.equals(input1.id.string, input2.id.string);
+		}
+
+		/**
+		 * Diese Methode gibt das einzigartige {@link EncodeNavigationEntry} mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @see EncodeNavigationEntry#EncodeNavigationEntry(EncodeValue, EncodeIndices)
+		 * @see EncodeNavigationEntryPool#get(EncodeNavigationEntry)
+		 * @param id {@code Id}.
+		 * @param indices {@code Indices}.
+		 * @return einzigartiges {@link EncodeNavigationEntry}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeNavigationEntry unique(final EncodeValue id, final EncodeIndices indices) throws NullPointerException {
+			return this.get(new EncodeNavigationEntry(id, indices));
 		}
 
 	}
@@ -990,6 +1830,154 @@ public class Encoder2 {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein abstraktens Objekt zum Schrrittweisen Aufbau eines {@link EncodeDocument}s bzw. {@link EncodeElementNode}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GThiz> Typ dieses Objekts.
+	 */
+	public static abstract class EncodeBuilder<GThiz extends EncodeBuilder<?>> {
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeXmlnsBuilder} oder {@code null}.
+		 */
+		protected EncodeXmlnsBuilder xmlns;
+
+		/**
+		 * Dieses Feld speichert die {@code Children} oder {@code null}.
+		 */
+		protected List<Object> children = new ArrayList<Object>(0);
+
+		/**
+		 * Dieses Feld speichert das {@link EncodeDocument} oder {@code null}.
+		 */
+		protected EncodeDocument document;
+
+		/**
+		 * Diese Methode gibt {@code this} zurück.
+		 * 
+		 * @return {@code this}.
+		 */
+		protected abstract GThiz thiz();
+
+		/**
+		 * Diese Methode setzt {@link #xmlns} und {@link #children} auf {@code null}.
+		 */
+		protected void clear() {
+			this.xmlns = null;
+			this.children = null;
+		}
+
+		/**
+		 * Diese Methode prüft die Modifizierbarkeit.
+		 * 
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		protected void check() throws IllegalStateException {
+			if(this.children == null) throw new IllegalStateException("already committed");
+		}
+
+		/**
+		 * Diese Methode gibt die {@link EncodeItem}-{@link List} der {@code Children} zurück. Diese kann {@link EncodeTextNode}s, {@link EncodeCommentNode}s, {@link EncodeElementNode}s, {@link EncodeReferenceNode}s und {@link EncodeInstructionNode}s enthalten. Jeden noch nicht bestätigte {@link EncodeElementNodeBuilder} wird via {@link EncodeElementNodeBuilder#result()} bestätigt.
+		 * 
+		 * @return {@link EncodeItem}-{@link List} der {@code Children}
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		protected List<EncodeItem> children() throws IllegalStateException {
+			this.check();
+			final List<Object> source = this.children;
+			final int size = source.size();
+			final List<EncodeItem> target = new ArrayList<EncodeItem>(size);
+			for(int i = 0; i < size; i++){
+				final Object item = source.get(i);
+				if(item instanceof EncodeElementNodeBuilder<?>){
+					final EncodeElementNodeBuilder<?> builder = (EncodeElementNodeBuilder<?>)item;
+					final EncodeElementNode result = builder.result();
+					source.set(i, result);
+					target.add(i, result);
+				}else{
+					target.add(i, (EncodeItem)item);
+				}
+			}
+			return target;
+		}
+
+		/**
+		 * Diese Methode registriert den gegebenen Navigationspfad unter der gegebenen Id. Der Navigationspfad beschreibt dabei die Kindknotenindices zur Navigation zum Ziel {@link EncodeElementNode}.
+		 * 
+		 * @param id Id.
+		 * @param indices Navigationspfad.
+		 * @throws IllegalArgumentException Wenn der gegebenen Id bereits ein Navigationspfad zugeordnet ist.
+		 */
+		protected abstract void createId(String id, List<Integer> indices) throws IllegalArgumentException;
+
+		/**
+		 * Diese Methode fügt einen neuen {@link EncodeElementNodeBuilder} zur Definition eines {@link EncodeElementNode}s mit dem gegebenen {@code Name} als letzten Kindknoten an und gibt ihn zurück. Als {@code Uri} wird {@link XMLConstants#NULL_NS_URI} verwendet.
+		 * 
+		 * @see #createElement(String, String)
+		 * @param name {@code Name}.
+		 * @return {@link EncodeElementNodeBuilder}.
+		 * @throws NullPointerException Wenn der gegebene {@code Name} {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public EncodeElementNodeBuilder<GThiz> createElement(final String name) throws IllegalStateException {
+			return this.createElement(XMLConstants.NULL_NS_URI, name);
+		}
+
+		/**
+		 * Diese Methode fügt einen neuen {@link EncodeElementNodeBuilder} zur Definition eines {@link EncodeElementNode}s mit der gegebenen {@code Uri} und dem gegebenen {@code Name} als letzten Kindknoten an und gibt ihn zurück.
+		 * 
+		 * @see EncodeElementLabel#getUri()
+		 * @see EncodeElementLabel#getName()
+		 * @see EncodeElementNodeBuilder#commit()
+		 * @param uri {@code Uri}.
+		 * @param name {@code Name}.
+		 * @return {@link EncodeElementNodeBuilder}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public EncodeElementNodeBuilder<GThiz> createElement(final String uri, final String name) throws NullPointerException, IllegalStateException {
+			this.check();
+			final EncodeElementNodeBuilder<GThiz> builder = new EncodeElementNodeBuilder<GThiz>(this.thiz(), uri, name, this.children.size());
+			this.children.add(builder.index, builder);
+			return builder;
+		}
+
+		/**
+		 * Diese Methode fügt den {@link EncodeCommentNode} mit dem gegebenen {@code Value} als letzten Kindknoten an und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeDocument#getCommentNodePool()
+		 * @see EncodeDocument#createCommentNode(String)
+		 * @param value {@code Value}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn der gegebene {@code Value} {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public GThiz createComment(final String value) throws NullPointerException, IllegalStateException {
+			this.check();
+			this.children.add(this.document.createCommentNode(value));
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode fügt die {@link EncodeInstructionNode} mit den gegebenen Eigenschaften als letzten Kindknoten an und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeDocument#getInstructionNodePool()
+		 * @see EncodeDocument#createInstructionNode(String, String)
+		 * @param name Name.
+		 * @param value Wert.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public GThiz createInstruction(final String name, final String value) throws NullPointerException, IllegalStateException {
+			this.check();
+			this.children.add(this.document.createInstructionNode(name, value));
+			return this.thiz();
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert ein {@link EncodeItem} zur Abstraktion eines {@link Text}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -1023,6 +2011,14 @@ public class Encoder2 {
 		@Override
 		public EncodeValue getValue() {
 			return this.value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeTextNode asTextNode() {
+			return this;
 		}
 
 		/**
@@ -1152,17 +2148,27 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeElementNode asElementNode() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			final StringBuilder builder = new StringBuilder();
 			builder.append('<').append(this.label);
-			if(!this.label.lookupUriList.items.isEmpty()){
-				builder.append(' ').append(this.label.lookupUriList);
+			for(final Object label: this.label.lookupUriList.items.values()){
+				builder.append(' ').append(label);
 			}
-			if(!this.attributes.items.isEmpty()){
-				builder.append(' ').append(this.attributes);
+			for(final Object label: this.attributes.items.values()){
+				builder.append(' ').append(label);
 			}
 			builder.append('>');
-
+			for(final Object label: this.children.items.values()){
+				builder.append(label);
+			}
 			builder.append("</").append(this.label).append(">");
 			return builder.toString();
 		}
@@ -1190,6 +2196,256 @@ public class Encoder2 {
 		@Override
 		protected boolean equals(final EncodeElementNode input1, final EncodeElementNode input2) {
 			return (input1.label == input2.label) && (input1.children == input2.children) && (input1.attributes == input2.attributes);
+		}
+
+		/**
+		 * Diese Methode gibt den einzigartigen {@link EncodeElementNode} mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @see EncodeElementNode#EncodeElementNode(EncodeElementLabel, EncodeGroup, EncodeGroup)
+		 * @see EncodeElementNodePool#get(EncodeElementNode)
+		 * @param label {@code Label}.
+		 * @param children {@code Children}.
+		 * @param attributes {@code Attributes}.
+		 * @return einzigartiger {@link EncodeElementNode}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeElementNode unique(final EncodeElementLabel label, final EncodeGroup children, final EncodeGroup attributes) throws NullPointerException {
+			return this.get(new EncodeElementNode(label, children, attributes));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zum Schrrittweisen Aufbau eines {@link EncodeElementNode}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GParent> Typ des {@code Eltern}-{@link EncodeBuilder}s.
+	 */
+	public static class EncodeElementNodeBuilder<GParent extends EncodeBuilder<?>> extends EncodeBuilder<EncodeElementNodeBuilder<GParent>> {
+
+		/**
+		 * Dieses Feld speichert die {@code Uri} oder {@code null}.
+		 */
+		protected String uri;
+
+		/**
+		 * Dieses Feld speichert den {@code Name} oder {@code null}.
+		 */
+		protected String name;
+
+		/**
+		 * Dieses Feld speichert die Position dieses {@link EncodeElementNodeBuilder}s in seinem {@code Eltern}-{@link EncodeBuilder}.
+		 */
+		protected final int index;
+
+		/**
+		 * Dieses Feld speichert den {@code Eltern}-{@link EncodeBuilder} oder {@code null}.
+		 */
+		protected final GParent parent;
+
+		/**
+		 * Dieses Feld speichert die {@code Attributes} oder {@code null}.
+		 */
+		protected List<EncodeAttributeNode> attributes;
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeElementNode} oder {@code null}.
+		 */
+		protected EncodeElementNode result;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@code Eltern}-{@link EncodeBuilder}, die {@code Uri}, den {@code Name} sowie den {@code Child}-Index, den der definierte {@link EncodeElementNode} in den {@code Children} des {@code Eltern}-{@link EncodeBuilder} besitzt.
+		 * 
+		 * @param parent {@code Eltern}-{@link EncodeBuilder}.
+		 * @param uri {@code Uri}.
+		 * @param name {@code Name}.
+		 * @param index {@code Child}-Index.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeElementNodeBuilder(final GParent parent, final String uri, final String name, final int index) {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(name == null) throw new NullPointerException("name is null");
+			if(parent == null) throw new NullPointerException("parent is null");
+			this.uri = uri;
+			this.name = name;
+			this.index = index;
+			this.parent = parent;
+			this.xmlns = new EncodeXmlnsBuilder(parent.xmlns);
+			this.document = parent.document;
+			this.attributes = new ArrayList<EncodeAttributeNode>(0);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected EncodeElementNodeBuilder<GParent> thiz() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc} Auch {@link #uri}, {@link #name}, {@link #document} und {@link #attributes} werden auf {@code null} gesetzt.
+		 */
+		@Override
+		protected void clear() {
+			super.clear();
+			this.uri = null;
+			this.name = null;
+			this.document = null;
+			this.attributes = null;
+		}
+
+		/**
+		 * Diese Methode schließt die Bearbeitung des {@link EncodeElementNode}s ab und gibt ihn zurück. Nach dem Aufruf dieser Methode lässt dieser {@link EncodeElementNodeBuilder} keine Modifikationen mehr zu.
+		 * 
+		 * @return {@link EncodeElementNode}.
+		 * @throws IllegalArgumentException Wenn der {@code Uri} kein {@code Prefix} zugeordnet ist.
+		 */
+		protected EncodeElementNode result() throws IllegalArgumentException {
+			if(this.result != null) return this.result;
+			final String prefix = this.xmlns.lookupPrefix(this.uri);
+			if(prefix == null) throw new IllegalArgumentException("uri has no prefix");
+			this.result =
+				this.document.createElementNode(this.uri, this.name, prefix, this.xmlns.lookupUriList(), this.xmlns.lookupPrefixList(), this.children(),
+					this.attributes);
+			this.clear();
+			return this.result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void createId(final String id, final List<Integer> indices) throws IllegalArgumentException {
+			indices.add(0, Integer.valueOf(this.index));
+			this.parent.createId(id, indices);
+		}
+
+		/**
+		 * Diese Methode erzeugt einen Navigationspfad mit der gegebenen {@code Id} zum definierten {@link EncodeElementNode} und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeDocument#getNavigationEntryPool()
+		 * @param id {@code Id}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die gegebene {@code Id} {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 * @throws IllegalArgumentException Wenn die gegebene {@code Id} bereits verwendet wird.
+		 */
+		public EncodeElementNodeBuilder<GParent> createId(final String id) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			this.check();
+			if(id == null) throw new NullPointerException("id ist null");
+			this.createId(id, new ArrayList<Integer>());
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode fügt den {@link EncodeTextNode} mit dem gegebenen Wert als letzten Kindknoten an und gibt {@code this} zurück.
+		 * 
+		 * @param value Wert.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public EncodeElementNodeBuilder<GParent> createText(final String value) throws NullPointerException, IllegalStateException {
+			this.check();
+			this.children.add(this.document.createTextNode(value));
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode erzeugt ein neues {@link EncodeXmlnsLabel} und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeElementNode#getLabel()
+		 * @see EncodeElementLabel#getLookupUriList()
+		 * @see EncodeElementLabel#getLookupPrefixList()
+		 * @see EncodeDocument#getXmlnsLabelPool()
+		 * @param uri {@code Uri}.
+		 * @param prefix {@code Prefix}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 * @throws IllegalArgumentException Wenn dem {@code Prefix} bereits eine andere {@code Uri} zugeordnet ist.
+		 */
+		public EncodeElementNodeBuilder<GParent> createXmlns(final String uri, final String prefix) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
+			this.check();
+			this.xmlns.create(uri, prefix);
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode erzeugt den {@link EncodeAttributeNode} mit den gegebenen Eigenschaften und gibt {@code this} zurück. Als {@code Uri} wird {@link XMLConstants#NULL_NS_URI} verwendet.
+		 * 
+		 * @see #createAttribute(String, String, String)
+		 * @param name {@code Name}.
+		 * @param value {@code Value}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 * @throws IllegalArgumentException Wenn der {@code Uri} kein {@code Prefix} zugeordnet ist oder bereits ein {@link EncodeAttributeNode} mit der gegebenen {@code Uri} und dem gegebenen {@code Name} existiert.
+		 */
+		public EncodeElementNodeBuilder<GParent> createAttribute(final String name, final String value) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
+			return this.createAttribute(XMLConstants.NULL_NS_URI, name, value);
+		}
+
+		/**
+		 * Diese Methode erzeugt den {@link EncodeAttributeNode} mit den gegebenen Eigenschaften und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeDocument#getAttributeNodePool()
+		 * @see EncodeDocument#createAttributeNode(String, String, String, String)
+		 * @param uri {@code Uri}.
+		 * @param name {@code Name}.
+		 * @param value {@code Value}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 * @throws IllegalArgumentException Wenn der gegebenen {@code Uri} kein {@code Prefix} zugeordnet ist oder bereits ein {@link EncodeAttributeNode} mit der gegebenen {@code Uri} und dem gegebenen {@code Name} existiert.
+		 */
+		public EncodeElementNodeBuilder<GParent> createAttribute(final String uri, final String name, final String value) throws NullPointerException,
+			IllegalStateException, IllegalArgumentException {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(name == null) throw new NullPointerException("name is null");
+			if(value == null) throw new NullPointerException("value is null");
+			this.check();
+			final String prefix = this.xmlns.lookupPrefix(uri);
+			if(prefix == null) throw new IllegalArgumentException("uri has no prefix");
+			for(final EncodeAttributeNode attribute: this.attributes){
+				final EncodeAttributeLabel label = attribute.label;
+				if(label.uri.string.equals(uri) && label.name.string.equals(name)) throw new IllegalArgumentException("attribute already exists");
+			}
+			this.attributes.add(this.document.createAttributeNode(uri, name, prefix, value));
+			Collections.sort(this.attributes, Encoder2.AttributeNameUriComparator);
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode fügt den {@link EncodeReferenceNode} mit dem gegebenen {@code Name} als letzten Kindknoten an und gibt {@code this} zurück.
+		 * 
+		 * @see EncodeDocument#getCommentNodePool()
+		 * @see EncodeDocument#createReferenceNode(String)
+		 * @param name {@code Name}.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn der gegebene {@code Name} {@code null} ist.
+		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
+		 */
+		public EncodeElementNodeBuilder<GParent> createReference(final String name) {
+			this.check();
+			this.children.add(this.document.createReferenceNode(name));
+			return this.thiz();
+		}
+
+		/**
+		 * Diese Methode schließt die Bearbeitung des {@link EncodeElementNode}s ab und gibt den {@code Eltern}-{@link EncodeBuilder} zurück. Nach dem Aufruf dieser Methode lässt dieser {@link EncodeElementNodeBuilder} keine Modifikationen mehr zu.
+		 * 
+		 * @return {@code Eltern}-{@link EncodeBuilder}.
+		 * @throws IllegalArgumentException Wenn der {@code Uri} kein {@code Prefix} zugeordnet ist.
+		 */
+		public GParent commit() throws IllegalArgumentException {
+			final GParent parent = this.parent;
+			if(this.result != null) return parent;
+			parent.children.set(this.index, this.result());
+			return parent;
 		}
 
 	}
@@ -1265,6 +2521,14 @@ public class Encoder2 {
 		 */
 		public EncodeGroup getLookupPrefixList() {
 			return this.lookupPrefixList;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeElementLabel asElementLabel() {
+			return this;
 		}
 
 	}
@@ -1377,6 +2641,14 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeAttributeNode asAttributeNode() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return this.label + "=\"" + this.value + "\"";
 		}
@@ -1469,6 +2741,14 @@ public class Encoder2 {
 		 */
 		public EncodeValue getName() {
 			return this.name;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeAttributeLabel asAttributeLabel() {
+			return this;
 		}
 
 		/**
@@ -1568,6 +2848,14 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeReferenceNode asReferenceNode() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return "&" + this.name + ";";
 		}
@@ -1646,6 +2934,14 @@ public class Encoder2 {
 		@Override
 		public EncodeValue getValue() {
 			return this.value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public EncodeCommentNode asCommentNode() {
+			return super.asCommentNode();
 		}
 
 		/**
@@ -1741,6 +3037,14 @@ public class Encoder2 {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public EncodeInstructionNode asInstructionNode() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return "<?" + this.name + " " + this.value + "?>";
 		}
@@ -1786,376 +3090,6 @@ public class Encoder2 {
 
 	}
 
-	public static abstract class EncodeBuilder<GThiz extends EncodeBuilder<?>> {
-
-		protected List<Object> children = new ArrayList<Object>();
-
-		protected List<List<EncodeItem>> navigations = new ArrayList<List<EncodeItem>>();
-
-		protected EncodeDocument document;
-
-		protected abstract GThiz thiz();
-
-		Map<String, List<EncodeItem>> idPathMap = new HashMap<String, List<EncodeItem>>(0);
-
-		protected boolean idTest(final String id) {
-			return this.idPathMap.containsKey(id);
-		}
-
-		protected Iterable<String> prefixes() {
-			return Arrays.asList(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.XML_NS_PREFIX);
-		}
-
-		/**
-		 * Diese Methode gibt die {@code Uri} zum gegebenen {@code Prefix} oder {@code null} zurück.
-		 * 
-		 * @param prefix {@code Prefix}.
-		 * @return {@code Uri} zum gegebenen {@code Prefix} oder {@code null}.
-		 */
-		protected String lookupUri(final String prefix) {
-			if(XMLConstants.XML_NS_PREFIX.equals(prefix)) return XMLConstants.XML_NS_URI;
-			if(XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) return XMLConstants.NULL_NS_URI;
-			return null;
-		}
-
-		protected String lookupPrefix(final String uri) {
-			if(XMLConstants.XML_NS_URI.equals(uri)) return XMLConstants.XML_NS_PREFIX;
-			if(XMLConstants.NULL_NS_URI.equals(uri)) return XMLConstants.DEFAULT_NS_PREFIX;
-			return null;
-		}
-
-		protected void assertNotNull(final Object string) throws IllegalStateException {
-			if(string == null) throw new IllegalStateException();
-		}
-
-		protected void assertNotEmpty(final String string) throws IllegalStateException {
-			this.assertNotNull(string);
-			if(string.isEmpty()) throw new IllegalStateException();
-		}
-
-		protected void check() throws IllegalStateException {
-			if(this.children == null) throw new IllegalStateException("already committed");
-		}
-
-		protected List<EncodeItem> commitChildren() throws IllegalStateException {
-			this.check();
-			final List<Object> source = this.children;
-			final int size = source.size();
-			final List<EncodeItem> target = new ArrayList<EncodeItem>(size);
-			for(int i = 0; i < size; i++){
-				final Object item = source.get(i);
-				if(item instanceof EncodeElementBuilder<?>){
-					final EncodeElementBuilder<?> builder = (EncodeElementBuilder<?>)item;
-					final EncodeElementNode element = builder.commitResult();
-					source.set(i, element);
-					target.add(element);
-				}else{
-					target.add((EncodeItem)item);
-				}
-			}
-			return target;
-		}
-
-		public EncodeElementBuilder<GThiz> createElement(final String name) throws IllegalStateException {
-			return this.createElement(XMLConstants.NULL_NS_URI, name);
-		}
-
-		public EncodeElementBuilder<GThiz> createElement(final String uri, final String name) throws IllegalStateException {
-			this.check();
-			this.assertNotNull(uri);
-			this.assertNotEmpty(name);
-			final EncodeElementBuilder<GThiz> builder = new EncodeElementBuilder<GThiz>(this.thiz(), uri, name);
-			this.children.add(builder);
-			return builder;
-		}
-
-		/**
-		 * Diese Methode fügt den {@link EncodeCommentNode} mit dem gegebenen Wert als letzten Kindknoten an und gibt {@code this} zurück.
-		 * 
-		 * @see EncodeValuePool#unique(String)
-		 * @see EncodeCommentNodePool#unique(EncodeValue)
-		 * @param value Wert.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
-		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
-		 */
-		public GThiz createComment(final String value) throws NullPointerException, IllegalStateException {
-			if(value == null) throw new NullPointerException("value is null");
-			this.check();
-			final EncodeDocument docu = this.document;
-			this.children.add(docu.commentNodePool.unique(docu.valuePool.unique(value)));
-			return this.thiz();
-		}
-
-		/**
-		 * Diese Methode fügt die {@link EncodeInstructionNode} mit den gegebenen Eigenschaften als letzten Kindknoten an und gibt {@code this} zurück.
-		 * 
-		 * @see EncodeInstructionNodePool#unique(String, String)
-		 * @param name Name.
-		 * @param value Wert.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
-		 */
-		public GThiz createInstruction(final String name, final String value) throws NullPointerException, IllegalStateException {
-			if(name == null) throw new NullPointerException("name is null");
-			if(value == null) throw new NullPointerException("value is null");
-			this.check();
-			final EncodeDocument docu = this.document;
-			this.children.add(docu.instructionNodePool.unique(docu.instructionNamePool.unique(name), docu.valuePool.unique(value)));
-			return this.thiz();
-		}
-
-	}
-
-	public static class EncodeElementBuilder<GOwner extends EncodeBuilder<?>> extends EncodeBuilder<EncodeElementBuilder<GOwner>> {
-
-		final protected String uri;
-
-		final protected String name;
-
-		Map<String, String> lookupPrefixMap;
-
-		Map<String, String> lookupUriMap;
-
-		final protected GOwner owner;
-
-		protected List<EncodeXmlnsLabel> xmlns = new ArrayList<EncodeXmlnsLabel>();
-
-		protected List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>();
-
-		EncodeElementNode result;
-
-		public EncodeElementBuilder(final GOwner owner, final String uri, final String name) {
-			if(uri == null) throw new NullPointerException("uri is null");
-			if(name == null) throw new NullPointerException("name is null");
-			if(owner == null) throw new NullPointerException("owner is null");
-			this.owner = owner;
-			this.uri = uri;
-			this.name = name;
-			this.document = owner.document;
-		}
-
-		@Override
-		protected EncodeElementBuilder<GOwner> thiz() {
-			return this;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected String lookupUri(final String prefix) {
-			if(this.lookupUriMap == null) return this.owner.lookupUri(prefix);
-			final String uri = this.lookupUriMap.get(prefix);
-			if(uri != null) return uri;
-			return this.owner.lookupUri(prefix);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected String lookupPrefix(final String uri) {
-			if(this.lookupPrefixMap == null) return this.owner.lookupPrefix(uri);
-			final String prefix = this.lookupPrefixMap.get(uri);
-			if(prefix != null) return prefix;
-			return this.owner.lookupPrefix(uri);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected Iterable<String> prefixes() {
-			if(this.lookupUriMap == null) return this.owner.prefixes();
-			return Iterables.chainedIterable(this.owner.prefixes(), this.lookupUriMap.keySet());
-		}
-
-		public EncodeElementBuilder<GOwner> createId(final String value) {
-			this.check();
-			this.assertNotEmpty(value);
-
-			return this.thiz();
-		}
-
-		/**
-		 * Diese Methode fügt den {@link EncodeTextNode} mit dem gegebenen Wert als letzten Kindknoten an und gibt {@code this} zurück.
-		 * 
-		 * @param value Wert.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
-		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
-		 */
-		public EncodeElementBuilder<GOwner> createText(final String value) throws NullPointerException, IllegalStateException {
-			if(value == null) throw new NullPointerException("value is null");
-			this.check();
-			final EncodeDocument docu = this.document;
-			this.children.add(docu.textNodePool.unique(docu.valuePool.unique(value)));
-			return this.thiz();
-		}
-
-		/**
-		 * Diese Methode erzeugt ein neues {@code Uri/Prefix}-{@link EncodeXmlnsLabel} und gibt {@code this} zurück.
-		 * 
-		 * @see EncodeElementNode#getLabel()
-		 * @see EncodeElementLabel#getLookupUriList()
-		 * @see EncodeElementLabel#getLookupPrefixList()
-		 * @param uri {@code Uri}.
-		 * @param prefix {@code Prefix}.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 * @throws IllegalStateException Wenn dieser {@link EncodeBuilder} keine Modifikationen mehr zulässt.
-		 */
-		public final EncodeElementBuilder<GOwner> createXmlns(final String uri, final String prefix) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			if(uri == null) throw new NullPointerException("uri is null");
-			if(prefix == null) throw new NullPointerException("name is null");
-			this.check();
-			if(this.lookupUriMap == null){
-				this.lookupUriMap = new HashMap<String, String>(1);
-				this.lookupPrefixMap = new HashMap<String, String>(1);
-			}else if(this.lookupUriMap.containsKey(prefix)) throw new IllegalArgumentException("prefix already exists");
-			this.lookupUriMap.put(prefix, uri);
-			this.lookupPrefixMap.put(uri, prefix);
-			return this.thiz();
-		}
-
-		public EncodeElementBuilder<GOwner> createAttribute(final String name, final String value) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			return this.createAttribute(XMLConstants.NULL_NS_URI, name, value);
-		}
-
-		public EncodeElementBuilder<GOwner> createAttribute(final String uri, final String name, final String value) throws NullPointerException,
-			IllegalStateException, IllegalArgumentException {
-			if(uri == null) throw new NullPointerException("uri is null");
-			if(name == null) throw new NullPointerException("name is null");
-			if(value == null) throw new NullPointerException("value is null");
-			this.check();
-			final String prefix = this.lookupPrefix(uri);
-			if(prefix == null) throw new IllegalArgumentException("uri has no prefix");
-			for(final EncodeAttributeNode attribute: this.attributes){
-				final EncodeAttributeLabel label = attribute.label;
-				if(label.uri.string.equals(uri) && label.name.string.equals(name)) throw new IllegalArgumentException("attribute already exists");
-			}
-			final EncodeDocument docu = this.document;
-			final EncodeValue _uri = docu.xmlnsUriPool.unique(uri);
-			final EncodeValue _name = docu.attributeNamePool.unique(name);
-			final EncodeValue _value = docu.valuePool.unique(value);
-			final EncodeValue _prefix = docu.xmlnsPrefixPool.unique(name);
-			final EncodeAttributeLabel _label = docu.attributeLabelPool.unique(_uri, _name, _prefix);
-			final EncodeAttributeNode _attribute = docu.attributeNodePool.unique(_label, _value);
-			this.attributes.add(_attribute);
-			return this.thiz();
-		}
-
-		public EncodeElementBuilder<GOwner> createReference(final String name) {
-			if(name == null) throw new NullPointerException("name is null");
-			this.check();
-			final EncodeDocument docu = this.document;
-			this.children.add(docu.referenceNodePool.unique(docu.referenceNamePool.unique(name)));
-			return this.thiz();
-		}
-
-		protected EncodeElementNode commitResult() {
-			if(this.result != null) return this.result;
-			this.check();
-			final String prefix = this.lookupPrefix(this.uri);
-			if(prefix == null) throw new IllegalArgumentException("uri has no prefix");
-			
-			List<EncodeItem> children	=	commitChildren();
-			final EncodeDocument docu = this.document;
-			final Map<String, String> lookupUriMap = new HashMap<String, String>();
-			final Map<String, String> lookupPrefixMap = new HashMap<String, String>();
-			final List<EncodeXmlnsLabel> lookupUriList = new ArrayList<EncodeXmlnsLabel>();
-			final List<EncodeXmlnsLabel> lookupPrefixList = new ArrayList<EncodeXmlnsLabel>();
-			for(final String xmlnsPrefix: this.prefixes()){
-				final String xmlnsUri = this.lookupUri(xmlnsPrefix);
-				lookupUriMap.put(xmlnsPrefix, xmlnsUri);
-			}
-			for(final Entry<String, String> xmlnsEntry: lookupUriMap.entrySet()){
-				final String xmlnsUri = xmlnsEntry.getValue();
-				final String xmlnsPrefix = xmlnsEntry.getKey();
-				final EncodeXmlnsLabel xmlnsLabel = docu.xmlnsLabelPool.unique(docu.xmlnsUriPool.unique(xmlnsUri), docu.xmlnsPrefixPool.unique(xmlnsPrefix));
-				lookupUriList.add(xmlnsLabel);
-				lookupPrefixMap.put(xmlnsUri, this.lookupPrefix(xmlnsUri));
-			}
-			for(final Entry<String, String> xmlnsEntry: lookupPrefixMap.entrySet()){
-				final String xmlnsUri = xmlnsEntry.getKey();
-				final String xmlnsPrefix = xmlnsEntry.getValue();
-				final EncodeXmlnsLabel xmlnsLabel = docu.xmlnsLabelPool.unique(docu.xmlnsUriPool.unique(xmlnsUri), docu.xmlnsPrefixPool.unique(xmlnsPrefix));
-				lookupPrefixList.add(xmlnsLabel);
-			}
-			Collections.sort(lookupUriList, Encoder2.XmlnsPrefixUriComparator);
-			Collections.sort(lookupPrefixList, Encoder2.XmlnsUriPrefixComparator);
-			//
-
-			final EncodeValue uriValue = docu.xmlnsUriPool.unique(this.uri);
-			final EncodeValue nameValue = docu.elementNamePool.unique(this.name);
-			final EncodeValue prefixValue = docu.xmlnsPrefixPool.unique(prefix);
-			EncodeGroup lookupUriGroup = docu.xmlnsLookupPool.unique(lookupUriList);
-			EncodeGroup lookupPrefixGroup = docu.xmlnsLookupPool.unique(lookupPrefixList);
-			EncodeElementLabel elementLabel = docu.elementLabelPool.unique(uriValue, nameValue, prefixValue, lookupUriGroup, lookupPrefixGroup);
-
-			EncodeGroup a=docu.elementAttributesPool.unique(attributes);
-			EncodeGroup c = docu.elementChildrenPool.unique(children);
-			
-			EncodeElementNode elementNode = docu.elementNodePool.get(new EncodeElementNode(elementLabel, c, a));
-			
-			result = elementNode;
-			// clean state
-
-			this.lookupUriMap = null;
-			this.lookupPrefixMap = null;
-			this.document = null;
-			this.children = null;
-			this.attributes = null;
-			return this.result;
-		}
-
-		public GOwner commit() {
-			if(this.result != null) return this.owner;
-
-			final int index = this.owner.children.indexOf(this);
-			if(index < 0) throw new IllegalStateException();
-			this.owner.children.set(index, this.commitResult());
-
-			return this.owner;
-		}
-
-	}
-
-	public static class EncodeDocumentBuilder extends EncodeBuilder<EncodeDocumentBuilder> {
-
-		public EncodeDocumentBuilder() {
-			this.document = new EncodeDocument();
-		}
-
-		@Override
-		protected EncodeDocumentBuilder thiz() {
-			return this;
-		}
-
-		public EncodeDocument commit() {
-			if(this.children == null) return this.document;
-			final List<EncodeItem> children = this.commitChildren();
-			EncodeElementNode documentElement = null;
-			for(final EncodeItem item: children){
-				if(item instanceof EncodeElementNode){
-					if(documentElement != null) throw new IllegalStateException();
-					documentElement = (EncodeElementNode)item;
-				}
-			}
-			if(documentElement == null) throw new IllegalStateException();
-			final EncodeDocument document = this.document;
-			document.documentElement = documentElement;
-			document.documentChildren = document.elementChildrenPool.get(new EncodeGroup(children));
-			this.children = null;
-			return this.document;
-		}
-
-	}
-
 	/**
 	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link EncodePool}s zur Abstraktion eines {@link Document} s.
 	 * 
@@ -2166,134 +3100,111 @@ public class Encoder2 {
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeNode#getValue()}.
 		 */
-		protected final EncodeValuePool valuePool;
+		protected final EncodeValuePool valuePool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeXmlnsLabel#getUri()}.
 		 */
-		protected final EncodeValuePool xmlnsUriPool;
+		protected final EncodeValuePool xmlnsUriPool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeXmlnsLabel#getPrefix()}.
 		 */
-		protected final EncodeValuePool xmlnsPrefixPool;
+		protected final EncodeValuePool xmlnsPrefixPool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeXmlnsLabelPool} für {@link EncodeElementLabel#getLookupUriList()} bzw. {@link EncodeElementLabel#getLookupPrefixList()}.
 		 */
-		protected final EncodeXmlnsLabelPool xmlnsLabelPool;
+		protected final EncodeXmlnsLabelPool xmlnsLabelPool = new EncodeXmlnsLabelPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeGroupPool} für {@link EncodeElementLabel#getLookupUriList()} bzw. {@link EncodeElementLabel#getLookupPrefixList()}.
 		 */
-		protected final EncodeGroupPool xmlnsLookupPool;
+		protected final EncodeGroupPool xmlnsLookupPool = new EncodeGroupPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeTextNodePool} für {@link EncodeElementNode#getChildren()}.
 		 */
-		protected final EncodeTextNodePool textNodePool;
+		protected final EncodeTextNodePool textNodePool = new EncodeTextNodePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeElementLabel#getName()}.
 		 */
-		protected final EncodeValuePool elementNamePool;
+		protected final EncodeValuePool elementNamePool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeElementNodePool} für {@link EncodeDocument#getDocumentElement()}, {@link EncodeDocument#getDocumentChildren()} und {@link EncodeElementNode#getChildren()}.
 		 */
-		protected final EncodeElementNodePool elementNodePool;
+		protected final EncodeElementNodePool elementNodePool = new EncodeElementNodePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeElementLabelPool} für {@link EncodeElementNode#getLabel()}.
 		 */
-		protected final EncodeElementLabelPool elementLabelPool;
+		protected final EncodeElementLabelPool elementLabelPool = new EncodeElementLabelPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeGroupPool} für {@link EncodeElementNode#getChildren()}.
 		 */
-		protected final EncodeGroupPool elementChildrenPool;
+		protected final EncodeGroupPool elementChildrenPool = new EncodeGroupPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeGroupPool} für {@link EncodeElementNode#getAttributes()}.
 		 */
-		protected final EncodeGroupPool elementAttributesPool;
+		protected final EncodeGroupPool elementAttributesPool = new EncodeGroupPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeAttributeLabel#getName()}.
 		 */
-		protected final EncodeValuePool attributeNamePool;
+		protected final EncodeValuePool attributeNamePool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeAttributeNodePool} für {@link EncodeElementNode#getAttributes()}.
 		 */
-		protected final EncodeAttributeNodePool attributeNodePool;
+		protected final EncodeAttributeNodePool attributeNodePool = new EncodeAttributeNodePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeAttributeLabelPool} für {@link EncodeAttributeNode#getLabel()}.
 		 */
-		protected final EncodeAttributeLabelPool attributeLabelPool;
-
-		/**
-		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeReferenceNode#getName()}.
-		 */
-		protected final EncodeValuePool referenceNamePool;
-
-		/**
-		 * Dieses Feld speichert den {@link EncodeReferenceNodePool} für {@link EncodeElementNode#getChildren()}.
-		 */
-		protected final EncodeReferenceNodePool referenceNodePool;
+		protected final EncodeAttributeLabelPool attributeLabelPool = new EncodeAttributeLabelPool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeCommentNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
 		 */
-		protected final EncodeCommentNodePool commentNodePool;
+		protected final EncodeCommentNodePool commentNodePool = new EncodeCommentNodePool();
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeReferenceNode#getName()}.
+		 */
+		protected final EncodeValuePool referenceNamePool = new EncodeValuePool();
+
+		/**
+		 * Dieses Feld speichert den {@link EncodeReferenceNodePool} für {@link EncodeElementNode#getChildren()}.
+		 */
+		protected final EncodeReferenceNodePool referenceNodePool = new EncodeReferenceNodePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeValuePool} für {@link EncodeInstructionNode#getName()}.
 		 */
-		protected final EncodeValuePool instructionNamePool;
+		protected final EncodeValuePool instructionNamePool = new EncodeValuePool();
 
 		/**
 		 * Dieses Feld speichert den {@link EncodeInstructionNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
 		 */
-		protected final EncodeInstructionNodePool instructionNodePool;
+		protected final EncodeInstructionNodePool instructionNodePool = new EncodeInstructionNodePool();
 
-		protected final EncodeGroupPool navigationPathPool;
+		protected final EncodeValuePool navigationIdPool = new EncodeValuePool();
 
+		/**
+		 * Dieses Feld speichert den {@link EncodeGroupPool} mit den Navigationspfaden für {@link Document#getElementById(String)}.
+		 */
+		protected final EncodeNavigationEntryPool navigationEntryPool = new EncodeNavigationEntryPool();
+
+		protected final EncodeIndicesPool navigationIndicesPool = new EncodeIndicesPool();
+
+		/**
+		 * Dieses Feld speichert die {@link EncodeGroup} für {@link Document#getChildNodes()}.
+		 */
 		protected EncodeGroup documentChildren;
-
-		/**
-		 * Dieses Feld speichert das {@link EncodeElementNode} für {@link Document#getDocumentElement()}.
-		 * 
-		 * @see Document#getDocumentElement()
-		 */
-		protected EncodeElementNode documentElement;
-
-		/**
-		 * Dieser Konstrukteur initialisiert die {@link EncodePool}s.
-		 */
-		public EncodeDocument() {
-			this.valuePool = new EncodeValuePool();
-			this.xmlnsUriPool = new EncodeValuePool();
-			this.xmlnsLabelPool = new EncodeXmlnsLabelPool();
-			this.xmlnsPrefixPool = new EncodeValuePool();
-			this.xmlnsLookupPool = new EncodeGroupPool();
-			this.textNodePool = new EncodeTextNodePool();
-			this.elementNamePool = new EncodeValuePool();
-			this.elementNodePool = new EncodeElementNodePool();
-			this.elementLabelPool = new EncodeElementLabelPool();
-			this.elementChildrenPool = new EncodeGroupPool();
-			this.elementAttributesPool = new EncodeGroupPool();
-			this.attributeNamePool = new EncodeValuePool();
-			this.attributeNodePool = new EncodeAttributeNodePool();
-			this.attributeLabelPool = new EncodeAttributeLabelPool();
-			this.commentNodePool = new EncodeCommentNodePool();
-			this.referenceNamePool = new EncodeValuePool();
-			this.referenceNodePool = new EncodeReferenceNodePool();
-			this.instructionNamePool = new EncodeValuePool();
-			this.instructionNodePool = new EncodeInstructionNodePool();
-			this.navigationPathPool = new EncodeGroupPool();
-		}
 
 		/**
 		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttributeNode#getValue()} und {@link EncodeElementNode#getChildren()} zurück. <br>
@@ -2406,33 +3317,6 @@ public class Encoder2 {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeCommentNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()} zurück.
-		 * 
-		 * @return {@link EncodeCommentNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
-		 */
-		public EncodeCommentNodePool getCommentNodePool() {
-			return this.commentNodePool;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeInstructionNode#getName()} zurück.
-		 * 
-		 * @return {@link EncodeValuePool} für {@link EncodeInstructionNode#getName()}.
-		 */
-		public EncodeValuePool getInstructionNamePool() {
-			return this.instructionNamePool;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link EncodeInstructionNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()} zurück.
-		 * 
-		 * @return {@link EncodeInstructionNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
-		 */
-		public EncodeInstructionNodePool getInstructionNodePool() {
-			return this.instructionNodePool;
-		}
-
-		/**
 		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeAttributeLabel#getName()} zurück.
 		 * 
 		 * @return {@link EncodeValuePool} für {@link EncodeAttributeLabel#getName()}.
@@ -2460,44 +3344,220 @@ public class Encoder2 {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeGroupPool} für {@link Document#getElementById(String)} zurück.
-		 * <p>
-		 * Das erste Element jeder {@link EncodeGroup} ist das {@link EncodeValue} mit der {@code ID} des {@link Element}s und die anderen Elemente beschriben als {@link EncodeIndex} den Index des {@code Child}-{@link Node}s zur Navigation.
-		 * <p>
-		 * NEU:<br>
-		 * Das erste Element jeder {@link EncodeGroup} ist das {@link EncodeValue} mit der {@code ID} des {@link Element}s. <br>
-		 * Die folgenden Elemente beschriben mit je einem {@link EncodeIndex} und einem {@link EncodeElementNode} den Index des {@code Child}-{@link Node}s sowie den Index des {@link Element}s zur Navigation in Richtung des Wurzelelements.<br>
-		 * Der Pfad root/node3/node9 mit der Id "ID" im Index "INDEX" wird damit zu: <br>
-		 * [ID, 9, node9, 3, node3, x, root], wobei x der index des wutzelelements im der kondknotenliste des documents ist.
+		 * Diese Methode gibt den {@link EncodeCommentNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()} zurück.
+		 * 
+		 * @return {@link EncodeCommentNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
+		 */
+		public EncodeCommentNodePool getCommentNodePool() {
+			return this.commentNodePool;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeReferenceNode#getName()} zurück.
+		 * 
+		 * @return {@link EncodeValuePool} für {@link EncodeReferenceNode#getName()}.
+		 */
+		public EncodeValuePool getReferenceNamePool() {
+			return this.referenceNamePool;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeReferenceNodePool} für {@link EncodeElementNode#getChildren()} zurück.
+		 * 
+		 * @return {@link EncodeReferenceNodePool} für {@link EncodeElementNode#getChildren()}.
+		 */
+		public EncodeReferenceNodePool getReferenceNodePool() {
+			return this.referenceNodePool;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeValuePool} für {@link EncodeInstructionNode#getName()} zurück.
+		 * 
+		 * @return {@link EncodeValuePool} für {@link EncodeInstructionNode#getName()}.
+		 */
+		public EncodeValuePool getInstructionNamePool() {
+			return this.instructionNamePool;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeInstructionNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()} zurück.
+		 * 
+		 * @return {@link EncodeInstructionNodePool} für {@link EncodeElementNode#getChildren()} und {@link EncodeDocument#getDocumentChildren()}.
+		 */
+		public EncodeInstructionNodePool getInstructionNodePool() {
+			return this.instructionNodePool;
+		}
+
+		public EncodeValuePool getNavigationIdPool() {
+			return this.navigationIdPool;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeGroupPool} mit den Navigationspfaden für {@link Document#getElementById(String)} zurück. Das erste Element jeder {@link EncodeGroup} bzw. jeses Navigationspfads ist der {@link EncodeValue} mit der {@code ID} des {@link Element}s, das über dieser {@code ID} erreicht werden soll. Die folgenden Elemente beschriben mit je einem {@link EncodePosition} und einem {@link EncodeElementNode} den Pfad zu diesem {@link Element}, wobei der {@link EncodePosition} den {@code Child}-Index des jeweils nachfolgenden {@link EncodeElementNode}s beschreibt.<br>
+		 * Der Pfad {@code /node[7]/node[3]/node[9]} mit der {@code ID} {@code "VALUE"} wird damit zu: <code>{ "VALUE", 7, /node[7], 3, /node[7]/node[3], 9, /node[7]/node[3]/node[9] }</code>.
 		 * 
 		 * @see Attr#isId()
 		 * @see Document#getElementById(String)
 		 * @return {@link EncodeGroupPool} für {@link Document#getElementById(String)}.
 		 */
-		public EncodeGroupPool getNavigationPathPool() {
-			return this.navigationPathPool;
+		public EncodeNavigationEntryPool getNavigationEntryPool() {
+			return this.navigationEntryPool;
+		}
+
+		public EncodeIndicesPool getNavigationIndicesPool() {
+			return this.navigationIndicesPool;
 		}
 
 		/**
-		 * Diese Methode gibt das {@link EncodeElementNode} für {@link Document#getDocumentElement()} zurück.
+		 * Diese Methode gibt den {@link EncodeElementNode} für {@link Document#getDocumentElement()} zurück.
 		 * 
 		 * @see Document#getDocumentElement()
-		 * @return {@link EncodeElementNode} für {@link Document#getDocumentElement()}.
+		 * @return {@link EncodeElementNode} für {@link Document#getDocumentElement()} oder {@code null}.
+		 * @throws IllegalStateException Wenn kein oder mehrere {@link EncodeElementNode}s als {@link Document#getDocumentElement()} definiert wurden.
 		 */
-		public EncodeElementNode getDocumentElement() {
-			return this.documentElement;
+		public EncodeElementNode getDocumentElement() throws IllegalStateException {
+			if(this.documentChildren == null) return null;
+			EncodeElementNode documentElement = null;
+			for(final EncodeItem item: this.documentChildren.items.values()){
+				if(item instanceof EncodeElementNode){
+					if(documentElement != null) throw new IllegalStateException("multiple document elements");
+					documentElement = (EncodeElementNode)item;
+				}
+			}
+			if(documentElement == null) throw new IllegalStateException("no document element");
+			return documentElement;
 		}
 
-		public void setDocumentElement(final EncodeElementNode documentElement) {
-			this.documentElement = documentElement;
-		}
-
+		/**
+		 * Diese Methode gibt die {@link EncodeGroup} für {@link Document#getChildNodes()} zurück.
+		 * 
+		 * @see Document#getChildNodes()
+		 * @return {@link EncodeGroup} für {@link Document#getChildNodes()}.
+		 */
 		public EncodeGroup getDocumentChildren() {
 			return this.documentChildren;
 		}
 
+		/**
+		 * Diese Methode setzt die {@link EncodeGroup} für {@link Document#getChildNodes()}.
+		 * 
+		 * @see Document#getChildNodes()
+		 * @param documentChildren {@link EncodeElementNode} für {@link Document#getChildNodes()}.
+		 */
 		public void setDocumentChildren(final EncodeGroup documentChildren) {
 			this.documentChildren = documentChildren;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeTextNode} mit dem gegebenen {@code Value} zurück.
+		 * 
+		 * @see EncodeTextNodePool#unique(EncodeValue)
+		 * @param value {@code Value}.
+		 * @return {@link EncodeTextNode}.
+		 * @throws NullPointerException Wenn der gegebene {@code Value} {@code null} ist.
+		 */
+		public EncodeTextNode createTextNode(final String value) throws NullPointerException {
+			if(value == null) throw new NullPointerException("value is null");
+			return this.textNodePool.unique(this.valuePool.unique(value));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeElementNode} mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @see EncodeElementNodePool#unique(EncodeElementLabel, EncodeGroup, EncodeGroup)
+		 * @see EncodeElementLabelPool#unique(EncodeValue, EncodeValue, EncodeValue, EncodeGroup, EncodeGroup)
+		 * @param uri {@code Uri}.
+		 * @param name {@code Name}.
+		 * @param prefix {@code Prefix}.
+		 * @param lookupUriList nach {@code Prefix} sortierten {@code Xmlns}es.
+		 * @param lookupPrefixList nach {@code Uri} sortierten {@code Xmlns}es.
+		 * @param children {@code Children}.
+		 * @param attributes {@code Attributes}.
+		 * @return {@link EncodeElementNode}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeElementNode createElementNode(final String uri, final String name, final String prefix, final List<? extends EncodeItem> lookupUriList,
+			final List<? extends EncodeItem> lookupPrefixList, final List<? extends EncodeItem> children, final List<? extends EncodeItem> attributes) {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(name == null) throw new NullPointerException("name is null");
+			if(prefix == null) throw new NullPointerException("prefix is null");
+			if(lookupUriList == null) throw new NullPointerException("lookupUriList is null");
+			if(lookupPrefixList == null) throw new NullPointerException("lookupPrefixList is null");
+			if(children == null) throw new NullPointerException("children is null");
+			if(attributes == null) throw new NullPointerException("attributes is null");
+			return this.elementNodePool.unique(this.elementLabelPool.unique(this.xmlnsUriPool.unique(uri), this.elementNamePool.unique(name),
+				this.xmlnsPrefixPool.unique(prefix), this.xmlnsLookupPool.unique(lookupUriList), this.xmlnsLookupPool.unique(lookupPrefixList)),
+				this.elementChildrenPool.unique(children), this.elementAttributesPool.unique(attributes));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeAttributeNode} mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @see EncodeAttributeNodePool#unique(EncodeAttributeLabel, EncodeValue)
+		 * @see EncodeAttributeLabelPool#unique(EncodeValue, EncodeValue, EncodeValue)
+		 * @param uri {@code Uri}.
+		 * @param name {@code Name}.
+		 * @param prefix {@code Prefix}.
+		 * @param value {@code Value}.
+		 * @return {@link EncodeAttributeNode}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeAttributeNode createAttributeNode(final String uri, final String name, final String prefix, final String value) throws NullPointerException {
+			if(uri == null) throw new NullPointerException("uri is null");
+			if(name == null) throw new NullPointerException("name is null");
+			if(prefix == null) throw new NullPointerException("prefix is null");
+			if(value == null) throw new NullPointerException("value is null");
+			return this.attributeNodePool.unique(
+				this.attributeLabelPool.unique(this.xmlnsUriPool.unique(uri), this.attributeNamePool.unique(name), this.xmlnsPrefixPool.unique(name)),
+				this.valuePool.unique(value));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeCommentNode} mit dem gegebenen {@code Value} zurück.
+		 * 
+		 * @see EncodeCommentNodePool#unique(EncodeValue)
+		 * @param value {@code Value}.
+		 * @return {@link EncodeCommentNode}.
+		 * @throws NullPointerException Wenn der gegebene {@code Value} {@code null} ist.
+		 */
+		public EncodeCommentNode createCommentNode(final String value) throws NullPointerException {
+			if(value == null) throw new NullPointerException("value is null");
+			return this.commentNodePool.unique(this.valuePool.unique(value));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeReferenceNode} mit dem gegebenen {@code Name} zurück.
+		 * 
+		 * @see EncodeReferenceNodePool#unique(EncodeValue)
+		 * @param name {@code Name}.
+		 * @return {@link EncodeReferenceNode}.
+		 * @throws NullPointerException Wenn der gegebene {@code Name} {@code null} ist.
+		 */
+		public EncodeReferenceNode createReferenceNode(final String name) throws NullPointerException {
+			if(name == null) throw new NullPointerException("name is null");
+			return this.referenceNodePool.unique(this.referenceNamePool.unique(name));
+		}
+
+		/**
+		 * Diese Methode gibt den {@link EncodeInstructionNode} mit den gegebenen Eigenschaften zurück.
+		 * 
+		 * @see EncodeInstructionNodePool#unique(EncodeValue, EncodeValue)
+		 * @param name Name.
+		 * @param value Wert.
+		 * @return {@link EncodeInstructionNode}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public EncodeInstructionNode createInstructionNode(final String name, final String value) throws NullPointerException {
+			if(name == null) throw new NullPointerException("name is null");
+			if(value == null) throw new NullPointerException("value is null");
+			return this.instructionNodePool.unique(this.instructionNamePool.unique(name), this.valuePool.unique(value));
+		}
+
+		public EncodeNavigationEntry createNavigationEntry(final String id, final List<Integer> indices) throws NullPointerException {
+			if(id == null) throw new NullPointerException("id is null");
+			final EncodeNavigationEntry entry = new EncodeNavigationEntry(new EncodeValue(id), new EncodeIndices(indices));
+			if(this.navigationEntryPool.contains(entry)) throw new IllegalArgumentException("id already exists");
+			return this.navigationEntryPool.unique(this.navigationIdPool.get(entry.id), this.navigationIndicesPool.get(entry.indices));
 		}
 
 		/**
@@ -2512,7 +3572,6 @@ public class Encoder2 {
 				"xmlnsLabelPool", this.xmlnsLabelPool, //
 				"xmlnsLookupPool", this.xmlnsLookupPool, //
 				"textNodePool", this.textNodePool, //
-				"commentNodePool", this.commentNodePool, //
 				"elementNamePool", this.elementNamePool, //
 				"elementNodePool", this.elementNodePool, //
 				"elementLabelPool", this.elementLabelPool, //
@@ -2521,14 +3580,106 @@ public class Encoder2 {
 				"attributeNamePool", this.attributeNamePool, //
 				"attributeNodePool", this.attributeNodePool, //
 				"attributeLabelPool", this.attributeLabelPool, //
+				"commentNodePool", this.commentNodePool, //
 				"referenceNamePool", this.referenceNamePool, //
 				"referenceNodePool", this.referenceNodePool, //
 				"instructionNamePool", this.instructionNamePool, //
 				"instructionNodePool", this.instructionNodePool, //
-				"navigationPathPool", this.navigationPathPool, //
-				"documentElement", this.documentElement, //
+				"navigationIdPool", this.navigationIdPool, //
+				"navigationEntryPool", this.navigationEntryPool, //
+				"navigationIndicesPool", this.navigationIndicesPool, //
 				"documentChildren", this.documentChildren //
 				);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zum Schrrittweisen Aufbau eines {@link EncodeDocument}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class EncodeDocumentBuilder extends EncodeBuilder<EncodeDocumentBuilder> {
+
+		/**
+		 * Dieses Feld speichert die {@link Map} der Navigationspfade.
+		 */
+		protected Map<String, List<Integer>> navigations;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den {@link EncodeDocumentBuilder} mit einem neuen {@link EncodeDocument}.
+		 */
+		public EncodeDocumentBuilder() {
+			this(new EncodeDocument());
+		}
+
+		/**
+		 * Dieser Konstrukteur initialisiert das {@link EncodeDocument}.
+		 * 
+		 * @param document {@link EncodeDocument}.
+		 * @throws NullPointerException Wenn das gegebene {@link EncodeDocument} {@code null} ist.
+		 */
+		public EncodeDocumentBuilder(final EncodeDocument document) throws NullPointerException {
+			this.xmlns = new EncodeXmlnsBuilder(this.document = document) //
+				.append(XMLConstants.XML_NS_URI, XMLConstants.XML_NS_PREFIX).append(XMLConstants.NULL_NS_URI, XMLConstants.DEFAULT_NS_PREFIX);
+			this.navigations = new HashMap<String, List<Integer>>(1);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected EncodeDocumentBuilder thiz() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void clear() {
+			super.clear();
+			this.navigations = null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void createId(final String id, final List<Integer> indices) throws IllegalArgumentException {
+			this.document.createNavigationEntry(id, indices);
+		}
+
+		/**
+		 * Diese Methode schließt die Bearbeitung des {@link EncodeDocument}s ab und gibt dieses zurück. Nach dem Aufruf dieser Methode lässt dieser {@link EncodeDocumentBuilder} keine Modifikationen mehr zu.
+		 * 
+		 * @return {@link EncodeDocument}.
+		 * @throws IllegalStateException Wenn kein oder mehrere {@link EncodeElementNode}s als {@link Document#getDocumentElement()} definiert wurden.
+		 */
+		public EncodeDocument commit() throws IllegalStateException {
+			if(this.children == null) return this.document;
+			final List<EncodeItem> children = this.children();
+			final EncodeDocument document = this.document;
+			document.documentChildren = document.elementChildrenPool.unique(children);
+			// TODO document.navigationPathPool
+
+			// for(final Entry<String, List<Integer>> entry: this.navigations.entrySet()){
+			// final List<Integer> source = entry.getValue();
+			// final int size = source.size();
+			// final List<EncodeItem> target = new ArrayList<EncodeItem>((size * 2) + 1);
+			// List<?> nodes = children;
+			// target.add(document.valuePool.unique(entry.getKey()));
+			// for(int i = 0; i < size; i++){
+			// final int index = source.get(i).intValue();
+			// target.add(new EncodePosition(index));
+			// final EncodeElementNode node = (EncodeElementNode)nodes.get(index);
+			// target.add(node);
+			// nodes = node.children.items;
+			// }
+			// document.navigationPathPool.unique(target);
+			// }
+			this.clear();
+			return this.document;
 		}
 
 	}
@@ -2539,340 +3690,6 @@ public class Encoder2 {
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class EncodeDocumentHandler implements ContentHandler {
-
-		/**
-		 * Diese Klasse implementiert einen {@link EncodeElementPath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} sowie ein gegebenes {@link EncodeElementNode} delegieren.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected static final class ElementPath extends NavigationPath implements EncodeElementPath {
-
-			/**
-			 * Dieses Feld speichert das {@link EncodeElementNode}.
-			 */
-			protected final EncodeElementNode element;
-
-			/**
-			 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath} und {@link EncodeElementNode}.
-			 * 
-			 * @param path {@link EncodeNavigationPath}.
-			 * @param element {@link EncodeElementNode}.
-			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-			 */
-			public ElementPath(final EncodeNavigationPath path, final EncodeElementNode element) throws NullPointerException {
-				super(path);
-				if(element == null) throw new NullPointerException();
-				this.element = element;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String elementUri() {
-				return this.element.label.uri.string;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String elementName() {
-				return this.element.label.name.string;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return Objects.toStringCall("ElementPath", this.pathNames(), this.elementName());
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert einen {@link EncodeAttributePath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} sowie gegebene {@link Attributes} delegieren.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected static final class AttributePath extends NavigationPath implements EncodeAttributePath {
-
-			/**
-			 * Dieses Feld speichert die {@link Attributes}.
-			 */
-			protected final Attributes atts;
-
-			/**
-			 * Dieses Feld speichert den Index.
-			 */
-			protected final int index;
-
-			/**
-			 * Dieser Konstrukteur initialisiert {@link EncodeNavigationPath}, {@link Attributes} und Index.
-			 * 
-			 * @param path {@link EncodeNavigationPath}.
-			 * @param atts {@link Attributes}.
-			 * @param index Index.
-			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-			 */
-			public AttributePath(final EncodeNavigationPath path, final Attributes atts, final int index) throws NullPointerException {
-				super(path);
-				if(atts == null) throw new NullPointerException();
-				this.atts = atts;
-				this.index = index;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String attributeUri() {
-				return this.atts.getURI(this.index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String attributeName() {
-				return this.atts.getLocalName(this.index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String attributeType() {
-				return this.atts.getType(this.index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return Objects.toStringCall("AttributePath", this.pathNames(), this.attributeName());
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert einen abstrakten {@link EncodeNavigationPath}, dessen Methoden auf einen gegebenen {@link EncodeNavigationPath} delegieren.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected static abstract class NavigationPath implements EncodeNavigationPath {
-
-			/**
-			 * Dieses Feld speichert den {@link EncodeNavigationPath}.
-			 */
-			protected final EncodeNavigationPath path;
-
-			/**
-			 * Dieser Konstrukteur initialisiert den {@link EncodeNavigationPath}.
-			 * 
-			 * @param path {@link EncodeNavigationPath}.
-			 * @throws NullPointerException Wenn der gegebene {@link EncodeNavigationPath} {@code null} ist.
-			 */
-			public NavigationPath(final EncodeNavigationPath path) throws NullPointerException {
-				if(path == null) throw new NullPointerException();
-				this.path = path;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final String pathUri(final int index) throws IndexOutOfBoundsException {
-				return this.path.pathUri(index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final List<String> pathUris() {
-				return this.path.pathUris();
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final String pathName(final int index) throws IndexOutOfBoundsException {
-				return this.path.pathName(index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final List<String> pathNames() {
-				return this.path.pathNames();
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public final int pathLength() {
-				return this.path.pathLength();
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert den dynamischen {@link EncodeNavigationPath}, der während des Einlesens vom {@link EncodeDocumentHandler} angepasst wird.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected static final class NavigationStack implements EncodeNavigationPath {
-
-			/**
-			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Uri}s.
-			 */
-			protected final List<String> pathUris;
-
-			/**
-			 * Dieses Feld speichert die {@link List} der {@code Uri}s.
-			 */
-			protected final List<String> pathUriStack;
-
-			/**
-			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Name}s.
-			 */
-			protected final List<String> pathNames;
-
-			/**
-			 * Dieses Feld speichert die {@link List} der {@code Name}s.
-			 */
-			protected final List<String> pathNameStack;
-
-			/**
-			 * Dieser Konstrukteur initialisiert die {@link List}s.
-			 */
-			public NavigationStack() {
-				this.pathUriStack = new ArrayList<String>();
-				this.pathUris = Collections.unmodifiableList(this.pathUriStack);
-				this.pathNameStack = new ArrayList<String>();
-				this.pathNames = Collections.unmodifiableList(this.pathNameStack);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String pathUri(final int index) throws IndexOutOfBoundsException {
-				return this.pathUriStack.get(index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public List<String> pathUris() {
-				return this.pathUris;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String pathName(final int index) throws IndexOutOfBoundsException {
-				return this.pathNameStack.get(index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public List<String> pathNames() {
-				return this.pathNames;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public int pathLength() {
-				return this.pathUriStack.size();
-			}
-
-			/**
-			 * Diese Methode fügt das gegebene Segmant aus {@code Uri} und {@code Name} an das Ende des Navigationspfads an.
-			 * 
-			 * @param pathUri {@code Uri}.
-			 * @param pathName {@code Name}.
-			 */
-			public void append(final String pathUri, final String pathName) {
-				final int index = this.pathLength();
-				this.pathUriStack.add(index, pathUri);
-				this.pathNameStack.add(index, pathName);
-			}
-
-			/**
-			 * Diese Methode entfernt das letzte Segment des Navigationspfads.
-			 */
-			public void remove() {
-				final int index = this.pathLength() - 1;
-				this.pathUriStack.remove(index);
-				this.pathNameStack.remove(index);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return Objects.toStringCall("NavigationStack", this.pathNames);
-			}
-
-		}
-
-		/**
-		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Paare aus {@code Uri} und {@code Prefix} als {@link EncodeXmlnsLabel}s während des Einlesens eines {@link Document}s.
-		 * 
-		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		protected static final class XmlnsStack {
-
-			/**
-			 * Dieses Feld speichert die {@code Uri}-{@code Prefix}-{@link Map}.
-			 */
-			protected final Map<String, String> map;
-
-			/**
-			 * Dieses Feld speichert den nächsten {@link XmlnsStack} oder {@code null}.
-			 */
-			protected final XmlnsStack next;
-
-			/**
-			 * Dieser Konstrukteur initialisiert den leeren {@link XmlnsStack}.
-			 */
-			public XmlnsStack() {
-				this(null);
-			}
-
-			/**
-			 * Dieser Konstrukteur initialisiert den nächsten {@link XmlnsStack}.
-			 * 
-			 * @param next nächster {@link XmlnsStack} oder {@code null}.
-			 */
-			public XmlnsStack(final XmlnsStack next) {
-				this.map = new HashMap<String, String>(1);
-				this.next = next;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return Objects.toStringCall(true, "EncodeXmlnsStack", this.map, this.next);
-			}
-
-		}
 
 		/**
 		 * Diese Klasse implementiert ein Objekt zur Verwaltung der Inhalte eine {@link Element}s während des Einlesens eines {@link Document}s.
@@ -2896,10 +3713,7 @@ public class Encoder2 {
 			 */
 			protected final String name;
 
-			/**
-			 * Dieses Feld speichert die {@link EncodeElementNode#xmlns()} oder {@code null}.
-			 */
-			protected final List<EncodeXmlnsLabel> xmlns;
+			public String prefix;
 
 			/**
 			 * Dieses Feld speichert die {@link EncodeElementNode#getChildren()}.
@@ -2912,7 +3726,7 @@ public class Encoder2 {
 			protected final List<? extends EncodeItem> attributes;
 
 			/**
-			 * Dieses Feld speichert die {@link EncodeGroup}s für den {@link EncodeDocument#getNavigationPathPool()}.
+			 * Dieses Feld speichert die {@link EncodeGroup}s für den {@link EncodeDocument#getNavigationEntryPool()}.
 			 */
 			protected final List<EncodeGroup> navigations;
 
@@ -2953,16 +3767,16 @@ public class Encoder2 {
 			 * @param id {@code ID}.
 			 * @param uri {@code Uri}.
 			 * @param name {@code Name}.
-			 * @param spaces {@code Uri/Prefix}-{@link EncodeXmlnsLabel}-{@link List}.
+			 * @param prefix {@code Prefix}.
 			 * @param attributes {@link EncodeAttributeNode}-{@link List}.
 			 * @param next nächster {@link CursorStack} oder {@code null}.
 			 */
-			public CursorStack(final EncodeValue id, final String uri, final String name, final List<EncodeXmlnsLabel> spaces,
-				final List<EncodeAttributeNode> attributes, final CursorStack next) {
+			public CursorStack(final EncodeValue id, final String uri, final String name, final String prefix, final List<EncodeAttributeNode> attributes,
+				final CursorStack next) {
 				this.id = id;
 				this.uri = uri;
 				this.name = name;
-				this.xmlns = spaces;
+				this.prefix = prefix;
 				this.children = new ArrayList<EncodeItem>(0);
 				this.attributes = attributes;
 				this.navigations = new ArrayList<EncodeGroup>(0);
@@ -2974,31 +3788,175 @@ public class Encoder2 {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall(true, true, "EncodeCursorStack", "id", this.id, "uri", this.uri, "name", this.name, "xmlns", this.xmlns, "children",
+				return Objects.toStringCall(true, true, "EncodeCursorStack", "id", this.id, "uri", this.uri, "name", this.name, "prefix", this.prefix, "children",
 					this.children, "attributes", this.attributes, "navigations", this.navigations, "next", this.next);
 			}
 
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link NavigationStack} für den aktuellen Navigationspfad und den {@link EncodeNavigationPathFilter}.
+		 * Diese Klasse implementiert den dynamischen {@link EncodeNavigationPath}, der während des Einlesens vom {@link EncodeDocumentHandler} angepasst wird.
+		 * 
+		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected final NavigationStack pathStack;
+		protected static final class NavigationStack extends EncodeNavigationPath {
 
-		/**
-		 * Dieses Feld speichert den {@link XmlnsStack} für die aktuellen Paare aus {@code Uri} und {@code Prefix} oder {@code null}.
-		 */
-		protected XmlnsStack xmlnsStack;
+			/**
+			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Uri}s.
+			 */
+			protected final List<String> pathUris;
 
-		/**
-		 * Dieses Feld speichert die aktuellen Paare aus {@code Uri} und {@code Prefix}.
-		 */
-		protected List<EncodeXmlnsLabel> xmlnsCache;
+			/**
+			 * Dieses Feld speichert die {@link List} der {@code Uri}s.
+			 */
+			protected final List<String> pathUriStack;
+
+			/**
+			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Name}s.
+			 */
+			protected final List<String> pathNames;
+
+			/**
+			 * Dieses Feld speichert die {@link List} der {@code Name}s.
+			 */
+			protected final List<String> pathNameStack;
+
+			/**
+			 * Dieses Feld speichert die unveränderliche {@link List} der {@code Child}-Indices.
+			 */
+			protected final List<Integer> pathIndices;
+
+			/**
+			 * Dieses Feld speichert die {@link List} der {@code Child}-Indices.
+			 */
+			protected final List<Integer> pathIndexStack;
+
+			/**
+			 * Dieser Konstrukteur initialisiert die {@link List}s.
+			 */
+			public NavigationStack() {
+				this.pathUriStack = new ArrayList<String>();
+				this.pathUris = Collections.unmodifiableList(this.pathUriStack);
+				this.pathNameStack = new ArrayList<String>();
+				this.pathNames = Collections.unmodifiableList(this.pathNameStack);
+				this.pathIndexStack = new ArrayList<Integer>();
+				this.pathIndices = Collections.unmodifiableList(this.pathIndexStack);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected EncodeNavigationPath path() {
+				return null;
+			}
+
+			/**
+			 * Diese Methode fügt das gegebene Segmant aus {@code Uri} und {@code Name} an das Ende des Navigationspfads an.
+			 * 
+			 * @param pathUri {@code Uri}.
+			 * @param pathName {@code Name}.
+			 */
+			protected void append(final String pathUri, final String pathName, final int pathIndex) {
+				final int index = this.pathLength();
+				this.pathUriStack.add(index, pathUri);
+				this.pathNameStack.add(index, pathName);
+				this.pathIndexStack.add(index, Integer.valueOf(pathIndex));
+			}
+
+			/**
+			 * Diese Methode entfernt das letzte Segment des Navigationspfads.
+			 * 
+			 * @return
+			 */
+			protected int remove() {
+				final int index = this.pathLength() - 1;
+				this.pathUriStack.remove(index);
+				this.pathNameStack.remove(index);
+				return this.pathIndexStack.remove(index).intValue();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String pathUri(final int index) throws IndexOutOfBoundsException {
+				return this.pathUriStack.get(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public List<String> pathUris() {
+				return this.pathUris;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String pathName(final int index) throws IndexOutOfBoundsException {
+				return this.pathNameStack.get(index);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public List<String> pathNames() {
+				return this.pathNames;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int pathIndex(final int index) throws IndexOutOfBoundsException {
+				return this.pathIndexStack.get(index).intValue();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public List<Integer> pathIndices() {
+				return this.pathIndices;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int pathLength() {
+				return this.pathUriStack.size();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall("NavigationStack", this.pathNames);
+			}
+
+		}
+
+		protected EncodeXmlnsBuilder xmlnsBuilder;
+
+		StringBuilder valueBuilder;
 
 		/**
 		 * Dieses Feld speichert den {@link CursorStack} für das aktuelle {@link Element}.
 		 */
 		protected CursorStack cursorStack;
+
+		/**
+		 * Dieses Feld speichert den {@link NavigationStack} für den aktuellen Navigationspfad und den {@link EncodeNavigationPathFilter}.
+		 */
+		protected final NavigationStack navigationStack;
+
+		EncodeNavigationEntryPool navigationPool;
 
 		/**
 		 * Dieses Feld speichert das {@link EncodeDocument}.
@@ -3027,15 +3985,13 @@ public class Encoder2 {
 		 */
 		public EncodeDocumentHandler(final EncodeDocument document, final boolean xmlnsEnabled, final EncodeNavigationPathFilter navigationPathFilter)
 			throws NullPointerException {
-			if(document == null) throw new NullPointerException();
+			this.xmlnsBuilder = new EncodeXmlnsBuilder(document);
 			this.document = document;
-			this.pathStack = new NavigationStack();
-			this.cursorStack = new CursorStack();
+			this.navigationPool = new EncodeNavigationEntryPool();
+			this.navigationStack = new NavigationStack();
 			this.xmlnsEnabled = xmlnsEnabled;
+			this.valueBuilder = new StringBuilder();
 			this.navigationPathFilter = navigationPathFilter;
-			if(!xmlnsEnabled) return;
-			this.startPrefixMapping(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
-			this.startPrefixMapping(XMLConstants.DEFAULT_NS_PREFIX, XMLConstants.NULL_NS_URI);
 		}
 
 		/**
@@ -3054,11 +4010,11 @@ public class Encoder2 {
 		 * @return {@link EncodeNavigationPath}.
 		 */
 		public EncodeNavigationPath getNavigationPath() {
-			return this.pathStack;
+			return this.navigationStack;
 		}
 
 		/**
-		 * Diese Methode gibt den {@link EncodeNavigationPathFilter} oder {@code null} zurück. Wenn er {@code null} ist, wird der {@link EncodeDocument#getNavigationPathPool()} nicht befüllt.
+		 * Diese Methode gibt den {@link EncodeNavigationPathFilter} oder {@code null} zurück. Wenn er {@code null} ist, wird der {@link EncodeDocument#getNavigationEntryPool()} nicht befüllt.
 		 * 
 		 * @see Encoder2#getNavigationPathFilter()
 		 * @return {@link EncodeNavigationPathFilter} oder {@code null}.
@@ -3073,15 +4029,7 @@ public class Encoder2 {
 		@Override
 		public void endPrefixMapping(final String prefix) {
 			if(!this.xmlnsEnabled) return;
-			for(XmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
-				if(scope.map.values().remove(prefix)){
-					if(scope.map.isEmpty() && (scope == this.xmlnsStack)){
-						this.xmlnsStack = scope.next;
-					}
-					this.xmlnsCache = null;
-					return;
-				}
-			}
+			this.xmlnsBuilder = this.xmlnsBuilder.remove(prefix);
 		}
 
 		/**
@@ -3090,13 +4038,7 @@ public class Encoder2 {
 		@Override
 		public void startPrefixMapping(final String prefix, final String uri) {
 			if(!this.xmlnsEnabled) return;
-			XmlnsStack scope = this.xmlnsStack;
-			if((scope == null) || scope.map.containsValue(prefix)){
-				scope = new XmlnsStack(scope);
-				this.xmlnsStack = scope;
-			}
-			scope.map.put(uri, prefix);
-			this.xmlnsCache = null;
+			this.xmlnsBuilder = this.xmlnsBuilder.append(uri, prefix);
 		}
 
 		/**
@@ -3104,39 +4046,33 @@ public class Encoder2 {
 		 */
 		@Override
 		public void endElement(final String uri, final String name, final String qName) {
+			this.commitValue();
+
 			final CursorStack cursor = this.cursorStack;
 			final CursorStack nextCursor = this.cursorStack.next;
 			final List<EncodeItem> children = cursor.children;
-			final List<EncodeItem> nextChildren = new ArrayList<EncodeItem>(children.size());
-			final StringBuilder textValue = new StringBuilder();
-			final EncodeValuePool valuePool = this.document.valuePool;
-			for(final EncodeItem oldNode: children){
-				if(oldNode instanceof EncodeValue){
-					final EncodeValue textNode = (EncodeValue)oldNode;
-					textValue.append(textNode.string);
-				}else{
-					if(textValue.length() != 0){
-						nextChildren.add(valuePool.unique(textValue.toString()));
-						textValue.setLength(0);
-					}
+			final EncodeNavigationPathFilter filter = this.navigationPathFilter;
+
+			for(int i = 0, size = children.size(); i < size; i++){
+				final EncodeItem oldNode = children.get(i);
+				if(oldNode.getType() == EncodeItem.TYPE_ELEMENT_NODE){
 					final EncodeElementNode elementNode = (EncodeElementNode)oldNode;
-					nextChildren.add(elementNode);
-					if((this.navigationPathFilter != null) && (cursor.id == null)){
-						final EncodeElementPath elementPath = new ElementPath(this.pathStack, elementNode);
-						if(this.navigationPathFilter.isId(elementPath)){
-							final List<EncodeItem> items = elementNode.children.items;
-							if(items.size() != 1) throw new IllegalArgumentException("");
-							cursor.id = (EncodeValue)items.get(0);
-						}
+
+					if((filter != null) && filter.isId(new EncodeElementPath(this.navigationStack, i, elementNode))){
+						final List<EncodeItem> items = elementNode.children.items.values();
+						if(items.size() != 1) throw new IllegalArgumentException("invalid element content as id");
+						final EncodeItem item = items.get(0);
+						if(item.getType() != EncodeItem.TYPE_VALUE) throw new IllegalArgumentException("invalid element content as id");
+						document.createNavigationEntry(item.asValue().string, navigationStack.pathIndexStack);
 					}
+
 				}
 			}
-			if(textValue.length() != 0){
-				nextChildren.add(valuePool.unique(textValue.toString()));
-			}
-			// final EncodeElementNode elementNode =
-			// (this.xmlnsEnabled ? this.document.elementNodePool.unique(cursor.uri, cursor.name, cursor.xmlns, nextChildren, cursor.attributes)
-			// : this.document.elementNodePool.unique(cursor.name, nextChildren, cursor.attributes));
+
+			final EncodeElementNode elementNode =
+				this.document.createElementNode(cursor.uri, cursor.name, cursor.prefix, this.xmlnsBuilder.lookupUriList(), this.xmlnsBuilder.lookupPrefixList(),
+					children, cursor.attributes);
+
 			// nextCursor.children.add(elementNode);
 			// if(this.navigationPathFilter != null){
 			// if(cursor.id != null){
@@ -3147,7 +4083,7 @@ public class Encoder2 {
 			// nextCursor.navigations.add(navigation);
 			// }
 			// }
-			this.pathStack.remove();
+			this.navigationStack.remove();
 			this.cursorStack = nextCursor;
 		}
 
@@ -3156,49 +4092,43 @@ public class Encoder2 {
 		 */
 		@Override
 		public void startElement(final String uri, final String name, final String qName, final Attributes atts) {
-			if(this.xmlnsEnabled && (this.xmlnsCache == null)){
-				final Map<String, String> map = new HashMap<String, String>();
-				final ArrayList<EncodeXmlnsLabel> xmlns = new ArrayList<EncodeXmlnsLabel>();
-				final EncodeXmlnsLabelPool xmlnsLabelPool = this.document.xmlnsLabelPool;
-				for(XmlnsStack scope = this.xmlnsStack; scope != null; scope = scope.next){
-					for(final Entry<String, String> entry: scope.map.entrySet()){
-						final String xmlnsName = entry.getValue();
-						if(!map.containsKey(xmlnsName)){
-							final String xmlnsUri = entry.getKey();
-							map.put(xmlnsName, xmlnsUri);
-							// xmlns.add(xmlnsLabelPool.unique(xmlnsUri, xmlnsName));
-						}
-					}
-				}
-				xmlns.trimToSize();
-				if(xmlns.size() > 1){
-					Collections.sort(xmlns, Encoder2.XmlnsUriPrefixComparator);
-				}
-				this.xmlnsCache = xmlns;
-			}
-			this.pathStack.append(uri, name);
+			this.commitValue();
+
+			final int position = this.cursorStack.children.size();
+			this.navigationStack.append(uri, name, position);
 			final EncodeValue id = null;
 			final int size = atts.getLength();
 			final List<EncodeAttributeNode> attributes = new ArrayList<EncodeAttributeNode>(size);
 			final EncodeAttributeNodePool attributeNodePool = this.document.attributeNodePool;
+
+			final EncodeNavigationPathFilter filter = this.navigationPathFilter;
+
 			for(int i = 0; i < size; i++){
-				// final EncodeAttributeNode attributeNode =
-				// (this.xmlnsEnabled ? attributeNodePool.unique(atts.getURI(i), atts.getLocalName(i), atts.getValue(i)) : attributeNodePool.unique(
-				// atts.getLocalName(i), atts.getValue(i)));
-				// attributes.add(attributeNode);
-				// if((this.navigationPathFilter != null) && (id == null)){
-				// final EncodeAttributePath attributePath = new AttributePath(this.pathStack, atts, i);
-				// if(this.navigationPathFilter.isId(attributePath)){
-				// id = attributeNode.value;
-				// }
-				// }
+				final String uri2 = atts.getURI(i);
+
+				String prefix = this.xmlnsBuilder.lookupPrefix(uri2);
+				if(prefix == null){
+					this.xmlnsBuilder.append(uri2, prefix = "");
+				}
+				final EncodeAttributeNode attributeNode = this.document.createAttributeNode(uri2, atts.getLocalName(i), prefix, atts.getValue(i));
+				attributes.add(attributeNode);
+				if((filter != null) && filter.isId(new EncodeAttributePath(this.navigationStack, atts, i))){
+					this.document.createNavigationEntry(attributeNode.value.string, this.navigationStack.pathIndexStack);
+				}
 			}
 			if(size > 1){
-				// Collections.sort(attributes, (this.xmlnsEnabled ? Encoder2.AttributeLabelComparator : Encoder2.AttributeNameComparator));
+				Collections.sort(attributes, Encoder2.AttributeNameUriComparator);
 			}
-			this.cursorStack =
-				(this.xmlnsEnabled ? new CursorStack(id, uri, name, this.xmlnsCache, attributes, this.cursorStack) : new CursorStack(id, name, attributes,
-					this.cursorStack));
+			final List<EncodeXmlnsLabel> u = this.xmlnsBuilder.lookupUriList();
+			final List<EncodeXmlnsLabel> v = this.xmlnsBuilder.lookupPrefixList();
+
+			System.out.println(v);
+
+			this.cursorStack = new CursorStack(id, uri, name, this.xmlnsBuilder.lookupPrefix(uri), attributes, this.cursorStack);
+		}
+
+		void createId(final CursorStack cursor, final String id, final int position) {
+
 		}
 
 		/**
@@ -3207,23 +4137,35 @@ public class Encoder2 {
 		@Override
 		public void endDocument() {
 			final CursorStack cursor = this.cursorStack;
-			this.document.documentElement = (EncodeElementNode)cursor.children.remove(0);
-			final EncodeGroupPool navigationPool = this.document.navigationPathPool;
-			navigationPool.clear();
-			for(final EncodeGroup navigation: cursor.navigations){
-				final List<EncodeItem> items = navigation.items;
-				int index = items.size();
-				final List<EncodeItem> nextItems = new ArrayList<EncodeItem>(index);
-				nextItems.add(items.get(0));
-				EncodeElementNode parentNode = (EncodeElementNode)items.get(--index);
-				while(index > 1){
-					final EncodeElementNode childNode = (EncodeElementNode)items.get(--index);
-					nextItems.add(new EncodeIndex(parentNode.children.items.indexOf(childNode)));
-					parentNode = childNode;
-				}
-				navigationPool.unique(nextItems);
-			}
-			cursor.navigations.clear();
+			// int p = navigationStack.
+
+			this.document.documentChildren = this.document.elementChildrenPool.unique(cursor.children);
+			// final EncodeGroupPool navigationPathPool = this.document.navigationPathPool;
+			// for(final EncodeGroup navigation: cursor.navigations){
+			// final List<EncodeItem> source = navigation.items;
+			// final int size = source.size();
+			// final List<EncodeItem> target = new ArrayList<EncodeItem>(size);
+			// target.add(source.get(0));
+			// EncodeGroup nodes = this.document.documentChildren;
+			// EncodeElementNode parentNode = (EncodeElementNode)source.get(--index);
+			// for(int i = 1; i < size; i++){
+			// final EncodeElementNode node = (EncodeElementNode)source.get(--index);
+			// nodes = node.children;
+			// target.add(new EncodePosition(parentNode.children.items.indexOf(node)));
+			// target.add(node);
+			// parentNode = node;
+			// }
+			// navigationPathPool.unique(target);
+			// }
+			// cursor.navigations.clear();
+			System.out.println(this.document);
+		}
+
+		protected void commitValue() {
+			final String value = this.valueBuilder.toString();
+			this.valueBuilder.setLength(0);
+			if(value.isEmpty()) return;
+			this.cursorStack.children.add(this.document.valuePool.unique(value));
 		}
 
 		/**
@@ -3231,6 +4173,8 @@ public class Encoder2 {
 		 */
 		@Override
 		public void startDocument() {
+			if(this.cursorStack != null) throw new IllegalStateException("document already built");
+			this.cursorStack = new CursorStack();
 		}
 
 		/**
@@ -3238,7 +4182,7 @@ public class Encoder2 {
 		 */
 		@Override
 		public void characters(final char[] ch, final int start, final int length) {
-			this.cursorStack.children.add(new EncodeValue(new String(ch, start, length)));
+			this.valueBuilder.append(ch, start, length);
 		}
 
 		/**
@@ -3254,6 +4198,8 @@ public class Encoder2 {
 		 */
 		@Override
 		public void skippedEntity(final String name) {
+			this.commitValue();
+			this.cursorStack.children.add(this.document.createReferenceNode(name));
 		}
 
 		/**
@@ -3261,6 +4207,8 @@ public class Encoder2 {
 		 */
 		@Override
 		public void processingInstruction(final String target, final String data) {
+			this.commitValue();
+			this.cursorStack.children.add(this.document.createInstructionNode(target, data));
 		}
 
 		/**
@@ -3330,15 +4278,29 @@ public class Encoder2 {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeXmlnsLabel}s primär nach ihrem {@link EncodeXmlnsLabel#getPrefix()} und sekundär nach ihrer {@link EncodeXmlnsLabel#getUri()} via {@link Encoder2#IndexComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeXmlnsLabel}s primär nach ihrer {@link EncodeXmlnsLabel#getUri()} und sekundär nach ihrem {@link EncodeXmlnsLabel#getPrefix()} via {@link Encoder2#ValueComparator}.
+	 */
+	protected static final Comparator<EncodeXmlnsLabel> XmlnsUriPrefixComparator = new Comparator<EncodeXmlnsLabel>() {
+
+		@Override
+		public int compare(final EncodeXmlnsLabel o1, final EncodeXmlnsLabel o2) {
+			final int comp = Encoder2.ValueComparator.compare(o1.uri, o2.uri);
+			if(comp != 0) return comp;
+			return Encoder2.ValueComparator.compare(o1.prefix, o2.prefix);
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeXmlnsLabel}s primär nach ihrem {@link EncodeXmlnsLabel#getPrefix()} und sekundär nach ihrer {@link EncodeXmlnsLabel#getUri()} via {@link Encoder2#ValueComparator}.
 	 */
 	protected static final Comparator<EncodeXmlnsLabel> XmlnsPrefixUriComparator = new Comparator<EncodeXmlnsLabel>() {
 
 		@Override
 		public int compare(final EncodeXmlnsLabel o1, final EncodeXmlnsLabel o2) {
-			final int comp = Encoder2.IndexComparator.compare(o1.prefix, o2.prefix);
+			final int comp = Encoder2.ValueComparator.compare(o1.prefix, o2.prefix);
 			if(comp != 0) return comp;
-			return Encoder2.IndexComparator.compare(o1.uri, o2.uri);
+			return Encoder2.ValueComparator.compare(o1.uri, o2.uri);
 		}
 
 	};
@@ -3368,35 +4330,9 @@ public class Encoder2 {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeXmlnsLabel}s primär nach ihrer {@link EncodeXmlnsLabel#getUri()} und sekundär nach ihrem {@link EncodeXmlnsLabel#name()} via {@link Encoder2#ValueComparator}.
+	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttributeNode}s primär nach dem {@link EncodeAttributeLabel#getName()} und sekundär nach der {@link EncodeAttributeLabel#getUri()} der {@link EncodeAttributeNode#getLabel()} via {@link Encoder2#ValueComparator}.
 	 */
-	protected static final Comparator<EncodeXmlnsLabel> XmlnsUriPrefixComparator = new Comparator<EncodeXmlnsLabel>() {
-
-		@Override
-		public int compare(final EncodeXmlnsLabel o1, final EncodeXmlnsLabel o2) {
-			final int comp = Encoder2.ValueComparator.compare(o1.uri, o2.uri);
-			if(comp != 0) return comp;
-			return Encoder2.ValueComparator.compare(o1.prefix, o2.prefix);
-		}
-
-	};
-
-	// /**
-	// * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttributeNode}s nach ihrem {@link EncodeAttributeNode#name()} via {@link Encoder2#ValueComparator}.
-	// */
-	// protected static final Comparator<EncodeAttributeNode> AttributeNameComparator = new Comparator<EncodeAttributeNode>() {
-	//
-	// @Override
-	// public int compare(final EncodeAttributeNode value1, final EncodeAttributeNode value2) {
-	// return Encoder2.ValueComparator.compare(value1.name, value2.name);
-	// }
-	//
-	// };
-
-	/**
-	 * Dieses Feld speichert den {@link Comparator} zur aufsteigenden Sortierung von {@link EncodeAttributeNode}s primär nach dem {@link EncodeXmlnsLabel#name()} und sekundär nach der {@link EncodeXmlnsLabel#getUri()} der {@link EncodeAttributeNode#getLabel()} via {@link Encoder2#ValueComparator}.
-	 */
-	protected static final Comparator<EncodeAttributeNode> AttributeLabelComparator = new Comparator<EncodeAttributeNode>() {
+	protected static final Comparator<EncodeAttributeNode> AttributeNameUriComparator = new Comparator<EncodeAttributeNode>() {
 
 		@Override
 		public int compare(final EncodeAttributeNode value1, final EncodeAttributeNode value2) {
@@ -3422,6 +4358,11 @@ public class Encoder2 {
 		@Override
 		public boolean isId(final EncodeElementPath elementPath) {
 			return false;
+		}
+
+		@Override
+		public Iterable<String> getIds(final EncodeNavigationPath navigationPath) {
+			return Iterables.voidIterable();
 		}
 
 	};
@@ -3650,30 +4591,6 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Uri-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getXmlnsUriPool()} eine {@code Uri-Hash-Table} erzeugt.
-	 * 
-	 * @see Coder#hashString(String)
-	 * @see Encoder2#isXmlnsEnabled()
-	 * @see DecodeDocument#uriHash()
-	 * @return {@code Uri-Hash}-Aktivierung.
-	 */
-	public boolean isUriHashEnabled() {
-		return this.uriHashEnabled;
-	}
-
-	/**
-	 * Diese Methode setzt die {@code Uri-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getXmlnsUriPool()} eine {@code Uri-Hash-Table} erzeugt.
-	 * 
-	 * @see Coder#hashString(String)
-	 * @see Encoder2#isXmlnsEnabled()
-	 * @see DecodeDocument#uriHash()
-	 * @param value {@code Uri-Hash}-Aktivierung.
-	 */
-	public void setUriHashEnabled(final boolean value) {
-		this.uriHashEnabled = value;
-	}
-
-	/**
 	 * Diese Methode gibt die {@code Value-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getValuePool()} eine {@code Value-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashString(String)
@@ -3717,6 +4634,30 @@ public class Encoder2 {
 	 */
 	public void setXmlnsEnabled(final boolean value) {
 		this.xmlnsEnabled = value;
+	}
+
+	/**
+	 * Diese Methode gibt die {@code Uri-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getXmlnsUriPool()} eine {@code Uri-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashString(String)
+	 * @see Encoder2#isXmlnsEnabled()
+	 * @see DecodeDocument#uriHash()
+	 * @return {@code Uri-Hash}-Aktivierung.
+	 */
+	public boolean isUriHashEnabled() {
+		return this.uriHashEnabled;
+	}
+
+	/**
+	 * Diese Methode setzt die {@code Uri-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getXmlnsUriPool()} eine {@code Uri-Hash-Table} erzeugt.
+	 * 
+	 * @see Coder#hashString(String)
+	 * @see Encoder2#isXmlnsEnabled()
+	 * @see DecodeDocument#uriHash()
+	 * @param value {@code Uri-Hash}-Aktivierung.
+	 */
+	public void setUriHashEnabled(final boolean value) {
+		this.uriHashEnabled = value;
 	}
 
 	/**
@@ -3879,11 +4820,11 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Navigation-Path}-Aktivierung zurück. Wenn diese Option {@code true} ist, werden Navigationsdaten für {@link EncodeDocument#getNavigationPathPool()} erzeugt.
+	 * Diese Methode gibt die {@code Navigation-Path}-Aktivierung zurück. Wenn diese Option {@code true} ist, werden Navigationsdaten für {@link EncodeDocument#getNavigationEntryPool()} erzeugt.
 	 * 
 	 * @see Attr#isId()
 	 * @see Document#getElementById(String)
-	 * @see EncodeDocument#getNavigationPathPool()
+	 * @see EncodeDocument#getNavigationEntryPool()
 	 * @return {@code Navigation-Path}-Aktivierung.
 	 */
 	public boolean isNavigationPathEnabled() {
@@ -3891,11 +4832,11 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Navigation-Path}-Aktivierung. Wenn diese Option {@code true} ist, werden Navigationsdaten für {@link EncodeDocument#getNavigationPathPool()} erzeugt.
+	 * Diese Methode setzt die {@code Navigation-Path}-Aktivierung. Wenn diese Option {@code true} ist, werden Navigationsdaten für {@link EncodeDocument#getNavigationEntryPool()} erzeugt.
 	 * 
 	 * @see Attr#isId()
 	 * @see Document#getElementById(String)
-	 * @see EncodeDocument#getNavigationPathPool()
+	 * @see EncodeDocument#getNavigationEntryPool()
 	 * @param value {@code Navigation-Path}-Aktivierung.
 	 */
 	public void setNavigationPathEnabled(final boolean value) {
@@ -3903,7 +4844,7 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Methode gibt die {@code Navigation-Path-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getNavigationPathPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
+	 * Diese Methode gibt die {@code Navigation-Path-Hash}-Aktivierung zurück. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getNavigationEntryPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#navigationPathHash()
@@ -3914,7 +4855,7 @@ public class Encoder2 {
 	}
 
 	/**
-	 * Diese Methode setzt die {@code Navigation-Path-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getNavigationPathPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
+	 * Diese Methode setzt die {@code Navigation-Path-Hash}-Aktivierung. Wenn diese Option {@code true} ist, wird für {@link EncodeDocument#getNavigationEntryPool()} eine {@code Navigation-Path-Hash-Table} erzeugt.
 	 * 
 	 * @see Coder#hashString(String)
 	 * @see DecodeDocument#navigationPathHash()
@@ -3924,40 +4865,40 @@ public class Encoder2 {
 		this.navigationPathHashEnabled = value;
 	}
 
-	// /**
-	// * Diese Methode kodiert das im {@code Source}-{@link File} gegebene XML-Dokument in eine optimierte binäre Darstellung und speichert diese im {@code Target}-{@link File}.
-	// *
-	// * @see #encode(XMLReader, InputSource, EncodeTarget)
-	// * @param source {@code Source}-{@link File}.
-	// * @param target {@code Target}-{@link File}.
-	// * @throws IOException Wenn die verwendete {@link InputSource} bzw. das verwendete {@link EncodeTarget} eine {@link IOException} auslöst.
-	// * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
-	// * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
-	// */
-	// public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
-	// if(source == null) throw new NullPointerException("source is null");
-	// if(target == null) throw new NullPointerException("target is null");
-	// this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new EncodeTargetFile(target));
-	// }
+	/**
+	 * Diese Methode kodiert das im {@code Source}-{@link File} gegebene XML-Dokument in eine optimierte binäre Darstellung und speichert diese im {@code Target}-{@link File}.
+	 * 
+	 * @see #encode(XMLReader, InputSource, EncodeTarget)
+	 * @param source {@code Source}-{@link File}.
+	 * @param target {@code Target}-{@link File}.
+	 * @throws IOException Wenn die verwendete {@link InputSource} bzw. das verwendete {@link EncodeTarget} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new EncodeTargetFile(target));
+	}
 
-	// /**
-	// * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und gibt dieses zurück.
-	// *
-	// * @see #encode(XMLReader, InputSource, EncodeDocument)
-	// * @param reader {@link XMLReader}.
-	// * @param source {@link InputSource}.
-	// * @return {@link EncodeDocument}.
-	// * @throws IOException Wenn die {@link InputSource} eine {@link IOException} auslöst.
-	// * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
-	// * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
-	// */
-	// public EncodeDocument encode(final XMLReader reader, final InputSource source) throws IOException, SAXException, NullPointerException {
-	// if(reader == null) throw new NullPointerException("reader is null");
-	// if(source == null) throw new NullPointerException("source is null");
-	// final EncodeDocument target = new EncodeDocument();
-	// this.encode(reader, source, target);
-	// return target;
-	// }
+	/**
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und gibt dieses zurück.
+	 * 
+	 * @see #encode(XMLReader, InputSource, EncodeDocument)
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @return {@link EncodeDocument}.
+	 * @throws IOException Wenn die {@link InputSource} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public EncodeDocument encode(final XMLReader reader, final InputSource source) throws IOException, SAXException, NullPointerException {
+		if(reader == null) throw new NullPointerException("reader is null");
+		if(source == null) throw new NullPointerException("source is null");
+		final EncodeDocument target = new EncodeDocument();
+		this.encode(reader, source, target);
+		return target;
+	}
 
 	/**
 	 * Diese Methode speichert das gegebene {@link EncodeDocument} in das gegebene {@link EncodeTarget}.
@@ -3970,75 +4911,76 @@ public class Encoder2 {
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
 	public void encode(final EncodeDocument source, final EncodeTarget target) throws IOException, NullPointerException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(target == null) throw new NullPointerException("target is null");
-		final List<EncodeValue> uriPool = Encoder2.compilePool(source.getXmlnsUriPool(), 0, Encoder2.ValueComparator);
-		final List<EncodeGroup> uriHash = Encoder2.compileHash(uriPool, this.uriHashEnabled, Encoder2.ValueHasher);
-		final List<EncodeValue> valuePool = Encoder2.compilePool(source.getValuePool(), 0, Encoder2.ValueComparator);
-		final List<EncodeGroup> valueHash = Encoder2.compileHash(valuePool, this.valueHashEnabled, Encoder2.ValueHasher);
-		final List<EncodeValue> xmlnsNamePool = Encoder2.compilePool(source.getXmlnsPrefixPool(), 0, Encoder2.ValueComparator);
-		final List<EncodeGroup> xmlnsNameHash = Encoder2.compileHash(xmlnsNamePool, this.xmlnsNameHashEnabled, Encoder2.ValueHasher);
-		final List<EncodeXmlnsLabel> xmlnsLabelPool = Encoder2.compilePool(source.getXmlnsLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
-		final List<EncodeGroup> xmlnsLabelHash = Encoder2.compileHash(xmlnsLabelPool, this.xmlnsLabelHashEnabled, Encoder2.LabelHasher);
-		final List<EncodeValue> elementNamePool = Encoder2.compilePool(source.getElementNamePool(), 0, Encoder2.ValueComparator);
-		final List<EncodeGroup> elementNameHash = Encoder2.compileHash(elementNamePool, this.elementNameHashEnabled, Encoder2.ValueHasher);
-		final List<EncodeXmlnsLabel> elementLabelPool = Encoder2.compilePool(source.getElementLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
-		final List<EncodeGroup> elementLabelHash = Encoder2.compileHash(elementLabelPool, this.elementLabelHashEnabled, Encoder2.LabelHasher);
-		final List<EncodeValue> attributeNamePool = Encoder2.compilePool(source.getAttributeNamePool(), 0, Encoder2.ValueComparator);
-		final List<EncodeGroup> attributeNameHash = Encoder2.compileHash(attributeNamePool, this.attributeNameHashEnabled, Encoder2.ValueHasher);
-		final List<EncodeXmlnsLabel> attributeLabelPool = Encoder2.compilePool(source.getAttributeLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
-		final List<EncodeGroup> attributeLabelHash = Encoder2.compileHash(attributeLabelPool, this.attributeLabelHashEnabled, Encoder2.LabelHasher);
-		final List<EncodeGroup> elementXmlnsPool = Encoder2.compilePool(source.elementXmlnsPool(), 0, Encoder2.IndexComparator);
-		final List<EncodeGroup> elementChildrenPool = Encoder2.compilePool(source.getElementChildrenPool(), 0, Encoder2.IndexComparator);
-		final List<EncodeGroup> elementAttributesPool = Encoder2.compilePool(source.getElementAttributesPool(), 0, Encoder2.IndexComparator);
-		final List<EncodeElementNode> elementNodePool = Encoder2.compilePool(source.getElementNodePool(), valuePool.size(), Encoder2.IndexComparator);
-		final List<EncodeAttributeNode> attributeNodePool = Encoder2.compilePool(source.getAttributeNodePool(), 0, Encoder2.IndexComparator);
-		final List<EncodeGroup> navigationPathPool = Encoder2.compilePool(source.getNavigationPathPool(), 0, Encoder2.GroupComparator);
-		final List<EncodeGroup> navigationPathHash = Encoder2.compileHash(navigationPathPool, this.navigationPathHashEnabled, Encoder2.GroupHasher);
-		Encoder2.writeLists(target, uriHash);
-		Encoder2.writeLists(target, uriPool);
-		Encoder2.writeLists(target, valueHash);
-		Encoder2.writeLists(target, valuePool);
-		Encoder2.writeLists(target, xmlnsNameHash);
-		Encoder2.writeLists(target, xmlnsNamePool);
-		Encoder2.writeLists(target, xmlnsLabelHash);
-		Encoder2.writeItems(target, xmlnsLabelPool);
-		Encoder2.writeLists(target, elementNameHash);
-		Encoder2.writeLists(target, elementNamePool);
-		Encoder2.writeLists(target, elementLabelHash);
-		Encoder2.writeItems(target, elementLabelPool);
-		Encoder2.writeLists(target, attributeNameHash);
-		Encoder2.writeLists(target, attributeNamePool);
-		Encoder2.writeLists(target, attributeLabelHash);
-		Encoder2.writeItems(target, attributeLabelPool);
-		Encoder2.writeLists(target, elementXmlnsPool);
-		Encoder2.writeLists(target, elementChildrenPool);
-		Encoder2.writeLists(target, elementAttributesPool);
-		Encoder2.writeItems(target, elementNodePool);
-		Encoder2.writeItems(target, attributeNodePool);
-		Encoder2.writeLists(target, navigationPathHash);
-		Encoder2.writeLists(target, navigationPathPool);
-		Encoder2.writeInts(target, source.getDocumentElement().getIndex() - valuePool.size());
+		System.out.println(source);
+		// if(source == null) throw new NullPointerException("source is null");
+		// if(target == null) throw new NullPointerException("target is null");
+		// final List<EncodeValue> uriPool = Encoder2.compilePool(source.getXmlnsUriPool(), 0, Encoder2.ValueComparator);
+		// final List<EncodeGroup> uriHash = Encoder2.compileHash(uriPool, this.uriHashEnabled, Encoder2.ValueHasher);
+		// final List<EncodeValue> valuePool = Encoder2.compilePool(source.getValuePool(), 0, Encoder2.ValueComparator);
+		// final List<EncodeGroup> valueHash = Encoder2.compileHash(valuePool, this.valueHashEnabled, Encoder2.ValueHasher);
+		// final List<EncodeValue> xmlnsNamePool = Encoder2.compilePool(source.getXmlnsPrefixPool(), 0, Encoder2.ValueComparator);
+		// final List<EncodeGroup> xmlnsNameHash = Encoder2.compileHash(xmlnsNamePool, this.xmlnsNameHashEnabled, Encoder2.ValueHasher);
+		// final List<EncodeXmlnsLabel> xmlnsLabelPool = Encoder2.compilePool(source.getXmlnsLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
+		// final List<EncodeGroup> xmlnsLabelHash = Encoder2.compileHash(xmlnsLabelPool, this.xmlnsLabelHashEnabled, Encoder2.LabelHasher);
+		// final List<EncodeValue> elementNamePool = Encoder2.compilePool(source.getElementNamePool(), 0, Encoder2.ValueComparator);
+		// final List<EncodeGroup> elementNameHash = Encoder2.compileHash(elementNamePool, this.elementNameHashEnabled, Encoder2.ValueHasher);
+		// final List<EncodeXmlnsLabel> elementLabelPool = Encoder2.compilePool(source.getElementLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
+		// final List<EncodeGroup> elementLabelHash = Encoder2.compileHash(elementLabelPool, this.elementLabelHashEnabled, Encoder2.LabelHasher);
+		// final List<EncodeValue> attributeNamePool = Encoder2.compilePool(source.getAttributeNamePool(), 0, Encoder2.ValueComparator);
+		// final List<EncodeGroup> attributeNameHash = Encoder2.compileHash(attributeNamePool, this.attributeNameHashEnabled, Encoder2.ValueHasher);
+		// final List<EncodeXmlnsLabel> attributeLabelPool = Encoder2.compilePool(source.getAttributeLabelPool(), 0, Encoder2.XmlnsPrefixUriComparator);
+		// final List<EncodeGroup> attributeLabelHash = Encoder2.compileHash(attributeLabelPool, this.attributeLabelHashEnabled, Encoder2.LabelHasher);
+		// final List<EncodeGroup> elementXmlnsPool = Encoder2.compilePool(source.elementXmlnsPool(), 0, Encoder2.IndexComparator);
+		// final List<EncodeGroup> elementChildrenPool = Encoder2.compilePool(source.getElementChildrenPool(), 0, Encoder2.IndexComparator);
+		// final List<EncodeGroup> elementAttributesPool = Encoder2.compilePool(source.getElementAttributesPool(), 0, Encoder2.IndexComparator);
+		// final List<EncodeElementNode> elementNodePool = Encoder2.compilePool(source.getElementNodePool(), valuePool.size(), Encoder2.IndexComparator);
+		// final List<EncodeAttributeNode> attributeNodePool = Encoder2.compilePool(source.getAttributeNodePool(), 0, Encoder2.IndexComparator);
+		// final List<EncodeGroup> navigationPathPool = Encoder2.compilePool(source.getNavigationPathPool(), 0, Encoder2.GroupComparator);
+		// final List<EncodeGroup> navigationPathHash = Encoder2.compileHash(navigationPathPool, this.navigationPathHashEnabled, Encoder2.GroupHasher);
+		// Encoder2.writeLists(target, uriHash);
+		// Encoder2.writeLists(target, uriPool);
+		// Encoder2.writeLists(target, valueHash);
+		// Encoder2.writeLists(target, valuePool);
+		// Encoder2.writeLists(target, xmlnsNameHash);
+		// Encoder2.writeLists(target, xmlnsNamePool);
+		// Encoder2.writeLists(target, xmlnsLabelHash);
+		// Encoder2.writeItems(target, xmlnsLabelPool);
+		// Encoder2.writeLists(target, elementNameHash);
+		// Encoder2.writeLists(target, elementNamePool);
+		// Encoder2.writeLists(target, elementLabelHash);
+		// Encoder2.writeItems(target, elementLabelPool);
+		// Encoder2.writeLists(target, attributeNameHash);
+		// Encoder2.writeLists(target, attributeNamePool);
+		// Encoder2.writeLists(target, attributeLabelHash);
+		// Encoder2.writeItems(target, attributeLabelPool);
+		// Encoder2.writeLists(target, elementXmlnsPool);
+		// Encoder2.writeLists(target, elementChildrenPool);
+		// Encoder2.writeLists(target, elementAttributesPool);
+		// Encoder2.writeItems(target, elementNodePool);
+		// Encoder2.writeItems(target, attributeNodePool);
+		// Encoder2.writeLists(target, navigationPathHash);
+		// Encoder2.writeLists(target, navigationPathPool);
+		// Encoder2.writeInts(target, source.getDocumentElement().getIndex() - valuePool.size());
 	}
 
-	// /**
-	// * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und speichert dessen in das gegebene {@link EncodeTarget}.
-	// *
-	// * @see #encode(XMLReader, InputSource)
-	// * @see #encode(EncodeDocument, EncodeTarget)
-	// * @param reader {@link XMLReader}.
-	// * @param source {@link InputSource}.
-	// * @param target {@link EncodeTarget}.
-	// * @throws IOException Wenn {@link InputSource} oder {@link EncodeTarget} eine {@link IOException} auslöst.
-	// * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
-	// * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
-	// */
-	// public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException, SAXException, NullPointerException {
-	// if(reader == null) throw new NullPointerException("reader is null");
-	// if(source == null) throw new NullPointerException("source is null");
-	// if(target == null) throw new NullPointerException("target is null");
-	// this.encode(this.encode(reader, source), target);
-	// }
+	/**
+	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in ein neues {@link EncodeDocument} ein und speichert dessen in das gegebene {@link EncodeTarget}.
+	 * 
+	 * @see #encode(XMLReader, InputSource)
+	 * @see #encode(EncodeDocument, EncodeTarget)
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn {@link InputSource} oder {@link EncodeTarget} eine {@link IOException} auslöst.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final XMLReader reader, final InputSource source, final EncodeTarget target) throws IOException, SAXException, NullPointerException {
+		if(reader == null) throw new NullPointerException("reader is null");
+		if(source == null) throw new NullPointerException("source is null");
+		if(target == null) throw new NullPointerException("target is null");
+		this.encode(this.encode(reader, source), target);
+	}
 
 	/**
 	 * Diese Methode ließt die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} in das gegebene {@link EncodeDocument} ein.
