@@ -1,6 +1,5 @@
 package bee.creative.function;
 
-import java.util.Iterator;
 import bee.creative.function.Scopes.ExecuteScope;
 import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Objects.UseToString;
@@ -42,15 +41,7 @@ public interface Scope extends Iterable<Value>, UseToString {
 	 * @return Kontextobjekt.
 	 */
 	public Object context();
-
-	/**
-	 * Diese Methode gibt den {@link Iterator} über die {@link Value Parameterwerte} zurück.
-	 * 
-	 * @return {@link Value Parameterwert}-{@link Iterator}.
-	 */
-	@Override
-	public Iterator<Value> iterator();
-
+ 
 	/**
 	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und
 	 * gibt deren {@link Value Ergebniswert} mit {@link ReturnValue call-by-reference}-Semantik zurück. Der hierfür
@@ -96,17 +87,5 @@ public interface Scope extends Iterable<Value>, UseToString {
 	 */
 	public Value execute(Object context, Function function, int deleteCount, Value... insertValues)
 		throws NullPointerException, IllegalArgumentException;
-
-	/**
-	 * {@inheritDoc} Der {@link Object#hashCode() Streuwert} wird aus den {@link Value}s berechnet.
-	 */
-	@Override
-	public int hashCode();
-
-	/**
-	 * {@inheritDoc} Die {@link Object#equals(Object) Äquivalenz} basiert auf den {@link Value}s.
-	 */
-	@Override
-	public boolean equals(Object obj);
 
 }

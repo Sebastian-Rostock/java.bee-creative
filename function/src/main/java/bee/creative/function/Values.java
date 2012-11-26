@@ -27,11 +27,6 @@ public final class Values {
 		static final Value[] ARRAY_DATA = new Value[0];
 
 		/**
-		 * Dieses Feld speichert {@code ""}.
-		 */
-		static final String STRING_DATA = "";
-
-		/**
 		 * Dieses Feld speichert {@code Double.valueOf(Double.NaN)}.
 		 */
 		static final Double NUMBER_DATA = Double.valueOf(Double.NaN);
@@ -45,21 +40,6 @@ public final class Values {
 		 * Dieses Feld speichert den {@code Integer.valueOf(0)}.
 		 */
 		static final Number NUMBER_FALSE = Integer.valueOf(0);
-
-		/**
-		 * Dieses Feld speichert {@code Boolean.FALSE}.
-		 */
-		static final Boolean BOOLEAN_DATA = Boolean.FALSE;
-
-		/**
-		 * Dieses Feld speichert {@code Boolean.TRUE}.
-		 */
-		static final Boolean BOOLEAN_TRUE = Boolean.TRUE;
-
-		/**
-		 * Dieses Feld speichert {@code Boolean.FALSE}.
-		 */
-		static final Boolean BOOLEAN_FALSE = Boolean.FALSE;
 
 		/**
 		 * Diese Methode konvertiert den gegebene {@link String} in einen {@link Double} und gibt ihn oder
@@ -175,7 +155,7 @@ public final class Values {
 		 */
 		@Override
 		public String stringData() {
-			return ((this.data.length != 0) ? this.data[0].stringData() : AbstractValue.STRING_DATA);
+			return ((this.data.length != 0) ? this.data[0].stringData() : "");
 		}
 
 		/**
@@ -191,7 +171,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return ((this.data.length != 0) ? AbstractValue.BOOLEAN_TRUE : AbstractValue.BOOLEAN_FALSE);
+			return Boolean.valueOf(this.data.length != 0);
 		}
 
 		/**
@@ -265,7 +245,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return AbstractValue.BOOLEAN_TRUE;
+			return Boolean.TRUE;
 		}
 
 		/**
@@ -339,7 +319,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return ((this.data.length() == 0) ? AbstractValue.BOOLEAN_FALSE : AbstractValue.BOOLEAN_TRUE);
+			return Boolean.valueOf(this.data.length() != 0);
 		}
 
 		/**
@@ -447,7 +427,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return ((this.data.intValue() == 0) ? AbstractValue.BOOLEAN_FALSE : AbstractValue.BOOLEAN_TRUE);
+			return Boolean.valueOf(this.data.intValue() != 0);
 		}
 
 		/**
@@ -513,7 +493,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return AbstractValue.BOOLEAN_TRUE;
+			return Boolean.TRUE;
 		}
 
 		/**
@@ -719,7 +699,7 @@ public final class Values {
 
 		@Override
 		public String stringData() {
-			return AbstractValue.STRING_DATA;
+			return "";
 		}
 
 		/**
@@ -735,7 +715,7 @@ public final class Values {
 		 */
 		@Override
 		public Boolean booleanData() {
-			return AbstractValue.BOOLEAN_DATA;
+			return Boolean.FALSE;
 		}
 
 		@Override

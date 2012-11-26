@@ -235,7 +235,7 @@ public interface Value {
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_ARRAY}</td>
-	 * <td>{@code (arrayData().length != 0) ? Boolean.valueOf(true) : Boolean.valueOf(false)}</td>
+	 * <td>{@code Boolean.valueOf(arrayData().length != 0)}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_OBJECT}</td>
@@ -243,11 +243,11 @@ public interface Value {
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_STRING}</td>
-	 * <td>{@code (stringData().length != 0) ? Boolean.valueOf(true) : Boolean.valueOf(false)}</td>
+	 * <td>{@code Boolean.valueOf(stringData().length != 0)}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_NUMBER}</td>
-	 * <td>{@code (numberData().intValue() != 0) ? Boolean.valueOf(true) : Boolean.valueOf(false)}</td>
+	 * <td>{@code Boolean.valueOf(numberData().intValue() != 0)}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_BOOLEAN}</td>

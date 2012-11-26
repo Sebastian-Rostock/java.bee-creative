@@ -286,7 +286,7 @@ public final class Functions {
 	 * @return {@link ParameterFunction projizierende Funktion}.
 	 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 	 */
-	public static ParameterFunction parameterFunctions(final int index) throws IndexOutOfBoundsException {
+	public static ParameterFunction parameterFunction(final int index) throws IndexOutOfBoundsException {
 		if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
 		if(index < Functions.PARAMETER_FUNCTIONS.length) return Functions.PARAMETER_FUNCTIONS[index];
 		return new ParameterFunction(index);

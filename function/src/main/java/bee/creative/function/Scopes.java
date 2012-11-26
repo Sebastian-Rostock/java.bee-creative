@@ -19,36 +19,11 @@ import bee.creative.util.Objects.UseToString;
 public final class Scopes {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Scope Ausführungskontext} ohne {@link Value Parameterwerte} und
-	 * ohne Kontextobjekt.
+	 * Diese Klasse implementiert einen abstrakten {@link Scope Ausführungskontext}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class AbstractScope implements Scope, UseToString {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException("index out of range: " + index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object context() {
-			return null;
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -90,8 +65,8 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final Value execute(final Object context, final Function function, final int deleteCount,
-			final Value... insertValues) throws NullPointerException, IllegalArgumentException {
+		public final Value execute(final Object context, final Function function, final int deleteCount, final Value... insertValues) throws NullPointerException,
+			IllegalArgumentException {
 			if(function == null) throw new NullPointerException("function is null");
 			return new ReturnValue(function, new ExecuteScope(this, context, deleteCount, insertValues));
 		}
@@ -101,9 +76,9 @@ public final class Scopes {
 		 */
 		@Override
 		public final int hashCode() {
-			int hash = 0;
+			int hash = 0x811C9DC5;
 			for(int i = 0, size = this.size(); i < size; i++){
-				hash = (hash * 31) + Objects.hash(this.get(i));
+				hash = (hash * 0x01000193) ^ Objects.hash(this.get(i));
 			}
 			return hash;
 		}
@@ -126,8 +101,7 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Scope Ausführungskontext} mit Kontextobjekt und {@link Value
-	 * Parameterwerten}.
+	 * Diese Klasse implementiert einen {@link Scope Ausführungskontext} mit Kontextobjekt und {@link Value Parameterwerten}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -195,10 +169,7 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Scope Ausführungskontext} zum Aufruf einer {@link Function Funktion} mit
-	 * einer Liste von {@link Value Parameterwerten}, die durch das virtuelle Ersetzen der ersen {@link Value
-	 * Parameterwerte} eines gegebenen {@link Scope Ausführungskontexts} mit gegebenen {@link Value Parameterwerten}
-	 * entsteht.
+	 * Diese Klasse implementiert den {@link Scope Ausführungskontext} zum Aufruf einer {@link Function Funktion} mit einer Liste von {@link Value Parameterwerten}, die durch das virtuelle Ersetzen der ersen {@link Value Parameterwerte} eines gegebenen {@link Scope Ausführungskontexts} mit gegebenen {@link Value Parameterwerten} entsteht.
 	 * 
 	 * @see Scope#execute(Function, int, Value...)
 	 * @see Scope#execute(Object, Function, int, Value...)
@@ -207,8 +178,7 @@ public final class Scopes {
 	public static final class ExecuteScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den aufrufenden {@link Scope Ausführungskontext}, dessen erste {@link Value Parameterwerte}
-		 * virtuell ersetzt werden.
+		 * Dieses Feld speichert den aufrufenden {@link Scope Ausführungskontext}, dessen erste {@link Value Parameterwerte} virtuell ersetzt werden.
 		 */
 		final Scope scope;
 
@@ -218,8 +188,7 @@ public final class Scopes {
 		final Object context;
 
 		/**
-		 * Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} des aufrufenden {@link Scope Ausführungskontexts}
-		 * .
+		 * Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} des aufrufenden {@link Scope Ausführungskontexts} .
 		 */
 		final int deleteCount;
 
@@ -229,22 +198,19 @@ public final class Scopes {
 		final Value[] insertValues;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den aufrufenden {@link Scope Ausführungskontext}, das Kontextobjekt, die Anzahl
-		 * der virtuel zu entfernenden {@link Value Parameterwerte} und das Array der ersten {@link Value Parameterwerte}.
+		 * Dieser Konstrukteur initialisiert den aufrufenden {@link Scope Ausführungskontext}, das Kontextobjekt, die Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} und das Array der ersten {@link Value Parameterwerte}.
 		 * 
 		 * @see Scope#execute(Function, int, Value...)
 		 * @see Scope#execute(Object, Function, int, Value...)
 		 * @param scope aufrufender {@link Scope Ausführungskontext}.
 		 * @param context Kontextobjekt.
-		 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} des gegebenen {@link Scope
-		 *        Ausführungskontexts}.
+		 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} des gegebenen {@link Scope Ausführungskontexts}.
 		 * @param insertValues Array der ersten {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext}, die gegebene {@link Function
-		 *         Funktion} bzw. einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext}, die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist.
 		 */
-		public ExecuteScope(final Scope scope, final Object context, final int deleteCount, final Value... insertValues)
-			throws NullPointerException, IllegalArgumentException {
+		public ExecuteScope(final Scope scope, final Object context, final int deleteCount, final Value... insertValues) throws NullPointerException,
+			IllegalArgumentException {
 			if(scope == null) throw new NullPointerException("scope is null");
 			if(deleteCount < 0) throw new IllegalArgumentException("deleteCount < 0");
 			if(deleteCount > scope.size()) throw new IllegalArgumentException("deleteCount > scope.size()");
@@ -289,28 +255,23 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "executeScope", "scope", this.scope, "context", this.context,
-				"deleteCount", this.deleteCount, "insertValues", this.insertValues);
+			return Objects.toStringCall(true, true, "executeScope", "scope", this.scope, "context", this.context, "deleteCount", this.deleteCount, "insertValues",
+				this.insertValues);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Scope Ausführungskontext} einer {@link CompositeFunction Komposition}, deren
-	 * {@link Value Parameterwerte} mit Hilfe eines gegebenen {@link Scope Ausführungskontexts} und gegebener
-	 * {@link Function Parameterfunktionen} ermittelt werden.
+	 * Diese Klasse implementiert den {@link Scope Ausführungskontext} einer {@link CompositeFunction Komposition}, deren {@link Value Parameterwerte} mit Hilfe eines gegebenen {@link Scope Ausführungskontexts} und gegebener {@link Function Parameterfunktionen} ermittelt werden.
 	 * <p>
-	 * Die {@link Function Parameterfunktionen} werden zur Ermittlung der {@link Value Parameterwerte} einmalig mit dem
-	 * gegebenen {@link Scope Ausführungskontext} aufgerufen. Die {@link Value Parameterwerte} werden zur schnellen
-	 * Wiederverwendung gepuffert.
+	 * Die {@link Function Parameterfunktionen} werden zur Ermittlung der {@link Value Parameterwerte} einmalig mit dem gegebenen {@link Scope Ausführungskontext} aufgerufen. Die {@link Value Parameterwerte} werden zur schnellen Wiederverwendung gepuffert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class CompositeScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den aufrufenden {@link Scope Ausführungskontext}, der für die {@link Function
-		 * Parameterfunktionen} genutzt wird.
+		 * Dieses Feld speichert den aufrufenden {@link Scope Ausführungskontext}, der für die {@link Function Parameterfunktionen} genutzt wird.
 		 */
 		final Scope scope;
 
@@ -320,14 +281,12 @@ public final class Scopes {
 		final Value[] values;
 
 		/**
-		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als
-		 * {@link Value Parameterwerte} verwendet werden.
+		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Value Parameterwerte} verwendet werden.
 		 */
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}. Die
-		 * {@link Function Parameterfunktionen} werden nicht geprüft.
+		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}. Die {@link Function Parameterfunktionen} werden nicht geprüft.
 		 * 
 		 * @param scope {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
 		 * @param functions {@link Function Parameterfunktionen}.
@@ -345,8 +304,7 @@ public final class Scopes {
 		 * 
 		 * @param scope {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
 		 * @param functions {@link Function Parameterfunktionen}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. eine der gegebenen
-		 *         {@link Function Parameterfunktionen} {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. eine der gegebenen {@link Function Parameterfunktionen} {@code null} ist.
 		 */
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
 			if(scope == null) throw new NullPointerException("scope is null");
@@ -394,8 +352,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "compositeScope", "scope", this.scope, "functions", this.functions,
-				"values", this.values);
+			return Objects.toStringCall(true, true, "compositeScope", "scope", this.scope, "functions", this.functions, "values", this.values);
 		}
 
 	}
@@ -406,6 +363,21 @@ public final class Scopes {
 	static final Scope VOID_SCOPE = new AbstractScope() {
 
 		@Override
+		public Value get(final int index) throws IndexOutOfBoundsException {
+			throw new IndexOutOfBoundsException("index out of range: " + index);
+		}
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public Object context() {
+			return null;
+		}
+
+		@Override
 		public String toString() {
 			return Objects.toStringCall("voidScope");
 		}
@@ -413,8 +385,16 @@ public final class Scopes {
 	};
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt und gibt ihn
-	 * zurück.
+	 * Diese Methode gibt den leeren {@link Scope Ausführungskontext} ohne Kontextobjekt und ohne {@link Value Parameterwerte} zurück.
+	 * 
+	 * @return {@code void}-{@link Scope Ausführungskontext}.
+	 */
+	public static Scope voidScope() {
+		return Scopes.VOID_SCOPE;
+	}
+
+	/**
+	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt und gibt ihn zurück.
 	 * 
 	 * @see Scopes#voidScope()
 	 * @see Scopes#createScope(Object, Value...)
@@ -423,14 +403,13 @@ public final class Scopes {
 	 * @param context Kontextobjekt.
 	 * @return {@link Scope Ausführungskontext}.
 	 */
-	public static  Scope createScope(final Object context) {
+	public static Scope createScope(final Object context) {
 		if(context == null) return Scopes.voidScope();
 		return Scopes.createScope(context, Values.voidValue().arrayData());
 	}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den
-	 * gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
+	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
 	 * 
 	 * @see Scopes#voidScope()
 	 * @see Scopes#createScope(Object, Value...)
@@ -441,13 +420,12 @@ public final class Scopes {
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static  Scope createScope(final Object context, final Object... values) throws NullPointerException {
+	public static Scope createScope(final Object context, final Object... values) throws NullPointerException {
 		return Scopes.createScope(context, Values.arrayValue(values).arrayData());
 	}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den
-	 * gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
+	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
 	 * 
 	 * @see Scopes#voidScope()
 	 * @param context Kontextobjekt.
@@ -455,20 +433,10 @@ public final class Scopes {
 	 * @return {@link Scope Ausführungskontext}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
-	public static  Scope createScope(final Object context, final Value... values) throws NullPointerException {
+	public static Scope createScope(final Object context, final Value... values) throws NullPointerException {
 		if(values == null) throw new NullPointerException("values is null");
 		if((context == null) && (values.length == 0)) return Scopes.voidScope();
 		return new DefaultScope(context, values);
-	}
-
-	/**
-	 * Diese Methode gibt den leeren {@link Scope Ausführungskontext} ohne Kontextobjekt und ohne {@link Value
-	 * Parameterwerte} zurück.
-	 * 
-	 * @return {@code void}-{@link Scope Ausführungskontext}.
-	 */
-	public static  Scope voidScope() {
-		return Scopes.VOID_SCOPE;
 	}
 
 	/**
