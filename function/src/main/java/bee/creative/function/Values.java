@@ -42,8 +42,7 @@ public final class Values {
 		static final Number NUMBER_FALSE = Integer.valueOf(0);
 
 		/**
-		 * Diese Methode konvertiert den gegebene {@link String} in einen {@link Double} und gibt ihn oder
-		 * {@link #NUMBER_DATA} zurück.
+		 * Diese Methode konvertiert den gegebene {@link String} in einen {@link Double} und gibt ihn oder {@link #NUMBER_DATA} zurück.
 		 * 
 		 * @param data {@link String}.
 		 * @return {@link Double} oder {@link #NUMBER_DATA}.
@@ -97,6 +96,80 @@ public final class Values {
 			if(!(object instanceof Value)) return false;
 			final Value data = (Value)object;
 			return (this.type() == data.type()) && Objects.equals(this.data(), data.data());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den leeren {@link Value Wert}.
+	 * 
+	 * @see Value#TYPE_VOID
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class VoidValue extends AbstractValue {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int type() {
+			return Value.TYPE_VOID;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object data() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value[] arrayData() {
+			return AbstractValue.ARRAY_DATA;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String stringData() {
+			return "";
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Number numberData() {
+			return AbstractValue.NUMBER_DATA;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Boolean booleanData() {
+			return Boolean.FALSE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Function functionData() {
+			return Functions.VOID_FUNCTION;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("voidValue");
 		}
 
 	}
@@ -338,7 +411,23 @@ public final class Values {
 	 * @see Value#TYPE_BOOLEAN
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class BooleanValue extends AbstractValue {
+	public static final class BooleanValue extends AbstractValue {
+
+		/**
+		 * Dieses Feld speichert den Datensatz.
+		 */
+		final Boolean data;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * 
+		 * @param data Datensatz.
+		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
+		 */
+		public BooleanValue(final Boolean data) throws NullPointerException {
+			if(data == null) throw new NullPointerException("data is null");
+			this.data = data;
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -353,7 +442,7 @@ public final class Values {
 		 */
 		@Override
 		public Object data() {
-			return this.booleanData();
+			return this.data;
 		}
 
 		/**
@@ -362,6 +451,14 @@ public final class Values {
 		@Override
 		public Number numberData() {
 			return (this.booleanData().booleanValue() ? AbstractValue.NUMBER_TRUE : AbstractValue.NUMBER_FALSE);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Boolean booleanData() {
+			return this.data;
 		}
 
 		/**
@@ -515,14 +612,9 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Value Ergebniswert} einer {@link Function Funktion} mit
-	 * {@code call-by-reference}-Semantik, welcher eine gegebene {@link Function Funktion} erst dann mit einem gegebenen
-	 * {@link Scope Ausführungskontext} einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Datensatz}
-	 * gelesen werden.
+	 * Diese Klasse implementiert den {@link Value Ergebniswert} einer {@link Function Funktion} mit {@code call-by-reference}-Semantik, welcher eine gegebene {@link Function Funktion} erst dann mit einem gegebenen {@link Scope Ausführungskontext} einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Datensatz} gelesen werden.
 	 * <p>
-	 * Der von der {@link Function Funktion} berechnete {@link Value Ergebniswert} wird zur schnellen Wiederverwendung
-	 * gepuffert. Nach der einmaligen Auswertung der {@link Function Funktion} werden die Verweise auf {@link Scope
-	 * Ausführungskontext} und {@link Function Funktion} aufgelöst.
+	 * Der von der {@link Function Funktion} berechnete {@link Value Ergebniswert} wird zur schnellen Wiederverwendung gepuffert. Nach der einmaligen Auswertung der {@link Function Funktion} werden die Verweise auf {@link Scope Ausführungskontext} und {@link Function Funktion} aufgelöst.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -536,8 +628,7 @@ public final class Values {
 		Value value;
 
 		/**
-		 * Dieses Feld speichert den {@link Scope Ausführungskontext} zum Aufruf der {@link Function Funktion} oder
-		 * {@code null}.
+		 * Dieses Feld speichert den {@link Scope Ausführungskontext} zum Aufruf der {@link Function Funktion} oder {@code null}.
 		 * 
 		 * @see Function#execute(Scope)
 		 */
@@ -551,8 +642,7 @@ public final class Values {
 		Function function;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}. {@link Scope
-		 * Ausführungskontext} und {@link Function Funktion} werden nicht geprüft.
+		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}. {@link Scope Ausführungskontext} und {@link Function Funktion} werden nicht geprüft.
 		 * 
 		 * @param scope {@link Scope Ausführungskontext}.
 		 * @param function {@link Function Funktion}.
@@ -567,8 +657,7 @@ public final class Values {
 		 * 
 		 * @param scope {@link Scope Ausführungskontext}.
 		 * @param function {@link Function Funktion}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. die gegebene
-		 *         {@link Function Funktion} {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. die gegebene {@link Function Funktion} {@code null} ist.
 		 */
 		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
 			if(scope == null) throw new NullPointerException("scope is null");
@@ -578,8 +667,7 @@ public final class Values {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem
-		 * {@link Scope Ausführungskontext} zurück.
+		 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem {@link Scope Ausführungskontext} zurück.
 		 * 
 		 * @see Function#execute(Scope)
 		 * @return {@link Value Ergebniswert}.
@@ -665,8 +753,7 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "resultValue", "value", this.value, "scope", this.scope, "function",
-				this.function);
+			return Objects.toStringCall(true, true, "resultValue", "value", this.value, "scope", this.scope, "function", this.function);
 		}
 
 	}
@@ -674,85 +761,17 @@ public final class Values {
 	/**
 	 * Dieses Feld speichert den {@code null}-{@link Value Wert}.
 	 */
-	static final Value VOID_VALUE = new AbstractValue() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int type() {
-			return Value.TYPE_VOID;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object data() {
-			return null;
-		}
-
-		@Override
-		public Value[] arrayData() {
-			return AbstractValue.ARRAY_DATA;
-		}
-
-		@Override
-		public String stringData() {
-			return "";
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Number numberData() {
-			return AbstractValue.NUMBER_DATA;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Boolean booleanData() {
-			return Boolean.FALSE;
-		}
-
-		@Override
-		public Function functionData() {
-			return Functions.VOID_FUNCTION;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("voidValue");
-		}
-
-	};
+	static final Value VOID_VALUE = new VoidValue();
 
 	/**
 	 * Dieses Feld speichert den {@link Value Wert} mit dem Datensatz {@link Boolean#TRUE}.
 	 */
-	static final Value TRUE_VALUE = new BooleanValue() {
-
-		@Override
-		public Boolean booleanData() {
-			return Boolean.TRUE;
-		}
-
-	};
+	static final Value TRUE_VALUE = new BooleanValue(Boolean.TRUE);
 
 	/**
 	 * Dieses Feld speichert den {@link Value Wert} mit dem Datensatz {@link Boolean#FALSE}.
 	 */
-	static final Value FALSE_VALUE = new BooleanValue() {
-
-		@Override
-		public Boolean booleanData() {
-			return Boolean.FALSE;
-		}
-
-	};
+	static final Value FALSE_VALUE = new BooleanValue(Boolean.FALSE);
 
 	/**
 	 * Diese Methode konvertiert die gegebenen {@link Array Objekte} in einen {@link Value Wert} und gibt diesen zurück.
@@ -772,8 +791,7 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link Value Wert} oder den {@link Values#voidValue() void}-{@link Value Wert}
-	 * zurück.
+	 * Diese Methode gibt den gegebenen {@link Value Wert} oder den {@link Values#voidValue() void}-{@link Value Wert} zurück.
 	 * 
 	 * @param value {@link Value Wert} oder {@code null}.
 	 * @return {@link Value Wert} oder den {@link Values#voidValue() void}-{@link Value Wert}.
@@ -784,8 +802,7 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value Wert} und gibt diesen zurück. Abhängig vom
-	 * Datentyp des gegebenen Datensatzes wird hierfür eine entsprechende {@link Value Wert}-Implementation gewählt.
+	 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value Wert} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes wird hierfür eine entsprechende {@link Value Wert}-Implementation gewählt.
 	 * 
 	 * @param data Datensatz.
 	 * @return {@link Value Wert}.
@@ -982,8 +999,7 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Methode konvertiert die gegebene {@link Function Funktion} in einen {@link Value Wert} und gibt diesen
-	 * zurück.
+	 * Diese Methode konvertiert die gegebene {@link Function Funktion} in einen {@link Value Wert} und gibt diesen zurück.
 	 * 
 	 * @param data {@link Function}.
 	 * @return {@link Value Wert}.

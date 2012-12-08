@@ -1,10 +1,7 @@
 package bee.creative.function;
 
 /**
- * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link Function Funktion} oder als Parameter in
- * einem {@link Scope Ausführungskontext} verwendet werden kann. Ein solcher {@link Value Wert} besitzt dazu einen
- * {@link Value#type() Datentyp}, einen {@link Value#data() Datensatz} sowie Methoden zur Konvertierung des
- * {@link Value#data() Datensatzes} in andere {@link Value#type() Datentypen}.
+ * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link Function Funktion} oder als Parameter in einem {@link Scope Ausführungskontext} verwendet werden kann. Ein solcher {@link Value Wert} besitzt dazu einen {@link Value#type() Datentyp}, einen {@link Value#data() Datensatz} sowie Methoden zur Konvertierung des {@link Value#data() Datensatzes} in andere {@link Value#type() Datentypen}.
  * 
  * @see Scope
  * @see Values
@@ -193,13 +190,11 @@ public interface Value {
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_OBJECT}</td>
-	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException
-	 * NumberFormatException}</td>
+	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException NumberFormatException}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_STRING}</td>
-	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException
-	 * NumberFormatException}</td>
+	 * <td>{@code Double.valueOf(stringData())} bzw. {@code Double.valueOf(NaN)} bei einer {@link NumberFormatException NumberFormatException}</td>
 	 * </tr>
 	 * <tr>
 	 * <td>{@link #TYPE_NUMBER}</td>

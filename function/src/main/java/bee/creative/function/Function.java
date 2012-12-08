@@ -1,10 +1,7 @@
 package bee.creative.function;
 
 /**
- * Diese Schnittstelle definiert eine Funktion, deren {@link Function#execute(Scope) Berechnungsmethode} mit einem
- * {@link Scope Ausführungskontext} aufgerufen wird und einen {@link Value Ergebniswert} zurück gibt. Aus dem
- * {@link Scope#context() Kontextobjekt} des {@link Scope Ausführungskontexts} können hierbei Informationen für die
- * Berechnungen extrahiert oder auch der Zustand dieses Objekts modifiziert werden.
+ * Diese Schnittstelle definiert eine Funktion, deren {@link Function#execute(Scope) Berechnungsmethode} mit einem {@link Scope Ausführungskontext} aufgerufen wird und einen {@link Value Ergebniswert} zurück gibt. Aus dem {@link Scope#context() Kontextobjekt} des {@link Scope Ausführungskontexts} können hierbei Informationen für die Berechnungen extrahiert oder auch der Zustand dieses Objekts modifiziert werden.
  * 
  * @see Value
  * @see Scope
@@ -14,8 +11,7 @@ package bee.creative.function;
 public interface Function {
 
 	/**
-	 * Diese Methode führt Berechnungen im gegebenen {@link Scope Ausführungskontext} durch und gibt deren {@link Value
-	 * Ergebniswert} zurück.
+	 * Diese Methode führt Berechnungen im gegebenen {@link Scope Ausführungskontext} durch und gibt deren {@link Value Ergebniswert} zurück.
 	 * 
 	 * @param scope {@link Scope Ausführungskontext}.
 	 * @return {@link Value Ergebniswert}.

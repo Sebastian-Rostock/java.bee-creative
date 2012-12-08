@@ -333,8 +333,8 @@ public final class Scopes {
 			if(index >= values.length) throw new IndexOutOfBoundsException("index out of range: " + index);
 			Value value = values[index];
 			if(value != null) return value;
-			value = this.functions[index].execute(this.scope);
-			if(value == null) throw new NullPointerException("value is null");
+			value = new ReturnValue(this.functions[index], this.scope);
+			// if(value == null) throw new NullPointerException("value is null");
 			values[index] = value;
 			return value;
 		}
