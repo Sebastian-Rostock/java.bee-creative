@@ -1,6 +1,7 @@
 package bee.creative.xml.coder;
 
 import java.nio.charset.Charset;
+import java.util.BitSet;
 import bee.creative.array.ArrayCopy;
 import bee.creative.xml.coder.Decoder.DecodeDocument;
 import bee.creative.xml.coder.Decoder.DecodeItem;
@@ -145,6 +146,15 @@ return hash;</pre>
 		final int[] array = new int[length];
 		ArrayCopy.copy(value, 0, array, 0, length);
 		return array;
+	}
+
+	public static int byteCount(int poolSize, int addBits) {
+		if(poolSize == 0) return 0;
+		poolSize = (poolSize - 1) << addBits;
+		if(poolSize <= 0x01000000) return 4;
+		if(poolSize <= 0x010000) return 3;
+		if(poolSize <= 0x0100) return 2;
+		return 1;
 	}
 
 }

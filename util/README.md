@@ -1,11 +1,10 @@
 # bee-creative.util
 
+	[cc-by] Sebastian Rostock (bee-creative@gmx.de)
+
 Wenn sich Probleme mit einem verkettenden, filternden, konvertierenden oder begrenzenden `Iterator` bzw. `Iterable` oder mit einem verkettenden oder konvertierenden `Comparator` bzw. `Comparable` lösen lassen, kann `bee-creative.util` die Lösung sein.
 
 In dieser Bibliothek finden sich dazu `Filter` für verschiedene logische Operationen, verkettende, filternde sowie gepufferte `Converter`, statische, dynamische sowie inverse `Conversion`, gepufferte sowie konvertierende `Builder`, `Pointer` unterschiedlicher Stärke sowie `Tester` zur Ermittlung von Rechenzeit und Speicherbelegung einer Testmethode.
-
-__________________________________________________________________________________________
-
 
 ### Filter
 
@@ -16,13 +15,13 @@ Ein `Filter` ist eine Methode, die mit den beiden Rückgabewerten *true* und *fa
 			return input.startsWith(prefix);
 		}
 	};
-
+	
 	Filter<String> suffixFilter = new Filter<String>() {
 		public boolean accept(String input) {
 			return input.endsWith(suffix);
 		}
 	};
-
+	
 `Filter` entsprechen damit logischen Eigenschaften bzw. Prädikaten und können als soche über logische Operatoren miteinander verklüpft werden. Einige Beispiele hierfür sind:
 
 	Filter<String> prefixOrSuffixFilter = Filters.disjunctionFilter(prefixFilter, suffixFilter);
@@ -45,9 +44,6 @@ Der konvertierende `Filter` *itemNameFilter* könnte beispielsweise ein `Item` a
 	
 	Filter<Item> itemNameFilter = Filters.convertedFilter(itemNameConverter, prefixOrSuffixFilter);
 
-__________________________________________________________________________________________
-
-
 ### Converter
 
 Ein `Converter` ist eine Methode, die ein gegebenes Eingabeobjekt in ein Ausgabeobjekt umwandelt. Bei dieser Umwandlung kann es sich beispielsweise um eine Navigation in einem Objektgraph oder auch das Parsen, Formatieren bzw. Umkodieren des Eingabeobjekts handel.
@@ -61,20 +57,9 @@ Der Puffer in diesem `Converter` besteht aus einer `Map`, deren Schlüssel und W
 
 `Converter` zur Navigation 
 
-ChainedConverter
-
-
-
-
-
-
-
-__________________________________________________________________________________________
+...
 
 ### Conversion
-
-
-	
 
 In diesem Beispiel soll eine Menge komplexer Objekte (ComplexEntry) zur Anzeige in einer
 sortierten Auswahlliste aufbereitet werden. Die für die Anzeige benötigten Texte
@@ -82,82 +67,51 @@ sortierten Auswahlliste aufbereitet werden. Die für die Anzeige benötigten Tex
 (ComplexFormatConverter) berechnet. Die Sortierung der Auswahlliste soll an Hand der
 berechneten Texte erfolgen.
 
-----------------------------------------------------------------------------------------
+*Eingabe:*
 
-Eingabe:
 - Iterable<ComplexEntry> - Menge der komplexen Objekte
 
-----------------------------------------------------------------------------------------
+*Ausgabe:*
 
-Ausgabe:
 - List<String> - sortierte Liste der Texte zu den komplexen Objekte
 - List<ComplexEntry> - nach Text sortierte Liste der komplexen Objekte
 
-----------------------------------------------------------------------------------------
+*Quelltext:*
 
-Quelltext:
-
-class ComplexEntry {
-
-static Converter<ComplexEntry, String> ComplexFormatConverter =
-new Converter<ComplexEntry, String>() {
-
-@Override
-public String convert(final ComplexEntry input) {
-final StringBuilder builder = new StringBuilder();
-// ... aufwändige Formatierung
-return builder.toString();
-}
-
-};
-
-// ...
-
-}
-
-void work(...) {
-
-	// Eingabe
-	Iterable<ComplexEntry> complexEntries = ...
-
-	// Ausgabe
-	List<ComplexEntry> sortedComplexEntryList = new ArrayList<ComplexEntry>();
-	List<String> sortedComplexFormatList = new ArrayList<String>();
-
-	// Conversion
-	List<Conversion<ComplexEntry, String>> conversionList = new ArrayList<Conversion<ComplexEntry, String>>();
-	Iterables.appendAll(conversionList, Iterables.convertedIterable(Conversions.staticConversionConverter(ComplexEntry.ComplexFormatConverter), complexEntries));
-
-// Conversion.Output
-Converter<Conversion<?, ? extends String>, String> conversionOutputConverter =
-Conversions.conversionOutputConverter();
-
-ConvertedComparator<Conversion<?, ? extends String>, String>
-conversionOutputComparator = Comparators.convertedComparator(
-conversionOutputConverter, Comparators.stringAlphanumericalComparator());
-
-Collections.sort(conversionList, conversionOutputComparator);
-
-ConvertedIterable<Conversion<ComplexEntry, String>, String>
-conversionOutputIterable = Iterables.convertedIterable(conversionOutputConverter,
-conversionList);
-
-Iterables.appendAll(sortedComplexFormatList, conversionOutputIterable);
-
-// Conversion.Input
-Converter<Conversion<? extends ComplexEntry, ?>, ComplexEntry>
-conversionInputConverter = Conversions.<ComplexEntry>conversionInputConverter();
-
-ConvertedIterable<Conversion<ComplexEntry, String>, ComplexEntry>
-conversionInputIterable = Iterables.convertedIterable(conversionInputConverter,
-conversionList);
-
-Iterables.appendAll(sortedComplexEntryList, conversionInputIterable);
-
-}
-
-__________________________________________________________________________________________
-
+	class ComplexEntry {
+		static Converter<ComplexEntry, String> ComplexFormatConverter = new Converter<ComplexEntry, String>() {
+			@Override
+			public String convert(final ComplexEntry input) {
+				final StringBuilder builder = new StringBuilder();
+				... aufwändige Formatierung
+				return builder.toString();
+			}
+		};
+		...
+	}
+	
+	void work(...) {
+		// Eingabe
+		Iterable<ComplexEntry> complexEntries = ...
+		// Ausgabe
+		List<ComplexEntry> sortedComplexEntryList = new ArrayList<ComplexEntry>();
+		List<String> sortedComplexFormatList = new ArrayList<String>();
+		// Conversion
+		List<Conversion<ComplexEntry, String>> conversionList = new ArrayList<Conversion<ComplexEntry, String>>();
+		Iterables.appendAll(conversionList, Iterables.convertedIterable(Conversions.staticConversionConverter(ComplexEntry.ComplexFormatConverter), complexEntries));
+		// Conversion.Output
+		Converter<Conversion<?, ? extends String>, String> conversionOutputConverter = Conversions.conversionOutputConverter();
+		ConvertedComparator<Conversion<?, ? extends String>, String> conversionOutputComparator = Comparators.convertedComparator(conversionOutputConverter, Comparators.stringAlphanumericalComparator());
+		Collections.sort(conversionList, conversionOutputComparator);
+		ConvertedIterable<Conversion<ComplexEntry, String>, String> conversionOutputIterable = Iterables.convertedIterable(conversionOutputConverter, conversionList);
+		Iterables.appendAll(sortedComplexFormatList, conversionOutputIterable);
+		// Conversion.Input
+		Converter<Conversion<? extends ComplexEntry, ?>, ComplexEntry> conversionInputConverter = Conversions.<ComplexEntry>conversionInputConverter();
+		ConvertedIterable<Conversion<ComplexEntry, String>, ComplexEntry> conversionInputIterable = Iterables.convertedIterable(conversionInputConverter, conversionList);
+		Iterables.appendAll(sortedComplexEntryList, conversionInputIterable);
+		...
+	}
+	
 ### Builder
 
 In diesem Beispiel soll ein statisches Hilfsobjekt (Helper) unter Verwendung einer
@@ -165,65 +119,46 @@ automatischen Erzeugung und Zwischenspeicherung zur Verfügung gestellt werden. 
 Hilfsobjekt dann nicht mehr verwendet wird soll es bei Speichermangel und automatisch
 gelöscht werden.
 
-----------------------------------------------------------------------------------------
+*Eingabe:*
 
-Eingabe:
 - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts
 
-----------------------------------------------------------------------------------------
+*Ausgabe:*
 
-Ausgabe:
 - Builder<Helper> - Methode zur Erzeugung des Hilfsobjekts mit speichersensitiver
 Zwischenspeicherung
 
-----------------------------------------------------------------------------------------
+*Quelltext:*
 
-Quelltext:
-
-public final class Helper {
-
-private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(
-Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {
-
-@Override
-public Helper build() {
-return new Helper();
-}
-
-}));
-
-public static Helper get() {
-return Helper.BUILDER.build();
-}
-
-Helper() {
-// ...
-}
-
-// ...
-
-}
-
-
-public void work() {
-
-Helper helper = Helper.get();
-
-// ...
-
-}
-
-
-__________________________________________________________________________________________
-
+	public final class Helper {
+		private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {	
+			@Override
+			public Helper build() {
+				return new Helper();
+			}			
+		}));	
+		public static Helper get() {
+			return Helper.BUILDER.build();
+		}	
+		Helper() {
+			...
+		}
+		...	
+	}
+	public void work(...) {
+		Helper helper = Helper.get();
+		...	
+	}
+	
 ### Pointer
 
-__________________________________________________________________________________________
+...
 
 ### Tester
 
-__________________________________________________________________________________________
+...
 
+---
 
 ##### [cc-by] Sebastian Rostock ( bee-creative@gmx.de )
 

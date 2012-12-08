@@ -1814,6 +1814,86 @@ public class Decoder {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein {@link DecodeItem} mit {@code URI} und {@code Name}.
+	 * 
+	 * @see Attr#getPrefix()
+	 * @see Attr#getLocalName()
+	 * @see Attr#getNamespaceURI()
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class DecodeAttributeLabel extends DecodeItem {
+	
+		/**
+		 * Dieses Feld speichert den Index des {@code URI}-{@link DecodeValue}s.
+		 */
+		protected final int uri;
+	
+		/**
+		 * Dieses Feld speichert den Index des {@code Name}-{@link DecodeValue}s.
+		 */
+		protected final int name;
+	
+		/**
+		 * Dieses Feld speichert den Index des {@code Prefix}-{@link DecodeValue}s.
+		 */
+		protected final int prefix;
+	
+		/**
+		 * Dieser Konstrukteur initialisiert die Indizes.
+		 * 
+		 * @param index Index.
+		 * @param uri Index des {@code URI}-{@link DecodeValue}s.
+		 * @param name Index des {@code Name}-{@link DecodeValue}s.
+		 * @param prefix Index des {@code Prefix}-{@link DecodeValue}s.
+		 */
+		public DecodeAttributeLabel(final int index, final int uri, final int name,int prefix) {
+			super(index);
+			this.uri = uri;
+			this.name = name;
+			this.prefix=prefix;
+		}
+	
+		/**
+		 * Diese Methode gibt den Index des {@code URI}-{@link DecodeValue}s zurück.
+		 * 
+		 * @see Attr#getNamespaceURI()
+		 * @return Index des {@code URI}-{@link DecodeValue}s.
+		 */
+		public int uri() {
+			return this.uri;
+		}
+	
+		/**
+		 * Diese Methode gibt den Index des {@code Name}-{@link DecodeValue}s zurück.
+		 * 
+		 * @see Attr#getLocalName()
+		 * @return Index des {@code Name}-{@link DecodeValue}s.
+		 */
+		public int name() {
+			return this.name;
+		}
+	
+		/**
+		 * Diese Methode gibt den Index des {@code Prefix}-{@link DecodeValue}s zurück.
+		 * 
+		 * @see Attr#getPrefix()
+		 * @return Index des {@code Name}-{@link DecodeValue}s.
+		 */
+		public int prefix() {
+			return this.prefix;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(false, true, "DecodeLabel", "index", this.index, "uri", this.uri, "name", this.name, "prefix", this.prefix);
+		}
+	
+	}
+
+	/**
 	 * Diese Klasse implementiert eine Zusammenfassung mehrerer {@link DecodePool}s zur Abstraktion eines {@link Document}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -4937,23 +5017,232 @@ public class Decoder {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein {@link Text} als {@link DecodeChildNodeAdapter}.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	 static abstract class DecodeTextNodeAdapter2 extends DecodeChildNodeAdapter2 implements Text {
+	
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeTextNodeAdapter2 asText() {
+			return this;
+		}
+	
+		/**
+		 * Diese Methode gibt den Index des {@link DecodeValue}s im {@link DecodeDocument#valuePool()} zurück.
+		 * 
+		 * @return Index des {@link DecodeValue}s.
+		 */
+		public abstract int valueIndex();
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public short getNodeType() {
+			return Node.TEXT_NODE;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getNodeName() {
+			return "#text";
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getNodeValue() throws DOMException {
+			return this.adapter.getTextNodeValue(this.valueIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getData() throws DOMException {
+			return this.getNodeValue();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setData(final String data) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getLength() {
+			return this.getData().length();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getTextContent() throws DOMException {
+			return this.getNodeValue();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getWholeText() {
+			return this.getNodeValue();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String substringData(final int offset, final int count) throws DOMException {
+			try{
+				return this.getNodeValue().substring(offset, offset + count);
+			}catch(final IndexOutOfBoundsException e){
+				throw new DOMException(DOMException.INDEX_SIZE_ERR, e.getMessage());
+			}
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Text splitText(final int offset) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void insertData(final int offset, final String arg) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void deleteData(final int offset, final int count) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void appendData(final String arg) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void replaceData(final int offset, final int count, final String arg) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Text replaceWholeText(final String content) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isSameNode(final Node object) {
+			return this.equals(object);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEqualNode(final Node object) {
+			if(object == this) return true;
+			if(!(object instanceof DecodeTextNodeAdapter2)) return false;
+			final DecodeTextNodeAdapter2 data = (DecodeTextNodeAdapter2)object;
+			return this.valueIndex() == data.valueIndex();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isElementContentWhitespace() {
+			final String nodeValue = this.getNodeValue();
+			for(int i = 0, size = nodeValue.length(); i < size; i++){
+				final char value = nodeValue.charAt(i);
+				if((value > 0x20) || (value < 0x09)) return false;
+				if((value != 0x0A) && (value != 0x0D)) return false;
+			}
+			return true;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.valueIndex() ^ this.childIndex();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof DecodeTextNodeAdapter2)) return false;
+			final DecodeTextNodeAdapter2 data = (DecodeTextNodeAdapter2)object;
+			return (this.valueIndex() == data.valueIndex()) && (this.childIndex() == data.childIndex()) && this.parentAdapter().equals(data.parentAdapter());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return this.getNodeValue();
+		}
+	
+	}
+
+	/**
 	 * Diese Klasse implementiert einen {@link DecodeNodeAdapter} mit {@code Parent}-{@link DecodeNodeAdapter} und {@code Child-Index} als Basis von {@link DecodeTextNodeAdapter} und {@link DecodeElementNodeAdapter}.
 	 * 
 	 * @see Element#getChildNodes()
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class DecodeChildNodeAdapter extends DecodeNodeAdapter {
-
+	
 		/**
 		 * Dieses Feld speichert den {@code Parent}-{@link DecodeNodeAdapter}.
 		 */
 		protected final DecodeNodeAdapter parent;
-
+	
 		/**
 		 * Dieses Feld speichert dne Index des {@link DecodeItem}s.
 		 */
 		protected final int index;
-
+	
 		/**
 		 * Dieses Feld speichert den {@code Child-Index}.
 		 * 
@@ -4961,7 +5250,7 @@ public class Decoder {
 		 * @see NodeList#item(int)
 		 */
 		protected final int child;
-
+	
 		/**
 		 * Dieser Konstrukteur initialisiert {@code Parent}-{@link DecodeNodeAdapter}, Index des {@link DecodeItem}s und {@code Child-Index}.
 		 * 
@@ -4976,7 +5265,7 @@ public class Decoder {
 			this.index = index;
 			this.child = child;
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -4984,7 +5273,7 @@ public class Decoder {
 		public DecodeAdapter adapter() {
 			return this.parent.adapter();
 		}
-
+	
 		/**
 		 * Diese Methode gibt den Index dieses {@link DecodeChildNodeAdapter}s in den {@link Node#getChildNodes()} des {@link Node#getParentNode()}s zurück.
 		 * 
@@ -4993,7 +5282,7 @@ public class Decoder {
 		public int childIndex() {
 			return this.child;
 		}
-
+	
 		/**
 		 * Diese Methode gibt den {@code Parent}-{@link DecodeNodeAdapter} zurück.
 		 * 
@@ -5002,7 +5291,7 @@ public class Decoder {
 		public DecodeNodeAdapter parentAdapter() {
 			return this.parent;
 		}
-
+	
 		/**
 		 * Diese Methode gibt nur dann {@code this} zurück, wenn dieses Objekt ein {@link DecodeTextNodeAdapter} ist.
 		 * 
@@ -5011,7 +5300,7 @@ public class Decoder {
 		public DecodeTextNodeAdapter asText() {
 			return null;
 		}
-
+	
 		/**
 		 * Diese Methode gibt nur dann {@code this} zurück, wenn dieses Objekt ein {@link DecodeElementNodeAdapter} ist.
 		 * 
@@ -5020,7 +5309,7 @@ public class Decoder {
 		public DecodeElementNodeAdapter asElement() {
 			return null;
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -5028,7 +5317,7 @@ public class Decoder {
 		public Node getParentNode() {
 			return this.parent;
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -5040,7 +5329,7 @@ public class Decoder {
 			if(children == null) return null;
 			return children.item(this.child - 1);
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -5052,7 +5341,7 @@ public class Decoder {
 			if(children == null) return null;
 			return children.item(this.child + 1);
 		}
-
+	
 		/**
 		 * {@inheritDoc}
 		 */
@@ -5060,7 +5349,91 @@ public class Decoder {
 		public int hashCode() {
 			return this.index ^ this.child;
 		}
+	
+	}
 
+	/**
+	 * Diese Klasse implementiert einen {@link DecodeNodeAdapter} mit {@code Parent}-{@link DecodeNodeAdapter} und {@code Child-Index} als Basis von {@link DecodeTextNodeAdapter} und {@link DecodeElementNodeAdapter}.
+	 * 
+	 * @see Element#getChildNodes()
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	 static abstract class DecodeChildNodeAdapter2 extends DecodeNodeAdapter {
+
+
+			protected DecodeAdapter adapter;
+			
+			
+			@Override
+			public final DecodeAdapter adapter() {
+			return adapter;
+			}
+
+
+		/**
+		 * Diese Methode gibt den Index dieses {@link DecodeChildNodeAdapter}s in den {@link Node#getChildNodes()} des {@link Node#getParentNode()}s zurück.
+		 * 
+		 * @return Index dieses {@link DecodeChildNodeAdapter}s im {@link Node#getParentNode()}.
+		 */
+		public abstract int childIndex();
+
+		/**
+		 * Diese Methode gibt den {@code Parent}-{@link DecodeNodeAdapter} zurück.
+		 * 
+		 * @return {@code Parent}-{@link DecodeNodeAdapter}.
+		 */
+		public abstract DecodeNodeAdapter parentAdapter();
+
+		/**
+		 * Diese Methode gibt nur dann {@code this} zurück, wenn dieses Objekt ein {@link DecodeTextNodeAdapter} ist.
+		 * 
+		 * @return {@code this} oder {@code null}.
+		 */
+		public DecodeTextNodeAdapter2 asText() {
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code this} zurück, wenn dieses Objekt ein {@link DecodeElementNodeAdapter} ist.
+		 * 
+		 * @return {@code this} oder {@code null}.
+		 */
+		public DecodeElementNodeAdapter2 asElement() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Node getParentNode() {
+			return this.parentAdapter();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeChildNodeAdapter getPreviousSibling() {
+			final DecodeNodeAdapter parent = this.parentAdapter();
+			if(parent == null) return null;
+			final ChildList children = parent.getChildNodes();
+			if(children == null) return null;
+			return children.item(this.childIndex() - 1);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeChildNodeAdapter getNextSibling() {
+			final DecodeNodeAdapter parent = this.parentAdapter();
+			if(parent == null) return null;
+			final ChildList children = parent.getChildNodes();
+			if(children == null) return null;
+			return children.item(this.childIndex() + 1);
+		}
+ 
 	}
 
 	/**
@@ -5639,6 +6012,478 @@ public class Decoder {
 		}
 
 	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Element} als {@link DecodeChildNodeAdapter}.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	 static abstract class DecodeElementNodeAdapter2 extends DecodeChildNodeAdapter2 implements Element {
+	
+
+	
+		/**
+		 * Diese Methode gibt den Index des {@link DecodeElement}s im {@link DecodeDocument#elementNodePool()} zurück.
+		 * 
+		 * @return Index des {@link DecodeElement}s.
+		 */
+		public abstract int elementIndex();
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeElementNodeAdapter2 asElement() {
+			return this;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getPrefix() {
+			return this.adapter.getElementPrefix(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getNamespaceURI() {
+			return this.adapter.getElementNamespaceURI(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public short getNodeType() {
+			return Node.ELEMENT_NODE;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getNodeName() {
+			return this.adapter.getElementNodeName(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getNodeValue() throws DOMException {
+			return null;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getTagName() {
+			return this.getNodeName();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getLocalName() {
+			return this.adapter.getElementLocalName(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeChildNodeAdapter getFirstChild() {
+			return null;// TODO this.adapter().getChildNodeFirst(this);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeChildNodeAdapter getLastChild() {
+			return null;// TODO this.adapter().getChildNodeLast(this);
+		}
+	
+		/**
+		 * Diese Methode gibt den {@code index}-te {@link DecodeChildNodeAdapter} oder {@code null} zurück.
+		 * 
+		 * @see DecodeChildNodesAdapter#item(int)
+		 * @param index Index.
+		 * @return {@code index}-ter {@link DecodeChildNodeAdapter} oder {@code null}.
+		 */
+		public DecodeChildNodeAdapter getChildNode(final int index) {
+			return null;// TODO this.adapter().getChildNode(this, index);
+		}
+	
+		/**
+		 * Diese Methode gibt das erste gefundenen {@code Child}-{@link Element} mit dem gegebenen {@code Name} oder {@code null} zurück. Die lineare Suche beginnt ab der gegebenen Position.
+		 * 
+		 * @see Element#getNodeName()
+		 * @see Element#getChildNodes()
+		 * @see Element#getTextContent()
+		 * @param name {@code Name}.
+		 * @param child {@code Child}-Index als Beginn der linearen Suche.
+		 * @return erstes gefundenes {@code Child}-{@link Element} oder {@code null}.
+		 */
+		public DecodeElementNodeAdapter getChildNode(final String name, final int child) {
+			return this.getChildNodeNS(XMLConstants.NULL_NS_URI, name, child);
+		}
+	
+		/**
+		 * Diese Methode gibt das erste gefundenen {@code Child}-{@link Element} mit der gegebenen {@code URI} und dem gegebenen {@code Name} oder {@code null} zurück. Die lineare Suche beginnt ab der gegebenen Position.
+		 * 
+		 * @see Element#getLocalName()
+		 * @see Element#getNamespaceURI()
+		 * @see Element#getChildNodes()
+		 * @see Element#getTextContent()
+		 * @param uri {@code URI}.
+		 * @param name {@code Name}.
+		 * @param child {@code Child}-Index als Beginn der linearen Suche.
+		 * @return erstes gefundenes {@code Child}-{@link Element} oder {@code null}.
+		 */
+		public DecodeElementNodeAdapter getChildNodeNS(final String uri, final String name, final int child) {
+			return null;// TODO this.adapter().getChildNodeByUriName(this, uri, name, child);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasChildNodes() {
+			return this.adapter.hasChildNodes(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeChildNodesAdapter getChildNodes() {
+			return null;// TODO this.adapter().getChildNodes(this);
+		}
+	
+		/**
+		 * Diese Methode gibt den Textwert des ersten gefundenen {@code Child}-{@link Element}s mit dem gegebenen {@code Name} oder {@code ""} zurück. Die lineare Suche nach dem {@link Element} beginnt ab der gegebenen Position.
+		 * 
+		 * @see Element#getNodeName()
+		 * @see Element#getChildNodes()
+		 * @see Element#getTextContent()
+		 * @param name {@code Name}.
+		 * @param child {@code Child}-Index als Beginn der linearen Suche.
+		 * @return Textwert des ersten gefundenen {@code Child}-{@link Element}s oder {@code ""}.
+		 */
+		public String getChildContent(final String name, final int child) {
+			return this.getChildContentNS(XMLConstants.NULL_NS_URI, name, child);
+		}
+	
+		/**
+		 * Diese Methode gibt den Textwert des ersten gefundenen {@code Child}-{@link Element}s mit der gegebenen {@code URI} und dem gegebenen {@code Name} oder {@code ""} zurück. Die lineare Suche nach dem {@link Element} beginnt ab der gegebenen Position.
+		 * 
+		 * @see Element#getLocalName()
+		 * @see Element#getNamespaceURI()
+		 * @see Element#getChildNodes()
+		 * @see Element#getTextContent()
+		 * @param uri {@code URI}.
+		 * @param name {@code Name}.
+		 * @param child {@code Child}-Index als Beginn der linearen Suche.
+		 * @return Textwert des ersten gefundenen {@code Child}-{@link Element}s oder {@code ""}.
+		 */
+		public String getChildContentNS(final String uri, final String name, final int child) {
+			return null;// TODO this.adapter().getChildContentByUriName(this.index, uri, name, child);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeAttributeNodesAdapter getAttributes() {
+			return null;// TODO this.adapter().getAttributeNodes(this);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasAttributes() {
+			return this.adapter.hasAttributeNodes(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getAttribute(final String name) {
+			return this.getAttributeNS(XMLConstants.NULL_NS_URI, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasAttribute(final String name) {
+			return this.hasAttributeNS(XMLConstants.NULL_NS_URI, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setAttribute(final String name, final String value) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getAttributeNS(final String uri, final String name) throws DOMException {
+			return this.adapter.getAttributeValueByUriName(this.elementIndex(), uri, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasAttributeNS(final String uri, final String name) throws DOMException {
+			return this.adapter.hasAttributeNodeByUriName(this.elementIndex(), uri, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setAttributeNS(final String namespaceURI, final String qualifiedName, final String value) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeAttributeNodeAdapter getAttributeNode(final String name) {
+			return this.getAttributeNodeNS(XMLConstants.NULL_NS_URI, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Attr setAttributeNode(final Attr newAttr) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DecodeAttributeNodeAdapter getAttributeNodeNS(final String uri, final String name) throws DOMException {
+			return null;// TODO this.adapter().getAttributeNodeByUriName(this, uri, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Attr setAttributeNodeNS(final Attr newAttr) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setIdAttribute(final String name, final boolean isId) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setIdAttributeNS(final String namespaceURI, final String localName, final boolean isId) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setIdAttributeNode(final Attr idAttr, final boolean isId) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getTextContent() throws DOMException {
+			return this.adapter.getElementContent(this.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public TypeInfo getSchemaTypeInfo() {
+			return DecodeAdapter.VOID_TYPE_INFO;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void removeAttribute(final String name) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void removeAttributeNS(final String namespaceURI, final String localName) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Attr removeAttributeNode(final Attr oldAttr) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String lookupPrefix(final String uri) {
+			return this.adapter.lookupPrefix(this.elementIndex(), uri);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String lookupNamespaceURI(final String prefix) {
+			return this.adapter.lookupNamespaceURI(this.elementIndex(), prefix);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isDefaultNamespace(final String uri) {
+			return uri.equals(this.lookupNamespaceURI(XMLConstants.DEFAULT_NS_PREFIX));
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ElementList getElementsByTagName(final String name) {
+			return this.getElementsByTagNameNS(XMLConstants.NULL_NS_URI, name);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ElementList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
+			return null;// TODO this.adapter().getElementsByUriName(this, uri, name, DecodeElementNodeCollector.MODE_DESCENDANT);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isSameNode(final Node object) {
+			return this.equals(object);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEqualNode(final Node object) {
+			if(object == this) return true;
+			if(!(object instanceof DecodeElementNodeAdapter2)) return false;
+			final DecodeElementNodeAdapter2 data = (DecodeElementNodeAdapter2)object;
+			return (this.elementIndex() == data.elementIndex());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.elementIndex() ^ this.childIndex();
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof DecodeElementNodeAdapter2)) return false;
+			final DecodeElementNodeAdapter2 data = (DecodeElementNodeAdapter2)object;
+			return (this.elementIndex() == data.elementIndex()) && (this.childIndex() == data.childIndex()) && this.parentAdapter().equals(data.parentAdapter());
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return "<" + this.getNodeName() + " " + this.getAttributes() + ">";
+		}
+	
+	}
+	 
+	 static  class DecodeElementNodeAdapter_Navi extends DecodeElementNodeAdapter2 {
+		 
+		 int level;
+		 
+		 int[] indices;
+		 
+			public DecodeElementNodeAdapter_Navi(DecodeAdapter adapter, int[] indices) {
+				this.adapter=adapter;
+				this.level=indices.length-2;
+				this.indices=indices;
+			}
+ 
+		 
+		public DecodeElementNodeAdapter_Navi(DecodeAdapter adapter, int level,int[] indices) {
+			this.adapter=adapter;
+			this.level=level;
+			this.indices=indices;
+		}
+		
+
+		@Override
+		public int childIndex() {
+			return indices[level];
+		}
+
+		@Override
+		public int elementIndex() {
+			return indices[level+1];
+		}
+
+		@Override
+		public DecodeNodeAdapter parentAdapter() {
+			if(level==0)return adapter.getOwnerDocument();
+			return new DecodeElementNodeAdapter_Navi(adapter, level-2, indices);
+		}
+		 
+		
+		
+		
+	 }
 
 	/**
 	 * Diese Klasse implementiert ein {@link Attr} als {@link DecodeNodeAdapter}.

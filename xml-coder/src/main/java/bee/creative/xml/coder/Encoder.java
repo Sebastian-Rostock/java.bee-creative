@@ -479,7 +479,7 @@ public class Encoder {
 		/**
 		 * Dieses Feld speichert beim Aufbau der {@link EncodePool}s die absolute Häufigkeit und beim Speichern den Index des Datensatzes.
 		 */
-		protected int index;
+		public int index;
 
 		/**
 		 * Diese Methode schreibt den Datensatz in das gegebenen {@link EncodeTarget}.
@@ -1217,6 +1217,37 @@ public class Encoder {
 
 	}
 
+	public static abstract class EncodeElementLabel extends EncodeAttributeLabel {
+
+		/**
+		 * Dieses Feld speichert die {@link EncodeGroup} der {@code URI/Prefix}-{@link EncodeLabel}s.
+		 * 
+		 * @see Element#lookupNamespaceURI(String)
+		 */
+		protected EncodeGroup lookupUriList;
+
+		/**
+		 * Dieses Feld speichert die {@link EncodeGroup} der {@code URI/Prefix}-{@link EncodeLabel}s.
+		 * 
+		 * @see Element#lookupPrefix(String)
+		 */
+		protected EncodeGroup lookupPrefixList;
+
+		public EncodeElementLabel(EncodeValue uri, EncodeValue name, EncodeValue prefix,EncodeGroup lookupUriList,EncodeGroup lookupPrefixList) throws NullPointerException {
+			super(uri, name, prefix);
+			if(lookupUriList == null) throw new NullPointerException("lookupUriList is null");
+			if(lookupPrefixList == null) throw new NullPointerException("lookupPrefixList is null");
+			this.lookupUriList=lookupUriList;
+			this.lookupPrefixList=lookupPrefixList;
+		}
+
+		@Override
+		public void write(final EncodeTarget target) throws IOException, NullPointerException {
+			Encoder.writeInts(target, this.uri.index, this.name.index, this.prefix.index, this.lookupUriList.index, this.lookupPrefixList.index);
+		}
+
+	}
+
 	/**
 	 * Diese Klasse implementiert ein {@link EncodeItem} zur Abstraktion eines {@link Attr}s.
 	 * 
@@ -1424,6 +1455,49 @@ public class Encoder {
 		 */
 		public EncodeAttribute unique(final String uri, final String name, final String value) throws NullPointerException {
 			return this.get(new EncodeAttribute(this.labelPool.unique(uri, name), this.valuePool.unique(value)));
+		}
+
+	}
+
+	public static abstract class EncodeAttributeLabel extends EncodeLabel {
+
+		/**
+		 * Dieses Feld speichert das {@code Prefix} oder {@code null}.
+		 * 
+		 * @see Attr#getPrefix()
+		 */
+		protected final EncodeValue prefix;
+
+		public EncodeAttributeLabel(EncodeValue uri, EncodeValue name, EncodeValue prefix) throws NullPointerException {
+			super(uri, name);
+			if(prefix == null) throw new NullPointerException("prefix is null");
+			this.prefix = prefix;
+		}
+
+		/**
+		 * Diese Methode gibt den {@code Prefix} zurück.
+		 * 
+		 * @see Attr#getPrefix()
+		 * @return {@code Name}.
+		 */
+		public EncodeValue prefix() {
+			return this.prefix;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void write(final EncodeTarget target) throws IOException, NullPointerException {
+			Encoder.writeInts(target, this.uri.index, this.name.index, this.prefix.index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(false, true, "EncodeAttributeLabel", "index", this.index, "uri", this.uri, "name", this.name, "prefix", this.prefix);
 		}
 
 	}
@@ -2436,6 +2510,7 @@ public class Encoder {
 		 */
 		@Override
 		public void skippedEntity(final String name) {
+		System.out.println("&"+name+";");
 		}
 
 		/**
@@ -2443,6 +2518,7 @@ public class Encoder {
 		 */
 		@Override
 		public void processingInstruction(final String target, final String data) {
+		System.out.println("<?"+target+" "+data+"?>");
 		}
 
 		/**
@@ -3240,6 +3316,7 @@ public class Encoder {
 		if(target == null) throw new NullPointerException("target is null");
 		final EncodeDocumentHandler adapter = new EncodeDocumentHandler(target, this.xmlnsEnabled, (this.navigationPathEnabled ? this.navigationPathFilter : null));
 		reader.setContentHandler(adapter);
+		reader.setFeature("http://xml.org/sax/features/external-general-entities", true);
 		reader.parse(source);
 	}
 
