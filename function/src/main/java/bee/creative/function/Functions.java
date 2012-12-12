@@ -4,6 +4,7 @@ import java.util.Arrays;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.ReturnValue;
+import bee.creative.function.Values.VoidValue;
 import bee.creative.util.Objects;
 
 /**
@@ -28,7 +29,7 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return Values.VOID_VALUE;
+			return VoidValue.NULL;
 		}
 
 		/**
@@ -42,7 +43,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert}.
+	 * Diese Klasse implementiert eine {@link Function} mit konstantem {@link Value Ergebniswert}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -56,11 +57,11 @@ public final class Functions {
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Value Ergebniswert}.
 		 * 
-		 * @param value {@link Value Ergebniswert}.
-		 * @throws NullPointerException Wenn der gegebene {@link Value Ergebniswert} {@code null} ist.
+		 * @param value {@link Value}.
+		 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
 		 */
 		public ValueFunction(final Value value) throws NullPointerException {
-			if(value == null) throw new NullPointerException("value is null");
+			if(value == null) throw new NullPointerException();
 			this.value = value;
 		}
 
@@ -96,7 +97,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("valueFunction", this.value);
+			return Objects.toStringCall("ValueFunction", this.value);
 		}
 
 	}

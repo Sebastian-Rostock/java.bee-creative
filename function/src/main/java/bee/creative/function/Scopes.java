@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Values.ReturnValue;
+import bee.creative.function.Values.VoidValue;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -405,7 +406,7 @@ public final class Scopes {
 	 */
 	public static Scope createScope(final Object context) {
 		if(context == null) return Scopes.voidScope();
-		return Scopes.createScope(context, Values.voidValue().arrayData());
+		return Scopes.createScope(context, new Value[0]);
 	}
 
 	/**
