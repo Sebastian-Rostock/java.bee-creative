@@ -1,16 +1,12 @@
 package bee.creative.function;
 
-import java.util.Arrays;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
-import bee.creative.function.Types.DoubleType;
-import bee.creative.function.Types.FloatType;
 import bee.creative.function.Types.FunctionType;
-import bee.creative.function.Types.IntegerType;
-import bee.creative.function.Types.LongType;
+import bee.creative.function.Types.NullType;
+import bee.creative.function.Types.NumberType;
 import bee.creative.function.Types.ObjectType;
 import bee.creative.function.Types.StringType;
-import bee.creative.function.Types.VoidType;
 import bee.creative.util.Objects;
 
 /**
@@ -24,8 +20,21 @@ public final class Values {
 	 * Diese Klasse implementiert einen abstrakten {@link Value Wert}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static abstract class AbstractValue implements Value {
+	public static abstract class AbstractValue<GData> implements Value {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public abstract GData data();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public abstract Type<GData> type();
 
 		/**
 		 * {@inheritDoc}
@@ -41,8 +50,16 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+		public <GData2> GData2 dataTo(final Type<GData2> type) throws NullPointerException, IllegalArgumentException {
 			return type.dataOf(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+			return type.valueOf(this);
 		}
 
 		/**
@@ -81,33 +98,31 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den leeren {@link Value}.
 	 * 
-	 * @see VoidType
+	 * @see NullType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class VoidValue extends AbstractValue {
+	public static final class NullValue extends AbstractValue<Object> {
 
 		/**
-		 * Dieses Feld speichert den {@link VoidValue} für {@code null}.
+		 * Dieses Feld speichert den {@link NullValue} für {@code null}.
 		 */
-		public static final Value NULL = new VoidValue();
+		public static final Value INSTANCE = new NullValue();
 
 		/**
-		 * Diese Methode gibt den gegebenen {@link Value} oder den {@link VoidValue#NULL} zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode gibt den gegebenen {@link Value} oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param value {@link Value} oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Value value) {
-			if(value == null) return VoidValue.NULL;
+			if(value == null) return NullValue.INSTANCE;
 			return value;
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 		 */
-		@Override
-		public VoidType type() {
-			return VoidType.TYPE;
+		NullValue() {
 		}
 
 		/**
@@ -118,6 +133,14 @@ public final class Values {
 			return null;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NullType type() {
+			return NullType.INSTANCE;
+		}
+
 	}
 
 	/**
@@ -126,150 +149,161 @@ public final class Values {
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends AbstractValue {
+	public static final class ArrayValue extends AbstractValue<Value[]> {
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final byte... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = IntegerValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final short... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = IntegerValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final char... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = IntegerValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final int... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = IntegerValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final long... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = LongValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final float... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = FloatValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Zahlenliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final double... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = DoubleValue.valueOf(data[i]);
+				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Wahrheitswertliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Wahrheitswertliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Wahrheitswertliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final boolean... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = BooleanValue.valueOf(data[i]);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Objektliste in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Objektliste in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Objektliste oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Object... data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = ObjectValue.valueOf(data);
 			}
-			return new ArrayValue(0, values);
+			return new ArrayValue(values);
+		}
+
+		/**
+		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * 
+		 * @param data Wertliste oder {@code null}.
+		 * @return {@link Value}.
+		 */
+		public static Value valueOf(final Value... data) {
+			if(data == null) return NullValue.INSTANCE;
+			return new ArrayValue(data);
 		}
 
 		/**
@@ -278,24 +312,14 @@ public final class Values {
 		final Value[] data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Datensätze.
+		 * Dieser Konstrukteur initialisiert den Datensatz.
 		 * 
-		 * @param IGNORED IGNORIERT.
-		 * @param data Datensätze.
-		 */
-		ArrayValue(int IGNORED, final Value... data) {
-			this.data = data;
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert die Datensätze.
-		 * 
-		 * @param data Datensätze.
-		 * @throws NullPointerException Wenn einer der Datensätze {@code null} ist.
+		 * @param data Datensatz.
+		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
 		 */
 		public ArrayValue(final Value... data) throws NullPointerException {
-			if((data == null) || Arrays.asList(data).contains(null)) throw new NullPointerException();
-			this.data = data.clone();
+			if(data == null) throw new NullPointerException();
+			this.data = data;
 		}
 
 		/**
@@ -303,7 +327,7 @@ public final class Values {
 		 */
 		@Override
 		public ArrayType type() {
-			return ArrayType.TYPE;
+			return ArrayType.INSTANCE;
 		}
 
 		/**
@@ -322,26 +346,32 @@ public final class Values {
 	 * @see ObjectType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectValue extends AbstractValue {
+	public static final class ObjectValue extends AbstractValue<Object> {
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes wird hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link IntegerValue}, {@link LongValue}, {@link FloatValue}, {@link DoubleValue} oder {@link BooleanValue} verwendet. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes wird hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data Datensatz.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Object data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			if(data instanceof Value) return (Value)data;
-			if(data instanceof Long) return LongValue.valueOf((Long)data);
-			if(data instanceof Float) return FloatValue.valueOf((Float)data);
-			if(data instanceof Double) return DoubleValue.valueOf((Double)data);
-			if(data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
 			if(data instanceof String) return StringValue.valueOf((String)data);
-			if(data instanceof Number) return IntegerValue.valueOf((Number)data);
+			if(data instanceof Number) return NumberValue.valueOf((Number)data);
+			if(data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
 			if(data instanceof Function) return FunctionValue.valueOf((Function)data);
-			if(data.getClass().isArray()) return ArrayValue.valueOf((Object[])data);
-			return new ObjectValue(data);
+			final Class<?> clazz = data.getClass();
+			if(!clazz.isArray()) return new ObjectValue(data);
+			if(clazz == int[].class) return ArrayValue.valueOf((int[])data);
+			if(clazz == long[].class) return ArrayValue.valueOf((long[])data);
+			if(clazz == byte[].class) return ArrayValue.valueOf((byte[])data);
+			if(clazz == char[].class) return ArrayValue.valueOf((char[])data);
+			if(clazz == short[].class) return ArrayValue.valueOf((short[])data);
+			if(clazz == float[].class) return ArrayValue.valueOf((float[])data);
+			if(clazz == double[].class) return ArrayValue.valueOf((double[])data);
+			if(clazz == boolean[].class) return ArrayValue.valueOf((boolean[])data);
+			return ArrayValue.valueOf((Object[])data);
 		}
 
 		/**
@@ -365,7 +395,7 @@ public final class Values {
 		 */
 		@Override
 		public ObjectType type() {
-			return ObjectType.TYPE;
+			return ObjectType.INSTANCE;
 		}
 
 		/**
@@ -384,16 +414,16 @@ public final class Values {
 	 * @see FunctionType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionValue extends AbstractValue {
+	public static final class FunctionValue extends AbstractValue<Function> {
 
 		/**
-		 * Diese Methode konvertiert die gegebene {@link Function} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene {@link Function} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data {@link Function} oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Function data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			return new FunctionValue(data);
 		}
 
@@ -418,7 +448,7 @@ public final class Values {
 		 */
 		@Override
 		public FunctionType type() {
-			return FunctionType.TYPE;
+			return FunctionType.INSTANCE;
 		}
 
 		/**
@@ -437,16 +467,16 @@ public final class Values {
 	 * @see StringType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringValue extends AbstractValue {
+	public static final class StringValue extends AbstractValue<String> {
 
 		/**
-		 * Diese Methode konvertiert den gegebenen {@link String} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen {@link String} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data {@link String} oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final String data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			return new StringValue(data);
 		}
 
@@ -471,7 +501,7 @@ public final class Values {
 		 */
 		@Override
 		public StringType type() {
-			return StringType.TYPE;
+			return StringType.INSTANCE;
 		}
 
 		/**
@@ -485,12 +515,12 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Integer}-{@link Value}.
+	 * Diese Klasse implementiert den {@link Number}-{@link Value}.
 	 * 
-	 * @see IntegerType
+	 * @see NumberType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IntegerValue extends AbstractValue {
+	public static final class NumberValue extends AbstractValue<Number> {
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
@@ -498,80 +528,9 @@ public final class Values {
 		 * @param data Zahlenwert.
 		 * @return {@link Value}.
 		 */
-		public static IntegerValue valueOf(final int data) {
-			return new IntegerValue(data);
+		public static NumberValue valueOf(final int data) {
+			return new NumberValue(Integer.valueOf(data));
 		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
-		 * 
-		 * @param data {@link Number} oder {@code null}.
-		 * @return {@link Value}.
-		 */
-		public static Value valueOf(final Number data) {
-			if(data == null) return VoidValue.NULL;
-			return new IntegerValue(data.intValue());
-		}
-
-		/**
-		 * Dieses Feld speichert den Datensatz.
-		 */
-		final int data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 */
-		public IntegerValue(final int data) {
-			this.data = data;
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
-		 */
-		public IntegerValue(final Number data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
-			this.data = data.intValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IntegerType type() {
-			return IntegerType.TYPE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Integer data() {
-			return Integer.valueOf(this.data);
-		}
-
-		/**
-		 * Diese Methode gibt den Datensatz als {@code int} zurück.
-		 * 
-		 * @return Datensatz als {@code int}.
-		 */
-		public int value() {
-			return this.data;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Long}-{@link Value}.
-	 * 
-	 * @see LongType
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class LongValue extends AbstractValue {
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
@@ -579,80 +538,9 @@ public final class Values {
 		 * @param data Zahlenwert.
 		 * @return {@link Value}.
 		 */
-		public static LongValue valueOf(final long data) {
-			return new LongValue(data);
+		public static NumberValue valueOf(final long data) {
+			return new NumberValue(Long.valueOf(data));
 		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
-		 * 
-		 * @param data {@link Number} oder {@code null}.
-		 * @return {@link Value}.
-		 */
-		public static Value valueOf(final Number data) {
-			if(data == null) return VoidValue.NULL;
-			return new LongValue(data.longValue());
-		}
-
-		/**
-		 * Dieses Feld speichert den Datensatz.
-		 */
-		final int data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 */
-		public LongValue(final int data) {
-			this.data = data;
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
-		 */
-		public LongValue(final Number data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
-			this.data = data.intValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public LongType type() {
-			return LongType.TYPE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Long data() {
-			return Long.valueOf(this.data);
-		}
-
-		/**
-		 * Diese Methode gibt den Datensatz als {@code long} zurück.
-		 * 
-		 * @return Datensatz als {@code long}.
-		 */
-		public long value() {
-			return this.data;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Float}-{@link Value}.
-	 * 
-	 * @see FloatType
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class FloatValue extends AbstractValue {
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
@@ -660,80 +548,9 @@ public final class Values {
 		 * @param data Zahlenwert.
 		 * @return {@link Value}.
 		 */
-		public static FloatValue valueOf(final float data) {
-			return new FloatValue(data);
+		public static NumberValue valueOf(final float data) {
+			return new NumberValue(Float.valueOf(data));
 		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
-		 * 
-		 * @param data {@link Number} oder {@code null}.
-		 * @return {@link Value}.
-		 */
-		public static Value valueOf(final Number data) {
-			if(data == null) return VoidValue.NULL;
-			return new FloatValue(data.floatValue());
-		}
-
-		/**
-		 * Dieses Feld speichert den Datensatz.
-		 */
-		final float data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 */
-		public FloatValue(final float data) {
-			this.data = data;
-		}
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
-		 */
-		public FloatValue(final Number data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
-			this.data = data.floatValue();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public FloatType type() {
-			return FloatType.TYPE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Float data() {
-			return Float.valueOf(this.data);
-		}
-
-		/**
-		 * Diese Methode gibt den Datensatz als {@code float} zurück.
-		 * 
-		 * @return Datensatz als {@code float}.
-		 */
-		public float value() {
-			return this.data;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Double}-{@link Value}.
-	 * 
-	 * @see DoubleType
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class DoubleValue extends AbstractValue {
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
@@ -741,34 +558,25 @@ public final class Values {
 		 * @param data Zahlenwert.
 		 * @return {@link Value}.
 		 */
-		public static DoubleValue valueOf(final double data) {
-			return new DoubleValue(data);
+		public static NumberValue valueOf(final double data) {
+			return new NumberValue(Double.valueOf(data));
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data {@link Number} oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Number data) {
-			if(data == null) return VoidValue.NULL;
-			return new DoubleValue(data.doubleValue());
+			if(data == null) return NullValue.INSTANCE;
+			return new NumberValue(data);
 		}
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
 		 */
-		final double data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 */
-		public DoubleValue(final double data) {
-			this.data = data;
-		}
+		final Number data;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -776,33 +584,24 @@ public final class Values {
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
 		 */
-		public DoubleValue(final Number data) throws NullPointerException {
+		public NumberValue(final Number data) throws NullPointerException {
 			if(data == null) throw new NullPointerException();
-			this.data = data.doubleValue();
+			this.data = data;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DoubleType type() {
-			return DoubleType.TYPE;
+		public NumberType type() {
+			return NumberType.INSTANCE;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Double data() {
-			return Double.valueOf(this.data);
-		}
-
-		/**
-		 * Diese Methode gibt den Datensatz als {@code double} zurück.
-		 * 
-		 * @return Datensatz als {@code double}.
-		 */
-		public double value() {
+		public Number data() {
 			return this.data;
 		}
 
@@ -814,7 +613,7 @@ public final class Values {
 	 * @see BooleanType#ID
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BooleanValue extends AbstractValue {
+	public static final class BooleanValue extends AbstractValue<Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#TRUE}.
@@ -837,20 +636,20 @@ public final class Values {
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen {@link Boolean} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link VoidValue#NULL} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen {@link Boolean} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
 		 * @param data {@link Boolean} oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Boolean data) {
-			if(data == null) return VoidValue.NULL;
+			if(data == null) return NullValue.INSTANCE;
 			return BooleanValue.valueOf(data.booleanValue());
 		}
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
 		 */
-		final boolean data;
+		final Boolean data;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -858,7 +657,7 @@ public final class Values {
 		 * @param data Datensatz.
 		 */
 		public BooleanValue(final boolean data) {
-			this.data = data;
+			this.data = Boolean.valueOf(data);
 		}
 
 		/**
@@ -869,7 +668,7 @@ public final class Values {
 		 */
 		public BooleanValue(final Boolean data) throws NullPointerException {
 			if(data == null) throw new NullPointerException();
-			this.data = data.booleanValue();
+			this.data = data;
 		}
 
 		/**
@@ -877,7 +676,7 @@ public final class Values {
 		 */
 		@Override
 		public BooleanType type() {
-			return BooleanType.TYPE;
+			return BooleanType.INSTANCE;
 		}
 
 		/**
@@ -885,15 +684,6 @@ public final class Values {
 		 */
 		@Override
 		public Boolean data() {
-			return Boolean.valueOf(this.data);
-		}
-
-		/**
-		 * Diese Methode gibt den Datensatz als {@code boolean} zurück.
-		 * 
-		 * @return Datensatz als {@code boolean}.
-		 */
-		public boolean value() {
 			return this.data;
 		}
 
@@ -928,17 +718,6 @@ public final class Values {
 		 * @see Function#execute(Scope)
 		 */
 		Function function;
-
-		/**
-		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}. {@link Scope Ausführungskontext} und {@link Function Funktion} werden nicht geprüft.
-		 * 
-		 * @param scope {@link Scope Ausführungskontext}.
-		 * @param function {@link Function Funktion}.
-		 */
-		ReturnValue(final Function function, final Scope scope) {
-			this.scope = scope;
-			this.function = function;
-		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}.
@@ -983,6 +762,14 @@ public final class Values {
 		@Override
 		public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
 			return this.value().dataTo(type);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+			return this.value().valueTo(type);
 		}
 
 		/**

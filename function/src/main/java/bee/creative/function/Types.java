@@ -1,8 +1,19 @@
 package bee.creative.function;
 
+import java.util.Arrays;
+import bee.creative.function.Functions.NullFunction;
 import bee.creative.function.Functions.ValueFunction;
+import bee.creative.function.Values.ArrayValue;
+import bee.creative.function.Values.BooleanValue;
+import bee.creative.function.Values.FunctionValue;
+import bee.creative.function.Values.NullValue;
+import bee.creative.function.Values.NumberValue;
+import bee.creative.function.Values.ObjectValue;
+import bee.creative.function.Values.StringValue;
 import bee.creative.util.Converter;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
+import bee.creative.util.Strings;
 
 /**
  * Diese Klasse implementiert {@link Type}{@code s} für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} und {@link Boolean}.
@@ -23,8 +34,8 @@ public class Types {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean is(final Type<?> type) throws NullPointerException {
-			return (type == this) || (type.id() == this.id());
+		public boolean is(final Type<?> type) {
+			return (type == this) || ((type != null) && (type.id() == this.id()));
 		}
 
 		/**
@@ -74,7 +85,7 @@ public class Types {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class VoidType extends AbstractType<Object> {
+	public static final class NullType extends AbstractType<Object> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -84,26 +95,43 @@ public class Types {
 		public static final int ID = 0;
 
 		/**
-		 * Dieses Feld speichert den {@link VoidType}.
+		 * Dieses Feld speichert den {@link NullType}.
 		 */
-		public static final VoidType TYPE = new VoidType();
+		public static final NullType INSTANCE = new NullType();
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		NullType() {
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public int id() {
-			return VoidType.ID;
+			return NullType.ID;
 		}
 
 		/**
 		 * {@inheritDoc} <br>
-		 * Der Rückgabewert ist immer {@code null}.
+		 * <ul>
+		 * <li>Der Rückgabewert ist immer {@code null}.</li>
+		 * </ul>
 		 */
 		@Override
-		public Object dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
-			if(value == null) throw new NullPointerException();
+		public Object dataOf(final Value value) throws IllegalArgumentException {
 			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see NullType#dataOf(Value)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			return NullValue.INSTANCE;
 		}
 
 	}
@@ -125,7 +153,23 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den {@link ArrayType}.
 		 */
-		public static final ArrayType TYPE = new ArrayType();
+		public static final ArrayType INSTANCE = new ArrayType();
+
+		/**
+		 * Dieses Feld speichert das leere {@link Value}{@code []}.
+		 */
+		static final Value[] NULL_DATA = {};
+
+		/**
+		 * Dieses Feld speichert das leere {@link Value}{@code []} als {@link Value}.
+		 */
+		static final Value NULL_VALUE = ArrayValue.valueOf(ArrayType.NULL_DATA);
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		ArrayType() {
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -136,18 +180,30 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * {@inheritDoc} TODO
 		 */
 		@Override
-		public Value[] dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public Value[] dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return ArrayType.NULL_DATA;
 			final Object data = value.data();
-			if(data == null) return null;
-			switch(value.type().id()){
-				case ArrayType.ID:
-					return (Value[])data;
-				default:
-					return new Value[]{value};
-			}
+			if(data == null) return ArrayType.NULL_DATA;
+			if(value.type().id() == ArrayType.ID) return (Value[])data;
+			return new Value[]{value};
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see ArrayType#dataOf(Value)
+		 * @see ArrayValue#valueOf(Value...)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return ArrayType.NULL_VALUE;
+			final Object data = value.data();
+			if(data == null) return ArrayType.NULL_VALUE;
+			if(value.type().id() == ArrayType.ID) return value;
+			return ArrayValue.valueOf(value);
 		}
 
 	}
@@ -169,7 +225,23 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den {@link ObjectType}.
 		 */
-		public static final ObjectType TYPE = new ObjectType();
+		public static final ObjectType INSTANCE = new ObjectType();
+
+		/**
+		 * Dieses Feld speichert ein {@link Object}.
+		 */
+		static final Object NULL_DATA = new Object();
+
+		/**
+		 * Dieses Feld speichert ein {@link Object} als {@link Value}.
+		 */
+		static final Value NULL_VALUE = ObjectValue.valueOf(ObjectType.NULL_DATA);
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		ObjectType() {
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -180,12 +252,29 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc} <br>
-		 * Der Rückgabewert ist immer {@code value.data()}.
+		 * {@inheritDoc}
 		 */
 		@Override
-		public Object dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public Object dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return ObjectType.NULL_DATA;
+			final Object data = value.data();
+			if(data == null) return ObjectType.NULL_DATA;
 			return value.data();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see ObjectType#dataOf(Value)
+		 * @see ObjectValue#valueOf(Object)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return ObjectType.NULL_VALUE;
+			final Object data = value.data();
+			if(data == null) return ObjectType.NULL_VALUE;
+			if(value.type().id() == ObjectType.ID) return value;
+			return ObjectValue.valueOf(data);
 		}
 
 	}
@@ -207,7 +296,18 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den {@link FunctionType}.
 		 */
-		public static final FunctionType TYPE = new FunctionType();
+		public static final FunctionType INSTANCE = new FunctionType();
+
+		/**
+		 * Dieses Feld speichert ein {@link Object} als {@link Value}.
+		 */
+		static final Value NULL_VALUE = FunctionValue.valueOf(NullFunction.INSTANCE);
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		FunctionType() {
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -218,18 +318,32 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * {@inheritDoc} TODO
+		 * 
+		 * @see ValueFunction#valueOf(Value)
 		 */
 		@Override
-		public Function dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public Function dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return NullFunction.INSTANCE;
 			final Object data = value.data();
-			if(data == null) return null;
-			switch(value.type().id()){
-				case FunctionType.ID:
-					return (Function)data;
-				default:
-					return new ValueFunction(value);
-			}
+			if(data == null) return NullFunction.INSTANCE;
+			if(value.type().id() == FunctionType.ID) return (Function)data;
+			return ValueFunction.valueOf(value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see FunctionType#dataOf(Value)
+		 * @see FunctionValue#valueOf(Function)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return FunctionType.NULL_VALUE;
+			final Object data = value.data();
+			if(data == null) return FunctionType.NULL_VALUE;
+			if(value.type().id() == FunctionType.ID) return value;
+			return FunctionValue.valueOf(ValueFunction.valueOf(value));
 		}
 
 	}
@@ -251,7 +365,23 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den {@link StringType}.
 		 */
-		public static final StringType TYPE = new StringType();
+		public static final StringType INSTANCE = new StringType();
+
+		/**
+		 * Dieses Feld speichert {@code ""} als {@link Double}.
+		 */
+		static final String NULL_DATA = "";
+
+		/**
+		 * Dieses Feld speichert {@code ""} als {@link Value}.
+		 */
+		static final Value NULL_VALUE = StringValue.valueOf(StringType.NULL_DATA);
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		StringType() {
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -263,19 +393,56 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} ist, wird {@code ""} zurück gegeben.</li>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@code "null"} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ObjectType}, {@link FunctionType}, {@link NumberType} oder {@link BooleanType} ist, wird dieser via {@link String#valueOf(Object)} umgewandelt und zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, .</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 */
 		@Override
-		public String dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public String dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return StringType.NULL_DATA;
 			final Object data = value.data();
-			if(data == null) return null;
+			if(data == null) return StringType.NULL_DATA;
 			switch(value.type().id()){
+				case ArrayType.ID:
+					return Strings.join(", ", Iterables.convertedIterable(this, Arrays.asList((Value[])data)));
 				case StringType.ID:
-				case IntegerType.ID:
-				case LongType.ID:
-				case FloatType.ID:
-				case DoubleType.ID:
+					return (String)data;
+				case ObjectType.ID:
+				case FunctionType.ID:
+				case NumberType.ID:
 				case BooleanType.ID:
-					return data.toString();
+					return String.valueOf(data);
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see StringType#dataOf(Value)
+		 * @see StringValue#valueOf(String)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return StringType.NULL_VALUE;
+			final Object data = value.data();
+			if(data == null) return StringType.NULL_VALUE;
+			switch(value.type().id()){
+				case ArrayType.ID:
+					return StringValue.valueOf(Strings.join(", ", Iterables.convertedIterable(this, Arrays.asList((Value[])data))));
+				case StringType.ID:
+					return value;
+				case ObjectType.ID:
+				case FunctionType.ID:
+				case NumberType.ID:
+				case BooleanType.ID:
+					return StringValue.valueOf(String.valueOf(data));
 				default:
 					throw new IllegalArgumentException();
 			}
@@ -284,11 +451,11 @@ public class Types {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Integer}-{@link Type}.
+	 * Diese Klasse implementiert den {@link Number}-{@link Type}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IntegerType extends AbstractType<Integer> {
+	public static final class NumberType extends AbstractType<Number> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -298,184 +465,99 @@ public class Types {
 		public static final int ID = 5;
 
 		/**
-		 * Dieses Feld speichert den {@link IntegerType}.
+		 * Dieses Feld speichert den {@link NumberType}.
 		 */
-		public static final IntegerType TYPE = new IntegerType();
+		public static final NumberType INSTANCE = new NumberType();
+
+		/**
+		 * Dieses Feld speichert {@code NaN} als {@link Double}.
+		 */
+		static final Number NULL_DATA = Double.valueOf(Double.NaN);
+
+		/**
+		 * Dieses Feld speichert {@code NaN} als {@link Value}.
+		 */
+		static final Value NULL_VALUE = NumberValue.valueOf(NumberType.NULL_DATA);
+
+		/**
+		 * Dieses Feld speichert {@code 1} als {@link Integer}.
+		 */
+		static final Number TRUE_DATA = Integer.valueOf(1);
+
+		/**
+		 * Dieses Feld speichert {@code 1} als {@link Value}.
+		 */
+		static final Value TRUE_VALUE = NumberValue.valueOf(NumberType.TRUE_DATA);
+
+		/**
+		 * Dieses Feld speichert {@code 0} als {@link Integer}.
+		 */
+		static final Number FALSE_DATA = Integer.valueOf(0);
+
+		/**
+		 * Dieses Feld speichert {@code 0} als {@link Value}.
+		 */
+		static final Value FALSE_VALUE = NumberValue.valueOf(NumberType.FALSE_DATA);
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		NumberType() {
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public int id() {
-			return IntegerType.ID;
+			return NumberType.ID;
 		}
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} sind, wird {@code NaN} als {@link Double} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird dieser via {@link Double#valueOf(String)} umgewandelt und zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} nur nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer}.</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 */
 		@Override
-		public Integer dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public Number dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return NumberType.NULL_DATA;
 			final Object data = value.data();
-			if(data == null) return null;
+			if(data == null) return NumberType.NULL_DATA;
 			switch(value.type().id()){
-				case IntegerType.ID:
-					return (Integer)data;
-				case LongType.ID:
-				case FloatType.ID:
-				case DoubleType.ID:
-					return Integer.valueOf(((Number)data).intValue());
-				case StringType.ID:
-					return Integer.valueOf((String)data);
-				default:
-					throw new IllegalArgumentException();
-			}
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Long}-{@link Type}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class LongType extends AbstractType<Long> {
-
-		/**
-		 * Dieses Feld speichert den Identifikator.
-		 * 
-		 * @see Type#id()
-		 */
-		public static final int ID = 6;
-
-		/**
-		 * Dieses Feld speichert den {@link LongType}.
-		 */
-		public static final LongType TYPE = new LongType();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int id() {
-			return LongType.ID;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Long dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
-			final Object data = value.data();
-			if(data == null) return null;
-			switch(value.type().id()){
-				case LongType.ID:
-					return (Long)data;
-				case IntegerType.ID:
-				case FloatType.ID:
-				case DoubleType.ID:
-					return Long.valueOf(((Number)data).longValue());
-				case StringType.ID:
-					return Long.valueOf((String)data);
-				default:
-					throw new IllegalArgumentException();
-			}
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Float}-{@link Type}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class FloatType extends AbstractType<Float> {
-
-		/**
-		 * Dieses Feld speichert den Identifikator.
-		 * 
-		 * @see Type#id()
-		 */
-		public static final int ID = 7;
-
-		/**
-		 * Dieses Feld speichert den {@link FloatType}.
-		 */
-		public static final FloatType TYPE = new FloatType();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int id() {
-			return FloatType.ID;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Float dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
-			final Object data = value.data();
-			if(data == null) return null;
-			switch(value.type().id()){
-				case FloatType.ID:
-					return (Float)data;
-				case LongType.ID:
-				case IntegerType.ID:
-				case DoubleType.ID:
-					return Float.valueOf(((Number)data).floatValue());
-				case StringType.ID:
-					return Float.valueOf((String)data);
-				default:
-					throw new IllegalArgumentException();
-			}
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Double}-{@link Type}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class DoubleType extends AbstractType<Double> {
-
-		/**
-		 * Dieses Feld speichert den Identifikator.
-		 * 
-		 * @see Type#id()
-		 */
-		public static final int ID = 8;
-
-		/**
-		 * Dieses Feld speichert den {@link DoubleType}.
-		 */
-		public static final DoubleType TYPE = new DoubleType();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int id() {
-			return IntegerType.ID;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Double dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
-			final Object data = value.data();
-			if(data == null) return null;
-			switch(value.type().id()){
-				case DoubleType.ID:
-					return (Double)data;
-				case LongType.ID:
-				case IntegerType.ID:
-				case FloatType.ID:
-					return Double.valueOf(((Number)data).doubleValue());
 				case StringType.ID:
 					return Double.valueOf((String)data);
+				case NumberType.ID:
+					return (Number)data;
+				case BooleanType.ID:
+					return (((Boolean)data).booleanValue() ? NumberType.TRUE_DATA : NumberType.FALSE_DATA);
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see NumberType#dataOf(Value)
+		 * @see NumberValue#valueOf(Number)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return NumberType.NULL_VALUE;
+			final Object data = value.data();
+			if(data == null) return NumberType.NULL_VALUE;
+			switch(value.type().id()){
+				case StringType.ID:
+					return NumberValue.valueOf(Double.valueOf((String)data));
+				case NumberType.ID:
+					return value;
+				case BooleanType.ID:
+					return (((Boolean)data).booleanValue() ? NumberType.TRUE_VALUE : NumberType.FALSE_VALUE);
 				default:
 					throw new IllegalArgumentException();
 			}
@@ -495,12 +577,18 @@ public class Types {
 		 * 
 		 * @see Type#id()
 		 */
-		public static final int ID = 9;
+		public static final int ID = 6;
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanType}.
 		 */
-		public static final BooleanType TYPE = new BooleanType();
+		public static final BooleanType INSTANCE = new BooleanType();
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		BooleanType() {
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -512,16 +600,58 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} sind, wird {@link Boolean#FALSE} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType}, {@link ObjectType} oder {@link FunctionType} ist, wird {@link Boolean#TRUE} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link Boolean#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link Boolean#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 */
 		@Override
-		public Boolean dataOf(final Value value) throws NullPointerException, IllegalArgumentException {
+		public Boolean dataOf(final Value value) throws IllegalArgumentException {
+			if(value == null) return Boolean.FALSE;
 			final Object data = value.data();
-			if(data == null) return null;
+			if(data == null) return Boolean.FALSE;
 			switch(value.type().id()){
+				case ArrayType.ID:
+				case ObjectType.ID:
+				case FunctionType.ID:
+					return Boolean.TRUE;
+				case StringType.ID:
+					return Boolean.valueOf(((String)data).length() != 0);
+				case NumberType.ID:
+					return Boolean.valueOf(((Number)data).intValue() != 0);
 				case BooleanType.ID:
 					return (Boolean)data;
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see BooleanType#dataOf(Value)
+		 * @see BooleanValue#valueOf(Boolean)
+		 */
+		@Override
+		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+			if(value == null) return BooleanValue.FALSE;
+			final Object data = value.data();
+			if(data == null) return BooleanValue.FALSE;
+			switch(value.type().id()){
+				case ArrayType.ID:
+				case ObjectType.ID:
+				case FunctionType.ID:
+					return BooleanValue.TRUE;
 				case StringType.ID:
-					return Boolean.valueOf((String)data);
+					return BooleanValue.valueOf(((String)data).length() != 0);
+				case NumberType.ID:
+					return BooleanValue.valueOf(((Number)data).intValue() != 0);
+				case BooleanType.ID:
+					return value;
 				default:
 					throw new IllegalArgumentException();
 			}

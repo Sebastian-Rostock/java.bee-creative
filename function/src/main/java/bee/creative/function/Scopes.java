@@ -3,8 +3,10 @@ package bee.creative.function;
 import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
+import bee.creative.function.Types.ArrayType;
+import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.ReturnValue;
-import bee.creative.function.Values.VoidValue;
+import bee.creative.function.Values.NullValue;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -68,8 +70,8 @@ public final class Scopes {
 		@Override
 		public final Value execute(final Object context, final Function function, final int deleteCount, final Value... insertValues) throws NullPointerException,
 			IllegalArgumentException {
-			if(function == null) throw new NullPointerException("function is null");
-			return new ReturnValue(function, new ExecuteScope(this, context, deleteCount, insertValues));
+			if(function == null) throw new NullPointerException();
+			return new ReturnValue(new ExecuteScope(this, context, deleteCount, insertValues), function);
 		}
 
 		/**
@@ -334,7 +336,7 @@ public final class Scopes {
 			if(index >= values.length) throw new IndexOutOfBoundsException("index out of range: " + index);
 			Value value = values[index];
 			if(value != null) return value;
-			value = new ReturnValue(this.functions[index], this.scope);
+			value = new ReturnValue(this.scope, this.functions[index]);
 			// if(value == null) throw new NullPointerException("value is null");
 			values[index] = value;
 			return value;
@@ -422,7 +424,7 @@ public final class Scopes {
 	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
 	 */
 	public static Scope createScope(final Object context, final Object... values) throws NullPointerException {
-		return Scopes.createScope(context, Values.arrayValue(values).arrayData());
+		return Scopes.createScope(context, ArrayValue.valueOf(values).dataTo(ArrayType.INSTANCE));
 	}
 
 	/**

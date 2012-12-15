@@ -1,10 +1,12 @@
 package bee.creative.function;
 
 import java.util.Arrays;
+import bee.creative.function.Functions.NullFunction;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
+import bee.creative.function.Values.ObjectValue;
 import bee.creative.function.Values.ReturnValue;
-import bee.creative.function.Values.VoidValue;
+import bee.creative.function.Values.NullValue;
 import bee.creative.util.Objects;
 
 /**
@@ -18,18 +20,40 @@ import bee.creative.util.Objects;
 public final class Functions {
 
 	/**
-	 * Diese Klasse implementiert die leere {@link Function Funktion}.
+	 * Diese Klasse implementiert die leere {@link Function Funktion}, deren {@link Value Ergebniswert} immer {@link NullValue#INSTANCE} ist.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class VoidFunction implements Function {
+	public static final class NullFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert die {@link NullFunction}.
+		 */
+		public static final Function INSTANCE = new NullFunction();
+
+		/**
+		 * Diese Methode gibt die gegebene {@link Function} oder {@link NullFunction#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.
+		 * 
+		 * @param value {@link Function} oder {@code null}.
+		 * @return {@link Function}.
+		 */
+		public static Function valueOf(final Function value) {
+			if(value == null) return INSTANCE;
+			return value;
+		}
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		NullFunction() {
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return VoidValue.NULL;
+			return NullValue.INSTANCE;
 		}
 
 		/**
@@ -37,7 +61,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("voidFunction");
+			return Objects.toStringCall("NullFunction");
 		}
 
 	}
@@ -48,6 +72,29 @@ public final class Functions {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ValueFunction implements Function {
+
+		/**
+		 * Diese Methode erzeugt eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert} und gibt diese zurück. Wenn die Eingabe {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.
+		 * 
+		 * @see ObjectValue#valueOf(Object)
+		 * @param data {@link Value Ergebniswert}.
+		 * @return {@link Functions.ValueFunction Wert-Funktion}.
+		 */
+		public static Function valueOf(final Object data) {
+			if(data == null) return NullFunction.INSTANCE;
+			return new ValueFunction(ObjectValue.valueOf(data));
+		}
+
+		/**
+		 * Diese Methode erzeugt eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert} und gibt diese zurück. Wenn die Eingabe {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.
+		 * 
+		 * @param data {@link Value Ergebniswert}.
+		 * @return {@link Functions.ValueFunction Wert-Funktion}.
+		 */
+		public static Function valueOf(final Value data) {
+			if(data == null) return NullFunction.INSTANCE;
+			return new ValueFunction(data);
+		}
 
 		/**
 		 * Dieses Feld speichert den {@link Value Ergebniswert}.
@@ -78,7 +125,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return this.value.hashCode();
+			return Objects.hash(this.value);
 		}
 
 		/**
@@ -110,6 +157,17 @@ public final class Functions {
 	public static final class ScopeFunction implements Function {
 
 		/**
+		 * Dieses Feld speichert die {@link ScopeFunction}.
+		 */
+		public static final Function INSTANCE = new ScopeFunction();
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		ScopeFunction() {
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -119,7 +177,7 @@ public final class Functions {
 			for(int i = 0; i < size; i++){
 				array[i] = scope.get(i);
 			}
-			return new ArrayValue(array);
+			return ArrayValue.valueOf(array);
 		}
 
 		/**
@@ -127,7 +185,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("scopeFunction");
+			return Objects.toStringCall("ScopeFunction");
 		}
 
 	}
@@ -229,7 +287,7 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return new ReturnValue(this.function, new CompositeScope(this.functions, scope));
+			return new ReturnValue(new CompositeScope(this.functions, scope),this.function);
 		}
 
 		/**
@@ -262,68 +320,10 @@ public final class Functions {
 	}
 
 	/**
-	 * Dieses Feld speichert die {@link VoidFunction}.
-	 */
-	static final Function VOID_FUNCTION = new VoidFunction();
-
-	/**
-	 * Dieses Feld speichert die {@link ScopeFunction}.
-	 */
-	static final Function SCOPE_FUNCTION = new ScopeFunction();
-
-	/**
 	 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
 	 */
 	static final Function[] PARAMETER_FUNCTIONS = {new ParameterFunction(0), new ParameterFunction(1), new ParameterFunction(2), new ParameterFunction(3),
 		new ParameterFunction(4), new ParameterFunction(5), new ParameterFunction(6), new ParameterFunction(7), new ParameterFunction(8), new ParameterFunction(9)};
-
-	/**
-	 * Diese Methode gibt die leere {@link Function Funktion} zurück, deren {@link Value Ergebniswert} {@link Values#voidValue()} ist.
-	 * 
-	 * @see Values#voidValue()
-	 * @return {@link VoidFunction leere Funktion}.
-	 */
-	public static Function voidFunction() {
-		return Functions.VOID_FUNCTION;
-	}
-
-	/**
-	 * Diese Methode erzeugt eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert} und gibt diese zurück.
-	 * 
-	 * @see Values#value(Object)
-	 * @see Functions#voidFunction()
-	 * @see Functions#valueFunction(Value)
-	 * @param data {@link Value Ergebniswert}.
-	 * @return {@link ValueFunction Wert-Funktion}.
-	 */
-	public static Function valueFunction(final Object data) {
-		if(data == null) return Functions.voidFunction();
-		return new ValueFunction(Values.value(data));
-	}
-
-	/**
-	 * Diese Methode erzeugt eine {@link Function Funktion} mit konstantem {@link Value Ergebniswert} und gibt diese zurück.
-	 * 
-	 * @see Functions#voidFunction()
-	 * @param data {@link Value Ergebniswert}.
-	 * @return {@link ValueFunction Wert-Funktion}.
-	 */
-	public static Function valueFunction(final Value data) {
-		if(data == null) return Functions.voidFunction();
-		return new ValueFunction(data);
-	}
-
-	/**
-	 * Diese Methode gibt die {@link Function Funktion} zurück, deren {@link Value Ergebniswert} der {@link ArrayValue Liste} der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
-	 * 
-	 * @see Scope#get(int)
-	 * @see Scope#size()
-	 * @see Value#arrayData()
-	 * @return {@link ScopeFunction Parameter Funktion}.
-	 */
-	public static Function scopeFunction() {
-		return Functions.SCOPE_FUNCTION;
-	}
 
 	/**
 	 * Diese Methode erzeugt eine eine projizierende {@link Function Funktion}, deren {@link Value Ergebniswert} einem der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht und gibt diese zurück.
@@ -338,17 +338,7 @@ public final class Functions {
 		return new ParameterFunction(index);
 	}
 
-	/**
-	 * Diese Methode erzeugt eine komponierte {@link Function Funktion}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen {@link Function Parameterfunktionen} als als {@link Value Parameterwerte} berechnet, und gibt diese zurück.
-	 * 
-	 * @param function {@link Function Funktion}.
-	 * @param functions {@link Function Parameterfunktionen}.
-	 * @return {@link CompositeFunction komponierte Funktion}.
-	 * @throws NullPointerException Wenn eine der gegebenen {@link Function Funktionen} {@code null} ist.
-	 */
-	public static CompositeFunction compositeFunction(final Function function, final Function... functions) throws NullPointerException {
-		return new CompositeFunction(function, functions);
-	}
+
 
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.

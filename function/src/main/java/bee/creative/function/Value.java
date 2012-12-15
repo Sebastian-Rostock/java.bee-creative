@@ -50,4 +50,16 @@ public interface Value {
 	 */
 	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, IllegalArgumentException;
 
+	/**
+	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz als {@link Value} zurück. Der Rückgabewert entspricht {@code type.valueOf(this)}.
+	 * 
+	 * @see Type#dataOf(Value)
+	 * @see Value#data()
+	 * @param type {@link Type}.
+	 * @return konvertierter Datensatz.
+	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
+	 */
+	public Value valueTo(Type<?> type) throws NullPointerException, IllegalArgumentException;
+
 }
