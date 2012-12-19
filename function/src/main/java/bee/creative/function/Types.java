@@ -12,6 +12,7 @@ import bee.creative.function.Values.ObjectValue;
 import bee.creative.function.Values.StringValue;
 import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
+import bee.creative.util.Iterables.ConvertedIterable;
 import bee.creative.util.Objects;
 import bee.creative.util.Strings;
 
@@ -120,7 +121,8 @@ public class Types {
 		 * </ul>
 		 */
 		@Override
-		public Object dataOf(final Value value) throws IllegalArgumentException {
+		public Object dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			if(value == null) throw new NullPointerException();
 			return null;
 		}
 
@@ -130,7 +132,8 @@ public class Types {
 		 * @see NullType#dataOf(Value)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			if(value == null) throw new NullPointerException();
 			return NullValue.INSTANCE;
 		}
 
@@ -183,8 +186,7 @@ public class Types {
 		 * {@inheritDoc} TODO
 		 */
 		@Override
-		public Value[] dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return ArrayType.NULL_DATA;
+		public Value[] dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return ArrayType.NULL_DATA;
 			if(value.type().id() == ArrayType.ID) return (Value[])data;
@@ -198,8 +200,7 @@ public class Types {
 		 * @see ArrayValue#valueOf(Value...)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return ArrayType.NULL_VALUE;
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return ArrayType.NULL_VALUE;
 			if(value.type().id() == ArrayType.ID) return value;
@@ -252,11 +253,14 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * {@inheritDoc} TODO
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird ein {@link Object} zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird der Datensatz des {@link Value}{@code s} zurück gegeben.</li>
+		 * </ul>
 		 */
 		@Override
-		public Object dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return ObjectType.NULL_DATA;
+		public Object dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return ObjectType.NULL_DATA;
 			return value.data();
@@ -269,8 +273,7 @@ public class Types {
 		 * @see ObjectValue#valueOf(Object)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return ObjectType.NULL_VALUE;
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return ObjectType.NULL_VALUE;
 			if(value.type().id() == ObjectType.ID) return value;
@@ -318,13 +321,16 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc} TODO
+		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} umgewandelt und zurück gegeben.</li>
+		 * </ul>
 		 * 
 		 * @see ValueFunction#valueOf(Value)
 		 */
 		@Override
-		public Function dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return NullFunction.INSTANCE;
+		public Function dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return NullFunction.INSTANCE;
 			if(value.type().id() == FunctionType.ID) return (Function)data;
@@ -333,13 +339,16 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} umgewandelt und zurück gegeben.</li>
+		 * </ul>
 		 * 
 		 * @see FunctionType#dataOf(Value)
 		 * @see FunctionValue#valueOf(Function)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return FunctionType.NULL_VALUE;
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return FunctionType.NULL_VALUE;
 			if(value.type().id() == FunctionType.ID) return value;
@@ -394,7 +403,6 @@ public class Types {
 		/**
 		 * {@inheritDoc}
 		 * <ul>
-		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} ist, wird {@code ""} zurück gegeben.</li>
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@code "null"} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link ObjectType}, {@link FunctionType}, {@link NumberType} oder {@link BooleanType} ist, wird dieser via {@link String#valueOf(Object)} umgewandelt und zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
@@ -403,8 +411,7 @@ public class Types {
 		 * </ul>
 		 */
 		@Override
-		public String dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return StringType.NULL_DATA;
+		public String dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return StringType.NULL_DATA;
 			switch(value.type().id()){
@@ -424,18 +431,24 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@code "null"} als {@link StringValue} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ObjectType}, {@link FunctionType}, {@link NumberType} oder {@link BooleanType} ist, wird dieser via {@link String#valueOf(Object)} umgewandelt und als {@link StringValue} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird der {@link Value} unverändert zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, werden die Elemente via {@code Strings.join(", ", new ConvertedIterable<Value, String>(this, Arrays.asList((Value[])data)))} umgewandelt und als {@link StringValue} zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 * 
 		 * @see StringType#dataOf(Value)
 		 * @see StringValue#valueOf(String)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return StringType.NULL_VALUE;
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return StringType.NULL_VALUE;
 			switch(value.type().id()){
 				case ArrayType.ID:
-					return StringValue.valueOf(Strings.join(", ", Iterables.convertedIterable(this, Arrays.asList((Value[])data))));
+					return StringValue.valueOf(Strings.join(", ", new ConvertedIterable<Value, String>(this, Arrays.asList((Value[])data))));
 				case StringType.ID:
 					return value;
 				case ObjectType.ID:
@@ -516,16 +529,15 @@ public class Types {
 		/**
 		 * {@inheritDoc}
 		 * <ul>
-		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} sind, wird {@code NaN} als {@link Double} zurück gegeben.</li>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@code NaN} als {@link Double} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird dieser via {@link Double#valueOf(String)} umgewandelt und zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} nur nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer}.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 */
 		@Override
-		public Number dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return NumberType.NULL_DATA;
+		public Number dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return NumberType.NULL_DATA;
 			switch(value.type().id()){
@@ -542,13 +554,19 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@code NaN} als {@link Double} in inemem {@link NumberValue} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird dieser via {@link Double#valueOf(String)} umgewandelt und als {@link NumberValue} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird der {@link Value} unverändert zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} in einem {@link NumberValue} nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer} in einem {@link NumberValue}.</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 * 
 		 * @see NumberType#dataOf(Value)
 		 * @see NumberValue#valueOf(Number)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return NumberType.NULL_VALUE;
+		public Value valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return NumberType.NULL_VALUE;
 			switch(value.type().id()){
@@ -601,7 +619,7 @@ public class Types {
 		/**
 		 * {@inheritDoc}
 		 * <ul>
-		 * <li>Wenn der {@link Value} oder sein Datensatz {@code null} sind, wird {@link Boolean#FALSE} zurück gegeben.</li>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@link Boolean#FALSE} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType}, {@link ObjectType} oder {@link FunctionType} ist, wird {@link Boolean#TRUE} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link Boolean#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link Boolean#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
@@ -610,8 +628,7 @@ public class Types {
 		 * </ul>
 		 */
 		@Override
-		public Boolean dataOf(final Value value) throws IllegalArgumentException {
-			if(value == null) return Boolean.FALSE;
+		public Boolean dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return Boolean.FALSE;
 			switch(value.type().id()){
@@ -632,13 +649,20 @@ public class Types {
 
 		/**
 		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@link BooleanValue#FALSE} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType}, {@link ObjectType} oder {@link FunctionType} ist, wird {@link BooleanValue#TRUE} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link BooleanValue#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link BooleanValue#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird der {@link Value} unverändert zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 * 
 		 * @see BooleanType#dataOf(Value)
 		 * @see BooleanValue#valueOf(Boolean)
 		 */
 		@Override
-		public Value valueOf(final Value value) throws ClassCastException, IllegalArgumentException {
-			if(value == null) return BooleanValue.FALSE;
+		public BooleanValue valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
 			if(data == null) return BooleanValue.FALSE;
 			switch(value.type().id()){
@@ -651,7 +675,7 @@ public class Types {
 				case NumberType.ID:
 					return BooleanValue.valueOf(((Number)data).intValue() != 0);
 				case BooleanType.ID:
-					return value;
+					return (BooleanValue)value;
 				default:
 					throw new IllegalArgumentException();
 			}

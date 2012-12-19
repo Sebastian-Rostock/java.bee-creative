@@ -6,7 +6,6 @@ import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.ReturnValue;
-import bee.creative.function.Values.NullValue;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -70,7 +69,6 @@ public final class Scopes {
 		@Override
 		public final Value execute(final Object context, final Function function, final int deleteCount, final Value... insertValues) throws NullPointerException,
 			IllegalArgumentException {
-			if(function == null) throw new NullPointerException();
 			return new ReturnValue(new ExecuteScope(this, context, deleteCount, insertValues), function);
 		}
 
@@ -111,14 +109,31 @@ public final class Scopes {
 	public static final class DefaultScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert das Kontextobjekt.
+		 * Dieses Feld speichert den leeren {@link Scope Ausführungskontext} ohne {@link Value Parameterwerte} und mit {@code null} als Kontextobjekt.
 		 */
-		final Object context;
+		public static final DefaultScope INSTANCE = new DefaultScope(null, ArrayType.NULL_DATA);
 
 		/**
 		 * Dieses Feld speichert die {@link Value Parameterwerte}.
 		 */
 		final Value[] values;
+
+		/**
+		 * Dieses Feld speichert das Kontextobjekt.
+		 */
+		final Object context;
+
+		/**
+		 * Dieser Konstrukteur initialisiert Kontextobjekt und {@link Value Parameterwerte}.
+		 * 
+		 * @see ArrayValue#valueOf(Object...)
+		 * @param context Kontextobjekt.
+		 * @param values {@link Value Parameterwerte}.
+		 */
+		public DefaultScope(final Object context, final Object... values) {
+			this.values = ArrayValue.valueOf(values).data();
+			this.context = context;
+		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert Kontextobjekt und {@link Value Parameterwerte}.
@@ -127,11 +142,10 @@ public final class Scopes {
 		 * @param values {@link Value Parameterwerte}.
 		 * @throws NullPointerException Wenn einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
 		 */
-		public DefaultScope(final Object context, final Value... values) throws NullPointerException {
-			if(values == null) throw new NullPointerException("values is null");
-			if(Arrays.asList(values).contains(null)) throw new NullPointerException("values contains null");
-			this.context = context;
+		public DefaultScope(final Object context, final Value[] values) throws NullPointerException {
+			if(Arrays.asList(values).contains(null)) throw new NullPointerException();
 			this.values = values;
+			this.context = context;
 		}
 
 		/**
@@ -147,10 +161,7 @@ public final class Scopes {
 		 */
 		@Override
 		public Value get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
-			final Value[] values = this.values;
-			if(index >= values.length) throw new IndexOutOfBoundsException("index out of range: " + index);
-			return values[index];
+			return this.values[index];
 		}
 
 		/**
@@ -166,7 +177,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "defaultScope", "context", this.context, "values", this.values);
+			return Objects.toStringCall(true, true, "DefaultScope", "context", this.context, "values", this.values);
 		}
 
 	}
@@ -214,11 +225,8 @@ public final class Scopes {
 		 */
 		public ExecuteScope(final Scope scope, final Object context, final int deleteCount, final Value... insertValues) throws NullPointerException,
 			IllegalArgumentException {
-			if(scope == null) throw new NullPointerException("scope is null");
-			if(deleteCount < 0) throw new IllegalArgumentException("deleteCount < 0");
-			if(deleteCount > scope.size()) throw new IllegalArgumentException("deleteCount > scope.size()");
-			if(insertValues == null) throw new NullPointerException("insertValues is null");
-			if(Arrays.asList(insertValues).contains(null)) throw new NullPointerException("insertValues contains null");
+			if(scope == null || Arrays.asList(insertValues).contains(null)) throw new NullPointerException();
+			if(deleteCount < 0 || deleteCount > scope.size()) throw new IllegalArgumentException();
 			this.scope = scope;
 			this.context = context;
 			this.deleteCount = deleteCount;
@@ -238,11 +246,10 @@ public final class Scopes {
 		 */
 		@Override
 		public Value get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
 			final Value[] insertValues = this.insertValues;
 			final int length = insertValues.length;
-			if(index >= length) return this.scope.get((index + this.deleteCount) - length);
-			return insertValues[index];
+			if(index < length) return insertValues[index];
+			return this.scope.get((index + this.deleteCount) - length);
 		}
 
 		/**
@@ -258,7 +265,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "executeScope", "scope", this.scope, "context", this.context, "deleteCount", this.deleteCount, "insertValues",
+			return Objects.toStringCall(true, true, "ExecuteScope", "scope", this.scope, "context", this.context, "deleteCount", this.deleteCount, "insertValues",
 				this.insertValues);
 		}
 
@@ -289,30 +296,14 @@ public final class Scopes {
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}. Die {@link Function Parameterfunktionen} werden nicht geprüft.
-		 * 
-		 * @param scope {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
-		 * @param functions {@link Function Parameterfunktionen}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} {@code null} ist.
-		 */
-		CompositeScope(final Function[] functions, final Scope scope) throws NullPointerException {
-			if(scope == null) throw new NullPointerException("scope is null");
-			this.scope = scope;
-			this.values = new Value[functions.length];
-			this.functions = functions;
-		}
-
-		/**
 		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}.
 		 * 
 		 * @param scope {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
 		 * @param functions {@link Function Parameterfunktionen}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. eine der gegebenen {@link Function Parameterfunktionen} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
-			if(scope == null) throw new NullPointerException("scope is null");
-			if(functions == null) throw new NullPointerException("functions is null");
-			if(Arrays.asList(functions).contains(null)) throw new NullPointerException("functions contains null");
+			if((scope == null) || Arrays.asList(functions).contains(null)) throw new NullPointerException();
 			this.scope = scope;
 			this.values = new Value[functions.length];
 			this.functions = functions;
@@ -331,13 +322,10 @@ public final class Scopes {
 		 */
 		@Override
 		public Value get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
 			final Value[] values = this.values;
-			if(index >= values.length) throw new IndexOutOfBoundsException("index out of range: " + index);
 			Value value = values[index];
 			if(value != null) return value;
 			value = new ReturnValue(this.scope, this.functions[index]);
-			// if(value == null) throw new NullPointerException("value is null");
 			values[index] = value;
 			return value;
 		}
@@ -355,91 +343,9 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "compositeScope", "scope", this.scope, "functions", this.functions, "values", this.values);
+			return Objects.toStringCall(true, true, "CompositeScope", "scope", this.scope, "functions", this.functions, "values", this.values);
 		}
 
-	}
-
-	/**
-	 * Dieses Feld speichert den leeren {@link Scope Ausführungskontext}.
-	 */
-	static final Scope VOID_SCOPE = new AbstractScope() {
-
-		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException("index out of range: " + index);
-		}
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public Object context() {
-			return null;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("voidScope");
-		}
-
-	};
-
-	/**
-	 * Diese Methode gibt den leeren {@link Scope Ausführungskontext} ohne Kontextobjekt und ohne {@link Value Parameterwerte} zurück.
-	 * 
-	 * @return {@code void}-{@link Scope Ausführungskontext}.
-	 */
-	public static Scope voidScope() {
-		return Scopes.VOID_SCOPE;
-	}
-
-	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt und gibt ihn zurück.
-	 * 
-	 * @see Scopes#voidScope()
-	 * @see Scopes#createScope(Object, Value...)
-	 * @see Value#arrayData()
-	 * @see Values#voidValue()
-	 * @param context Kontextobjekt.
-	 * @return {@link Scope Ausführungskontext}.
-	 */
-	public static Scope createScope(final Object context) {
-		if(context == null) return Scopes.voidScope();
-		return Scopes.createScope(context, new Value[0]);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
-	 * 
-	 * @see Scopes#voidScope()
-	 * @see Scopes#createScope(Object, Value...)
-	 * @see Value#arrayData()
-	 * @see Values#arrayValue(Object...)
-	 * @param context Kontextobjekt.
-	 * @param values {@link Value Parameterwerte}.
-	 * @return {@link Scope Ausführungskontext}.
-	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
-	 */
-	public static Scope createScope(final Object context, final Object... values) throws NullPointerException {
-		return Scopes.createScope(context, ArrayValue.valueOf(values).dataTo(ArrayType.INSTANCE));
-	}
-
-	/**
-	 * Diese Methode erzeugt einen neuen {@link Scope Ausführungskontext} mit dem gegebenen Kontextobjekt sowie den gegebenen {@link Value Parameterwerten} und gibt ihn zurück.
-	 * 
-	 * @see Scopes#voidScope()
-	 * @param context Kontextobjekt.
-	 * @param values {@link Value Parameterwerte}.
-	 * @return {@link Scope Ausführungskontext}.
-	 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
-	 */
-	public static Scope createScope(final Object context, final Value... values) throws NullPointerException {
-		if(values == null) throw new NullPointerException("values is null");
-		if((context == null) && (values.length == 0)) return Scopes.voidScope();
-		return new DefaultScope(context, values);
 	}
 
 	/**

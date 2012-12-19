@@ -1,12 +1,10 @@
 package bee.creative.function;
 
-import java.util.Arrays;
-import bee.creative.function.Functions.NullFunction;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
+import bee.creative.function.Values.NullValue;
 import bee.creative.function.Values.ObjectValue;
 import bee.creative.function.Values.ReturnValue;
-import bee.creative.function.Values.NullValue;
 import bee.creative.util.Objects;
 
 /**
@@ -62,6 +60,47 @@ public final class Functions {
 		@Override
 		public String toString() {
 			return Objects.toStringCall("NullFunction");
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link Function Funktion}, deren {@link Value Ergebniswert} dem {@link ArrayValue} der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class ArrayFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert die {@link ArrayFunction}.
+		 */
+		public static final Function INSTANCE = new ArrayFunction();
+
+		/**
+		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+		 */
+		ArrayFunction() {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ArrayValue execute(final Scope scope) {
+			final int size = scope.size();
+			final Value[] array = new Value[size];
+			for(int i = 0; i < size; i++){
+				array[i] = scope.get(i);
+			}
+			return ArrayValue.valueOf(array);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall("ArrayFunction");
 		}
 
 	}
@@ -150,52 +189,30 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function Funktion}, deren {@link Value Ergebniswert} dem {@link ArrayValue} der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class ScopeFunction implements Function {
-
-		/**
-		 * Dieses Feld speichert die {@link ScopeFunction}.
-		 */
-		public static final Function INSTANCE = new ScopeFunction();
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		ScopeFunction() {
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Value execute(final Scope scope) {
-			final int size = scope.size();
-			final Value[] array = new Value[size];
-			for(int i = 0; i < size; i++){
-				array[i] = scope.get(i);
-			}
-			return ArrayValue.valueOf(array);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall("ScopeFunction");
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine projizierende {@link Function Funktion}, deren {@link Value Ergebniswert} einem der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ParameterFunction implements Function {
+	public static final class ParamFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
+		 */
+		static final Function[] INSTANCES = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
+			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
+
+		/**
+		 * Diese Methode erzeugt eine eine projizierende {@link Function Funktion}, deren {@link Value Ergebniswert} einem der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht und gibt diese zurück.
+		 * 
+		 * @param index Index des {@link Value Parameterwerts}.
+		 * @return {@link ParamFunction projizierende Funktion}.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
+		 */
+		public static Function valueOf(final int index) throws IndexOutOfBoundsException {
+			if(index < 0) throw new IndexOutOfBoundsException();
+			if(index < INSTANCES.length) return INSTANCES[index];
+			return new ParamFunction(index);
+		}
 
 		/**
 		 * Dieses Feld speichert den Index des {@link Value Parameterwerts}.
@@ -208,8 +225,8 @@ public final class Functions {
 		 * @param index Index des {@link Value Parameterwerts}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
-		public ParameterFunction(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
+		public ParamFunction(final int index) throws IndexOutOfBoundsException {
+			if(index < 0) throw new IndexOutOfBoundsException();
 			this.index = index;
 		}
 
@@ -235,8 +252,8 @@ public final class Functions {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ParameterFunction)) return false;
-			final ParameterFunction data = (ParameterFunction)object;
+			if(!(object instanceof ParamFunction)) return false;
+			final ParamFunction data = (ParamFunction)object;
 			return this.index == data.index;
 		}
 
@@ -245,7 +262,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("parameterFunction", this.index);
+			return Objects.toStringCall("ParamFunction", this.index);
 		}
 
 	}
@@ -272,12 +289,10 @@ public final class Functions {
 		 * 
 		 * @param function {@link Function Funktion}.
 		 * @param functions {@link Function Parameterfunktionen}.
-		 * @throws NullPointerException Wenn eine der gegebenen {@link Function Funktionen} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
-			if(function == null) throw new NullPointerException("functions is null");
-			if(functions == null) throw new NullPointerException("functions is null");
-			if(Arrays.asList(functions).contains(null)) throw new NullPointerException("functions contains null");
+			if(function == null || functions == null) throw new NullPointerException();
 			this.function = function;
 			this.functions = functions;
 		}
@@ -287,7 +302,7 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return new ReturnValue(new CompositeScope(this.functions, scope),this.function);
+			return new ReturnValue(new CompositeScope(scope, this.functions), this.function);
 		}
 
 		/**
@@ -314,31 +329,10 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "compositeFunction", "function", this.function, "functions", this.functions);
+			return Objects.toStringCall(true, true, "CompositeFunction", "function", this.function, "functions", this.functions);
 		}
 
 	}
-
-	/**
-	 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
-	 */
-	static final Function[] PARAMETER_FUNCTIONS = {new ParameterFunction(0), new ParameterFunction(1), new ParameterFunction(2), new ParameterFunction(3),
-		new ParameterFunction(4), new ParameterFunction(5), new ParameterFunction(6), new ParameterFunction(7), new ParameterFunction(8), new ParameterFunction(9)};
-
-	/**
-	 * Diese Methode erzeugt eine eine projizierende {@link Function Funktion}, deren {@link Value Ergebniswert} einem der {@link Value Parameterwerte} des {@link Scope Ausführungskontexts} entspricht und gibt diese zurück.
-	 * 
-	 * @param index Index des {@link Value Parameterwerts}.
-	 * @return {@link ParameterFunction projizierende Funktion}.
-	 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
-	 */
-	public static Function parameterFunction(final int index) throws IndexOutOfBoundsException {
-		if(index < 0) throw new IndexOutOfBoundsException("index out of range: " + index);
-		if(index < Functions.PARAMETER_FUNCTIONS.length) return Functions.PARAMETER_FUNCTIONS[index];
-		return new ParameterFunction(index);
-	}
-
-
 
 	/**
 	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.

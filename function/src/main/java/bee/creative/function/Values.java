@@ -1,5 +1,6 @@
 package bee.creative.function;
 
+import java.util.Arrays;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
 import bee.creative.function.Types.FunctionType;
@@ -152,158 +153,163 @@ public final class Values {
 	public static final class ArrayValue extends AbstractValue<Value[]> {
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final byte... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final byte[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final short... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final short[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final char... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final char[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final int... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final int[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final long... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final long[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final float... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final float[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Zahlenliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Zahlenliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final double... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final double[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = NumberValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Wahrheitswertliste in einen {@link Value Wert} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Wahrheitswertliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
-		 * @param data Wahrheitswertliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Wahrheitswertliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final boolean... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final boolean[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
 				values[i] = BooleanValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Objektliste in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Objektliste in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data Objektliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Objektliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final Object... data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static ArrayValue valueOf(final Object... data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
-				values[i] = ObjectValue.valueOf(data);
+				values[i] = ObjectValue.valueOf(data[i]);
 			}
-			return new ArrayValue(values);
+			return new ArrayValue(0, values);
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data Wertliste oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data Wertliste.
+		 * @return {@link ArrayValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final Value... data) {
-			if(data == null) return NullValue.INSTANCE;
-			return new ArrayValue(data);
+		public static ArrayValue valueOf(final Value[] data) throws NullPointerException {
+			final int size = data.length;
+			final Value[] values = new Value[size];
+			for(int i = 0; i < size; i++){
+				values[i] = NullValue.valueOf(data[i]);
+			}
+			return new ArrayValue(0, values);
 		}
 
 		/**
@@ -312,13 +318,23 @@ public final class Values {
 		final Value[] data;
 
 		/**
+		 * Dieser Konstrukteur initialisiert den Datensatz ohne Prüfung.
+		 * 
+		 * @param IGNORE IGNORTIERT.
+		 * @param data Datensatz.
+		 */
+		ArrayValue(int IGNORE, final Value[] data) {
+			this.data = data;
+		}
+
+		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
+		 * @throws NullPointerException Wenn der Datensatz {@code null} ist oder enthält.
 		 */
 		public ArrayValue(final Value... data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
+			if(  Arrays.asList(data).contains(null)) throw new NullPointerException();
 			this.data = data;
 		}
 
@@ -351,7 +367,7 @@ public final class Values {
 		/**
 		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes wird hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
 		 * 
-		 * @param data Datensatz.
+		 * @param data Datensatz oder {@code null}.
 		 * @return {@link Value}.
 		 */
 		public static Value valueOf(final Object data) {
@@ -417,13 +433,13 @@ public final class Values {
 	public static final class FunctionValue extends AbstractValue<Function> {
 
 		/**
-		 * Diese Methode konvertiert die gegebene {@link Function} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene {@link Function} in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data {@link Function} oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data {@link Function}.
+		 * @return {@link FunctionValue}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final Function data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static FunctionValue valueOf(final Function data) throws NullPointerException {
 			return new FunctionValue(data);
 		}
 
@@ -470,13 +486,13 @@ public final class Values {
 	public static final class StringValue extends AbstractValue<String> {
 
 		/**
-		 * Diese Methode konvertiert den gegebenen {@link String} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen {@link String} in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data {@link String} oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data {@link String}.
+		 * @return {@link StringValue}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final String data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static StringValue valueOf(final String data) throws NullPointerException {
 			return new StringValue(data);
 		}
 
@@ -526,7 +542,7 @@ public final class Values {
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @param data Zahlenwert.
-		 * @return {@link Value}.
+		 * @return {@link NumberValue}.
 		 */
 		public static NumberValue valueOf(final int data) {
 			return new NumberValue(Integer.valueOf(data));
@@ -536,7 +552,7 @@ public final class Values {
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @param data Zahlenwert.
-		 * @return {@link Value}.
+		 * @return {@link NumberValue}.
 		 */
 		public static NumberValue valueOf(final long data) {
 			return new NumberValue(Long.valueOf(data));
@@ -546,7 +562,7 @@ public final class Values {
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @param data Zahlenwert.
-		 * @return {@link Value}.
+		 * @return {@link NumberValue}.
 		 */
 		public static NumberValue valueOf(final float data) {
 			return new NumberValue(Float.valueOf(data));
@@ -556,20 +572,20 @@ public final class Values {
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @param data Zahlenwert.
-		 * @return {@link Value}.
+		 * @return {@link NumberValue}.
 		 */
 		public static NumberValue valueOf(final double data) {
 			return new NumberValue(Double.valueOf(data));
 		}
 
 		/**
-		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert die gegebene {@link Number} in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data {@link Number} oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data {@link Number}.
+		 * @return {@link NumberValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final Number data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static NumberValue valueOf(final Number data) throws NullPointerException {
 			return new NumberValue(data);
 		}
 
@@ -618,31 +634,31 @@ public final class Values {
 		/**
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#TRUE}.
 		 */
-		public static final BooleanValue TRUE = new BooleanValue(true);
+		public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#FALSE}.
 		 */
-		public static final BooleanValue FALSE = new BooleanValue(false);
+		public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Wahrheitswert in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @param data Wahrheitswert.
-		 * @return {@link Value}.
+		 * @return {@link BooleanValue}.
 		 */
 		public static BooleanValue valueOf(final boolean data) {
 			return (data ? BooleanValue.TRUE : BooleanValue.FALSE);
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen {@link Boolean} in einen {@link Value} und gibt diesen zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen {@link Boolean} in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @param data {@link Boolean} oder {@code null}.
-		 * @return {@link Value}.
+		 * @param data {@link Boolean}.
+		 * @return {@link BooleanValue}.
+		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
-		public static Value valueOf(final Boolean data) {
-			if(data == null) return NullValue.INSTANCE;
+		public static BooleanValue valueOf(final Boolean data) throws NullPointerException {
 			return BooleanValue.valueOf(data.booleanValue());
 		}
 
@@ -650,15 +666,6 @@ public final class Values {
 		 * Dieses Feld speichert den Datensatz.
 		 */
 		final Boolean data;
-
-		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 */
-		public BooleanValue(final boolean data) {
-			this.data = Boolean.valueOf(data);
-		}
 
 		/**
 		 * Dieser Konstrukteur initialisiert den Datensatz.
@@ -724,7 +731,7 @@ public final class Values {
 		 * 
 		 * @param scope {@link Scope Ausführungskontext}.
 		 * @param function {@link Function Funktion}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. die gegebene {@link Function Funktion} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
 			if((scope == null) || (function == null)) throw new NullPointerException();
@@ -753,7 +760,7 @@ public final class Values {
 		 */
 		@Override
 		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
-			return this.value.dataAs(type);
+			return this.value().dataAs(type);
 		}
 
 		/**
@@ -813,7 +820,7 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this.getClass().getSimpleName(), "value", this.value, "scope", this.scope, "function", this.function);
+			return Objects.toStringCall(true, true, "ReturnValue", "value", this.value, "scope", this.scope, "function", this.function);
 		}
 
 	}

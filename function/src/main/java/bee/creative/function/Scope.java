@@ -2,6 +2,7 @@ package bee.creative.function;
 
 import bee.creative.function.Scopes.ExecuteScope;
 import bee.creative.function.Values.ReturnValue;
+import bee.creative.util.Comparables.Get;
 import bee.creative.util.Objects.UseToString;
 
 /**
@@ -12,7 +13,7 @@ import bee.creative.util.Objects.UseToString;
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Scope extends Iterable<Value>, UseToString {
+public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 
 	/**
 	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück.
@@ -22,6 +23,7 @@ public interface Scope extends Iterable<Value>, UseToString {
 	 * @return {@code index}-ter {@link Value Parameterwert}.
 	 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist, d.h. {@code index < 0} oder {@code index >= size()}.
 	 */
+	@Override
 	public Value get(int index) throws IndexOutOfBoundsException;
 
 	/**
