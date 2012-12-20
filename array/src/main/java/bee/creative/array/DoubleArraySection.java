@@ -49,8 +49,8 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static DoubleArraySection from(final double[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static DoubleArraySection from(final double[] array, final int startIndex, final int finalIndex) throws NullPointerException,
+		IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new DoubleArraySection() {
 
 			@Override

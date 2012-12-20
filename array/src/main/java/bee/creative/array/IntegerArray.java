@@ -44,8 +44,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * 
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public int get(int index) throws IndexOutOfBoundsException;
 
@@ -57,8 +56,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.length > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}).
 	 */
 	public void get(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -79,8 +77,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public void set(int index, int value) throws IndexOutOfBoundsException;
 
@@ -92,8 +89,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void set(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -143,8 +139,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, int value) throws IndexOutOfBoundsException;
 
@@ -156,8 +151,7 @@ public interface IntegerArray extends Array<int[], Integer> {
 	 * @param index Position.
 	 * @param values {@code int}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code int}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, int[] values) throws NullPointerException, IndexOutOfBoundsException;
 

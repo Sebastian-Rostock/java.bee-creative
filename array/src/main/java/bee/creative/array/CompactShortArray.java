@@ -8,13 +8,11 @@ package bee.creative.array;
 public class CompactShortArray extends CompactArray<short[], Short> implements ShortArray {
 
 	/**
-	 * Diese Klasse implementiert ein {@link ShortArray} als modifizierbare Sicht auf einen Teil eines
-	 * {@link CompactShortArray}s.
+	 * Diese Klasse implementiert ein {@link ShortArray} als modifizierbare Sicht auf einen Teil eines {@link CompactShortArray}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	protected static class CompactShortSubArray extends CompactSubArray<CompactShortArray, short[], Short> implements
-		ShortArray {
+	protected static class CompactShortSubArray extends CompactSubArray<CompactShortArray, short[], Short> implements ShortArray {
 
 		/**
 		 * Dieser Konstrukteur initialisiert Besitzer und Indices.
@@ -23,11 +21,10 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder
-		 *         {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
+		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
 		 */
-		public CompactShortSubArray(final CompactShortArray owner, final int startIndex, final int finalIndex)
-			throws NullPointerException, IndexOutOfBoundsException {
+		public CompactShortSubArray(final CompactShortArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
+			IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
 
@@ -240,16 +237,14 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	protected short[] array;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition
-	 * {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
 	 */
 	public CompactShortArray() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition
-	 * {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
@@ -260,20 +255,16 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als
-	 * internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird
-	 * {@code 0.5} verwendet.
+	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
-	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder
-	 *         {@code section.finalIndex() > section.arrayLength()}.
+	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}.
 	 */
-	public CompactShortArray(final ArraySection<short[]> section) throws NullPointerException, IndexOutOfBoundsException,
-		IllegalArgumentException {
+	public CompactShortArray(final ArraySection<short[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
 

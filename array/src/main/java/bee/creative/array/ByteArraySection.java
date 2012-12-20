@@ -49,8 +49,8 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static ByteArraySection from(final byte[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static ByteArraySection from(final byte[] array, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
+		IllegalArgumentException {
 		return ArraySection.validate(new ByteArraySection() {
 
 			@Override

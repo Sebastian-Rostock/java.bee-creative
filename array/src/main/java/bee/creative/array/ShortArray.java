@@ -44,8 +44,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * 
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public short get(int index) throws IndexOutOfBoundsException;
 
@@ -57,8 +56,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code short}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.length > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}).
 	 */
 	public void get(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -79,8 +77,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public void set(int index, short value) throws IndexOutOfBoundsException;
 
@@ -92,8 +89,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code short}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void set(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -143,8 +139,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, short value) throws IndexOutOfBoundsException;
 
@@ -156,8 +151,7 @@ public interface ShortArray extends Array<short[], Short> {
 	 * @param index Position.
 	 * @param values {@code short}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code short}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, short[] values) throws NullPointerException, IndexOutOfBoundsException;
 

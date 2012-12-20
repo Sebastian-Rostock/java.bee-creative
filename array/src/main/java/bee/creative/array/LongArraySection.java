@@ -49,8 +49,8 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static LongArraySection from(final long[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static LongArraySection from(final long[] array, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
+		IllegalArgumentException {
 		return ArraySection.validate(new LongArraySection() {
 
 			@Override

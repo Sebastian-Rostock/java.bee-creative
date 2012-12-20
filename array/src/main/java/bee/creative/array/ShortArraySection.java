@@ -49,8 +49,8 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static ShortArraySection from(final short[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static ShortArraySection from(final short[] array, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
+		IllegalArgumentException {
 		return ArraySection.validate(new ShortArraySection() {
 
 			@Override

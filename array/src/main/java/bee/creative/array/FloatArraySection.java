@@ -49,8 +49,8 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static FloatArraySection from(final float[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static FloatArraySection from(final float[] array, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
+		IllegalArgumentException {
 		return ArraySection.validate(new FloatArraySection() {
 
 			@Override

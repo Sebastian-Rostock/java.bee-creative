@@ -49,8 +49,8 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static BooleanArraySection from(final boolean[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static BooleanArraySection from(final boolean[] array, final int startIndex, final int finalIndex) throws NullPointerException,
+		IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new BooleanArraySection() {
 
 			@Override

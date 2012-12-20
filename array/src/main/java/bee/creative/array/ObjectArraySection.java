@@ -23,8 +23,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @return {@link ObjectArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 */
-	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue... array)
-		throws NullPointerException {
+	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue... array) throws NullPointerException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override
@@ -61,8 +60,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @return {@link ObjectArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebenen {@link Comparator} {@code null} ist.
 	 */
-	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator,
-		final GValue... array) throws NullPointerException {
+	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue... array) throws NullPointerException {
 		if(comparator == null) throw new NullPointerException("comparator is null");
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
@@ -101,9 +99,8 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue[] array,
-		final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
-		IllegalArgumentException {
+	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue[] array, final int startIndex, final int finalIndex)
+		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			/**
@@ -145,9 +142,8 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator,
-		final GValue[] array, final int startIndex, final int finalIndex) throws NullPointerException,
-		IndexOutOfBoundsException, IllegalArgumentException {
+	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue[] array, final int startIndex,
+		final int finalIndex) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		if(comparator == null) throw new NullPointerException("comparator is null");
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 

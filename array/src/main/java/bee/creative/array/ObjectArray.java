@@ -45,8 +45,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * 
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public GValue get(int index) throws IndexOutOfBoundsException;
 
@@ -58,8 +57,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.length > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.length > size()}).
 	 */
 	public void get(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -80,8 +78,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}).
 	 */
 	public void set(int index, GValue value) throws IndexOutOfBoundsException;
 
@@ -93,8 +90,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code GValue}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void set(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -144,8 +140,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * 
 	 * @param index Position.
 	 * @param value Wert.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, GValue value) throws IndexOutOfBoundsException;
 
@@ -157,8 +152,7 @@ public interface ObjectArray<GValue> extends Array<GValue[], GValue> {
 	 * @param index Position.
 	 * @param values {@code GValue}-Array.
 	 * @throws NullPointerException Wenn da gegebene {@code GValue}-Array {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, GValue[] values) throws NullPointerException, IndexOutOfBoundsException;
 

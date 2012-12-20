@@ -8,20 +8,17 @@ import java.util.RandomAccess;
  * Diese Klasse implementiert ein abstraktes {@link Array} auf Basis einer {@link ArrayData}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]},
- *        {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
- * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
- *        {@link Float}, {@link Double} oder {@link Boolean}).
+ * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
+ * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
  */
 public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> implements Array<GArray, GValue> {
 
 	/**
-	 * Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte.
+	 * Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte eines {@link CompactArray}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Array#values()
-	 * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
-	 *        {@link Float}, {@link Double} oder {@link Boolean}).
+	 * @param <GValue> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
 	 */
 	protected static final class Values<GValue> extends AbstractList<GValue> implements RandomAccess {
 
@@ -136,18 +133,14 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link Array} als modifizierbare Sicht auf einen Teil eines
-	 * {@link CompactArray}s.
+	 * Diese Klasse implementiert ein abstraktes {@link Array} als modifizierbare Sicht auf einen Teil eines {@link CompactArray}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des {@link CompactArray}s.
-	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]},
-	 *        {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
-	 * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
-	 *        {@link Float}, {@link Double} oder {@link Boolean}).
+	 * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
+	 * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
 	 */
-	protected static abstract class CompactSubArray<GOwner extends CompactArray<GArray, GValue>, GArray, GValue>
-		implements Array<GArray, GValue> {
+	protected static abstract class CompactSubArray<GOwner extends CompactArray<GArray, GValue>, GArray, GValue> implements Array<GArray, GValue> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
@@ -171,11 +164,9 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder
-		 *         {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
+		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
 		 */
-		public CompactSubArray(final GOwner owner, final int startIndex, final int finalIndex) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public CompactSubArray(final GOwner owner, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException {
 			if(owner == null) throw new NullPointerException("owner is null");
 			if(startIndex > finalIndex) throw new IndexOutOfBoundsException("startIndex > finalIndex");
 			this.startIndex = owner.exclusiveIndex(startIndex);
@@ -188,8 +179,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * 
 		 * @param index Index.
 		 * @return Index + {@code startIndex}.
-		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist ({@code index < 0} oder
-		 *         {@code index > size()}).
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist ({@code index < 0} oder {@code index > size()}).
 		 */
 		protected final int ownerIndex(final int index) throws IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
@@ -205,8 +195,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @return modifizierbare Teil-{@link Array}-Sicht.
-		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder
-		 *         {@code finalIndex > size()} oder {@code startIndex > finalIndex}).
+		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > size()} oder {@code startIndex > finalIndex}).
 		 */
 		protected final Array<GArray, GValue> ownerSubArray(final int startIndex, final int finalIndex) {
 			if(startIndex < 0) throw new IndexOutOfBoundsException();
@@ -245,8 +234,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
 			this.owner.get(this.ownerIndex(index), values);
 		}
 
@@ -254,8 +242,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void get(final int index, final ArraySection<GArray> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void get(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 			this.owner.get(this.ownerIndex(index), values);
 		}
 
@@ -263,8 +250,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
 			this.owner.set(this.ownerIndex(index), values);
 		}
 
@@ -272,8 +258,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final int index, final ArraySection<GArray> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void set(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 			this.owner.set(this.ownerIndex(index), values);
 		}
 
@@ -297,8 +282,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void add(final int index, final Array<GArray, GValue> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void add(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
 			if(values == null) throw new NullPointerException("values is null");
 			this.add(index, values.section());
 		}
@@ -307,8 +291,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void add(final int index, final ArraySection<GArray> values) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 			if(values == null) throw new NullPointerException("values is null");
 			this.insert(index, values.size());
 			this.set(index, values);
@@ -406,16 +389,14 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	private float alignment = 0.5f;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition
-	 * {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
 	 */
 	public CompactArray() {
 		this(0);
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition
-	 * {@code 0.5}.
+	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
@@ -428,20 +409,16 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als
-	 * internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird
-	 * {@code 0.5} verwendet.
+	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
-	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder
-	 *         {@code section.finalIndex() > section.arrayLength()}.
+	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}.
 	 */
-	public CompactArray(final ArraySection<GArray> section) throws NullPointerException, IndexOutOfBoundsException,
-		IllegalArgumentException {
+	public CompactArray(final ArraySection<GArray> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		ArraySection.validate(section);
 		this.setArray(section.array());
 		this.from = section.startIndex();
@@ -475,13 +452,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	protected abstract void setValue(int index, GValue value);
 
 	/**
-	 * Diese Methode gibt die gegebenen Position als Index des internen Arrays zurück. Wenn ({@code index < 0} oder
-	 * {@code index >= size}) wird eine {@link IndexOutOfBoundsException} ausgelöst.
+	 * Diese Methode gibt die gegebenen Position als Index des internen Arrays zurück. Wenn ({@code index < 0} oder {@code index >= size}) wird eine {@link IndexOutOfBoundsException} ausgelöst.
 	 * 
 	 * @param index Position.
 	 * @return Index des internen Array ({@code index + from}).
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index >= size}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size}).
 	 */
 	protected final int inclusiveIndex(final int index) throws IndexOutOfBoundsException {
 		if((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException();
@@ -489,13 +464,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	}
 
 	/**
-	 * Diese Methode gibt die gegebenen Position als Index des internen Arrays zurück. Wenn ({@code index < 0} oder
-	 * {@code index > size}) wird eine {@link IndexOutOfBoundsException} ausgelöst.
+	 * Diese Methode gibt die gegebenen Position als Index des internen Arrays zurück. Wenn ({@code index < 0} oder {@code index > size}) wird eine {@link IndexOutOfBoundsException} ausgelöst.
 	 * 
 	 * @param index Position.
 	 * @return Index des internen Array ({@code index + from}).
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size}).
 	 */
 	protected final int exclusiveIndex(final int index) throws IndexOutOfBoundsException {
 		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
@@ -507,8 +480,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException,
-		IndexOutOfBoundsException {
+	public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
 		if(values == null) throw new NullPointerException("values is null");
 		this.get(index, values.section());
 	}
@@ -517,8 +489,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void get(final int index, final ArraySection<GArray> values) throws NullPointerException,
-		IndexOutOfBoundsException {
+	public void get(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		if(values == null) throw new NullPointerException("values is null");
 		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
@@ -531,8 +502,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException,
-		IndexOutOfBoundsException {
+	public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
 		if(values == null) throw new NullPointerException("values is null");
 		this.set(index, values.section());
 	}
@@ -541,8 +511,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void set(final int index, final ArraySection<GArray> values) throws NullPointerException,
-		IndexOutOfBoundsException {
+	public void set(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		if(values == null) throw new NullPointerException("values is null");
 		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
@@ -580,8 +549,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void add(final int index, final ArraySection<GArray> values) throws NullPointerException,
-		IndexOutOfBoundsException {
+	public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
 		if(values == null) throw new NullPointerException("values is null");
 		final int valuesSize = values.size();
 		if(valuesSize == 0) return;
@@ -590,11 +558,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	}
 
 	/**
-	 * Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen
-	 * Ausrichtungsposition {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen
-	 * von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das
-	 * gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen
-	 * am Anfang des Arrays beschleunigt wird.
+	 * Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays beschleunigt wird.
 	 * 
 	 * @return relative Ausrichtungsposition ({@code 0..1}).
 	 */
@@ -603,15 +567,10 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	}
 
 	/**
-	 * Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition
-	 * {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende
-	 * des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das gegenteil, da hier die
-	 * Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
-	 * beschleunigt wird.
+	 * Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays beschleunigt wird.
 	 * 
 	 * @param alignment relative Ausrichtungsposition ({@code 0..1}).
-	 * @throws IllegalArgumentException Wenn die gegebene relative Ausrichtungsposition kleiner {@code 0}, größer
-	 *         {@code 1} ist oder {@link Float#NaN}.
+	 * @throws IllegalArgumentException Wenn die gegebene relative Ausrichtungsposition kleiner {@code 0}, größer {@code 1} ist oder {@link Float#NaN}.
 	 */
 	public void setAlignment(final float alignment) throws IllegalArgumentException {
 		if(!((alignment >= 0f) && (alignment <= 1f))) throw new IllegalArgumentException();

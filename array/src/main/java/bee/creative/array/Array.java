@@ -7,10 +7,8 @@ import java.util.List;
  * Diese Schnittstelle definiert ein modifizierbares Array mit {@link List}-Sicht auf seine Werte.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]},
- *        {@code float[]}, {@code double[]} oder {@code boolean[]}).
- * @param <GValue> Typ der Werte ({@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long},
- *        {@link Float}, {@link Double} oder {@link Boolean}).
+ * @param <GArray> Typ des Arrays (z.B. {@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
+ * @param <GValue> Typ der Werte (z.B. {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
  */
 public interface Array<GArray, GValue> {
 
@@ -22,7 +20,7 @@ public interface Array<GArray, GValue> {
 	public int size();
 
 	/**
-	 * Diese Methode entfernt alle Werte.
+	 * Diese Methode entfernt alle Werte ({@code this.remove(0, this.size())}).
 	 * 
 	 * @see Array#remove(int, int)
 	 */
@@ -42,8 +40,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn das gegebene {@link Array} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void get(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -53,8 +50,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void get(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -64,8 +60,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn das gegebene {@link Array} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void set(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -75,8 +70,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index + values.size() > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index + values.size() > size()}).
 	 */
 	public void set(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -106,8 +100,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link Array}.
 	 * @throws NullPointerException Wenn da gegebene {@link Array} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -119,8 +112,7 @@ public interface Array<GArray, GValue> {
 	 * @param index Position.
 	 * @param values {@link ArraySection}.
 	 * @throws NullPointerException Wenn die gegebene {@link ArraySection} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder
-	 *         {@code index > size()}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}).
 	 */
 	public void add(int index, ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException;
 
@@ -152,8 +144,7 @@ public interface Array<GArray, GValue> {
 	public List<GValue> values();
 
 	/**
-	 * Diese Methode gibt den Abschnitt des intern verwalteten Arrays zurück, in dem sich die Werte dieses {@link Arrays}
-	 * befinden. Der Abschnitt
+	 * Diese Methode gibt den Abschnitt des intern verwalteten Arrays zurück, in dem sich die Werte dieses {@link Arrays} befinden. Der Abschnitt
 	 * 
 	 * @return mit Werten belegter Abschnitt des intern verwalteten Arrays.
 	 */
@@ -174,8 +165,7 @@ public interface Array<GArray, GValue> {
 	 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 	 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 	 * @return modifizierbare Teil-{@link Array}-Sicht.
-	 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder
-	 *         {@code finalIndex > size()} oder {@code startIndex > finalIndex}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > size()} oder {@code startIndex > finalIndex}).
 	 */
 	public Array<GArray, GValue> subArray(int startIndex, int finalIndex) throws IndexOutOfBoundsException;
 

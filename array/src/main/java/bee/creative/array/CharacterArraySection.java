@@ -49,8 +49,8 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
 	 */
-	public static CharacterArraySection from(final char[] array, final int startIndex, final int finalIndex)
-		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
+	public static CharacterArraySection from(final char[] array, final int startIndex, final int finalIndex) throws NullPointerException,
+		IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new CharacterArraySection() {
 
 			@Override
