@@ -55,7 +55,7 @@ public final class Comparables {
 		 * 
 		 * @param index Index.
 		 * @return {@code index}-tes Element.
-		 * @throws IndexOutOfBoundsException Wenn der ggebene Index ungültig ist.
+		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public GItem get(int index) throws IndexOutOfBoundsException;
 
