@@ -1,10 +1,10 @@
 package bee.creative.function;
 
+import bee.creative.function.Scopes.AbstractScope.ReturnValue;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.NullValue;
 import bee.creative.function.Values.ObjectValue;
-import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Objects;
 
 /**
@@ -301,7 +301,7 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope scope) {
+		public ReturnValue execute(final Scope scope) {
 			return new ReturnValue(new CompositeScope(scope, this.functions), this.function);
 		}
 

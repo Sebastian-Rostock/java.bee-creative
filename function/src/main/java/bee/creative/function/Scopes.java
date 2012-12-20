@@ -5,7 +5,6 @@ import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Values.ArrayValue;
-import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -26,6 +25,135 @@ public final class Scopes {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class AbstractScope implements Scope, UseToString {
+
+		/**
+		 * Diese Klasse implementiert den {@link Value Ergebniswert} einer {@link Function Funktion} mit {@code call-by-reference}-Semantik, welcher eine gegebene {@link Function Funktion} erst dann mit einem gegebenen {@link Scope Ausführungskontext} einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Datensatz} gelesen werden.
+		 * <p>
+		 * Der von der {@link Function Funktion} berechnete {@link Value Ergebniswert} wird zur schnellen Wiederverwendung gepuffert. Nach der einmaligen Auswertung der {@link Function Funktion} werden die Verweise auf {@link Scope Ausführungskontext} und {@link Function Funktion} aufgelöst.
+		 * 
+		 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		public static final class ReturnValue implements Value {
+
+			/**
+			 * Dieses Feld speichert das von der {@link Function Funktion} berechnete Ergebnis oder {@code null}.
+			 * 
+			 * @see Function#execute(Scope)
+			 */
+			Value value;
+
+			/**
+			 * Dieses Feld speichert den {@link Scope Ausführungskontext} zum Aufruf der {@link Function Funktion} oder {@code null}.
+			 * 
+			 * @see Function#execute(Scope)
+			 */
+			Scope scope;
+
+			/**
+			 * Dieses Feld speichert die {@link Function Funktion} oder {@code null}.
+			 * 
+			 * @see Function#execute(Scope)
+			 */
+			Function function;
+
+			/**
+			 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}.
+			 * 
+			 * @param scope {@link Scope Ausführungskontext}.
+			 * @param function {@link Function Funktion}.
+			 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+			 */
+			public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
+				if((scope == null) || (function == null)) throw new NullPointerException();
+				this.scope = scope;
+				this.function = function;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Type<?> type() {
+				return this.value().type();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Object data() {
+				return this.value().data();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
+				return this.value().dataAs(type);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+				return this.value().dataTo(type);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+				return this.value().valueTo(type);
+			}
+
+			/**
+			 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem {@link Scope Ausführungskontext} zurück.
+			 * 
+			 * @see Function#execute(Scope)
+			 * @return {@link Value Ergebniswert}.
+			 * @throws NullPointerException Wenn der berechnete {@link Value Ergebniswert} {@code null} ist.
+			 */
+			public Value value() throws NullPointerException {
+				Value value = this.value;
+				if(value != null) return value;
+				value = this.function.execute(this.scope);
+				if(value == null) throw new NullPointerException();
+				this.value = value;
+				this.scope = null;
+				this.function = null;
+				return value;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int hashCode() {
+				return this.value().hashCode();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean equals(final Object object) {
+				if(object == this) return true;
+				if(!(object instanceof Value)) return false;
+				return this.value().equals(object);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall(true, true, "ReturnValue", "value", this.value, "scope", this.scope, "function", this.function);
+			}
+
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -59,7 +187,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final Value execute(final Function function, final int deleteCount, final Value... insertValues) {
+		public final ReturnValue execute(final Function function, final int deleteCount, final Value... insertValues) {
 			return this.execute(this.context(), function, deleteCount, insertValues);
 		}
 
@@ -67,8 +195,8 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final Value execute(final Object context, final Function function, final int deleteCount, final Value... insertValues) throws NullPointerException,
-			IllegalArgumentException {
+		public final ReturnValue execute(final Object context, final Function function, final int deleteCount, final Value... insertValues)
+			throws NullPointerException, IllegalArgumentException {
 			return new ReturnValue(new ExecuteScope(this, context, deleteCount, insertValues), function);
 		}
 
@@ -288,7 +416,7 @@ public final class Scopes {
 		/**
 		 * Dieses Feld speichert die {@link Value Parameterwerte} als Ergebnisse der {@link Function Parameterfunktionen}.
 		 */
-		final Value[] values;
+		final ReturnValue[] values;
 
 		/**
 		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Value Parameterwerte} verwendet werden.
@@ -305,7 +433,7 @@ public final class Scopes {
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
 			if((scope == null) || Arrays.asList(functions).contains(null)) throw new NullPointerException();
 			this.scope = scope;
-			this.values = new Value[functions.length];
+			this.values = new ReturnValue[functions.length];
 			this.functions = functions;
 		}
 
@@ -321,11 +449,11 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
-			final Value[] values = this.values;
-			Value value = values[index];
+		public ReturnValue get(final int index) throws IndexOutOfBoundsException {
+			final ReturnValue[] values = this.values;
+			ReturnValue value = values[index];
 			if(value != null) return value;
-			value = new ReturnValue(this.scope, this.functions[index]);
+			value = new AbstractScope.ReturnValue(this.scope, this.functions[index]);
 			values[index] = value;
 			return value;
 		}

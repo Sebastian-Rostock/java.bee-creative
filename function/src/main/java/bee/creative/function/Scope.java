@@ -1,7 +1,5 @@
 package bee.creative.function;
 
-import bee.creative.function.Scopes.ExecuteScope;
-import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Comparables.Get;
 import bee.creative.util.Objects.UseToString;
 
@@ -41,10 +39,10 @@ public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 	public Object context();
 
 	/**
-	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} mit {@link ReturnValue call-by-reference}-Semantik zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das Kontextobjekt dieses {@link Scope Ausführungskontexts} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value Parameterwerten} entsteht.
+	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} mit {@link Value call-by-reference}-Semantik zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das Kontextobjekt dieses {@link Scope Ausführungskontexts} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value Parameterwerten} entsteht.
 	 * 
-	 * @see ReturnValue
-	 * @see ExecuteScope
+	 * @see Value
+	 * @see Function
 	 * @see #execute(Object, Function, int, Value...)
 	 * @param function {@link Function Funktion}.
 	 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts}.
@@ -56,10 +54,10 @@ public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 	public Value execute(Function function, int deleteCount, Value... insertValues) throws NullPointerException, IllegalArgumentException;
 
 	/**
-	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} mit {@link ReturnValue call-by-reference}-Semantik zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das gegebene Kontextobjekt {@code context} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value Parameterwerten} entsteht.
+	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} mit {@link Value call-by-reference}-Semantik zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das gegebene Kontextobjekt {@code context} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value Parameterwerten} entsteht.
 	 * 
-	 * @see ReturnValue
-	 * @see ExecuteScope
+	 * @see Value
+	 * @see Function
 	 * @param context Kontextobjekt.
 	 * @param function {@link Function Funktion}.
 	 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts}.
