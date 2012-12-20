@@ -1,9 +1,6 @@
 package bee.creative.xml.coder;
 
 import java.nio.charset.Charset;
-import java.util.regex.Pattern;
-import bee.creative.array.ArrayCopy;
-import bee.creative.array.ArrayData;
 
 public class Codecs {
 

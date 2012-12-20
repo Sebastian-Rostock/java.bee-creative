@@ -2,7 +2,7 @@ package bee.creative.xml.coder;
 
 import java.nio.charset.Charset;
 import java.util.BitSet;
-import bee.creative.array.ArrayCopy;
+import bee.creative.util.Bytes;
 import bee.creative.xml.coder.Decoder.DecodeDocument;
 import bee.creative.xml.coder.Decoder.DecodeItem;
 import bee.creative.xml.coder.Decoder.DecodeLabel;
@@ -107,7 +107,7 @@ return hash;</pre>
 	/**
 	 * Diese Methode dekodiert das gegebene {@code int}-Array in eine {@code byte}-Array und gibt dieses zurück.
 	 * 
-	 * @see ArrayCopy#copy(int[], int, byte[], int, int)
+	 * @see Bytes#set4(int[], int, byte[], int, int)
 	 * @param value {@code int}-Array.
 	 * @return {@code byte}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code int}-Array {@code null} ist.
@@ -116,7 +116,7 @@ return hash;</pre>
 		final int length = value.length << 2;
 		if(length == 0) return Coder.VOID_BYTES;
 		final byte[] array = new byte[length];
-		ArrayCopy.copy(value, 0, array, 0, length);
+		Bytes.set4(value, 0, array, 0, length);
 		return array;
 	}
 
@@ -135,7 +135,7 @@ return hash;</pre>
 	/**
 	 * Diese Methode dekodiert das gegebene {@code byte}-Array in eine {@code int}-Array und gibt dieses zurück.
 	 * 
-	 * @see ArrayCopy#copy(byte[], int, int[], int, int)
+	 * @see Bytes#get4(byte[], int, int[], int, int)
 	 * @param value {@code byte}-Array.
 	 * @return {@code int}-Array.
 	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
@@ -144,7 +144,7 @@ return hash;</pre>
 		final int length = value.length >> 2;
 		if(length == 0) return Coder.VOID_INTS;
 		final int[] array = new int[length];
-		ArrayCopy.copy(value, 0, array, 0, length);
+		Bytes.get4(value, 0, array, 0, length);
 		return array;
 	}
 
