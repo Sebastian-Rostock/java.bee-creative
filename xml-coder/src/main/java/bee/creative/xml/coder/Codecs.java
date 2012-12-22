@@ -47,5 +47,12 @@ public class Codecs {
 		}
 		
 	}
+	
+	public static class CodecPool {
+		
+		
+		
+		
+	}
 
 }
