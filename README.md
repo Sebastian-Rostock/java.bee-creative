@@ -22,10 +22,6 @@ Wer speicherminimale, modifizierbare Implementationen von `Map`, `NavigableMap`,
 
 ...
 
-### bee.creative.xml-coder
-
-...
-
 ---
 
 ##### [cc-by] Sebastian Rostock ( bee-creative@gmx.de )
