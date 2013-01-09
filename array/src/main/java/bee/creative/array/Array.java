@@ -144,7 +144,7 @@ public interface Array<GArray, GValue> {
 	public List<GValue> values();
 
 	/**
-	 * Diese Methode gibt den Abschnitt des intern verwalteten Arrays zurück, in dem sich die Werte dieses {@link Arrays} befinden. Der Abschnitt
+	 * Diese Methode gibt den Abschnitt des intern verwalteten Arrays zurück, in dem sich die Werte dieses {@link Arrays} befinden. 
 	 * 
 	 * @return mit Werten belegter Abschnitt des intern verwalteten Arrays.
 	 */
