@@ -1,7 +1,6 @@
 package bee.creative.function;
 
 import java.util.Arrays;
-import bee.creative.function.Functions.NullFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
@@ -96,17 +95,6 @@ public class Types {
 		public static final int ID = 0;
 
 		/**
-		 * Dieses Feld speichert den {@link NullType}.
-		 */
-		public static final NullType INSTANCE = new NullType();
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		NullType() {
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -154,11 +142,6 @@ public class Types {
 		public static final int ID = 1;
 
 		/**
-		 * Dieses Feld speichert den {@link ArrayType}.
-		 */
-		public static final ArrayType INSTANCE = new ArrayType();
-
-		/**
 		 * Dieses Feld speichert das leere {@link Value}{@code []}.
 		 */
 		static final Value[] NULL_DATA = {};
@@ -167,12 +150,6 @@ public class Types {
 		 * Dieses Feld speichert das leere {@link Value}{@code []} als {@link Value}.
 		 */
 		static final Value NULL_VALUE = ArrayValue.valueOf(ArrayType.NULL_DATA);
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		ArrayType() {
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -224,11 +201,6 @@ public class Types {
 		public static final int ID = 2;
 
 		/**
-		 * Dieses Feld speichert den {@link ObjectType}.
-		 */
-		public static final ObjectType INSTANCE = new ObjectType();
-
-		/**
 		 * Dieses Feld speichert ein {@link Object}.
 		 */
 		static final Object NULL_DATA = new Object();
@@ -237,12 +209,6 @@ public class Types {
 		 * Dieses Feld speichert ein {@link Object} als {@link Value}.
 		 */
 		static final Value NULL_VALUE = ObjectValue.valueOf(ObjectType.NULL_DATA);
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		ObjectType() {
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -297,20 +263,14 @@ public class Types {
 		public static final int ID = 3;
 
 		/**
-		 * Dieses Feld speichert den {@link FunctionType}.
+		 * Dieses Feld speichert die leere {@link Function}.
 		 */
-		public static final FunctionType INSTANCE = new FunctionType();
+		static final Function NULL_DATA = ValueFunction.valueOf(NullValue.INSTANCE);
 
 		/**
-		 * Dieses Feld speichert ein {@link Object} als {@link Value}.
+		 * Dieses Feld speichert die leere {@link Function} als {@link Value}.
 		 */
-		static final Value NULL_VALUE = FunctionValue.valueOf(NullFunction.INSTANCE);
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		FunctionType() {
-		}
+		static final Value NULL_VALUE = FunctionValue.valueOf(NULL_DATA);
 
 		/**
 		 * {@inheritDoc}
@@ -323,7 +283,7 @@ public class Types {
 		/**
 		 * {@inheritDoc}
 		 * <ul>
-		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link FunctionType} und sein Datensatz nicht {@code null} sind, wird sein Datensatz unverändert zurück gegeben.</li>
 		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} umgewandelt und zurück gegeben.</li>
 		 * </ul>
 		 * 
@@ -332,7 +292,7 @@ public class Types {
 		@Override
 		public Function dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			final Object data = value.data();
-			if(data == null) return NullFunction.INSTANCE;
+			if(data == null) return FunctionType.NULL_DATA;
 			if(value.type().id() == FunctionType.ID) return (Function)data;
 			return ValueFunction.valueOf(value);
 		}
@@ -340,8 +300,8 @@ public class Types {
 		/**
 		 * {@inheritDoc}
 		 * <ul>
-		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@link NullFunction#INSTANCE} zurück gegeben.</li>
-		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} umgewandelt und zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link FunctionType} und sein Datensatz nicht {@code null} sind, wird der {@link Value} unverändert zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} und {@link FunctionValue#valueOf(Function)} umgewandelt und zurück gegeben.</li>
 		 * </ul>
 		 * 
 		 * @see FunctionType#dataOf(Value)
@@ -372,11 +332,6 @@ public class Types {
 		public static final int ID = 4;
 
 		/**
-		 * Dieses Feld speichert den {@link StringType}.
-		 */
-		public static final StringType INSTANCE = new StringType();
-
-		/**
 		 * Dieses Feld speichert {@code ""} als {@link Double}.
 		 */
 		static final String NULL_DATA = "";
@@ -385,12 +340,6 @@ public class Types {
 		 * Dieses Feld speichert {@code ""} als {@link Value}.
 		 */
 		static final Value NULL_VALUE = StringValue.valueOf(StringType.NULL_DATA);
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		StringType() {
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -478,11 +427,6 @@ public class Types {
 		public static final int ID = 5;
 
 		/**
-		 * Dieses Feld speichert den {@link NumberType}.
-		 */
-		public static final NumberType INSTANCE = new NumberType();
-
-		/**
 		 * Dieses Feld speichert {@code NaN} als {@link Double}.
 		 */
 		static final Number NULL_DATA = Double.valueOf(Double.NaN);
@@ -511,12 +455,6 @@ public class Types {
 		 * Dieses Feld speichert {@code 0} als {@link Value}.
 		 */
 		static final Value FALSE_VALUE = NumberValue.valueOf(NumberType.FALSE_DATA);
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		NumberType() {
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -596,17 +534,6 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 6;
-
-		/**
-		 * Dieses Feld speichert den {@link BooleanType}.
-		 */
-		public static final BooleanType INSTANCE = new BooleanType();
-
-		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		BooleanType() {
-		}
 
 		/**
 		 * {@inheritDoc}

@@ -105,6 +105,11 @@ public final class Values {
 	public static final class NullValue extends AbstractValue<Object> {
 
 		/**
+		 * Dieses Feld speichert den {@link NullType}.
+		 */
+		public static final NullType TYPE = new NullType();
+
+		/**
 		 * Dieses Feld speichert den {@link NullValue} für {@code null}.
 		 */
 		public static final Value INSTANCE = new NullValue();
@@ -121,12 +126,6 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-		 */
-		NullValue() {
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -139,7 +138,7 @@ public final class Values {
 		 */
 		@Override
 		public NullType type() {
-			return NullType.INSTANCE;
+			return NullValue.TYPE;
 		}
 
 	}
@@ -151,6 +150,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ArrayValue extends AbstractValue<Value[]> {
+
+		/**
+		 * Dieses Feld speichert den {@link ArrayType}.
+		 */
+		public static final ArrayType TYPE = new ArrayType();
 
 		/**
 		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
@@ -343,7 +347,7 @@ public final class Values {
 		 */
 		@Override
 		public ArrayType type() {
-			return ArrayType.INSTANCE;
+			return ArrayValue.TYPE;
 		}
 
 		/**
@@ -363,6 +367,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ObjectValue extends AbstractValue<Object> {
+
+		/**
+		 * Dieses Feld speichert den {@link ObjectType}.
+		 */
+		public static final ObjectType TYPE = new ObjectType();
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes wird hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
@@ -411,7 +420,7 @@ public final class Values {
 		 */
 		@Override
 		public ObjectType type() {
-			return ObjectType.INSTANCE;
+			return ObjectValue.TYPE;
 		}
 
 		/**
@@ -431,6 +440,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class FunctionValue extends AbstractValue<Function> {
+
+		/**
+		 * Dieses Feld speichert den {@link FunctionType}.
+		 */
+		public static final FunctionType TYPE = new FunctionType();
 
 		/**
 		 * Diese Methode konvertiert die gegebene {@link Function} in einen {@link Value} und gibt diesen zurück.
@@ -464,7 +478,7 @@ public final class Values {
 		 */
 		@Override
 		public FunctionType type() {
-			return FunctionType.INSTANCE;
+			return FunctionValue.TYPE;
 		}
 
 		/**
@@ -484,6 +498,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class StringValue extends AbstractValue<String> {
+
+		/**
+		 * Dieses Feld speichert den {@link StringType}.
+		 */
+		public static final StringType TYPE = new StringType();
 
 		/**
 		 * Diese Methode konvertiert den gegebenen {@link String} in einen {@link Value} und gibt diesen zurück.
@@ -517,7 +536,7 @@ public final class Values {
 		 */
 		@Override
 		public StringType type() {
-			return StringType.INSTANCE;
+			return StringValue.TYPE;
 		}
 
 		/**
@@ -537,6 +556,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class NumberValue extends AbstractValue<Number> {
+
+		/**
+		 * Dieses Feld speichert den {@link NumberType}.
+		 */
+		public static final NumberType TYPE = new NumberType();
 
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link Value} und gibt diesen zurück.
@@ -610,7 +634,7 @@ public final class Values {
 		 */
 		@Override
 		public NumberType type() {
-			return NumberType.INSTANCE;
+			return NumberValue.TYPE;
 		}
 
 		/**
@@ -630,6 +654,11 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class BooleanValue extends AbstractValue<Boolean> {
+
+		/**
+		 * Dieses Feld speichert den {@link BooleanType}.
+		 */
+		public static final BooleanType TYPE = new BooleanType();
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#TRUE}.
@@ -683,7 +712,7 @@ public final class Values {
 		 */
 		@Override
 		public BooleanType type() {
-			return BooleanType.INSTANCE;
+			return BooleanValue.TYPE;
 		}
 
 		/**
