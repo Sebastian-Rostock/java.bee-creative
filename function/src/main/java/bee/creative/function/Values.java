@@ -112,7 +112,7 @@ public final class Values {
 		/**
 		 * Dieses Feld speichert den {@link NullValue} für {@code null}.
 		 */
-		public static final Value INSTANCE = new NullValue();
+		public static final NullValue INSTANCE = new NullValue();
 
 		/**
 		 * Diese Methode gibt den gegebenen {@link Value} oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
@@ -157,11 +157,33 @@ public final class Values {
 		public static final ArrayType TYPE = new ArrayType();
 
 		/**
+		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link ArrayValue} und gibt diesen oder {@code null} zurück. Wenn der Datensatz kein Array ist, wird {@link NullPointerException} zurück gegeben.
+		 * 
+		 * @param data Datensatz.
+		 * @return {@link ArrayValue} oder {@code null}.
+		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
+		 */
+		static ArrayValue valueOf(final Object data) throws NullPointerException {
+			final Class<?> clazz = data.getClass();
+			if(!clazz.isArray()) return null;
+			if(clazz == int[].class) return ArrayValue.valueOf((int[])data);
+			if(clazz == long[].class) return ArrayValue.valueOf((long[])data);
+			if(clazz == byte[].class) return ArrayValue.valueOf((byte[])data);
+			if(clazz == char[].class) return ArrayValue.valueOf((char[])data);
+			if(clazz == short[].class) return ArrayValue.valueOf((short[])data);
+			if(clazz == float[].class) return ArrayValue.valueOf((float[])data);
+			if(clazz == double[].class) return ArrayValue.valueOf((double[])data);
+			if(clazz == boolean[].class) return ArrayValue.valueOf((boolean[])data);
+			if(clazz == Value[].class) return ArrayValue.valueOf((Value[])data);
+			return ArrayValue.valueOf((Object[])data);
+		}
+
+		/**
 		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link Value Wert} und gibt diesen zurück.
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final byte[] data) throws NullPointerException {
 			final int size = data.length;
@@ -177,7 +199,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final short[] data) throws NullPointerException {
 			final int size = data.length;
@@ -193,7 +215,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final char[] data) throws NullPointerException {
 			final int size = data.length;
@@ -209,7 +231,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final int[] data) throws NullPointerException {
 			final int size = data.length;
@@ -225,7 +247,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final long[] data) throws NullPointerException {
 			final int size = data.length;
@@ -241,7 +263,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final float[] data) throws NullPointerException {
 			final int size = data.length;
@@ -257,7 +279,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final double[] data) throws NullPointerException {
 			final int size = data.length;
@@ -273,7 +295,7 @@ public final class Values {
 		 * 
 		 * @param data Wahrheitswertliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final boolean[] data) throws NullPointerException {
 			final int size = data.length;
@@ -289,9 +311,9 @@ public final class Values {
 		 * 
 		 * @param data Objektliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static ArrayValue valueOf(final Object... data) throws NullPointerException {
+		public static ArrayValue valueOf(final Object[] data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
@@ -305,7 +327,7 @@ public final class Values {
 		 * 
 		 * @param data Wertliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final Value[] data) throws NullPointerException {
 			final int size = data.length;
@@ -386,17 +408,9 @@ public final class Values {
 			if(data instanceof Number) return NumberValue.valueOf((Number)data);
 			if(data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
 			if(data instanceof Function) return FunctionValue.valueOf((Function)data);
-			final Class<?> clazz = data.getClass();
-			if(!clazz.isArray()) return new ObjectValue(data);
-			if(clazz == int[].class) return ArrayValue.valueOf((int[])data);
-			if(clazz == long[].class) return ArrayValue.valueOf((long[])data);
-			if(clazz == byte[].class) return ArrayValue.valueOf((byte[])data);
-			if(clazz == char[].class) return ArrayValue.valueOf((char[])data);
-			if(clazz == short[].class) return ArrayValue.valueOf((short[])data);
-			if(clazz == float[].class) return ArrayValue.valueOf((float[])data);
-			if(clazz == double[].class) return ArrayValue.valueOf((double[])data);
-			if(clazz == boolean[].class) return ArrayValue.valueOf((boolean[])data);
-			return ArrayValue.valueOf((Object[])data);
+			final Value value = ArrayValue.valueOf(data);
+			if(value == null) return new ObjectValue(data);
+			return value;
 		}
 
 		/**
