@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>bee-creative</name>
 	<description>Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, 
