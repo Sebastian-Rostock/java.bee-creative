@@ -11,9 +11,9 @@ package bee.creative.function;
 public interface Value {
 
 	/**
-	 * Diese Methode gibt den {@link Type} zurück.
+	 * Diese Methode gibt den {@link Type Datentyp} zurück.
 	 * 
-	 * @return {@link Type}.
+	 * @return {@link Type Datentyp}.
 	 */
 	public Type<?> type();
 

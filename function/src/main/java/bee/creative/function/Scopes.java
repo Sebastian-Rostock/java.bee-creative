@@ -353,8 +353,8 @@ public final class Scopes {
 		 */
 		public ExecuteScope(final Scope scope, final Object context, final int deleteCount, final Value... insertValues) throws NullPointerException,
 			IllegalArgumentException {
-			if(scope == null || Arrays.asList(insertValues).contains(null)) throw new NullPointerException();
-			if(deleteCount < 0 || deleteCount > scope.size()) throw new IllegalArgumentException();
+			if((scope == null) || Arrays.asList(insertValues).contains(null)) throw new NullPointerException();
+			if((deleteCount < 0) || (deleteCount > scope.size())) throw new IllegalArgumentException();
 			this.scope = scope;
 			this.context = context;
 			this.deleteCount = deleteCount;

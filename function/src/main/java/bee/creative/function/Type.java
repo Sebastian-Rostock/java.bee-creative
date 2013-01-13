@@ -33,7 +33,7 @@ public interface Type<GData> {
 	 * @param value {@link Value}.
 	 * @return konvertierter Datensatz.
 	 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein znzulässiger {@code cast} vorkommt.
+	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s} konvertiert werden kann.
 	 */
 	public GData dataOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
@@ -47,7 +47,7 @@ public interface Type<GData> {
 	 * @param value {@link Value}.
 	 * @return {@link Value} mit konvertiertem Datensatz.
 	 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein znzulässiger {@code cast} vorkommt.
+	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s} konvertiert werden kann.
 	 */
 	public Value valueOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;

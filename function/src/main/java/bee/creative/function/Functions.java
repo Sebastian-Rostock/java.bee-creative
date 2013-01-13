@@ -4,7 +4,6 @@ import bee.creative.function.Scopes.AbstractScope.ReturnValue;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.NullValue;
-import bee.creative.function.Values.ObjectValue;
 import bee.creative.util.Objects;
 
 /**
@@ -67,13 +66,13 @@ public final class Functions {
 		/**
 		 * Diese Methode erzeugt eine {@link Function} mit konstantem {@link Value Ergebniswert} und gibt diese zurück.
 		 * 
-		 * @see ObjectValue#valueOf(Object)
+		 * @see Values#valueOf(Object)
 		 * @param data {@link Value Ergebniswert}.
 		 * @return {@link ValueFunction}.
 		 */
 		public static Function valueOf(final Object data) {
 			if(data == null) return ValueFunction.NULL_FUNCTION;
-			return new ValueFunction(ObjectValue.valueOf(data));
+			return new ValueFunction(Values.valueOf(data));
 		}
 
 		/**
