@@ -45,6 +45,22 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || (object instanceof ArrayFunction);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
 			return Objects.toStringCall("ArrayFunction");
 		}
@@ -100,6 +116,15 @@ public final class Functions {
 		public ValueFunction(final Value value) throws NullPointerException {
 			if(value == null) throw new NullPointerException();
 			this.value = value;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Value Ergebniswert} zurück.
+		 * 
+		 * @return {@link Value Ergebniswert}.
+		 */
+		public Value value() {
+			return this.value;
 		}
 
 		/**
@@ -182,6 +207,15 @@ public final class Functions {
 		}
 
 		/**
+		 * Diese Methode gibt den Index des {@link Scope#get(int) Parameterwerts} zurück.
+		 * 
+		 * @return Index des {@link Scope#get(int) Parameterwerts}.
+		 */
+		public int index() {
+			return this.index;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -261,6 +295,24 @@ public final class Functions {
 		}
 
 		/**
+		 * Diese Methode gibt die aufzurufende {@link Function Funktion} zurück.
+		 * 
+		 * @return aufzurufende {@link Function Funktion}.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		/**
+		 * Diese Methode gibt eine Kopie der {@link Function Parameterfunktionen} zurück.
+		 * 
+		 * @return Kopie der {@link Function Parameterfunktionen}.
+		 */
+		public Function[] functions() {
+			return this.functions.clone();
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -284,7 +336,7 @@ public final class Functions {
 			if(object == this) return true;
 			if(!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;
-			return Objects.equals(this.function, data.function) && Objects.equalsEx(this.functions, data.functions);
+			return Objects.equals(this.function, data.function) && Objects.equals(this.functions, data.functions);
 		}
 
 		/**

@@ -102,14 +102,6 @@ public final class Scopes {
 			}
 
 			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
-				return this.value().valueTo(type);
-			}
-
-			/**
 			 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem {@link Scope Ausführungskontext} zurück.
 			 * 
 			 * @see Function#execute(Scope)
@@ -125,6 +117,32 @@ public final class Scopes {
 				this.scope = null;
 				this.function = null;
 				return value;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+				return this.value().valueTo(type);
+			}
+
+			/**
+			 * Diese Methode gibt den {@link Scope Ausführungskontext} oder {@code null} zurück. Der erste Aufruf von {@link #value()} setzt den {@link Scope Ausführungskontext} auf {@code null}.
+			 * 
+			 * @return {@link Scope Ausführungskontext} oder {@code null}.
+			 */
+			public Scope scope() {
+				return this.scope;
+			}
+
+			/**
+			 * Diese Methode gibt die {@link Function Funktion} oder {@code null} zurück. Der erste Aufruf von {@link #value()} setzt die {@link Function Funktion} auf {@code null}.
+			 * 
+			 * @return {@link Function Funktion} oder {@code null}.
+			 */
+			public Function function() {
+				return this.function;
 			}
 
 			/**
@@ -254,7 +272,7 @@ public final class Scopes {
 		/**
 		 * Dieser Konstrukteur initialisiert Kontextobjekt und {@link Value Parameterwerte}.
 		 * 
-		 * @see ArrayValue#valueOf(Object...)
+		 * @see ArrayValue#valueOf(Object[])
 		 * @param context Kontextobjekt.
 		 * @param values {@link Value Parameterwerte}.
 		 */
@@ -268,12 +286,23 @@ public final class Scopes {
 		 * 
 		 * @param context Kontextobjekt.
 		 * @param values {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
+		 * @see ArrayValue#valueOf(Value[])
 		 */
-		public DefaultScope(final Object context, final Value[] values) throws NullPointerException {
-			if(Arrays.asList(values).contains(null)) throw new NullPointerException();
-			this.values = values;
+		public DefaultScope(final Object context, final Value[] values) {
+			this.values = ArrayValue.valueOf(values).data();
 			this.context = context;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @throws NullPointerException Wenn der {@code index}-ter {@link Value Parameterwert} {@code null} ist.
+		 */
+		@Override
+		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
+			final Value value = this.values[index];
+			if(value == null) throw new NullPointerException();
+			return value;
 		}
 
 		/**
@@ -285,11 +314,12 @@ public final class Scopes {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode gibt eine Kopie der {@link Value Parameterwerte} zurück.
+		 * 
+		 * @return Kopie der {@link Value Parameterwerte}.
 		 */
-		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
-			return this.values[index];
+		public Value[] values() {
+			return this.values.clone();
 		}
 
 		/**
@@ -348,12 +378,12 @@ public final class Scopes {
 		 * @param context Kontextobjekt.
 		 * @param deleteCount Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} des gegebenen {@link Scope Ausführungskontexts}.
 		 * @param insertValues Array der ersten {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext}, die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl ungültig ist.
 		 */
 		public ExecuteScope(final Scope scope, final Object context, final int deleteCount, final Value... insertValues) throws NullPointerException,
 			IllegalArgumentException {
-			if((scope == null) || Arrays.asList(insertValues).contains(null)) throw new NullPointerException();
+			if((scope == null) || (insertValues == null)) throw new NullPointerException();
 			if((deleteCount < 0) || (deleteCount > scope.size())) throw new IllegalArgumentException();
 			this.scope = scope;
 			this.context = context;
@@ -365,19 +395,30 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int size() {
-			return (this.scope.size() + this.insertValues.length) - this.deleteCount;
+		public Value get(final int index) throws IndexOutOfBoundsException {
+			final Value[] insertValues = this.insertValues;
+			final int length = insertValues.length;
+			if(index >= length) return this.scope.get((index + this.deleteCount) - length);
+			final Value value = insertValues[index];
+			if(value == null) throw new NullPointerException();
+			return value;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
-			final Value[] insertValues = this.insertValues;
-			final int length = insertValues.length;
-			if(index < length) return insertValues[index];
-			return this.scope.get((index + this.deleteCount) - length);
+		public int size() {
+			return (this.scope.size() + this.insertValues.length) - this.deleteCount;
+		}
+
+		/**
+		 * Diese Methode gibt den aufrufenden {@link Scope Ausführungskontext} zurück, dessen {@link Value Parameterwerte} virtuel modifiziert werden.
+		 * 
+		 * @return aufrufender {@link Scope Ausführungskontext}.
+		 */
+		public Scope scope() {
+			return this.scope;
 		}
 
 		/**
@@ -386,6 +427,24 @@ public final class Scopes {
 		@Override
 		public Object context() {
 			return this.context;
+		}
+
+		/**
+		 * Diese Methode gibt Anzahl der vom aufrufenden {@link Scope Ausführungskontext} virtuel zu entfernenden {@link Value Parameterwerte} zurück.
+		 * 
+		 * @return Anzahl der virtuel zu entfernenden {@link Value Parameterwerte}.
+		 */
+		public int deleteCount() {
+			return this.deleteCount;
+		}
+
+		/**
+		 * Diese Methode gibt eine Kopie der ersten {@link Value Parameterwerte} zurück.
+		 * 
+		 * @return Kopie der ersten {@link Value Parameterwerte}.
+		 */
+		public Value[] insertValues() {
+			return this.insertValues.clone();
 		}
 
 		/**
@@ -441,14 +500,6 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int size() {
-			return this.values.length;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public ReturnValue get(final int index) throws IndexOutOfBoundsException {
 			final ReturnValue[] values = this.values;
 			ReturnValue value = values[index];
@@ -462,8 +513,34 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int size() {
+			return this.values.length;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen} zurück.
+		 * 
+		 * @return {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public Object context() {
 			return this.scope.context();
+		}
+
+		/**
+		 * Diese Methode gibt eine Kopie der {@link Function Parameterfunktionen} zurück.
+		 * 
+		 * @return Kopie der {@link Function Parameterfunktionen}.
+		 */
+		public Function[] functions() {
+			return this.functions.clone();
 		}
 
 		/**
