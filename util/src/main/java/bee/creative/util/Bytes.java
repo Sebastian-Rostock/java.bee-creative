@@ -10,7 +10,7 @@ public final class Bytes {
 	/**
 	 * Diese Methode ließt {@code 1 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück.
 	 * 
-	 * @see #set2(byte[], int, int)
+	 * @see #set1(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
 	 * @return {@code 1 byte}-Wert als {@code int}.
