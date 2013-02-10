@@ -3,7 +3,10 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.util.Iterators.ChainedIterator;
+import bee.creative.util.Iterators.EntryIterator;
 import bee.creative.util.Iterators.EntryLink;
+import bee.creative.util.Iterators.UnmodifiableIterator;
 import bee.creative.util.Objects.UseToString;
 
 /**
@@ -330,7 +333,7 @@ public final class Iterables {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			return Iterators.entryIterator(this.entry);
+			return EntryIterator.of(this.entry);
 		}
 
 		/**
@@ -484,7 +487,7 @@ public final class Iterables {
 		 */
 		@Override
 		public final Iterator<GEntry> iterator() {
-			return Iterators.chainedIterator(Iterators.convertedIterator(Iterables.<GEntry>iterableIteratorConverter(),
+			return ChainedIterator.chainedIterator(Iterators.convertedIterator(Iterables.<GEntry>iterableIteratorConverter(),
 				this.iterables.iterator()));
 		}
 
@@ -638,7 +641,7 @@ public final class Iterables {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			return Iterators.unmodifiableIterator(this.iterable.iterator());
+			return UnmodifiableIterator.of(this.iterable.iterator());
 		}
 
 		/**
@@ -1017,7 +1020,7 @@ public final class Iterables {
 	 * Diese Methode erzeugt einen verketteten {@link Iterable}, der alle Elemente der gegebenen {@link Iterable}s in der
 	 * gegebenen Reihenfolge liefert, und gibt ihn zurück.
 	 * 
-	 * @see Iterators#chainedIterator(Iterator)
+	 * @see ChainedIterator#chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable}-{@link Iterable}.
 	 * @return {@link ChainedIterable}.

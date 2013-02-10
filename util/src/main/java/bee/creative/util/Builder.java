@@ -1,8 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Schnittstelle definiert eine Methode zur Erzeugung bzw. Bereitstellung eines (neuen) Datensatzes vom Typ
- * {@code GData}.
+ * Diese Schnittstelle definiert eine Methode zur Erzeugung eines Datensatzes.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GData> Typ des Datensatzes.
@@ -10,10 +9,10 @@ package bee.creative.util;
 public interface Builder<GData> {
 
 	/**
-	 * Diese Methode gibt eine einen (neuen) Datensatz zurück.
+	 * Diese Methode erzeugt einen Datensatz und gibt ihn zurück.
 	 * 
-	 * @return (neuer) Datensatz.
+	 * @return Datensatz.
 	 */
-	public GData build();
+	public GData create();
 
 }

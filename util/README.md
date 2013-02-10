@@ -131,14 +131,14 @@ Zwischenspeicherung
 *Quelltext:*
 
 	public final class Helper {
-		private static final Builder<Helper> BUILDER = Builders.synchronizedBuilder(Builders.cachedBuilder(Pointers.SOFT, new Builder<Helper>() {	
+		private static final Builder<Helper> BUILDER = SynchronizedBuilder.of(CachedBuilder.of(Pointers.SOFT, new Builder<Helper>() {	
 			@Override
-			public Helper build() {
+			public Helper create() {
 				return new Helper();
 			}			
 		}));	
 		public static Helper get() {
-			return Helper.BUILDER.build();
+			return Helper.BUILDER.create();
 		}	
 		Helper() {
 			...

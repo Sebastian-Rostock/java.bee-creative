@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten},
- * {@link Object#equals(Object) Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
+ * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten}, {@link Object#equals(Object) Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
  * 
  * @see Object#hashCode()
  * @see Object#equals(Object)
@@ -18,9 +17,7 @@ import java.util.Map.Entry;
 public final class Objects {
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via
-	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen
-	 * Objekts entspricht.
+	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -69,9 +66,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via
-	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} eines gegebenen
-	 * Objekts entspricht.
+	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} eines gegebenen Objekts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -107,9 +102,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via
-	 * {@link Objects#toString(boolean, Object)} ermittelten formatierten {@link Object#toString() Textdarstelung} eines
-	 * gegebenen Objekts entspricht.
+	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten formatierten {@link Object#toString() Textdarstelung} eines gegebenen Objekts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -145,9 +138,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)},
-	 * sodass diese für Objekte mit dieser Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode
-	 * verwendet.
+	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}, sodass diese für Objekte mit dieser Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode verwendet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -155,8 +146,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in
-	 * eine {@link Object#toString() Textdarstelung} umwandelt.
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
 	 */
 	static final Converter<Object, String> NORMAL_STRING_CONVERTER = new Converter<Object, String>() {
 
@@ -173,8 +163,7 @@ public final class Objects {
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in
-	 * eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
+	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
 	 */
 	static final Converter<Object, String> FORMAT_STRING_CONVERTER = new Converter<Object, String>() {
 
@@ -191,8 +180,7 @@ public final class Objects {
 	};
 
 	/**
-	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von
-	 * {@code "\n"} durch {@code "\n  "} ersetzt.
+	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
 	 * 
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug.
@@ -210,11 +198,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für
-	 * eine bessere Lesbarkeit der Zeichenkette können deren hierarchische Formatierung sowie die Erhöhung des Einzugs
-	 * aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
-	 * {@link Object#toString()}-Methode zurück gegeben.
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis {@link Object#toString()}-Methode zurück gegeben.
 	 * 
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -241,8 +225,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
-	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Map} oder {@code null}.
@@ -255,16 +238,14 @@ public final class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
 		for(final Entry<?, ?> entry: object.entrySet()){
-			output.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ")
-				.append(Objects.toString(format, format, entry.getValue()));
+			output.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
 		}
 		return output.append((format ? "\n}" : " }")).toString();
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
-	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -286,8 +267,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link String} als {@link Object#toString() Textdarstelung} zurück. Für eine
-	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt den gegebenen {@link String} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param object {@link String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -320,8 +300,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene {@link Iterable} als {@link Object#toString() Textdarstelung} zurück. Für eine
-	 * bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
+	 * Diese Methode gibt das gegebene {@link Iterable} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden.
 	 * 
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Iterable} oder {@code null}.
@@ -391,12 +370,11 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object object1, final Object object2, final Object object3) {
-		return (Objects.hash(object1, object2) * 0x01000193)^ Objects.hash(object3);
+		return (Objects.hash(object1, object2) * 0x01000193) ^ Objects.hash(object3);
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Arrays#hashCode(int[])
 	 * @see Arrays#hashCode(long[])
@@ -426,8 +404,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#hashEx(Object)
 	 * @param objects Objekte oder {@code null}.
@@ -437,14 +414,13 @@ public final class Objects {
 		if(objects == null) return 0;
 		int hash = 0x811C9DC5;
 		for(final Object object: objects){
-			hash = (hash*0x01000193) ^ Objects.hashEx(object);
+			hash = (hash * 0x01000193) ^ Objects.hashEx(object);
 		}
 		return hash;
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#hashEx(Object)
 	 * @see Objects#hashEx(Object...)
@@ -453,12 +429,11 @@ public final class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hashEx(final Object object1, final Object object2) {
-		return ((0x50C5D1F ^ Objects.hashEx(object1))*0x01000193) ^Objects.hashEx(object2);
+		return ((0x50C5D1F ^ Objects.hashEx(object1)) * 0x01000193) ^ Objects.hashEx(object2);
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#hashEx(Object)
 	 * @see Objects#hashEx(Object...)
@@ -472,9 +447,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
@@ -489,8 +462,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * {@code null}-Eingaben. Der Rückgabewert entspricht:
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
@@ -505,9 +477,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei
-	 * {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via
-	 * {@link Objects#equals(Object, Object)} ermittelt.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
@@ -526,9 +496,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @see Objects#equals(Object...)
@@ -543,9 +511,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equals(Object, Object)}.
 	 * 
 	 * @see Objects#equals(Object, Object)
 	 * @see Objects#equals(Object...)
@@ -557,16 +523,13 @@ public final class Objects {
 	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4,
-		final Object object5, final Object object6) {
+	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4, final Object object5,
+		final Object object6) {
 		return Objects.equals(object1, object2) && Objects.equals(object3, object4) && Objects.equals(object5, object6);
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#equalsEx(Object, Object)
 	 * @param objects Objekte oder {@code null}.
@@ -581,9 +544,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei
-	 * {@code null}-Eingaben und Arrays. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse
-	 * {@link Arrays} verwendet. Wenn beide Objekte keine Arrays sind, entspricht der Rückgabewert:
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben und Arrays. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Wenn beide Objekte keine Arrays sind, entspricht der Rückgabewert:
 	 * 
 	 * <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equalsEx(object2))
@@ -621,10 +582,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei
-	 * {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via
-	 * {@link Objects#equalsEx(Object, Object)} ermittelt. Für Arrays werden die entsprechenden Hilfsmethoden aus der
-	 * Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#equalsEx(Object, Object)} ermittelt. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#equalsEx(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
@@ -643,10 +601,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#equalsEx(Object, Object)
 	 * @see Objects#equalsEx(Object...)
@@ -661,10 +616,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und
-	 * tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und
-	 * {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays
-	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#equalsEx(Object, Object)
 	 * @see Objects#equalsEx(Object...)
@@ -676,16 +628,13 @@ public final class Objects {
 	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean equalsEx(final Object object1, final Object object2, final Object object3,
-		final Object object4, final Object object5, final Object object6) {
-		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4)
-			&& Objects.equalsEx(object5, object6);
+	public static boolean equalsEx(final Object object1, final Object object2, final Object object3, final Object object4, final Object object5,
+		final Object object6) {
+		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4) && Objects.equalsEx(object5, object6);
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Der
-	 * Rückgabewert entspricht:
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * Objects.toString(false, object)
@@ -700,11 +649,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für
-	 * {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für
-	 * eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Sollte das
-	 * gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString()
-	 * toString()}-Methode zurück gegeben.
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode zurück gegeben.
 	 * 
 	 * @see Objects#toString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -716,9 +661,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via
-	 * {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen
-	 * Objekts entspricht, und gibt es zurück.
+	 * Diese Methode erzeugt ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht, und gibt es zurück.
 	 * 
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -730,8 +673,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Objects#toString(boolean, Object)}
-	 * in eine {@link Object#toString() Textdarstelung} umwandelt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
 	 * 
 	 * @see Converter
 	 * @see Objects#toString(boolean, Object)
@@ -743,8 +685,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert
-	 * entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * Objects.toStringCall(false, name, args)
@@ -761,8 +702,7 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
-	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Der Rückgabewert entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
 	 * Objects.toStringCall(format, false, name, args)
@@ -775,27 +715,21 @@ public final class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final String name, final Object... args)
-		throws NullPointerException {
+	public static String toStringCall(final boolean format, final String name, final Object... args) throws NullPointerException {
 		return Objects.toStringCall(format, false, name, args);
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere
-	 * Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung
-	 * aktiviert wird, werden die Argumente beschriftete Parameter interpretiert. Ein beschrifteter Parameter besteht
-	 * hierbei aus einem Namen {@code args[i]} und einem Wert {@code args[i+1]} für jede gerade Position {@code i}.
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente beschriftete Parameter interpretiert. Ein beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und einem Wert {@code args[i+1]} für jede gerade Position {@code i}.
 	 * 
 	 * @param name Funktionsname.
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array
-	 *         {@code null} ist.
+	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args)
-		throws NullPointerException {
+	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
 		if(name == null) throw new NullPointerException("name is null");
 		if(args == null) throw new NullPointerException("args is null");
 		final StringBuilder output = new StringBuilder(name);
@@ -804,8 +738,7 @@ public final class Objects {
 			final String comma = (format ? ",\n  " : ", ");
 			if(label){
 				for(int i = 0, size = args.length - 1; i < size; i += 2){
-					output.append(join).append(Objects.toString(format, format, args[i])).append(" = ")
-						.append(Objects.toString(format, format, args[i + 1]));
+					output.append(join).append(Objects.toString(format, format, args[i])).append(" = ").append(Objects.toString(format, format, args[i + 1]));
 					join = comma;
 				}
 			}else{
@@ -819,6 +752,19 @@ public final class Objects {
 			output.append("()");
 		}
 		return output.toString();
+	}
+
+	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
+		return Objects.toStringCall(false, object, args);
+	}
+
+	public static String toStringCall(final boolean format, final Object object, final Object... args) throws NullPointerException {
+		return Objects.toStringCall(format, false, object, args);
+	}
+
+	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+		if(object == null) throw new NullPointerException("object is null");
+		return Objects.toStringCall(format, label, object.getClass().getSimpleName(), args);
 	}
 
 	/**

@@ -1,8 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer
- * {@link Test Testmethode} benötigt werden.
+ * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Test Testmethode} benötigt werden.
  * <p>
  * Im nachfolgenden Beispiel wird eine anonyme {@link Test Testmethode} initialisiert und gleich vermessen:
  * 
@@ -28,8 +27,7 @@ public class Tester {
 	public static interface Test {
 
 		/**
-		 * Diese Methode führt den Test aus. Ein gegebenenfalls geworfenes {@link Throwable} wird dann im {@link Tester}
-		 * gespeichert.
+		 * Diese Methode führt den Test aus. Ein gegebenenfalls geworfenes {@link Throwable} wird dann im {@link Tester} gespeichert.
 		 * 
 		 * @throws Throwable Wenn während des Tests ein Fehler eintritt.
 		 */
@@ -45,8 +43,7 @@ public class Tester {
 	public static final class Updater extends Thread {
 
 		/**
-		 * Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die
-		 * Messung beendet werden soll.
+		 * Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll.
 		 */
 		int millis;
 
@@ -175,8 +172,7 @@ public class Tester {
 	public final Throwable throwable;
 
 	/**
-	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der
-	 * Speicherbelegung erfolgt synchron von und nach dem Aufruf der Testmethode.
+	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem Aufruf der Testmethode.
 	 * 
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
@@ -186,8 +182,7 @@ public class Tester {
 	}
 
 	/**
-	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval
-	 * größer als {@code 0} ist, wird ein {@link Thread} zur asynchronen Messung der Speicherbelegung verwendet.
+	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein {@link Thread} zur asynchronen Messung der Speicherbelegung verwendet.
 	 * 
 	 * @param millis Interval der asynchronen Messung der Speicherbelegung in Millisekunden oder {@code 0}.
 	 * @param method Testmethode.
@@ -247,9 +242,8 @@ public class Tester {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(false, true, "Tester", "usedTime", this.usedTime, "usedMemory", this.usedMemory,
-			"enterTime", this.enterTime, "leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory",
-			this.leaveMemory);
+		return Objects.toStringCall(false, true, this, new Object[]{"usedTime", this.usedTime, "usedMemory", this.usedMemory, "enterTime", this.enterTime,
+			"leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory", this.leaveMemory});
 	}
 
 }

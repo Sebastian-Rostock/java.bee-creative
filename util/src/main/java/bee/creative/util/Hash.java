@@ -242,7 +242,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		final int index = this.getIndex(hash, table.length);
 		for(@SuppressWarnings ("unchecked")
 		GEntry entry = (GEntry)table[index]; entry != null; entry = this.getEntryNext(entry)){
-			if(this.getEntryEquals(entry, key, index)) return entry;
+			if(this.getEntryEquals(entry, key, hash)) return entry;
 		}
 		return null;
 	}
