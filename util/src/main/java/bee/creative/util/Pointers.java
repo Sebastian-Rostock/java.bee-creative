@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import bee.creative.util.Converters.AbstractConverter;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer}n.
@@ -9,7 +10,7 @@ import java.lang.ref.WeakReference;
  * @see Pointer
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Pointers {
+public class Pointers {
 
 	/**
 	 * Diese Klasse implementiert den {@link Pointer} auf {@code null}.
@@ -36,7 +37,7 @@ public final class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.hashCode(this);
+			return Pointers.hash(this);
 		}
 
 		/**
@@ -92,7 +93,7 @@ public final class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.hashCode(this);
+			return Pointers.hash(this);
 		}
 
 		/**
@@ -144,7 +145,7 @@ public final class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.hashCode(this);
+			return Pointers.hash(this);
 		}
 
 		/**
@@ -196,7 +197,7 @@ public final class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.hashCode(this);
+			return Pointers.hash(this);
 		}
 
 		/**
@@ -272,7 +273,7 @@ public final class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.hashCode(this);
+			return Pointers.hash(this);
 		}
 
 		/**
@@ -294,85 +295,48 @@ public final class Pointers {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#hardPointer(Object)} in einen {@link HardPointer Hard-Pointer} umwandelt.
+	 * Diese Klasse implementiert den {@link Converter}, der den Datensatz eines {@link Pointer}s ermittelt.
+	 * 
+	 * @param <GData> Typ des Datensatzes.
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final Converter<?, ?> HARD_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
+	public static final class PointerDataConverter<GData> extends AbstractConverter<Pointer<? extends GData>, GData> {
 
+		/**
+		 * Dieses Feld speichert den {@link PointerDataConverter}.
+		 */
+		public static final PointerDataConverter<?> INSTANCE = new PointerDataConverter<Object>();
+
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		public Pointer<Object> convert(final Object input) {
-			return Pointers.hardPointer(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toString("hardPointerConverter");
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#weakPointer(Object)} in einen {@link WeakPointer Weak-Pointer} umwandelt.
-	 */
-	static final Converter<?, ?> WEAK_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
-
-		@Override
-		public Pointer<Object> convert(final Object input) {
-			return Pointers.weakPointer(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toString("weakPointerConverter");
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Pointers#softPointer(Object)} in einen {@link SoftPointer} umwandelt.
-	 */
-	static final Converter<?, ?> SOFT_POINTER_CONVERTER = new Converter<Object, Pointer<Object>>() {
-
-		@Override
-		public Pointer<Object> convert(final Object input) {
-			return Pointers.softPointer(input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toString("softPointerConverter");
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter}, der den Datensatz eines {@link Pointer}s ermitelt.
-	 */
-	static final Converter<?, ?> POINTER_DATA_CONVERTER = new Converter<Pointer<?>, Object>() {
-
-		@Override
-		public Object convert(final Pointer<?> input) {
+		public GData convert(final Pointer<? extends GData> input) {
 			return input.data();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		public String toString() {
-			return Objects.toStringCall("pointerDataConverter");
+		public boolean equals(final Object object) {
+			return (object == this) || (object instanceof PointerDataConverter<?>);
 		}
 
-	};
+	}
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointerOf(int, Object)} zur Erzeugung eines {@link HardPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
 	 */
 	public static final int HARD = 0;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointerOf(int, Object)} zur Erzeugung eines {@link WeakPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link WeakPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 */
 	public static final int WEAK = 1;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointerOf(int, Object)} zur Erzeugung eines {@link SoftPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link SoftPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
 	 */
 	public static final int SOFT = 2;
 
@@ -383,7 +347,7 @@ public final class Pointers {
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Object#hashCode() Streuwert}.
 	 */
-	static int hashCode(final Pointer<?> pointer) {
+	static int hash(final Pointer<?> pointer) {
 		return Objects.hash(pointer.data());
 	}
 
@@ -435,7 +399,7 @@ public final class Pointers {
 	 * @return {@link Pointer} auf den Datensatz.
 	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
 	 */
-	public static <GData> Pointer<GData> pointerOf(final int mode, final GData data) throws IllegalArgumentException {
+	public static <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
 		switch(mode){
 			case HARD:
 				return Pointers.hardPointer(data);
@@ -448,41 +412,15 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Pointers#pointerOf(int, Object)} in einen {@link Pointer} umwandelt.
-	 * 
-	 * @see Converter
-	 * @see Pointers#pointerOf(int, Object)
-	 * @see Pointers#hardPointerConverter()
-	 * @see Pointers#weakPointerConverter()
-	 * @see Pointers#softPointerConverter()
-	 * @param <GData> Typ des Datensatzes.
-	 * @param mode Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
-	 * @return {@link Pointers#pointerOf(int, Object)}-{@link Converter}.
-	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
-	 */
-	public static <GData> Converter<GData, Pointer<GData>> pointerConverter(final int mode) {
-		switch(mode){
-			case HARD:
-				return Pointers.hardPointerConverter();
-			case WEAK:
-				return Pointers.weakPointerConverter();
-			case SOFT:
-				return Pointers.softPointerConverter();
-		}
-		throw new IllegalArgumentException("mode out of range: " + mode);
-	}
-
-	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der den Datensatz eines {@link Pointer}s ermitelt.
 	 * 
-	 * @see Converter
 	 * @see Pointer#data()
 	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link Pointer#data()}-{@link Converter}.
+	 * @return {@link PointerDataConverter}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GData> Converter<Pointer<GData>, GData> pointerDataConverter() {
-		return (Converter<Pointer<GData>, GData>)Pointers.POINTER_DATA_CONVERTER;
+	public static <GData> PointerDataConverter<GData> pointerDataConverter() {
+		return (PointerDataConverter<GData>)PointerDataConverter.INSTANCE;
 	}
 
 	/**
@@ -508,19 +446,6 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Pointers#hardPointer(Object)} in einen {@link HardPointer} umwandelt.
-	 * 
-	 * @see Converter
-	 * @see Pointers#hardPointer(Object)
-	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link Pointers#hardPointer(Object)}-{@link Converter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GData> Converter<GData, Pointer<GData>> hardPointerConverter() {
-		return (Converter<GData, Pointer<GData>>)Pointers.HARD_POINTER_CONVERTER;
-	}
-
-	/**
 	 * Diese Methode erzeugt einen {@link WeakPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
@@ -532,19 +457,6 @@ public final class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Pointers#weakPointer(Object)} in einen {@link WeakPointer} umwandelt.
-	 * 
-	 * @see Converter
-	 * @see Pointers#weakPointer(Object)
-	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link Pointers#weakPointer(Object)}-{@link Converter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GData> Converter<GData, Pointer<GData>> weakPointerConverter() {
-		return (Converter<GData, Pointer<GData>>)Pointers.WEAK_POINTER_CONVERTER;
-	}
-
-	/**
 	 * Diese Methode erzeugt einen {@link SoftPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
@@ -553,19 +465,6 @@ public final class Pointers {
 	 */
 	public static <GData> Pointer<GData> softPointer(final GData data) {
 		return ((data == null) ? Pointers.<GData>nullPointer() : new SoftPointer<GData>(data));
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Pointers#softPointer(Object)} in einen {@link SoftPointer} umwandelt.
-	 * 
-	 * @see Converter
-	 * @see Pointers#softPointer(Object)
-	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link Pointers#softPointer(Object)}-{@link Converter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GData> Converter<GData, Pointer<GData>> softPointerConverter() {
-		return (Converter<GData, Pointer<GData>>)Pointers.SOFT_POINTER_CONVERTER;
 	}
 
 	/**

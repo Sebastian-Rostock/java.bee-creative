@@ -11,7 +11,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * <pre>
  * public final class Helper {
  * 
- *   static final {@literal Builder<Helper>} CACHE = SynchronizedBuilder.of(CachedBuilder.of(new Builder<Helper>() {
+ *   static final {@literal Builder<Helper> CACHE = Builders.synchronizedBuilder(Builders.cachedBuilder(new Builder<Helper>()} {
  *   
  *     public Helper create() {
  *       return new Helper();
@@ -38,18 +38,18 @@ import bee.creative.util.Pointers.SoftPointer;
 public class Builders {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten delegierenden {@link Builder}.
+	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Builder}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Datensatzes.
-	 * @param <GData2> Typ des Datensatzes des gegebenen {@link Builder}s.
+	 * @param <GValue> Typ der Datensatzes.
+	 * @param <GValue2> Typ des Datensatzes des gegebenen {@link Builder}s.
 	 */
-	static abstract class AbstractBuilder<GData, GData2> implements Builder<GData> {
+	static abstract class AbstractDelegatingBuilder<GValue, GValue2> implements Builder<GValue> {
 
 		/**
 		 * Dieses Feld speichert den {@link Builder}.
 		 */
-		final Builder<? extends GData2> builder;
+		final Builder<? extends GValue2> builder;
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Builder}.
@@ -57,7 +57,7 @@ public class Builders {
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
-		public AbstractBuilder(final Builder<? extends GData2> builder) throws NullPointerException {
+		public AbstractDelegatingBuilder(final Builder<? extends GValue2> builder) throws NullPointerException {
 			if(builder == null) throw new NullPointerException("builder is null");
 			this.builder = builder;
 		}
@@ -75,7 +75,7 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final AbstractBuilder<?, ?> data = (AbstractBuilder<?, ?>)object;
+			final AbstractDelegatingBuilder<?, ?> data = (AbstractDelegatingBuilder<?, ?>)object;
 			return Objects.equals(this.builder, data.builder);
 		}
 
@@ -90,23 +90,33 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder}, der immer {@code null} liefert.
+	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen Datensatz bereitstellt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ des Datensatzes.
 	 */
-	public static final class NullBuilder implements Builder<Object> {
+	public static final class ValueBuilder<GValue> implements Builder<GValue> {
 
 		/**
-		 * Dieses Feld speichert den {@link Builder}, der immer {@code null} liefert.
+		 * Dieses Feld speichert den Wert.
 		 */
-		public static final Builder<?> INSTANCE = new NullBuilder();
+		GValue value;
+
+		/**
+		 * Dieser Konstrukteur initialisiert den Wert.
+		 * 
+		 * @param value Wert.
+		 */
+		public ValueBuilder(final GValue value) {
+			this.value = value;
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object create() {
-			return null;
+		public GValue create() {
+			return this.value;
 		}
 
 		/**
@@ -114,7 +124,7 @@ public class Builders {
 		 */
 		@Override
 		public int hashCode() {
-			return 0;
+			return Objects.hash(this.value);
 		}
 
 		/**
@@ -122,7 +132,10 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof NullBuilder);
+			if(object == this) return true;
+			if(!(object instanceof ValueBuilder<?>)) return false;
+			final ValueBuilder<?> data = (ValueBuilder<?>)object;
+			return Objects.equals(this.value, data.value);
 		}
 
 		/**
@@ -130,18 +143,19 @@ public class Builders {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toStringCall(this, this.value);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Builder}. Ein gepufferter {@link Builder} verwaltet den vom einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s.
+	 * Diese Klasse implementiert einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s verwaltet.
 	 * 
+	 * @see Pointer
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 */
-	public static final class CachedBuilder<GData> extends AbstractBuilder<GData, GData> {
+	public static final class CachedBuilder<GValue> extends AbstractDelegatingBuilder<GValue, GValue> {
 
 		/**
 		 * Dieses Feld speichert den {@link Pointer}-Modus.
@@ -151,7 +165,7 @@ public class Builders {
 		/**
 		 * Dieses Feld speichert den {@link Pointer}.
 		 */
-		Pointer<GData> pointer;
+		Pointer<GValue> pointer;
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link Pointer}-Modus und {@link Builder}.
@@ -161,9 +175,9 @@ public class Builders {
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebenen {@link Pointer}-Modus ungültig ist.
 		 */
-		public CachedBuilder(final int mode, final Builder<? extends GData> builder) throws NullPointerException, IllegalArgumentException {
+		public CachedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException, IllegalArgumentException {
 			super(builder);
-			Pointers.pointerConverter(mode);
+			Pointers.pointer(mode, null);
 			this.mode = mode;
 		}
 
@@ -178,15 +192,15 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GData create() {
-			final Pointer<GData> pointer = this.pointer;
+		public GValue create() {
+			final Pointer<GValue> pointer = this.pointer;
 			if(pointer != null){
-				final GData data = pointer.data();
+				final GValue data = pointer.data();
 				if(data != null) return data;
 				if(pointer == NullPointer.INSTANCE) return null;
 			}
-			final GData data = this.builder.create();
-			this.pointer = Pointers.pointerOf(this.mode, data);
+			final GValue data = this.builder.create();
+			this.pointer = Pointers.pointer(this.mode, data);
 			return data;
 		}
 
@@ -195,7 +209,7 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if((object == this) || this.builder.equals(object)) return true;
+			if(object == this) return true;
 			if(!(object instanceof CachedBuilder<?>)) return false;
 			return super.equals(object);
 		}
@@ -203,13 +217,13 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen {@link Builder}s ermittelt wird.
+	 * Diese Klasse implementiert einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen {@link Builder}s erzeugt wird.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 */
-	public static final class ConvertedBuilder<GInput, GOutput> extends AbstractBuilder<GOutput, GInput> {
+	public static final class ConvertedBuilder<GInput, GOutput> extends AbstractDelegatingBuilder<GOutput, GInput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter}.
@@ -221,7 +235,7 @@ public class Builders {
 		 * 
 		 * @param converter {@link Converter}.
 		 * @param builder {@link Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Builder} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ConvertedBuilder(final Converter<? super GInput, ? extends GOutput> converter, final Builder<? extends GInput> builder) throws NullPointerException {
 			super(builder);
@@ -270,9 +284,9 @@ public class Builders {
 	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 */
-	public static final class SynchronizedBuilder<GData> extends AbstractBuilder<GData, GData> {
+	public static final class SynchronizedBuilder<GValue> extends AbstractDelegatingBuilder<GValue, GValue> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Builder}.
@@ -280,7 +294,7 @@ public class Builders {
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
-		public SynchronizedBuilder(final Builder<? extends GData> builder) {
+		public SynchronizedBuilder(final Builder<? extends GValue> builder) {
 			super(builder);
 		}
 
@@ -288,7 +302,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GData create() {
+		public GValue create() {
 			synchronized(this.builder){
 				return this.builder.create();
 			}
@@ -307,42 +321,41 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link Builder} oder {@link NullBuilder#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullBuilder#INSTANCE} zurück gegeben.
+	 * Diese Methode erzeugt einen {@link Builder}, der den gegebenen Datensatz bereitstellt, und gibt ihn zurück.
 	 * 
-	 * @param <GData> Typ des Datensatzes.
-	 * @param builder {@link Builder} oder {@code null}.
-	 * @return {@link Builder}.
+	 * @param <GValue> Typ des Datensatzes.
+	 * @param value Datensatz.
+	 * @return {@link ValueBuilder}.
 	 */
-	@SuppressWarnings ("unchecked")
-	public static <GData> Builder<GData> builder(final Builder<GData> builder) {
-		return builder != null ? null : (Builder<GData>)NullBuilder.INSTANCE;
+	public static <GValue> ValueBuilder<GValue> valueBuilder(final GValue value) {
+		return new ValueBuilder<GValue>(value);
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder} und gibt ihn zurück. Der erzeugte {@link Builder} verwaltet den vom gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link SoftPointer}s.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link SoftPointer}s verwaltet, und gibt ihn zurück.
 	 * 
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link CachedBuilder}.
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
-	public static <GData> CachedBuilder<GData> cachedBuilder(final Builder<? extends GData> builder) throws NullPointerException {
+	public static <GValue> CachedBuilder<GValue> cachedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
 		return Builders.cachedBuilder(Pointers.SOFT, builder);
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder} und gibt ihn zurück. Der erzeugte {@link Builder} verwaltet den vom gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s im gegebenenen Modus verwaltet, und gibt ihn zurück.
 	 * 
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param builder {@link Builder}.
 	 * @return {@link CachedBuilder}.
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen {@link Pointer}-Modus ungültig ist.
 	 */
-	public static <GData> CachedBuilder<GData> cachedBuilder(final int mode, final Builder<? extends GData> builder) throws NullPointerException,
+	public static <GValue> CachedBuilder<GValue> cachedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
 		IllegalArgumentException {
-		return new CachedBuilder<GData>(mode, builder);
+		return new CachedBuilder<GValue>(mode, builder);
 	}
 
 	/**
@@ -353,7 +366,7 @@ public class Builders {
 	 * @param converter {@link Converter}.
 	 * @param builder {@link Builder}.
 	 * @return {@link ConvertedBuilder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter} bzw. der gegebene {@link Builder} {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GInput, GOutput> ConvertedBuilder<GInput, GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
@@ -363,13 +376,13 @@ public class Builders {
 	/**
 	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
 	 * 
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link SynchronizedBuilder}.
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
-	public static <GData> SynchronizedBuilder<GData> synchronizedBuilder(final Builder<? extends GData> builder) throws NullPointerException {
-		return new SynchronizedBuilder<GData>(builder);
+	public static <GValue> SynchronizedBuilder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
+		return new SynchronizedBuilder<GValue>(builder);
 	}
 
 	/**

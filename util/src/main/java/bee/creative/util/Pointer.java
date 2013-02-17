@@ -17,8 +17,7 @@ public interface Pointer<GData> {
 	public GData data();
 
 	/**
-	 * Diese Methode gibt den via {@link Objects#hash(Object)} berechneten {@link Object#hashCode() Streuwert} des
-	 * Datensatzes zurück.
+	 * Diese Methode gibt den via {@link Objects#hash(Object)} berechneten {@link Object#hashCode() Streuwert} des Datensatzes zurück.
 	 * 
 	 * @return {@link Object#hashCode() Streuwert} des Datensatzes.
 	 */
@@ -26,8 +25,7 @@ public interface Pointer<GData> {
 	public int hashCode();
 
 	/**
-	 * Diese Methode gibt die via {@link Objects#equals(Object, Object)} berechnete {@link Object#equals(Object)
-	 * Äquivalenz} der Datensätze dieses und des gegebenenen {@link Pointer}s zurück.
+	 * Diese Methode gibt die via {@link Objects#equals(Object, Object)} berechnete {@link Object#equals(Object) Äquivalenz} der Datensätze dieses und des gegebenenen {@link Pointer}s zurück.
 	 * 
 	 * @param object {@link Pointer}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der Datensätze.

@@ -8,15 +8,15 @@ import java.util.List;
  * <p>
  * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Converter}s {@code converter} eine {@link List} aus {@link Conversion}s erzeugt. Diese {@link Conversion}s werden anschließend bezüglich ihrer Ausgabe ({@link Conversion#output()}) gemäß dem {@link Comparator} {@code comparator} sortiert. Abschließend werden je ein {@link Iterable} für die Eingabe ({@link Conversion#input()}) und die Ausgabe ( {@link Conversion#output()}) der {@link Conversion}s erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen.
  * 
- * <pre>
- * Iterable&lt;I&gt; entries = // ...
- * Converter&lt;I, O&gt; converter = // ...
- * Comparator&lt;O&gt; comparator = // ...
- * List&lt;Conversion&lt;I, O&gt;&gt; conversions = new ArrayList&lt;Conversion&lt;I, O&gt;&gt;();
- * Iterables.appendAll(ConvertedIterable.of(StaticConversionConverter.of(converter), entries), conversions);
- * Collections.sort(conversions, ConvertedComparator.of(Conversions.&lt;O&gt;outputConverter(), comparator));
- * Iterable&lt;I&gt; inputs = ConvertedIterable.of(Conversions.&lt;I&gt;inputConverter(), conversions);
- * Iterable&lt;O&gt; outputs = ConvertedIterable.of(Conversions.&lt;O&gt;outputConverter(), conversions);
+ * <pre>{@literal 
+ * Iterable<I> entries = // ...
+ * Converter<I, O> converter = // ...
+ * Comparator<O> comparator = // ...
+ * List<Conversion<I, O>> conversions = new ArrayList<Conversion<I, O>>();
+ * Iterables.appendAll(conversions, Iterables.convertedIterable(Conversions.staticConversionConverter(converter), entries));
+ * Collections.sort(conversions, Comparators.convertedComparator(Conversions.<O>conversionOutputConverter(), comparator));
+ * Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInputConverter(), conversions);
+ * Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutputConverter(), conversions);}
  * </pre>
  * 
  * @see Converter

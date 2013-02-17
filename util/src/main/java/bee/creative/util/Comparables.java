@@ -47,13 +47,13 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten delegierenden {@link Comparable}.
+	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Comparable}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Comparable}s.
 	 */
-	static abstract class AbstractComparable<GEntry, GEntry2> implements Comparable<GEntry> {
+	static abstract class AbstractDelegatingComparable<GEntry, GEntry2> implements Comparable<GEntry> {
 
 		/**
 		 * Dieses Feld speichert den {@link Comparable}.
@@ -66,7 +66,7 @@ public class Comparables {
 		 * @param comparable {@link Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
-		public AbstractComparable(final Comparable<? super GEntry2> comparable) throws NullPointerException {
+		public AbstractDelegatingComparable(final Comparable<? super GEntry2> comparable) throws NullPointerException {
 			if(comparable == null) throw new NullPointerException("comparable is null");
 			this.comparable = comparable;
 		}
@@ -84,7 +84,7 @@ public class Comparables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			final AbstractComparable<?, ?> data = (AbstractComparable<?, ?>)object;
+			final AbstractDelegatingComparable<?, ?> data = (AbstractDelegatingComparable<?, ?>)object;
 			return Objects.equals(this.comparable, data.comparable);
 		}
 
@@ -106,7 +106,7 @@ public class Comparables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class NullComparable<GEntry> extends AbstractComparable<GEntry, GEntry> {
+	public static final class NullComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
@@ -216,7 +216,7 @@ public class Comparables {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
 	 */
-	public static final class ReverseComparable<GEntry> extends AbstractComparable<GEntry, GEntry> {
+	public static final class ReverseComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
@@ -273,7 +273,7 @@ public class Comparables {
 		 * 
 		 * @param comparable1 primärer {@link Comparable}.
 		 * @param comparable2 sekundärer {@link Comparable}.
-		 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2) throws NullPointerException {
 			if(comparable1 == null) throw new NullPointerException("comparable1 is null");
@@ -329,7 +329,7 @@ public class Comparables {
 	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
 	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
 	 */
-	public static final class ConvertedComparable<GInput, GOutput> extends AbstractComparable<GInput, GOutput> {
+	public static final class ConvertedComparable<GInput, GOutput> extends AbstractDelegatingComparable<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den {@link Converter}.
@@ -341,7 +341,7 @@ public class Comparables {
 		 * 
 		 * @param comparable {@link Comparable}.
 		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable} bzw. der gegebene {@link Converter} {@code null} ist.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ConvertedComparable(final Comparable<? super GOutput> comparable, final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
@@ -529,7 +529,7 @@ public class Comparables {
 	 * @param comparable1 erster {@link Comparable}.
 	 * @param comparable2 zweiter {@link Comparable}.
 	 * @return {@link ChainedComparable}.
-	 * @throws NullPointerException Wenn einer der gegebenen {@link Comparable} {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GEntry> ChainedComparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 		throws NullPointerException {
@@ -547,7 +547,7 @@ public class Comparables {
 	 * @param converter {@link Converter}.
 	 * @param comparable {@link Comparable}.
 	 * @return {@link ConvertedComparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable} oder der gegebene {@link Converter} {@code null} sind.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GInput, GOutput> ConvertedComparable<GInput, GOutput> convertedComparable(final Converter<? super GInput, ? extends GOutput> converter,
 		final Comparable<? super GOutput> comparable) throws NullPointerException {

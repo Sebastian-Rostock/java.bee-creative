@@ -14,7 +14,7 @@ import bee.creative.util.Converters.SynchronizedConverter;
  * @see Pattern
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Strings {
+public class Strings {
 
 	/**
 	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe via {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck umwandelt.
@@ -24,19 +24,7 @@ public final class Strings {
 	static public final class PatternConverter implements Converter<String, Pattern> {
 
 		/**
-		 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe via {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck umwandelt, und gibt ihn zurück.
-		 * 
-		 * @see Converter
-		 * @see Pattern#compile(String, int)
-		 * @param flags Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
-		 * @return {@link Pattern#compile(String, int)}-{@link Converter}.
-		 */
-		public static Converter<String, Pattern> of(final int flags) {
-			return new PatternConverter(flags);
-		}
-
-		/**
-		 * Dieses Feld speichert die Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS}).
+		 * Dieses Feld speichert die Bitmaske.
 		 */
 		final int flags;
 
@@ -81,7 +69,7 @@ public final class Strings {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(getClass().getName(), this.flags);
+			return Objects.toStringCall(this, this.flags);
 		}
 
 	}
@@ -89,7 +77,7 @@ public final class Strings {
 	/**
 	 * Dieses Feld speichert den {@link Converter} zur Kompilation von {@link Pattern}.
 	 */
-	static final Converter<String, Pattern> PATTERN_CONVERTER = SynchronizedConverter.synchronizedConverter(CachedConverter.cachedConverter(PatternConverter.of(0)));
+	static final Converter<String, Pattern> PATTERN_CONVERTER = Converters.synchronizedConverter(Converters.cachedConverter(Strings.patternConverter(0)));
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in diese Liste eingetragen werden sollen.
@@ -601,6 +589,18 @@ public final class Strings {
 	 */
 	public static List<List<String>> splatchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings.applyAll(pattern, string, true, true);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe via {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck umwandelt, und gibt ihn zurück.
+	 * 
+	 * @see Converter
+	 * @see Pattern#compile(String, int)
+	 * @param flags Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
+	 * @return {@link Pattern#compile(String, int)}-{@link Converter}.
+	 */
+	public static Converter<String, Pattern> patternConverter(final int flags) {
+		return new PatternConverter(flags);
 	}
 
 	/**

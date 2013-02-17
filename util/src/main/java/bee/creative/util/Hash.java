@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von Schlüsseln auf Werte. Die Einträge der Abbildung besitzen einen nächsten Eintrag, sodass einfach verkettete Listen von Einträgen erzeugt werden können. Der nächste Eintrag eines Eintrags muss dazü mit {@link Hash#getEntryNext(Object)} gelesen und mit {@link Hash#setEntryNext(Object, Object)} geschrieben werden können. Als Schlüssel und Werte sind beliebige Objekte zulässig. Insbesondere ist es möglich, die Werte der Abbildung als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten Element verfügen. Es ist auch möglich für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
+ * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von Schlüsseln auf Werte. Die Einträge der Abbildung besitzen einen nächsten Eintrag, sodass einfach verkettete Listen von Einträgen erzeugt werden können. Der nächste Eintrag eines Eintrags muss dazü mit {@link #getEntryNext(Object)} gelesen und mit {@link #setEntryNext(Object, Object)} geschrieben werden können. Als Schlüssel und Werte sind beliebige Objekte zulässig. Insbesondere ist es möglich, die Werte der Abbildung als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten Element verfügen. Es ist auch möglich für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
  * <p>
- * Die Einträge werden in einfach verketteten Listen verwaltet, deren Kopfelemente bzw. Einträge in einer Tabelle hinterlegt werden. Die Methoden {@link Hash#getKeyHash(Object)} muss zu einem gegebenen Schlüssel den {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link Hash#getIndex(int, int)} muss zu einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach verketteter Liste sich der Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
+ * Die Einträge werden in einfach verketteten Listen verwaltet, deren Kopfelemente bzw. Einträge in einer Tabelle hinterlegt werden. Die Methoden {@link #getKeyHash(Object)} muss zu einem gegebenen Schlüssel den {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link #getIndex(int, int)} muss zu einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach verketteter Liste sich der Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -177,6 +177,15 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
+	 * Diese Methode gibt einen {@link Iterator} über die Einträge zurück.
+	 * 
+	 * @return {@link Iterator} über die Einträge.
+	 */
+	protected final Iterator<GEntry> getEntries() {
+		return ((this.size == 0) ? Iterators.<GEntry>voidIterator() : new HashIterator<GKey, GEntry>(this));
+	}
+
+	/**
 	 * Diese Methode gibt die Anzahl der Einträge zurück.
 	 * 
 	 * @return Anzahl der Einträge.
@@ -248,6 +257,44 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
+	 * Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int)} berechneten.
+	 * 
+	 * @see Hash#verifyLength(int)
+	 */
+	protected final void verifyLength() {
+		this.verifyLength(this.getLength(this.size, this.table.length));
+	}
+
+	/**
+	 * Diese Methode aktualisiert die Größe der Tabelle, sofern die gegebene Größe ungleich der Größe der bisherigen Tabelle ist. Bei der Aktialisierung werden alle Schlüssel-Wert-Paare der bisherigen Tabelle in eine neue Tabelle der gegebenen Größe einfügt und die bisherige Tabelle mit der neuen ersetzt.
+	 * 
+	 * @param newLength neue Größe der Tabelle.
+	 */
+	protected final void verifyLength(final int newLength) {
+		final Object[] oldTable = this.table;
+		final int oldLength = oldTable.length;
+		if(oldLength == newLength) return;
+		final Object[] newTable = (this.table = new Object[newLength]);
+		if(newLength == 0){
+			if(this.size != 0) throw new IllegalArgumentException();
+			return;
+		}
+		for(int oldIndex = 0; oldIndex < oldLength; oldIndex++){
+			@SuppressWarnings ("unchecked")
+			GEntry item = (GEntry)oldTable[oldIndex];
+			for(GEntry next; item != null; item = next){
+				next = this.getEntryNext(item);
+				final GKey key = this.getEntryKey(item);
+				final int hash = this.getKeyHash(key);
+				final int newIndex = this.getIndex(hash, newLength);
+				@SuppressWarnings ("unchecked")
+				final GEntry item2 = (GEntry)newTable[newIndex];
+				newTable[newIndex] = this.createEntry(key, this.getEntryValue(item), item2, hash);
+			}
+		}
+	}
+
+	/**
 	 * Diese Methode soll einen neuen Eintrag mit dem gegebenen Schlüssel, Wert, nächstem Eintrag sowie {@link Object#hashCode() Streuwert} des Schlüssels erzeugen und zurück geben.
 	 * 
 	 * @param key Schlüssel.
@@ -292,7 +339,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		}
 		this.size++;
 		@SuppressWarnings ({"unchecked"})
-		GEntry item2 = (GEntry)table[index];
+		final GEntry item2 = (GEntry)table[index];
 		table[index] = this.createEntry(key, value, item2, hash);
 		if(!verifyLength) return null;
 		this.verifyLength();
@@ -332,59 +379,20 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int)} berechneten.
-	 * 
-	 * @see Hash#verifyLength(int)
-	 */
-	protected final void verifyLength() {
-		this.verifyLength(this.getLength(this.size, this.table.length));
-	}
-
-	/**
-	 * Diese Methode aktualisiert die Größe der Tabelle, sofern die gegebene Größe ungleich der Größe der bisherigen Tabelle ist. Bei der Aktialisierung werden alle Schlüssel-Wert-Paare der bisherigen Tabelle in eine neue Tabelle der gegebenen Größe einfügt und die bisherige Tabelle mit der neuen ersetzt.
-	 * 
-	 * @param newLength neue Größe der Tabelle.
-	 */
-	protected final void verifyLength(final int newLength) {
-		final Object[] oldTable = this.table;
-		final int oldLength = oldTable.length;
-		if(oldLength == newLength) return;
-		final Object[] newTable = (this.table = new Object[newLength]);
-		if(newLength == 0){
-			if(this.size != 0) throw new IllegalArgumentException();
-			return;
-		}
-		for(int oldIndex = 0; oldIndex < oldLength; oldIndex++){
-			@SuppressWarnings ("unchecked")
-			GEntry item = (GEntry)oldTable[oldIndex];
-			for(GEntry next; item != null; item = next){
-				next = this.getEntryNext(item);
-				final GKey key = this.getEntryKey(item);
-				final int hash = this.getKeyHash(key);
-				final int newIndex = this.getIndex(hash, newLength);
-				@SuppressWarnings ("unchecked")
-				GEntry item2 = (GEntry)newTable[newIndex];
-				newTable[newIndex] = this.createEntry(key, this.getEntryValue(item), item2, hash);
-			}
-		}
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Iterator} über die Einträge zurück.
-	 * 
-	 * @return {@link Iterator} über die Einträge.
-	 */
-	protected final Iterator<GEntry> getEntries() {
-		return ((this.size == 0) ? Iterators.<GEntry>voidIterator() : new HashIterator<GKey, GEntry>(this));
-	}
-
-	/**
-	 * Diese Methode entfernt alle Einträge.
+	 * Diese Methode entfernt alle Einträge. Hierbei werden die Anzahl der Einträge auf {@code 0} gesetzt und die Tabelle mit {@code null} gefüllt.
 	 */
 	protected final void clearEntries() {
 		if(this.size == 0) return;
 		this.size = 0;
 		Arrays.fill(this.table, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Objects.toStringCall(this);
 	}
 
 }

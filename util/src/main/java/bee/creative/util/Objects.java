@@ -14,7 +14,7 @@ import java.util.Map.Entry;
  * @see Object#toString()
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Objects {
+public class Objects {
 
 	/**
 	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht.
@@ -146,40 +146,6 @@ public final class Objects {
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
-	 */
-	static final Converter<Object, String> NORMAL_STRING_CONVERTER = new Converter<Object, String>() {
-
-		@Override
-		public String convert(final Object input) {
-			return Objects.toString(false, input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("toStringConverter", false);
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Converter}, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine formatierte {@link Object#toString() Textdarstelung} umwandelt.
-	 */
-	static final Converter<Object, String> FORMAT_STRING_CONVERTER = new Converter<Object, String>() {
-
-		@Override
-		public String convert(final Object input) {
-			return Objects.toString(false, input);
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringCall("toStringConverter", true);
-		}
-
-	};
-
-	/**
 	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
 	 * 
 	 * @param value Zeichenkette.
@@ -188,12 +154,12 @@ public final class Objects {
 	static String indent(final String value) {
 		if(value == null) return "null";
 		final StringBuilder output = new StringBuilder();
-		int last = -1;
+		int last = -1, next = 0;
 		final int size = value.length();
-		for(int next = 0; next < size; next++)
-			if(value.charAt(next) == '\n'){
-				output.append(value.substring(last + 1, last = next)).append("\n  ");
-			}
+		while((next = value.indexOf('\n', next)) >= 0){
+			output.append(value.substring(last + 1, last = next)).append("\n  ");
+			next++;
+		}
 		return output.append(value.substring(last + 1, size)).toString();
 	}
 
@@ -673,32 +639,20 @@ public final class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Objects#toString(boolean, Object)} in eine {@link Object#toString() Textdarstelung} umwandelt.
-	 * 
-	 * @see Converter
-	 * @see Objects#toString(boolean, Object)
-	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @return {@link Objects#toString(boolean, Object)}-{@link Converter}.
-	 */
-	public static Converter<Object, String> toStringConverter(final boolean format) {
-		return (format ? Objects.FORMAT_STRING_CONVERTER : Objects.NORMAL_STRING_CONVERTER);
-	}
-
-	/**
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
-	 * Objects.toStringCall(false, name, args)
+	 * Objects.toStringCall(false, false, name, args)
 	 * </pre>
 	 * 
-	 * @see Objects#toStringCall(boolean, String, Object...)
+	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
 	public static String toStringCall(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, name, args);
+		return Objects.toStringCall(false, false, name, args);
 	}
 
 	/**
@@ -754,14 +708,56 @@ public final class Objects {
 		return output.toString();
 	}
 
+	/**
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * 
+	 * <pre>
+	 * Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)
+	 * </pre>
+	 * 
+	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
+	 */
 	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, object, args);
+		return Objects.toStringCall(false, false, object.getClass().getSimpleName(), args);
 	}
 
+	/**
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * 
+	 * <pre>
+	 * Objects.toStringCall(format, false, object.getClass().getSimpleName(), args)
+	 * </pre>
+	 * 
+	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @param format Formatiermodus.
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
+	 */
 	public static String toStringCall(final boolean format, final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(format, false, object, args);
+		return Objects.toStringCall(format, false, object.getClass().getSimpleName(), args);
 	}
 
+	/**
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * 
+	 * <pre>
+	 * Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)
+	 * </pre>
+	 * 
+	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @param format Formatiermodus.
+	 * @param label Aktivierung der Argumentbeschriftung.
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
+	 */
 	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if(object == null) throw new NullPointerException("object is null");
 		return Objects.toStringCall(format, label, object.getClass().getSimpleName(), args);
