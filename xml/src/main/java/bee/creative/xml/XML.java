@@ -9,12 +9,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.ErrorListener;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -58,9 +60,7 @@ import bee.creative.util.Pointers;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden zur zur Erzeugung und Formatierung von {@link Document DOM-Dokumenten}, zur
- * Verarbeitung von {@link XPath XPath-Auswertungsumgebungen}, {@link Node DOM-Knoten}, {@link Templates XSL-Templates}
- * und {@link Transformer XSL-Transformern}.
+ * Diese Klasse implementiert Hilfsmethoden zur zur Erzeugung und Formatierung von {@link Document DOM-Dokumenten}, zur Verarbeitung von {@link XPath XPath-Auswertungsumgebungen}, {@link Node DOM-Knoten}, {@link Templates XSL-Templates} und {@link Transformer XSL-Transformern}.
  * 
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -83,8 +83,7 @@ public class XML {
 		Map<String, Boolean> featureMap;
 
 		/**
-		 * Diese Methode gibt die gegebene Abbildung nur dann zurück, wenn diese nicht {@code null} ist. Anderenfalls wird
-		 * eine neue Abbildung erzeugt und zurück gegeben.
+		 * Diese Methode gibt die gegebene Abbildung nur dann zurück, wenn diese nicht {@code null} ist. Anderenfalls wird eine neue Abbildung erzeugt und zurück gegeben.
 		 * 
 		 * @param <GValue> Typ der Werte in der Abbildung.
 		 * @param map Abbildung oder {@code null}.
@@ -95,8 +94,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode gibt den Wert des Eintrags mit dem gegebenen Namen aus der gegebenen Abbildung oder {@code null}
-		 * zurück.
+		 * Diese Methode gibt den Wert des Eintrags mit dem gegebenen Namen aus der gegebenen Abbildung oder {@code null} zurück.
 		 * 
 		 * @param <GValue> Typ der Werte in der Abbildung.
 		 * @param map Abbildung oder {@code null}.
@@ -109,10 +107,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt den Wert des Eintrags mit dem gegebenen Namen in der gegebenen Abbildung und gibt die
-		 * Abbildung zurück. Wenn der Wert {@code null} ist, wird der Eintrag aus der Abbildung entfernt. Wenn die Abbildung
-		 * {@code null} und der Wert nicht {@code null} sind, werden eine neue Abbildung erzeugt, der gegebene Wert unter
-		 * dem gegebenen Namen in die erzeute Abbildung eingefügt und die erzeugte Abbildung zurück gegeben.
+		 * Diese Methode setzt den Wert des Eintrags mit dem gegebenen Namen in der gegebenen Abbildung und gibt die Abbildung zurück. Wenn der Wert {@code null} ist, wird der Eintrag aus der Abbildung entfernt. Wenn die Abbildung {@code null} und der Wert nicht {@code null} sind, werden eine neue Abbildung erzeugt, der gegebene Wert unter dem gegebenen Namen in die erzeute Abbildung eingefügt und die erzeugte Abbildung zurück gegeben.
 		 * 
 		 * @param <GValue> Typ der Werte in der Abbildung.
 		 * @param map Abbildung oder {@code null}.
@@ -121,8 +116,7 @@ public class XML {
 		 * @return Abbildung.
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
-		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final String name, final GValue value)
-			throws NullPointerException {
+		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final String name, final GValue value) throws NullPointerException {
 			if(name == null) throw new NullPointerException("name is null");
 			if(value == null){
 				if(map == null) return null;
@@ -136,8 +130,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode entfernt alle Einträge aus der gegebene Abbildung, überträgt die gegebenen Werte auf die Abbildung
-		 * und gibt die gibt Abbildung zurück.
+		 * Diese Methode entfernt alle Einträge aus der gegebene Abbildung, überträgt die gegebenen Werte auf die Abbildung und gibt die gibt Abbildung zurück.
 		 * 
 		 * @param <GValue> Typ der Werte in der Abbildung.
 		 * @param map Abbildung oder {@code null}.
@@ -145,10 +138,8 @@ public class XML {
 		 * @return Abbildung.
 		 * @throws NullPointerException Wenn ein Name der gegebenen Abbildung {@code null} ist.
 		 */
-		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final Map<String, GValue> value)
-			throws NullPointerException {
-			final Iterable<Entry<String, GValue>> entries =
-				((value == null) ? Collections.<Entry<String, GValue>>emptySet() : value.entrySet());
+		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final Map<String, GValue> value) throws NullPointerException {
+			final Iterable<Entry<String, GValue>> entries = ((value == null) ? Collections.<Entry<String, GValue>>emptySet() : value.entrySet());
 			if(map != null){
 				map.clear();
 			}
@@ -159,8 +150,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Abbildungen zurück. Hierbei sind
-		 * {@code null}-Werte und leere synonym.
+		 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Abbildungen zurück. Hierbei sind {@code null}-Werte und leere synonym.
 		 * 
 		 * @see Objects#equals(Object, Object)
 		 * @param <GValue> Typ der Werte.
@@ -169,8 +159,7 @@ public class XML {
 		 * @return {@link Object#equals(Object) Äquivalenz}.
 		 */
 		final <GValue> boolean equals(final Map<String, GValue> map1, final Map<String, GValue> map2) {
-			return (map1 == map2) || ((map1 == null) && map2.isEmpty()) || ((map2 == null) && map1.isEmpty())
-				|| Objects.equals(map1, map2);
+			return (map1 == map2) || ((map1 == null) && map2.isEmpty()) || ((map2 == null) && map1.isEmpty()) || Objects.equals(map1, map2);
 		}
 
 		/**
@@ -204,8 +193,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt den Zustand des Features mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem
-		 * Feature-Zustand {@code null} wird das Feature entfernt.
+		 * Diese Methode setzt den Zustand des Features mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem Feature-Zustand {@code null} wird das Feature entfernt.
 		 * 
 		 * @param name Feature-Name.
 		 * @param value Feature-Zustand oder {@code null}.
@@ -227,8 +215,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt alle Feature und gibt {@code this} zurück. Wenn die gegebene Feature-Abbildung {@code null}
-		 * ist, werden alle Feature entfernt.
+		 * Diese Methode setzt alle Feature und gibt {@code this} zurück. Wenn die gegebene Feature-Abbildung {@code null} ist, werden alle Feature entfernt.
 		 * 
 		 * @param valueMap Feature-Abbildung oder {@code null}.
 		 * @return {@code this}.
@@ -237,6 +224,27 @@ public class XML {
 		public FeatureOptions setFeatureMap(final Map<String, Boolean> valueMap) throws NullPointerException {
 			this.featureMap = this.set(this.featureMap, valueMap);
 			return this;
+		}
+
+		/**
+		 * Diese Methode gibt den Zustand des Features {@link XMLConstants#FEATURE_SECURE_PROCESSING} zurück.
+		 * 
+		 * @see XMLConstants#FEATURE_SECURE_PROCESSING
+		 * @return Feature-Zustand.
+		 */
+		public boolean getFeatureSecureProcessing() {
+			return this.getFeature(XMLConstants.FEATURE_SECURE_PROCESSING);
+		}
+
+		/**
+		 * Diese Methode setzt den Zustand des Features {@link XMLConstants#FEATURE_SECURE_PROCESSING} und gibt {@code this} zurück.
+		 * 
+		 * @see XMLConstants#FEATURE_SECURE_PROCESSING
+		 * @param value Feature-Zustand.
+		 * @return {@code this}.
+		 */
+		public FeatureOptions setFeatureSecureProcessing(final boolean value) {
+			return this.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, value);
 		}
 
 		/**
@@ -284,8 +292,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt den Wert des Attributs mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem
-		 * Attributs-Wert {@code null} wird das Feature entfernt.
+		 * Diese Methode setzt den Wert des Attributs mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem Attributs-Wert {@code null} wird das Feature entfernt.
 		 * 
 		 * @param name Attribut-Name.
 		 * @param value Attribut-Wert.
@@ -307,8 +314,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt die Attribute und gibt {@code this} zurück. Wenn die gegebene Attribut-Abbildung {@code null}
-		 * ist, werden alle Attribute entfernt.
+		 * Diese Methode setzt die Attribute und gibt {@code this} zurück. Wenn die gegebene Attribut-Abbildung {@code null} ist, werden alle Attribute entfernt.
 		 * 
 		 * @param value Attribut-Abbildung oder {@code null}.
 		 * @return {@code this}.
@@ -341,11 +347,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine gepufferte {@link XPath XPath-Auswertungsumgebung}, die die von einer gegebenen
-	 * {@link XPath XPath-Auswertungsumgebung} erzeugten {@link XPathExpression XPath-Ausdrücke} in einer {@link Map
-	 * Abbildung} von Schlüsseln auf Werte verwaltet. Die Schlüssel werden dabei über {@link Pointer} auf Zeichenketten
-	 * und die Werte als {@link Pointer} auf die {@link XPathExpression XPath-Ausdrücke} des gegebenen {@link XPath
-	 * XPath-Auswertungsumgebung} realisiert.
+	 * Diese Klasse implementiert eine gepufferte {@link XPath XPath-Auswertungsumgebung}, die die von einer gegebenen {@link XPath XPath-Auswertungsumgebung} erzeugten {@link XPathExpression XPath-Ausdrücke} in einer {@link Map Abbildung} von Schlüsseln auf Werte verwaltet. Die Schlüssel werden dabei über {@link Pointer} auf Zeichenketten und die Werte als {@link Pointer} auf die {@link XPathExpression XPath-Ausdrücke} des gegebenen {@link XPath XPath-Auswertungsumgebung} realisiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Converters#cachedConverter(int, int, int, Converter)
@@ -367,10 +369,8 @@ public class XML {
 		 * 
 		 * @see Pointers#pointer(int, Object)
 		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
-		 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der Abbildung
-		 *        erzeugt werden.
-		 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der Abbildung
-		 *        erzeugt werden.
+		 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der Abbildung erzeugt werden.
+		 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der Abbildung erzeugt werden.
 		 * @param xpath {@link XPath XPath-Auswertungsumgebung}.
 		 */
 		public CachedXPath(final int limit, final int inputMode, final int outputMode, final XPath xpath) {
@@ -426,8 +426,7 @@ public class XML {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object evaluate(final String expression, final Object item, final QName returnType)
-			throws XPathExpressionException {
+		public Object evaluate(final String expression, final Object item, final QName returnType) throws XPathExpressionException {
 			if(expression == null) throw new NullPointerException("expression is null");
 			if(returnType == null) throw new NullPointerException("returnType is null");
 			return this.compile(expression).evaluate(item, returnType);
@@ -446,8 +445,7 @@ public class XML {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object evaluate(final String expression, final InputSource source, final QName returnType)
-			throws XPathExpressionException {
+		public Object evaluate(final String expression, final InputSource source, final QName returnType) throws XPathExpressionException {
 			if(expression == null) throw new NullPointerException("expression is null");
 			if(source == null) throw new NullPointerException("source is null");
 			if(returnType == null) throw new NullPointerException("returnType is null");
@@ -526,8 +524,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Klasse implementiert die Optionen einer {@link XPath XPath-Auswertungsumgebung} sowie einer
-	 * {@link XPathFactory XPath-Factory}.
+	 * Diese Klasse implementiert die Optionen einer {@link XPath XPath-Auswertungsumgebung} sowie einer {@link XPathFactory XPath-Factory}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -570,13 +567,12 @@ public class XML {
 		 */
 		public XPathOptions applyTo(final XPathOptions target) throws NullPointerException {
 			if(target == null) throw new NullPointerException("target is null");
-			return target.setFeatureMap(this.featureMap).setVariableResolver(this.variableResolver)
-				.setFunctionResolver(this.functionResolver).setNamespaceContext(this.namespaceContext);
+			return target.setFeatureMap(this.featureMap).setVariableResolver(this.variableResolver).setFunctionResolver(this.functionResolver)
+				.setNamespaceContext(this.namespaceContext);
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf die gegebene {@link XPath XPath-Auswertungsumgebung} und gibt diese
-		 * zurück.
+		 * Diese Methode überträgt die Optionen auf die gegebene {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück.
 		 * 
 		 * @param target {@link XPath XPath-Auswertungsumgebung}.
 		 * @return {@link XPath XPath-Auswertungsumgebung}.
@@ -604,8 +600,7 @@ public class XML {
 		 * @throws NullPointerException Wenn die gegebene {@link XPathFactory XPath-Factory} {@code null} ist.
 		 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
-		public XPathFactory applyTo(final XPathFactory target) throws NullPointerException,
-			XPathFactoryConfigurationException {
+		public XPathFactory applyTo(final XPathFactory target) throws NullPointerException, XPathFactoryConfigurationException {
 			if(target == null) throw new NullPointerException("target is null");
 			if(this.variableResolver != null){
 				target.setXPathVariableResolver(this.variableResolver);
@@ -671,6 +666,15 @@ public class XML {
 		@Override
 		public XPathOptions setFeatureMap(final Map<String, Boolean> valueMap) throws NullPointerException {
 			super.setFeatureMap(valueMap);
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public XPathOptions setFeatureSecureProcessing(final boolean value) {
+			super.setFeatureSecureProcessing(value);
 			return this;
 		}
 
@@ -747,8 +751,7 @@ public class XML {
 		 */
 		@Override
 		public int hashCode() {
-			return super.hashCode() ^ Objects.hash(this.variableResolver) ^ Objects.hash(this.functionResolver)
-				^ Objects.hash(this.namespaceContext);
+			return super.hashCode() ^ Objects.hash(this.variableResolver) ^ Objects.hash(this.functionResolver) ^ Objects.hash(this.namespaceContext);
 		}
 
 		/**
@@ -760,8 +763,8 @@ public class XML {
 			if(!(object instanceof XPathOptions)) return false;
 			final XPathOptions data = (XPathOptions)object;
 			return super.equals(object)
-				&& Objects.equals(this.variableResolver, data.variableResolver, this.functionResolver, data.functionResolver,
-					this.namespaceContext, data.namespaceContext);
+				&& Objects.equals(this.variableResolver, data.variableResolver, this.functionResolver, data.functionResolver, this.namespaceContext,
+					data.namespaceContext);
 		}
 
 		/**
@@ -769,15 +772,14 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, "XPathOptions", "featureMap", this.featureMap, "variableResolver",
-				this.variableResolver, "functionResolver", this.functionResolver, "namespaceContext", this.namespaceContext);
+			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "variableResolver", this.variableResolver, "functionResolver",
+				this.functionResolver, "namespaceContext", this.namespaceContext});
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert die Optionen eines {@link DocumentBuilder Document-Builder} sowie einer
-	 * {@link DocumentBuilderFactory Document-Builder-Factory}.
+	 * Diese Klasse implementiert die Optionen eines {@link DocumentBuilder Document-Builder} sowie einer {@link DocumentBuilderFactory Document-Builder-Factory}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -875,17 +877,14 @@ public class XML {
 		 */
 		public ParseOptions applyTo(final ParseOptions target) throws NullPointerException {
 			if(target == null) throw new NullPointerException("target is null");
-			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap).setSchema(this.schema)
-				.setValidating(this.validating).setCoalescing(this.coalescing).setErrorHandler(this.errorHandler)
-				.setEntityResolver(this.entityResolver).setExpandEntityReferences(this.expandEntityReferences)
-				.setIgnoringComments(this.ignoringComments)
-				.setIgnoringElementContentWhitespace(this.ignoringElementContentWhitespace)
-				.setXIncludeAware(this.xIncludeAware).setNamespaceAware(this.namespaceAware);
+			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap).setSchema(this.schema).setValidating(this.validating)
+				.setCoalescing(this.coalescing).setErrorHandler(this.errorHandler).setEntityResolver(this.entityResolver)
+				.setExpandEntityReferences(this.expandEntityReferences).setIgnoringComments(this.ignoringComments)
+				.setIgnoringElementContentWhitespace(this.ignoringElementContentWhitespace).setXIncludeAware(this.xIncludeAware).setNamespaceAware(this.namespaceAware);
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf den gegebenen {@link DocumentBuilder Document-Builder} und gibt diesen
-		 * zurück.
+		 * Diese Methode überträgt die Optionen auf den gegebenen {@link DocumentBuilder Document-Builder} und gibt diesen zurück.
 		 * 
 		 * @param target {@link DocumentBuilder Document-Builder}.
 		 * @return {@link DocumentBuilder Document-Builder}.
@@ -899,17 +898,14 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf die gegebene {@link DocumentBuilderFactory Document-Builder-Factory} und
-		 * gibt diese zurück.
+		 * Diese Methode überträgt die Optionen auf die gegebene {@link DocumentBuilderFactory Document-Builder-Factory} und gibt diese zurück.
 		 * 
 		 * @param target {@link DocumentBuilderFactory Document-Builder-Factory}.
 		 * @return {@link DocumentBuilderFactory Document-Builder-Factory}.
-		 * @throws NullPointerException Wenn die gegebene {@link DocumentBuilderFactory Document-Builder-Factory}
-		 *         {@code null} ist.
+		 * @throws NullPointerException Wenn die gegebene {@link DocumentBuilderFactory Document-Builder-Factory} {@code null} ist.
 		 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
-		public DocumentBuilderFactory applyTo(final DocumentBuilderFactory target) throws NullPointerException,
-			ParserConfigurationException {
+		public DocumentBuilderFactory applyTo(final DocumentBuilderFactory target) throws NullPointerException, ParserConfigurationException {
 			if(target == null) throw new NullPointerException("target is null");
 			target.setSchema(this.schema);
 			target.setValidating(this.validating);
@@ -982,6 +978,15 @@ public class XML {
 		@Override
 		public ParseOptions setFeatureMap(final Map<String, Boolean> value) throws NullPointerException {
 			super.setFeatureMap(value);
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ParseOptions setFeatureSecureProcessing(final boolean value) {
+			super.setFeatureSecureProcessing(value);
 			return this;
 		}
 
@@ -1268,12 +1273,9 @@ public class XML {
 			if(object == this) return true;
 			if(!(object instanceof ParseOptions)) return false;
 			final ParseOptions data = (ParseOptions)object;
-			return super.equals(object)
-				&& Objects.equals(this.schema, data.schema, this.errorHandler, data.errorHandler, this.entityResolver,
-					data.entityResolver) && (this.validating == data.validating) && (this.coalescing == data.coalescing)
-				&& (this.expandEntityReferences == data.expandEntityReferences)
-				&& (this.ignoringComments == data.ignoringComments)
-				&& (this.ignoringElementContentWhitespace == data.ignoringElementContentWhitespace)
+			return super.equals(object) && Objects.equals(this.schema, data.schema, this.errorHandler, data.errorHandler, this.entityResolver, data.entityResolver)
+				&& (this.validating == data.validating) && (this.coalescing == data.coalescing) && (this.expandEntityReferences == data.expandEntityReferences)
+				&& (this.ignoringComments == data.ignoringComments) && (this.ignoringElementContentWhitespace == data.ignoringElementContentWhitespace)
 				&& (this.xIncludeAware == data.xIncludeAware) && (this.namespaceAware == data.namespaceAware);
 		}
 
@@ -1282,19 +1284,16 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, "ParseOptions", "featureMap", this.featureMap, "attributeMap",
-				this.attributeMap, "schema", this.schema, "validating", this.validating, "coalescing", this.coalescing,
-				"errorHandler", this.errorHandler, "entityResolver", this.entityResolver, "expandEntityReferences",
-				this.expandEntityReferences, "ignoringComments", this.ignoringComments, "ignoringElementContentWhitespace",
-				this.ignoringElementContentWhitespace, "xIncludeAware", this.xIncludeAware, "namespaceAware",
-				this.namespaceAware);
+			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "schema", this.schema,
+				"validating", this.validating, "coalescing", this.coalescing, "errorHandler", this.errorHandler, "entityResolver", this.entityResolver,
+				"expandEntityReferences", this.expandEntityReferences, "ignoringComments", this.ignoringComments, "ignoringElementContentWhitespace",
+				this.ignoringElementContentWhitespace, "xIncludeAware", this.xIncludeAware, "namespaceAware", this.namespaceAware});
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert die Optionen eines {@link Transformer XSL-Transformers} sowie einer
-	 * {@link TransformerFactory XSL-Transformer-Factory}.
+	 * Diese Klasse implementiert die Optionen eines {@link Transformer XSL-Transformers} sowie einer {@link TransformerFactory XSL-Transformer-Factory}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1342,8 +1341,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf die gegebenen {@link FormatOptions Format-Optionen} und gibt diese
-		 * zurück.
+		 * Diese Methode überträgt die Optionen auf die gegebenen {@link FormatOptions Format-Optionen} und gibt diese zurück.
 		 * 
 		 * @param target {@link FormatOptions Format-Optionen}.
 		 * @return {@link FormatOptions Format-Optionen}.
@@ -1351,14 +1349,12 @@ public class XML {
 		 */
 		public FormatOptions applyTo(final FormatOptions target) throws NullPointerException {
 			if(target == null) throw new NullPointerException("target is null");
-			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap)
-				.setParameterMap(this.parameterMap).setOutputPropertyMap(this.outputPropertyMap)
-				.setUriResolver(this.uriResolver).setErrorListener(this.errorListener);
+			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap).setParameterMap(this.parameterMap)
+				.setOutputPropertyMap(this.outputPropertyMap).setUriResolver(this.uriResolver).setErrorListener(this.errorListener);
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf den gegebenen {@link Transformer XSL-Transformer} und gibt diesen
-		 * zurück.
+		 * Diese Methode überträgt die Optionen auf den gegebenen {@link Transformer XSL-Transformer} und gibt diesen zurück.
 		 * 
 		 * @param target {@link Transformer XSL-Transformer}.
 		 * @return {@link Transformer XSL-Transformer}.
@@ -1380,17 +1376,14 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode überträgt die Optionen auf die gegebene {@link TransformerFactory XSL-Transformer-Factory} und gibt
-		 * diese zurück.
+		 * Diese Methode überträgt die Optionen auf die gegebene {@link TransformerFactory XSL-Transformer-Factory} und gibt diese zurück.
 		 * 
 		 * @param target {@link TransformerFactory XSL-XSL-Transformer-Factory}.
 		 * @return {@link TransformerFactory XSL-Transformer-Factory}.
-		 * @throws NullPointerException Wenn die gegebene {@link TransformerFactory XSL-Transformer-Factory} {@code null}
-		 *         ist.
+		 * @throws NullPointerException Wenn die gegebene {@link TransformerFactory XSL-Transformer-Factory} {@code null} ist.
 		 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
-		public TransformerFactory applyTo(final TransformerFactory target) throws NullPointerException,
-			TransformerConfigurationException {
+		public TransformerFactory applyTo(final TransformerFactory target) throws NullPointerException, TransformerConfigurationException {
 			if(target == null) throw new NullPointerException("target is null");
 			target.setURIResolver(this.uriResolver);
 			if(this.errorListener != null){
@@ -1440,6 +1433,15 @@ public class XML {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public FormatOptions setFeatureSecureProcessing(final boolean value) {
+			super.setFeatureSecureProcessing(value);
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public FormatOptions setAttribute(final String name, final String value) throws NullPointerException {
 			super.setAttribute(name, value);
 			return this;
@@ -1466,8 +1468,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt den Wert des Parameters mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem
-		 * Parameter-Wert {@code null} wird der Parameter entfernt.
+		 * Diese Methode setzt den Wert des Parameters mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem Parameter-Wert {@code null} wird der Parameter entfernt.
 		 * 
 		 * @param name Parameter-Name.
 		 * @param value Parameter-Wert oder {@code null}.
@@ -1489,8 +1490,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt alle Parameter und gibt {@code this} zurück. Wenn die gegebene Parameter-Abbildung
-		 * {@code null} ist, werden alle Parameter entfernt.
+		 * Diese Methode setzt alle Parameter und gibt {@code this} zurück. Wenn die gegebene Parameter-Abbildung {@code null} ist, werden alle Parameter entfernt.
 		 * 
 		 * @param valueMap Parameter-Abbildung oder {@code null}.
 		 * @return {@code this}.
@@ -1514,8 +1514,20 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt den Wert der Ausgabeoption mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem
-		 * Ausgabeoption-Wert {@code null} wird die Ausgabeoption entfernt.
+		 * Diese Methode setzt den Wert der Ausgabeoption mit dem gegebenen Namen und gibt {@code this} zurück.
+		 * 
+		 * @see Transformer#setOutputProperty(String, String)
+		 * @param name Ausgabeoption-Name.
+		 * @param value Ausgabeoption-Wert.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn der gegebene Ausgabeoption-Name {@code null} ist.
+		 */
+		public FormatOptions setOutputProperty(final String name, final boolean value) {
+			return this.setOutputProperty(name, value ? "yes" : "no");
+		}
+
+		/**
+		 * Diese Methode setzt den Wert der Ausgabeoption mit dem gegebenen Namen und gibt {@code this} zurück. Mit dem Ausgabeoption-Wert {@code null} wird die Ausgabeoption entfernt.
 		 * 
 		 * @see Transformer#setOutputProperty(String, String)
 		 * @param name Ausgabeoption-Name.
@@ -1539,8 +1551,7 @@ public class XML {
 		}
 
 		/**
-		 * Diese Methode setzt alle Ausgabeoptionen und gibt {@code this} zurück. Wenn die gegebene Ausgabeoption-Abbildung
-		 * {@code null} ist, werden alle Ausgabeoptionen entfernt.
+		 * Diese Methode setzt alle Ausgabeoptionen und gibt {@code this} zurück. Wenn die gegebene Ausgabeoption-Abbildung {@code null} ist, werden alle Ausgabeoptionen entfernt.
 		 * 
 		 * @see Transformer#setOutputProperty(String, String)
 		 * @param valueMap Ausgabeoption-Abbildung oder {@code null}.
@@ -1550,6 +1561,42 @@ public class XML {
 		public FormatOptions setOutputPropertyMap(final Map<String, String> valueMap) {
 			this.outputPropertyMap = this.set(this.outputPropertyMap, valueMap);
 			return this;
+		}
+
+		/**
+		 * Diese Methode setzt den Wert der Ausgabeoption {@link OutputKeys#INDENT} und gibt {@code this} zurück.
+		 * 
+		 * @see OutputKeys#INDENT
+		 * @see Transformer#setOutputProperty(String, String)
+		 * @param value Ausgabeoption-Wert oder {@code null}.
+		 * @return {@code this}.
+		 */
+		public FormatOptions setOutputIndent(final String value) {
+			return this.setOutputProperty(OutputKeys.INDENT, value);
+		}
+
+		/**
+		 * Diese Methode setzt den Wert der Ausgabeoption {@link OutputKeys#METHOD} und gibt {@code this} zurück. Mit dem Ausgabeoption-Wert {@code null} wird die Ausgabeoption entfernt.
+		 * 
+		 * @see OutputKeys#METHOD
+		 * @see Transformer#setOutputProperty(String, String)
+		 * @param value Ausgabeoption-Wert oder {@code null}.
+		 * @return {@code this}.
+		 */
+		public FormatOptions setOutputMethod(final String value) {
+			return this.setOutputProperty(OutputKeys.METHOD, value);
+		}
+
+		/**
+		 * Diese Methode setzt den Wert der Ausgabeoption {@link OutputKeys#ENCODING} und gibt {@code this} zurück. Mit dem Ausgabeoption-Wert {@code null} wird die Ausgabeoption entfernt.
+		 * 
+		 * @see OutputKeys#ENCODING
+		 * @see Transformer#setOutputProperty(String, String)
+		 * @param value Ausgabeoption-Wert oder {@code null}.
+		 * @return {@code this}.
+		 */
+		public FormatOptions setOutputEncoding(final String value) {
+			return this.setOutputProperty(OutputKeys.ENCODING, value);
 		}
 
 		/**
@@ -1605,8 +1652,8 @@ public class XML {
 		 */
 		@Override
 		public int hashCode() {
-			return super.hashCode() ^ Objects.hash(this.parameterMap) ^ Objects.hash(this.outputPropertyMap)
-				^ Objects.hash(this.uriResolver) ^ Objects.hash(this.errorListener);
+			return super.hashCode() ^ Objects.hash(this.parameterMap) ^ Objects.hash(this.outputPropertyMap) ^ Objects.hash(this.uriResolver)
+				^ Objects.hash(this.errorListener);
 		}
 
 		/**
@@ -1617,8 +1664,7 @@ public class XML {
 			if(object == this) return true;
 			if(!(object instanceof FormatOptions)) return false;
 			final FormatOptions data = (FormatOptions)object;
-			return super.equals(object) && this.equals(this.parameterMap, data.parameterMap)
-				&& this.equals(this.outputPropertyMap, data.outputPropertyMap)
+			return super.equals(object) && this.equals(this.parameterMap, data.parameterMap) && this.equals(this.outputPropertyMap, data.outputPropertyMap)
 				&& Objects.equals(this.uriResolver, data.uriResolver, this.errorListener, data.errorListener);
 		}
 
@@ -1627,39 +1673,35 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, "ParseOptions", "featureMap", this.featureMap, "attributeMap",
-				this.attributeMap, "parameterMap", this.parameterMap, "outputPropertyMap", this.outputPropertyMap,
-				"uriResolver", this.uriResolver, "errorListener", this.errorListener);
+			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "parameterMap",
+				this.parameterMap, "outputPropertyMap", this.outputPropertyMap, "uriResolver", this.uriResolver, "errorListener", this.errorListener});
 		}
 
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link CachedBuilder Cached-Builder} zur Erzeugung bzw. Bereitstellung einer
-	 * {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
+	 * Dieses Feld speichert den {@link CachedBuilder Cached-Builder} zur Erzeugung bzw. Bereitstellung einer {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
 	 */
-	static final Builder<XPath> CACHED_XPATH_BUILDER = Builders.synchronizedBuilder(Builders
-		.cachedBuilder(new Builder<XPath>() {
+	static final Builder<XPath> CACHED_XPATH_BUILDER = Builders.synchronizedBuilder(Builders.cachedBuilder(new Builder<XPath>() {
 
-			@Override
-			public XPath build() {
-				try{
-					return XML.cachedXPath();
-				}catch(final XPathFactoryConfigurationException e){
-					throw new IllegalStateException(e);
-				}
+		@Override
+		public XPath create() {
+			try{
+				return XML.cachedXPath();
+			}catch(final XPathFactoryConfigurationException e){
+				throw new IllegalStateException(e);
 			}
+		}
 
-			@Override
-			public String toString() {
-				return Objects.toStringCall("xpathBuilder");
-			}
+		@Override
+		public String toString() {
+			return Objects.toStringCall("XpathBuilder");
+		}
 
-		}));
+	}));
 
 	/**
-	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des gegebenen {@link Node DOM-Knoten} zurück. Wenn
-	 * der gegebene {@link Node DOM-Knoten} {@code null} ist, wird der gegebenen Standardwert zurück gegeben.
+	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des gegebenen {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, wird der gegebenen Standardwert zurück gegeben.
 	 * 
 	 * @see Node#getTextContent()
 	 * @param node {@link Node DOM-Knoten}.
@@ -1671,10 +1713,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des über seinen Namen gegebenen {@link Attr
-	 * DOM-Attributs} des gegebenen {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null}
-	 * ist oder kein {@link Attr DOM-Attribut} mit dem gegebenen Namen gefunden werden kann, wird der gegebenen
-	 * Standardwert zurück gegeben.
+	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des über seinen Namen gegebenen {@link Attr DOM-Attributs} des gegebenen {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist oder kein {@link Attr DOM-Attribut} mit dem gegebenen Namen gefunden werden kann, wird der gegebenen Standardwert zurück gegeben.
 	 * 
 	 * @see XML#value(Node, String)
 	 * @see Element#getAttributeNode(String)
@@ -1691,10 +1730,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des über seinen Namen und Namensraum gegebenen
-	 * {@link Attr DOM-Attributs} des gegebenen {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist oder kein {@link Attr DOM-Attribut} mit dem gegebenen Namen und Namensraum gefunden werden kann,
-	 * wird der gegebenen Standardwert zurück gegeben.
+	 * Diese Methode gibt den {@link Node#getTextContent() Knotenwert} des über seinen Namen und Namensraum gegebenen {@link Attr DOM-Attributs} des gegebenen {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist oder kein {@link Attr DOM-Attribut} mit dem gegebenen Namen und Namensraum gefunden werden kann, wird der gegebenen Standardwert zurück gegeben.
 	 * 
 	 * @see XML#value(Node, String)
 	 * @see Element#getAttributeNodeNS(String, String)
@@ -1705,8 +1741,7 @@ public class XML {
 	 * @return {@link Node#getTextContent() Knotenwert} oder Standardwert.
 	 * @throws NullPointerException Wenn der gegebene Attribut-Name {@code null} ist.
 	 */
-	public static String value(final Node node, final String namespaceURI, final String localName,
-		final String defaultValue) throws NullPointerException {
+	public static String value(final Node node, final String namespaceURI, final String localName, final String defaultValue) throws NullPointerException {
 		if(namespaceURI == null) throw new NullPointerException("namespaceURI is null");
 		if(localName == null) throw new NullPointerException("localName is null");
 		if((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) return defaultValue;
@@ -1762,8 +1797,7 @@ public class XML {
 	 * @throws NullPointerException Wenn die gegebenen {@link XPathOptions XPath-Kontext-Optionen} {@code null} sind.
 	 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static XPath createXPath(final XPathOptions options) throws NullPointerException,
-		XPathFactoryConfigurationException {
+	public static XPath createXPath(final XPathOptions options) throws NullPointerException, XPathFactoryConfigurationException {
 		if(options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(XPathFactory.newInstance()).newXPath());
 	}
@@ -1781,12 +1815,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine gepufferte {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück. Die erzeugte
-	 * {@link XPath XPath-Auswertungsumgebung} verwaltet die von der gegebenen {@link XPath XPath-Auswertungsumgebung}
-	 * erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über
-	 * {@link SoftPointer} auf Zeichenketten und die Werte als {@link SoftPointer} auf die {@link XPathExpression
-	 * XPath-Ausdrücke} der gegebenen {@link XPath XPath-Auswertungsumgebung} realisiert. Die Anzahl der Einträge in der
-	 * {@link Map} sind nicht beschränkt.
+	 * Diese Methode erzeugt eine gepufferte {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück. Die erzeugte {@link XPath XPath-Auswertungsumgebung} verwaltet die von der gegebenen {@link XPath XPath-Auswertungsumgebung} erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer} auf Zeichenketten und die Werte als {@link SoftPointer} auf die {@link XPathExpression XPath-Ausdrücke} der gegebenen {@link XPath XPath-Auswertungsumgebung} realisiert. Die Anzahl der Einträge in der {@link Map} sind nicht beschränkt.
 	 * 
 	 * @see XML#cachedXPath(int, int, int, XPath)
 	 * @param xpath {@link XPath XPath-Auswertungsumgebung}.
@@ -1808,30 +1837,22 @@ public class XML {
 	 * @throws NullPointerException Wenn die gegebenen {@link XPathOptions XPath-Kontext-Optionen} {@code null} sind.
 	 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static XPath cachedXPath(final XPathOptions options) throws NullPointerException,
-		XPathFactoryConfigurationException {
+	public static XPath cachedXPath(final XPathOptions options) throws NullPointerException, XPathFactoryConfigurationException {
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.cachedXPath(XML.createXPath(options));
 	}
 
 	/**
-	 * Diese Methode erzeugt eine gepufferte {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück. Die erzeugte
-	 * {@link XPath XPath-Auswertungsumgebung} verwaltet die von der gegebenen {@link XPath XPath-Auswertungsumgebung}
-	 * erzeugten {@link XPathExpression XPath-Ausdrücke} in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel
-	 * werden dabei über {@link Pointer} auf Zeichenketten und die Werte als {@link Pointer} auf die
-	 * {@link XPathExpression XPath-Ausdrücke} des gegebenen {@link XPath XPath-Auswertungsumgebung} realisiert.
+	 * Diese Methode erzeugt eine gepufferte {@link XPath XPath-Auswertungsumgebung} und gibt diese zurück. Die erzeugte {@link XPath XPath-Auswertungsumgebung} verwaltet die von der gegebenen {@link XPath XPath-Auswertungsumgebung} erzeugten {@link XPathExpression XPath-Ausdrücke} in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Zeichenketten und die Werte als {@link Pointer} auf die {@link XPathExpression XPath-Ausdrücke} des gegebenen {@link XPath XPath-Auswertungsumgebung} realisiert.
 	 * 
 	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
-	 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map}
-	 *        erzeugt werden.
-	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map}
-	 *        erzeugt werden.
+	 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map} erzeugt werden.
+	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map} erzeugt werden.
 	 * @param xpath {@link XPath XPath-Auswertungsumgebung}.
 	 * @return {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
 	 * @throws NullPointerException wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 	 */
-	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPath xpath)
-		throws NullPointerException {
+	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPath xpath) throws NullPointerException {
 		if(xpath == null) throw new NullPointerException("xpath is null");
 		return new CachedXPath(limit, inputMode, outputMode, xpath);
 	}
@@ -1842,24 +1863,21 @@ public class XML {
 	 * @see XML#createXPath(XPathOptions)
 	 * @see XML#cachedXPath(int, int, int, XPath)
 	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
-	 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map}
-	 *        erzeugt werden.
-	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map}
-	 *        erzeugt werden.
+	 * @param inputMode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map} erzeugt werden.
+	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map} erzeugt werden.
 	 * @param options {@link XPathOptions XPath-Kontext-Optionen}.
 	 * @return {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
 	 * @throws NullPointerException Wenn die gegebenen {@link XPathOptions XPath-Kontext-Optionen} {@code null} sind.
 	 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPathOptions options)
-		throws NullPointerException, XPathFactoryConfigurationException {
+	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPathOptions options) throws NullPointerException,
+		XPathFactoryConfigurationException {
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.cachedXPath(limit, inputMode, outputMode, XML.createXPath(options));
 	}
 
 	/**
-	 * Diese Methode gibt den {@link SynchronizedBuilder Synchronized-}-{@link CachedBuilder Cached}-{@link Builder
-	 * Builder} zur Erzeugung bzw. Bereitstellung einer {@link CachedXPath Cached-XPath-Auswertungsumgebung} zurück.
+	 * Diese Methode gibt den {@link SynchronizedBuilder Synchronized-}-{@link CachedBuilder Cached}-{@link Builder Builder} zur Erzeugung bzw. Bereitstellung einer {@link CachedXPath Cached-XPath-Auswertungsumgebung} zurück.
 	 * 
 	 * @return {@link CachedXPath Cached-XPath-Auswertungsumgebung}-{@link Builder}.
 	 */
@@ -1868,9 +1886,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XML#cachedXPathBuilder()
 	 * @see XML#evaluateNode(XPath, String, Node)
@@ -1878,19 +1894,15 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Node DOM-Knoten}.
 	 * @throws NullPointerException Wenn die gegebene Zeichenkette {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Node evaluateNode(final String script, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Node evaluateNode(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNode(XML.CACHED_XPATH_BUILDER.build(), script, input);
+		return XML.evaluateNode(XML.CACHED_XPATH_BUILDER.create(), script, input);
 	}
 
 	/**
-	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten}
-	 * aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XPathConstants#NODE
 	 * @see XPathExpression#evaluate(Object, QName)
@@ -1898,11 +1910,9 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Node DOM-Knoten}.
 	 * @throws NullPointerException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Node evaluateNode(final XPathExpression source, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Node evaluateNode(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		synchronized(source){
 			return (Node)source.evaluate(input, XPathConstants.NODE);
@@ -1910,10 +1920,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
-	 * Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Node DOM-Knoten} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}. Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
 	 * 
 	 * @see XPath#compile(String)
 	 * @see XML#evaluateNode(XPathExpression, Node)
@@ -1921,13 +1928,10 @@ public class XML {
 	 * @param script {@link XPathExpression XPath-Ausdruck} als Zeichenkette.
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Node DOM-Knoten}.
-	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath
-	 *         XPath-Auswertungsumgebung} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Node evaluateNode(final XPath source, final String script, final Node input)
-		throws NullPointerException, XPathExpressionException {
+	public static Node evaluateNode(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		synchronized(source){
@@ -1936,9 +1940,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XML#cachedXPathBuilder()
 	 * @see XML#evaluateNodeSet(XPath, String, Node)
@@ -1946,19 +1948,15 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link NodeList DOM-Knotenliste}.
 	 * @throws NullPointerException Wenn die gegebene Zeichenkette {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static NodeList evaluateNodeSet(final String script, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static NodeList evaluateNodeSet(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNodeSet(XML.CACHED_XPATH_BUILDER.build(), script, input);
+		return XML.evaluateNodeSet(XML.CACHED_XPATH_BUILDER.create(), script, input);
 	}
 
 	/**
-	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten}
-	 * aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XPathConstants#NODESET
 	 * @see XPathExpression#evaluate(Object, QName)
@@ -1966,11 +1964,9 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link NodeList DOM-Knotenliste}.
 	 * @throws NullPointerException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static NodeList evaluateNodeSet(final XPathExpression source, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static NodeList evaluateNodeSet(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		synchronized(source){
 			return (NodeList)source.evaluate(input, XPathConstants.NODESET);
@@ -1978,10 +1974,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
-	 * Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link NodeList DOM-Knotenliste} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}. Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
 	 * 
 	 * @see XPath#compile(String)
 	 * @see XML#evaluateNodeSet(XPathExpression, Node)
@@ -1989,13 +1982,10 @@ public class XML {
 	 * @param script {@link XPathExpression XPath-Ausdruck} als Zeichenkette.
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link NodeList DOM-Knotenliste}.
-	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath
-	 *         XPath-Auswertungsumgebung} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static NodeList evaluateNodeSet(final XPath source, final String script, final Node input)
-		throws NullPointerException, XPathExpressionException {
+	public static NodeList evaluateNodeSet(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		synchronized(source){
@@ -2004,9 +1994,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XML#cachedXPathBuilder()
 	 * @see XML#evaluateString(XPath, String, Node)
@@ -2014,19 +2002,15 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link String Textwert}.
 	 * @throws NullPointerException Wenn die gegebene Zeichenkette {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static String evaluateString(final String script, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static String evaluateString(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateString(XML.CACHED_XPATH_BUILDER.build(), script, input);
+		return XML.evaluateString(XML.CACHED_XPATH_BUILDER.create(), script, input);
 	}
 
 	/**
-	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten}
-	 * aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XPathConstants#NODE
 	 * @see XPathExpression#evaluate(Object, QName)
@@ -2034,11 +2018,9 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link String Textwert}.
 	 * @throws NullPointerException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static String evaluateString(final XPathExpression source, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static String evaluateString(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		synchronized(source){
 			return (String)source.evaluate(input, XPathConstants.STRING);
@@ -2046,10 +2028,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
-	 * Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link String Textwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}. Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
 	 * 
 	 * @see XPath#compile(String)
 	 * @see XML#evaluateString(XPathExpression, Node)
@@ -2057,13 +2036,10 @@ public class XML {
 	 * @param script {@link XPathExpression XPath-Ausdruck} als Zeichenkette.
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link String Textwert}.
-	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath
-	 *         XPath-Auswertungsumgebung} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static String evaluateString(final XPath source, final String script, final Node input)
-		throws NullPointerException, XPathExpressionException {
+	public static String evaluateString(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		synchronized(source){
@@ -2072,9 +2048,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XML#cachedXPathBuilder()
 	 * @see XML#evaluateBoolean(XPath, String, Node)
@@ -2082,19 +2056,15 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Boolean Wahrheitswert}.
 	 * @throws NullPointerException Wenn die gegebene Zeichenkette {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Boolean evaluateBoolean(final String script, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Boolean evaluateBoolean(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateBoolean(XML.CACHED_XPATH_BUILDER.build(), script, input);
+		return XML.evaluateBoolean(XML.CACHED_XPATH_BUILDER.create(), script, input);
 	}
 
 	/**
-	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten}
-	 * aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XPathConstants#BOOLEAN
 	 * @see XPathExpression#evaluate(Object, QName)
@@ -2102,11 +2072,9 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Boolean Wahrheitswert}.
 	 * @throws NullPointerException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Boolean evaluateBoolean(final XPathExpression source, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Boolean evaluateBoolean(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		synchronized(source){
 			return (Boolean)source.evaluate(input, XPathConstants.BOOLEAN);
@@ -2114,10 +2082,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
-	 * Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Boolean Wahrheitswert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}. Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
 	 * 
 	 * @see XPath#compile(String)
 	 * @see XML#evaluateBoolean(XPathExpression, Node)
@@ -2125,13 +2090,10 @@ public class XML {
 	 * @param script {@link XPathExpression XPath-Ausdruck} als Zeichenkette.
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Boolean Wahrheitswert}.
-	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath
-	 *         XPath-Auswertungsumgebung} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Boolean evaluateBoolean(final XPath source, final String script, final Node input)
-		throws NullPointerException, XPathExpressionException {
+	public static Boolean evaluateBoolean(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		synchronized(source){
@@ -2140,9 +2102,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XML#cachedXPathBuilder()
 	 * @see XML#evaluateNumber(XPath, String, Node)
@@ -2150,19 +2110,15 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Number Zahlenwert}.
 	 * @throws NullPointerException Wenn die gegebene Zeichenkette {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Number evaluateNumber(final String script, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Number evaluateNumber(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNumber(XML.CACHED_XPATH_BUILDER.build(), script, input);
+		return XML.evaluateNumber(XML.CACHED_XPATH_BUILDER.create(), script, input);
 	}
 
 	/**
-	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten}
-	 * aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene {@link Node DOM-Knoten}
-	 * {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
+	 * Diese Methode wertet den gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
 	 * 
 	 * @see XPathConstants#NUMBER
 	 * @see XPathExpression#evaluate(Object, QName)
@@ -2170,11 +2126,9 @@ public class XML {
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Number Zahlenwert}.
 	 * @throws NullPointerException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Number evaluateNumber(final XPathExpression source, final Node input) throws NullPointerException,
-		XPathExpressionException {
+	public static Number evaluateNumber(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		synchronized(source){
 			return (Number)source.evaluate(input, XPathConstants.NUMBER);
@@ -2182,10 +2136,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen
-	 * {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene
-	 * {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}.
-	 * Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
+	 * Diese Methode wertet den als Zeichenkette gegebenen {@link XPathExpression XPath-Ausdruck} auf dem gegebenen {@link Node DOM-Knoten} aus und gibt das Ergebnis als {@link Number Zahlenwert} zurück. Wenn der gegebene {@link Node DOM-Knoten} {@code null} ist, erfolgt die Auswertung auf einem leeren {@link Document DOM-Dokument}. Der {@link XPathExpression XPath-Ausdruck} wird über die gegebene {@link XPath XPath-Auswertungsumgebung} erzeugt.
 	 * 
 	 * @see XPath#compile(String)
 	 * @see XML#evaluateNumber(XPathExpression, Node)
@@ -2193,13 +2144,10 @@ public class XML {
 	 * @param script {@link XPathExpression XPath-Ausdruck} als Zeichenkette.
 	 * @param input {@link Node DOM-Knoten} oder {@code null}.
 	 * @return {@link Number Zahlenwert}.
-	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath
-	 *         XPath-Auswertungsumgebung} {@code null} ist.
-	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden
-	 *         kann.
+	 * @throws NullPointerException Wenn die gegebene Zeichenkette bzw. die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
-	public static Number evaluateNumber(final XPath source, final String script, final Node input)
-		throws NullPointerException, XPathExpressionException {
+	public static Number evaluateNumber(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		synchronized(source){
@@ -2230,15 +2178,13 @@ public class XML {
 	 * @throws NullPointerException Wenn die gegebenen {@link ParseOptions Parse-Optionen} {@code null} sind.
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final ParseOptions options) throws NullPointerException,
-		ParserConfigurationException {
+	public static Document createDocument(final ParseOptions options) throws NullPointerException, ParserConfigurationException {
 		if(options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(DocumentBuilderFactory.newInstance()).newDocumentBuilder()).newDocument();
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link String Zeichenkette} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link String Zeichenkette} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @see ParseOptions#DEFAULT
 	 * @see XML#createDocument(String, ParseOptions)
@@ -2249,36 +2195,32 @@ public class XML {
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final String source) throws NullPointerException, SAXException, IOException,
-		ParserConfigurationException {
+	public static Document createDocument(final String source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link String Zeichenkette} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link String Zeichenkette} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @see XML#createDocument(Reader, ParseOptions)
 	 * @param source Quelldokument als {@link String Zeichenkette}.
 	 * @param options {@link ParseOptions ParseOptions}.
 	 * @return {@link Document DOM-Dokument}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen} {@code null} sind.
 	 * @throws SAXException Wenn die Konvertierung des gegebenen Quelldokuments fehlschlägt
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt.
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final String source, final ParseOptions options) throws NullPointerException,
-		SAXException, IOException, ParserConfigurationException {
+	public static Document createDocument(final String source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
+		ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.createDocument(new StringReader(source), options);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @see ParseOptions#DEFAULT
 	 * @see XML#createDocument(Reader, ParseOptions)
@@ -2289,36 +2231,32 @@ public class XML {
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final Reader source) throws NullPointerException, SAXException, IOException,
-		ParserConfigurationException {
+	public static Document createDocument(final Reader source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @see XML#createDocument(InputSource, ParseOptions)
 	 * @param source Quelldokument als {@link Reader Reader}.
 	 * @param options {@link ParseOptions ParseOptions}.
 	 * @return {@link Document DOM-Dokument}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen} {@code null} sind.
 	 * @throws SAXException Wenn die Konvertierung des gegebenen Quelldokuments fehlschlägt
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt.
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final Reader source, final ParseOptions options) throws NullPointerException,
-		SAXException, IOException, ParserConfigurationException {
+	public static Document createDocument(final Reader source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
+		ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.createDocument(new InputSource(source), options);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @see ParseOptions#DEFAULT
 	 * @see XML#createDocument(InputSource, ParseOptions)
@@ -2329,35 +2267,31 @@ public class XML {
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final InputSource source) throws NullPointerException, SAXException,
-		IOException, ParserConfigurationException {
+	public static Document createDocument(final InputSource source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document
-	 * DOM-Dokument} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link InputSource InputSource} gegebene Quelldokument zu einem {@link Document DOM-Dokument} und gibt dieses zurück.
 	 * 
 	 * @param source Quelldokument als {@link InputSource InputSource}.
 	 * @param options {@link ParseOptions ParseOptions}.
 	 * @return {@link Document DOM-Dokument}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die gegebenen {@link ParseOptions Parse-Optionen} {@code null} sind.
 	 * @throws SAXException Wenn die Konvertierung des gegebenen Quelldokuments fehlschlägt
 	 * @throws IOException Wenn das Lesen des gegebenen Quelldokuments fehlschlägt.
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
-	public static Document createDocument(final InputSource source, final ParseOptions options)
-		throws NullPointerException, SAXException, IOException, ParserConfigurationException {
+	public static Document createDocument(final InputSource source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
+		ParserConfigurationException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(DocumentBuilderFactory.newInstance()).newDocumentBuilder()).parse(source);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link String} gegebene Quelldokument zu einem {@link Templates XSL-Template} und
-	 * gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link String} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see FormatOptions#DEFAULT
 	 * @see XML#createTemplates(String, FormatOptions)
@@ -2365,40 +2299,35 @@ public class XML {
 	 * @return {@link Templates XSL-Template}.
 	 * @throws NullPointerException Wenn das gegebene Quelldokument {@code null} ist.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final String source) throws NullPointerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final String source) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link String} gegebene Quelldokument zu einem {@link Templates XSL-Template} und
-	 * gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link String} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see StringReader
 	 * @see XML#createTemplates(Reader)
 	 * @param source Quelldokument als {@link String}.
 	 * @param options {@link FormatOptions Format-Optionen}.
 	 * @return {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final String source, final FormatOptions options)
-		throws NullPointerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final String source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new StringReader(source), options);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Node Node} gegebene Quelldokument zu einem {@link Templates XSL-Template}
-	 * und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Node Node} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see FormatOptions#DEFAULT
 	 * @see XML#createTemplates(Node, FormatOptions)
@@ -2406,40 +2335,35 @@ public class XML {
 	 * @return {@link Templates XSL-Template}.
 	 * @throws NullPointerException Wenn das gegebene Quelldokument {@code null} ist.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Node source) throws NullPointerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Node source) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Node Node} gegebene Quelldokument zu einem {@link Templates XSL-Template}
-	 * und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Node Node} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see DOMSource
 	 * @see XML#createTemplates(Source)
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param options {@link FormatOptions Format-Optionen}.
 	 * @return {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Node source, final FormatOptions options) throws NullPointerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Node source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new DOMSource(source), options);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Templates
-	 * XSL-Template} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see FormatOptions#DEFAULT
 	 * @see XML#createTemplates(Reader, FormatOptions)
@@ -2447,40 +2371,35 @@ public class XML {
 	 * @return {@link Templates XSL-Template}.
 	 * @throws NullPointerException Wenn das gegebene Quelldokument {@code null} ist.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Reader source) throws NullPointerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Reader source) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Templates
-	 * XSL-Template} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Reader Reader} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see StreamSource
 	 * @see XML#createTemplates(Source)
 	 * @param source Quelldokument als {@link Reader Reader}.
 	 * @param options {@link FormatOptions Format-Optionen}.
 	 * @return {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Reader source, final FormatOptions options)
-		throws NullPointerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Reader source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new StreamSource(source), options);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Source Source} gegebene Quelldokument zu einem {@link Templates
-	 * XSL-Template} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Source Source} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @see FormatOptions#DEFAULT
 	 * @see XML#createTemplates(Source, FormatOptions)
@@ -2488,39 +2407,33 @@ public class XML {
 	 * @return {@link Templates XSL-Template}.
 	 * @throws NullPointerException Wenn das gegebene Quelldokument {@code null} ist.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Source source) throws NullPointerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Source source) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode konvertiert das als {@link Source Source} gegebene Quelldokument zu einem {@link Templates
-	 * XSL-Template} und gibt dieses zurück.
+	 * Diese Methode konvertiert das als {@link Source Source} gegebene Quelldokument zu einem {@link Templates XSL-Template} und gibt dieses zurück.
 	 * 
 	 * @param source Quelldokument als {@link Source Source}.
 	 * @param options {@link FormatOptions Format-Optionen}.
 	 * @return {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen}
-	 *         {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument oder die {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerConfigurationException Wenn die Erzeugung des {@link Templates XSL-Templates} fehlschlägt.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static Templates createTemplates(final Source source, final FormatOptions options)
-		throws NullPointerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static Templates createTemplates(final Source source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		return options.applyTo(TransformerFactory.newInstance()).newTemplates(source);
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein
-	 * {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @see XML#transform(Writer, Node)
 	 * @param source Quelldokument als {@link Node Node}.
@@ -2528,11 +2441,10 @@ public class XML {
 	 * @throws NullPointerException Wenn das gegebene Quelldokument bzw. das gegebene Zieldokument {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static String transform(final Node source) throws NullPointerException, TransformerException,
-		TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static String transform(final Node source) throws NullPointerException, TransformerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		final Writer target = new StringWriter();
 		XML.transform(target, source);
@@ -2540,20 +2452,16 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein neuer {@link Transformer
-	 * XSL-Transformer} verwendet, welcher über das gegebene {@link Templates XSL-Template} erzeugt wurde.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein neuer {@link Transformer XSL-Transformer} verwendet, welcher über das gegebene {@link Templates XSL-Template} erzeugt wurde.
 	 * 
 	 * @see XML#transform(Writer, Node, Templates)
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param script {@link Templates XSL-Template}.
 	 * @return Zieldokument als {@link String Zeichenkette}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene
-	 *         {@link Templates XSL-Template} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene {@link Templates XSL-Template} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static String transform(final Node source, final Templates script) throws NullPointerException,
-		TransformerException {
+	public static String transform(final Node source, final Templates script) throws NullPointerException, TransformerException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		final Writer target = new StringWriter();
@@ -2562,20 +2470,16 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird der gegebenen {@link Transformer
-	 * XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird der gegebenen {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @see XML#transform(Result, Source, Transformer)
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param script {@link Transformer XSL-Transformer}.
 	 * @return Zieldokument als {@link String Zeichenkette}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene
-	 *         {@link Transformer XSL-Transformer} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene {@link Transformer XSL-Transformer} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static String transform(final Node source, final Transformer script) throws NullPointerException,
-		TransformerException {
+	public static String transform(final Node source, final Transformer script) throws NullPointerException, TransformerException {
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
 		final Writer target = new StringWriter();
@@ -2584,25 +2488,20 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Writer Writer} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein
-	 * {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet, welcher über die
-	 * gegebenen {@link FormatOptions Format-Optionen} konfiguriert wurde.
+	 * Diese Methode transformiert das als {@link Writer Writer} gegebenen Quelldokument in ein Zieldokument als {@link String Zeichenkette} und gibt dieses zurück. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet, welcher über die gegebenen {@link FormatOptions Format-Optionen} konfiguriert wurde.
 	 * 
 	 * @see XML#transform(Result, Source, FormatOptions)
 	 * @see TransformerFactory#newTransformer()
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param options {@link FormatOptions Format-Optionen}.
 	 * @return Zieldokument als {@link String Zeichenkette}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen
-	 *         {@link FormatOptions Format-Optionen} {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static String transform(final Node source, final FormatOptions options) throws NullPointerException,
-		TransformerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static String transform(final Node source, final FormatOptions options) throws NullPointerException, TransformerException,
+		TransformerConfigurationException, TransformerFactoryConfigurationError {
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
 		final Writer target = new StringWriter();
@@ -2611,9 +2510,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Writer Writer}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer}
-	 * {@link Transformer XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link Writer Writer}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @see XML#transform(Result, Source)
 	 * @param target Zieldokument als {@link Writer Writer}.
@@ -2621,31 +2518,26 @@ public class XML {
 	 * @throws NullPointerException Wenn das gegebene Quelldokument bzw. das gegebene Zieldokument {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static void transform(final Writer target, final Node source) throws NullPointerException,
-		TransformerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static void transform(final Writer target, final Node source) throws NullPointerException, TransformerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		XML.transform(new StreamResult(target), new DOMSource(source));
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Writer Writer}. Zur Transformation wird ein neuer {@link Transformer XSL-Transformer} verwendet, welcher
-	 * über das gegebene {@link Templates XSL-Template} erzeugt wurde.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link Writer Writer}. Zur Transformation wird ein neuer {@link Transformer XSL-Transformer} verwendet, welcher über das gegebene {@link Templates XSL-Template} erzeugt wurde.
 	 * 
 	 * @see XML#transform(Result, Source, Templates)
 	 * @param target Zieldokument als {@link Writer Writer}.
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param script {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene
-	 *         {@link Templates XSL-Template} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene {@link Templates XSL-Template} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static void transform(final Writer target, final Node source, final Templates script)
-		throws NullPointerException, TransformerException {
+	public static void transform(final Writer target, final Node source, final Templates script) throws NullPointerException, TransformerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
@@ -2653,19 +2545,16 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Writer Writer}. Zur Transformation wird der gegebenen {@link Transformer XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link Writer Writer}. Zur Transformation wird der gegebenen {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @see XML#transform(Result, Source, Transformer)
 	 * @param target Zieldokument als {@link Writer Writer}.
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param script {@link Transformer XSL-Transformer}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene
-	 *         {@link Transformer XSL-Transformer} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene {@link Transformer XSL-Transformer} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static void transform(final Writer target, final Node source, final Transformer script)
-		throws NullPointerException, TransformerException {
+	public static void transform(final Writer target, final Node source, final Transformer script) throws NullPointerException, TransformerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
@@ -2673,26 +2562,20 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Writer Writer}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer}
-	 * {@link Transformer XSL-Transformer} verwendet, welcher über die gegebenen {@link FormatOptions Format-Optionen}
-	 * konfiguriert wurde.
+	 * Diese Methode transformiert das als {@link Node Node} gegebenen Quelldokument in ein Zieldokument als {@link Writer Writer}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet, welcher über die gegebenen {@link FormatOptions Format-Optionen} konfiguriert wurde.
 	 * 
 	 * @see XML#transform(Result, Source, FormatOptions)
 	 * @see TransformerFactory#newTransformer()
 	 * @param target Zieldokument als {@link Writer Writer}.
 	 * @param source Quelldokument als {@link Node Node}.
 	 * @param options {@link FormatOptions Format-Optionen}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen
-	 *         {@link FormatOptions Format-Optionen} {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static void transform(final Writer target, final Node source, final FormatOptions options)
-		throws NullPointerException, TransformerException, TransformerConfigurationException,
-		TransformerFactoryConfigurationError {
+	public static void transform(final Writer target, final Node source, final FormatOptions options) throws NullPointerException, TransformerException,
+		TransformerConfigurationException, TransformerFactoryConfigurationError {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
@@ -2700,9 +2583,7 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Result Result}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer}
-	 * {@link Transformer XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als {@link Result Result}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @see XML#transform(Result, Source, FormatOptions)
 	 * @see FormatOptions#DEFAULT
@@ -2712,31 +2593,26 @@ public class XML {
 	 * @throws NullPointerException Wenn das gegebene Quelldokument bzw. das gegebene Zieldokument {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static void transform(final Result target, final Source source) throws NullPointerException,
-		TransformerException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	public static void transform(final Result target, final Source source) throws NullPointerException, TransformerException, TransformerConfigurationException,
+		TransformerFactoryConfigurationError {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		XML.transform(target, source, FormatOptions.DEFAULT);
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Result Result}. Zur Transformation wird ein neuer {@link Transformer XSL-Transformer} verwendet, welcher
-	 * über das gegebene {@link Templates XSL-Template} erzeugt wurde.
+	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als {@link Result Result}. Zur Transformation wird ein neuer {@link Transformer XSL-Transformer} verwendet, welcher über das gegebene {@link Templates XSL-Template} erzeugt wurde.
 	 * 
 	 * @see Templates#newTransformer()
 	 * @param target Zieldokument als {@link Result Result}.
 	 * @param source Quelldokument als {@link Source Source}.
 	 * @param script {@link Templates XSL-Template}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene
-	 *         {@link Templates XSL-Template} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. das gegebene {@link Templates XSL-Template} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static void transform(final Result target, final Source source, final Templates script)
-		throws NullPointerException, TransformerException {
+	public static void transform(final Result target, final Source source, final Templates script) throws NullPointerException, TransformerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
@@ -2744,18 +2620,15 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Result Result}. Zur Transformation wird der gegebenen {@link Transformer XSL-Transformer} verwendet.
+	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als {@link Result Result}. Zur Transformation wird der gegebenen {@link Transformer XSL-Transformer} verwendet.
 	 * 
 	 * @param target Zieldokument als {@link Result Result}.
 	 * @param source Quelldokument als {@link Source Source}.
 	 * @param script {@link Transformer XSL-Transformer}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene
-	 *         {@link Transformer XSL-Transformer} {@code null} ist.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. der gegebene {@link Transformer XSL-Transformer} {@code null} ist.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
-	public static void transform(final Result target, final Source source, final Transformer script)
-		throws NullPointerException, TransformerException {
+	public static void transform(final Result target, final Source source, final Transformer script) throws NullPointerException, TransformerException {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(script == null) throw new NullPointerException("script is null");
@@ -2765,25 +2638,19 @@ public class XML {
 	}
 
 	/**
-	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als
-	 * {@link Result Result}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer}
-	 * {@link Transformer XSL-Transformer} verwendet, welcher über die gegebenen {@link FormatOptions Format-Optionen}
-	 * konfiguriert wurde.
+	 * Diese Methode transformiert das als {@link Source Source} gegebenen Quelldokument in ein Zieldokument als {@link Result Result}. Zur Transformation wird ein {@link TransformerFactory#newTransformer() neuer} {@link Transformer XSL-Transformer} verwendet, welcher über die gegebenen {@link FormatOptions Format-Optionen} konfiguriert wurde.
 	 * 
 	 * @see TransformerFactory#newTransformer()
 	 * @param target Zieldokument als {@link Result Result}.
 	 * @param source Quelldokument als {@link Source Source}.
 	 * @param options {@link FormatOptions Format-Optionen}.
-	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen
-	 *         {@link FormatOptions Format-Optionen} {@code null} sind.
+	 * @throws NullPointerException Wenn das gegebene Quelldokument, das gegebene Zieldokument bzw. die gegebenen {@link FormatOptions Format-Optionen} {@code null} sind.
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
-	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory}
-	 *         Implementation verfügbar ist.
+	 * @throws TransformerFactoryConfigurationError Wenn keine {@link TransformerFactory XSL-Transformer-Factory} Implementation verfügbar ist.
 	 */
-	public static void transform(final Result target, final Source source, final FormatOptions options)
-		throws NullPointerException, TransformerException, TransformerConfigurationException,
-		TransformerFactoryConfigurationError {
+	public static void transform(final Result target, final Source source, final FormatOptions options) throws NullPointerException, TransformerException,
+		TransformerConfigurationException, TransformerFactoryConfigurationError {
 		if(target == null) throw new NullPointerException("target is null");
 		if(source == null) throw new NullPointerException("source is null");
 		if(options == null) throw new NullPointerException("options is null");
