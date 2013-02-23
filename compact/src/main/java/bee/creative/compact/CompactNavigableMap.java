@@ -22,8 +22,7 @@ import java.util.SortedSet;
  * @param <GValue> Typ der Werte.
  */
 @SuppressWarnings ("javadoc")
-public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements
-	NavigableMap<GKey, GValue> {
+public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
 	/**
 	 * Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
@@ -32,8 +31,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GData> Typ der {@link NavigableMap}.
 	 */
-	protected static abstract class AbstractNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends
-		AbstractSet<GKey> implements NavigableSet<GKey> {
+	protected static abstract class AbstractNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends AbstractSet<GKey> implements NavigableSet<GKey> {
 
 		/**
 		 * Dieses Feld speichert die {@link NavigableMap}.
@@ -106,8 +104,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NavigableSet<GKey> subSet(final GKey fromElement, final boolean fromInclusive, final GKey toElement,
-			final boolean toInclusive) {
+		public NavigableSet<GKey> subSet(final GKey fromElement, final boolean fromInclusive, final GKey toElement, final boolean toInclusive) {
 			return this.data.subMap(fromElement, fromInclusive, toElement, toInclusive).navigableKeySet();
 		}
 
@@ -249,8 +246,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 */
-	protected static final class CompactNavigableKeySet<GKey> extends
-		CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
+	protected static final class CompactNavigableKeySet<GKey> extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap}.
@@ -287,8 +283,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @param data {@link CompactAscendingSubMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist.
 		 */
-		public CompactAscendingKeySet(final CompactNavigableMap.CompactAscendingSubMap<GKey, ?> data)
-			throws NullPointerException {
+		public CompactAscendingKeySet(final CompactNavigableMap.CompactAscendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
 
@@ -317,8 +312,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @param data {@link CompactDescendingSubMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist.
 		 */
-		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data)
-			throws NullPointerException {
+		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
 
@@ -327,8 +321,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public Iterator<GKey> iterator() {
-			return new CompactMapKeyDescendingIterator<GKey>(this.data.data, this.data.firstIndex(),
-				this.data.lastIndex() + 1);
+			return new CompactMapKeyDescendingIterator<GKey>(this.data.data, this.data.firstIndex(), this.data.lastIndex() + 1);
 		}
 
 	}
@@ -340,12 +333,11 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 */
-	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends
-		CompactSubData<CompactNavigableMap<GKey, GValue>> implements NavigableMap<GKey, GValue> {
+	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends CompactSubData<CompactNavigableMap<GKey, GValue>> implements
+		NavigableMap<GKey, GValue> {
 
 		/**
-		 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
-		 * {@link CompactNavigableSubMap} delegiert.
+		 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactNavigableSubMap} delegiert.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
@@ -388,14 +380,12 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			 */
 			@Override
 			public Iterator<Entry<GKey, GValue>> iterator() {
-				return new CompactMapEntryIterator<GKey, GValue>(this.data.data, this.data.firstIndex(),
-					this.data.lastIndex() - 1);
+				return new CompactMapEntryIterator<GKey, GValue>(this.data.data, this.data.firstIndex(), this.data.lastIndex() - 1);
 			}
 		}
 
 		/**
-		 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
-		 * {@link CompactNavigableSubMap} delegiert.
+		 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactNavigableSubMap} delegiert.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Werte.
@@ -452,8 +442,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactNavigableSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) {
+		public CompactNavigableSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
@@ -625,8 +615,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 */
-	protected static final class CompactAscendingSubMap<GKey, GValue> extends
-		CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
+	protected static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
@@ -638,8 +627,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactAscendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactAscendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) throws IllegalArgumentException {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
@@ -768,8 +757,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.fromItem,
-				this.fromInclusive, this.lastItem, this.lastInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/**
@@ -784,12 +772,10 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey,
-			final boolean toInclusive) {
+		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, fromInclusive, toKey,
-				toInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, fromInclusive, toKey, toInclusive);
 		}
 
 		/**
@@ -798,8 +784,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive,
-				toKey, inclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, toKey, inclusive);
 		}
 
 		/**
@@ -808,8 +793,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, inclusive, this.lastItem,
-				this.lastInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 	}
@@ -821,8 +805,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
 	 */
-	protected static final class CompactDescendingSubMap<GKey, GValue> extends
-		CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
+	protected static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -835,8 +818,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
 
-		public CompactDescendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactDescendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) throws IllegalArgumentException {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 
 		}
@@ -966,8 +949,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
-			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive,
-				this.lastItem, this.lastInclusive);
+			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/**
@@ -982,12 +964,10 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey,
-			final boolean toInclusive) {
+		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if(!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if(!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, toInclusive, fromKey,
-				fromInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, toInclusive, fromKey, fromInclusive);
 		}
 
 		/**
@@ -996,8 +976,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if(!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, inclusive, this.fromItem,
-				this.fromInclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, inclusive, this.fromItem, this.fromInclusive);
 		}
 
 		/**
@@ -1006,8 +985,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if(!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.lastItem,
-				this.lastInclusive, fromKey, inclusive);
+			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.lastItem, this.lastInclusive, fromKey, inclusive);
 		}
 
 	}
@@ -1037,8 +1015,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator)
-		throws IllegalArgumentException, NullPointerException {
+	public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator) throws IllegalArgumentException, NullPointerException {
 		this(comparator);
 		this.allocate(capacity);
 	}
@@ -1052,8 +1029,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
 	 */
-	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator)
-		throws NullPointerException {
+	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
 		if(map == null) throw new NullPointerException("map is null");
 		this.allocate(map.size());
@@ -1268,8 +1244,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 */
 	@Override
 	public NavigableMap<GKey, GValue> descendingMap() {
-		return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this, CompactSubData.OPEN, true,
-			CompactSubData.OPEN, true);
+		return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this, CompactSubData.OPEN, true, CompactSubData.OPEN, true);
 	}
 
 	/**
@@ -1300,10 +1275,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey,
-		final boolean toInclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, fromInclusive, toKey,
-			toInclusive);
+	public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
+		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, fromInclusive, toKey, toInclusive);
 	}
 
 	/**
@@ -1319,8 +1292,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 */
 	@Override
 	public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, CompactSubData.OPEN, true, toKey,
-			inclusive);
+		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, CompactSubData.OPEN, true, toKey, inclusive);
 	}
 
 	/**
@@ -1336,8 +1308,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 */
 	@Override
 	public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, inclusive, CompactSubData.OPEN,
-			true);
+		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, inclusive, CompactSubData.OPEN, true);
 	}
 
 }

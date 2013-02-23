@@ -20,8 +20,7 @@ import java.util.Set;
 public abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
 	/**
-	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer
-	 * {@link CompactMap} delegiert.
+	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer {@link CompactMap} delegiert.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -74,8 +73,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 */
-	protected static final class CompactMapKeyAscendingIterator<GKey> extends
-		CompactDataAscendingIterator<GKey, CompactMap<GKey, ?>> {
+	protected static final class CompactMapKeyAscendingIterator<GKey> extends CompactDataAscendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -104,8 +102,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 */
-	protected static final class CompactMapKeyDescendingIterator<GKey> extends
-		CompactDataDescendingIterator<GKey, CompactMap<GKey, ?>> {
+	protected static final class CompactMapKeyDescendingIterator<GKey> extends CompactDataDescendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -162,8 +159,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer
-	 * {@link CompactMap} delegiert.
+	 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactMap} delegiert.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte.
@@ -285,8 +281,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer
-	 * {@link CompactMap} delegiert.
+	 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactMap} delegiert.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
@@ -341,8 +336,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <V> Typ der Werte.
 	 */
-	protected static final class CompactMapEntryIterator<GKey, V> extends
-		CompactDataAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
+	protected static final class CompactMapEntryIterator<GKey, V> extends CompactDataAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
@@ -435,9 +429,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	protected abstract void setEntry(int index, GKey key, GValue value);
 
 	/**
-	 * Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den
-	 * Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der
-	 * Index, bei dem der Eintrag eingefügt werden müsste.
+	 * Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#defaultEqualsIndex(Object, int)
 	 * @see CompactData#defaultCompareIndex(Object, int)

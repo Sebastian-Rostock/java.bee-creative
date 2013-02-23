@@ -168,7 +168,7 @@ public final class Scopes {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall(true, true, "ReturnValue", "value", this.value, "scope", this.scope, "function", this.function);
+				return Objects.toStringCall(true, true, this, new Object[]{"value", this.value, "scope", this.scope, "function", this.function});
 			}
 
 		}
@@ -243,6 +243,14 @@ public final class Scopes {
 			for(int i = 0; i < size; i++)
 				if(!Objects.equals(this.get(i), data.get(i))) return false;
 			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this);
 		}
 
 	}
@@ -335,7 +343,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "DefaultScope", "context", this.context, "values", this.values);
+			return Objects.toStringCall(true, true, this, new Object[]{"context", this.context, "values", this.values});
 		}
 
 	}
@@ -452,8 +460,8 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "ExecuteScope", "scope", this.scope, "context", this.context, "deleteCount", this.deleteCount, "insertValues",
-				this.insertValues);
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "context", this.context, "deleteCount", this.deleteCount, "insertValues",
+				this.insertValues});
 		}
 
 	}
@@ -548,7 +556,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "CompositeScope", "scope", this.scope, "functions", this.functions, "values", this.values);
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "functions", this.functions, "values", this.values});
 		}
 
 	}

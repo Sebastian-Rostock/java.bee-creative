@@ -123,7 +123,7 @@ public class Types {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this.getClass().getSimpleName(), this.id());
+			return Objects.toStringCall(this, this.id());
 		}
 
 	}

@@ -110,7 +110,7 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this.getClass().getSimpleName(), this.type(), this.data());
+			return Objects.toStringCall(this, this.data());
 		}
 
 	}

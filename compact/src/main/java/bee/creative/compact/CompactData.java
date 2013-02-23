@@ -11,17 +11,11 @@ import bee.creative.array.CompactObjectArray;
 /**
  * Diese Klasse implementiert eine abstrakte Sammlung von Elementen, die in einem (sortierten) Array verwaltet werden.
  * <p>
- * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten
- * belegte Bereichs im Array, sondern auch dessen Position.
+ * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten belegte Bereichs im Array, sondern auch dessen Position.
  * <p>
- * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben.
- * Dadurch vergrößert sich entweder die Größe des Leerraums vor oder die die Größe des Leerraums nach dem
- * Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus, werden alle
- * Elemente verschoben und im Array neu ausgerichtet.
+ * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben. Dadurch vergrößert sich entweder die Größe des Leerraums vor oder die die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus, werden alle Elemente verschoben und im Array neu ausgerichtet.
  * <p>
- * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des Arrays ausgerichtet wird, wird das
- * häufige Einfügen von Elementen am Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des Arrays
- * führ in jedem Fall zu einer erneuten Ausrichtung.
+ * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -90,8 +84,7 @@ public abstract class CompactData {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GData> Typ des {@link CompactData}s.
 	 */
-	protected static abstract class CompactDataIterator<GItem, GData extends CompactData> extends
-		CompactData.CompactDataOwner<GData> implements Iterator<GItem> {
+	protected static abstract class CompactDataIterator<GItem, GData extends CompactData> extends CompactData.CompactDataOwner<GData> implements Iterator<GItem> {
 
 		/**
 		 * Dieses Feld speichert den Index des ersten Elements (inklusiv).
@@ -158,8 +151,7 @@ public abstract class CompactData {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GData> Typ des {@link CompactData}s.
 	 */
-	public static abstract class CompactDataAscendingIterator<GItem, GData extends CompactData> extends
-		CompactData.CompactDataIterator<GItem, GData> {
+	public static abstract class CompactDataAscendingIterator<GItem, GData extends CompactData> extends CompactData.CompactDataIterator<GItem, GData> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
@@ -199,8 +191,7 @@ public abstract class CompactData {
 	 * @param <GItem> Typ der Elemente.
 	 * @param <GData> Typ des {@link CompactData}s.
 	 */
-	public static abstract class CompactDataDescendingIterator<GItem, GData extends CompactData> extends
-		CompactData.CompactDataIterator<GItem, GData> {
+	public static abstract class CompactDataDescendingIterator<GItem, GData extends CompactData> extends CompactData.CompactDataIterator<GItem, GData> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
@@ -224,8 +215,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData}s und wird zur realisierung von
-	 * {@link NavigableSet}s und {@link NavigableMap}s verwendet.
+	 * Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactData}s und wird zur realisierung von {@link NavigableSet}s und {@link NavigableMap}s verwendet.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des {@link CompactData}s.
@@ -267,13 +257,12 @@ public abstract class CompactData {
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactSubData(final GData data, final Object fromItem, final boolean fromInclusive, final Object lastItem,
-			final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactSubData(final GData data, final Object fromItem, final boolean fromInclusive, final Object lastItem, final boolean lastInclusive)
+			throws IllegalArgumentException {
 			super(data);
 			if(fromItem != CompactSubData.OPEN){
 				if(lastItem != CompactSubData.OPEN){
-					if(data.customItemCompare(fromItem, 0, lastItem) > 0)
-						throw new IllegalArgumentException("fromItem > lastItem");
+					if(data.customItemCompare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
 				}else{
 					data.customItemCompare(fromItem, 0, fromItem);
 				}
@@ -287,8 +276,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und
-		 * das {@code index}-te Element zu klein sind.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu klein sind.
 		 * 
 		 * @see CompactSubData#isTooLow(Object)
 		 * @param index Index.
@@ -302,10 +290,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu klein ist. Wenn das erste Element
-		 * gleich {@link CompactSubData#OPEN} ist, kann das gegebene Element nie zu klein sein. Anderenfalls gilt es als zu
-		 * klein, wenn es entweder kleiner als das erste Element ist oder wenn das erste Element exklusiv ist und das
-		 * gegebene Element gleich dem ersten Element ist.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu klein ist. Wenn das erste Element gleich {@link CompactSubData#OPEN} ist, kann das gegebene Element nie zu klein sein. Anderenfalls gilt es als zu klein, wenn es entweder kleiner als das erste Element ist oder wenn das erste Element exklusiv ist und das gegebene Element gleich dem ersten Element ist.
 		 * 
 		 * @see CompactData#customItemCompare(Object, int, Object)
 		 * @see CompactSubData#fromItem
@@ -321,8 +306,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und
-		 * das {@code index}-te Element zu groß sind.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu groß sind.
 		 * 
 		 * @see CompactSubData#isTooHigh(Object)
 		 * @param index Index.
@@ -336,10 +320,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu groß ist. Wenn das letzte Element
-		 * gleich {@link CompactSubData#OPEN} ist, kann das gegebene Element nie zu groß sein. Anderenfalls gilt es als zu
-		 * groß, wenn es entweder größer als das letzte Element ist oder wenn das letzte Element exklusiv ist und das
-		 * gegebene Element gleich dem letzten Element ist.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu groß ist. Wenn das letzte Element gleich {@link CompactSubData#OPEN} ist, kann das gegebene Element nie zu groß sein. Anderenfalls gilt es als zu groß, wenn es entweder größer als das letzte Element ist oder wenn das letzte Element exklusiv ist und das gegebene Element gleich dem letzten Element ist.
 		 * 
 		 * @see CompactData#customItemCompare(Object, int, Object)
 		 * @see CompactSubData#lastItem
@@ -355,8 +336,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich liegt. Die
-		 * Inklusitivität des ersten bzw. letzten Elements wird beachtet.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich liegt. Die Inklusitivität des ersten bzw. letzten Elements wird beachtet.
 		 * 
 		 * @see CompactSubData#isTooLow(int)
 		 * @see CompactSubData#isTooHigh(Object)
@@ -368,8 +348,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich (oder auf dessen
-		 * Grenzen) liegt.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich (oder auf dessen Grenzen) liegt.
 		 * 
 		 * @see CompactSubData#isInRange(Object)
 		 * @see CompactSubData#isInClosedRange(Object)
@@ -382,8 +361,7 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich oder auf dessen
-		 * Grenzen liegt. Die Inklusitivität des ersten bzw. letzten Elements ignoriert.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich oder auf dessen Grenzen liegt. Die Inklusitivität des ersten bzw. letzten Elements ignoriert.
 		 * 
 		 * @see CompactData#customItemCompare(Object, int, Object)
 		 * @param key Element.
@@ -447,13 +425,11 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Wenn kein solches
-		 * Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Wenn kein solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#lower(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder
-		 *         <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int lowerIndex(final Object item) {
 			if(this.isTooHigh(item)) return this.highestIndex();
@@ -463,13 +439,11 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebenen ist. Wenn kein
-		 * solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebenen ist. Wenn kein solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#floor(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder
-		 *         <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int floorIndex(final Object item) {
 			if(this.isTooHigh(item)) return this.highestIndex();
@@ -479,13 +453,11 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt den Index des größten Elements zurück, dass größer oder gleich dem gegebenen ist. Wenn kein
-		 * solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * Diese Methode gibt den Index des größten Elements zurück, dass größer oder gleich dem gegebenen ist. Wenn kein solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#ceiling(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder
-		 *         <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int ceilingIndex(final Object item) {
 			if(this.isTooLow(item)) return this.lowestIndex();
@@ -495,13 +467,11 @@ public abstract class CompactData {
 		}
 
 		/**
-		 * Diese Methode gibt den Index des größten Elements zurück, dass größer dem gegebenen ist. Wenn kein solches
-		 * Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * Diese Methode gibt den Index des größten Elements zurück, dass größer dem gegebenen ist. Wenn kein solches Element existiert wird <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#higher(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder
-		 *         <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int higherIndex(final Object item) {
 			if(this.isTooLow(item)) return this.lowestIndex();
@@ -543,10 +513,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen
-	 * Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die
-	 * <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element} ist
-	 * dann zum gegebenen Schlüssel gleich, wenn:
+	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste. Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
 	 * 
 	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
 	 * 
@@ -568,17 +535,14 @@ public abstract class CompactData {
 		for(int next = (index + from) - 1; (from <= next) && (this.customItemCompare(key, hash, item = array[next]) == 0); next--){
 			if(this.customItemEquals(key, hash, item)) return next - from;
 		}
-		for(int next = (index + from) + 1, last = data.finalIndex(); (next < last)
-			&& (this.customItemCompare(key, hash, item = array[next]) == 0); next++){
+		for(int next = (index + from) + 1, last = data.finalIndex(); (next < last) && (this.customItemCompare(key, hash, item = array[next]) == 0); next++){
 			if(this.customItemEquals(key, hash, item)) return next - from;
 		}
 		return -index - 1;
 	}
 
 	/**
-	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen
-	 * Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem
-	 * der Eintrag eingefügt werden müsste.
+	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#customItemCompare(Object, int, Object)
 	 * @param key Schlüssel.
@@ -614,8 +578,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem Array mit der gegebenen
-	 * Länge der Belegung.
+	 * Diese Methode entfernt die gegebene Anzahl an Einträgen ab dem gegebenen Index aus dem Array mit der gegebenen Länge der Belegung.
 	 * 
 	 * @see CompactArray#remove(int, int)
 	 * @param index Index.
@@ -647,9 +610,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder
-	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag
-	 * eingefügt werden müsste.
+	 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#defaultEqualsIndex(Object, int)
 	 * @see CompactData#defaultCompareIndex(Object, int)
@@ -659,8 +620,7 @@ public abstract class CompactData {
 	protected abstract int customItemIndex(final Object item);
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object)
-	 * äquivalent} dem Schlüssel des gegebenen Elements ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object) äquivalent} dem Schlüssel des gegebenen Elements ist.
 	 * 
 	 * @see Object#hashCode()
 	 * @see Object#equals(Object)
@@ -672,9 +632,7 @@ public abstract class CompactData {
 	protected abstract boolean customItemEquals(Object key, int hash, Object item);
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel kleiner,
-	 * gleich bzw. größer als der Schlüssel des gegebenen Elements ist. Die Berechnung kann auf den Schlüsseln selbst oder
-	 * ihren {@link Object#hashCode() Streuwerten} beruhen.
+	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel kleiner, gleich bzw. größer als der Schlüssel des gegebenen Elements ist. Die Berechnung kann auf den Schlüsseln selbst oder ihren {@link Object#hashCode() Streuwerten} beruhen.
 	 * 
 	 * @see Comparator#compare(Object, Object)
 	 * @see CompactSubData
@@ -700,8 +658,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Dieser Index kann die
-	 * Werte {@code -1} und {@code from+size} annehmen.
+	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Dieser Index kann die Werte {@code -1} und {@code from+size} annehmen.
 	 * 
 	 * @see NavigableSet#lower(Object)
 	 * @param item Element.
@@ -714,8 +671,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebene ist. Dieser Index
-	 * kann die Werte {@code -1} und {@code from+size} annehmen.
+	 * Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebene ist. Dieser Index kann die Werte {@code -1} und {@code from+size} annehmen.
 	 * 
 	 * @see NavigableSet#floor(Object)
 	 * @param item Element.
@@ -728,8 +684,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer oder gleich dem gegebene ist. Dieser Index
-	 * kann den Wert {@code size} annehmen.
+	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer oder gleich dem gegebene ist. Dieser Index kann den Wert {@code size} annehmen.
 	 * 
 	 * @see NavigableSet#ceiling(Object)
 	 * @param item Element.
@@ -742,8 +697,7 @@ public abstract class CompactData {
 	}
 
 	/**
-	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer dem gegebene ist. Dieser Index kann den
-	 * Wert {@code size} annehmen.
+	 * Diese Methode gibt den Index des kleinsten Elements zurück, dass größer dem gegebene ist. Dieser Index kann den Wert {@code size} annehmen.
 	 * 
 	 * @see NavigableSet#higher(Object)
 	 * @param item Element.

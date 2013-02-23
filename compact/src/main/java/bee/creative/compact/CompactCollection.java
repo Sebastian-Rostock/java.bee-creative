@@ -18,8 +18,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	protected static final class CompactCollectionAscendingIterator<GItem> extends
-		CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
+	protected static final class CompactCollectionAscendingIterator<GItem> extends CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.
@@ -48,8 +47,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	protected static final class CompactCollectionDescendingIterator<GItem> extends
-		CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
+	protected static final class CompactCollectionDescendingIterator<GItem> extends CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.

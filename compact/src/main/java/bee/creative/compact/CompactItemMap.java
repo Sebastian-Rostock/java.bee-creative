@@ -3,8 +3,7 @@ package bee.creative.compact;
 import java.util.Map;
 
 /**
- * Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem Array verwaltet werden und ihren
- * Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
+ * Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
  * 
  * @see CompactItemMap#getKey(Object)
  * @see CompactItemMap#setKey(Object, Object)

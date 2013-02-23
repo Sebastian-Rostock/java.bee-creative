@@ -4,8 +4,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden
- * und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
+ * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
  * 
  * @see CompactNavigableItemMap#getKey(Object)
  * @see CompactNavigableItemMap#setKey(Object, Object)
@@ -34,8 +33,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public CompactNavigableItemMap(final int capacity, final Comparator<? super GKey> comparator)
-		throws IllegalArgumentException, NullPointerException {
+	public CompactNavigableItemMap(final int capacity, final Comparator<? super GKey> comparator) throws IllegalArgumentException, NullPointerException {
 		super(capacity, comparator);
 	}
 
@@ -48,8 +46,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
 	 */
-	public CompactNavigableItemMap(final Map<? extends GKey, ? extends GValue> map,
-		final Comparator<? super GKey> comparator) throws NullPointerException {
+	public CompactNavigableItemMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		super(map, comparator);
 	}
 

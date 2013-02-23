@@ -62,7 +62,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("ArrayFunction");
+			return Objects.toStringCall(this);
 		}
 
 	}
@@ -159,7 +159,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("ValueFunction", this.value);
+			return Objects.toStringCall(this, this.value);
 		}
 
 	}
@@ -247,7 +247,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("ParamFunction", this.index);
+			return Objects.toStringCall(this, this.index);
 		}
 
 	}
@@ -344,7 +344,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, "CompositeFunction", "function", this.function, "functions", this.functions);
+			return Objects.toStringCall(true, true, this, new Object[]{"function", this.function, "functions", this.functions});
 		}
 
 	}

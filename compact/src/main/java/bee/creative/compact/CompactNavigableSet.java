@@ -12,20 +12,11 @@ import java.util.TreeSet;
 import bee.creative.util.Iterables;
 
 /**
- * Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der
- * Speicherverbrauch eines {@link CompactNavigableSet} liegt bei ca. {@code 13%} des Speicherverbrauchs eines
- * {@link TreeSet}s.
+ * Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet} liegt bei ca. {@code 13%} des Speicherverbrauchs eines {@link TreeSet}s.
  * <p>
- * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen
- * sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 208%} der Rechenzeit, die ein {@link TreeSet} dazu
- * benötigen würde. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide {@link NavigableSet} dafür in etwa
- * die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet} schneller, bei mehr Elementen
- * ist das {@link TreeSet} schneller. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5}
- * Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einem {@link CompactNavigableSet}
- * auf ca. {@code 3900%} der Rechenzeit, die ein {@link TreeSet} hierfür benötigen würde.
+ * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 208%} der Rechenzeit, die ein {@link TreeSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide {@link NavigableSet} dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet} schneller, bei mehr Elementen ist das {@link TreeSet} schneller. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einem {@link CompactNavigableSet} auf ca. {@code 3900%} der Rechenzeit, die ein {@link TreeSet} hierfür benötigen würde.
  * <p>
- * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel
- * nur noch {@code 25%} bzw. {@code 75%} der Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
+ * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel nur noch {@code 25%} bzw. {@code 75%} der Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente.
@@ -39,8 +30,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	protected static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>>
-		implements NavigableSet<GItem> {
+	protected static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>> implements NavigableSet<GItem> {
 
 		/**
 		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
@@ -52,8 +42,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactNavigableSubSet(final CompactNavigableSet<GItem> set, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactNavigableSubSet(final CompactNavigableSet<GItem> set, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) throws IllegalArgumentException {
 			super(set, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
@@ -225,8 +215,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactAscendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactAscendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) throws IllegalArgumentException {
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
@@ -315,8 +305,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> descendingSet() {
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive,
-				this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/**
@@ -331,12 +320,10 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
-			final boolean toInclusive) {
+		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
 			if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, fromInclusive, toElement,
-				toInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, fromInclusive, toElement, toInclusive);
 		}
 
 		/**
@@ -345,8 +332,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
 			if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive,
-				toElement, inclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, toElement, inclusive);
 		}
 
 		/**
@@ -355,8 +341,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
 			if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, inclusive, this.lastItem,
-				this.lastInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 	}
@@ -379,8 +364,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
-		public CompactDescendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem,
-			final boolean fromInclusive, final Object lastItem, final boolean lastInclusive) throws IllegalArgumentException {
+		public CompactDescendingSubSet(final CompactNavigableSet<GItem> array, final Object fromItem, final boolean fromInclusive, final Object lastItem,
+			final boolean lastInclusive) throws IllegalArgumentException {
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
@@ -469,8 +454,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> descendingSet() {
-			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive,
-				this.lastItem, this.lastInclusive);
+			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/**
@@ -485,12 +469,10 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
-			final boolean toInclusive) {
+		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
 			if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
 			if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, toInclusive, fromElement,
-				fromInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, toInclusive, fromElement, fromInclusive);
 		}
 
 		/**
@@ -499,8 +481,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
 			if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, inclusive, this.lastItem,
-				this.lastInclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
 		/**
@@ -509,8 +490,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
 			if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
-			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive,
-				fromElement, inclusive);
+			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, fromElement, inclusive);
 		}
 
 	}
@@ -540,8 +520,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator)
-		throws NullPointerException {
+	public CompactNavigableSet(final int capacity, final Comparator<? super GItem> comparator) throws NullPointerException {
 		this(comparator);
 		this.allocate(capacity);
 	}
@@ -552,11 +531,9 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @see Set#addAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn die gegebene {@link Collection} bzw. der gegebene {@link Comparator} {@code null}
-	 *         ist.
+	 * @throws NullPointerException Wenn die gegebene {@link Collection} bzw. der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator)
-		throws NullPointerException {
+	public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator) throws NullPointerException {
 		this(comparator);
 		if(collection == null) throw new NullPointerException("collection is null");
 		this.allocate(collection.size());
@@ -708,10 +685,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement,
-		final boolean toInclusive) {
-		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, fromInclusive, toElement,
-			toInclusive);
+	public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
+		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, fromInclusive, toElement, toInclusive);
 	}
 
 	/**
@@ -743,8 +718,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	@Override
 	public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, inclusive, CompactSubData.OPEN,
-			true);
+		return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this, fromElement, inclusive, CompactSubData.OPEN, true);
 	}
 
 	/**
@@ -752,8 +726,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	@Override
 	public NavigableSet<GItem> descendingSet() {
-		return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this, CompactSubData.OPEN, true, CompactSubData.OPEN,
-			true);
+		return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this, CompactSubData.OPEN, true, CompactSubData.OPEN, true);
 	}
 
 	/**
