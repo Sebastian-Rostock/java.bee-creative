@@ -848,7 +848,7 @@ public class Comparables {
 		}
 		from--;
 		if((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(array[from]) == 0)) return from;
-		return -(from + 1);
+		return -from - 2;
 	}
 
 	/**
@@ -897,7 +897,7 @@ public class Comparables {
 		}
 		from--;
 		if((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(list.get(from)) == 0)) return from;
-		return -(from + 1);
+		return -from - 2;
 	}
 
 	/**
@@ -929,7 +929,7 @@ public class Comparables {
 		}
 		from--;
 		if((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(items.get(from)) == 0)) return from;
-		return -(from + 1);
+		return -from - 2;
 	}
 
 	/**
