@@ -34,7 +34,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		protected final CompactList<GItem> owner;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
@@ -95,14 +95,14 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link List}.
+	 * Dieser Konstruktor initialisiert die {@link List}.
 	 */
 	public CompactList() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link List} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link List} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -112,7 +112,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link List} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link List} mit den gegebenen Elementen.
 	 * 
 	 * @see Collection#addAll(Collection)
 	 * @see CompactData#allocate(int)

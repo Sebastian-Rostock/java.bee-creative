@@ -365,7 +365,7 @@ public class XML {
 		final CachedConverter<String, XPathExpression> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link XPath XPath-Auswertungsumgebung}.
+		 * Dieser Konstruktor initialisiert die {@link XPath XPath-Auswertungsumgebung}.
 		 * 
 		 * @see Pointers#pointer(int, Object)
 		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
@@ -1685,7 +1685,7 @@ public class XML {
 	static final Builder<XPath> CACHED_XPATH_BUILDER = Builders.synchronizedBuilder(Builders.cachedBuilder(new Builder<XPath>() {
 
 		@Override
-		public XPath create() {
+		public XPath build() {
 			try{
 				return XML.cachedXPath();
 			}catch(final XPathFactoryConfigurationException e){
@@ -1898,7 +1898,7 @@ public class XML {
 	 */
 	public static Node evaluateNode(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNode(XML.CACHED_XPATH_BUILDER.create(), script, input);
+		return XML.evaluateNode(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
 	/**
@@ -1952,7 +1952,7 @@ public class XML {
 	 */
 	public static NodeList evaluateNodeSet(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNodeSet(XML.CACHED_XPATH_BUILDER.create(), script, input);
+		return XML.evaluateNodeSet(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
 	/**
@@ -2006,7 +2006,7 @@ public class XML {
 	 */
 	public static String evaluateString(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateString(XML.CACHED_XPATH_BUILDER.create(), script, input);
+		return XML.evaluateString(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
 	/**
@@ -2060,7 +2060,7 @@ public class XML {
 	 */
 	public static Boolean evaluateBoolean(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateBoolean(XML.CACHED_XPATH_BUILDER.create(), script, input);
+		return XML.evaluateBoolean(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
 	/**
@@ -2114,7 +2114,7 @@ public class XML {
 	 */
 	public static Number evaluateNumber(final String script, final Node input) throws NullPointerException, XPathExpressionException {
 		if(script == null) throw new NullPointerException("script is null");
-		return XML.evaluateNumber(XML.CACHED_XPATH_BUILDER.create(), script, input);
+		return XML.evaluateNumber(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
 	/**
@@ -2658,7 +2658,7 @@ public class XML {
 	}
 
 	/**
-	 * Dieser Konstrukteur erzwingt die Nichtinstanziierbarkeit.
+	 * Dieser Konstruktor erzwingt die Nichtinstanziierbarkeit.
 	 */
 	XML() {
 	}

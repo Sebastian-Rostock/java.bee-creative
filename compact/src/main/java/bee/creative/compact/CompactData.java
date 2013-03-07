@@ -66,7 +66,7 @@ public abstract class CompactData {
 		protected final GData data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactData}.
+		 * Dieser Konstruktor initialisiert die {@link CompactData}.
 		 * 
 		 * @param data {@link CompactData}.
 		 */
@@ -102,7 +102,7 @@ public abstract class CompactData {
 		protected int last;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactData} und Indizes.
 		 * 
 		 * @param data {@link CompactData}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -154,7 +154,7 @@ public abstract class CompactData {
 	public static abstract class CompactDataAscendingIterator<GItem, GData extends CompactData> extends CompactData.CompactDataIterator<GItem, GData> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactData} und Indizes.
 		 * 
 		 * @param data {@link CompactData}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -194,7 +194,7 @@ public abstract class CompactData {
 	public static abstract class CompactDataDescendingIterator<GItem, GData extends CompactData> extends CompactData.CompactDataIterator<GItem, GData> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactData} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactData} und Indizes.
 		 * 
 		 * @param array {@link CompactData}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -248,7 +248,7 @@ public abstract class CompactData {
 		protected final boolean lastInclusive;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link CompactData} und die Grenzen und deren Inklusion.
+		 * Dieser Konstruktor initialisiert das {@link CompactData} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param data {@link CompactData}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
@@ -506,7 +506,7 @@ public abstract class CompactData {
 	protected final CompactDataArray items;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Array} der Elemente.
+	 * Dieser Konstruktor initialisiert das {@link Array} der Elemente.
 	 */
 	public CompactData() {
 		this.items = new CompactDataArray();

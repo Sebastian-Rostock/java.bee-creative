@@ -3,7 +3,7 @@ package bee.creative.util;
 /**
  * Diese Schnittstelle definiert Methoden zur Berechnung von {@link Object#hashCode() Streuwert} und {@link Object#equals(Object) Äquivalenz} gegebener Eingaben.
  * 
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ der Eingaben.
  */
 public interface Hasher<GInput> {

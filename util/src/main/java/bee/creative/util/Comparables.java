@@ -61,7 +61,7 @@ public class Comparables {
 		final Comparable<? super GEntry2> comparable;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
+		 * Dieser Konstruktor initialisiert den {@link Comparable}.
 		 * 
 		 * @param comparable {@link Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
@@ -109,7 +109,7 @@ public class Comparables {
 	public static final class NullComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
+		 * Dieser Konstruktor initialisiert den {@link Comparable}.
 		 * 
 		 * @param comparable {@link Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
@@ -159,7 +159,7 @@ public class Comparables {
 		final Comparator<? super GEntry> comparator;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Element und {@link Comparator}.
+		 * Dieser Konstruktor initialisiert Element und {@link Comparator}.
 		 * 
 		 * @param entry erstes Argument des {@link Comparator}s.
 		 * @param comparator {@link Comparator}.
@@ -219,7 +219,7 @@ public class Comparables {
 	public static final class ReverseComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparable}.
+		 * Dieser Konstruktor initialisiert den {@link Comparable}.
 		 * 
 		 * @param comparable {@link Comparable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
@@ -269,7 +269,7 @@ public class Comparables {
 		final Comparable<? super GEntry> comparable2;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Comparable}.
+		 * Dieser Konstruktor initialisiert die {@link Comparable}.
 		 * 
 		 * @param comparable1 primärer {@link Comparable}.
 		 * @param comparable2 sekundärer {@link Comparable}.
@@ -337,7 +337,7 @@ public class Comparables {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Comparable} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Comparable} und {@link Converter}.
 		 * 
 		 * @param comparable {@link Comparable}.
 		 * @param converter {@link Converter}.
@@ -933,7 +933,7 @@ public class Comparables {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Comparables() {
 	}

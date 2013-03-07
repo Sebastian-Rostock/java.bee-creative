@@ -24,7 +24,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	protected final CompactDataArray values;
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 	 * 
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
@@ -35,7 +35,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -49,7 +49,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)

@@ -63,7 +63,7 @@ public class Tester {
 		long usedMemory = 0;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Interval in Millisekunden.
+		 * Dieser Konstruktor initialisiert das Interval in Millisekunden.
 		 * 
 		 * @param millis Interval der Messung in Millisekunden.
 		 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner oder gleich {@code 0} ist.
@@ -172,7 +172,7 @@ public class Tester {
 	public final Throwable throwable;
 
 	/**
-	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem Aufruf der Testmethode.
+	 * Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem Aufruf der Testmethode.
 	 * 
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
@@ -182,7 +182,7 @@ public class Tester {
 	}
 
 	/**
-	 * Dieser Konstrukteur ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein {@link Thread} zur asynchronen Messung der Speicherbelegung verwendet.
+	 * Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein {@link Thread} zur asynchronen Messung der Speicherbelegung verwendet.
 	 * 
 	 * @param millis Interval der asynchronen Messung der Speicherbelegung in Millisekunden oder {@code 0}.
 	 * @param method Testmethode.

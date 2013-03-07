@@ -108,7 +108,7 @@ public final class Functions {
 		final Value value;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Value Ergebniswert}.
+		 * Dieser Konstruktor initialisiert den {@link Value Ergebniswert}.
 		 * 
 		 * @param value {@link Value}.
 		 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
@@ -196,7 +196,7 @@ public final class Functions {
 		final int index;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Index des {@link Scope#get(int) Parameterwerts}.
+		 * Dieser Konstruktor initialisiert den Index des {@link Scope#get(int) Parameterwerts}.
 		 * 
 		 * @param index Index des {@link Scope#get(int) Parameterwerts}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
@@ -282,7 +282,7 @@ public final class Functions {
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die aufzurufende {@link Function Funktion} und die {@link Function Parameterfunktionen}.
+		 * Dieser Konstruktor initialisiert die aufzurufende {@link Function Funktion} und die {@link Function Parameterfunktionen}.
 		 * 
 		 * @param function {@link Function Funktion}.
 		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} verwendet beim Aufruf der {@link Function Funktion} werden sollen.
@@ -350,7 +350,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Functions() {
 	}

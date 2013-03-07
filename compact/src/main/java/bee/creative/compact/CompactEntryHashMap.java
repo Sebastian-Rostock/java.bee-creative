@@ -20,14 +20,14 @@ import bee.creative.util.Comparators;
 public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GValue> {
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map}.
+	 * Dieser Konstruktor initialisiert die {@link Map}.
 	 */
 	public CompactEntryHashMap() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -38,7 +38,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.

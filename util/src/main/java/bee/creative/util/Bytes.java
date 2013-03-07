@@ -3,7 +3,7 @@ package bee.creative.util;
 /**
  * Diese Klasse implementiert Methoden zum konvertierenden Kopieren von {@code byte}-, {@code int} und {@code long}-Arrays.
  * 
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Bytes {
 
@@ -466,7 +466,7 @@ public final class Bytes {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Bytes() {
 	}

@@ -28,7 +28,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		protected final Set<GItem> set;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Set}.
+		 * Dieser Konstruktor initialisiert das {@link Set}.
 		 * 
 		 * @param set {@link Set}.
 		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist.
@@ -57,13 +57,13 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set}.
+	 * Dieser Konstruktor initialisiert das {@link Set}.
 	 */
 	public CompactSet() {
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -73,7 +73,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
 	 * 
 	 * @see Set#addAll(Collection)
 	 * @see CompactData#allocate(int)

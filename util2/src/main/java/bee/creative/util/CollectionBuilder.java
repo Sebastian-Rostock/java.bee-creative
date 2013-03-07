@@ -9,7 +9,7 @@ import java.util.Collections;
  * 
  * @see CollectionBuilder1
  * @see CollectionBuilder2
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class CollectionBuilder {
 
@@ -19,11 +19,12 @@ public class CollectionBuilder {
 	 * @see Collections#checkedCollection(Collection, Class)
 	 * @see Collections#synchronizedCollection(Collection)
 	 * @see Collections#unmodifiableCollection(Collection)
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <V> Typ der Werte.
-	 * @param <L> Typ der {@link Collection}.
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Werte.
+	 * @param <GCollection> Typ der {@link Collection}.
 	 */
-	public static interface CollectionBuilder1<V, L extends Collection<V>> extends ValuesBuilder<V>, CollectionBuilder2<V, L> {
+	public static interface CollectionBuilder1<GValue, GCollection extends Collection<GValue>> extends ValuesBuilder<GValue>,
+		CollectionBuilder2<GValue, GCollection> {
 
 		/**
 		 * {@inheritDoc}
@@ -31,7 +32,7 @@ public class CollectionBuilder {
 		 * @return {@link Collection}-{@link Builder}.
 		 */
 		@Override
-		public CollectionBuilder1<V, L> add(V value);
+		public CollectionBuilder1<GValue, GCollection> add(GValue value);
 
 		/**
 		 * {@inheritDoc}
@@ -39,7 +40,7 @@ public class CollectionBuilder {
 		 * @return {@link Collection}-{@link Builder}.
 		 */
 		@Override
-		public CollectionBuilder1<V, L> addAll(V... value);
+		public CollectionBuilder1<GValue, GCollection> addAll(GValue... value);
 
 		/**
 		 * {@inheritDoc}
@@ -47,31 +48,55 @@ public class CollectionBuilder {
 		 * @return {@link Collection}-{@link Builder}.
 		 */
 		@Override
-		public CollectionBuilder1<V, L> addAll(Iterable<? extends V> value);
+		public CollectionBuilder1<GValue, GCollection> addAll(Iterable<? extends GValue> value);
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @return {@link Collection}-{@link Builder}.
+		 */
+		@Override
+		public CollectionBuilder1<GValue, GCollection> remove(GValue value);
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @return {@link Collection}-{@link Builder}.
+		 */
+		@Override
+		public CollectionBuilder1<GValue, GCollection> removeAll(GValue... value);
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @return {@link Collection}-{@link Builder}.
+		 */
+		@Override
+		public CollectionBuilder1<GValue, GCollection> removeAll(Iterable<? extends GValue> value);
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1<V, Collection<V>> asCheckedCollection(Class<V> clazz);
+		public CollectionBuilder1<GValue, Collection<GValue>> asCheckedCollection(Class<GValue> type);
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1<V, Collection<V>> asSynchronizedCollection();
+		public CollectionBuilder1<GValue, Collection<GValue>> asSynchronizedCollection();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder2<V, Collection<V>> asUnmodifiableCollection();
+		public CollectionBuilder2<GValue, Collection<GValue>> asUnmodifiableCollection();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public L create();
+		public GCollection build();
 
 	}
 
@@ -81,20 +106,20 @@ public class CollectionBuilder {
 	 * @see Collections#checkedCollection(Collection, Class)
 	 * @see Collections#synchronizedCollection(Collection)
 	 * @see Collections#unmodifiableCollection(Collection)
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <V> Typ der Werte.
-	 * @param <L> Typ der {@link Collection}.
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Werte.
+	 * @param <GCollection> Typ der {@link Collection}.
 	 */
-	public static interface CollectionBuilder2<V, L extends Collection<V>> extends Builder<L> {
+	public static interface CollectionBuilder2<GValue, GCollection extends Collection<GValue>> extends Builder<GCollection> {
 
 		/**
 		 * Diese Methode konvertiert die konfigurierte {@link Collection} via {@link Collections#checkedCollection(Collection, Class)}.
 		 * 
 		 * @see Collections#checkedCollection(Collection, Class)
-		 * @param clazz {@link Class} der Werte.
+		 * @param type {@link Class} der Werte.
 		 * @return {@link Collection}-{@link Builder}.
 		 */
-		public CollectionBuilder2<V, Collection<V>> asCheckedCollection(Class<V> clazz);
+		public CollectionBuilder2<GValue, Collection<GValue>> asCheckedCollection(Class<GValue> type);
 
 		/**
 		 * Diese Methode konvertiert die konfigurierte {@link Collection} via {@link Collections#synchronizedCollection(Collection)}.
@@ -102,7 +127,7 @@ public class CollectionBuilder {
 		 * @see Collections#synchronizedCollection(Collection)
 		 * @return {@link Collection}-{@link Builder}.
 		 */
-		public CollectionBuilder2<V, Collection<V>> asSynchronizedCollection();
+		public CollectionBuilder2<GValue, Collection<GValue>> asSynchronizedCollection();
 
 		/**
 		 * Diese Methode konvertiert die konfigurierte {@link Collection} via {@link Collections#unmodifiableCollection(Collection)}.
@@ -110,7 +135,7 @@ public class CollectionBuilder {
 		 * @see Collections#unmodifiableCollection(Collection)
 		 * @return {@link CollectionBuilder2}.
 		 */
-		public CollectionBuilder2<V, Collection<V>> asUnmodifiableCollection();
+		public CollectionBuilder2<GValue, Collection<GValue>> asUnmodifiableCollection();
 
 		/**
 		 * Diese Methode gibt die konfigurierte {@link Collection} zurück.
@@ -118,30 +143,30 @@ public class CollectionBuilder {
 		 * @return {@link Collection}.
 		 */
 		@Override
-		public L create();
+		public GCollection build() throws IllegalStateException;
 
 	}
 
 	/**
 	 * Diese Klasse implementiert den {@link CollectionBuilder1}.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <V> Typ der Werte.
-	 * @param <L> Typ der {@link Collection}.
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Werte.
+	 * @param <GCollection> Typ der {@link Collection}.
 	 */
-	static final class CollectionBuilder1Impl<V, L extends Collection<V>> implements CollectionBuilder1<V, L> {
+	static final class CollectionBuilderImpl<GValue, GCollection extends Collection<GValue>> implements CollectionBuilder1<GValue, GCollection> {
 
 		/**
 		 * Dieses Feld speichert die {@link Collection}.
 		 */
-		final L collection;
+		final GCollection collection;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Collection}.
+		 * Dieser Konstruktor initialisiert die {@link Collection}.
 		 * 
 		 * @param collection {@link Collection}.
 		 */
-		public CollectionBuilder1Impl(final L collection) {
+		public CollectionBuilderImpl(final GCollection collection) {
 			this.collection = collection;
 		}
 
@@ -149,7 +174,7 @@ public class CollectionBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, L> add(final V value) {
+		public CollectionBuilder1<GValue, GCollection> add(final GValue value) {
 			this.collection.add(value);
 			return this;
 		}
@@ -158,7 +183,7 @@ public class CollectionBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, L> addAll(final V... value) {
+		public CollectionBuilder1<GValue, GCollection> addAll(final GValue... value) {
 			this.collection.addAll(Arrays.asList(value));
 			return this;
 		}
@@ -167,7 +192,7 @@ public class CollectionBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, L> addAll(final Iterable<? extends V> value) {
+		public CollectionBuilder1<GValue, GCollection> addAll(final Iterable<? extends GValue> value) {
 			Iterables.appendAll(this.collection, value);
 			return this;
 		}
@@ -176,31 +201,58 @@ public class CollectionBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, Collection<V>> asCheckedCollection(final Class<V> clazz) {
-			return new CollectionBuilder1Impl<V, Collection<V>>(Collections.checkedCollection(this.collection, clazz));
+		public CollectionBuilder1<GValue, GCollection> remove(final GValue value) {
+			this.collection.remove(value);
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, Collection<V>> asSynchronizedCollection() {
-			return new CollectionBuilder1Impl<V, Collection<V>>(Collections.synchronizedCollection(this.collection));
+		public CollectionBuilder1<GValue, GCollection> removeAll(final GValue... value) {
+			this.collection.removeAll(Arrays.asList(value));
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public CollectionBuilder1Impl<V, Collection<V>> asUnmodifiableCollection() {
-			return new CollectionBuilder1Impl<V, Collection<V>>(Collections.unmodifiableCollection(this.collection));
+		public CollectionBuilder1<GValue, GCollection> removeAll(final Iterable<? extends GValue> value) {
+			Iterables.removeAll(this.collection, value);
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public L create() {
+		public CollectionBuilder1<GValue, Collection<GValue>> asCheckedCollection(final Class<GValue> type) {
+			return new CollectionBuilderImpl<GValue, Collection<GValue>>(Collections.checkedCollection(this.collection, type));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public CollectionBuilder1<GValue, Collection<GValue>> asSynchronizedCollection() {
+			return new CollectionBuilderImpl<GValue, Collection<GValue>>(Collections.synchronizedCollection(this.collection));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public CollectionBuilder1<GValue, Collection<GValue>> asUnmodifiableCollection() {
+			return new CollectionBuilderImpl<GValue, Collection<GValue>>(Collections.unmodifiableCollection(this.collection));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GCollection build() {
 			return this.collection;
 		}
 
@@ -218,15 +270,16 @@ public class CollectionBuilder {
 	/**
 	 * Diese Methode gibt einen {@link Collection}-{@link Builder} für die gegebene {@link Collection} zurück.
 	 * 
-	 * @param <V> Typ der Werte.
-	 * @param <L> Typ der {@link Collection}.
+	 * @param <GValue> Typ der Werte.
+	 * @param <GCollection> Typ der {@link Collection}.
 	 * @param collection {@link Collection}.
 	 * @return {@link Collection}-{@link Builder}.
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
 	 */
-	public <V, L extends Collection<V>> CollectionBuilder1<V, L> collection(final L collection) throws NullPointerException {
+	public <GValue, GCollection extends Collection<GValue>> CollectionBuilder1<GValue, GCollection> collection(final GCollection collection)
+		throws NullPointerException {
 		if(collection == null) throw new NullPointerException();
-		return new CollectionBuilder1Impl<V, L>(collection);
+		return new CollectionBuilderImpl<GValue, GCollection>(collection);
 	}
 
 }

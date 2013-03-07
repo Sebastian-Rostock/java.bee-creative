@@ -21,14 +21,14 @@ import bee.creative.util.Objects;
 public class CompactHashSet<GItem> extends CompactSet<GItem> {
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set}.
+	 * Dieser Konstruktor initialisiert das {@link Set}.
 	 */
 	public CompactHashSet() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -38,7 +38,7 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Set#addAll(Collection)

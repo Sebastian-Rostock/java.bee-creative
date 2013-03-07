@@ -21,7 +21,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	protected static final class CompactCollectionAscendingIterator<GItem> extends CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
 		 * 
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -50,7 +50,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	protected static final class CompactCollectionDescendingIterator<GItem> extends CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactCollection} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
 		 * 
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -71,14 +71,14 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Collection}.
+	 * Dieser Konstruktor initialisiert die {@link Collection}.
 	 */
 	public CompactCollection() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Collection} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link Collection} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -89,7 +89,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Collection} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link Collection} mit den gegebenen Elementen.
 	 * 
 	 * @see Collection#addAll(Collection)
 	 * @see CompactData#allocate(int)

@@ -129,7 +129,7 @@ public final class Values {
 		final GData data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -402,7 +402,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz ohne Prüfung.
+		 * Dieser Konstruktor initialisiert den Datensatz ohne Prüfung.
 		 * 
 		 * @param IGNORE IGNORTIERT.
 		 * @param data Datensatz.
@@ -412,7 +412,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist oder enthält.
@@ -457,7 +457,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -501,7 +501,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -545,7 +545,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -629,7 +629,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -693,7 +693,7 @@ public final class Values {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
@@ -718,7 +718,7 @@ public final class Values {
 	static DataHandler handler;
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Values() {
 	}

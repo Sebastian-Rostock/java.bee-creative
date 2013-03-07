@@ -29,7 +29,7 @@ public class Strings {
 		final int flags;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Bitmaske.
+		 * Dieser Konstruktor initialisiert die Bitmaske.
 		 * 
 		 * @param flags Bitmaske ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 		 */
@@ -616,7 +616,7 @@ public class Strings {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Strings() {
 	}

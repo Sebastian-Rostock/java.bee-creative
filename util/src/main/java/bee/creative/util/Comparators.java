@@ -52,7 +52,7 @@ public class Comparators {
 		final Comparator<? super GEntry2> comparator;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
+		 * Dieser Konstruktor initialisiert den {@link Comparator}.
 		 * 
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -102,7 +102,7 @@ public class Comparators {
 	public static final class NullComparator<GEntry> extends AbstractDelegatingComparator<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
+		 * Dieser Konstruktor initialisiert den {@link Comparator}.
 		 * 
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -140,7 +140,7 @@ public class Comparators {
 	public static final class ReverseComparator<GEntry> extends AbstractDelegatingComparator<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
+		 * Dieser Konstruktor initialisiert den {@link Comparator}.
 		 * 
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -179,7 +179,7 @@ public class Comparators {
 	public static final class IterableComparator<GEntry extends Iterable<? extends GItem>, GItem> extends AbstractDelegatingComparator<GEntry, GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Comparator}.
+		 * Dieser Konstruktor initialisiert den {@link Comparator}.
 		 * 
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -227,7 +227,7 @@ public class Comparators {
 		final Comparator<? super GEntry> comparator2;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Comparator}en.
+		 * Dieser Konstruktor initialisiert die {@link Comparator}en.
 		 * 
 		 * @param comparator1 primärer {@link Comparator}.
 		 * @param comparator2 sekundärer {@link Comparator}.
@@ -293,7 +293,7 @@ public class Comparators {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Comparator} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Comparator} und {@link Converter}.
 		 * 
 		 * @param comparator {@link Comparator}.
 		 * @param converter {@link Converter}.
@@ -933,7 +933,7 @@ public class Comparators {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Comparators() {
 	}

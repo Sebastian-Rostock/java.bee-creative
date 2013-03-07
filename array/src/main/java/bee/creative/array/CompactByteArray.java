@@ -15,7 +15,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	protected static class CompactByteSubArray extends CompactSubArray<CompactByteArray, byte[], Byte> implements ByteArray {
 
 		/**
-		 * Dieser Konstrukteur initialisiert Besitzer und Indices.
+		 * Dieser Konstruktor initialisiert Besitzer und Indices.
 		 * 
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
@@ -123,7 +123,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		protected final CompactByteArray owner;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
@@ -181,7 +181,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		protected final CompactByteSubArray owner;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
@@ -236,14 +236,14 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	protected byte[] array;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
 	 */
 	public CompactByteArray() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
@@ -254,7 +254,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
+	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)

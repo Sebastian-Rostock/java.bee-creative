@@ -18,7 +18,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	protected final CompactDataArray values;
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map}.
+	 * Dieser Konstruktor initialisiert die {@link Map}.
 	 */
 	public CompactEntryMap() {
 		super();
@@ -26,7 +26,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -38,7 +38,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.

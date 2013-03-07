@@ -14,14 +14,14 @@ import java.util.Map;
 public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GValue> {
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map}.
+	 * Dieser Konstruktor initialisiert die {@link Map}.
 	 */
 	public CompactItemMap() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -32,7 +32,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.

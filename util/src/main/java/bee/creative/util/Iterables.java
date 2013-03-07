@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Converters.AbstractConverter;
@@ -11,6 +10,7 @@ import bee.creative.util.Iterators.EntryIterator;
 import bee.creative.util.Iterators.FilteredIterator;
 import bee.creative.util.Iterators.IntegerIterator;
 import bee.creative.util.Iterators.LimitedIterator;
+import bee.creative.util.Iterators.UniqueIterator;
 import bee.creative.util.Iterators.UnmodifiableIterator;
 import bee.creative.util.Iterators.VoidIterator;
 import bee.creative.util.Objects.UseToString;
@@ -24,6 +24,119 @@ import bee.creative.util.Objects.UseToString;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Iterables {
+
+	/**
+	 * Diese Klasse implementiert das in einem {@link ChainedIterable} verwendete {@link Iterable} über {@link Iterable}s.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	static class IterableArray<GEntry> implements Iterable<Iterable<? extends GEntry>> {
+
+		/**
+		 * Diese Methode gibt ein {@link Iterable} zurück, das die gegebenen {@link Iterable}s liefert. Wenn unter den Eingaben {@link ChainedIterable}s sind, werden diese zu einem {@link IterableArray} zusammengefasst.
+		 * 
+		 * @see Iterables#chainedIterable(Iterable...)
+		 * @see Iterables#chainedIterable(Iterable, Iterable)
+		 * @param <GEntry> Typ der Elemente.
+		 * @param iterable1 {@link Iterable} 1.
+		 * @param iterable2 {@link Iterable} 2.
+		 * @return {@link IterableArray}.
+		 */
+		@SuppressWarnings ("unchecked")
+		public static <GEntry> Iterable<? extends Iterable<? extends GEntry>> valueOf(final Iterable<? extends GEntry> iterable1,
+			final Iterable<? extends GEntry> iterable2) {
+			if(iterable1 instanceof ChainedIterable<?>){
+				final Iterable<?> iterableA = ((ChainedIterable<?>)iterable1).iterable;
+				if(iterableA instanceof IterableArray<?>){
+					final Iterable<?>[] arrayA = ((IterableArray<?>)iterableA).array;
+					if(iterable2 instanceof ChainedIterable<?>){
+						final Iterable<?> iterableB = ((ChainedIterable<?>)iterable1).iterable;
+						if(iterableB instanceof IterableArray){
+							final Iterable<?>[] arrayB = ((IterableArray<?>)iterableB).array;
+							final Iterable<?>[] array = new Iterable<?>[arrayA.length + arrayB.length];
+							System.arraycopy(arrayA, 0, array, 0, arrayA.length);
+							System.arraycopy(arrayB, 0, array, arrayA.length, arrayB.length);
+							return new IterableArray<GEntry>(array);
+						}
+					}
+					if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)){
+						final Iterable<?>[] array = new Iterable<?>[arrayA.length + 1];
+						System.arraycopy(arrayA, 0, array, 0, arrayA.length);
+						array[arrayA.length] = iterable2;
+						return new IterableArray<GEntry>(array);
+					}
+					return (Iterable<? extends Iterable<? extends GEntry>>)iterableA;
+				}
+			}
+			if(iterable2 instanceof ChainedIterable<?>){
+				final Iterable<?> iterableB = ((ChainedIterable<?>)iterable1).iterable;
+				if((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)){
+					if(iterableB instanceof IterableArray){
+						final Iterable<?>[] arrayB = ((IterableArray<?>)iterableB).array;
+						final Iterable<?>[] array = new Iterable<?>[1 + arrayB.length];
+						System.arraycopy(arrayB, 0, array, 1, arrayB.length);
+						array[0] = iterable1;
+						return new IterableArray<GEntry>(array);
+					}
+				}
+				return (Iterable<? extends Iterable<? extends GEntry>>)iterableB;
+			}
+			if((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)){
+				if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable1, iterable2);
+				return new IterableArray<GEntry>(iterable1);
+			}
+			if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable2);
+			return new IterableArray<GEntry>();
+		}
+
+		/**
+		 * Dieses Feld speichert das Array der {@link Iterable}s.
+		 */
+		Iterable<?>[] array;
+
+		/**
+		 * Dieser Konstruktor initialisiert das Array der {@link Iterable}s.
+		 * 
+		 * @param array {@link Iterable}-Array.
+		 * @throws NullPointerException Wenn das gegebene {@link Iterable}-Array {@code null} ist.
+		 */
+		public IterableArray(final Iterable<?>... array) throws NullPointerException {
+			if(array == null) throw new NullPointerException("array is null");
+			this.array = array;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<Iterable<? extends GEntry>> iterator() {
+			return new Iterator<Iterable<? extends GEntry>>() {
+
+				int index = 0;
+
+				int count = IterableArray.this.array.length;
+
+				@Override
+				public boolean hasNext() {
+					return this.index < this.count;
+				}
+
+				@SuppressWarnings ({"unchecked"})
+				@Override
+				public Iterable<? extends GEntry> next() {
+					return (Iterable<? extends GEntry>)IterableArray.this.array[this.index++];
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+
+			};
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert ein abstraktes {@link Iterable}.
@@ -66,7 +179,7 @@ public class Iterables {
 		final Iterable<? extends GEntry2> iterable;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Iterable}.
+		 * Dieser Konstruktor initialisiert den {@link Iterable}.
 		 * 
 		 * @param iterable {@link Iterable}.
 		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
@@ -152,7 +265,7 @@ public class Iterables {
 		final GEntry entry;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Element.
+		 * Dieser Konstruktor initialisiert das Element.
 		 * 
 		 * @param entry Element.
 		 */
@@ -212,7 +325,7 @@ public class Iterables {
 		final Builder<? extends GEntry> builder;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder}.
+		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
@@ -273,7 +386,7 @@ public class Iterables {
 		final int count;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Anzahl.
+		 * Dieser Konstruktor initialisiert die Anzahl.
 		 * 
 		 * @param count Anzahl.
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
@@ -321,6 +434,45 @@ public class Iterables {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein {@link Iterable}, der kein Element eines gegebenen {@link Iterable}s mehrfach liefert.
+	 * 
+	 * @see UniqueIterator
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class UniqueIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link Iterable}.
+		 * 
+		 * @param iterable {@link Iterable}.
+		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
+		 */
+		public UniqueIterable(final Iterable<? extends GEntry> iterable) throws NullPointerException {
+			super(iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return new UniqueIterator<GEntry>(this.iterable.iterator());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof UniqueIterable<?>)) return false;
+			return super.equals(object);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert ein {@link Iterable}, das eine begrenzte Anzahl an Elementen eines gegebenen {@link Iterable}s liefert.
 	 * 
 	 * @see LimitedIterator
@@ -335,7 +487,7 @@ public class Iterables {
 		final int count;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Anzahl und {@link Iterable}.
+		 * Dieser Konstruktor initialisiert Anzahl und {@link Iterable}.
 		 * 
 		 * @param count Anzahl.
 		 * @param iterable {@link Iterable}.
@@ -400,7 +552,7 @@ public class Iterables {
 		final Filter<? super GEntry> filter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Filter} und {@link Iterable}.
+		 * Dieser Konstruktor initialisiert das {@link Filter} und {@link Iterable}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @param iterable {@link Iterable}.
@@ -459,13 +611,23 @@ public class Iterables {
 	public static final class ChainedIterable<GEntry> extends AbstractDelegatingIterable<GEntry, Iterable<? extends GEntry>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Iterable}.
+		 * Dieser Konstruktor initialisiert die {@link Iterable}.
 		 * 
 		 * @param iterable {@link Iterable}-{@link Iterable}.
 		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
 		 */
 		public ChainedIterable(final Iterable<? extends Iterable<? extends GEntry>> iterable) throws NullPointerException {
 			super(iterable);
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link Iterable} mit der Verkettung der gegebenen.
+		 * 
+		 * @param iterable1 {@link Iterable} 1.
+		 * @param iterable2 {@link Iterable} 2.
+		 */
+		public ChainedIterable(final Iterable<? extends GEntry> iterable1, final Iterable<? extends GEntry> iterable2) {
+			super(IterableArray.valueOf(iterable1, iterable2));
 		}
 
 		/**
@@ -506,7 +668,7 @@ public class Iterables {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Converter} und {@link Iterable}.
+		 * Dieser Konstruktor initialisiert {@link Converter} und {@link Iterable}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @param iterable {@link Iterable}.
@@ -566,7 +728,7 @@ public class Iterables {
 	public static final class UnmodifiableIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Iterable}.
+		 * Dieser Konstruktor initialisiert den {@link Iterable}.
 		 * 
 		 * @param iterable {@link Iterable}.
 		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
@@ -781,6 +943,30 @@ public class Iterables {
 	}
 
 	/**
+	 * Diese Methode gibt ein {@link Iterable} über das durch den gegebenen {@link Builder} bereitgestellte Element zurück.
+	 * 
+	 * @param <GEntry> Typ des Elements.
+	 * @param builder {@link Builder}.
+	 * @return {@link BuilderIterable}
+	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+	 */
+	public static <GEntry> BuilderIterable<GEntry> builderIterable(final Builder<? extends GEntry> builder) throws NullPointerException {
+		return new BuilderIterable<GEntry>(builder);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein {@link Iterable}, der kein Element eines gegebenen {@link Iterable}s mehrfach liefert, und gibt es zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable {@link Iterable}.
+	 * @return {@link UniqueIterable}.
+	 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
+	 */
+	public static <GEntry> Iterable<GEntry> uniqueIterable(final Iterable<? extends GEntry> iterable) throws NullPointerException {
+		return new UniqueIterable<GEntry>(iterable);
+	}
+
+	/**
 	 * Diese Methode erzeugt ein {@link Iterable}, das maximal die gegebene Anzahl an Elementen des gegebenen {@link Iterable}s liefert, und gibt es zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
@@ -810,7 +996,7 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}-{@link Iterable}.
@@ -822,7 +1008,7 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
@@ -832,11 +1018,12 @@ public class Iterables {
 	 */
 	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables) throws NullPointerException {
 		if(iterables == null) throw new NullPointerException("iterables is null");
-		return Iterables.chainedIterable(Arrays.asList(iterables));
+		if(iterables.length == 2) return Iterables.chainedIterable(iterables[0], iterables[1]);
+		return Iterables.chainedIterable(new IterableArray<GEntry>(iterables.clone()));
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
@@ -844,13 +1031,12 @@ public class Iterables {
 	 * @param iterable2 {@link Iterable} 2.
 	 * @return {@link ChainedIterable}.
 	 */
-	@SuppressWarnings ("unchecked")
 	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry> iterable1, final Iterable<? extends GEntry> iterable2) {
-		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
+		return new ChainedIterable<GEntry>(iterable1, iterable2);
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Iterable}, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}s liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt ein {@link Iterable}, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}s liefert, und gibt es zurück.
 	 * 
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterable}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente des erzeugten {@link Iterable}s.
@@ -865,7 +1051,7 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt, und gibt ihn zurück.
+	 * Diese Methode erzeugt ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt, und gibt es zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
@@ -877,7 +1063,7 @@ public class Iterables {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Iterables() {
 	}

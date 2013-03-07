@@ -33,7 +33,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, ?> data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+		 * Dieser Konstruktor initialisiert die {@link CompactMap}.
 		 * 
 		 * @param data {@link CompactMap}.
 		 */
@@ -76,7 +76,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	protected static final class CompactMapKeyAscendingIterator<GKey> extends CompactDataAscendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
 		 * 
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -105,7 +105,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	protected static final class CompactMapKeyDescendingIterator<GKey> extends CompactDataDescendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
 		 * 
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -140,7 +140,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final Map<GKey, GValue> map;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Map}.
+		 * Dieser Konstruktor initialisiert die {@link Map}.
 		 * 
 		 * @param data {@link Map}.
 		 */
@@ -172,7 +172,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<?, GValue> data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+		 * Dieser Konstruktor initialisiert die {@link CompactMap}.
 		 * 
 		 * @param data {@link CompactMap}.
 		 */
@@ -215,7 +215,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	protected static final class CompactMapValueIterator<V> extends CompactDataAscendingIterator<V, CompactMap<?, V>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
 		 * 
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -255,7 +255,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, GValue> data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap} und den Index.
+		 * Dieser Konstruktor initialisiert die {@link CompactMap} und den Index.
 		 * 
 		 * @param data {@link CompactMap}.
 		 * @param index Index.
@@ -295,7 +295,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, GValue> data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link CompactMap}.
+		 * Dieser Konstruktor initialisiert die {@link CompactMap}.
 		 * 
 		 * @param data {@link CompactMap}.
 		 */
@@ -339,7 +339,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	protected static final class CompactMapEntryIterator<GKey, V> extends CompactDataAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link CompactMap} und Indizes.
+		 * Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
 		 * 
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
@@ -360,14 +360,14 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map}.
+	 * Dieser Konstruktor initialisiert die {@link Map}.
 	 */
 	public CompactMap() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -379,7 +379,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)

@@ -46,7 +46,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		int index;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Abbildung und sucht den ersten Eintrag.
+		 * Dieser Konstruktor initialisiert die Abbildung und sucht den ersten Eintrag.
 		 * 
 		 * @param hash Abbildung.
 		 */

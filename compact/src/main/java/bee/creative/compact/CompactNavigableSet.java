@@ -33,7 +33,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	protected static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>> implements NavigableSet<GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
+		 * Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param set {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
@@ -206,7 +206,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
+		 * Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param array {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
@@ -355,7 +355,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	protected static final class CompactDescendingSubSet<GItem> extends CompactNavigableSet.CompactNavigableSubSet<GItem> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
+		 * Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param array {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
@@ -501,7 +501,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	protected final Comparator<? super GItem> comparator;
 
 	/**
-	 * Dieser Konstrukteur initialisiert den {@link Comparator}.
+	 * Dieser Konstruktor initialisiert den {@link Comparator}.
 	 * 
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -513,7 +513,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -526,7 +526,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das {@link Set} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see Set#addAll(Collection)
 	 * @param collection {@link Collection}.

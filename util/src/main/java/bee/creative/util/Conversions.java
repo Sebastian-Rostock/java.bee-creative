@@ -63,7 +63,7 @@ public class Conversions {
 		final GOutput output;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Eingabe und Ausgabe.
+		 * Dieser Konstruktor initialisiert Eingabe und Ausgabe.
 		 * 
 		 * @param input Eingabe.
 		 * @param output Ausgabe.
@@ -111,7 +111,7 @@ public class Conversions {
 		AbstractDelegatingConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter}.
+		 * Dieser Konstruktor initialisiert den {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
@@ -155,7 +155,7 @@ public class Conversions {
 		final Conversion<? extends GOutput, ? extends GInput> conversion;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Conversion}.
+		 * Dieser Konstruktor initialisiert die {@link Conversion}.
 		 * 
 		 * @param conversion {@link Conversion}.
 		 * @throws NullPointerException Wenn die gegebene {@link Conversion} {@code null} ist.
@@ -244,7 +244,7 @@ public class Conversions {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Eingabe und {@link Converter}.
+		 * Dieser Konstruktor initialisiert Eingabe und {@link Converter}.
 		 * 
 		 * @param input Eingabe.
 		 * @param converter {@link Converter}.
@@ -294,7 +294,7 @@ public class Conversions {
 		AbstractDelegatingConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter}.
+		 * Dieser Konstruktor initialisiert den {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
@@ -494,7 +494,7 @@ public class Conversions {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Conversions() {
 	}

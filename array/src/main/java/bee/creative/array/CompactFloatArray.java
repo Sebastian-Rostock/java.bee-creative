@@ -15,7 +15,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	protected static class CompactFloatSubArray extends CompactSubArray<CompactFloatArray, float[], Float> implements FloatArray {
 
 		/**
-		 * Dieser Konstrukteur initialisiert Besitzer und Indices.
+		 * Dieser Konstruktor initialisiert Besitzer und Indices.
 		 * 
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
@@ -124,7 +124,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		protected final CompactFloatArray owner;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
@@ -182,7 +182,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		protected final CompactFloatSubArray owner;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Besitzer.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
@@ -237,14 +237,14 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	protected float[] array;
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
 	 */
 	public CompactFloatArray() {
 		super();
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	 * Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
@@ -255,7 +255,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
+	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)

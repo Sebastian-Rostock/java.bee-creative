@@ -29,7 +29,7 @@ public class Objects {
 		final Object object;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * Dieser Konstruktor initialisiert das Objekt.
 		 * 
 		 * @param object Objekt.
 		 */
@@ -73,7 +73,7 @@ public class Objects {
 	static final class NormalObject extends AbstractObject {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * Dieser Konstruktor initialisiert das Objekt.
 		 * 
 		 * @param object Objekt.
 		 */
@@ -109,7 +109,7 @@ public class Objects {
 	static final class FormatObject extends AbstractObject {
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Objekt.
+		 * Dieser Konstruktor initialisiert das Objekt.
 		 * 
 		 * @param object Objekt.
 		 */
@@ -764,7 +764,7 @@ public class Objects {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Objects() {
 	}

@@ -52,7 +52,7 @@ public class Builders {
 		final Builder<? extends GValue2> builder;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder}.
+		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
@@ -103,7 +103,7 @@ public class Builders {
 		GValue value;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Wert.
+		 * Dieser Konstruktor initialisiert den Wert.
 		 * 
 		 * @param value Wert.
 		 */
@@ -115,7 +115,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue create() {
+		public GValue build() throws IllegalStateException {
 			return this.value;
 		}
 
@@ -168,7 +168,7 @@ public class Builders {
 		Pointer<GValue> pointer;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Pointer}-Modus und {@link Builder}.
+		 * Dieser Konstruktor initialisiert {@link Pointer}-Modus und {@link Builder}.
 		 * 
 		 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 		 * @param builder {@link Builder}.
@@ -192,14 +192,14 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue create() {
+		public GValue build() throws IllegalStateException {
 			final Pointer<GValue> pointer = this.pointer;
 			if(pointer != null){
 				final GValue data = pointer.data();
 				if(data != null) return data;
 				if(pointer == NullPointer.INSTANCE) return null;
 			}
-			final GValue data = this.builder.create();
+			final GValue data = this.builder.build();
 			this.pointer = Pointers.pointer(this.mode, data);
 			return data;
 		}
@@ -231,7 +231,7 @@ public class Builders {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Builder} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Builder} und {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @param builder {@link Builder}.
@@ -247,8 +247,8 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GOutput create() {
-			return this.converter.convert(this.builder.create());
+		public GOutput build() throws IllegalStateException {
+			return this.converter.convert(this.builder.build());
 		}
 
 		/**
@@ -289,7 +289,7 @@ public class Builders {
 	public static final class SynchronizedBuilder<GValue> extends AbstractDelegatingBuilder<GValue, GValue> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder}.
+		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
@@ -302,9 +302,9 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue create() {
+		public GValue build() throws IllegalStateException {
 			synchronized(this.builder){
-				return this.builder.create();
+				return this.builder.build();
 			}
 		}
 
@@ -386,7 +386,7 @@ public class Builders {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Builders() {
 	}

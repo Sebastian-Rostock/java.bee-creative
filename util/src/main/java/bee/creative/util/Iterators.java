@@ -3,9 +3,12 @@ package bee.creative.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import bee.creative.util.Filters.ContainsFilter;
+import bee.creative.util.Filters.NegationFilter;
 import bee.creative.util.Objects.UseToString;
 
 /**
@@ -92,7 +95,7 @@ public class Iterators {
 		final Iterator<? extends GEntry2> iterator;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Iterator}.
+		 * Dieser Konstruktor initialisiert den {@link Iterator}.
 		 * 
 		 * @param iterator {@link Iterator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
@@ -189,7 +192,7 @@ public class Iterators {
 		final GEntry value;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das Element.
+		 * Dieser Konstruktor initialisiert das Element.
 		 * 
 		 * @param entry Element.
 		 */
@@ -222,7 +225,7 @@ public class Iterators {
 		final Builder<? extends GEntry> builder;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Builder}.
+		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
@@ -238,7 +241,7 @@ public class Iterators {
 		@Override
 		public GEntry next() {
 			super.next();
-			return this.builder.create();
+			return this.builder.build();
 		}
 
 	}
@@ -261,7 +264,7 @@ public class Iterators {
 		int value;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Anzahl.
+		 * Dieser Konstruktor initialisiert die Anzahl.
 		 * 
 		 * @param count Anzahl.
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
@@ -307,6 +310,53 @@ public class Iterators {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen {@link Iterator}, der kein Element eines gegebenen {@link Iterator}s mehrfach liefert. Die {@link Collection} zum Ausschluss von Dopplungen kann im Konstruktor angegeben werden.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class UniqueIterator<GEntry> extends AbstractDelegatingIterator<GEntry, GEntry> {
+	
+		/**
+		 * Dieses Feld speichert die {@link Collection} zum Ausschluss von Dopplungen.
+		 */
+		final Collection<GEntry> collection;
+	
+		/**
+		 * Dieser Konstruktor initialisiert den {@link Iterator} und verwendet ein {@link HashSet} zum Ausschluss von Dopplungen.
+		 * 
+		 * @param iterator {@link Iterator}.
+		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+		 */
+		public UniqueIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
+			this(iterator, new HashSet<GEntry>());
+		}
+	
+		/**
+		 * Dieser Konstruktor initialisiert den {@link Iterator} sowie die {@link Collection} zum Ausschluss von Dopplungen.
+		 * 
+		 * @param iterator {@link Iterator}.
+		 * @param collection {@link Collection} zum Ausschluss von Dopplungen.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public UniqueIterator(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection) throws NullPointerException {
+			super(new FilteredIterator<GEntry>(new NegationFilter<GEntry>(new ContainsFilter<GEntry>(collection)), iterator));
+			this.collection = collection;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry next() {
+			final GEntry next = this.iterator.next();
+			this.collection.add(next);
+			return next;
+		}
+	
+	}
+
+	/**
 	 * Diese Klasse implementiert einen {@link Iterator}, der eine begrenzte Anzahl an Elementen eines gegebenen {@link Iterator}s liefert.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -320,7 +370,7 @@ public class Iterators {
 		int count;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Anzahl und {@link Iterator}.
+		 * Dieser Konstruktor initialisiert Anzahl und {@link Iterator}.
 		 * 
 		 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
 		 * @param iterator {@link Iterator}.
@@ -385,7 +435,7 @@ public class Iterators {
 		GEntry entry;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Iterator}.
+		 * Dieser Konstruktor initialisiert {@link Filter} und {@link Iterator}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @param iterator {@link Iterator}.
@@ -451,7 +501,7 @@ public class Iterators {
 		Iterator<? extends GEntry> entries;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Iterator} über die {@link Iterator}en. Der {@link Iterator} darf {@code null} liefern.
+		 * Dieser Konstruktor initialisiert den {@link Iterator} über die {@link Iterator}en. Der {@link Iterator} darf {@code null} liefern.
 		 * 
 		 * @param iterator {@link Iterator} über die {@link Iterator}en.
 		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
@@ -510,7 +560,7 @@ public class Iterators {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Converter} und {@link Iterator}.
+		 * Dieser Konstruktor initialisiert {@link Converter} und {@link Iterator}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @param iterator {@link Iterator}.
@@ -551,7 +601,7 @@ public class Iterators {
 	public static final class UnmodifiableIterator<GEntry> extends AbstractDelegatingIterator<GEntry, GEntry> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Iterator}.
+		 * Dieser Konstruktor initialisiert den {@link Iterator}.
 		 * 
 		 * @param iterator {@link Iterator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
@@ -784,7 +834,7 @@ public class Iterators {
 	 * @param entry Element.
 	 * @return {@link EntryIterator}
 	 */
-	public static <GEntry> EntryIterator<GEntry> entryIterator(final GEntry entry) {
+	public static <GEntry> Iterator<GEntry> entryIterator(final GEntry entry) {
 		return new EntryIterator<GEntry>(entry);
 	}
 
@@ -796,7 +846,7 @@ public class Iterators {
 	 * @return {@link BuilderIterator}
 	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 	 */
-	public static <GEntry> BuilderIterator<GEntry> builderIterator(final Builder<? extends GEntry> builder) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> builderIterator(final Builder<? extends GEntry> builder) throws NullPointerException {
 		return new BuilderIterator<GEntry>(builder);
 	}
 
@@ -807,8 +857,34 @@ public class Iterators {
 	 * @return {@link IntegerIterator}.
 	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
 	 */
-	public static IntegerIterator integerIterator(final int count) throws IllegalArgumentException {
+	public static Iterator<Integer> integerIterator(final int count) throws IllegalArgumentException {
 		return new IntegerIterator(count);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück. Als {@link Collection} zum Ausschluss von Dopplungen wird ein {@link HashSet} verwendet.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterator {@link Iterator}.
+	 * @return {@link UniqueIterator}.
+	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 */
+	public static <GEntry> Iterator<GEntry> uniqueIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
+		return new UniqueIterator<GEntry>(iterator);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterator {@link Iterator}.
+	 * @return {@link UniqueIterator}.
+	 * @param collection {@link Collection} zum Ausschluss von Dopplungen.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GEntry> Iterator<GEntry> uniqueIterator(final Iterator<? extends GEntry> iterator, final Collection<GEntry> collection)
+		throws NullPointerException {
+		return new UniqueIterator<GEntry>(iterator, collection);
 	}
 
 	/**
@@ -821,7 +897,7 @@ public class Iterators {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
 	 */
-	public static <GEntry> LimitedIterator<GEntry> limitedIterator(final int count, final Iterator<? extends GEntry> iterator) throws NullPointerException,
+	public static <GEntry> Iterator<GEntry> limitedIterator(final int count, final Iterator<? extends GEntry> iterator) throws NullPointerException,
 		IllegalArgumentException {
 		return new LimitedIterator<GEntry>(count, iterator);
 	}
@@ -836,7 +912,7 @@ public class Iterators {
 	 * @return {@link FilteredIterator}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GEntry> FilteredIterator<GEntry> filteredIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
+	public static <GEntry> Iterator<GEntry> filteredIterator(final Filter<? super GEntry> filter, final Iterator<? extends GEntry> iterator)
 		throws NullPointerException {
 		return new FilteredIterator<GEntry>(filter, iterator);
 	}
@@ -850,7 +926,7 @@ public class Iterators {
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
 	 */
-	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
 		return new ChainedIterator<GEntry>(iterators);
 	}
 
@@ -865,7 +941,7 @@ public class Iterators {
 	 * @return {@link ChainedIterator}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1, final Iterator<? extends GEntry> iterator2) {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry> iterator1, final Iterator<? extends GEntry> iterator2) {
 		return Iterators.chainedIterator(Arrays.asList(iterator1, iterator2));
 	}
 
@@ -879,7 +955,7 @@ public class Iterators {
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn die gegebenen {@link Iterator}en {@code null} sind.
 	 */
-	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterator<? extends GEntry>... iterators) throws NullPointerException {
 		if(iterators == null) throw new NullPointerException("iterators is null");
 		return Iterators.chainedIterator(Arrays.asList(iterators));
 	}
@@ -894,7 +970,7 @@ public class Iterators {
 	 * @return {@link ChainedIterator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
-	public static <GEntry> ChainedIterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> chainedIterator(final Iterable<? extends Iterator<? extends GEntry>> iterators) throws NullPointerException {
 		return Iterators.chainedIterator(iterators.iterator());
 	}
 
@@ -909,7 +985,7 @@ public class Iterators {
 	 * @return {@link ConvertedIterator}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GOutput> ConvertedIterator<GInput, GOutput> convertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
 		return new ConvertedIterator<GInput, GOutput>(converter, iterator);
 	}
@@ -923,12 +999,12 @@ public class Iterators {
 	 * @return {@link UnmodifiableIterator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
 	 */
-	public static <GEntry> UnmodifiableIterator<GEntry> unmodifiableIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
+	public static <GEntry> Iterator<GEntry> unmodifiableIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
 		return new UnmodifiableIterator<GEntry>(iterator);
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Iterators() {
 	}

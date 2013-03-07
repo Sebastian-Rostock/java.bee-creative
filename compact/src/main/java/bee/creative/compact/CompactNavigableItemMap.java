@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 	 * 
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
@@ -25,7 +25,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
@@ -38,7 +38,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	}
 
 	/**
-	 * Dieser Konstrukteur initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
+	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)

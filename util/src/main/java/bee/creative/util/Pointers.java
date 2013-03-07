@@ -72,7 +72,7 @@ public class Pointers {
 		final GData data;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 */
@@ -124,7 +124,7 @@ public class Pointers {
 	public static final class WeakPointer<GData> extends WeakReference<GData> implements Pointer<GData> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 */
@@ -176,7 +176,7 @@ public class Pointers {
 	public static final class SoftPointer<GData> extends SoftReference<GData> implements Pointer<GData> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Datensatz.
+		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
 		 */
@@ -238,7 +238,7 @@ public class Pointers {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Pointer} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Pointer} und {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @param pointer {@link Pointer}.
@@ -484,7 +484,7 @@ public class Pointers {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Pointers() {
 	}

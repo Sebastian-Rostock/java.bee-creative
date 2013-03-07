@@ -16,7 +16,7 @@ import java.util.RandomAccess;
  * 
  * @see ListBuilder1
  * @see ListBuilder2
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class ListBuilder {
 
@@ -27,7 +27,7 @@ public class ListBuilder {
 	 * @see Collections#checkedList(List, Class)
 	 * @see Collections#synchronizedList(List)
 	 * @see Collections#unmodifiableList(List)
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte.
 	 * @param <GList> Typ der {@link List}.
 	 */
@@ -59,6 +59,30 @@ public class ListBuilder {
 
 		/**
 		 * {@inheritDoc}
+		 * 
+		 * @return {@link List}-{@link Builder}.
+		 */
+		@Override
+		public ListBuilder1<GValue, GList> remove(GValue value);
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @return {@link List}-{@link Builder}.
+		 */
+		@Override
+		public ListBuilder1<GValue, GList> removeAll(GValue... value);
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @return {@link List}-{@link Builder}.
+		 */
+		@Override
+		public ListBuilder1<GValue, GList> removeAll(Iterable<? extends GValue> value);
+
+		/**
+		 * {@inheritDoc}
 		 */
 		@Override
 		public ListBuilder1<GValue, List<GValue>> asReverseList();
@@ -67,7 +91,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1<GValue, List<GValue>> asCheckedList(Class<GValue> clazz);
+		public ListBuilder1<GValue, List<GValue>> asCheckedList(Class<GValue> type);
 
 		/**
 		 * {@inheritDoc}
@@ -85,7 +109,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GList create();
+		public GList build();
 
 	}
 
@@ -96,7 +120,7 @@ public class ListBuilder {
 	 * @see Collections#checkedList(List, Class)
 	 * @see Collections#synchronizedList(List)
 	 * @see Collections#unmodifiableList(List)
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte.
 	 * @param <GList> Typ der {@link List}.
 	 */
@@ -114,10 +138,10 @@ public class ListBuilder {
 		 * Diese Methode konvertiert die konfigurierte {@link List} via {@link Collections#checkedList(List, Class)}.
 		 * 
 		 * @see Collections#checkedList(List, Class)
-		 * @param clazz {@link Class} der Werte.
+		 * @param type {@link Class} der Werte.
 		 * @return {@link List}-{@link Builder}.
 		 */
-		public ListBuilder2<GValue, List<GValue>> asCheckedList(Class<GValue> clazz);
+		public ListBuilder2<GValue, List<GValue>> asCheckedList(Class<GValue> type);
 
 		/**
 		 * Diese Methode konvertiert die konfigurierte {@link List} via {@link Collections#synchronizedList(List)}.
@@ -141,18 +165,18 @@ public class ListBuilder {
 		 * @return {@link List}.
 		 */
 		@Override
-		public GList create();
+		public GList build() throws IllegalStateException;
 
 	}
 
 	/**
 	 * Diese Klasse implementiert den {@link ListBuilder1}.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte.
 	 * @param <GList> Typ der {@link List}.
 	 */
-	static final class ListBuilder1Impl<GValue, GList extends List<GValue>> implements ListBuilder1<GValue, GList> {
+	static final class ListBuilderImpl<GValue, GList extends List<GValue>> implements ListBuilder1<GValue, GList> {
 
 		/**
 		 * Dieses Feld speichert die {@link List}.
@@ -160,11 +184,11 @@ public class ListBuilder {
 		final GList list;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link List}.
+		 * Dieser Konstruktor initialisiert die {@link List}.
 		 * 
 		 * @param list {@link List}.
 		 */
-		public ListBuilder1Impl(final GList list) {
+		public ListBuilderImpl(final GList list) {
 			this.list = list;
 		}
 
@@ -172,7 +196,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, GList> add(final GValue value) {
+		public ListBuilder1<GValue, GList> add(final GValue value) {
 			this.list.add(value);
 			return this;
 		}
@@ -181,7 +205,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, GList> addAll(final GValue... value) {
+		public ListBuilder1<GValue, GList> addAll(final GValue... value) {
 			this.list.addAll(Arrays.asList(value));
 			return this;
 		}
@@ -190,7 +214,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, GList> addAll(final Iterable<? extends GValue> value) {
+		public ListBuilder1<GValue, GList> addAll(final Iterable<? extends GValue> value) {
 			Iterables.appendAll(this.list, value);
 			return this;
 		}
@@ -199,39 +223,66 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, List<GValue>> asReverseList() {
-			return new ListBuilder1Impl<GValue, List<GValue>>(ListBuilder.reverseList(this.list));
+		public ListBuilder1<GValue, GList> remove(final GValue value) {
+			this.list.remove(value);
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, List<GValue>> asCheckedList(final Class<GValue> clazz) {
-			return new ListBuilder1Impl<GValue, List<GValue>>(Collections.checkedList(this.list, clazz));
+		public ListBuilder1<GValue, GList> removeAll(final GValue... value) {
+			this.list.removeAll(Arrays.asList(value));
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, List<GValue>> asSynchronizedList() {
-			return new ListBuilder1Impl<GValue, List<GValue>>(Collections.synchronizedList(this.list));
+		public ListBuilder1<GValue, GList> removeAll(final Iterable<? extends GValue> value) {
+			Iterables.appendAll(this.list, value);
+			return this;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListBuilder1Impl<GValue, List<GValue>> asUnmodifiableList() {
-			return new ListBuilder1Impl<GValue, List<GValue>>(Collections.unmodifiableList(this.list));
+		public ListBuilder1<GValue, List<GValue>> asReverseList() {
+			return new ListBuilderImpl<GValue, List<GValue>>(ListBuilder.reverseList(this.list));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GList create() {
+		public ListBuilder1<GValue, List<GValue>> asCheckedList(final Class<GValue> type) {
+			return new ListBuilderImpl<GValue, List<GValue>>(Collections.checkedList(this.list, type));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ListBuilder1<GValue, List<GValue>> asSynchronizedList() {
+			return new ListBuilderImpl<GValue, List<GValue>>(Collections.synchronizedList(this.list));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ListBuilder1<GValue, List<GValue>> asUnmodifiableList() {
+			return new ListBuilderImpl<GValue, List<GValue>>(Collections.unmodifiableList(this.list));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GList build() {
 			return this.list;
 		}
 
@@ -240,23 +291,23 @@ public class ListBuilder {
 	/**
 	 * Diese Klasse implementiert eine {@link List} als rückwärts geordnete Sicht auf eine gegebene {@link List}.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <V> Typ der Elemente.
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Elemente.
 	 */
-	static class ReverseList<V> extends AbstractList<V> {
+	static class ReverseList<GValue> extends AbstractList<GValue> {
 
 		/**
 		 * Dieses Feld speichert die {@link List}.
 		 */
-		List<V> list;
+		List<GValue> list;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link List}.
+		 * Dieser Konstruktor initialisiert die {@link List}.
 		 * 
 		 * @param list {@link List}
 		 * @throws NullPointerException wenn die gegebene {@link List} {@code null} ist.
 		 */
-		public ReverseList(final List<V> list) throws NullPointerException {
+		public ReverseList(final List<GValue> list) throws NullPointerException {
 			if(list == null) throw new NullPointerException();
 			this.list = list;
 		}
@@ -273,15 +324,15 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public List<V> subList(final int fromIndex, final int toIndex) {
-			return new ReverseList<V>(this.list.subList(this.list.size() - toIndex - 2, this.list.size() - fromIndex - 2));
+		public List<GValue> subList(final int fromIndex, final int toIndex) {
+			return new ReverseList<GValue>(this.list.subList(this.list.size() - toIndex - 2, this.list.size() - fromIndex - 2));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public V get(final int index) {
+		public GValue get(final int index) {
 			return this.list.get(this.list.size() - index - 1);
 		}
 
@@ -289,7 +340,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public V set(final int index, final V element) {
+		public GValue set(final int index, final GValue element) {
 			return this.list.set(this.list.size() - index - 1, element);
 		}
 
@@ -297,7 +348,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void add(final int index, final V element) {
+		public void add(final int index, final GValue element) {
 			this.list.add(this.list.size() - index, element);
 		}
 
@@ -305,7 +356,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public V remove(final int index) {
+		public GValue remove(final int index) {
 			return this.list.remove(this.list.size() - index - 1);
 		}
 
@@ -387,7 +438,7 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<V> iterator() {
+		public Iterator<GValue> iterator() {
 			return super.listIterator(0);
 		}
 
@@ -395,10 +446,10 @@ public class ListBuilder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ListIterator<V> listIterator(final int index) {
-			return new ListIterator<V>() {
+		public ListIterator<GValue> listIterator(final int index) {
+			return new ListIterator<GValue>() {
 
-				final ListIterator<V> iterator = ReverseList.this.list.listIterator(ReverseList.this.list.size() - index);
+				final ListIterator<GValue> iterator = ReverseList.this.list.listIterator(ReverseList.this.list.size() - index);
 
 				@Override
 				public boolean hasNext() {
@@ -406,7 +457,7 @@ public class ListBuilder {
 				}
 
 				@Override
-				public V next() {
+				public GValue next() {
 					return this.iterator.previous();
 				}
 
@@ -416,7 +467,7 @@ public class ListBuilder {
 				}
 
 				@Override
-				public V previous() {
+				public GValue previous() {
 					return this.iterator.next();
 				}
 
@@ -436,12 +487,12 @@ public class ListBuilder {
 				}
 
 				@Override
-				public void set(final V e) {
+				public void set(final GValue e) {
 					this.iterator.set(e);
 				}
 
 				@Override
-				public void add(final V e) {
+				public void add(final GValue e) {
 					this.iterator.add(e);
 					this.iterator.hasPrevious();
 					this.iterator.previous();
@@ -455,13 +506,13 @@ public class ListBuilder {
 	/**
 	 * Diese Klasse implementiert eine {@link ReverseList} mit {@link RandomAccess}.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
 	static class ReverseRandomAccessList<GValue> extends ReverseList<GValue> implements RandomAccess {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link List}.
+		 * Dieser Konstruktor initialisiert die {@link List}.
 		 * 
 		 * @param list {@link List}
 		 * @throws NullPointerException wenn die gegebene {@link List} {@code null} ist.
@@ -492,59 +543,59 @@ public class ListBuilder {
 	/**
 	 * Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
 	 * 
-	 * @param <V> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @param list {@link List}
 	 * @return rückwärts geordnete {@link List}-Sicht.
 	 * @throws NullPointerException Wenn die gegebene {@link List} {@code null} ist.
 	 */
-	public static <V> List<V> reverseList(final List<V> list) throws NullPointerException {
-		return (list instanceof RandomAccess ? new ReverseRandomAccessList<V>(list) : new ReverseList<V>(list));
+	public static <GValue> List<GValue> reverseList(final List<GValue> list) throws NullPointerException {
+		return (list instanceof RandomAccess ? new ReverseRandomAccessList<GValue>(list) : new ReverseList<GValue>(list));
 	}
 
 	/**
 	 * Diese Methode gibt einen {@link List}-{@link Builder} für die gegebene {@link List} zurück.
 	 * 
-	 * @param <V> Typ der Werte.
-	 * @param <L> Typ der {@link List}.
+	 * @param <GValue> Typ der Werte.
+	 * @param <GList> Typ der {@link List}.
 	 * @param list {@link List}.
 	 * @return {@link List}-{@link Builder}.
 	 * @throws NullPointerException Wenn die gegebene {@link List} {@code null} ist.
 	 */
-	public <V, L extends List<V>> ListBuilder1<V, L> list(final L list) throws NullPointerException {
+	public <GValue, GList extends List<GValue>> ListBuilder1<GValue, GList> list(final GList list) throws NullPointerException {
 		if(list == null) throw new NullPointerException();
-		return new ListBuilder1Impl<V, L>(list);
+		return new ListBuilderImpl<GValue, GList>(list);
 	}
 
 	/**
 	 * Diese Methode einen neuen {@link ArrayList}-{@link Builder} zurück.
 	 * 
-	 * @param <V> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @return {@link ArrayList}-{@link Builder}.
 	 */
-	public <V> ListBuilder1<V, ArrayList<V>> newArrayList() {
+	public <GValue> ListBuilder1<GValue, ArrayList<GValue>> newArrayList() {
 		return this.newArrayList(10);
 	}
 
 	/**
 	 * Diese Methode einen neuen {@link ArrayList}-{@link Builder} mit der gegebenen Kapazität zurück.
 	 * 
-	 * @param <V> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @param capacity Kapazität.
 	 * @return {@link ArrayList}-{@link Builder}.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität negativ ist.
 	 */
-	public <V> ListBuilder1<V, ArrayList<V>> newArrayList(final int capacity) throws IllegalArgumentException {
-		return this.list(new ArrayList<V>(capacity));
+	public <GValue> ListBuilder1<GValue, ArrayList<GValue>> newArrayList(final int capacity) throws IllegalArgumentException {
+		return this.list(new ArrayList<GValue>(capacity));
 	}
 
 	/**
 	 * Diese Methode einen neuen {@link LinkedList}-{@link Builder} zurück.
 	 * 
-	 * @param <V> Typ der Werte.
+	 * @param <GValue> Typ der Werte.
 	 * @return {@link LinkedList}-{@link Builder}.
 	 */
-	public <V> ListBuilder1<V, LinkedList<V>> newLinkedList() {
-		return this.list(new LinkedList<V>());
+	public <GValue> ListBuilder1<GValue, LinkedList<GValue>> newLinkedList() {
+		return this.list(new LinkedList<GValue>());
 	}
 
 }

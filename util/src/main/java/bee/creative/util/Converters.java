@@ -87,7 +87,7 @@ public class Converters {
 		final String name;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Namen.
+		 * Dieser Konstruktor initialisiert den Namen.
 		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
@@ -141,7 +141,7 @@ public class Converters {
 		final Converter<? super GInput2, ? extends GOutput2> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter}.
+		 * Dieser Konstruktor initialisiert den {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
@@ -217,7 +217,7 @@ public class Converters {
 		final Field field;
 
 		/**
-		 * Dieser Konstrukteur initialisiert das {@link Field}.
+		 * Dieser Konstruktor initialisiert das {@link Field}.
 		 * 
 		 * @param field {@link Field}.
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
@@ -285,7 +285,7 @@ public class Converters {
 		final Method method;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Method}.
+		 * Dieser Konstruktor initialisiert die {@link Method}.
 		 * 
 		 * @param method {@link Method}.
 		 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
@@ -350,7 +350,7 @@ public class Converters {
 	public static final class NamedFieldConverter<GInput, GOutput> extends AbstractNamedConverter<GInput, GOutput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Namen.
+		 * Dieser Konstruktor initialisiert den Namen.
 		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
@@ -400,7 +400,7 @@ public class Converters {
 	public static final class NamedMethodConverter<GInput, GOutput> extends AbstractNamedConverter<GInput, GOutput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den Namen.
+		 * Dieser Konstruktor initialisiert den Namen.
 		 * 
 		 * @param name Name.
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
@@ -455,7 +455,7 @@ public class Converters {
 		final GValue value;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die Ausgabe.
+		 * Dieser Konstruktor initialisiert die Ausgabe.
 		 * 
 		 * @param value Ausgabe.
 		 */
@@ -539,7 +539,7 @@ public class Converters {
 		int capacity = 0;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den gepuferten {@link Converter}.
+		 * Dieser Konstruktor initialisiert den gepuferten {@link Converter}.
 		 * 
 		 * @see Pointers#pointer(int, Object)
 		 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
@@ -648,7 +648,7 @@ public class Converters {
 		final Converter<? super GValue, ? extends GOutput> converter2;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Converter}.
+		 * Dieser Konstruktor initialisiert die {@link Converter}.
 		 * 
 		 * @param converter1 primärer {@link Converter}.
 		 * @param converter2 sekundärer {@link Converter}.
@@ -724,7 +724,7 @@ public class Converters {
 		final Converter<? super GInput, ? extends GOutput> reject;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Filter} und {@link Converter}.
 		 * 
 		 * @param condition {@link Filter}.
 		 * @param accept {@code Accept}-{@link Converter}.
@@ -789,7 +789,7 @@ public class Converters {
 	public static final class SynchronizedConverter<GInput, GOutput> extends AbstractDelegatingConverter<GInput, GOutput, GInput, GOutput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Converter}.
+		 * Dieser Konstruktor initialisiert den {@link Converter}.
 		 * 
 		 * @param converter {@link Converter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
@@ -1020,7 +1020,7 @@ public class Converters {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Converters() {
 	}

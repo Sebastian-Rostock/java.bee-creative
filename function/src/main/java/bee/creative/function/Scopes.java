@@ -57,7 +57,7 @@ public final class Scopes {
 			Function function;
 
 			/**
-			 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}.
+			 * Dieser Konstruktor initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}.
 			 * 
 			 * @param scope {@link Scope Ausführungskontext}.
 			 * @param function {@link Function Funktion}.
@@ -278,7 +278,7 @@ public final class Scopes {
 		final Object context;
 
 		/**
-		 * Dieser Konstrukteur initialisiert Kontextobjekt und {@link Value Parameterwerte}.
+		 * Dieser Konstruktor initialisiert Kontextobjekt und {@link Value Parameterwerte}.
 		 * 
 		 * @see ArrayValue#valueOf(Object[])
 		 * @param context Kontextobjekt.
@@ -290,7 +290,7 @@ public final class Scopes {
 		}
 
 		/**
-		 * Dieser Konstrukteur initialisiert Kontextobjekt und {@link Value Parameterwerte}.
+		 * Dieser Konstruktor initialisiert Kontextobjekt und {@link Value Parameterwerte}.
 		 * 
 		 * @param context Kontextobjekt.
 		 * @param values {@link Value Parameterwerte}.
@@ -378,7 +378,7 @@ public final class Scopes {
 		final Value[] insertValues;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den aufrufenden {@link Scope Ausführungskontext}, das Kontextobjekt, die Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} und das Array der ersten {@link Value Parameterwerte}.
+		 * Dieser Konstruktor initialisiert den aufrufenden {@link Scope Ausführungskontext}, das Kontextobjekt, die Anzahl der virtuel zu entfernenden {@link Value Parameterwerte} und das Array der ersten {@link Value Parameterwerte}.
 		 * 
 		 * @see Scope#execute(Function, int, Value...)
 		 * @see Scope#execute(Object, Function, int, Value...)
@@ -491,7 +491,7 @@ public final class Scopes {
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}.
+		 * Dieser Konstruktor initialisiert {@link Scope Ausführungskontext} und {@link Function Parameterfunktionen}.
 		 * 
 		 * @param scope {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
 		 * @param functions {@link Function Parameterfunktionen}.
@@ -562,7 +562,7 @@ public final class Scopes {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Scopes() {
 	}

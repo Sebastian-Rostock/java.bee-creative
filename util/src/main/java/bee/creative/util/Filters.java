@@ -55,7 +55,7 @@ public class Filters {
 		final Filter<? super GInput> filter2;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Filter}.
+		 * Dieser Konstruktor initialisiert die {@link Filter}.
 		 * 
 		 * @param filter1 primärer {@link Filter}.
 		 * @param filter2 sekundärer {@link Filter}.
@@ -112,7 +112,7 @@ public class Filters {
 		final Filter<? super GInput2> filter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter}.
+		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
@@ -254,7 +254,7 @@ public class Filters {
 	public static final class NegationFilter<GInput> extends AbstractDelegatingFilter<GInput, GInput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter}.
+		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
@@ -299,7 +299,7 @@ public class Filters {
 		final Collection<?> collection;
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Collection}.
+		 * Dieser Konstruktor initialisiert die {@link Collection}.
 		 * 
 		 * @param collection {@link Collection}.
 		 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
@@ -363,7 +363,7 @@ public class Filters {
 		final Converter<? super GInput, ? extends GOutput> converter;
 
 		/**
-		 * Dieser Konstrukteur initialisiert {@link Filter} und {@link Converter}.
+		 * Dieser Konstruktor initialisiert {@link Filter} und {@link Converter}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @param converter {@link Converter}.
@@ -423,7 +423,7 @@ public class Filters {
 	public static final class DisjunctionFilter<GInput> extends AbstractJunctionFilter<GInput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Filter}.
+		 * Dieser Konstruktor initialisiert die {@link Filter}.
 		 * 
 		 * @param filter1 primärer {@link Filter}.
 		 * @param filter2 sekundärer {@link Filter}.
@@ -464,7 +464,7 @@ public class Filters {
 	public static final class ConjunctionFilter<GInput> extends AbstractJunctionFilter<GInput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Filter}.
+		 * Dieser Konstruktor initialisiert die {@link Filter}.
 		 * 
 		 * @param filter1 primärer {@link Filter}.
 		 * @param filter2 sekundärer {@link Filter}.
@@ -505,7 +505,7 @@ public class Filters {
 	public static final class EquivalenceFilter<GInput> extends AbstractJunctionFilter<GInput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert die {@link Filter}.
+		 * Dieser Konstruktor initialisiert die {@link Filter}.
 		 * 
 		 * @param filter1 primärer {@link Filter}.
 		 * @param filter2 sekundärer {@link Filter}.
@@ -544,7 +544,7 @@ public class Filters {
 	public static final class SynchronizedFilter<GInput> extends AbstractDelegatingFilter<GInput, GInput> {
 
 		/**
-		 * Dieser Konstrukteur initialisiert den {@link Filter}.
+		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
 		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
@@ -717,7 +717,7 @@ public class Filters {
 	}
 
 	/**
-	 * Dieser Konstrukteur ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Filters() {
 	}
