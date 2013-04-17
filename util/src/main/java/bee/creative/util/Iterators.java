@@ -316,12 +316,12 @@ public class Iterators {
 	 * @param <GEntry> Typ der Elemente.
 	 */
 	public static final class UniqueIterator<GEntry> extends AbstractDelegatingIterator<GEntry, GEntry> {
-	
+
 		/**
 		 * Dieses Feld speichert die {@link Collection} zum Ausschluss von Dopplungen.
 		 */
 		final Collection<GEntry> collection;
-	
+
 		/**
 		 * Dieser Konstruktor initialisiert den {@link Iterator} und verwendet ein {@link HashSet} zum Ausschluss von Dopplungen.
 		 * 
@@ -331,7 +331,7 @@ public class Iterators {
 		public UniqueIterator(final Iterator<? extends GEntry> iterator) throws NullPointerException {
 			this(iterator, new HashSet<GEntry>());
 		}
-	
+
 		/**
 		 * Dieser Konstruktor initialisiert den {@link Iterator} sowie die {@link Collection} zum Ausschluss von Dopplungen.
 		 * 
@@ -343,7 +343,7 @@ public class Iterators {
 			super(new FilteredIterator<GEntry>(new NegationFilter<GEntry>(new ContainsFilter<GEntry>(collection)), iterator));
 			this.collection = collection;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -353,7 +353,7 @@ public class Iterators {
 			this.collection.add(next);
 			return next;
 		}
-	
+
 	}
 
 	/**
