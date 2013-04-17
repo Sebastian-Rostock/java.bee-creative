@@ -780,7 +780,7 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(converter)} auf dem gegebenen {@link Converter}.
+	 * Diese Klasse implementiert einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Converter}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -803,7 +803,7 @@ public class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			synchronized(this.converter){
+			synchronized(this){
 				return this.converter.convert(input);
 			}
 		}
@@ -1006,7 +1006,7 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(converter)} auf dem gegebenen {@link Converter}.
+	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Converter}.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
