@@ -1,8 +1,8 @@
 package bee.creative.function;
 
-import bee.creative.function.Scopes.AbstractScope.ReturnValue;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Values.ArrayValue;
+import bee.creative.function.Values.FunctionValue;
 import bee.creative.function.Values.NullValue;
 import bee.creative.util.Objects;
 
@@ -15,6 +15,202 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Functions {
+
+	/**
+	 * Diese Klasse implementiert eine {@link Function Funktion} zur Verfolgung bzw. Überwachung der Verarbeitung von {@link Function Funktionen} über einem {@link TraceHandler} und {@link TraceEvent}s.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class TraceFunction implements Function {
+
+		/**
+		 * Diese Klasse implementiert das Argument für die Methoden des {@link TraceHandler}.
+		 * 
+		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		public static final class TraceEvent {
+
+			/**
+			 * Dieses Feld speichert den {@link Scope Ausführungskontext} der {@link Function Funktion}. Dieser kann in der Methode {@link TraceHandler#onExecute(TraceEvent)} für den Aufruf angepasst werden.
+			 */
+			public Scope scope;
+
+			/**
+			 * Dieses Feld speichert die {@link Function}, die nach {@link TraceHandler#onExecute(TraceEvent)} aufgerufen wird bzw. vor {@link TraceHandler#onThrow(TraceEvent)} oder {@link TraceHandler#onReturn(TraceEvent)} aufgerufen wurde. Diese kann in der Methode {@link TraceHandler#onExecute(TraceEvent)} für den Aufruf angepasst werden.
+			 */
+			public Function function;
+
+			/**
+			 * Dieses Feld speichert den {@link Value Ergebniswert}, der von der {@link Function Funktion} zurück gegeben wurde. Dieser kann in der Methode {@link TraceHandler#onReturn(TraceEvent)} angepasst werden.
+			 */
+			public Value result;
+
+			/**
+			 * Dieses Feld speichert die {@link RuntimeException}, die von der {@link Function Funktion} ausgelöst wurde. Diese kann in der Methode {@link TraceHandler#onThrow(TraceEvent)} angepasst werden.
+			 */
+			public RuntimeException exception;
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "function", this.function, "result", this.result, "exception",
+					this.exception});
+			}
+
+		}
+
+		/**
+		 * Diese Schnittstelle definiert die Methoden zur Verfolgung bzw. Überwachung der Verarbeitung von {@link Function Funktionen}.
+		 * 
+		 * @see TraceEvent
+		 * @see TraceFunction
+		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		public static interface TraceHandler {
+
+			/**
+			 * Diese Methode wird nach dem Verlassen einer {@link Function Funktion} via {@code throw} aufgerufen. Das Feld {@link TraceEvent#exception} kann hierbei angepasst werden.
+			 * 
+			 * @see TraceEvent#exception
+			 * @param event {@link TraceEvent}.
+			 */
+			public void onThrow(TraceEvent event);
+
+			/**
+			 * Diese Methode wird nach dem Verlassen einer {@link Function Funktion} via {@code return} aufgerufen. Das Feld {@link TraceEvent#result} kann hierbei angepasst werden.
+			 * 
+			 * @see TraceEvent#result
+			 * @param event {@link TraceEvent}.
+			 */
+			public void onReturn(TraceEvent event);
+
+			/**
+			 * Diese Methode wird vor dem Aufruf einer {@link Function Funktion} aufgerufen. Die Felder {@link TraceEvent#scope} und {@link TraceEvent#function} können hierbei angepasst werden, um den Aufruf auf eine andere {@link Function Funktion} umzulenken bzw. mit einem anderen {@link Scope Ausführungskontext} durchzuführen.
+			 * 
+			 * @see TraceEvent#scope
+			 * @see TraceEvent#function
+			 * @param event {@link TraceEvent}.
+			 */
+			public void onExecute(TraceEvent event);
+
+		}
+
+		/**
+		 * Dieses Feld speichert den {@link TraceHandler}.
+		 */
+		final TraceHandler handler;
+
+		/**
+		 * Dieses Feld speichert die aufzurufende {@link Function Funktion}.
+		 */
+		final Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert {@link Function Funktion} und {@link TraceHandler}.
+		 * 
+		 * @param handler {@link TraceHandler}.
+		 * @param function {@link Function Funktion}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TraceFunction(final TraceHandler handler, final Function function) throws NullPointerException {
+			if((handler == null) || (function == null)) throw new NullPointerException();
+			this.handler = handler;
+			this.function = function;
+		}
+
+		/**
+		 * Diese Methode gibt den {@link TraceHandler} zurück.
+		 * 
+		 * @return {@link TraceHandler}.
+		 */
+		public TraceHandler handler() {
+			return this.handler;
+		}
+
+		/**
+		 * Diese Methode gibt die aufzurufende {@link Function Funktion} zurück.
+		 * 
+		 * @return aufzurufende {@link Function Funktion}.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value execute(final Scope scope) {
+			final TraceEvent event = new TraceEvent();
+			final TraceHandler handler = this.handler;
+			final Function function = this.function;
+			event.scope = scope;
+			event.function = function;
+			handler.onExecute(event);
+			Scope scope2 = event.scope;
+			if(scope2 == null) throw new NullPointerException();
+			Function function2 = event.function;
+			if(function2 == null) throw new NullPointerException();
+			final Object functionClass = function2.getClass();
+			if(functionClass == CompositeFunction.class){
+				final CompositeFunction compositeFunction = (CompositeFunction)function2;
+				function2 = new TraceFunction(handler, compositeFunction.function);
+				final Function[] functions2 = compositeFunction.functions.clone();
+				for(int i = 0, size = functions2.length; i < size; i++){
+					functions2[i] = new TraceFunction(handler, functions2[i]);
+				}
+				scope2 = new CompositeScope(scope2, functions2);
+			}else if(functionClass == ValueFunction.class){
+				final Value value = function2.execute(null);
+				if(value.getClass() == FunctionValue.class){
+					function2 = ValueFunction.valueOf(FunctionValue.valueOf(new TraceFunction(handler, (Function)value.data())));
+				}
+			}
+			event.scope = scope;
+			event.function = function;
+			try{
+				event.result = function2.execute(scope2);
+				event.exception = null;
+				handler.onReturn(event);
+				return event.result;
+			}catch(final RuntimeException exception){
+				event.result = null;
+				event.exception = exception;
+				handler.onThrow(event);
+				throw exception;
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hashEx(this.handler, this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof TraceFunction)) return false;
+			final TraceFunction data = (TraceFunction)object;
+			return Objects.equals(this.handler, data.handler) && Objects.equals(this.function, data.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(true, true, this, new Object[]{"handler", this.handler, "function", this.function});
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert eine {@link Function}, deren {@link Value Ergebniswert} dem {@link ArrayValue} der {@link Scope#get(int) Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
@@ -253,17 +449,17 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse definiert eine komponierte {@link Function}, die den Aufruf einer gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} mehrerer gegebener {@link Function Parameterfunktionen} als {@link Scope#get(int) Parameterwerte} berechnet.
+	 * Diese Klasse definiert eine komponierte {@link Function}, die den Aufruf einer gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} mehrerer gegebener {@link Function Parameterfunktionen} berechnet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class CompositeFunction implements Function {
 
 		/**
-		 * Diese Methode erzeugt eine {@link Function}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen {@link Function Parameterfunktionen} als {@link Scope#get(int) Parameterwerte} berechnet, und gibt diese zurück.
+		 * Diese Methode erzeugt eine {@link Function}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen {@link Function Parameterfunktionen} berechnet, und gibt diese zurück.
 		 * 
 		 * @param function {@link Function Funktion}.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} verwendet beim Aufruf der {@link Function Funktion} werden sollen.
+		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der {@link Function Funktion} verwendet werden sollen.
 		 * @return {@link CompositeFunction komponierte Funktion}.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
@@ -285,7 +481,7 @@ public final class Functions {
 		 * Dieser Konstruktor initialisiert die aufzurufende {@link Function Funktion} und die {@link Function Parameterfunktionen}.
 		 * 
 		 * @param function {@link Function Funktion}.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} verwendet beim Aufruf der {@link Function Funktion} werden sollen.
+		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der {@link Function Funktion} verwendet werden sollen.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
@@ -316,8 +512,8 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ReturnValue execute(final Scope scope) {
-			return new ReturnValue(new CompositeScope(scope, this.functions), this.function);
+		public Value execute(final Scope scope) {
+			return this.function.execute(new CompositeScope(scope, this.functions));
 		}
 
 		/**
