@@ -240,7 +240,7 @@ public final class Bytes {
 	 * @param value {@code int} mit {@code 1 byte}-Wert.
 	 */
 	public static void set1(final byte[] array, final int index, final int value) {
-		array[index + 0] = (byte)(value >> 0);
+		array[index + 0] = (byte)(value >>> 0);
 	}
 
 	/**
@@ -268,8 +268,8 @@ public final class Bytes {
 	 * @param value {@code int} mit {@code 2 byte}-Wert.
 	 */
 	public static void set2(final byte[] array, final int index, final int value) {
-		array[index + 0] = (byte)(value >> 8);
-		array[index + 1] = (byte)(value >> 0);
+		array[index + 0] = (byte)(value >>> 8);
+		array[index + 1] = (byte)(value >>> 0);
 	}
 
 	/**
@@ -297,9 +297,9 @@ public final class Bytes {
 	 * @param value {@code int} mit {@code 3 byte}-Wert.
 	 */
 	public static void set3(final byte[] array, final int index, final int value) {
-		array[index + 0] = (byte)(value >> 16);
-		array[index + 1] = (byte)(value >> 8);
-		array[index + 2] = (byte)(value >> 0);
+		array[index + 0] = (byte)(value >>> 16);
+		array[index + 1] = (byte)(value >>> 8);
+		array[index + 2] = (byte)(value >>> 0);
 	}
 
 	/**
@@ -327,10 +327,10 @@ public final class Bytes {
 	 * @param value {@code int} mit {@code 4 byte}-Wert.
 	 */
 	public static void set4(final byte[] array, final int index, final int value) {
-		array[index + 0] = (byte)(value >> 24);
-		array[index + 1] = (byte)(value >> 16);
-		array[index + 2] = (byte)(value >> 8);
-		array[index + 3] = (byte)(value >> 0);
+		array[index + 0] = (byte)(value >>> 24);
+		array[index + 1] = (byte)(value >>> 16);
+		array[index + 2] = (byte)(value >>> 8);
+		array[index + 3] = (byte)(value >>> 0);
 	}
 
 	/**
@@ -358,8 +358,8 @@ public final class Bytes {
 	 * @param value {@code long} mit {@code 5 byte}-Wert.
 	 */
 	public static void set5(final byte[] array, final int index, final long value) {
-		Bytes.set1(array, index + 0, (int)(value >> 32));
-		Bytes.set4(array, index + 1, (int)(value >> 0));
+		Bytes.set1(array, index + 0, (int)(value >>> 32));
+		Bytes.set4(array, index + 1, (int)(value >>> 0));
 	}
 
 	/**
@@ -387,8 +387,8 @@ public final class Bytes {
 	 * @param value {@code long} mit {@code 6 byte}-Wert.
 	 */
 	public static void set6(final byte[] array, final int index, final long value) {
-		Bytes.set2(array, index + 0, (int)(value >> 32));
-		Bytes.set4(array, index + 2, (int)(value >> 0));
+		Bytes.set2(array, index + 0, (int)(value >>> 32));
+		Bytes.set4(array, index + 2, (int)(value >>> 0));
 	}
 
 	/**
@@ -416,8 +416,8 @@ public final class Bytes {
 	 * @param value {@code long} mit {@code 7 byte}-Wert.
 	 */
 	public static void set7(final byte[] array, final int index, final long value) {
-		Bytes.set3(array, index + 0, (int)(value >> 32));
-		Bytes.set4(array, index + 3, (int)(value >> 0));
+		Bytes.set3(array, index + 0, (int)(value >>> 32));
+		Bytes.set4(array, index + 3, (int)(value >>> 0));
 	}
 
 	/**
@@ -445,8 +445,8 @@ public final class Bytes {
 	 * @param value {@code long} mit {@code 8 byte}-Wert.
 	 */
 	public static void set8(final byte[] array, final int index, final long value) {
-		Bytes.set4(array, index + 0, (int)(value >> 32));
-		Bytes.set4(array, index + 4, (int)(value >> 0));
+		Bytes.set4(array, index + 0, (int)(value >>> 32));
+		Bytes.set4(array, index + 4, (int)(value >>> 0));
 	}
 
 	/**
