@@ -536,7 +536,7 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der einen gegebenen {@link Filter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(filter)} auf dem gegebenen {@link Filter}.
+	 * Diese Klasse implementiert einen {@link Filter}, der einen gegebenen {@link Filter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Filter}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -558,7 +558,7 @@ public class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			synchronized(this.filter){
+			synchronized(this){
 				return this.filter.accept(input);
 			}
 		}
@@ -620,7 +620,12 @@ public class Filters {
 	 * @return {@link NegationFilter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
 	 */
-	public static <GInput> NegationFilter<GInput> inverseFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	@SuppressWarnings ("unchecked")
+	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		if(filter == null) throw new NullPointerException("filter is null");
+		if(filter == AcceptFilter.INSTANCE) return Filters.rejectFilter();
+		if(filter == RejectFilter.INSTANCE) return Filters.acceptFilter();
+		if(filter instanceof NegationFilter<?>) return (Filter<GInput>)((NegationFilter<?>)filter).filter;
 		return new NegationFilter<GInput>(filter);
 	}
 
@@ -667,8 +672,10 @@ public class Filters {
 	 * @return {@link DisjunctionFilter}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput> DisjunctionFilter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
+		if((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
+			return Filters.negationFilter(Filters.conjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
 		return new DisjunctionFilter<GInput>(filter1, filter2);
 	}
 
@@ -683,8 +690,10 @@ public class Filters {
 	 * @return {@link ConjunctionFilter}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput> ConjunctionFilter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
+		if((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
+			return Filters.negationFilter(Filters.disjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
 		return new ConjunctionFilter<GInput>(filter1, filter2);
 	}
 
@@ -705,7 +714,7 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück. Die Synchronisation erfolgt via {@code synchronized(filter)} auf dem gegebenen {@link Filter} .
+	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Filter} .
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
