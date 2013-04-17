@@ -13,14 +13,14 @@ import bee.creative.util.Pointers.SoftPointer;
  * 
  *   static final {@literal Builder<Helper> CACHE = Builders.synchronizedBuilder(Builders.cachedBuilder(new Builder<Helper>()} {
  *   
- *     public Helper create() {
+ *     public Helper build() {
  *       return new Helper();
  *     }
  *     
  *   }));
  *   
  *   public static Helper get() {
- *     return Helper.CACHE.create();
+ *     return Helper.CACHE.build();
  *   }
  *   
  *   protected Helper() {
@@ -281,7 +281,7 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
+	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Builder}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ des Datensatzes.
@@ -303,7 +303,7 @@ public class Builders {
 		 */
 		@Override
 		public GValue build() throws IllegalStateException {
-			synchronized(this.builder){
+			synchronized(this){
 				return this.builder.build();
 			}
 		}
@@ -374,7 +374,7 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(builder)} auf dem gegebenen {@link Builder}.
+	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Builder}.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
