@@ -45,6 +45,7 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 	<modules>
 		<module>compact</module>
 		<module>util</module>
+	    <module>util2</module>
 		<module>array</module>
 		<module>function</module>
 		<module>xml</module>
