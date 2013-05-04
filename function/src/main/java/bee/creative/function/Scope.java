@@ -14,7 +14,7 @@ import bee.creative.util.Objects.UseToString;
 public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 
 	/**
-	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück. Über die {@link #size() Anzahl der Parameterwerte} für eine aufgerufene {@link Function Funktion} hinaus können auch zusätzliche {@link Value Parameterwerte} bereitgestellt werden.
+	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch zusätzliche {@link Value Parameterwerte} bereitgestellt werden.
 	 * 
 	 * @see Value
 	 * @param index Index.
@@ -37,31 +37,5 @@ public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 	 * @return Kontextobjekt.
 	 */
 	public Object context();
-
-	/**
-	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das Kontextobjekt dieses {@link Scope Ausführungskontexts} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der ersen {@code deleteCount} {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den in {@code insertValues} gegebenen {@link Value Parameterwerten} entsteht.
-	 * 
-	 * @see Value
-	 * @see Function
-	 * @see #execute(Object, Function, Value...)
-	 * @param function {@link Function Funktion}.
-	 * @param values Array der ersten {@link Value Parameterwerte} des neuen {@link Scope Ausführungskontexts}.
-	 * @return {@link Value Ergebniswert}.
-	 * @throws NullPointerException Wenn die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
-	 */
-	public Value execute(Function function, Value... values) throws NullPointerException;
-
-	/**
-	 * Diese Methode ruft die gegebene {@link Function Funktion} mit einem neuen {@link Scope Ausführungskontext} auf und gibt deren {@link Value Ergebniswert} zurück. Der hierfür erzeugte {@link Scope Ausführungskontext} verwendet das gegebene Kontextobjekt {@code context} und besitzt eine Liste von {@link Value Parameterwerten}, die durch das Ersetzen der {@link Value Parameterwerte} dieses {@link Scope Ausführungskontexts} mit den gegebenen {@link Value Parameterwerten} entsteht.
-	 * 
-	 * @see Value
-	 * @see Function
-	 * @param context Kontextobjekt.
-	 * @param function {@link Function Funktion}.
-	 * @param values Array der ersten {@link Value Parameterwerte} des neuen {@link Scope Ausführungskontexts}.
-	 * @return {@link Value Ergebniswert}.
-	 * @throws NullPointerException Wenn die gegebene {@link Function Funktion} bzw. einer der gegebenen {@link Value Parameterwerte} {@code null} ist.
-	 */
-	public Value execute(Object context, Function function, Value... values) throws NullPointerException;
 
 }

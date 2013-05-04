@@ -376,7 +376,7 @@ public final class Values {
 		 * @return {@link ArrayValue}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static ArrayValue valueOf(final Object[] data) throws NullPointerException {
+		public static ArrayValue valueOf(final Object... data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){
@@ -392,7 +392,7 @@ public final class Values {
 		 * @return {@link ArrayValue}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static ArrayValue valueOf(final Value[] data) throws NullPointerException {
+		public static ArrayValue valueOf(final Value... data) throws NullPointerException {
 			final int size = data.length;
 			final Value[] values = new Value[size];
 			for(int i = 0; i < size; i++){

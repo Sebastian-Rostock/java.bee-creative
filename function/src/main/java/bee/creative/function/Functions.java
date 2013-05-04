@@ -20,6 +20,8 @@ public final class Functions {
 	 * Diese Klasse implementiert eine {@link Function Funktion} zur Verfolgung bzw. Überwachung der Verarbeitung von {@link Function Funktionen} über einem {@link TraceHandler} und {@link TraceEvent}s.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see TraceEvent
+	 * @see TraceHandler
 	 */
 	public static final class TraceFunction implements Function {
 
@@ -27,6 +29,8 @@ public final class Functions {
 		 * Diese Klasse implementiert das Argument für die Methoden des {@link TraceHandler}.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @see TraceHandler
+		 * @see TraceFunction
 		 */
 		public static final class TraceEvent {
 
@@ -188,7 +192,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return Objects.hashEx(this.handler, this.function);
+			return Objects.hash(this.handler, this.function);
 		}
 
 		/**
@@ -216,6 +220,7 @@ public final class Functions {
 	 * Diese Klasse implementiert eine {@link Function}, deren {@link Value Ergebniswert} dem {@link ArrayValue} der {@link Scope#get(int) Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see ArrayFunction#execute(Scope)
 	 */
 	public static final class ArrayFunction implements Function {
 
@@ -226,6 +231,11 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Der {@link Value Ergebniswert} entspricht dem {@link ArrayValue} der {@link Value Parameterwerte} des gegebenen {@link Scope Ausführungskontext}s.
+		 * 
+		 * @see Scope#get(int)
+		 * @see Scope#size()
 		 */
 		@Override
 		public ArrayValue execute(final Scope scope) {
@@ -267,6 +277,7 @@ public final class Functions {
 	 * Diese Klasse implementiert eine {@link Function} mit konstantem {@link Value Ergebniswert}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see ValueFunction#execute(Scope)
 	 */
 	public static final class ValueFunction implements Function {
 
@@ -325,6 +336,10 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Der {@link Value Ergebniswert} entspricht {@code this.value()}.
+		 * 
+		 * @see #value()
 		 */
 		@Override
 		public Value execute(final Scope scope) {
@@ -364,6 +379,7 @@ public final class Functions {
 	 * Diese Klasse implementiert eine projizierende {@link Function}, deren {@link Value Ergebniswert} einem der {@link Scope#get(int) Parameterwerte} des {@link Scope Ausführungskontexts} entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see ParamFunction#execute(Scope)
 	 */
 	public static final class ParamFunction implements Function {
 
@@ -374,7 +390,7 @@ public final class Functions {
 			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
 
 		/**
-		 * Diese Methode erzeugt eine eine projizierende {@link Function}, deren {@link Value Ergebniswert} einem der {@link Scope#get(int) Parameterwerte} des {@link Scope Ausführungskontexts} entspricht und gibt diese zurück.
+		 * Diese Methode erzeugt eine eine projizierende {@link Function}, deren {@link Value Ergebniswert} dem {@code index}-ten {@link Scope#get(int) Parameterwert} des {@link Scope Ausführungskontexts} entspricht, und gibt diese zurück.
 		 * 
 		 * @param index Index des {@link Scope#get(int) Parameterwerts}.
 		 * @return {@link ParamFunction}.
@@ -406,6 +422,7 @@ public final class Functions {
 		 * Diese Methode gibt den Index des {@link Scope#get(int) Parameterwerts} zurück.
 		 * 
 		 * @return Index des {@link Scope#get(int) Parameterwerts}.
+		 * @see #execute(Scope)
 		 */
 		public int index() {
 			return this.index;
@@ -413,6 +430,10 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Der {@link Value Ergebniswert} entspricht {@code scope.get(this.index())}.
+		 * 
+		 * @see #index()
 		 */
 		@Override
 		public Value execute(final Scope scope) {
@@ -452,6 +473,7 @@ public final class Functions {
 	 * Diese Klasse definiert eine komponierte {@link Function}, die den Aufruf einer gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} mehrerer gegebener {@link Function Parameterfunktionen} berechnet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see CompositeFunction#execute(Scope)
 	 */
 	public static final class CompositeFunction implements Function {
 
@@ -466,6 +488,24 @@ public final class Functions {
 		public static CompositeFunction valueOf(final Function function, final Function... functions) throws NullPointerException {
 			return new CompositeFunction(function, functions);
 		}
+
+		/**
+		 * Diese Methode erzeugt eine {@link Function}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen {@link Function Parameterfunktionen} berechnet, und gibt diese zurück.
+		 * 
+		 * @param function {@link Function Funktion}.
+		 * @param chained Verketung.
+		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der {@link Function Funktion} verwendet werden sollen.
+		 * @return {@link CompositeFunction komponierte Funktion}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public static CompositeFunction valueOf(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
+			return new CompositeFunction(function, chained, functions);
+		}
+
+		/**
+		 * Dieses Feld speichert die Verkettung.
+		 */
+		final boolean chained;
 
 		/**
 		 * Dieses Feld speichert die aufzurufende {@link Function Funktion}.
@@ -485,15 +525,39 @@ public final class Functions {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
+			this(function, false, functions);
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert die aufzurufende {@link Function Funktion}, die Verketung und die {@link Function Parameterfunktionen}.
+		 * 
+		 * @param function {@link Function Funktion}.
+		 * @param chained Verketung.
+		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der {@link Function Funktion} verwendet werden sollen.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public CompositeFunction(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
 			if((function == null) || (functions == null)) throw new NullPointerException();
+			this.chained = chained;
 			this.function = function;
 			this.functions = functions;
+		}
+
+		/**
+		 * Diese Methode gibt die Verkettung zurück.
+		 * 
+		 * @return Verkettung.
+		 * @see #execute(Scope)
+		 */
+		public boolean chained() {
+			return this.chained;
 		}
 
 		/**
 		 * Diese Methode gibt die aufzurufende {@link Function Funktion} zurück.
 		 * 
 		 * @return aufzurufende {@link Function Funktion}.
+		 * @see #execute(Scope)
 		 */
 		public Function function() {
 			return this.function;
@@ -503,6 +567,7 @@ public final class Functions {
 		 * Diese Methode gibt eine Kopie der {@link Function Parameterfunktionen} zurück.
 		 * 
 		 * @return Kopie der {@link Function Parameterfunktionen}.
+		 * @see #execute(Scope)
 		 */
 		public Function[] functions() {
 			return this.functions.clone();
@@ -510,10 +575,19 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Wenn die {@link #chained() Verkettung} deaktiviert ist, ergibt sich dieser {@link Value Ergebniswert} aus dem Aufruf der {@link #function() aufzurufende Funktion} mit den {@link Value Parameterwerten}, die sich aus der Auswertung der {@link #functions() Parameterfunktionen} mit dem gegebenen {@link Scope Ausführungskontext} ergeben. Ist die {@link #chained() Verkettung} dagegen deaktiviert, wird statt der {@link #function() aufzurufende Funktion} die {@link Function Funktion} verwendet, die bei der Auswertung der {@link #function() aufzurufenden Funktion} mit dem gegebenen {@link Scope Ausführungskontext} ermittelt wurde. <br>
+		 * <p>
+		 * Der {@link Value Ergebniswert} entspricht {@code (this.chained() ? this.function().execute(scope).dataAs(FunctionValue.TYPE) : this.function()).execute(new CompositeScope(scope, this.functions()))}.
+		 * 
+		 * @see #chained()
+		 * @see #function()
+		 * @see #functions()
+		 * @see CompositeScope
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return this.function.execute(new CompositeScope(scope, this.functions));
+			return (this.chained ? this.function.execute(scope).dataAs(FunctionValue.TYPE) : this.function).execute(new CompositeScope(scope, this.functions));
 		}
 
 		/**
