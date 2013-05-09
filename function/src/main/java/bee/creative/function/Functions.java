@@ -75,7 +75,7 @@ public final class Functions {
 		public static interface TraceHandler {
 
 			/**
-			 * Diese Methode wird nach dem Verlassen einer {@link Function Funktion} via {@code throw} aufgerufen. Das Feld {@link TraceEvent#exception} kann hierbei angepasst werden.
+			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer {@link Function Funktion} via {@code throw} aufgerufen. Das Feld {@link TraceEvent#exception} kann hierbei angepasst werden.
 			 * 
 			 * @see TraceEvent#exception
 			 * @param event {@link TraceEvent}.
@@ -83,7 +83,7 @@ public final class Functions {
 			public void onThrow(TraceEvent event);
 
 			/**
-			 * Diese Methode wird nach dem Verlassen einer {@link Function Funktion} via {@code return} aufgerufen. Das Feld {@link TraceEvent#result} kann hierbei angepasst werden.
+			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer {@link Function Funktion} via {@code return} aufgerufen. Das Feld {@link TraceEvent#result} kann hierbei angepasst werden.
 			 * 
 			 * @see TraceEvent#result
 			 * @param event {@link TraceEvent}.
@@ -153,7 +153,7 @@ public final class Functions {
 			event.scope = scope;
 			event.function = function;
 			handler.onExecute(event);
-			Scope scope2 = event.scope;
+			final Scope scope2 = event.scope;
 			if(scope2 == null) throw new NullPointerException();
 			Function function2 = event.function;
 			if(function2 == null) throw new NullPointerException();
@@ -165,11 +165,11 @@ public final class Functions {
 				for(int i = 0, size = functions2.length; i < size; i++){
 					functions2[i] = new TraceFunction(handler, functions2[i]);
 				}
-				scope2 = new CompositeScope(scope2, functions2);
+				function2 = new CompositeFunction(function2, compositeFunction.chained, functions2);
 			}else if(functionClass == ValueFunction.class){
 				final Value value = function2.execute(null);
 				if(value.getClass() == FunctionValue.class){
-					function2 = ValueFunction.valueOf(FunctionValue.valueOf(new TraceFunction(handler, (Function)value.data())));
+					function2 = new ValueFunction(new FunctionValue(new TraceFunction(handler, (Function)value.data())));
 				}
 			}
 			event.scope = scope;

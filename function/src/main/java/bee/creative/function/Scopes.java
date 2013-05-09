@@ -163,30 +163,6 @@ public final class Scopes {
 		final Object context;
 
 		/**
-		 * Dieser Konstruktor initialisiert die {@link Value Parameterwerte}. Das Kontextobjekt ist {@code null} und zusätzliche {@link Value Parameterwerte} werden keine bereitgestellt.
-		 * 
-		 * @see ExecuteScope#ExecuteScope(Scope, Value...)
-		 * @see ExecuteScope#ExecuteScope(Object, Value...)
-		 * @param values {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
-		 */
-		public ExecuteScope(final Value... values) throws NullPointerException {
-			this(VoidScope.INSTANCE, null, 0, values);
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert das Kontextobjekt und die {@link Value Parameterwerte}. Zusätzliche {@link Value Parameterwerte} werden keine bereitgestellt.
-		 * 
-		 * @see ExecuteScope#ExecuteScope(Scope, Object, Value...)
-		 * @param context Kontextobjekt.
-		 * @param values {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn die gegebenen {@link Value Parameterwerte} {@code null} sind.
-		 */
-		public ExecuteScope(final Object context, final Value... values) throws NullPointerException {
-			this(VoidScope.INSTANCE, context, 0, values);
-		}
-
-		/**
 		 * Dieser Konstruktor initialisiert den übergeordneten {@link Scope Ausführungskontext} und die {@link Value Parameterwerte}. Das Kontextobjekt sowie die zusätzlichen {@link Value Parameterwerte} entsprechen denen des gegebenen {@link Scope Ausführungskontexts}.
 		 * 
 		 * @see ExecuteScope#ExecuteScope(Scope, int, Value...)
@@ -215,19 +191,6 @@ public final class Scopes {
 			this.ignore = ignore;
 			this.values = values;
 			this.context = scope.context();
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert den übergeordneten {@link Scope Ausführungskontext}, das Kontextobjekt und die {@link Value Parameterwerte}. Diese zusätzlichen {@link Value Parameterwerte} entsprechen denen des übergeordneten {@link Scope Ausführungskontexts}.
-		 * 
-		 * @see ExecuteScope#ExecuteScope(Scope, Object, int, Value...)
-		 * @param scope übergeordneter {@link Scope Ausführungskontext}.
-		 * @param context Kontextobjekt.
-		 * @param values {@link Value Parameterwerte}.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} bzw. die gegebenen {@link Value Parameterwerte} {@code null} sind.
-		 */
-		public ExecuteScope(final Scope scope, final Object context, final Value... values) throws NullPointerException {
-			this(scope, context, 0, values);
 		}
 
 		/**
