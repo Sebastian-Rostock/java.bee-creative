@@ -1,7 +1,5 @@
 package bee.creative.util;
 
-import java.io.IOException;
-
 /**
  * Diese Klasse implementiert ein Objekt zum Parsen der Zeichen eines {@link String}s.
  * 
@@ -38,10 +36,9 @@ public class StringParser {
 	 * Dieser Konstruktor initialisiert die Eingabe.
 	 * 
 	 * @param source Eingabe.
-	 * @throws IOException Wenn die Eingabe nicht lesbar ist.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public StringParser(final String source) throws IOException, NullPointerException {
+	public StringParser(final String source) throws NullPointerException {
 
 		this.source = source;
 		this.length = source.length();
@@ -73,9 +70,8 @@ public class StringParser {
 	 * @see #symbol()
 	 * @see #string()
 	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
-	 * @throws IOException Wenn die Eingabe nicht lesbar ist.
 	 */
-	public final int skip() throws IOException {
+	public final int skip() {
 		if(this.symbol < 0) return -1;
 		final int index = this.index, symbol = index < this.length ? this.source.charAt(index) : -1;
 		this.index = index + 1;
@@ -91,9 +87,8 @@ public class StringParser {
 	 * @see #symbol()
 	 * @see #string()
 	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
-	 * @throws IOException Wenn die Eingabe nicht lesbar ist.
 	 */
-	public final int take() throws IOException {
+	public final int take() {
 		this.target.append((char)this.symbol);
 		return this.skip();
 	}
