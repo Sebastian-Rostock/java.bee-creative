@@ -1,10 +1,10 @@
-package bee.creative.util;
+package bee.creative.util2;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Diese Schnittstelle definiert methoden zum Hinzufügen von Schlüssel-Wert-Paaren.
+ * Diese Schnittstelle definiert Methoden zum Hinzufügen von Schlüssel-Wert-Paaren.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.

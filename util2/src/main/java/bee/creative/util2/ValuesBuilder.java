@@ -1,7 +1,7 @@
-package bee.creative.util;
+package bee.creative.util2;
 
 /**
- * Diese Schnittstelle definiert methoden zum Hinzufügen von Werten.
+ * Diese Schnittstelle definiert Methoden zum Hinzufügen von Werten.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der Werte.
