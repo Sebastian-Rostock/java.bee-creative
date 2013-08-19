@@ -10,9 +10,10 @@
 	<artifactId>bee-creative.function</artifactId>
 	<dependencies>
 		<dependency>
-			<version>3.0.9-SNAPSHOT</version>
+			<version>3.1.10-SNAPSHOT</version>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative.util</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
