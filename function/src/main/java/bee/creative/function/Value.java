@@ -1,7 +1,9 @@
 package bee.creative.function;
 
 /**
- * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link Function Funktion} oder als Parameter in einem {@link Scope Ausführungskontext} verwendet werden kann. Ein solcher {@link Value Wert} besitzt dazu einen {@link Value#type() Datentyp}, einen {@link Value#data() Datensatz} sowie Methoden zur Konvertierung des {@link Value#data() Datensatzes} in andere {@link Value#type() Datentypen}.
+ * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link Function Funktion} oder als Parameter in einem {@link Scope Ausführungskontext}
+ * verwendet werden kann. Ein solcher {@link Value Wert} besitzt dazu einen {@link Value#type() Datentyp}, einen {@link Value#data() Datensatz} sowie Methoden
+ * zur Konvertierung des {@link Value#data() Datensatzes} in andere {@link Value#type() Datentypen}.
  * 
  * @see Scope
  * @see Value
@@ -38,7 +40,8 @@ public interface Value {
 	public <GData> GData dataAs(Type<GData> type) throws NullPointerException, ClassCastException;
 
 	/**
-	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz zurück. Der Rückgabewert entspricht {@code type.dataOf(this)}.
+	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz zurück. Der Rückgabewert entspricht
+	 * {@code type.dataOf(this)}.
 	 * 
 	 * @see Type#dataOf(Value)
 	 * @see Value#data()
@@ -51,7 +54,8 @@ public interface Value {
 	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, IllegalArgumentException;
 
 	/**
-	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz als {@link Value} zurück. Der Rückgabewert entspricht {@code type.valueOf(this)}.
+	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz als {@link Value} zurück. Der Rückgabewert
+	 * entspricht {@code type.valueOf(this)}.
 	 * 
 	 * @see Type#dataOf(Value)
 	 * @see Value#data()

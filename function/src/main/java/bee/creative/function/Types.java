@@ -15,14 +15,17 @@ import bee.creative.util.Objects;
 import bee.creative.util.Strings;
 
 /**
- * Diese Klasse implementiert {@link Type}{@code s} für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} und {@link Boolean}.
+ * Diese Klasse implementiert {@link Type}{@code s} für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Integer}
+ * , {@link Long}, {@link Float}, {@link Double} und {@link Boolean}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Types {
 
 	/**
-	 * Diese Schnittstelle definiert Methoden zur Konvertierung des Datensatzes eines gegebenen {@link Value}{@code s} in einen bestimmten Datentyp bzw. {@link Value}. Verwendung finden diese Methoden in {@link AbstractType2#dataOf(Value)} und {@link AbstractType2#valueOf(Value)}, wofür sie via {@link AbstractType2#setHandler(ValueHandler)} registriert werden können.
+	 * Diese Schnittstelle definiert Methoden zur Konvertierung des Datensatzes eines gegebenen {@link Value}{@code s} in einen bestimmten Datentyp bzw.
+	 * {@link Value}. Verwendung finden diese Methoden in {@link AbstractType2#dataOf(Value)} und {@link AbstractType2#valueOf(Value)}, wofür sie via
+	 * {@link AbstractType2#setHandler(ValueHandler)} registriert werden können.
 	 * 
 	 * @see AbstractType2#dataOf(Value)
 	 * @see AbstractType2#valueOf(Value)
@@ -60,7 +63,8 @@ public class Types {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Type}, dem zur Vollständigkeit nur noch die Methoden {@link #dataOf(Value)} und {@link #valueOf(Value)} fehlen. {@link Object#hashCode() Streuwert} und {@link Object#equals(Object) Äquivalenz} beruhen auf dem {@link Type#id() Identifikator}.
+	 * Diese Klasse implementiert einen abstrakten {@link Type}, dem zur Vollständigkeit nur noch die Methoden {@link #dataOf(Value)} und {@link #valueOf(Value)}
+	 * fehlen. {@link Object#hashCode() Streuwert} und {@link Object#equals(Object) Äquivalenz} beruhen auf dem {@link Type#id() Identifikator}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -129,7 +133,8 @@ public class Types {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Type}, dessen {@link #dataOf(Value)}- und {@link #valueOf(Value)}-Methoden durch einen via {@link #setHandler(ValueHandler)} registrierten {@link ValueHandler} beeinflusst werden können.
+	 * Diese Klasse implementiert einen abstrakten {@link Type}, dessen {@link #dataOf(Value)}- und {@link #valueOf(Value)}-Methoden durch einen via
+	 * {@link #setHandler(ValueHandler)} registrierten {@link ValueHandler} beeinflusst werden können.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -161,7 +166,8 @@ public class Types {
 		}
 
 		/**
-		 * Diese Methode wird von {@link #dataOf(Value)} mit dem {@link Value} sowie dessen Datensatz aufgerufen und gibt den in den generischen Datentyp dieses {@link Type}{@code s} konvertierten Datensatz zurück.
+		 * Diese Methode wird von {@link #dataOf(Value)} mit dem {@link Value} sowie dessen Datensatz aufgerufen und gibt den in den generischen Datentyp dieses
+		 * {@link Type}{@code s} konvertierten Datensatz zurück.
 		 * 
 		 * @see Type#dataOf(Value)
 		 * @param value {@link Value}.
@@ -169,12 +175,14 @@ public class Types {
 		 * @return konvertierter Datensatz.
 		 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
 		 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-		 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s} konvertiert werden kann.
+		 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s}
+		 *         konvertiert werden kann.
 		 */
 		protected abstract GData dataOf(Value value, Object data) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 		/**
-		 * Diese Methode wird von {@link #valueOf(Value)} mit dem {@link Value} sowie dessen Datensatz aufgerufen und gibt den in den generischen Datentyp dieses {@link Type}{@code s} konvertierten Datensatz als {@link Value} zurück.
+		 * Diese Methode wird von {@link #valueOf(Value)} mit dem {@link Value} sowie dessen Datensatz aufgerufen und gibt den in den generischen Datentyp dieses
+		 * {@link Type}{@code s} konvertierten Datensatz als {@link Value} zurück.
 		 * 
 		 * @see Type#valueOf(Value)
 		 * @param value {@link Value}.
@@ -182,12 +190,15 @@ public class Types {
 		 * @return {@link Value} mit konvertiertem Datensatz.
 		 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
 		 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-		 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s} konvertiert werden kann.
+		 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s}
+		 *         konvertiert werden kann.
 		 */
 		protected abstract GValue valueOf(Value value, Object data) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 		/**
-		 * {@inheritDoc} Wenn der via {@link #setHandler(ValueHandler)} registrierte {@link ValueHandler} sowie das Ergebnis seiner {@link ValueHandler#dataOf(Value) Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben. Anderenfalls gelten die folgenden Konvertierungsregeln:
+		 * {@inheritDoc} Wenn der via {@link #setHandler(ValueHandler)} registrierte {@link ValueHandler} sowie das Ergebnis seiner
+		 * {@link ValueHandler#dataOf(Value) Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben. Anderenfalls gelten die folgenden
+		 * Konvertierungsregeln:
 		 * 
 		 * @see ValueHandler#dataOf(Value)
 		 */
@@ -202,7 +213,9 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc} Wenn der via {@link #setHandler(ValueHandler)} registrierte {@link ValueHandler} sowie das Ergebnis seiner {@link ValueHandler#valueOf(Value) Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben. Anderenfalls gelten die folgenden Konvertierungsregeln:
+		 * {@inheritDoc} Wenn der via {@link #setHandler(ValueHandler)} registrierte {@link ValueHandler} sowie das Ergebnis seiner
+		 * {@link ValueHandler#valueOf(Value) Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben. Anderenfalls gelten die folgenden
+		 * Konvertierungsregeln:
 		 * 
 		 * @see ValueHandler#valueOf(Value)
 		 */
@@ -501,7 +514,8 @@ public class Types {
 		 * {@inheritDoc}
 		 * <ul>
 		 * <li>Wenn der {@link Value} vom Typ {@link FunctionType} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} und {@link FunctionValue#valueOf(Function)} umgewandelt und zurück gegeben.</li>
+		 * <li>In allen anderen Fällen wird der {@link Value} via {@link ValueFunction#valueOf(Value)} und {@link FunctionValue#valueOf(Function)} umgewandelt und
+		 * zurück gegeben.</li>
 		 * </ul>
 		 * 
 		 * @see ValueFunction#valueOf(Value)
@@ -582,7 +596,8 @@ public class Types {
 		 * <ul>
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@code ""} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, werden die mit dieser Methode in {@link String Zeichenketten} umgewandelten Elemente des Datensatzes mit dem Trennzeichen {@code ", "} verkettet und zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, werden die mit dieser Methode in {@link String Zeichenketten} umgewandelten Elemente des
+		 * Datensatzes mit dem Trennzeichen {@code ", "} verkettet und zurück gegeben.</li>
 		 * <li>In allen anderen Fällen wird der Datensatz via {@link String#valueOf(Object)} umgewandelt und zurück gegeben.</li>
 		 * </ul>
 		 * 
@@ -598,7 +613,8 @@ public class Types {
 		 * <ul>
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} ist, wird {@code "null"} als {@link StringValue} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, werden die mit dieser Methode in {@link String Zeichenketten} umgewandelten Elemente des Datensatzes mit dem Trennzeichen {@code ", "} verkettet und als {@link StringValue} zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType} ist, werden die mit dieser Methode in {@link String Zeichenketten} umgewandelten Elemente des
+		 * Datensatzes mit dem Trennzeichen {@code ", "} verkettet und als {@link StringValue} zurück gegeben.</li>
 		 * <li>In allen anderen Fällen wird der Datensatz via {@link String#valueOf(Object)} umgewandelt und als {@link StringValue} zurück gegeben.</li>
 		 * </ul>
 		 * 
@@ -704,7 +720,8 @@ public class Types {
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@code NaN} als {@link Double} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird dieser via {@link Double#valueOf(String)} umgewandelt und zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} nur bei dem Datensatz {@link Boolean#FALSE} zurück
+		 * gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer}.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 * 
@@ -720,8 +737,10 @@ public class Types {
 		 * <ul>
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@code NaN} als {@link Double} in inemem {@link NumberValue} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird sein Datensatz via {@link Double#valueOf(String)} umgewandelt und als {@link NumberValue} zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} in einem {@link NumberValue} nur bei dem Datensatz {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer} in einem {@link NumberValue}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird sein Datensatz via {@link Double#valueOf(String)} umgewandelt und als {@link NumberValue}
+		 * zurück gegeben.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird {@code 0} als {@link Integer} in einem {@link NumberValue} nur bei dem Datensatz
+		 * {@link Boolean#FALSE} zurück gegeben; Anderenfalls ist der Rückgabewert {@code 1} als {@link Integer} in einem {@link NumberValue}.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 * 
@@ -805,8 +824,10 @@ public class Types {
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@link Boolean#FALSE} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird sein Datensatz unverändert zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType}, {@link ObjectType} oder {@link FunctionType} ist, wird {@link Boolean#TRUE} zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link Boolean#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link Boolean#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link Boolean#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben;
+		 * Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link Boolean#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als
+		 * Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link Boolean#TRUE}.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 */
@@ -821,8 +842,10 @@ public class Types {
 		 * <li>Wenn der Datensatz des {@link Value}{@code s} {@code null} sind, wird {@link BooleanValue#FALSE} zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link BooleanType} ist, wird er unverändert zurück gegeben.</li>
 		 * <li>Wenn der {@link Value} vom Typ {@link ArrayType}, {@link ObjectType} oder {@link FunctionType} ist, wird {@link BooleanValue#TRUE} zurück gegeben.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link BooleanValue#FALSE} nur bei einem leeren {@link String} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
-		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link BooleanValue#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link StringType} ist, wird {@link BooleanValue#FALSE} nur bei einem leeren {@link String} als Datensatz zurück
+		 * gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
+		 * <li>Wenn der {@link Value} vom Typ {@link NumberType} ist, wird {@link BooleanValue#FALSE} nur bei einer {@code 0}- bzw. {@code NaN}-{@link Number} als
+		 * Datensatz zurück gegeben; Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 */
@@ -831,12 +854,6 @@ public class Types {
 			return super.valueOf(value);
 		}
 
-	}
-
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Types() {
 	}
 
 }

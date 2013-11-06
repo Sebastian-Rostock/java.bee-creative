@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import bee.creative.util.Comparables.Get;
 import bee.creative.util.Filters.ContainsFilter;
 import bee.creative.util.Filters.NegationFilter;
 import bee.creative.util.Objects.UseToString;
@@ -179,6 +180,79 @@ public class Iterators {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen {@link Iterator}, der eine gegebene Anzahl an Elementen eines {@link Get} liefert.
+	 * 
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class GetIterator<GEntry> extends AbstractIterator<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das {@link Get}.
+		 */
+		final Get<? extends GEntry> get;
+
+		/**
+		 * Dieses Feld speichert den maximalen Index.
+		 */
+		final int count;
+
+		/**
+		 * Dieses Feld speichert den aktuellen Wert.
+		 */
+		int index;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Anzahl.
+		 * 
+		 * @param count Anzahl.
+		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+		 */
+		public GetIterator(Get<? extends GEntry> get, final int count) throws IllegalArgumentException {
+			this(get, 0, count);
+		}
+
+		public GetIterator(Get<? extends GEntry> get, int offset, int count) {
+			this.get = get;
+			this.index = offset;
+			this.count = offset + count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasNext() {
+			return this.index < this.count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry next() {
+			return get.get(index++);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, get, this.count);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert einen {@link Iterator} über ein einzelnes, gegebenes Element.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -247,7 +321,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der eine gegebene Anzahl an {@link Integer}s ab dem Wert {@code 0} liefert. Ein {@link IntegerIterator}, der mit der Anzahl {@code count} erstellt wird, liefert damit die Werte {@code 0}, {@code 1}, {@code 2}, ..., {@code count-1}.
+	 * Diese Klasse implementiert einen {@link Iterator}, der eine gegebene Anzahl an {@link Integer}s ab dem Wert {@code 0} liefert. Ein {@link IntegerIterator},
+	 * der mit der Anzahl {@code count} erstellt wird, liefert damit die Werte {@code 0}, {@code 1}, {@code 2}, ..., {@code count-1}.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -310,7 +385,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der kein Element eines gegebenen {@link Iterator}s mehrfach liefert. Die {@link Collection} zum Ausschluss von Dopplungen kann im Konstruktor angegeben werden.
+	 * Diese Klasse implementiert einen {@link Iterator}, der kein Element eines gegebenen {@link Iterator}s mehrfach liefert. Die {@link Collection} zum
+	 * Ausschluss von Dopplungen kann im Konstruktor angegeben werden.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
@@ -412,7 +488,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterator}s liefert.
+	 * Diese Klasse implementiert einen {@link Iterator}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterator}s
+	 * liefert.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
@@ -488,7 +565,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen verketteten {@link Iterator}, der über alle Elemente der eingegebenen {@link Iterator}en in der gegebenen Reihenfolge läuft. Wenn einer der eingegebenen {@link Iterator}en {@code null} ist, wird er ausgelassen.
+	 * Diese Klasse implementiert einen verketteten {@link Iterator}, der über alle Elemente der eingegebenen {@link Iterator}en in der gegebenen Reihenfolge
+	 * läuft. Wenn einer der eingegebenen {@link Iterator}en {@code null} ist, wird er ausgelassen.
 	 * 
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente.
@@ -592,7 +670,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der die Elemente eines gegebene {@link Iterator}s liefert und dessen {@link #remove()} eine {@link UnsupportedOperationException} auslöst.
+	 * Diese Klasse implementiert einen {@link Iterator}, der die Elemente eines gegebene {@link Iterator}s liefert und dessen {@link #remove()} eine
+	 * {@link UnsupportedOperationException} auslöst.
 	 * 
 	 * @see Iterator#remove()
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -646,7 +725,11 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator} zu überspringen und gibt die Anzahl der noch zu überspringenden Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene {@link Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine weiteren Elemente mehr liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der Elemente des gegebenen {@link Iterator}s zurück gegeben. Damit bestimmt {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des {@link Iterator}s {@code iterator}.
+	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator} zu überspringen und gibt die Anzahl der noch zu überspringenden
+	 * Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene {@link Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine
+	 * weiteren Elemente mehr liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der Elemente des gegebenen
+	 * {@link Iterator}s zurück gegeben. Damit bestimmt {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des {@link Iterator}s {@code iterator}
+	 * .
 	 * 
 	 * @see Iterator#hasNext()
 	 * @param iterator {@link Iterator}.
@@ -664,7 +747,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
+	 * des {@link Iterator}s {@code true} zurück.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
@@ -686,7 +770,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur bei Veränderung der {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur bei Veränderung der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param collection {@link Collection}.
@@ -703,7 +788,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Collection#addAll(Collection)
 	 * @param <GEntry> Typ der Elemente.
@@ -744,7 +830,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
+	 * {@link Iterator}s {@code true} zurück.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
@@ -766,7 +853,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Collection#removeAll(Collection)
 	 * @param collection {@link Collection}.
@@ -862,7 +950,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück. Als {@link Collection} zum Ausschluss von Dopplungen wird ein {@link HashSet} verwendet.
+	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück. Als
+	 * {@link Collection} zum Ausschluss von Dopplungen wird ein {@link HashSet} verwendet.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
@@ -888,7 +977,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen einen {@link Iterator}, der die gegebene maximale Anzahl der Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen einen {@link Iterator}, der die gegebene maximale Anzahl der Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn
+	 * zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
@@ -903,7 +993,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen filternden {@link Iterator}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen filternden {@link Iterator}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}s
+	 * liefert, und gibt ihn zurück.
 	 * 
 	 * @see Filter
 	 * @param <GEntry> Typ der Elemente.
@@ -918,7 +1009,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
+	 * und gibt ihn zurück.
 	 * 
 	 * @see ChainedIterator
 	 * @param <GEntry> Typ der Elemente.
@@ -931,7 +1023,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
+	 * und gibt ihn zurück.
 	 * 
 	 * @see ChainedIterator
 	 * @see ChainedIterator#chainedIterator(Iterator)
@@ -946,7 +1039,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
+	 * und gibt ihn zurück.
 	 * 
 	 * @see ChainedIterator
 	 * @see ChainedIterator#chainedIterator(Iterator)
@@ -961,7 +1055,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
+	 * und gibt ihn zurück.
 	 * 
 	 * @see ChainedIterator
 	 * @see ChainedIterator#chainedIterator(Iterator)
@@ -975,7 +1070,8 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Iterator}, der die vom gegebenen {@link Converter Converter} konvertierten Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen konvertierenden {@link Iterator}, der die vom gegebenen {@link Converter Converter} konvertierten Elemente des gegebenen
+	 * {@link Iterator}s liefert, und gibt ihn zurück.
 	 * 
 	 * @see Converter
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterator Iterators}.

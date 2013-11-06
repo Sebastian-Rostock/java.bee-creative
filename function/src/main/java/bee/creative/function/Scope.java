@@ -4,7 +4,8 @@ import bee.creative.util.Comparables.Get;
 import bee.creative.util.Objects.UseToString;
 
 /**
- * Diese Schnittstelle definiert den Ausführungskontext einer {@link Function Funktion}. Ein solcher {@link Scope Ausführungskontext} stellt eine Liste von {@link Value Parameterwerten} sowie ein Kontextobjekt zur Verfügung.
+ * Diese Schnittstelle definiert den Ausführungskontext einer {@link Function Funktion}. Ein solcher {@link Scope Ausführungskontext} stellt eine Liste von
+ * {@link Value Parameterwerten} sowie ein Kontextobjekt zur Verfügung.
  * 
  * @see Value
  * @see Scopes
@@ -14,7 +15,8 @@ import bee.creative.util.Objects.UseToString;
 public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 
 	/**
-	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch zusätzliche {@link Value Parameterwerte} bereitgestellt werden.
+	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch
+	 * zusätzliche {@link Value Parameterwerte} bereitgestellt werden.
 	 * 
 	 * @see Value
 	 * @param index Index.
@@ -25,14 +27,16 @@ public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
 	public Value get(int index) throws IndexOutOfBoundsException;
 
 	/**
-	 * Diese Methode gibt die Anzahl der {@link Value Parameterwerte} zurück, die zur Verwendung durch eine aufgerufene {@link Function Funktion} bestimmt sind. Über die Methode {@link #get(int)} werden mindestens soviele {@link Value Parameterwerte} bereitgestellt.
+	 * Diese Methode gibt die Anzahl der {@link Value Parameterwerte} zurück, die zur Verwendung durch eine aufgerufene {@link Function Funktion} bestimmt sind.
+	 * Über die Methode {@link #get(int)} werden mindestens soviele {@link Value Parameterwerte} bereitgestellt.
 	 * 
 	 * @return Anzahl der {@link Value Parameterwert}.
 	 */
 	public int size();
 
 	/**
-	 * Diese Methode gibt das Kontextobjekt zurück. {@link Function Funktionen} können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch den Zustand dieses Objekts modifizieren. Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
+	 * Diese Methode gibt das Kontextobjekt zurück. {@link Function Funktionen} können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch
+	 * den Zustand dieses Objekts modifizieren. Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
 	 * 
 	 * @return Kontextobjekt.
 	 */

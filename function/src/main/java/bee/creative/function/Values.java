@@ -11,14 +11,16 @@ import bee.creative.function.Types.StringType;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert {@link Value}{@code s} für {@code null}-, {@link Value}{@code []}-, {@link Object}-, {@link Function}-, {@link String}-, {@link Integer}-, {@link Long}-, {@link Float}-, {@link Double}- und {@link Boolean}-Datensätze.
+ * Diese Klasse implementiert {@link Value}{@code s} für {@code null}-, {@link Value}{@code []}-, {@link Object}-, {@link Function}-, {@link String}-,
+ * {@link Integer}-, {@link Long}-, {@link Float}-, {@link Double}- und {@link Boolean}-Datensätze.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Values {
 
 	/**
-	 * Diese Schnittstelle definiert eine Methode zur Konvertierung eines gegebenen Datensatzes in einen {@link Value}. Verwendung findet diese Methode in {@link Values#valueOf(Object)}, wofür sie via {@link Values#setHandler(DataHandler)} registriert werden kann.
+	 * Diese Schnittstelle definiert eine Methode zur Konvertierung eines gegebenen Datensatzes in einen {@link Value}. Verwendung findet diese Methode in
+	 * {@link Values#valueOf(Object)}, wofür sie via {@link Values#setHandler(DataHandler)} registriert werden kann.
 	 * 
 	 * @see Values#valueOf(Object)
 	 * @see Values#setHandler(DataHandler)
@@ -37,7 +39,160 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Value}, dem zur Vollständigkeit nur noch ein {@link #data() Datensatz} sowie ein {@link #type() Datentyp} fehlen.
+	 * Diese Klasse implementiert den {@link Value Ergebniswert} einer {@link Function Funktion} mit {@code call-by-reference}-Semantik, welcher eine gegebene
+	 * {@link Function Funktion} erst dann mit einem gegebenen {@link Scope Ausführungskontext} einmalig auswertet, wenn {@link #type() Datentyp} oder
+	 * {@link #data() Datensatz} gelesen werden. Der von der {@link Function Funktion} berechnete {@link Value Ergebniswert} wird zur schnellen Wiederverwendung
+	 * zwischengespeichert. Nach der einmaligen Auswertung der {@link Function Funktion} werden die Verweise auf {@link Scope Ausführungskontext} und
+	 * {@link Function Funktion} aufgelöst.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class ReturnValue implements Value {
+
+		/**
+		 * Dieses Feld speichert das von der {@link Function Funktion} berechnete Ergebnis oder {@code null}.
+		 * 
+		 * @see Function#execute(Scope)
+		 */
+		Value value;
+
+		/**
+		 * Dieses Feld speichert den {@link Scope Ausführungskontext} zum Aufruf der {@link Function Funktion} oder {@code null}.
+		 * 
+		 * @see Function#execute(Scope)
+		 */
+		Scope scope;
+
+		/**
+		 * Dieses Feld speichert die {@link Function Funktion} oder {@code null}.
+		 * 
+		 * @see Function#execute(Scope)
+		 */
+		Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert {@link Scope Ausführungskontext} und {@link Function Funktion}.
+		 * 
+		 * @param scope {@link Scope Ausführungskontext}.
+		 * @param function {@link Function Funktion}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
+			if((scope == null) || (function == null)) throw new NullPointerException();
+			this.scope = scope;
+			this.function = function;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Type<?> type() {
+			return this.value().type();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object data() {
+			return this.value().data();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
+			return this.value().dataAs(type);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+			return this.value().dataTo(type);
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem {@link Scope Ausführungskontext} zurück.
+		 * 
+		 * @see Function#execute(Scope)
+		 * @return {@link Value Ergebniswert}.
+		 * @throws NullPointerException Wenn der berechnete {@link Value Ergebniswert} {@code null} ist.
+		 */
+		public Value value() throws NullPointerException {
+			Value value = this.value;
+			if(value != null) return value;
+			value = this.function.execute(this.scope);
+			if(value == null) throw new NullPointerException();
+			this.value = value;
+			this.scope = null;
+			this.function = null;
+			return value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+			return this.value().valueTo(type);
+		}
+
+		/**
+		 * Diese Methode gibt den {@link Scope Ausführungskontext} oder {@code null} zurück. Der erste Aufruf von {@link #value()} setzt den {@link Scope
+		 * Ausführungskontext} auf {@code null}.
+		 * 
+		 * @return {@link Scope Ausführungskontext} oder {@code null}.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		/**
+		 * Diese Methode gibt die {@link Function Funktion} oder {@code null} zurück. Der erste Aufruf von {@link #value()} setzt die {@link Function Funktion} auf
+		 * {@code null}.
+		 * 
+		 * @return {@link Function Funktion} oder {@code null}.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.value().hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof Value)) return false;
+			return this.value().equals(object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			if(this.value != null) return Objects.toStringCall(true, true, this, new Object[]{"value", this.value});
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "function", this.function});
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen abstrakten {@link Value}, dem zur Vollständigkeit nur noch ein {@link #data() Datensatz} sowie ein {@link #type()
+	 * Datentyp} fehlen.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -116,7 +271,8 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Value} mit {@link #data() Datensatz}, dem zur Vollständigkeit nur noch ein {@link #type() Datentyp} fehlt.
+	 * Diese Klasse implementiert einen abstrakten {@link Value} mit {@link #data() Datensatz}, dem zur Vollständigkeit nur noch ein {@link #type() Datentyp}
+	 * fehlt.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -168,7 +324,8 @@ public final class Values {
 		public static final NullValue INSTANCE = new NullValue();
 
 		/**
-		 * Diese Methode gibt den gegebenen {@link Value} oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.
+		 * Diese Methode gibt den gegebenen {@link Value} oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE}
+		 * zurück gegeben.
 		 * 
 		 * @param value {@link Value} oder {@code null}.
 		 * @return {@link Value}.
@@ -197,7 +354,8 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Value} mit {@link Value}{@code []} als Datensatz. Der {@link #data() Datensatz} sollte als konstant betrachtet und nicht verändert werden.
+	 * Diese Klasse implementiert den {@link Value} mit {@link Value}{@code []} als Datensatz. Der {@link #data() Datensatz} sollte als konstant betrachtet und
+	 * nicht verändert werden.
 	 * 
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -210,7 +368,8 @@ public final class Values {
 		public static final ArrayType TYPE = new ArrayType();
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link ArrayValue} und gibt diesen oder {@code null} zurück. Wenn der Datensatz kein Array ist, wird {@code null} zurück gegeben.
+		 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link ArrayValue} und gibt diesen oder {@code null} zurück. Wenn der Datensatz kein Array
+		 * ist, wird {@code null} zurück gegeben.
 		 * 
 		 * @see ArrayValue#valueOf(int[])
 		 * @see ArrayValue#valueOf(long[])
@@ -718,17 +877,13 @@ public final class Values {
 	static DataHandler handler;
 
 	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Values() {
-	}
-
-	/**
-	 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes kann hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet.
+	 * Diese Methode konvertiert den gegebenen Datensatz in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Datensatzes kann
+	 * hierfür ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet.
 	 * <ul>
 	 * <li>Wenn der Datensatz {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.</li>
 	 * <li>Wenn der Datensatz ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
-	 * <li>Wenn der via {@link #setHandler(DataHandler)} registrierte {@link DataHandler} sowie das Ergebnis seiner {@link DataHandler#valueOf(Object) Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
+	 * <li>Wenn der via {@link #setHandler(DataHandler)} registrierte {@link DataHandler} sowie das Ergebnis seiner {@link DataHandler#valueOf(Object)
+	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
 	 * <li>Wenn der Datensatz ein {@link String} ist, wird dieser als {@link StringValue} zurück gegeben.</li>
 	 * <li>Wenn der Datensatz eine {@link Number} ist, wird dieser als {@link NumberValue} zurück gegeben.</li>
 	 * <li>Wenn der Datensatz ein {@link Boolean} ist, wird dieser als {@link BooleanValue} zurück gegeben.</li>

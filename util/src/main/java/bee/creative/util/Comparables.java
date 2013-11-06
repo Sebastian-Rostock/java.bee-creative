@@ -10,13 +10,22 @@ import java.util.List;
  * <p>
  * <a name="comparables_old"><u>Binäre Suche mit {@link Arrays} und {@link Collections}</u></a>
  * <p>
- * Die Schwächen der Hilfsmethoden {@link Arrays#binarySearch(Object[], Object, Comparator)} und {@link Collections#binarySearch(List, Object, Comparator)} liegen zum einen bei ihrer Beschränkung auf Suchkriterien, die zum Typ der Elemente in den Arrays bzw. {@link List}s kompatibel sein müssel, und zum anderen im Indererminismus bei merhfach vorkommenden Elemente.
+ * Die Schwächen der Hilfsmethoden {@link Arrays#binarySearch(Object[], Object, Comparator)} und {@link Collections#binarySearch(List, Object, Comparator)}
+ * liegen zum einen bei ihrer Beschränkung auf Suchkriterien, die zum Typ der Elemente in den Arrays bzw. {@link List}s kompatibel sein müssel, und zum anderen
+ * im Indererminismus bei merhfach vorkommenden Elemente.
  * <p>
  * <a name="comparables_new"><u>Binäre Suche mit {@link Comparables}</u></a>
  * <p>
- * Die hier in {@link Comparables} implementierten Hilfsmethoden zur binären Suche abstrahieren Suchkriterien als {@link Comparable}s, welche zu einem gegebenen Element einen Navigationswert berechnen. Bei einer binären Suche mit dem einem {@link Comparable} {@code comparable} als Suchkriterium gilt ein Element {@code element} an Position {@code index} als Treffer, wenn der Navigationswert {@code comparable.compareTo(element)} gleich {@code 0} ist. Wenn der Navigationswert dagegen kleier oder größer als {@code 0} ist, wird die binäre Suche bei den Positionen kleier bzw. größer als {@code index} fortgesetzt. Bei einer erfolglosen benären Suche geben die Hilfsmethoden <code>(-(<i>Einfügeposition</i>)-1)</code> zurück, sodass ein positiver Rückgabewert immer einen Treffer signalisiert. Die <i>Einfügeposition</i> ist dabei die Position, an der ein Element seiner Ordnung entsprechend in das Array bzw. die {@link List} eingefügt werden müsste. Das gegebene Array bzw. die gegebene {@link List} muss bezüglich der Ordnung des {@link Comparable}s aufsteigend sortiert sein.
+ * Die hier in {@link Comparables} implementierten Hilfsmethoden zur binären Suche abstrahieren Suchkriterien als {@link Comparable}s, welche zu einem gegebenen
+ * Element einen Navigationswert berechnen. Bei einer binären Suche mit dem einem {@link Comparable} {@code comparable} als Suchkriterium gilt ein Element
+ * {@code element} an Position {@code index} als Treffer, wenn der Navigationswert {@code comparable.compareTo(element)} gleich {@code 0} ist. Wenn der
+ * Navigationswert dagegen kleier oder größer als {@code 0} ist, wird die binäre Suche bei den Positionen kleier bzw. größer als {@code index} fortgesetzt. Bei
+ * einer erfolglosen benären Suche geben die Hilfsmethoden <code>(-(<i>Einfügeposition</i>)-1)</code> zurück, sodass ein positiver Rückgabewert immer einen
+ * Treffer signalisiert. Die <i>Einfügeposition</i> ist dabei die Position, an der ein Element seiner Ordnung entsprechend in das Array bzw. die {@link List}
+ * eingefügt werden müsste. Das gegebene Array bzw. die gegebene {@link List} muss bezüglich der Ordnung des {@link Comparable}s aufsteigend sortiert sein.
  * <p>
- * Nebn den für merhfach vorkommenden Elemente indererministischen {@code binarySearch()}-Methoden gibt es hier auch die deterministischen {@code binarySearchFirst()}- und {@code binarySearchLast()}-Methoden, welche nach der kleinsten bzw. größten Position eines Treffers suchen.
+ * Nebn den für merhfach vorkommenden Elemente indererministischen {@code binarySearch()}-Methoden gibt es hier auch die deterministischen
+ * {@code binarySearchFirst()}- und {@code binarySearchLast()}-Methoden, welche nach der kleinsten bzw. größten Position eines Treffers suchen.
  * 
  * @see Arrays#binarySearch(Object[], Object)
  * @see Arrays#binarySearch(Object[], Object, Comparator)
@@ -43,6 +52,72 @@ public class Comparables {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist.
 		 */
 		public GItem get(int index) throws IndexOutOfBoundsException;
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine beliebig sortierte Sicht auf die Elemente eines {@link Get}. Das zu einem Index via {@link #get(int)} gelieferten Elemente
+	 * entspricht dem eines gegebenen {@link Get}s, dessen Index über ein gegebenes Array von Indizes ermittelt wird.
+	 * 
+	 * @see #get(int)
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 */
+	public static final class GetSection<GItem> implements Get<GItem> {
+
+		/**
+		 * Dieses Feld speichert das {@link Get}.
+		 */
+		final Get<? extends GItem> get;
+
+		/**
+		 * Dieses Feld speichert den Suchraum.
+		 */
+		final int[] indices;
+
+		/**
+		 * Dieser Konstruktor initialisiert Besitzer und Indexraum.
+		 * 
+		 * @param get Besitzer.
+		 * @param indices Indexraum.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public GetSection(final Get<? extends GItem> get, final int[] indices) throws NullPointerException {
+			if((get == null) || (indices == null)) throw new NullPointerException();
+			this.get = get;
+			this.indices = indices;
+		}
+
+		/**
+		 * Diese Methode gibt das {@link Get} zurück, auf dessen Elemente via {@link #get(int)} zugegriffen werden kann.
+		 * 
+		 * @see #get(int)
+		 * @see #indices()
+		 * @return {@link Get}.
+		 */
+		public Get<? extends GItem> get() {
+			return this.get;
+		}
+
+		/**
+		 * Diese Methode gibt den Indexraum zurück, der darüber entscheidet, auf welche Elemente via {@link #get(int)} zugegriffen werden kann.
+		 * 
+		 * @see #get(int)
+		 * @see #indices()
+		 * @return Indexraum.
+		 */
+		public int[] indices() {
+			return this.indices.clone();
+		}
+
+		/**
+		 * {@inheritDoc} <br>
+		 * Dieses entspricht dem Ausdruck {@code this.get().get(this.indices()[index])}.
+		 */
+		@Override
+		public GItem get(final int index) throws IndexOutOfBoundsException {
+			return this.get.get(this.indices[index]);
+		}
 
 	}
 
@@ -99,7 +174,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
+	 * Diese Klasse implementiert ein {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
+	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
 	 * 
 	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
 	 * 
@@ -139,7 +215,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparable}, der einen gegebenen {@link Comparator} sowie ein gegebenes Element zur Berechnung des Navigationswert verwendet. Das gegebene Element ist hierbei das erstes Argument des {@link Comparator}s. Der Navigationswert für ein Element {@code element} sowie das gegebene Element {@code entry} und den gegebenen {@link Comparator} {@code comparator} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Comparable}, der einen gegebenen {@link Comparator} sowie ein gegebenes Element zur Berechnung des Navigationswert
+	 * verwendet. Das gegebene Element ist hierbei das erstes Argument des {@link Comparator}s. Der Navigationswert für ein Element {@code element} sowie das
+	 * gegebene Element {@code entry} und den gegebenen {@link Comparator} {@code comparator} ergibt sich aus:
 	 * 
 	 * <pre>comparator.compare(entry, element)</pre>
 	 * 
@@ -209,7 +287,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparable}, der den Navigationswert eines gegebenen {@link Comparable}s umkehrt. Der Navigationswert für ein Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Comparable}, der den Navigationswert eines gegebenen {@link Comparable}s umkehrt. Der Navigationswert für ein
+	 * Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
 	 * 
 	 * <pre>-comparable.compareTo(element)</pre>
 	 * 
@@ -249,7 +328,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert für ein Element {@code element} sowie die {@link Comparable}s {@code comparable1} und {@code comparable2} ergibt sich aus:
+	 * Diese Klasse implementiert einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
+	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
+	 * für ein Element {@code element} sowie die {@link Comparable}s {@code comparable1} und {@code comparable2} ergibt sich aus:
 	 * 
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
@@ -321,7 +402,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen konvertierenden {@link Comparable}, der die mit einem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des Navigationswerts an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element}, einen {@link Converter} {@code onverter} und einen {@link Comparable} {@code comparable} ergibt sich aus:
+	 * Diese Klasse implementiert einen konvertierenden {@link Comparable}, der die mit einem gegebenen {@link Converter} konvertierten Elemente zur Berechnung
+	 * des Navigationswerts an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element}, einen {@link Converter}
+	 * {@code onverter} und einen {@link Comparable} {@code comparable} ergibt sich aus:
 	 * 
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
@@ -478,7 +561,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
+	 * {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
 	 * 
@@ -492,7 +576,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert verwendet, und gibt ihn zurück. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Comparable}, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
+	 * verwendet, und gibt ihn zurück. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element
+	 * {@code element} ergibt sich aus:
 	 * 
 	 * <pre>comparator.compare(entry, element)</pre>
 	 * 
@@ -507,7 +593,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, der den Navigationswert des gegebenen {@link Comparable}s umkehrt, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Comparable}, der den Navigationswert des gegebenen {@link Comparable}s umkehrt, und gibt ihn zurück. Der Navigationswert
+	 * für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>- comparable.compareTo(element)</pre>
 	 * 
@@ -521,7 +608,9 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode erzeugt einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet und
+	 * nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat, und gibt ihn zurück. Der
+	 * Navigationswert für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
@@ -537,7 +626,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Comparable}, der die mit dem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des Navigationswerts an den gegebenen {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode erzeugt einen konvertierenden {@link Comparable}, der die mit dem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des
+	 * Navigationswerts an den gegebenen {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
@@ -555,7 +645,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
+	 * Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearch(Object[], Comparable, int, int)
@@ -571,7 +662,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
+	 * Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -601,7 +693,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des
+	 * ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearch(List, Comparable, int, int)
@@ -618,7 +711,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des
+	 * ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -648,7 +742,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des
+	 * ersten Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -678,7 +773,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position
+	 * eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearchFirst(Object[], Comparable, int, int)
@@ -694,7 +790,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position
+	 * eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -725,7 +822,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste
+	 * Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearchFirst(List, Comparable, int, int)
@@ -742,7 +840,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste
+	 * Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -773,7 +872,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die kleinste
+	 * Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -804,7 +904,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines
+	 * Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearchLast(Object[], Comparable, int, int)
@@ -820,7 +921,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines
+	 * Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -852,7 +954,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte
+	 * Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @see Comparables#binarySearchLast(List, Comparable, int, int)
@@ -869,7 +972,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf der gegebenen {@link List} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte
+	 * Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
@@ -901,7 +1005,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+	 * Diese Methode führt auf dem gegebenen {@link Get} eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die größte Position
+	 * eines Treffers oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 	 * 
 	 * @see Comparables
 	 * @param <GItem> Typ der Elemente.
