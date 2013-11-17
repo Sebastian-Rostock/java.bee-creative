@@ -17,6 +17,12 @@ import bee.creative.util.Objects;
  */
 public final class Functions {
 
+	/**
+	 * Diese Klasse implementiert eine {@link Function Funktion} mit der Signatur {@code (function: Function, params: Value[]): Value}. Der {@link Value
+	 * Ergebniswert} entspricht {@code function(params[0], params[1], ...)} entspricht.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static final class CallFunction implements Function {
 
 		/**
@@ -28,7 +34,7 @@ public final class Functions {
 		 * {@inheritDoc}
 		 * <p>
 		 * Der {@link Value Ergebniswert} entspricht dem der {@link Function Funktion}, die als erster {@link Value Parameterwerte} des gegebenen {@link Scope
-		 * Ausführungskontext}s ist und mit den {@link Value Werten} im {@link ArrayValue} des zweiten {@link Value Parameterwerte}s aufgerufen wird.
+		 * Ausführungskontext}s gegeben ist und mit den {@link Value Werten} im {@link ArrayValue} des zweiten {@link Value Parameterwerte}s aufgerufen wird.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
@@ -41,7 +47,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return 0;
+			return CallFunction.class.hashCode();
 		}
 
 		/**
@@ -62,6 +68,12 @@ public final class Functions {
 
 	}
 
+	/**
+	 * Diese Klasse implementiert eine {@link Function Funktion} mit der Signatur {@code (function: FunctionValue, params... Value): Value}. Der {@link Value
+	 * Ergebniswert} entspricht {@code function(params[0], params[1], ...)} entspricht.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static final class ApplyFunction implements Function {
 
 		/**
@@ -94,7 +106,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return 0;
+			return ApplyFunction.class.hashCode();
 		}
 
 		/**
@@ -210,6 +222,18 @@ public final class Functions {
 
 		}
 
+		/**
+		 * Diese Methode gibt die gegebenen {@link Function Funktion} als {@link TraceFunction} mit dem gegebenen {@link TraceHandler} oder unverändert zurück. Wenn
+		 * die {@link Function Funktion} {@link CompositeFunction komponiert} ist, wird eine {@link CompositeFunction komponierte Funktion} zurück gegeben, deren
+		 * {@link Function Parameterfunktionen} mit dieser Methode umgewandelt wurden. Wenn die {@link Function Funktion} eine {@link ValueFunction Konstante} ist
+		 * und ihr {@link Value Ergebniswert} eine {@link FunctionValue Funktion} ist, wird diese mit dieser Methode umgewandelt und als {@link ValueFunction
+		 * konstante Funktion} zurück gegeben. Andernfalls wird die gegebene {@link Function Funktion} zurück gegeben.
+		 * 
+		 * @param handler {@link TraceHandler}.
+		 * @param function {@link Function Funktion}.
+		 * @return {@link Function Funktion}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
 		public static final Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
 			if((handler == null) || (function == null)) throw new NullPointerException();
 			final Object clazz = function.getClass();
