@@ -5,7 +5,7 @@ package bee.creative.util;
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class StringParser {
+public class Parser {
 
 	/**
 	 * Dieses Feld speichert die Eingabe.
@@ -38,8 +38,7 @@ public class StringParser {
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public StringParser(final String source) throws NullPointerException {
-
+	public Parser(final String source) throws NullPointerException {
 		this.source = source;
 		this.length = source.length();
 		this.target = new StringBuffer();
@@ -55,7 +54,7 @@ public class StringParser {
 	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
 	 */
-	public final int seek(int index) throws IndexOutOfBoundsException {
+	public final int seek(final int index) throws IndexOutOfBoundsException {
 		if(index < 0) throw new IndexOutOfBoundsException("Index out of range: " + index);
 		if(index < this.length) return this.symbol = this.source.codePointAt(this.index = index);
 		this.index = this.length;
@@ -80,7 +79,8 @@ public class StringParser {
 	}
 
 	/**
-	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses oder {@code -1} zurück.
+	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses oder
+	 * {@code -1} zurück.
 	 * 
 	 * @see #skip()
 	 * @see #index()
@@ -105,9 +105,22 @@ public class StringParser {
 	}
 
 	/**
+	 * Diese Methode übernimmt die gegebene Zeichenkette in die {@link #string() Ausgabe}.
+	 * 
+	 * @param symbols Zeichenkette.
+	 * @see #take()
+	 * @see #string()
+	 */
+	public final void take(final String symbols) {
+		this.target.append(symbols);
+	}
+
+	/**
 	 * Diese Methode leert die {@link #string() Ausgabe}.
 	 * 
 	 * @see #take()
+	 * @see #take(char)
+	 * @see #take(String)
 	 * @see #string()
 	 */
 	public final void clear() {
@@ -127,10 +140,12 @@ public class StringParser {
 	}
 
 	/**
-	 * Diese Methode gibt die via {@link #take()} gesammelten Zeichen als {@link String} zurück.
+	 * Diese Methode gibt die via {@link #take()}, {@link #take(char)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
 	 * 
 	 * @see #skip()
 	 * @see #take()
+	 * @see #take(char)
+	 * @see #take(String)
 	 * @see #clear()
 	 * @see #symbol()
 	 * @return Ausgabe.

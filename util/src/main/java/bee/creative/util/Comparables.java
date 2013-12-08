@@ -388,7 +388,7 @@ public class Comparables {
 			if(object == this) return true;
 			if(!(object instanceof ChainedComparable<?>)) return false;
 			final ChainedComparable<?> data = (ChainedComparable<?>)object;
-			return Objects.equals(this.comparable1, data.comparable1, this.comparable2, data.comparable2);
+			return Objects.equals(this.comparable1, data.comparable1) && Objects.equals(this.comparable2, data.comparable2);
 		}
 
 		/**

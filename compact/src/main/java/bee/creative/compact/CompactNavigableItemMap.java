@@ -4,7 +4,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
+ * Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren.
+ * Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
  * 
  * @see CompactNavigableItemMap#getKey(Object)
  * @see CompactNavigableItemMap#setKey(Object, Object)

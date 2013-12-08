@@ -34,7 +34,8 @@ public class Iterables {
 	static class IterableArray<GEntry> implements Iterable<Iterable<? extends GEntry>> {
 
 		/**
-		 * Diese Methode gibt ein {@link Iterable} zurück, das die gegebenen {@link Iterable}s liefert. Wenn unter den Eingaben {@link ChainedIterable}s sind, werden diese zu einem {@link IterableArray} zusammengefasst.
+		 * Diese Methode gibt ein {@link Iterable} zurück, das die gegebenen {@link Iterable}s liefert. Wenn unter den Eingaben {@link ChainedIterable}s sind,
+		 * werden diese zu einem {@link IterableArray} zusammengefasst.
 		 * 
 		 * @see Iterables#chainedIterable(Iterable...)
 		 * @see Iterables#chainedIterable(Iterable, Iterable)
@@ -538,7 +539,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Iterable}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterable}s liefert.
+	 * Diese Klasse implementiert ein {@link Iterable}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterable}s
+	 * liefert.
 	 * 
 	 * @see FilteredIterator
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -653,7 +655,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Iterable}, das die von einem gegebenen {@link Converter} konvertierten Elemente eines gegebenen {@link Iterable}s liefert.
+	 * Diese Klasse implementiert ein {@link Iterable}, das die von einem gegebenen {@link Converter} konvertierten Elemente eines gegebenen {@link Iterable}s
+	 * liefert.
 	 * 
 	 * @see ConvertedIterator
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -789,7 +792,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des {@link Iterable}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
+	 * des {@link Iterable}s {@code true} zurück.
 	 * 
 	 * @see Iterators#retainAll(Iterator, Collection)
 	 * @param iterable {@link Iterable}.
@@ -804,7 +808,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterable} vorkommen, und gibt nur bei Veränderung der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Iterators#retainAll(Collection, Iterator)
 	 * @param collection {@link Collection}.
@@ -819,7 +824,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterable}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterable}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Iterators#appendAll(Collection, Iterator)
 	 * @param <GEntry> Typ der Elemente.
@@ -848,7 +854,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des {@link Iterable}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
+	 * {@link Iterable}s {@code true} zurück.
 	 * 
 	 * @see Iterators#removeAll(Iterator, Collection)
 	 * @param iterable {@link Iterable}.
@@ -863,7 +870,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
+	 * {@link Collection} {@code true} zurück.
 	 * 
 	 * @see Iterators#removeAll(Collection, Iterator)
 	 * @param collection {@link Collection}.
@@ -982,7 +990,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Iterable}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterable}s liefert, und gibt es zurück.
+	 * Diese Methode erzeugt ein {@link Iterable}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterable}s liefert, und
+	 * gibt es zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter}.
@@ -996,7 +1005,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
+	 * zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}-{@link Iterable}.
@@ -1008,7 +1018,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
+	 * zurück.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
@@ -1023,7 +1034,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es zurück.
+	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
+	 * zurück.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
 	 * @param <GEntry> Typ der Elemente.
@@ -1036,7 +1048,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Iterable}, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}s liefert, und gibt es zurück.
+	 * Diese Methode erzeugt ein {@link Iterable}, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}s liefert, und
+	 * gibt es zurück.
 	 * 
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterable}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente des erzeugten {@link Iterable}s.
@@ -1051,7 +1064,8 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt, und gibt es zurück.
+	 * Diese Methode erzeugt ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt, und
+	 * gibt es zurück.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}.

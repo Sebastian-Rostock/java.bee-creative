@@ -10,9 +10,11 @@ import bee.creative.array.Array;
 import bee.creative.array.CompactArray;
 
 /**
- * Diese Klasse implementiert eine {@link List}, deren Daten in einem Array verwaltet werden. Der Speicherverbrauch einer {@link CompactList} liegt bei ca. {@code 100%} des Speicherverbrauchs einer {@link ArrayList}.
+ * Diese Klasse implementiert eine {@link List}, deren Daten in einem Array verwaltet werden. Der Speicherverbrauch einer {@link CompactList} liegt bei ca.
+ * {@code 100%} des Speicherverbrauchs einer {@link ArrayList}.
  * <p>
- * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und liegen bei einer mittigen Ausrichtung im Mittel bei {@code 50%} der Rechenzeit, die eine {@link ArrayList} dazu benötigen würde.
+ * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und liegen bei einer mittigen Ausrichtung im Mittel
+ * bei {@code 50%} der Rechenzeit, die eine {@link ArrayList} dazu benötigen würde.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente.
@@ -24,7 +26,8 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Array#values()
-	 * @param <GItem> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
+	 * @param <GItem> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder
+	 *        {@link Boolean}).
 	 */
 	protected static final class CompactListItems<GItem> extends AbstractList<GItem> implements RandomAccess {
 
@@ -148,7 +151,10 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/**
-	 * Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays beschleunigt wird.
+	 * Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am
+	 * Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition
+	 * {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
+	 * beschleunigt wird.
 	 * 
 	 * @see CompactArray#getAlignment()
 	 * @return relative Ausrichtungsposition ({@code 0..1}).
@@ -158,7 +164,10 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/**
-	 * Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays beschleunigt wird.
+	 * Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang
+	 * des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1}
+	 * gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
+	 * beschleunigt wird.
 	 * 
 	 * @see CompactArray#setAlignment(float)
 	 * @param alignment relative Ausrichtungsposition ({@code 0..1}).

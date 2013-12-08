@@ -16,7 +16,8 @@ import bee.creative.util.Iterables;
 public class CollectionBuilder {
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Collection}-{@link Builder}, der eine konfigurierte {@link Collection} in eine {@code reverse}-, {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Collection} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link Collection}-{@link Builder}, der eine konfigurierte {@link Collection} in eine {@code reverse}-, {@code checked}
+	 * -, {@code synchronized}- oder {@code unmodifiable}-{@link Collection} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
 	 * 
 	 * @see Collections#checkedCollection(Collection, Class)
 	 * @see Collections#synchronizedCollection(Collection)
@@ -103,7 +104,8 @@ public class CollectionBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Collection}-{@link Builder}, der eine konfigurierte {@link Collection} in eine {@code reverse}-, {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Collection} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Collection}-{@link Builder}, der eine konfigurierte {@link Collection} in eine {@code reverse}-, {@code checked}
+	 * -, {@code synchronized}- oder {@code unmodifiable}-{@link Collection} umwandeln kann.
 	 * 
 	 * @see Collections#checkedCollection(Collection, Class)
 	 * @see Collections#synchronizedCollection(Collection)

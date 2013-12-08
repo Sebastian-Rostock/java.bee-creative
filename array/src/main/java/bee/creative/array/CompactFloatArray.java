@@ -21,7 +21,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder {@code startIndex > finalIndex}).
+		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
+		 *         {@code startIndex > finalIndex}).
 		 */
 		public CompactFloatSubArray(final CompactFloatArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
 			IndexOutOfBoundsException {
@@ -255,7 +256,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	}
 
 	/**
-	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
+	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
+	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)

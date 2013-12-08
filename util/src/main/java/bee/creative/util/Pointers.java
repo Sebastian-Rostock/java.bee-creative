@@ -59,7 +59,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen harten {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
+	 * Diese Klasse implementiert einen harten {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht
+	 * automatisch aufgelöst.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
@@ -115,7 +116,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link WeakReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
+	 * Diese Klasse implementiert eine {@link WeakReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}
+	 * s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 * 
 	 * @see WeakReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -167,7 +169,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link SoftReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
+	 * Diese Klasse implementiert eine {@link SoftReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}
+	 * s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
 	 * 
 	 * @see SoftReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -326,17 +329,21 @@ public class Pointers {
 	}
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}s. Die Referenz auf den Datensatz
+	 * eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
 	 */
 	public static final int HARD = 0;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link WeakPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link WeakPointer}s. Die Referenz auf den Datensatz
+	 * eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 */
 	public static final int WEAK = 1;
 
 	/**
-	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link SoftPointer}s. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
+	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link SoftPointer}s. Die Referenz auf den Datensatz
+	 * eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage
+	 * Collector dies entscheidet.
 	 */
 	public static final int SOFT = 2;
 
@@ -367,7 +374,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich dem {@code null}- {@link Pointer} oder sein Datensatz nicht {@code null} ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich dem {@code null}- {@link Pointer} oder sein Datensatz nicht
+	 * {@code null} ist.
 	 * 
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Pointer}-Validität.
@@ -435,7 +443,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen harten {@link Pointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
+	 * Diese Methode erzeugt einen harten {@link Pointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher
+	 * {@link Pointer}s wird nicht automatisch aufgelöst.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -446,7 +455,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link WeakPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
+	 * Diese Methode erzeugt einen {@link WeakPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher
+	 * {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -457,7 +467,9 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link SoftPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies entscheidet.
+	 * Diese Methode erzeugt einen {@link SoftPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher
+	 * {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies
+	 * entscheidet.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -468,7 +480,8 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode erzeugt {@link Pointer}, dessen Datensatz mit Hilfe eines {@link Converter}s aus einem gegebenen {@link Pointer} ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt {@link Pointer}, dessen Datensatz mit Hilfe eines {@link Converter}s aus einem gegebenen {@link Pointer} ermittelt wird, und gibt ihn
+	 * zurück.
 	 * 
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie des Datensatzes des gegebenen {@link Pointer}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.

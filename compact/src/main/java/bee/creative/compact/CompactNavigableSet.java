@@ -12,11 +12,17 @@ import java.util.TreeSet;
 import bee.creative.util.Iterables;
 
 /**
- * Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet} liegt bei ca. {@code 13%} des Speicherverbrauchs eines {@link TreeSet}s.
+ * Diese Klasse implementiert ein {@link NavigableSet}, dessen Daten in einem Array verwaltet werden. Der Speicherverbrauch eines {@link CompactNavigableSet}
+ * liegt bei ca. {@code 13%} des Speicherverbrauchs eines {@link TreeSet}s.
  * <p>
- * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 208%} der Rechenzeit, die ein {@link TreeSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide {@link NavigableSet} dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet} schneller, bei mehr Elementen ist das {@link TreeSet} schneller. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einem {@link CompactNavigableSet} auf ca. {@code 3900%} der Rechenzeit, die ein {@link TreeSet} hierfür benötigen würde.
+ * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
+ * im Mittel auf ca. {@code 208%} der Rechenzeit, die ein {@link TreeSet} dazu benötigen würde. Bei einer Anzahl von ca. {@code 8000} Elementen benötigen Beide
+ * {@link NavigableSet} dafür in etwa die gleichen Rechenzeiten. Bei weniger Elementen ist das {@link CompactNavigableSet} schneller, bei mehr Elementen ist das
+ * {@link TreeSet} schneller. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen
+ * und Entfernen von Elementen in einem {@link CompactNavigableSet} auf ca. {@code 3900%} der Rechenzeit, die ein {@link TreeSet} hierfür benötigen würde.
  * <p>
- * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel nur noch {@code 25%} bzw. {@code 75%} der Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
+ * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel nur noch {@code 25%} bzw. {@code 75%} der
+ * Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente.

@@ -100,7 +100,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, deren Ausgabe mit einem gegebenen {@link Converter} ermittelt wird.
+	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, deren Ausgabe mit einem gegebenen
+	 * {@link Converter} ermittelt wird.
 	 * 
 	 * @see StaticConversion
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -141,7 +142,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt werden.
+	 * Diese Klasse implementiert eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt
+	 * werden.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -225,7 +227,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe eines gegebenen {@link Converter}s aus der gegebenen Eingabe ermittelt wird.
+	 * Diese Klasse implementiert eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe eines gegebenen {@link Converter}s aus der gegebenen Eingabe
+	 * ermittelt wird.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -399,7 +402,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, und gibt ihh zurück. Die Ausgabe der {@link StaticConversion} wird hierbei mit dem gegebenen {@link Converter} ermittelt.
+	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, und gibt ihh zurück. Die Ausgabe der
+	 * {@link StaticConversion} wird hierbei mit dem gegebenen {@link Converter} ermittelt.
 	 * 
 	 * @see Conversions#staticConversion(Object, Object)
 	 * @param <GInput> Typ des Eingabe.
@@ -414,7 +418,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt werden, und gibt sie zurück.
+	 * Diese Methode erzeugt eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt
+	 * werden, und gibt sie zurück.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -440,7 +445,8 @@ public class Conversions {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe des gegebenen {@link Converter}s aus der gegebenen Eingabe ermittelt wird, und gibt sie zurück.
+	 * Diese Methode erzeugt eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe des gegebenen {@link Converter}s aus der gegebenen Eingabe ermittelt
+	 * wird, und gibt sie zurück.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.

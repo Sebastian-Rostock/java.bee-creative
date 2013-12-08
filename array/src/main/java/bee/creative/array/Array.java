@@ -7,8 +7,10 @@ import java.util.List;
  * Diese Schnittstelle definiert ein modifizierbares Array mit {@link List}-Sicht auf seine Werte.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GArray> Typ des Arrays (z.B. {@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
- * @param <GValue> Typ der Werte (z.B. {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder {@link Boolean}).
+ * @param <GArray> Typ des Arrays (z.B. {@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder
+ *        {@code boolean[]}).
+ * @param <GValue> Typ der Werte (z.B. {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder
+ *        {@link Boolean}).
  */
 public interface Array<GArray, GValue> {
 
@@ -165,7 +167,8 @@ public interface Array<GArray, GValue> {
 	 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 	 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 	 * @return modifizierbare Teil-{@link Array}-Sicht.
-	 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > size()} oder {@code startIndex > finalIndex}).
+	 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > size()} oder
+	 *         {@code startIndex > finalIndex}).
 	 */
 	public Array<GArray, GValue> subArray(int startIndex, int finalIndex) throws IndexOutOfBoundsException;
 

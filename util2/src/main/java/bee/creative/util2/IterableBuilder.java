@@ -17,7 +17,8 @@ import bee.creative.util.Iterables;
 public class IterableBuilder {
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-, {@code limited}-, {@code filtered}-, {@code converted}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-,
+	 * {@code limited}-, {@code filtered}-, {@code converted}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable, Iterable)
 	 * @see Iterables#uniqueIterable(Iterable)
@@ -82,7 +83,8 @@ public class IterableBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-, {@code limited}-, {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-,
+	 * {@code limited}-, {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable, Iterable)
 	 * @see Iterables#uniqueIterable(Iterable)
@@ -150,7 +152,8 @@ public class IterableBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-, {@code limited}-, {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code chained}-, {@code unique}-,
+	 * {@code limited}-, {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable, Iterable)
 	 * @see Iterables#uniqueIterable(Iterable)
@@ -252,7 +255,8 @@ public class IterableBuilder {
 		public GParent iterable(Iterable<? extends GEntry> iterable) throws NullPointerException;
 
 		/**
-		 * Diese Methode gibt den {@link Iterable}-{@link Builder} zur Konfiguration des zweiten Arguments für {@link Iterables#convertedIterable(Converter, Iterable)} zurück.
+		 * Diese Methode gibt den {@link Iterable}-{@link Builder} zur Konfiguration des zweiten Arguments für
+		 * {@link Iterables#convertedIterable(Converter, Iterable)} zurück.
 		 * 
 		 * @see Iterables#convertedIterable(Converter, Iterable)
 		 * @param <GEntry2> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des konfigurierten {@link Iterable}s.
@@ -285,7 +289,8 @@ public class IterableBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code unique}-, {@code limited}-, {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Iterable}-{@link Builder}, der ein konfiguriertes {@link Iterable} in ein {@code unique}-, {@code limited}-,
+	 * {@code filtered}- oder {@code unmodifiable}-{@link Iterable} umwandeln kann.
 	 * 
 	 * @see Iterables#limitedIterable(int, Iterable)
 	 * @see Iterables#filteredIterable(Filter, Iterable)
@@ -296,7 +301,8 @@ public class IterableBuilder {
 	public static interface IterableBuilder6<GEntry> {
 
 		/**
-		 * Diese Methode gibt den {@link Iterable}-{@link Builder} zur Konfiguration des zweiten Arguments für {@link Iterables#chainedIterable(Iterable, Iterable)} zurück.
+		 * Diese Methode gibt den {@link Iterable}-{@link Builder} zur Konfiguration des zweiten Arguments für {@link Iterables#chainedIterable(Iterable, Iterable)}
+		 * zurück.
 		 * 
 		 * @return {@link Iterable}-{@link Builder}.
 		 */
@@ -747,7 +753,8 @@ public class IterableBuilder {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Iterable}-{@link Builder} für ein {@link Iterable} über das durch den gegebenen {@link Builder} bereitgestellte Element zurück.
+	 * Diese Methode gibt einen {@link Iterable}-{@link Builder} für ein {@link Iterable} über das durch den gegebenen {@link Builder} bereitgestellte Element
+	 * zurück.
 	 * 
 	 * @see Iterables#builderIterable(Builder)
 	 * @param <GEntry> Typ der Elemente.

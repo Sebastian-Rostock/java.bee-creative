@@ -478,7 +478,9 @@ public class Collections {
 		boolean extendMode;
 
 		/**
-		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen, entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
+		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen,
+		 * entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste
+		 * {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
 		 * 
 		 * @param values1 {@link List} der ersten Elemente.
 		 * @param values2 {@link List} der letzten Elemente.
@@ -627,7 +629,9 @@ public class Collections {
 		boolean extendMode;
 
 		/**
-		 * Dieser Konstruktor initialisiert die {@link Collection}s und den Erweiterungsmodus. Wenn Elemente eingefügt werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
+		 * Dieser Konstruktor initialisiert die {@link Collection}s und den Erweiterungsmodus. Wenn Elemente eingefügt werden sollen, entscheidet der
+		 * Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste {@link Collection}
+		 * erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
 		 * 
 		 * @param values1 {@link Collection} der ersten Elemente.
 		 * @param values2 {@link Collection} der letzten Elemente.
@@ -733,7 +737,8 @@ public class Collections {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List}s und gibt diese zurück. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen, wird die erste {@link List} erweitert. Der Rückgabewert entspricht
+	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List}s und gibt diese zurück. Wenn ein Elemente zwischen beiden
+	 * {@link List}s eingefügt werden sollen, wird die erste {@link List} erweitert. Der Rückgabewert entspricht
 	 * 
 	 * <pre>chainedList(values1, values2, true)</pre>
 	 * 
@@ -749,7 +754,9 @@ public class Collections {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List}s und gibt diese zurück. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen, entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
+	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List}s und gibt diese zurück. Wenn ein Elemente zwischen beiden
+	 * {@link List}s eingefügt werden sollen, entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus
+	 * {@code true}, wird die erste {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
 	 * 
 	 * @param <GValue> Typ der Elemente.
 	 * @param values1 {@link List} der ersten Elemente.
@@ -763,7 +770,8 @@ public class Collections {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection}s und gibt diese zurück. Wenn Elemente eingefügt werden sollen, wird die erste {@link Collection} erweitert. Der Rückgabewert entspricht
+	 * Diese Methode erzeugt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection}s und gibt diese zurück. Wenn Elemente eingefügt
+	 * werden sollen, wird die erste {@link Collection} erweitert. Der Rückgabewert entspricht
 	 * 
 	 * <pre>chainedCollection(values1, values2, true)</pre>
 	 * 
@@ -779,7 +787,9 @@ public class Collections {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection}s und gibt diese zurück. Wenn Elemente eingefügt werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
+	 * Diese Methode erzeugt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection}s und gibt diese zurück. Wenn Elemente eingefügt
+	 * werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird
+	 * die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
 	 * 
 	 * @param <GValue> Typ der Elemente.
 	 * @param values1 {@link Collection} der ersten Elemente.

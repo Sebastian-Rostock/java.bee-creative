@@ -1,6 +1,8 @@
 package bee.creative.util;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Filter}n.
@@ -152,7 +154,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Filter}, der die {@code null}-Eingabe ablehnat und alle anderen Eingaben akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Klasse implementiert den {@link Filter}, der die {@code null}-Eingabe ablehnat und alle anderen Eingaben akzeptiert. Die Eingabeakzeptanz für eine
+	 * Eingabe {@code input} ergibt sich aus:
 	 * 
 	 * <pre>input != null</pre>
 	 * 
@@ -244,7 +247,9 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Negation ({@code !}-Operator) eines gegebenen {@link Filter}s berechnet. Der {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn der gegebene {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie einen {@link Filter} {@code filter} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, der die Negation ({@code !}-Operator) eines gegebenen {@link Filter}s berechnet. Der {@link Filter}
+	 * akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn der gegebene
+	 * {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie einen {@link Filter} {@code filter} ergibt sich aus:
 	 * 
 	 * <pre>!filter.accept(input)</pre>
 	 * 
@@ -284,7 +289,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der nur die in einer gegebenen {@link Collection} enthaltenen Eingaben akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, der nur die in einer gegebenen {@link Collection} enthaltenen Eingaben akzeptiert. Die Eingabeakzeptanz
+	 * für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
 	 * 
 	 * <pre>collection.contains(input)</pre>
 	 * 
@@ -347,7 +353,11 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, dessen konvertierte Eingabe von einem gegebenen {@link Filter} bewertet wird. Der {@link Filter} konvertiert seine Eingabe mit einem gegebenen {@link Converter} zur Eingabe eines gegebenen {@link Filter}s. Der {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter} die konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input}, einen {@link Filter} {@code filter} sowie einen {@link Converter} {@code converter} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, dessen konvertierte Eingabe von einem gegebenen {@link Filter} bewertet wird. Der {@link Filter}
+	 * konvertiert seine Eingabe mit einem gegebenen {@link Converter} zur Eingabe eines gegebenen {@link Filter}s. Der {@link Filter} akzeptiert eine Eingabe nur
+	 * dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter} die
+	 * konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input}, einen {@link Filter} {@code filter} sowie einen {@link Converter}
+	 * {@code converter} ergibt sich aus:
 	 * 
 	 * <pre>filter.accept(converter.convert(input))</pre>
 	 * 
@@ -413,7 +423,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter} akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn die beiden gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter} {@code filter1} und {@code filter2} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter}
+	 * akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn
+	 * die beiden gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter} {@code filter1} und
+	 * {@code filter2} ergibt sich aus:
 	 * 
 	 * <pre>filter1.accept(input) || filter2.accept(input)</pre>
 	 * 
@@ -454,7 +467,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter} akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter} {@code filter1} und {@code filter2} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) zweier gegebener {@link Filter} berechnet. Der
+	 * {@link Filter} akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab,
+	 * wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter}
+	 * {@code filter1} und {@code filter2} ergibt sich aus:
 	 * 
 	 * <pre>filter1.accept(input) &amp;&amp; filter2.accept(input)</pre>
 	 * 
@@ -495,7 +511,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter} akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die Eingabe genau dann ab, wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter} {@code filter1} und {@code filter2} ergibt sich aus:
+	 * Diese Klasse implementiert einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter}
+	 * akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die Eingabe genau dann ab,
+	 * wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei
+	 * {@link Filter} {@code filter1} und {@code filter2} ergibt sich aus:
 	 * 
 	 * <pre>filter1.accept(input) == filter2.accept(input)</pre>
 	 * 
@@ -536,7 +555,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der einen gegebenen {@link Filter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Filter}.
+	 * Diese Klasse implementiert einen {@link Filter}, der einen gegebenen {@link Filter} synchronisiert. Die Synchronisation erfolgt via
+	 * {@code synchronized(this)}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -576,7 +596,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind. Die Eingabeakzeptanz für eine Eingabe
+	 * {@code input} ergibt sich aus:
 	 * 
 	 * <pre>input != null</pre>
 	 * 
@@ -589,7 +610,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer {@code true}.
+	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer
+	 * {@code true}.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link AcceptFilter}.
@@ -600,7 +622,8 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer {@code false}.
+	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer
+	 * {@code false}.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link RejectFilter}.
@@ -611,7 +634,9 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Negation ({@code !}-Operator) des gegebenen {@link Filter}s berechnet, und gibt diesen zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn der gegebene {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, der die Negation ({@code !}-Operator) des gegebenen {@link Filter}s berechnet, und gibt diesen zurück. Der
+	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn
+	 * der gegebene {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
 	 * 
 	 * <pre>!filter.accept(input)</pre>
 	 * 
@@ -630,7 +655,21 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der nur die in der gegebenen {@link Collection} enthaltenen Eingaben akzeptiert, und gibt diesen zurück. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, der nur die gegebenen Eingaben akzeptiert, und gibt diesen zurück.
+	 * 
+	 * @see #containsFilter(Collection)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param inputs Eingaben.
+	 * @return {@link ContainsFilter}.
+	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+	 */
+	public static <GInput> ContainsFilter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
+		return Filters.containsFilter(new HashSet<Object>(Arrays.asList(inputs)));
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Filter}, der nur die in der gegebenen {@link Collection} enthaltenen Eingaben akzeptiert, und gibt diesen zurück. Die
+	 * Eingabeakzeptanz für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
 	 * 
 	 * <pre>collection.contains(input)</pre>
 	 * 
@@ -644,7 +683,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter} bewertet wird, und gibt diesen zurück. Der erzeugte {@link Filter} konvertiert seine Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen {@link Filter}s. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter} die konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter} bewertet wird, und gibt diesen zurück. Der erzeugte
+	 * {@link Filter} konvertiert seine Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen {@link Filter}s. Der erzeugte {@link Filter}
+	 * akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen
+	 * {@link Filter} die konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
 	 * 
 	 * <pre>filter.accept(converter.convert(input))</pre>
 	 * 
@@ -662,7 +704,9 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn beide gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der
+	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die
+	 * Eingabe genau dann ab, wenn beide gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
 	 * 
 	 * <pre>filter1.accept(input) || filter2.accept(input)</pre>
 	 * 
@@ -680,7 +724,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn alle der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen
+	 * zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn alle der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die
+	 * Eingabe genau dann ab, wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt
+	 * sich aus:
 	 * 
 	 * <pre>filter1.accept(input) &amp;&amp; filter2.accept(input)</pre>
 	 * 
@@ -698,7 +745,10 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn beide gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die Eingabe genau dann ab, wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode erzeugt einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der
+	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn beide gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die
+	 * Eingabe genau dann ab, wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe
+	 * {@code input} ergibt sich aus:
 	 * 
 	 * <pre>filter1.accept(input) == filter2.accept(input)</pre>
 	 * 
@@ -714,7 +764,7 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Filter} .
+	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.

@@ -18,7 +18,8 @@ import bee.creative.util.Iterables;
 public class ListBuilder {
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link List}-{@link Builder}, der eine konfigurierte {@link List} in eine {@code reverse}-, {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link List} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link List}-{@link Builder}, der eine konfigurierte {@link List} in eine {@code reverse}-, {@code checked}-,
+	 * {@code synchronized}- oder {@code unmodifiable}-{@link List} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
 	 * 
 	 * @see bee.creative.util.Collections#reverseList(List)
 	 * @see Collections#checkedList(List, Class)
@@ -111,7 +112,8 @@ public class ListBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link List}-{@link Builder}, der eine konfigurierte {@link List} in eine {@code reverse}-, {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link List} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link List}-{@link Builder}, der eine konfigurierte {@link List} in eine {@code reverse}-, {@code checked}-,
+	 * {@code synchronized}- oder {@code unmodifiable}-{@link List} umwandeln kann.
 	 * 
 	 * @see bee.creative.util.Collections#reverseList(List)
 	 * @see Collections#checkedList(List, Class)

@@ -6,7 +6,8 @@ import bee.creative.util.Pointers.SoftPointer;
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Builder}n.
  * <p>
- * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse {@code Helper} verwendet:
+ * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse
+ * {@code Helper} verwendet:
  * 
  * <pre>
  * public final class Helper {
@@ -149,7 +150,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s verwaltet.
+	 * Diese Klasse implementiert einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines
+	 * {@link Pointer}s verwaltet.
 	 * 
 	 * @see Pointer
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -217,7 +219,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen {@link Builder}s erzeugt wird.
+	 * Diese Klasse implementiert einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen
+	 * {@link Builder}s erzeugt wird.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen {@link Converter}s.
@@ -281,7 +284,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Builder}.
+	 * Diese Klasse implementiert einen {@link Builder}, der einen gegebenen {@link Builder} synchronisiert. Die Synchronisation erfolgt via
+	 * {@code synchronized(this)}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ des Datensatzes.
@@ -332,7 +336,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link SoftPointer}s verwaltet, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines
+	 * {@link SoftPointer}s verwaltet, und gibt ihn zurück.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
@@ -344,7 +349,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s im gegebenenen Modus verwaltet, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s
+	 * im gegebenenen Modus verwaltet, und gibt ihn zurück.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
@@ -359,7 +365,8 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen {@link Builder}s ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen
+	 * {@link Builder}s ermittelt wird, und gibt ihn zurück.
 	 * 
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
@@ -374,7 +381,7 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Builder}.
+	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.

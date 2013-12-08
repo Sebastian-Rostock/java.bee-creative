@@ -12,7 +12,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene Eingaben über eine interne Abbildung mit berechneten Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe bereits via {@link #compile(Object)} erzeugt wurde, wird deren Wiederverwendung via {@link #reuse(Object, Object)} signalisiert.
+ * Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene Eingaben
+ * über eine interne Abbildung mit berechneten Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen Eingabe assoziierte Ausgabe ermittelt
+ * werden soll und diese Ausgabe bereits via {@link #compile(Object)} erzeugt wurde, wird deren Wiederverwendung via {@link #reuse(Object, Object)}
+ * signalisiert.
  * 
  * @see Unique#get(Object)
  * @see Unique#reuse(Object, Object)
@@ -110,7 +113,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/**
-		 * Diese Methode ermittelt via {@link Comparables#binarySearch(List, Comparable)} den Index der gegebenen Eingabe in {@link #inputs} und gibt diesen oder <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
+		 * Diese Methode ermittelt via {@link Comparables#binarySearch(List, Comparable)} den Index der gegebenen Eingabe in {@link #inputs} und gibt diesen oder
+		 * <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
 		 * 
 		 * @param input Eingabe.
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>)-1)</code>.
@@ -217,7 +221,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique.UniqueSet}s in {@link List}s mit Zugriff über eine binäre Suche.
+	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique.UniqueSet}s in {@link List}s mit Zugriff über eine binäre
+	 * Suche.
 	 * 
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
@@ -256,7 +261,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge einer {@link Unique.UniqueMap} in {@link List}s mit Zugriff über eine binäre Suche.
+	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge einer {@link Unique.UniqueMap} in {@link List}s mit Zugriff über eine binäre
+	 * Suche.
 	 * 
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
@@ -869,12 +875,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	protected Data<GInput, GOutput> data;
 
 	/**
-	 * Dieses Feld speichert die {@link Map}-Sicht auf die internen Einträge, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge eingefügt werden können.
+	 * Dieses Feld speichert die {@link Map}-Sicht auf die internen Einträge, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge eingefügt
+	 * werden können.
 	 */
 	protected final Map<GInput, GOutput> entryMap = new EntryMap<GInput, GOutput>(this);
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object}s nach {@code GInput} zulässig ist. Sie wird von der {@link Map}-Sich {@link #entryMap()} verwendet.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object}s nach {@code GInput} zulässig ist. Sie wird von der
+	 * {@link Map}-Sich {@link #entryMap()} verwendet.
 	 * 
 	 * @param input {@link Object}.
 	 * @return {@code true}, wenn {@code input instanceOf GInput}.
@@ -903,7 +911,9 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	protected abstract GOutput compile(GInput input);
 
 	/**
-	 * Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet ist, w ird deren Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe jedoch noch keine Ausgabe zugeordnet sein, wird diese via {@link Unique#compile(Object)} erzeugt und mit der Eingabe assoziiert.
+	 * Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet ist, w ird deren
+	 * Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe jedoch noch keine Ausgabe zugeordnet sein, wird diese via
+	 * {@link Unique#compile(Object)} erzeugt und mit der Eingabe assoziiert.
 	 * 
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
@@ -928,7 +938,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Map}-Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge eingefügt werden können.
+	 * Diese Methode gibt die {@link Map}-Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge
+	 * eingefügt werden können.
 	 * 
 	 * @return {@link Map}-Sicht.
 	 */

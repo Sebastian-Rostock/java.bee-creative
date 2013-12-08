@@ -20,7 +20,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code int} wird {@code 1 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code int} wird {@code 1 byte} gelesen.
 	 * 
 	 * @see #get1(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -36,7 +37,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 2 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 2 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set2(byte[], int, int)
 	 * @param array {@code byte}-Array.
@@ -48,7 +50,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 2 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 2 byte} gelesen.
 	 * 
 	 * @see #get2(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -64,7 +67,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 3 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 3 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set3(byte[], int, int)
 	 * @param array {@code byte}-Array.
@@ -76,7 +80,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 3 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 3 byte} gelesen.
 	 * 
 	 * @see #get3(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -92,7 +97,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 4 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 4 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set4(byte[], int, int)
 	 * @param array {@code byte}-Array.
@@ -104,7 +110,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 4 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code int}s aus dem gegebenen {@code byte}-Array in das gegebene {@code int}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code int} werden {@code 4 byte} gelesen.
 	 * 
 	 * @see #get4(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -120,7 +127,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 5 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 5 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set5(byte[], int, long)
 	 * @param array {@code byte}-Array.
@@ -132,7 +140,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 5 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 5 byte} gelesen.
 	 * 
 	 * @see #get5(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -148,7 +157,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 6 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 6 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set6(byte[], int, long)
 	 * @param array {@code byte}-Array.
@@ -160,7 +170,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 6 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 6 byte} gelesen.
 	 * 
 	 * @see #get6(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -176,7 +187,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 7 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 7 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set7(byte[], int, long)
 	 * @param array {@code byte}-Array.
@@ -188,7 +200,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 7 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 7 byte} gelesen.
 	 * 
 	 * @see #get7(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -204,7 +217,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode ließt {@code 8 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode ließt {@code 8 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code long} interpretiert zurück. Das {@code index}-te
+	 * {@code byte} besitzt das {@code most significant bit}.
 	 * 
 	 * @see #set8(byte[], int, long)
 	 * @param array {@code byte}-Array.
@@ -216,7 +230,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 8 byte} gelesen.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code long}s aus dem gegebenen {@code byte}-Array in das gegebene {@code long}-Array, beginnend an den
+	 * gegebenen Positionen. Für jeden geschriebenen {@code long} werden {@code 8 byte} gelesen.
 	 * 
 	 * @see #get8(byte[], int)
 	 * @param source {@code byte}-Array als Quelle.
@@ -244,7 +259,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code int} wird mit {@code 1 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code int} wird mit {@code 1 byte} geschrieben.
 	 * 
 	 * @see #set1(byte[], int, int)
 	 * @param source {@code int}-Array als Quelle.
@@ -260,7 +276,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 2 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 2 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get2(byte[], int)
 	 * @param array {@code byte}-Array.
@@ -273,7 +290,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code int} wird mit {@code 2 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code int} wird mit {@code 2 byte} geschrieben.
 	 * 
 	 * @see #set2(byte[], int, int)
 	 * @param source {@code int}-Array als Quelle.
@@ -289,7 +307,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 3 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 3 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get3(byte[], int)
 	 * @param array {@code byte}-Array.
@@ -303,7 +322,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code int} wird mit {@code 3 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code int} wird mit {@code 3 byte} geschrieben.
 	 * 
 	 * @see #set3(byte[], int, int)
 	 * @param source {@code int}-Array als Quelle.
@@ -319,7 +339,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 4 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 4 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get4(byte[], int)
 	 * @param array {@code byte}-Array.
@@ -334,7 +355,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code int} wird mit {@code 4 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code int}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code int} wird mit {@code 4 byte} geschrieben.
 	 * 
 	 * @see #set4(byte[], int, int)
 	 * @param source {@code int}-Array als Quelle.
@@ -350,7 +372,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 5 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 5 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get5(byte[], int)
 	 * @param array {@code long}-Array.
@@ -363,7 +386,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code long} wird mit {@code 5 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code long} wird mit {@code 5 byte} geschrieben.
 	 * 
 	 * @see #set5(byte[], int, long)
 	 * @param source {@code long}-Array als Quelle.
@@ -379,7 +403,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 6 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 6 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get6(byte[], int)
 	 * @param array {@code long}-Array.
@@ -392,7 +417,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code long} wird mit {@code 6 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code long} wird mit {@code 6 byte} geschrieben.
 	 * 
 	 * @see #set6(byte[], int, long)
 	 * @param source {@code long}-Array als Quelle.
@@ -408,7 +434,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 7 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 7 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get7(byte[], int)
 	 * @param array {@code long}-Array.
@@ -421,7 +448,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code long} wird mit {@code 7 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code long} wird mit {@code 7 byte} geschrieben.
 	 * 
 	 * @see #set7(byte[], int, long)
 	 * @param source {@code long}-Array als Quelle.
@@ -437,7 +465,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode schreibt {@code 8 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das {@code most significant bit}.
+	 * Diese Methode schreibt {@code 8 byte} des gegebenen {@code long} in das gegebene {@code byte}-Array. Das {@code index}-te {@code byte} besitzt das
+	 * {@code most significant bit}.
 	 * 
 	 * @see #get8(byte[], int)
 	 * @param array {@code long}-Array.
@@ -450,7 +479,8 @@ public final class Bytes {
 	}
 
 	/**
-	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den gegebenen Positionen. Jeder {@code long} wird mit {@code 8 byte} geschrieben.
+	 * Diese Methode kopiert die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code long}-Array in das gegebene {@code byte}-Array, beginnend an den
+	 * gegebenen Positionen. Jeder {@code long} wird mit {@code 8 byte} geschrieben.
 	 * 
 	 * @see #set8(byte[], int, long)
 	 * @param source {@code long}-Array als Quelle.

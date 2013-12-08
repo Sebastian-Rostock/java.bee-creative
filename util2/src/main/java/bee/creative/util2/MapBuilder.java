@@ -23,7 +23,8 @@ import bee.creative.util.Iterables;
 public class MapBuilder {
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Map}-{@link Builder}, der eine konfigurierte {@link Map} in ein {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Map} umwandeln sowie durch das Hinzufügen von Schlüssel-Wert-Paaren modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link Map}-{@link Builder}, der eine konfigurierte {@link Map} in ein {@code checked}-, {@code synchronized}- oder
+	 * {@code unmodifiable}-{@link Map} umwandeln sowie durch das Hinzufügen von Schlüssel-Wert-Paaren modifizieren kann.
 	 * 
 	 * @see Collections#checkedMap(Map, Class, Class)
 	 * @see Collections#synchronizedMap(Map)
@@ -132,7 +133,8 @@ public class MapBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link SortedMap}-{@link Builder}, der eine konfigurierte {@link SortedMap} in ein {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Map} umwandeln sowie durch das Hinzufügen von Schlüssel-Wert-Paaren modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link SortedMap}-{@link Builder}, der eine konfigurierte {@link SortedMap} in ein {@code checked}-,
+	 * {@code synchronized}- oder {@code unmodifiable}-{@link Map} umwandeln sowie durch das Hinzufügen von Schlüssel-Wert-Paaren modifizieren kann.
 	 * 
 	 * @see Collections#checkedSortedMap(SortedMap, Class, Class)
 	 * @see Collections#synchronizedSortedMap(SortedMap)
@@ -241,7 +243,8 @@ public class MapBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Map}-{@link Builder}, der eine konfigurierte {@link Map} in eine {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Map} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Map}-{@link Builder}, der eine konfigurierte {@link Map} in eine {@code checked}-, {@code synchronized}- oder
+	 * {@code unmodifiable}-{@link Map} umwandeln kann.
 	 * 
 	 * @see Collections#checkedMap(Map, Class, Class)
 	 * @see Collections#synchronizedMap(Map)
@@ -257,7 +260,8 @@ public class MapBuilder {
 	public static interface MapBuilder3<GKey, GValue, GMap extends Map<GKey, GValue>> extends Builder<GMap> {
 
 		/**
-		 * Diese Methode konvertiert das konfigurierte {@link Map} via {@link Collections#checkedMap(Map, Class, Class)} bzw. {@link Collections#checkedSortedMap(SortedMap, Class, Class)}.
+		 * Diese Methode konvertiert das konfigurierte {@link Map} via {@link Collections#checkedMap(Map, Class, Class)} bzw.
+		 * {@link Collections#checkedSortedMap(SortedMap, Class, Class)}.
 		 * 
 		 * @see Collections#checkedMap(Map, Class, Class)
 		 * @see Collections#checkedSortedMap(SortedMap, Class, Class)
@@ -268,7 +272,8 @@ public class MapBuilder {
 		public MapBuilder3<GKey, GValue, GMap> asCheckedMap(Class<GKey> keyType, Class<GValue> valueType);
 
 		/**
-		 * Diese Methode konvertiert die konfigurierte {@link Map} via {@link Collections#synchronizedMap(Map)} bzw. {@link Collections#synchronizedSortedMap(SortedMap)}.
+		 * Diese Methode konvertiert die konfigurierte {@link Map} via {@link Collections#synchronizedMap(Map)} bzw.
+		 * {@link Collections#synchronizedSortedMap(SortedMap)}.
 		 * 
 		 * @see Collections#synchronizedMap(Map)
 		 * @see Collections#synchronizedSortedMap(SortedMap)
@@ -277,7 +282,8 @@ public class MapBuilder {
 		public MapBuilder3<GKey, GValue, GMap> asSynchronizedMap();
 
 		/**
-		 * Diese Methode konvertiert die konfigurierte {@link Map} via {@link Collections#unmodifiableMap(Map)} bzw. {@link Collections#unmodifiableSortedMap(SortedMap)}.
+		 * Diese Methode konvertiert die konfigurierte {@link Map} via {@link Collections#unmodifiableMap(Map)} bzw.
+		 * {@link Collections#unmodifiableSortedMap(SortedMap)}.
 		 * 
 		 * @see Collections#unmodifiableMap(Map)
 		 * @see Collections#unmodifiableSortedMap(SortedMap)

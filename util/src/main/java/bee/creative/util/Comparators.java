@@ -90,7 +90,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparator}, der {@code null}-Eingaben vergleicht und alle anderen Eingaben an einen gegebenen {@link Comparator} weiterleitet. Der {@link Comparator} berechnet den Vergleichswert zweier Objekte {@code value1} und {@code value2} via:
+	 * Diese Klasse implementiert einen {@link Comparator}, der {@code null}-Eingaben vergleicht und alle anderen Eingaben an einen gegebenen {@link Comparator}
+	 * weiterleitet. Der {@link Comparator} berechnet den Vergleichswert zweier Objekte {@code value1} und {@code value2} via:
 	 * 
 	 * <pre>
 	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)));
@@ -170,7 +171,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Comparator}, der zwei {@link Iterable} mit Hilfe eines gegebenen {@link Comparator}s analog zu Zeichenketten vergleicht.
+	 * Diese Klasse implementiert einen {@link Comparator}, der zwei {@link Iterable} mit Hilfe eines gegebenen {@link Comparator}s analog zu Zeichenketten
+	 * vergleicht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der {@link Iterable}.
@@ -209,7 +211,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen verketteten {@link Comparator}, der die beiden Objekte in seiner Eingabe zuerst über einen ersten {@link Comparator} vergleicht und einen zweiten {@link Comparator} nur dann verwendet, wenn der erste {@link Comparator} die Gleichheit der beiden Objekte anzeigt.
+	 * Diese Klasse implementiert einen verketteten {@link Comparator}, der die beiden Objekte in seiner Eingabe zuerst über einen ersten {@link Comparator}
+	 * vergleicht und einen zweiten {@link Comparator} nur dann verwendet, wenn der erste {@link Comparator} die Gleichheit der beiden Objekte anzeigt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Objekte.
@@ -279,7 +282,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen konvertierenden {@link Comparator}, der die mit einem gegebenen {@link Converter} konvertierten Objekte zum Vergleich an einen gegebenen {@link Comparator} delegiert.
+	 * Diese Klasse implementiert einen konvertierenden {@link Comparator}, der die mit einem gegebenen {@link Converter} konvertierten Objekte zum Vergleich an
+	 * einen gegebenen {@link Comparator} delegiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der vom {@link Comparator} zu vergleichenden Objekte.
@@ -577,7 +581,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten {@link Integer} und normalem Text vergleicht und dabei Groß-/Kleinschreibung ignoriert.
+	 * Diese Klasse implementiert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten {@link Integer} und normalem Text vergleicht und
+	 * dabei Groß-/Kleinschreibung ignoriert.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -671,7 +676,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
@@ -684,7 +690,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
@@ -697,7 +704,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
@@ -710,7 +718,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(value1 < value2 ? -1 : (value1 == value2 ? 0 : 1))</pre>
 	 * 
@@ -723,7 +732,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite Objekt ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
+	 * Objekt ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>
 	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : value1.compareTo(value2)));
@@ -739,7 +749,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite Objekt ist. Der berechnete Vergleichswert entspricht:
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
+	 * Objekt ist. Der berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>
 	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)))
@@ -757,7 +768,12 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das zweite {@link Iterable} ist. Die gegebenen {@link Iterable} werden für den Verglcich parallel iteriert. Wenn der erste {@link Iterator} kein nächstes Element besitzt, der zweite {@link Iterator} jedoch ein nächstes Element liefern kann, wird {@code -1} zurück gegeben. Wenn beide {@link Iterator}en je ein nächstes Element liefern können, werden diese mit dem gegebenen {@link Comparator} verglichen. Wenn der so berechnete Vergleichswert unglich {@code 0} ist, wird er zurück gegeben. Anderenfalls läuft die Iteration weiter. Wenn der erste {@link Iterator} ein nächstes Element besitzt, der zweite {@link Iterator} jedoch kein nächstes Element liefern kann, wird {@code 1} zurück gegeben.
+	 * Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das
+	 * zweite {@link Iterable} ist. Die gegebenen {@link Iterable} werden für den Verglcich parallel iteriert. Wenn der erste {@link Iterator} kein nächstes
+	 * Element besitzt, der zweite {@link Iterator} jedoch ein nächstes Element liefern kann, wird {@code -1} zurück gegeben. Wenn beide {@link Iterator}en je ein
+	 * nächstes Element liefern können, werden diese mit dem gegebenen {@link Comparator} verglichen. Wenn der so berechnete Vergleichswert unglich {@code 0} ist,
+	 * wird er zurück gegeben. Anderenfalls läuft die Iteration weiter. Wenn der erste {@link Iterator} ein nächstes Element besitzt, der zweite {@link Iterator}
+	 * jedoch kein nächstes Element liefern kann, wird {@code 1} zurück gegeben.
 	 * 
 	 * @param <GEntry> Typ der Elemente der {@link Iterable}.
 	 * @param value1 erster {@link Iterable}.
@@ -779,7 +795,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparator}, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an einen gegebenen {@link Comparator} weiterleitet, und gibt ihn zurück. Der erzeugte {@link Comparator} berechnet den Vergleichswert zweier Objekte {@code value1} und {@code value2} via:
+	 * Diese Methode erzeugt einen {@link Comparator}, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an einen gegebenen {@link Comparator}
+	 * weiterleitet, und gibt ihn zurück. Der erzeugte {@link Comparator} berechnet den Vergleichswert zweier Objekte {@code value1} und {@code value2} via:
 	 * 
 	 * <pre>
 	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)))
@@ -808,7 +825,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparator}, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator}s analog zu Zeichenketten vergleicht, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Comparator}, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator}s analog zu Zeichenketten vergleicht,
+	 * und gibt ihn zurück.
 	 * 
 	 * @see Iterable
 	 * @see Comparators#compare(Iterable, Iterable, Comparator)
@@ -824,7 +842,9 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Comparator} und gibt ihn zurück. Der erzeugte {@link Comparator} vergleicht seine beiden Eingaben zuerst über den ersten {@link Comparator} und verwendet den zweiten {@link Comparator} nur dann, wenn der erste {@link Comparator} mit dem Vergleichswert {@code 0} die Gleichheit der beiden Objekte anzeigt.
+	 * Diese Methode erzeugt einen verketteten {@link Comparator} und gibt ihn zurück. Der erzeugte {@link Comparator} vergleicht seine beiden Eingaben zuerst
+	 * über den ersten {@link Comparator} und verwendet den zweiten {@link Comparator} nur dann, wenn der erste {@link Comparator} mit dem Vergleichswert
+	 * {@code 0} die Gleichheit der beiden Objekte anzeigt.
 	 * 
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator1 erster {@link Comparator}.
@@ -838,7 +858,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Comparator}, der die mit dem gegebenen {@link Converter} konvertierten Objekte zum Vergleich an den gegebenen {@link Comparator} delegiert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen konvertierenden {@link Comparator}, der die mit dem gegebenen {@link Converter} konvertierten Objekte zum Vergleich an den
+	 * gegebenen {@link Comparator} delegiert, und gibt ihn zurück.
 	 * 
 	 * @see Converter
 	 * @param <GInput> Typ der Eingabe des {@link Converter} sowie der vom konvertierender {@link Comparator} zu vergleichenden Elemente.
@@ -924,7 +945,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link String}-{@link Comparator} zurück, gemischte Zeichenkette aus kodierten {@link Integer} und normalem Text vergleicht und dabei Groß-/Kleinschreibung ignoriert.
+	 * Diese Methode gibt den {@link String}-{@link Comparator} zurück, gemischte Zeichenkette aus kodierten {@link Integer} und normalem Text vergleicht und
+	 * dabei Groß-/Kleinschreibung ignoriert.
 	 * 
 	 * @return {@link StringAlphanumericalComparator}.
 	 */

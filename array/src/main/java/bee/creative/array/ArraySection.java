@@ -3,12 +3,15 @@ package bee.creative.array;
 import java.util.Comparator;
 
 /**
- * Diese Klasse implementiert einen abstrakten Abschnitt eines Arrays. Definiert wird ein Abschnitt für ein Array {@link #array()} der Länge {@link #arrayLength()} mit dem Index des ersten Werts im Abschnitt ({@link #startIndex()}) sowie dem Index des ersten Werts nach dem Abschnitt ({@link #finalIndex()}).
+ * Diese Klasse implementiert einen abstrakten Abschnitt eines Arrays. Definiert wird ein Abschnitt für ein Array {@link #array()} der Länge
+ * {@link #arrayLength()} mit dem Index des ersten Werts im Abschnitt ({@link #startIndex()}) sowie dem Index des ersten Werts nach dem Abschnitt (
+ * {@link #finalIndex()}).
  * <p>
  * Die Methoden {@link #hashCode()}, {@link #equals(Object)} und {@link #toString()} reflektieren die Werte im Abschnitt.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
+ * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder
+ *        {@code boolean[]}).
  */
 public abstract class ArraySection<GArray> implements Comparable<ArraySection<GArray>> {
 
@@ -42,7 +45,8 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract int arrayLength(GArray array);
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Werts des gegebenen Arrays zurück und wird in {@link ArraySection#hashCode()} verwendet.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Werts des gegebenen Arrays zurück und wird in
+	 * {@link ArraySection#hashCode()} verwendet.
 	 * 
 	 * @param array Array.
 	 * @param index Index.
@@ -51,7 +55,8 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract int hashCode(GArray array, int index);
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in {@link ArraySection#equals(Object)} verwendet.
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in
+	 * {@link ArraySection#equals(Object)} verwendet.
 	 * 
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
@@ -62,7 +67,8 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract boolean equals(GArray array1, GArray array2, int index1, int index2);
 
 	/**
-	 * Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in {@link ArraySection#compareTo(ArraySection)} verwendet.
+	 * Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in
+	 * {@link ArraySection#compareTo(ArraySection)} verwendet.
 	 * 
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
@@ -73,7 +79,8 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract int compareTo(GArray array1, GArray array2, int index1, int index2);
 
 	/**
-	 * Diese Methode fügt den {@code index}-ten Wert des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()} verwendet.
+	 * Diese Methode fügt den {@code index}-ten Wert des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()}
+	 * verwendet.
 	 * 
 	 * @see StringBuilder#append(char)
 	 * @see StringBuilder#append(int)

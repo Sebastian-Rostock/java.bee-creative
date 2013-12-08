@@ -12,7 +12,8 @@ import bee.creative.util.Pointers.SoftPointer;
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Converter}n.
  * <p>
- * Im nachfolgenden Beispiel wird ein gepufferter {@link Converter} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread Thread} erzeugt wird:
+ * Im nachfolgenden Beispiel wird ein gepufferter {@link Converter} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse
+ * {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread Thread} erzeugt wird:
  * 
  * <pre>
  * public final class Helper {
@@ -171,7 +172,7 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert den leeren {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
+	 * Diese Klasse implementiert den leeren {@link Converter}, dessen Ausgabe gleich seiner Eingabe ist.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Ein-/Ausgeba.
@@ -197,6 +198,70 @@ public class Converters {
 		@Override
 		public boolean equals(final Object object) {
 			return (object == this) || (object instanceof VoidConverter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe mit Hilfe eines gegebenen {@link bee.creative.util.Field}s in seine Ausgabe
+	 * überführt. Der {@link Converter} liest die Eigenschaft der Eingabe, die durch das {@link bee.creative.util.Field} definiert wird.
+	 * 
+	 * @see Field#get(Object)
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 */
+	public static final class FieldConverter<GInput, GValue> implements Converter<GInput, GValue> {
+
+		/**
+		 * Dieses Feld speichert das {@link bee.creative.util.Field}.
+		 */
+		final bee.creative.util.Field<? super GInput, ? extends GValue> field;
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link bee.creative.util.Field}.
+		 * 
+		 * @param field {@link bee.creative.util.Field}.
+		 * @throws NullPointerException Wenn das gegebene {@link bee.creative.util.Field} null ist.
+		 */
+		public FieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) throws NullPointerException {
+			if(field == null) throw new NullPointerException("field is null");
+			this.field = field;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GValue convert(final GInput data) {
+			return this.field.get(data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.field);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof FieldConverter<?, ?>)) return false;
+			final FieldConverter<?, ?> data = (FieldConverter<?, ?>)object;
+			return Objects.equals(this.field, data.field);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.field);
 		}
 
 	}
@@ -340,7 +405,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Lesen eines durch einen Namen gegebenen {@link Field}s an der Eingabe ermittelt wird.
+	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Lesen eines durch einen Namen gegebenen {@link Field}s an der Eingabe
+	 * ermittelt wird.
 	 * 
 	 * @see Field#get(Object)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -390,7 +456,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Aufrufen einer durch einen Namen gegebenen {@link Method} an der Eingabe ermittelt wird.
+	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Aufrufen einer durch einen Namen gegebenen {@link Method} an der Eingabe
+	 * ermittelt wird.
 	 * 
 	 * @see Method#invoke(Object, Object...)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -501,7 +568,9 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen gepufferten {@link Converter}. Ein gepufferter {@link Converter} verwaltet die vom einem gegebenen {@link Converter} erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Eingaben und die Werte als {@link Pointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert.
+	 * Diese Klasse implementiert einen gepufferten {@link Converter}. Ein gepufferter {@link Converter} verwaltet die vom einem gegebenen {@link Converter}
+	 * erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Eingaben und die Werte als
+	 * {@link Pointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
@@ -534,7 +603,8 @@ public class Converters {
 		final int outputMode;
 
 		/**
-		 * Dieses Feld speichert die maximale Anzahl an Einträgen in der {@link Map}. Wenn die aktuelle Anzahl 25% der maximalen Anzahl unterschreitet, wird die Größe der {@link Map} angepasst.
+		 * Dieses Feld speichert die maximale Anzahl an Einträgen in der {@link Map}. Wenn die aktuelle Anzahl 25% der maximalen Anzahl unterschreitet, wird die
+		 * Größe der {@link Map} angepasst.
 		 */
 		int capacity = 0;
 
@@ -628,7 +698,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen verketteten {@link Converter}, der seine Eingabe an einen ersten {@link Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter} übergibt und dessen Ausgabe liefert.
+	 * Diese Klasse implementiert einen verketteten {@link Converter}, der seine Eingabe an einen ersten {@link Converter} weiterleitet, dessen Ausgabe an einen
+	 * zweiten {@link Converter} übergibt und dessen Ausgabe liefert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter}s.
@@ -686,7 +757,7 @@ public class Converters {
 			if(object == this) return true;
 			if(!(object instanceof ChainedConverter<?, ?, ?>)) return false;
 			final ChainedConverter<?, ?, ?> data = (ChainedConverter<?, ?, ?>)object;
-			return Objects.equals(this.converter1, data.converter1, this.converter2, data.converter2);
+			return Objects.equals(this.converter1, data.converter1) && Objects.equals(this.converter2, data.converter2);
 		}
 
 		/**
@@ -700,7 +771,9 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen bedingten {@link Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines einen {@link Filter}s entscheiden. Wenn der gegebene {@link Filter} eine Eingabe akzeptiert, liefert der {@link Converter} dafür die Ausgabe des gegebenen {@code Accept}-{@link Converter}s. Die Ausgabe des gegebenen {@code Reject}-{@link Converter}s liefert er dagegen für eine vom gegebenen {@link Filter} abgelehnten Eingabe.
+	 * Diese Klasse implementiert einen bedingten {@link Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter}s entscheiden. Wenn der
+	 * gegebene {@link Filter} eine Eingabe akzeptiert, liefert der {@link ConditionalConverter} dafür die Ausgabe des gegebenen {@code Accept}- {@link Converter}
+	 * s. Andernfalls wird die Ausgabe des gegebenen {@code Reject}-{@link Converter}s geliefert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -733,7 +806,7 @@ public class Converters {
 		 */
 		public ConditionalConverter(final Filter<? super GInput> condition, final Converter<? super GInput, ? extends GOutput> accept,
 			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-			if(condition == null) throw new NullPointerException("filter is null");
+			if(condition == null) throw new NullPointerException("condition is null");
 			if(accept == null) throw new NullPointerException("accept is null");
 			if(reject == null) throw new NullPointerException("reject is null");
 			this.condition = condition;
@@ -780,7 +853,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Converter}.
+	 * Diese Klasse implementiert einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert. Die Synchronisation erfolgt via
+	 * {@code synchronized(this)}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
@@ -832,7 +906,21 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch seinen Namen gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link FieldConverter} mit dem gegebenen {@link bee.creative.util.Field}s und gibt ihn zurück.
+	 * 
+	 * @see FieldConverter
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param field {@link bee.creative.util.Field}.
+	 * @return {@link FieldConverter}.
+	 */
+	public static <GInput, GValue> FieldConverter<GInput, GValue> fieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) {
+		return new FieldConverter<GInput, GValue>(field);
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch seinen Namen gegebenen {@link Field}s an der Eingabe ermittelt
+	 * wird, und gibt ihn zurück.
 	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
@@ -847,7 +935,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch einen Namen und eine {@link Class} gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch einen Namen und eine {@link Class} gegebenen {@link Field}s an der
+	 * Eingabe ermittelt wird, und gibt ihn zurück.
 	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
@@ -866,7 +955,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn
+	 * zurück.
 	 * 
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
@@ -892,7 +982,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch ihren Namen gegebenen {@link Method} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch ihren Namen gegebenen {@link Method} an der Eingabe ermittelt
+	 * wird, und gibt ihn zurück.
 	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
@@ -907,7 +998,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch einen Namen und eine {@link Class} gegebenen {@link Method} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch einen Namen und eine {@link Class} gegebenen {@link Method} an
+	 * der Eingabe ermittelt wird, und gibt ihn zurück.
 	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
@@ -926,7 +1018,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und
+	 * gibt ihn zurück.
 	 * 
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
@@ -941,7 +1034,10 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Converter} und gibt ihn zurück. Der erzeugte {@link Converter} verwaltet die vom gegebenen {@link Converter} erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer} auf Eingaben und die Werte als {@link SoftPointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht beschränkt. Der erzeute {@link Converter} realisiert damit einen speichersensitiven, assoziativen Cache.
+	 * Diese Methode erzeugt einen gepufferten {@link Converter} und gibt ihn zurück. Der erzeugte {@link Converter} verwaltet die vom gegebenen {@link Converter}
+	 * erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link SoftPointer} auf Eingaben und die Werte als
+	 * {@link SoftPointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht
+	 * beschränkt. Der erzeute {@link Converter} realisiert damit einen speichersensitiven, assoziativen Cache.
 	 * 
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
@@ -955,7 +1051,9 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen gepufferten {@link Converter} und gibt ihn zurück. Der erzeugte {@link Converter} verwaltet die vom gegebenen {@link Converter} erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Eingaben und die Werte als {@link Pointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert.
+	 * Diese Methode erzeugt einen gepufferten {@link Converter} und gibt ihn zurück. Der erzeugte {@link Converter} verwaltet die vom gegebenen {@link Converter}
+	 * erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Eingaben und die Werte als
+	 * {@link Pointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert.
 	 * 
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
@@ -973,7 +1071,8 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Converter}, der seine Eingabe an einen ersten {@link Converter} weiterleitet, dessen Ausgabe an einen zweiten {@link Converter} übergibt und dessen Ausgabe liefert, und gibt ihn zurück.
+	 * Diese Methode erzeugt einen verketteten {@link Converter}, der seine Eingabe an einen ersten {@link Converter} weiterleitet, dessen Ausgabe an einen
+	 * zweiten {@link Converter} übergibt und dessen Ausgabe liefert, und gibt ihn zurück.
 	 * 
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter}s.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter}s sowie der Eingabe des zweiten {@link Converter}s.
@@ -989,7 +1088,10 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines einen {@link Filter}s entscheiden, und gibt ihn zurück. Wenn der gegebene {@link Filter} eine Eingabe akzeptiert, liefert der erzeugte {@link Converter} dafür die Ausgabe des gegebenen {@code Accept}-{@link Converter}s. Die Ausgabe des gegebenen {@code Reject}-{@link Converter}s liefert er dagegen für eine vom gegebenen {@link Filter} abgelehnten Eingabe.
+	 * Diese Methode erzeugt einen {@link Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter}s entscheiden, und gibt ihn zurück. Wenn
+	 * der gegebene {@link Filter} eine Eingabe akzeptiert, liefert der erzeugte {@link Converter} dafür die Ausgabe des gegebenen {@code Accept}-
+	 * {@link Converter}s. Die Ausgabe des gegebenen {@code Reject}-{@link Converter}s liefert er dagegen für eine vom gegebenen {@link Filter} abgelehnten
+	 * Eingabe.
 	 * 
 	 * @see Filter
 	 * @param <GInput> Typ der Eingabe.
@@ -1006,7 +1108,7 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück. Die Synchronisation erfolgt via {@code synchronized(this)} auf dem gegebenen {@link Converter}.
+	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.

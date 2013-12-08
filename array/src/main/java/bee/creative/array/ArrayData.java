@@ -3,14 +3,19 @@ package bee.creative.array;
 /**
  * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung dynamischer Arrays.
  * <p>
- * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten belegten Bereichs im internen Array, sondern auch dessen Position.
+ * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten belegten Bereichs im internen Array,
+ * sondern auch dessen Position.
  * <p>
- * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben. Dadurch vergrößert sich entweder die Größe des Leerraums vor oder die die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus, werden alle Elemente verschoben und im internen Array neu ausgerichtet.
+ * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben. Dadurch vergrößert sich entweder die Größe
+ * des Leerraums vor oder die die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht
+ * aus, werden alle Elemente verschoben und im internen Array neu ausgerichtet.
  * <p>
- * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des internen Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des internen Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
+ * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des internen Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am
+ * Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des internen Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder {@code boolean[]}).
+ * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
+ *        oder {@code boolean[]}).
  */
 public abstract class ArrayData<GArray> {
 
@@ -77,7 +82,9 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/**
-	 * Diese Methode setzt die Größe des gegebenen Arrays und gibt es zurück. Wenn die Größe des gegebenen Arrays von der gegebenen Größe abweicht, werden ein neues Array mit passender Größe erzeugt, die Elemente des gegebenen Arrays werden der Ausrichtung entsprechend in das neue Array kopiert und das neue Array zurück gegeben.
+	 * Diese Methode setzt die Größe des gegebenen Arrays und gibt es zurück. Wenn die Größe des gegebenen Arrays von der gegebenen Größe abweicht, werden ein
+	 * neues Array mit passender Größe erzeugt, die Elemente des gegebenen Arrays werden der Ausrichtung entsprechend in das neue Array kopiert und das neue Array
+	 * zurück gegeben.
 	 * 
 	 * @see ArrayData#defaultAlignment(int)
 	 * @param length neue Größe.
@@ -97,7 +104,11 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/**
-	 * Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position in das interne Array ein. Wenn die Größe des internen Arrays nicht verändert werden muss, wird versucht, die wenigen Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via {@link ArrayData#defaultLength(int)} ermittelt.
+	 * Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position in das interne Array ein. Wenn die Größe des internen Arrays nicht verändert
+	 * werden muss, wird versucht, die wenigen Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum
+	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die
+	 * Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der
+	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via {@link ArrayData#defaultLength(int)} ermittelt.
 	 * 
 	 * @see ArrayData#defaultAlignment(int)
 	 * @see ArrayData#defaultLength(int)
@@ -159,7 +170,8 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/**
-	 * Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich um die gegebene Anzahl zu verschieben.
+	 * Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach
+	 * dem zu entfernenden Bereich um die gegebene Anzahl zu verschieben.
 	 * 
 	 * @see ArrayData#defaultAlignment(int)
 	 * @param index Index des ersten entfallenden Elements.
@@ -193,7 +205,10 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/**
-	 * Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des internen Arrays beschleunigt wird. Diese ergibt sich aus {@code space / 2}.
+	 * Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die
+	 * Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die
+	 * relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen
+	 * von Elementen am Anfang des internen Arrays beschleunigt wird. Diese ergibt sich aus {@code space / 2}.
 	 * 
 	 * @see ArrayData#defaultInsert(int, int)
 	 * @see ArrayData#defaultRemove(int, int)

@@ -5,9 +5,16 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von Schlüsseln auf Werte. Die Einträge der Abbildung besitzen einen nächsten Eintrag, sodass einfach verkettete Listen von Einträgen erzeugt werden können. Der nächste Eintrag eines Eintrags muss dazü mit {@link #getEntryNext(Object)} gelesen und mit {@link #setEntryNext(Object, Object)} geschrieben werden können. Als Schlüssel und Werte sind beliebige Objekte zulässig. Insbesondere ist es möglich, die Werte der Abbildung als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten Element verfügen. Es ist auch möglich für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
+ * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von Schlüsseln auf Werte. Die Einträge der
+ * Abbildung besitzen einen nächsten Eintrag, sodass einfach verkettete Listen von Einträgen erzeugt werden können. Der nächste Eintrag eines Eintrags muss dazü
+ * mit {@link #getEntryNext(Object)} gelesen und mit {@link #setEntryNext(Object, Object)} geschrieben werden können. Als Schlüssel und Werte sind beliebige
+ * Objekte zulässig. Insbesondere ist es möglich, die Werte der Abbildung als Einträge zu verwenden, sofern diese über einen Schlüssel und ein nächsten Element
+ * verfügen. Es ist auch möglich für Schlüssel und Wert eines Eintrags das gleiche Objekt zu nutzen.
  * <p>
- * Die Einträge werden in einfach verketteten Listen verwaltet, deren Kopfelemente bzw. Einträge in einer Tabelle hinterlegt werden. Die Methoden {@link #getKeyHash(Object)} muss zu einem gegebenen Schlüssel den {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link #getIndex(int, int)} muss zu einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach verketteter Liste sich der Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
+ * Die Einträge werden in einfach verketteten Listen verwaltet, deren Kopfelemente bzw. Einträge in einer Tabelle hinterlegt werden. Die Methoden
+ * {@link #getKeyHash(Object)} muss zu einem gegebenen Schlüssel den {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link #getIndex(int, int)}
+ * muss zu einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach verketteter Liste sich der
+ * Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
@@ -195,7 +202,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode soll den Index des gegebenen {@link Object#hashCode() Streuwert} eines Schlüssels zurück geben. Der Index gibt die Position in der Tabelle an, unter der eine einfach verkettete Liste verwaltet wird, deren Einträge einen Schlüssel mit diesem {@link Object#hashCode() Streuwert} besitzen können.
+	 * Diese Methode soll den Index des gegebenen {@link Object#hashCode() Streuwert} eines Schlüssels zurück geben. Der Index gibt die Position in der Tabelle
+	 * an, unter der eine einfach verkettete Liste verwaltet wird, deren Einträge einen Schlüssel mit diesem {@link Object#hashCode() Streuwert} besitzen können.
 	 * 
 	 * @see Hash#getLength(int, int)
 	 * @param hash {@link Object#hashCode() Streuwert} eines Schlüssels.
@@ -266,7 +274,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode aktualisiert die Größe der Tabelle, sofern die gegebene Größe ungleich der Größe der bisherigen Tabelle ist. Bei der Aktialisierung werden alle Schlüssel-Wert-Paare der bisherigen Tabelle in eine neue Tabelle der gegebenen Größe einfügt und die bisherige Tabelle mit der neuen ersetzt.
+	 * Diese Methode aktualisiert die Größe der Tabelle, sofern die gegebene Größe ungleich der Größe der bisherigen Tabelle ist. Bei der Aktialisierung werden
+	 * alle Schlüssel-Wert-Paare der bisherigen Tabelle in eine neue Tabelle der gegebenen Größe einfügt und die bisherige Tabelle mit der neuen ersetzt.
 	 * 
 	 * @param newLength neue Größe der Tabelle.
 	 */
@@ -295,7 +304,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode soll einen neuen Eintrag mit dem gegebenen Schlüssel, Wert, nächstem Eintrag sowie {@link Object#hashCode() Streuwert} des Schlüssels erzeugen und zurück geben.
+	 * Diese Methode soll einen neuen Eintrag mit dem gegebenen Schlüssel, Wert, nächstem Eintrag sowie {@link Object#hashCode() Streuwert} des Schlüssels
+	 * erzeugen und zurück geben.
 	 * 
 	 * @param key Schlüssel.
 	 * @param value Wert.
@@ -306,7 +316,10 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract GEntry createEntry(GKey key, GValue value, GEntry next, final int hash);
 
 	/**
-	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein und gibt den zuvor unter dem Schlüssel hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der Tabelle {@code 0} ist, wird die Methode {@link Hash#verifyLength()} vor dem Einfügen aufgerufen. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die Methode {@link Hash#verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
+	 * Diese Methode fügt einen neuen Eintrag mit den gegebenen Wert unter dem gegebenen Schlüssel in die Abbildung ein und gibt den zuvor unter dem Schlüssel
+	 * hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der Tabelle {@code 0} ist, wird die Methode {@link Hash#verifyLength()} vor dem Einfügen
+	 * aufgerufen. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die Methode
+	 * {@link Hash#verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
@@ -347,7 +360,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode {@link Hash#verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
+	 * Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die Tabellgrößenenprüfung {@code true} und unter
+	 * dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode {@link Hash#verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
 	 * 
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.

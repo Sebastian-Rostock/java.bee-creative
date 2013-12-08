@@ -203,19 +203,32 @@ public class Iterators {
 		int index;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Anzahl.
+		 * Dieser Konstruktor initialisiert das {@link Get} und die Anzahl. Die Iteration beginnt bei Index {@code 0}.
 		 * 
+		 * @param get {@link Get}, dessen Elemente geliefert werden.
 		 * @param count Anzahl.
+		 * @throws NullPointerException Wenn das gegebene {@link Get} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
 		 */
-		public GetIterator(Get<? extends GEntry> get, final int count) throws IllegalArgumentException {
+		public GetIterator(final Get<? extends GEntry> get, final int count) throws NullPointerException, IllegalArgumentException {
 			this(get, 0, count);
 		}
 
-		public GetIterator(Get<? extends GEntry> get, int offset, int count) {
+		/**
+		 * Dieser Konstruktor initialisiert das {@link Get}, den Index des ersten Elements und die Anzahl.
+		 * 
+		 * @param get {@link Get}, dessen Elemente geliefert werden.
+		 * @param index Index.
+		 * @param count Anzahl.
+		 * @throws NullPointerException Wenn das gegebene {@link Get} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+		 */
+		public GetIterator(final Get<? extends GEntry> get, final int index, final int count) throws NullPointerException, IllegalArgumentException {
+			if(get == null) throw new NullPointerException();
+			if(count < 0) throw new IllegalArgumentException();
 			this.get = get;
-			this.index = offset;
-			this.count = offset + count;
+			this.index = index;
+			this.count = index + count;
 		}
 
 		/**
@@ -231,7 +244,7 @@ public class Iterators {
 		 */
 		@Override
 		public GEntry next() {
-			return get.get(index++);
+			return this.get.get(this.index++);
 		}
 
 		/**
@@ -247,7 +260,7 @@ public class Iterators {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, get, this.count);
+			return Objects.toStringCall(this, this.get, this.count);
 		}
 
 	}

@@ -5,11 +5,16 @@ import java.util.Map;
 import bee.creative.util.Comparators;
 
 /**
- * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der Speicherverbrauch einer {@link CompactEntryHashMap} liegt bei ca. {@code 28%} des Speicherverbrauchs einer {@link HashMap}.
+ * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der Speicherverbrauch einer
+ * {@link CompactEntryHashMap} liegt bei ca. {@code 28%} des Speicherverbrauchs einer {@link HashMap}.
  * <p>
- * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl im Mittel auf ca. {@code 150%}. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim Hinzufügen und Entfernen von Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür benötigen würde.
+ * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
+ * im Mittel auf ca. {@code 150%}. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim
+ * Hinzufügen und Entfernen von Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür benötigen
+ * würde.
  * <p>
- * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen Rechenzeiten, unabhängig von der Anzahl der Elemente.
+ * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen Rechenzeiten, unabhängig von der Anzahl der
+ * Elemente.
  * 
  * @see Object#hashCode()
  * @see Object#equals(Object)

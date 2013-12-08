@@ -22,7 +22,8 @@ import bee.creative.util.Iterables;
 public class SetBuilder {
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Set}-{@link Builder}, der ein konfiguriertes {@link Set} in ein {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Set} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link Set}-{@link Builder}, der ein konfiguriertes {@link Set} in ein {@code checked}-, {@code synchronized}- oder
+	 * {@code unmodifiable}-{@link Set} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
 	 * 
 	 * @see Collections#checkedSet(Set, Class)
 	 * @see Collections#synchronizedSet(Set)
@@ -108,7 +109,8 @@ public class SetBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link SortedSet}-{@link Builder}, der ein konfiguriertes {@link SortedSet} in ein {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Set} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
+	 * Diese Schnittstelle definiert einen {@link SortedSet}-{@link Builder}, der ein konfiguriertes {@link SortedSet} in ein {@code checked}-,
+	 * {@code synchronized}- oder {@code unmodifiable}-{@link Set} umwandeln sowie durch das Hinzufügen von Werten modifizieren kann.
 	 * 
 	 * @see Collections#checkedSortedSet(SortedSet, Class)
 	 * @see Collections#synchronizedSortedSet(SortedSet)
@@ -198,7 +200,8 @@ public class SetBuilder {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert einen {@link Set}-{@link Builder}, der ein konfiguriertes {@link Set} in ein {@code checked}-, {@code synchronized}- oder {@code unmodifiable}-{@link Set} umwandeln kann.
+	 * Diese Schnittstelle definiert einen {@link Set}-{@link Builder}, der ein konfiguriertes {@link Set} in ein {@code checked}-, {@code synchronized}- oder
+	 * {@code unmodifiable}-{@link Set} umwandeln kann.
 	 * 
 	 * @see Collections#checkedSet(Set, Class)
 	 * @see Collections#synchronizedSet(Set)
@@ -213,7 +216,8 @@ public class SetBuilder {
 	public static interface SetBuilder3<GValue, GSet extends Set<GValue>> extends Builder<GSet> {
 
 		/**
-		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#checkedSet(Set, Class)} bzw. {@link Collections#checkedSortedSet(SortedSet, Class)}.
+		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#checkedSet(Set, Class)} bzw.
+		 * {@link Collections#checkedSortedSet(SortedSet, Class)}.
 		 * 
 		 * @see Collections#checkedSet(Set, Class)
 		 * @see Collections#checkedSortedSet(SortedSet, Class)
@@ -223,7 +227,8 @@ public class SetBuilder {
 		public SetBuilder3<GValue, GSet> asCheckedSet(Class<GValue> type);
 
 		/**
-		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#synchronizedSet(Set)} bzw. {@link Collections#synchronizedSortedSet(SortedSet)}.
+		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#synchronizedSet(Set)} bzw.
+		 * {@link Collections#synchronizedSortedSet(SortedSet)}.
 		 * 
 		 * @see Collections#synchronizedSet(Set)
 		 * @see Collections#synchronizedSortedSet(SortedSet)
@@ -232,7 +237,8 @@ public class SetBuilder {
 		public SetBuilder3<GValue, GSet> asSynchronizedSet();
 
 		/**
-		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#unmodifiableSet(Set)} bzw. {@link Collections#unmodifiableSortedSet(SortedSet)}.
+		 * Diese Methode konvertiert das konfigurierte {@link Set} via {@link Collections#unmodifiableSet(Set)} bzw.
+		 * {@link Collections#unmodifiableSortedSet(SortedSet)}.
 		 * 
 		 * @see Collections#unmodifiableSet(Set)
 		 * @see Collections#unmodifiableSortedSet(SortedSet)
