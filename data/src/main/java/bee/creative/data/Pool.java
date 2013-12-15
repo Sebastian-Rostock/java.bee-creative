@@ -5,8 +5,8 @@ import java.util.Iterator;
 import bee.creative.util.Field;
 
 /**
- * Diese Schnittstelle definiert einen Sammlung von {@link Item}s und stellt eine Tabelle einer Datenbank dar. Die {@link Item}s können über ihren Schlüssel
- * {@link Pool#get(long) identifiziert} werden. Ein {@link Pool} hat darüber hinaus einen Besitzer.
+ * Diese Schnittstelle definiert einen Sammlung von {@link Item}s und kann als Abstraktion einer eine Tabelle einer Datenbank verstenden werden. Die
+ * {@link Item}s können über ihren Schlüssel {@link Pool#get(long) identifiziert} werden. Ein {@link Pool} hat darüber hinaus einen Besitzer.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze.
@@ -48,7 +48,7 @@ public interface Pool<GItem extends Item<?>, GOwner> extends Owned<GOwner>, Sele
 	 * @see Pool#find(Field, Object, int)
 	 */
 	@Override
-	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value);
+	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt ein {@link Item} im gegebenen Status zurück, das für die als {@link Field} gegebene Eigenschaft den gegebenen Wert besitzen.
@@ -59,15 +59,16 @@ public interface Pool<GItem extends Item<?>, GOwner> extends Owned<GOwner>, Sele
 	 * @param value Wert.
 	 * @param states Status-Bitmaske ({@link Item#APPEND_STATE}, {@link Item#REMOVE_STATE}, {@link Item#UPDATE_STATE}).
 	 * @return {@link Item} oder {@code null}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 	 */
-	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value, int states);
+	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value, int states) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt die {@link Selection} der {@link Item}s im {@link Item#APPEND_STATE} zurück, die für die als {@link Field} gegebene Eigenschaft den
 	 * gegebenen Wert besitzen.
 	 */
 	@Override
-	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value);
+	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt die {@link Selection} der {@link Item}s im gegebenen Status zurück, die für die als {@link Field} gegebene Eigenschaft den gegebenen
@@ -78,8 +79,9 @@ public interface Pool<GItem extends Item<?>, GOwner> extends Owned<GOwner>, Sele
 	 * @param value Wert.
 	 * @param states Status-Bitmaske ({@link Item#APPEND_STATE}, {@link Item#REMOVE_STATE}, {@link Item#UPDATE_STATE}).
 	 * @return {@link Selection}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 	 */
-	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value, int states);
+	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value, int states) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt die Anzahl der Datensätze zurück. Hierzu zählen nur die im Zustand {@link Item#APPEND_STATE}.

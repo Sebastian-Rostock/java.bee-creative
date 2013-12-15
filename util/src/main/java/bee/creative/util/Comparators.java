@@ -172,13 +172,12 @@ public class Comparators {
 
 	/**
 	 * Diese Klasse implementiert einen {@link Comparator}, der zwei {@link Iterable} mit Hilfe eines gegebenen {@link Comparator}s analog zu Zeichenketten
-	 * vergleicht.
+	 * lexikographisch vergleicht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der {@link Iterable}.
-	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} verglichenen Objekte.
+	 * @param <GEntry> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} verglichenen Objekte.
 	 */
-	public static final class IterableComparator<GEntry extends Iterable<? extends GItem>, GItem> extends AbstractDelegatingComparator<GEntry, GItem> {
+	public static final class IterableComparator<GEntry> extends AbstractDelegatingComparator<Iterable<? extends GEntry>, GEntry> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link Comparator}.
@@ -186,7 +185,7 @@ public class Comparators {
 		 * @param comparator {@link Comparator}.
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
-		public IterableComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
+		public IterableComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
 			super(comparator);
 		}
 
@@ -194,7 +193,7 @@ public class Comparators {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final GEntry value1, final GEntry value2) {
+		public int compare(final Iterable<? extends GEntry> value1, final Iterable<? extends GEntry> value2) {
 			return Comparators.compare(value1, value2, this.comparator);
 		}
 
@@ -204,7 +203,7 @@ public class Comparators {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof IterableComparator<?, ?>)) return false;
+			if(!(object instanceof IterableComparator<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -802,7 +801,8 @@ public class Comparators {
 	 * ((value1 == null) ? ((value2 == null) ? 0 : -1) : ((value2 == null) ? 1 : comparator.compare(value1, value2)))
 	 * </pre>
 	 * 
-	 * @see Comparators#compare(Object, Object, Comparator)
+	 * @see NullComparator
+	 * @see #compare(Object, Object, Comparator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator {@link Comparator}
 	 * @return {@link NullComparator}
@@ -815,6 +815,7 @@ public class Comparators {
 	/**
 	 * Diese Methode erzeugt einen {@link Comparator}, der den Vergleichswert des gegebenen {@link Comparator}s umkehrt, und gibt ihn zurück.
 	 * 
+	 * @see ReverseComparator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link ReverseComparator}.
@@ -829,16 +830,15 @@ public class Comparators {
 	 * und gibt ihn zurück.
 	 * 
 	 * @see Iterable
-	 * @see Comparators#compare(Iterable, Iterable, Comparator)
-	 * @param <GEntry> Typ der {@link Iterable}.
-	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} zu verglichenen Elemente.
+	 * @see #compare(Iterable, Iterable, Comparator)
+	 * @see IterableComparator
+	 * @param <GEntry> Typ der in den {@link Iterable} enthaltenen Werte sowie der vom gegebenen {@link Comparator} zu verglichenen Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@link IterableComparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
-	public static <GEntry extends Iterable<? extends GItem>, GItem> IterableComparator<GEntry, GItem> iterableComparator(
-		final Comparator<? super GItem> comparator) throws NullPointerException {
-		return new IterableComparator<GEntry, GItem>(comparator);
+	public static <GEntry> IterableComparator<GEntry> iterableComparator(final Comparator<? super GEntry> comparator) throws NullPointerException {
+		return new IterableComparator<GEntry>(comparator);
 	}
 
 	/**
@@ -846,6 +846,7 @@ public class Comparators {
 	 * über den ersten {@link Comparator} und verwendet den zweiten {@link Comparator} nur dann, wenn der erste {@link Comparator} mit dem Vergleichswert
 	 * {@code 0} die Gleichheit der beiden Objekte anzeigt.
 	 * 
+	 * @see ChainedComparator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparator1 erster {@link Comparator}.
 	 * @param comparator2 zweiter {@link Comparator}.
@@ -862,6 +863,7 @@ public class Comparators {
 	 * gegebenen {@link Comparator} delegiert, und gibt ihn zurück.
 	 * 
 	 * @see Converter
+	 * @see ConvertedComparator
 	 * @param <GInput> Typ der Eingabe des {@link Converter} sowie der vom konvertierender {@link Comparator} zu vergleichenden Elemente.
 	 * @param <GOutput> Typ der Ausgabe des {@link Converter} sowie der vom gegebenen {@link Comparator} zu vergleichenden Elemente.
 	 * @param converter {@link Converter}.
@@ -877,6 +879,7 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link Comparator} für die natürliche Ordnung zurück.
 	 * 
+	 * @see NaturalComparator
 	 * @see Comparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link NaturalComparator}.
@@ -889,7 +892,8 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link Number}-{@link Comparator} zurück, der Zahlen über ihren {@link Number#longValue()} vergleicht.
 	 * 
-	 * @see Comparators#compare(long, long)
+	 * @see NumberLongComparator
+	 * @see #compare(long, long)
 	 * @return {@link NumberLongComparator}.
 	 */
 	public static Comparator<Number> numberLongComparator() {
@@ -899,7 +903,8 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link Number}-{@link Comparator} zurück, der Zahlen über ihren {@link Number#floatValue()} vergleicht.
 	 * 
-	 * @see Comparators#compare(float, float)
+	 * @see NumberFloatComparator
+	 * @see #compare(float, float)
 	 * @return {@link NumberFloatComparator}.
 	 */
 	public static Comparator<Number> numberFloatComparator() {
@@ -909,7 +914,8 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link Number}-{@link Comparator} zurück, der Zahlen über ihren {@link Number#intValue()} vergleicht.
 	 * 
-	 * @see Comparators#compare(int, int)
+	 * @see NumberIntegerComparator
+	 * @see #compare(int, int)
 	 * @return {@link NumberIntegerComparator}.
 	 */
 	public static Comparator<Number> numberIntegerComparator() {
@@ -919,7 +925,8 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link Number}-{@link Comparator} zurück, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
 	 * 
-	 * @see Comparators#compare(double, double)
+	 * @see NumberDoubleComparator
+	 * @see #compare(double, double)
 	 * @return {@link NumberDoubleComparator}.
 	 */
 	public static Comparator<Number> numberDoubleComparator() {
@@ -929,6 +936,7 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link String}-{@link Comparator} zurück, der als Zeichenkette kodierte {@link Integer} vergleicht.
 	 * 
+	 * @see StringNumericalComparator
 	 * @return {@link StringNumericalComparator}.
 	 */
 	public static Comparator<String> stringNumericalComparator() {
@@ -938,6 +946,7 @@ public class Comparators {
 	/**
 	 * Diese Methode gibt den {@link String}-{@link Comparator} zurück, der Groß-/Kleinschreibung ignoriert.
 	 * 
+	 * @see StringAlphabeticalComparator
 	 * @return {@link StringAlphabeticalComparator}.
 	 */
 	public static Comparator<String> stringAlphabeticalComparator() {
@@ -948,6 +957,7 @@ public class Comparators {
 	 * Diese Methode gibt den {@link String}-{@link Comparator} zurück, gemischte Zeichenkette aus kodierten {@link Integer} und normalem Text vergleicht und
 	 * dabei Groß-/Kleinschreibung ignoriert.
 	 * 
+	 * @see StringAlphanumericalComparator
 	 * @return {@link StringAlphanumericalComparator}.
 	 */
 	public static Comparator<String> stringAlphanumericalComparator() {

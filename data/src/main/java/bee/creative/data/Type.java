@@ -12,7 +12,16 @@ import bee.creative.util.Field;
 public interface Type<GItem extends Item<?>> {
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} in den gegebenen {@link Type} (Vorfahrentyp) zulässig ist.
+	 * Diese Methode gibt den Identifikator dieses {@link Type}s zurück, dessen Zahlenwert über eine statische Konstante definiert werden sollte, um
+	 * Fallunterscheidungen mit einem {@code switch}-Statement zu ermöglichen.
+	 * 
+	 * @return Identifikator dieses {@link Type}{@code s}.
+	 */
+	public int id();
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des {@link Item} ({@code GItem}) in den gegebenen {@link Type} (Vorfahrentyp)
+	 * zulässig ist.
 	 * 
 	 * @see Class#isAssignableFrom(Class)
 	 * @param type {@link Type}.

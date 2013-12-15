@@ -5,8 +5,9 @@ import bee.creative.util.Assignable;
 import bee.creative.util.Assigner;
 
 /**
- * Diese Schnittstelle definiert ein Objekt als Datensatz einer Datenbank. Ein solcher Datensatz hat einen {@link Item#type() Datentyp} und besitzt zur
- * Identifikation einen {@link Item#key() Schlüssel}. Der Schlüssel entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
+ * Diese Schnittstelle definiert ein von einem {@link Pool} verwalteten Datensatz, welcher als Abstraktion eiens Eintrags einer Tabelle einer Datenbank
+ * verstanden werden kann. Ein solcher Datensatz hat einen {@link Item#type() Datentyp} und besitzt zur Identifikation einen {@link Item#key() Schlüssel}. Der
+ * Schlüssel entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
  * {@link Item}s werden von {@link Pool}s verwaltet und sind {@link Assignable}.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -81,21 +82,25 @@ public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
 	public int state();
 
 	/**
-	 * Diese Methode gibt überführt das {@link Item} in den Status {@link #APPEND_STATE}.
+	 * Diese Methode überführt das {@link Item} in den Status {@link #APPEND_STATE}.
 	 */
 	public void append();
 
 	/**
-	 * Diese Methode gibt überführt das {@link Item} in den Status {@link #REMOVE_STATE}, sofern es sich in einem der Status {@link #APPEND_STATE} oder
+	 * Diese Methode überführt das {@link Item} in den Status {@link #REMOVE_STATE}, sofern es sich in einem der Status {@link #APPEND_STATE} oder
 	 * {@link #UPDATE_STATE} befindet.
+	 * 
+	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link #CREATE_STATE} befindet.
 	 */
-	public void remove();
+	public void remove() throws IllegalStateException;
 
 	/**
-	 * Diese Methode gibt überführt das {@link Item} in den Status {@link #UPDATE_STATE}, sofern es sich in einem der Status {@link #CREATE_STATE} oder
+	 * Diese Methode überführt das {@link Item} in den Status {@link #UPDATE_STATE}, sofern es sich in einem der Status {@link #CREATE_STATE} oder
 	 * {@link #REMOVE_STATE} befindet.
+	 * 
+	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link #APPEND_STATE} befindet.
 	 */
-	public void update();
+	public void update() throws IllegalStateException;
 
 	/**
 	 * Diese Methode überträgt die Informationen des im gegebenen {@link Assigner} gehaltenen {@link Item}s auf dieses {@link Item}.

@@ -566,6 +566,7 @@ public class Comparables {
 	 * 
 	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
 	 * 
+	 * @see NullComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable {@link Comparable}
 	 * @return {@link NullComparable}
@@ -582,6 +583,7 @@ public class Comparables {
 	 * 
 	 * <pre>comparator.compare(entry, element)</pre>
 	 * 
+	 * @see EntryComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param entry erstes Argument des {@link Comparator}s.
 	 * @param comparator {@link Comparator}.
@@ -598,6 +600,7 @@ public class Comparables {
 	 * 
 	 * <pre>- comparable.compareTo(element)</pre>
 	 * 
+	 * @see ReverseComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable {@link Comparable}.
 	 * @return {@link ReverseComparable}.
@@ -614,6 +617,7 @@ public class Comparables {
 	 * 
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
+	 * @see ChainedComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable1 erster {@link Comparable}.
 	 * @param comparable2 zweiter {@link Comparable}.
@@ -632,6 +636,7 @@ public class Comparables {
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
 	 * @see Converter
+	 * @see ConvertedComparable
 	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
 	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
 	 * @param converter {@link Converter}.

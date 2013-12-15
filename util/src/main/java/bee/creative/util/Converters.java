@@ -897,6 +897,7 @@ public class Converters {
 	/**
 	 * Diese Methode gibt den leeren {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
 	 * 
+	 * @see VoidConverter
 	 * @param <GInput> Typ der Ein-/Ausgabe.
 	 * @return {@link VoidConverter}.
 	 */
@@ -922,6 +923,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch seinen Namen gegebenen {@link Field}s an der Eingabe ermittelt
 	 * wird, und gibt ihn zurück.
 	 * 
+	 * @see NamedFieldConverter
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -938,6 +940,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch einen Namen und eine {@link Class} gegebenen {@link Field}s an der
 	 * Eingabe ermittelt wird, und gibt ihn zurück.
 	 * 
+	 * @see #fieldConverter(Field)
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -958,6 +961,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn
 	 * zurück.
 	 * 
+	 * @see FixedFieldConverter
 	 * @see Class#getField(String)
 	 * @see Field#get(Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -973,6 +977,7 @@ public class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter}, der für jede Eingabe immer die gegebene Ausgabe liefert, und gibt ihn zurück.
 	 * 
+	 * @see ValueConverter
 	 * @param <GValue> Typ der Ausgabe.
 	 * @param value Ausgabe.
 	 * @return {@link ValueConverter}.
@@ -985,6 +990,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch ihren Namen gegebenen {@link Method} an der Eingabe ermittelt
 	 * wird, und gibt ihn zurück.
 	 * 
+	 * @see NamedMethodConverter
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -1001,6 +1007,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch einen Namen und eine {@link Class} gegebenen {@link Method} an
 	 * der Eingabe ermittelt wird, und gibt ihn zurück.
 	 * 
+	 * @see #methodConverter(Method)
 	 * @see Class#getMethod(String, Class...)
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -1021,7 +1028,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der gegebenen {@link Method Methode} an der Eingabe ermittelt wird, und
 	 * gibt ihn zurück.
 	 * 
-	 * @see Class#getMethod(String, Class...)
+	 * @see FixedMethodConverter
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -1039,6 +1046,7 @@ public class Converters {
 	 * {@link SoftPointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert. Die Anzahl der Einträge in der {@link Map Abbildung} sind nicht
 	 * beschränkt. Der erzeute {@link Converter} realisiert damit einen speichersensitiven, assoziativen Cache.
 	 * 
+	 * @see #cachedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param converter {@link Converter}.
@@ -1055,6 +1063,7 @@ public class Converters {
 	 * erzeugten Ausgaben in einer {@link Map} von Schlüsseln auf Werte. Die Schlüssel werden dabei über {@link Pointer} auf Eingaben und die Werte als
 	 * {@link Pointer} auf die Ausgaben des gegebenen {@link Converter}s realisiert.
 	 * 
+	 * @see CachedConverter
 	 * @param <GInput> Typ der Eingabe bzw. der Datensätze in den Schlüsseln.
 	 * @param <GOutput> Typ der Ausgabe bzw. der Datensätze in den Werten.
 	 * @param limit Maximum für die Anzahl der Einträge in der {@link Map}.
@@ -1074,6 +1083,7 @@ public class Converters {
 	 * Diese Methode erzeugt einen verketteten {@link Converter}, der seine Eingabe an einen ersten {@link Converter} weiterleitet, dessen Ausgabe an einen
 	 * zweiten {@link Converter} übergibt und dessen Ausgabe liefert, und gibt ihn zurück.
 	 * 
+	 * @see ChainedConverter
 	 * @param <GInput> Typ der Eingabe sowie der Eingabe des ersten {@link Converter}s.
 	 * @param <GValue> Typ der Ausgabe des ersten {@link Converter}s sowie der Eingabe des zweiten {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe sowie der Ausgabe des zweiten {@link Converter}s.
@@ -1094,6 +1104,7 @@ public class Converters {
 	 * Eingabe.
 	 * 
 	 * @see Filter
+	 * @see ConditionalConverter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param filter {@link Filter}.
@@ -1110,6 +1121,7 @@ public class Converters {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück.
 	 * 
+	 * @see SynchronizedConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.

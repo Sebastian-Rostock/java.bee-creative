@@ -916,6 +916,7 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
 	 * 
+	 * @see IterableIteratorConverter
 	 * @see Converter
 	 * @see Iterable#iterator()
 	 * @param <GEntry> Typ der Elemente.
@@ -929,6 +930,7 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt das leere {@link Iterable} zurück.
 	 * 
+	 * @see VoidIterable
 	 * @see Iterators#voidIterator()
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link VoidIterable}.
@@ -941,6 +943,7 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt ein {@link Iterable} über das gegebene Element zurück.
 	 * 
+	 * @see EntryIterable
 	 * @see Iterators#entryIterator(Object)
 	 * @param <GEntry> Typ des Elements.
 	 * @param entry Element.
@@ -953,6 +956,7 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt ein {@link Iterable} über das durch den gegebenen {@link Builder} bereitgestellte Element zurück.
 	 * 
+	 * @see BuilderIterable
 	 * @param <GEntry> Typ des Elements.
 	 * @param builder {@link Builder}.
 	 * @return {@link BuilderIterable}
@@ -965,6 +969,7 @@ public class Iterables {
 	/**
 	 * Diese Methode erzeugt ein {@link Iterable}, der kein Element eines gegebenen {@link Iterable}s mehrfach liefert, und gibt es zurück.
 	 * 
+	 * @see UniqueIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
 	 * @return {@link UniqueIterable}.
@@ -977,6 +982,7 @@ public class Iterables {
 	/**
 	 * Diese Methode erzeugt ein {@link Iterable}, das maximal die gegebene Anzahl an Elementen des gegebenen {@link Iterable}s liefert, und gibt es zurück.
 	 * 
+	 * @see LimitedIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param count Anzahl.
 	 * @param iterable {@link Iterable}.
@@ -993,6 +999,7 @@ public class Iterables {
 	 * Diese Methode erzeugt ein {@link Iterable}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterable}s liefert, und
 	 * gibt es zurück.
 	 * 
+	 * @see FilteredIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param filter {@link Filter}.
 	 * @param iterable {@link Iterable}.
@@ -1008,6 +1015,7 @@ public class Iterables {
 	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
 	 * zurück.
 	 * 
+	 * @see ChainedIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}-{@link Iterable}.
 	 * @return {@link ChainedIterable}.
@@ -1022,6 +1030,7 @@ public class Iterables {
 	 * zurück.
 	 * 
 	 * @see Iterables#chainedIterable(Iterable)
+	 * @see Iterables#chainedIterable(Iterable, Iterable)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterables {@link Iterable}-Array.
 	 * @return {@link ChainedIterable}.
@@ -1037,7 +1046,7 @@ public class Iterables {
 	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
 	 * zurück.
 	 * 
-	 * @see Iterables#chainedIterable(Iterable)
+	 * @see ChainedIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable1 {@link Iterable} 1.
 	 * @param iterable2 {@link Iterable} 2.
@@ -1051,6 +1060,7 @@ public class Iterables {
 	 * Diese Methode erzeugt ein {@link Iterable}, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}s liefert, und
 	 * gibt es zurück.
 	 * 
+	 * @see ConvertedIterable
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterable}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente des erzeugten {@link Iterable}s.
 	 * @param converter {@link Converter}.
@@ -1067,6 +1077,7 @@ public class Iterables {
 	 * Diese Methode erzeugt ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt, und
 	 * gibt es zurück.
 	 * 
+	 * @see UnmodifiableIterable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
 	 * @return {@link UnmodifiableIterable}.

@@ -920,6 +920,7 @@ public class Iterators {
 	/**
 	 * Diese Methode gibt den leeren {@link Iterator} zurück.
 	 * 
+	 * @see VoidIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link VoidIterator}.
 	 */
@@ -931,6 +932,7 @@ public class Iterators {
 	/**
 	 * Diese Methode gibt den {@link Iterator} über das gegebene Element zurück.
 	 * 
+	 * @see EntryIterator
 	 * @param <GEntry> Typ des Elements.
 	 * @param entry Element.
 	 * @return {@link EntryIterator}
@@ -942,6 +944,7 @@ public class Iterators {
 	/**
 	 * Diese Methode gibt den {@link Iterator} über das durch den gegebenen {@link Builder} bereitgestellte Element zurück.
 	 * 
+	 * @see BuilderIterator
 	 * @param <GEntry> Typ des Elements.
 	 * @param builder {@link Builder}.
 	 * @return {@link BuilderIterator}
@@ -954,6 +957,7 @@ public class Iterators {
 	/**
 	 * Diese Methode erzeugt einen {@link Iterator}, der die gegebene Anzahl an {@link Integer}s ab dem Wert {@code 0} liefert, und gibt ihn zurück.
 	 * 
+	 * @see IntegerIterator
 	 * @param count Anzahl.
 	 * @return {@link IntegerIterator}.
 	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
@@ -966,6 +970,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück. Als
 	 * {@link Collection} zum Ausschluss von Dopplungen wird ein {@link HashSet} verwendet.
 	 * 
+	 * @see UniqueIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @return {@link UniqueIterator}.
@@ -978,6 +983,7 @@ public class Iterators {
 	/**
 	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück.
 	 * 
+	 * @see UniqueIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @return {@link UniqueIterator}.
@@ -993,6 +999,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen einen {@link Iterator}, der die gegebene maximale Anzahl der Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn
 	 * zurück.
 	 * 
+	 * @see LimitedIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
 	 * @param iterator {@link Iterator}.
@@ -1010,6 +1017,7 @@ public class Iterators {
 	 * liefert, und gibt ihn zurück.
 	 * 
 	 * @see Filter
+	 * @see FilteredIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @param filter {@link Filter}.
@@ -1039,8 +1047,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
 	 * und gibt ihn zurück.
 	 * 
-	 * @see ChainedIterator
-	 * @see ChainedIterator#chainedIterator(Iterator)
+	 * @see #chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator1 {@link Iterator} 1.
 	 * @param iterator2 {@link Iterator} 2.
@@ -1055,8 +1062,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
 	 * und gibt ihn zurück.
 	 * 
-	 * @see ChainedIterator
-	 * @see ChainedIterator#chainedIterator(Iterator)
+	 * @see #chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterators {@link Iterator}-Array.
 	 * @return {@link ChainedIterator}.
@@ -1071,8 +1077,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
 	 * und gibt ihn zurück.
 	 * 
-	 * @see ChainedIterator
-	 * @see ChainedIterator#chainedIterator(Iterator)
+	 * @see #chainedIterator(Iterator)
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterators {@link Iterable} über die {@link Iterator}en.
 	 * @return {@link ChainedIterator}.
@@ -1087,6 +1092,7 @@ public class Iterators {
 	 * {@link Iterator}s liefert, und gibt ihn zurück.
 	 * 
 	 * @see Converter
+	 * @see ConvertedIterator
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterator Iterators}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente des erzeugten {@link Iterator Iterators}.
 	 * @param iterator {@link Iterator}.
@@ -1103,6 +1109,7 @@ public class Iterators {
 	 * Diese Methode erzeugt einen unmodifizierbaren {@link Iterator}, und gibt ihn zurück.
 	 * 
 	 * @see Iterator#remove()
+	 * @see UnmodifiableIterator
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @return {@link UnmodifiableIterator}.

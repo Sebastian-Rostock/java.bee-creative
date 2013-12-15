@@ -2,6 +2,7 @@ package bee.creative.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -601,6 +602,7 @@ public class Filters {
 	 * 
 	 * <pre>input != null</pre>
 	 * 
+	 * @see NullFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link NullFilter}.
 	 */
@@ -613,6 +615,7 @@ public class Filters {
 	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer
 	 * {@code true}.
 	 * 
+	 * @see AcceptFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link AcceptFilter}.
 	 */
@@ -625,6 +628,7 @@ public class Filters {
 	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer
 	 * {@code false}.
 	 * 
+	 * @see RejectFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link RejectFilter}.
 	 */
@@ -640,6 +644,7 @@ public class Filters {
 	 * 
 	 * <pre>!filter.accept(input)</pre>
 	 * 
+	 * @see NegationFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@link NegationFilter}.
@@ -660,10 +665,12 @@ public class Filters {
 	 * @see #containsFilter(Collection)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param inputs Eingaben.
-	 * @return {@link ContainsFilter}.
+	 * @return {@link Filter}.
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static <GInput> ContainsFilter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
+	public static <GInput> Filter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
+		if(inputs.length == 0) return Filters.<GInput>rejectFilter();
+		if(inputs.length == 1) return Filters.containsFilter(Collections.singleton(inputs[0]));
 		return Filters.containsFilter(new HashSet<Object>(Arrays.asList(inputs)));
 	}
 
@@ -673,6 +680,7 @@ public class Filters {
 	 * 
 	 * <pre>collection.contains(input)</pre>
 	 * 
+	 * @see ContainsFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param collection {@link Collection}.
 	 * @return {@link ContainsFilter}.
@@ -691,6 +699,7 @@ public class Filters {
 	 * <pre>filter.accept(converter.convert(input))</pre>
 	 * 
 	 * @see Converter
+	 * @see ConvertedFilter
 	 * @param <GInput> Typ der Eingabe des {@link Filter}s sowie des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Eingabe des gegebenen {@link Filter Filters}.
 	 * @param converter {@link Converter}.
@@ -710,6 +719,7 @@ public class Filters {
 	 * 
 	 * <pre>filter1.accept(input) || filter2.accept(input)</pre>
 	 * 
+	 * @see DisjunctionFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 {@link Filter} 1.
 	 * @param filter2 {@link Filter} 2.
@@ -731,6 +741,7 @@ public class Filters {
 	 * 
 	 * <pre>filter1.accept(input) &amp;&amp; filter2.accept(input)</pre>
 	 * 
+	 * @see ConjunctionFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 {@link Filter} 1.
 	 * @param filter2 {@link Filter} 2.
@@ -752,6 +763,7 @@ public class Filters {
 	 * 
 	 * <pre>filter1.accept(input) == filter2.accept(input)</pre>
 	 * 
+	 * @see EquivalenceFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 {@link Filter} 1.
 	 * @param filter2 {@link Filter} 2.
@@ -766,6 +778,7 @@ public class Filters {
 	/**
 	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück.
 	 * 
+	 * @see SynchronizedFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@link SynchronizedFilter}.

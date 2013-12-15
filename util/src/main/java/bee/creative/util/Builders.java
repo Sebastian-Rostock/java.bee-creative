@@ -327,6 +327,7 @@ public class Builders {
 	/**
 	 * Diese Methode erzeugt einen {@link Builder}, der den gegebenen Datensatz bereitstellt, und gibt ihn zurück.
 	 * 
+	 * @see ValueBuilder
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param value Datensatz.
 	 * @return {@link ValueBuilder}.
@@ -339,6 +340,7 @@ public class Builders {
 	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines
 	 * {@link SoftPointer}s verwaltet, und gibt ihn zurück.
 	 * 
+	 * @see #cachedBuilder(int, Builder)
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link CachedBuilder}.
@@ -352,6 +354,7 @@ public class Builders {
 	 * Diese Methode erzeugt einen gepufferten {@link Builder}, der den von einem gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link Pointer}s
 	 * im gegebenenen Modus verwaltet, und gibt ihn zurück.
 	 * 
+	 * @see CachedBuilder
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param builder {@link Builder}.
@@ -368,6 +371,7 @@ public class Builders {
 	 * Diese Methode erzeugt einen {@link Builder}, dessen Datensatz mit Hilfe eines gegebenen {@link Converter}s aus dem Datensatz eines gegebenen
 	 * {@link Builder}s ermittelt wird, und gibt ihn zurück.
 	 * 
+	 * @see ConvertedBuilder
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 * @param converter {@link Converter}.
@@ -383,6 +387,7 @@ public class Builders {
 	/**
 	 * Diese Methode gibt erzeugt einen {@link SynchronizedBuilder}, der einen gegebenen {@link Builder} synchronisiert, und gibt ihn zurück.
 	 * 
+	 * @see SynchronizedBuilder
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link SynchronizedBuilder}.

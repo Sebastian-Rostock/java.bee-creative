@@ -391,6 +391,7 @@ public class Conversions {
 	/**
 	 * Diese Methode erzeugt eine statische {@link Conversion}, deren Eingabe und Ausgabe konstant sind, und gibt sie zurück.
 	 * 
+	 * @see StaticConversion
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
@@ -405,7 +406,8 @@ public class Conversions {
 	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, und gibt ihh zurück. Die Ausgabe der
 	 * {@link StaticConversion} wird hierbei mit dem gegebenen {@link Converter} ermittelt.
 	 * 
-	 * @see Conversions#staticConversion(Object, Object)
+	 * @see #staticConversion(Object, Object)
+	 * @see StaticConversionConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
@@ -421,6 +423,7 @@ public class Conversions {
 	 * Diese Methode erzeugt eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt
 	 * werden, und gibt sie zurück.
 	 * 
+	 * @see InverseConversion
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
@@ -434,7 +437,8 @@ public class Conversions {
 	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in eine {@link InverseConversion} überführt.
 	 * 
-	 * @see Conversions#inverseConversion(Conversion)
+	 * @see #inverseConversion(Conversion)
+	 * @see InverseConversionConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link InverseConversionConverter}.
@@ -448,6 +452,7 @@ public class Conversions {
 	 * Diese Methode erzeugt eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe des gegebenen {@link Converter}s aus der gegebenen Eingabe ermittelt
 	 * wird, und gibt sie zurück.
 	 * 
+	 * @see DynamicConversion
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
@@ -463,7 +468,7 @@ public class Conversions {
 	/**
 	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link DynamicConversion} mit dem gegebenen {@link Converter} überführt.
 	 * 
-	 * @see Conversions#dynamicConversion(Object, Converter)
+	 * @see DynamicConversionConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
@@ -479,6 +484,7 @@ public class Conversions {
 	 * Diese Methode gibt den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#input()
+	 * @see ConversionInputConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @return {@link Conversion#input()}-{@link Converter}.
 	 */
@@ -491,6 +497,7 @@ public class Conversions {
 	 * Diese Methode gibt den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#output()
+	 * @see ConversionOutputConverter
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link Conversion#output()}-{@link Converter}.
 	 */

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import bee.creative.util.Converters.VoidConverter;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}s.
@@ -86,6 +87,60 @@ public final class Fields {
 		public String toString() {
 			return Objects.toStringCall(this, this.field);
 		}
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, die über ein {@link Field} einer gegebenen Eingabe gelesen bzw. geschrieben
+	 * wird.<br>
+	 * Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen wird.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 */
+	public static interface MapField<GInput, GKey, GValue> extends Field<GInput, Map<GKey, GValue>> {
+
+		/**
+		 * Diese Methode ist analog zu {@link Map#clear()}.
+		 * 
+		 * @param input Eingabe.
+		 */
+		public void clear(final GInput input);
+
+		/**
+		 * Diese Methode ist analog zu {@link Map#put(Object, Object)}.
+		 * 
+		 * @param input Eingabe.
+		 * @param key Schlüssel.
+		 * @param value Wert.
+		 */
+		public void append(final GInput input, final GKey key, GValue value);
+
+		/**
+		 * Diese Methode ist analog zu {@link Map#putAll(Map)}.
+		 * 
+		 * @param input Eingabe.
+		 * @param entries Elemente.
+		 */
+		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
+
+		/**
+		 * Diese Methode ist analog zu {@link Map#remove(Object)}.
+		 * 
+		 * @param input Eingabe.
+		 * @param key Schlüssel.
+		 */
+		public void remove(final GInput input, final Object key);
+
+		/**
+		 * Diese Methode ist analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
+		 * 
+		 * @param input Eingabe.
+		 * @param keys Schlüssel.
+		 */
+		public void removeAll(final GInput input, final Iterable<?> keys);
 
 	}
 
@@ -232,60 +287,6 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> entries);
-
-	}
-
-	/**
-	 * Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, die über ein {@link Field} einer gegebenen Eingabe gelesen bzw. geschrieben
-	 * wird.<br>
-	 * Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen wird.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
-	public static interface MapField<GInput, GKey, GValue> extends Field<GInput, Map<GKey, GValue>> {
-
-		/**
-		 * Diese Methode ist analog zu {@link Map#clear()}.
-		 * 
-		 * @param input Eingabe.
-		 */
-		public void clear(final GInput input);
-
-		/**
-		 * Diese Methode ist analog zu {@link Map#put(Object, Object)}.
-		 * 
-		 * @param input Eingabe.
-		 * @param key Schlüssel.
-		 * @param value Wert.
-		 */
-		public void append(final GInput input, final GKey key, GValue value);
-
-		/**
-		 * Diese Methode ist analog zu {@link Map#putAll(Map)}.
-		 * 
-		 * @param input Eingabe.
-		 * @param entries Elemente.
-		 */
-		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
-
-		/**
-		 * Diese Methode ist analog zu {@link Map#remove(Object)}.
-		 * 
-		 * @param input Eingabe.
-		 * @param key Schlüssel.
-		 */
-		public void remove(final GInput input, final Object key);
-
-		/**
-		 * Diese Methode ist analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
-		 * 
-		 * @param input Eingabe.
-		 * @param keys Schlüssel.
-		 */
-		public void removeAll(final GInput input, final Iterable<?> keys);
 
 	}
 
@@ -708,7 +709,7 @@ public final class Fields {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link MapField}, welches das {@link Map} über ein gegebenes {@link Field} liest und schreibt.
+	 * Diese Klasse implementiert ein {@link MapField}, welches die {@link Map} über ein gegebenes {@link Field} liest und schreibt.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -779,24 +780,23 @@ public final class Fields {
 	}
 
 	/**
-	 * Diese Klasse implementiert das leere {@link Field}, das beim Lesen immer {@code null} liefert und das das Schreiben ignoriert.
+	 * Diese Klasse implementiert das leere {@link Field}, das beim Lesen immer {@code null} liefert und das Schreiben ignoriert.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 */
-	public static final class VoidField<GInput, GValue> extends AbstractField<GInput, GValue> {
+	public static final class VoidField<GValue> extends AbstractField<Object, GValue> {
 
 		/**
 		 * Dieses Feld speichert den {@link VoidField}.
 		 */
-		public static final VoidField<?, ?> INSTANCE = new VoidField<Object, Object>();
+		public static final VoidField<?> INSTANCE = new VoidField<Object>();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue get(final GInput input) {
+		public GValue get(final Object input) {
 			return null;
 		}
 
@@ -804,7 +804,7 @@ public final class Fields {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final GInput input, final GValue value) {
+		public void set(final Object input, final GValue value) {
 		}
 
 		/**
@@ -812,19 +812,18 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof VoidField<?, ?>);
+			return (object == this) || (object instanceof VoidField<?>);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Field}, das beim Lesen immer eine gegebene Ausgabe liefert und das das Schreiben ignoriert.
+	 * Diese Klasse implementiert ein {@link Field}, das beim Lesen immer eine gegebene Ausgabe liefert und das Schreiben ignoriert.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 */
-	public static final class ValueField<GInput, GValue> implements Field<GInput, GValue> {
+	public static final class ValueField<GValue> implements Field<Object, GValue> {
 
 		/**
 		 * Dieses Feld speichert den Wert.
@@ -844,7 +843,7 @@ public final class Fields {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue get(final GInput input) {
+		public GValue get(final Object input) {
 			return this.value;
 		}
 
@@ -852,7 +851,7 @@ public final class Fields {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final GInput input, final GValue value) {
+		public void set(final Object input, final GValue value) {
 		}
 
 		/**
@@ -869,8 +868,8 @@ public final class Fields {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof ValueField<?, ?>)) return false;
-			final ValueField<?, ?> data = (ValueField<?, ?>)object;
+			if(!(object instanceof ValueField<?>)) return false;
+			final ValueField<?> data = (ValueField<?>)object;
 			return Objects.equals(this.value, data.value);
 		}
 
@@ -887,29 +886,25 @@ public final class Fields {
 	/**
 	 * Diese Klasse implementiert ein {@link TranscodedField umkodierendes} {@link Field} zum Lesen bzw. Schreiben einer Eigenschaft aller Elemente seiner
 	 * iterierbaren Eingabe. Das {@link Field} gibt beim Lesen den Wert zurück, der unter allen Elementen {@link Objects#equals(Object) äquivalent} ist. Ermittelt
-	 * wird der Wert der Eigenschaft eines Elements mit Hilfe eines gegebenen {@link Field}s. Wenn kein einheitlicher Wert existiert, wird ein entsprechender
-	 * Standardwert zurück gegeben. Beim Schreiben wird der Wert der Eigenschaft für alle Elemente über das gegebene {@link Field} zugewiesen.
-	 * <p>
+	 * wird der Wert der Eigenschaft eines Elements mit Hilfe eines gegebenen {@link Field}s. Wenn kein einheitlicher Wert existiert, wird ein gegebener Mischwert
+	 * zurück gegeben. Beim Schreiben wird der Wert der Eigenschaft für alle Elemente über das gegebene {@link Field} zugewiesen. <br>
 	 * Mit dem durch diese Klasse definierten {@link Field} können mehrere Elemente parallel bearbeitet werden, indem jedes aus der iterierbaren Eingabe stammende
 	 * Elemente zur Bearbeitung an das gegebene {@link Field} weitergeleitet wird. Ein dabei gegebenenfalls notwendiges Standardverhalten wird dazu über
-	 * entsprechende Werte bereit gestellt.
-	 * <p>
+	 * entsprechende Werte bereit gestellt. <br>
 	 * Für das Standardverhalten beim Lesen des Wert der Eigenschaft lassen sich drei Zustände unterscheiden:
 	 * <ul>
 	 * <li>Der {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) ist {@code null}. Hier wird der Wert {@code null} geliefert.</li>
-	 * <li>Die Eingabe ist leer. Hier wird der spezielle Leerwert geliefert.</li>
-	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der spezielle Mischwert geliefert.</li>
+	 * <li>Die Eingabe ist leer. Hier wird der gegebene Leerwert geliefert.</li>
+	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der gegebene Mischwert geliefert.</li>
 	 * </ul>
 	 * 
 	 * @see TranscodedField
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der iterierbaren Eingabe.
-	 * @param <GInput2> Typ der Elemente in der Eingabe.
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GValue> Typ des Werts dieses {@link Field}s.
 	 * @param <GValue2> Typ des Werts der Elemente.
 	 */
-	public static final class IterableField<GInput extends Iterable<? extends GInput2>, GValue, GInput2, GValue2> extends
-		AbstractDelegatingField<GInput, GValue, GInput2, GValue2> {
+	public static final class IterableField<GInput, GValue, GValue2> extends AbstractDelegatingField<Iterable<? extends GInput>, GValue, GInput, GValue2> {
 
 		/**
 		 * Dieses Feld speichert den Wächter für das Lesen.
@@ -947,7 +942,7 @@ public final class Fields {
 		 * @param mixedValue Mischwert.
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
-		public IterableField(final Field<? super GInput2, GValue2> field, final Converter<? super GValue, ? extends GValue2> parser,
+		public IterableField(final Field<? super GInput, GValue2> field, final Converter<? super GValue, ? extends GValue2> parser,
 			final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue, final GValue mixedValue) throws NullPointerException {
 			super(field);
 			this.parser = parser;
@@ -960,13 +955,13 @@ public final class Fields {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue get(final GInput input) {
+		public GValue get(final Iterable<? extends GInput> input) {
 			final Converter<? super GValue2, ? extends GValue> formatter = this.formatter;
 			if(formatter == null) return null;
-			final Field<? super GInput2, GValue2> field = this.field;
+			final Field<? super GInput, GValue2> field = this.field;
 			GValue2 next = null;
 			Object last = IterableField.SKIP;
-			for(final GInput2 input2: input){
+			for(final GInput input2: input){
 				next = field.get(input2);
 				if((last != IterableField.SKIP) && !Objects.equals(last, next)) return this.mixedValue;
 				last = next;
@@ -979,12 +974,12 @@ public final class Fields {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final GInput input, final GValue value) {
+		public void set(final Iterable<? extends GInput> input, final GValue value) {
 			final Converter<? super GValue, ? extends GValue2> parser = this.parser;
 			if(parser == null) return;
-			final Field<? super GInput2, GValue2> field = this.field;
+			final Field<? super GInput, GValue2> field = this.field;
 			final GValue2 value2 = parser.convert(value);
-			for(final GInput2 entry: input){
+			for(final GInput entry: input){
 				field.set(entry, value2);
 			}
 		}
@@ -1003,8 +998,8 @@ public final class Fields {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof IterableField<?, ?, ?, ?>)) return false;
-			final IterableField<?, ?, ?, ?> data = (IterableField<?, ?, ?, ?>)object;
+			if(!(object instanceof IterableField<?, ?, ?>)) return false;
+			final IterableField<?, ?, ?> data = (IterableField<?, ?, ?>)object;
 			return Objects.equals(this.field, data.field) && Objects.equals(this.parser, data.parser) && Objects.equals(this.formatter, data.formatter)
 				&& Objects.equals(this.emptyValue, data.emptyValue) && Objects.equals(this.mixedValue, data.mixedValue);
 		}
@@ -1190,7 +1185,7 @@ public final class Fields {
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ der Ausgabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 */
 	public static final class ConditionalField<GInput, GValue> implements Field<GInput, GValue> {
 
@@ -1330,106 +1325,222 @@ public final class Fields {
 	}
 
 	/**
+	 * Diese Methode erzeugt ein {@link MapField}, welches eine {@link Map} über ein gegebenes {@link Field} liest und schreibt, und gibt es zurück.
+	 * 
+	 * @see MapField
+	 * @see AbstractMapField
+	 * @see DelegatingMapField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
+	 * @return {@link DelegatingMapField}.
+	 * @throws NullPointerException NullPointerException Wenn das gegebene {@link Field} null ist.
+	 */
+	public static <GInput, GKey, GValue> MapField<GInput, GKey, GValue> mapField(final Field<? super GInput, Map<GKey, GValue>> field)
+		throws NullPointerException {
+		return new DelegatingMapField<GInput, GKey, GValue>(field);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein {@link SetField}, welches ein {@link Set} über ein gegebenes {@link Field} liest und schreibt, und gibt es zurück.
+	 * 
+	 * @see SetField
+	 * @see AbstractSetField
+	 * @see DelegatingSetField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param field {@link Field} zum Lesen und Schreiben eines {@link Set}.
+	 * @return {@link DelegatingSetField}.
+	 * @throws NullPointerException NullPointerException Wenn das gegebene {@link Field} null ist.
+	 */
+	public static <GInput, GEntry> SetField<GInput, GEntry> setField(final Field<? super GInput, Set<GEntry>> field) throws NullPointerException {
+		return new DelegatingSetField<GInput, GEntry>(field);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein {@link SetField}, welches eine {@link List} über ein gegebenes {@link Field} liest und schreibt, und gibt es zurück.
+	 * 
+	 * @see ListField
+	 * @see AbstractListField
+	 * @see DelegatingListField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GEntry> Typ der Elemente.
+	 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
+	 * @return {@link DelegatingListField}.
+	 * @throws NullPointerException NullPointerException Wenn das gegebene {@link Field} null ist.
+	 */
+	public static <GInput, GEntry> ListField<GInput, GEntry> listField(final Field<? super GInput, List<GEntry>> field) throws NullPointerException {
+		return new DelegatingListField<GInput, GEntry>(field);
+	}
+
+	/**
 	 * Diese Methode gibt das leere {@link Field} zurück, das beim Lesen immer {@code null} liefert und das das Schreiben ignoriert.
 	 * 
-	 * @param <GInput> Typ der Eingabe.
+	 * @see VoidField
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @return {@link VoidField}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput, GValue> VoidField<GInput, GValue> voidField() {
-		return (VoidField<GInput, GValue>)VoidField.INSTANCE;
+	public static <GValue> VoidField<GValue> voidField() {
+		return (VoidField<GValue>)VoidField.INSTANCE;
 	}
 
-	// /**
-	// * Diese Methode erzeugt ein {@code default}-{@link Field}, das seine Schnittstellen an das gegebene {@link Field} delegiert und beim Lesen einer {@code
-	// null}
-	// * -Eingabe den gegebenen {@code default}-Wert liefert, und gibt es zurück.
-	// *
-	// * @param <GInput> Typ der Eingabe.
-	// * @param <GValue> Typ des Werts.
-	// * @param field {@link Field}.
-	// * @param value {@code default}-Wert
-	// * @return {@link ValueField}.
-	// * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
-	// */
-	// public static <GInput, GValue> Field<GInput, GValue> valueField(final GValue value) throws NullPointerException {
-	// return new ValueField<GInput, GValue>(value);
-	// }
+	/**
+	 * Diese Methode erzeugt ein {@link ValueField}, das beim Lesen den gegebenen Wert liefert, und gibt es zurück.
+	 * 
+	 * @see ValueField
+	 * @param <GValue> Typ des Werts.
+	 * @param value Wert
+	 * @return {@link ValueField}.
+	 */
+	public static <GValue> ValueField<GValue> valueField(final GValue value) {
+		return new ValueField<GValue>(value);
+	}
 
-	//
-	//
-	// public static <GInput extends Iterable<? extends GEntry>, GEntry, GValue, GValue2> Field<GInput, GValue> iterableField(
-	// final Field<? super GEntry, GValue2> field, final Converter<? super GValue, ? extends GValue2> parser,
-	// final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue, final GValue mixedValue) {
-	// return new IterableField<GInput, GEntry, GValue, GValue2>(field, parser, formatter, emptyValue, mixedValue);
-	// }
-	//
-	// public static <GInput extends Iterable<? extends GEntry>, GEntry, GValue> Field<GInput, GValue> iterableField(final Field<? super GEntry, GValue> field) {
-	// return Fields.iterableField(field, Converters.<GValue>voidConverter(), Converters.<GValue>voidConverter(), null, null);
-	// }
-	//
-	// public static <GInput extends Iterable<? extends GEntry>, GEntry, GValue2> Field<GInput, String> iterableField(final Field<? super GEntry, GValue2> field,
-	// final Converter<? super String, ? extends GValue2> parser, final Converter<? super GValue2, ? extends String> formatter) {
-	// return Fields.iterableField(field, parser, formatter, null, null);
-	// }
-	//
-	// public static <GInput, GEntry, GValue> TranscodedField<GInput, GEntry, GValue> transcodedField(final Field<? super GInput, GEntry> field,
-	// final Converter<? super GValue, ? extends GEntry> parser, final Converter<? super GEntry, ? extends GValue> formatter) throws NullPointerException {
-	// return new TranscodedField<GInput, GEntry, GValue>(field, parser, formatter);
-	// }
-	//
-	// /**
-	// * Diese Methode erzeugt einen {@link Converter}, der über die Weiterleitug der Eingabe mit Hilfe eines einen {@link Filter}s entscheiden, und gibt ihn
-	// * zurück. Wenn der gegebene {@link Filter} eine Eingabe akzeptiert, liefert der erzeugte {@link Converter} dafür die Ausgabe des gegebenen {@code Accept}-
-	// * {@link Converter}s. Die Ausgabe des gegebenen {@code Reject}-{@link Converter}s liefert er dagegen für eine vom gegebenen {@link Filter} abgelehnten
-	// * Eingabe.
-	// *
-	// * @see Filter
-	// * @param <GInput> Typ der Eingabe.
-	// * @param <GOutput> Typ der Ausgabe.
-	// * @param filter {@link Filter}.
-	// * @param accept {@code Accept}-{@link Converter}.
-	// * @param reject {@code Reject}-{@link Converter}.
-	// * @return {@link ConditionalField}.
-	// * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	// */
-	// public static <GInput, GOutput> ConditionalField<GInput, GOutput> conditionalConverter(final Filter<? super GInput> filter,
-	// final Converter<? super GInput, ? extends GOutput> accept, final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-	// return new ConditionalField<GInput, GOutput>(filter, accept, reject);
-	// }
-	//
-	// /**
-	// * Diese Methode erzeugt ein verkettetes {@link Field} und gibt es zurück. Das erzeugte {@link Field} verwendet ein {@link Field} zur Navigation von der
-	// * Eingabe zu einem Element, dessen Attribut bzw. Eigenschaft dann mit dem zweiten {@link Field} manipuliert werden.
-	// *
-	// * @author Sebastian Rostock 2012.
-	// * @param <GInput> Typ der Eingabe.
-	// * @param <GEntry> Typ des Elements als Werts des ersten und der Eingabe des zweiten {@link Field}s.
-	// * @param <GValue> Typ des Werts.
-	// * @param sourceField {@link Field} zur Navigation.
-	// * @param targetField {@link Field} zur Manipulation.
-	// * @return {@link ConvertedField}.
-	// * @throws NullPointerException Wenn eins der gegebenen {@link Field}s {@code null} ist.
-	// */
-	// public static <GInput, GEntry, GValue> Field<GInput, GValue> chainedField(final Field<? super GInput, ? extends GEntry> sourceField,
-	// final Field<? super GEntry, GValue> targetField) {
-	// return new ConvertedField<GInput, GEntry, GValue>(sourceField, targetField);
-	// }
-	//
-	// public static <GInput, GEntry, GValue> Field2<GInput, GValue> chainedField(final Field<? super GInput, ? extends GEntry> sourceField,
-	// final Field2<? super GEntry, GValue> targetField) {
-	// return Fields.chainedField(targetField.getFieldId(), targetField.getFieldLabel(), sourceField, targetField);
-	// }
-	//
-	// public static <GInput, GEntry, GValue> Field2<GInput, GValue> chainedField(final String fieldId, final Field<? super GInput, ? extends GEntry> sourceField,
-	// final Field2<? super GEntry, GValue> targetField) {
-	// return Fields.chainedField(fieldId, targetField.getFieldLabel(), sourceField, targetField);
-	// }
-	//
-	// public static <GInput, GEntry, GValue> Field2<GInput, GValue> chainedField(final String fieldId, final String fieldLabel,
-	// final Field<? super GInput, ? extends GEntry> sourceField, final Field<? super GEntry, GValue> targetField) {
-	// return Fields.labledField(fieldId, fieldLabel, Fields.chainedField(sourceField, targetField));
-	// }
+	/**
+	 * Diese Methode erzeugt ein neues {@link IterableField} und gibt es zurück. Die externen und internen Werte sind vom gleichen Typ, weshalb zur Umwandlung in
+	 * beide Richtungen ein {@link VoidConverter} genutzt wird. Leer- und Mischwert sind {@code null}.
+	 * 
+	 * @see IterableField
+	 * @see #iterableField(Field, Converter, Converter, Object, Object)
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
+	 * @param field {@link IterableField}.
+	 * @return {@link IterableField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue> IterableField<GInput, GValue, GValue> iterableField(final Field<? super GInput, GValue> field) throws NullPointerException {
+		return Fields.iterableField(field, Converters.<GValue>voidConverter(), Converters.<GValue>voidConverter(), null, null);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein neues {@link IterableField} und gibt es zurück. Die externen und internen Werte sind vom gleichen Typ, weshalb zur Umwandlung in
+	 * beide Richtungen ein {@link VoidConverter} genutzt wird.
+	 * 
+	 * @see IterableField
+	 * @see #iterableField(Field, Converter, Converter, Object, Object)
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
+	 * @param field {@link IterableField}.
+	 * @param emptyValue Leerwert.
+	 * @param mixedValue Mischwert.
+	 * @return {@link IterableField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue> IterableField<GInput, GValue, GValue> iterableField(final Field<? super GInput, GValue> field, final GValue emptyValue,
+		final GValue mixedValue) throws NullPointerException {
+		return Fields.iterableField(field, Converters.<GValue>voidConverter(), Converters.<GValue>voidConverter(), emptyValue, mixedValue);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein neues {@link IterableField} und gibt es zurück. Wenn der {@code parser} bzw. der {@code formatter} {@code null} ist, wird beim
+	 * Lesen immer {@code null} geliefert bzw. das Schreiben ignoriert. Leer- und Mischwert sind {@code null}.
+	 * 
+	 * @see IterableField
+	 * @see #iterableField(Field, Converter, Converter, Object, Object)
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts dieses {@link Field}s.
+	 * @param <GValue2> Typ des Werts der Elemente.
+	 * @param field {@link Field}.
+	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
+	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
+	 * @return {@link IterableField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue, GValue2> IterableField<GInput, GValue, GValue2> iterableField(final Field<? super GInput, GValue2> field,
+		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
+		return Fields.iterableField(field, parser, formatter, null, null);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein neues {@link IterableField} und gibt es zurück. Wenn der {@code parser} bzw. der {@code formatter} {@code null} ist, wird beim
+	 * Lesen immer {@code null} geliefert bzw. das Schreiben ignoriert.
+	 * 
+	 * @see IterableField
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts dieses {@link Field}s.
+	 * @param <GValue2> Typ des Werts der Elemente.
+	 * @param field {@link Field}.
+	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
+	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
+	 * @param emptyValue Leerwert.
+	 * @param mixedValue Mischwert.
+	 * @return {@link IterableField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue, GValue2> IterableField<GInput, GValue, GValue2> iterableField(final Field<? super GInput, GValue2> field,
+		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
+		final GValue mixedValue) throws NullPointerException {
+		return new IterableField<GInput, GValue, GValue2>(field, parser, formatter, emptyValue, mixedValue);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein navigierendes {@link Field}, dass mit dem gegebenen {@link Converter} von der Eingabe zu einem mit dem gegebene {@link Field}
+	 * manipulierten Element navigiert, und gibt es zurück.
+	 * 
+	 * @see ConvertedField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ des Elements als Ausgabe des {@link Converter}s sowie als Eingabe des {@link Field}s.
+	 * @param <GValue> Typ des Werts.
+	 * @param converter {@link Converter} zur Navigation.
+	 * @param field {@link Field} zur Manipulation.
+	 * @return {@link ConvertedField}.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GInput, GOutput, GValue> ConvertedField<GInput, GOutput, GValue> convertedField(final Converter<? super GInput, ? extends GOutput> converter,
+		final Field<? super GOutput, GValue> field) throws NullPointerException {
+		return new ConvertedField<GInput, GOutput, GValue>(converter, field);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein umkodierendes {@link Field}, dessen Methoden zum Lesen und Schreiben des Werts mit je einem {@link Converter} an das gegebene
+	 * {@link Field} angebunden sind, und gibt es zurück.
+	 * 
+	 * @see TranscodedField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param <GValue2> Typ des internen Werts des {@link Field}s.
+	 * @param field {@link Field}.
+	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
+	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
+	 * @return {@link TranscodedField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue, GValue2> TranscodedField<GInput, GValue, GValue2> transcodedField(final Field<? super GInput, GValue2> field,
+		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
+		return new TranscodedField<GInput, GValue, GValue2>(field, parser, formatter);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein bedingtes {@link Field}, das über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter}s entscheiden, und gibt es zurück.
+	 * 
+	 * @see ConditionalField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param condition {@link Filter}.
+	 * @param accept {@code Accept}-{@link Field}.
+	 * @param reject {@code Reject}-{@link Field}.
+	 * @return {@link ConditionalField}.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GInput, GValue> ConditionalField<GInput, GValue> conditionalField(final Filter<? super GInput> condition,
+		final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject) throws NullPointerException {
+		return new ConditionalField<GInput, GValue>(condition, accept, reject);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein {@link Field}, das das gegebene {@link Field} synchronisiert, und gibt es zurück.
+	 * 
+	 * @see SynchronizedField
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param field {@link Field}.
+	 * @return {@link SynchronizedField}.
+	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 */
+	public static <GInput, GValue> SynchronizedField<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
+		return new SynchronizedField<GInput, GValue>(field);
+	}
 
 }

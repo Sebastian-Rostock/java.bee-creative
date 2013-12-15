@@ -2,7 +2,6 @@ package bee.creative.util;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import bee.creative.util.Converters.AbstractConverter;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Pointer}n.
@@ -298,37 +297,6 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Converter}, der den Datensatz eines {@link Pointer}s ermittelt.
-	 * 
-	 * @param <GData> Typ des Datensatzes.
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class PointerDataConverter<GData> extends AbstractConverter<Pointer<? extends GData>, GData> {
-
-		/**
-		 * Dieses Feld speichert den {@link PointerDataConverter}.
-		 */
-		public static final PointerDataConverter<?> INSTANCE = new PointerDataConverter<Object>();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GData convert(final Pointer<? extends GData> input) {
-			return input.data();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof PointerDataConverter<?>);
-		}
-
-	}
-
-	/**
 	 * Dieses Feld speichert den Modus der Methode {@link Pointers#pointer(int, Object)} zur Erzeugung eines {@link HardPointer}s. Die Referenz auf den Datensatz
 	 * eines solcher {@link Pointer}s wird nicht automatisch aufgelöst.
 	 */
@@ -374,7 +342,7 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich dem {@code null}- {@link Pointer} oder sein Datensatz nicht
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich dem {@code null}-{@link Pointer} oder sein Datensatz nicht
 	 * {@code null} ist.
 	 * 
 	 * @param pointer {@link Pointer}.
@@ -389,7 +357,7 @@ public class Pointers {
 	/**
 	 * Diese Methode gibt den gegebenen {@link Pointer} oder den {@link Pointer} auf {@code null} zurück.
 	 * 
-	 * @see Pointers#nullPointer()
+	 * @see #nullPointer()
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer}
 	 * @return gegebener {@link Pointer} oder {@link Pointer} auf {@code null}.
@@ -401,6 +369,9 @@ public class Pointers {
 	/**
 	 * Diese Methode erzeugt einen {@link Pointer} auf den gegebenen Datensatz im gegebenen Modus ung gibt ihn zurück.
 	 * 
+	 * @see #hardPointer(Object)
+	 * @see #weakPointer(Object)
+	 * @see #softPointer(Object)
 	 * @param <GData> Typ des Datensatzes.
 	 * @param mode Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param data Datensatz.
@@ -420,20 +391,9 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der den Datensatz eines {@link Pointer}s ermitelt.
-	 * 
-	 * @see Pointer#data()
-	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link PointerDataConverter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GData> PointerDataConverter<GData> pointerDataConverter() {
-		return (PointerDataConverter<GData>)PointerDataConverter.INSTANCE;
-	}
-
-	/**
 	 * Diese Methode gibt den {@link Pointer} auf {@code null} zurück.
 	 * 
+	 * @see NullPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@code null}-{@link Pointer}.
 	 */
@@ -446,6 +406,7 @@ public class Pointers {
 	 * Diese Methode erzeugt einen harten {@link Pointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher
 	 * {@link Pointer}s wird nicht automatisch aufgelöst.
 	 * 
+	 * @see HardPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link HardPointer}.
@@ -458,6 +419,7 @@ public class Pointers {
 	 * Diese Methode erzeugt einen {@link WeakPointer} auf den gegebenen Datensatz und gibt ihn zurück. Die Referenz auf den Datensatz eines solcher
 	 * {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference}s erreichbar ist.
 	 * 
+	 * @see WeakPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link WeakPointer}.
@@ -471,6 +433,7 @@ public class Pointers {
 	 * {@link Pointer}s wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference}s erreichbar ist und der Garbage Collector dies
 	 * entscheidet.
 	 * 
+	 * @see SoftPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link SoftPointer}.

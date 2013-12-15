@@ -166,6 +166,7 @@ public class Assignables {
 	/**
 	 * Diese Methode gibt einen neuen {@link Assigner} ohne Quellobjekt zurück.
 	 * 
+	 * @see ParentAssigner
 	 * @return {@link ParentAssigner}.
 	 */
 	public static ParentAssigner assigner() {
@@ -175,6 +176,8 @@ public class Assignables {
 	/**
 	 * Diese Methode gibt einen neuen {@link Assigner} mit dem gegebenen Quellobjekt zurück.
 	 * 
+	 * @see ChildAssigner
+	 * @see #assigner()
 	 * @param <GSource> Typ des Quellobjekts.
 	 * @param source Quellobjekt.
 	 * @return {@link ChildAssigner}.
@@ -187,6 +190,8 @@ public class Assignables {
 	 * Diese Methode gibt einen neuen {@link Assigner} mit dem gegebenen Quellobjekt zurück. Die {@link Map} wird zur Abbildung der Quellobjekte auf die
 	 * Zielobjekte verwendet und muss keine {@code null} Schlüssel unterstützen.
 	 * 
+	 * @see ChildAssigner
+	 * @see ParentAssigner
 	 * @param <GSource> Typ des Quellobjekts.
 	 * @param map {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte.
 	 * @param source Quellobjekt.
