@@ -1,22 +1,22 @@
 package bee.creative.util;
 
 /**
- * Diese Schnittstelle definiert ein Objekt, auf das die Informationen eines {@link Assigner#source() gegebenen Objekts} übertragen werden können.
+ * Diese Schnittstelle definiert ein Objekt, auf das die Informationen eines {@link Assignment#value() gegebenen Objekts} übertragen werden können.
  * 
- * @see Assigner
+ * @see Assignment
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GSource> Typ des gegebenen Objekts, dessen Informationen auf dieses übertragen werden können.
+ * @param <GValue> Typ des gegebenen Objekts, dessen Informationen auf dieses übertragen werden können.
  */
-public interface Assignable<GSource> {
+public interface Assignable<GValue> {
 
 	/**
-	 * Diese Methode überträgt die Informationen des gegebenen {@link Assigner#source() Quellobjekts} auf dieses Objekt.
+	 * Diese Methode überträgt die Informationen des gegebenen {@link Assignment#value() Quellobjekts} auf dieses Objekt.
 	 * 
-	 * @see Assigner#source()
-	 * @param assigner {@link Assigner} mit dem {@link Assigner#source() Quellobjekt}.
-	 * @throws NullPointerException Wenn der {@link Assigner} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das {@link Assigner#source() Quellobjekt} ungültig ist.
+	 * @see Assignment#value()
+	 * @param assignment {@link Assignment} mit dem {@link Assignment#value() Quellobjekt}.
+	 * @throws NullPointerException Wenn das {@link Assignment} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn das {@link Assignment#value() Quellobjekt} ungültig ist.
 	 */
-	public void assign(Assigner<? extends GSource> assigner) throws NullPointerException, IllegalArgumentException;
+	public void assign(Assignment<? extends GValue> assignment) throws NullPointerException, IllegalArgumentException;
 
 }
