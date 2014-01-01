@@ -5,20 +5,23 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import bee.creative.util.Assigner;
+import bee.creative.util.Assignment;
 import bee.creative.util.Converter;
 import bee.creative.util.Converters;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterables.FilteredIterable;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden zur Erzeugung und Verwaltung von {@link Item}s.
+ * Diese Klasse implementiert Hilfsmethoden und Klassen zu {@link Item}s und {@link Pool}s.
  * 
  * @see Item
  * @see Pool
@@ -27,12 +30,21 @@ import bee.creative.util.Objects;
 public final class Items {
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link AbstractPool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert.
+	 * Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link AbstractPool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert. <br>
+	 * Die Methoden {@link #append()}, {@link #remove()} und {@link #update()} delegieren an {@link AbstractPool#append(AbstractItem)},
+	 * {@link AbstractPool#remove(AbstractItem)} bzw. {@link AbstractPool#update(AbstractItem)}. <br>
+	 * Der {@link #hashCode() Streuwert} basiert auf dem {@link #key() Schlüssel}, die {@link #equals(Object) Äquivalenz} basiert auf der von {@link #key()
+	 * Schlüssel} und {@link #pool() Pool}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public static abstract class AbstractItem<GOwner> implements Item<GOwner> {
+	public static abstract class AbstractItem<GOwner> implements Item {
+
+		/**
+		 * Dieses Feld speichert den {@link AbstractPool}.
+		 */
+		protected final AbstractPool<? extends Item, ? extends GOwner> pool;
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link AbstractPool}.
@@ -40,21 +52,37 @@ public final class Items {
 		 * @param pool {@link AbstractPool}.
 		 * @throws NullPointerException Wenn der gegebene {@link AbstractPool} {@code null} ist.
 		 */
-		public AbstractItem(final AbstractPool<? extends Item<? super GOwner>, ? extends GOwner> pool) throws NullPointerException {
+		public AbstractItem(final AbstractPool<? extends Item, ? extends GOwner> pool) throws NullPointerException {
 			if(pool == null) throw new NullPointerException("pool is null");
 			this.pool = pool;
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link AbstractPool}.
+		 * Diese Methode gibt die {@link Assigner} zurück, die in {@link #assigners(Item)} zur Übertragung der Informatioenen des gegebenen {@link Item}s auf dieses
+		 * Obejkt verwendet werden.
+		 * <p>
+		 * Die Implementation in {@link AbstractItem}
+		 * 
+		 * @param value {@link Item}.
+		 * @return {@link Assigner}s.
 		 */
-		protected final AbstractPool<? extends Item<? super GOwner>, ? extends GOwner> pool;
+		protected Iterable<? extends Assigner<? super Item>> assigners(final Item value) {
+			return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(new Converter<Field<?, ?>, Assigner<? super Item>>() {
+
+				@SuppressWarnings ("unchecked")
+				@Override
+				public Assigner<? super Item> convert(final Field<?, ?> input) {
+					return input instanceof Assigner<?> ? (Assigner<? super Item>)input : null;
+				}
+
+			}, this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.<Field<?, ?>>voidIterable()));
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public AbstractPool<? extends Item<? super GOwner>, ? extends GOwner> pool() {
+		public AbstractPool<? extends Item, ? extends GOwner> pool() {
 			return this.pool;
 		}
 
@@ -77,6 +105,34 @@ public final class Items {
 		/**
 		 * {@inheritDoc}
 		 * 
+		 * @see AbstractPool#state(AbstractItem)
+		 */
+		@Override
+		public int state() {
+			return this.pool.state(this);
+		}
+
+		/**
+		 * {@inheritDoc} Hierbei werden die {@link Assigner} verwendet, die über die Methode {@link #assigners(Item)} aus dem {@link Item} des gegebenen
+		 * {@link Assignment}s ({@link Assignment#value() Quellobjekt}) ermittelt werden.
+		 * 
+		 * @see #assigners(Item)
+		 * @see Assignment#assign(Object, Object, Assigner)
+		 */
+		@Override
+		public void assign(final Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException {
+			if(assignment == null) throw new NullPointerException();
+			final Item value = assignment.value();
+			if(value == null) throw new IllegalArgumentException();
+			for(final Assigner<? super Item> assigner: this.assigners(value)){
+				assignment.assign(value, this, assigner);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see AbstractPool#append(AbstractItem)
 		 * @see AbstractPool#doAppend(Item)
 		 */
 		@Override
@@ -87,6 +143,7 @@ public final class Items {
 		/**
 		 * {@inheritDoc}
 		 * 
+		 * @see AbstractPool#remove(AbstractItem)
 		 * @see AbstractPool#doRemove(Item)
 		 */
 		@Override
@@ -97,6 +154,7 @@ public final class Items {
 		/**
 		 * {@inheritDoc}
 		 * 
+		 * @see AbstractPool#update(AbstractItem)
 		 * @see AbstractPool#doUpdate(Item)
 		 */
 		@Override
@@ -119,8 +177,8 @@ public final class Items {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof Item<?>)) return false;
-			final Item<?> data = (Item<?>)object;
+			if(!(object instanceof Item)) return false;
+			final Item data = (Item)object;
 			return (this.key() == data.key()) && Objects.equals(this.pool(), data.pool());
 		}
 
@@ -141,7 +199,16 @@ public final class Items {
 	 * @param <GItem> Typ der Datensätze.
 	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public static abstract class AbstractPool<GItem extends Item<?>, GOwner> implements Pool<GItem, GOwner> {
+	public static abstract class AbstractPool<GItem extends Item, GOwner> implements Pool<GItem> {
+
+		/**
+		 * Diese Methode implementiert {@link AbstractItem#state()}.
+		 * 
+		 * @param item {@link AbstractItem}.
+		 * @return Status.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		protected abstract int state(final AbstractItem<?> item) throws NullPointerException;
 
 		/**
 		 * Diese Methode implementiert {@link AbstractItem#append()}.
@@ -151,7 +218,7 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		final void append(final AbstractItem<?> item) throws NullPointerException, IllegalArgumentException {
+		protected final void append(final AbstractItem<?> item) throws NullPointerException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.CREATE_STATE:
 				case Item.REMOVE_STATE:
@@ -174,7 +241,7 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		final void remove(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		protected final void remove(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.APPEND_STATE:
 				case Item.UPDATE_STATE:
@@ -198,7 +265,7 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		final void update(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		protected final void update(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.REMOVE_STATE:
 				case Item.CREATE_STATE:
@@ -214,29 +281,30 @@ public final class Items {
 		}
 
 		/**
-		 * Diese Methode erstellt ein neues {@link Item} im {@link Item#CREATE_STATE} und gibt dieses zurück.
+		 * Diese Methode erstellt ein neues {@link Item} im {@link Item#CREATE_STATE} und gibt dieses zurück. Sie wird bei {@link Pool#create()} aufgerufen.
 		 * 
 		 * @see Item#state()
+		 * @see Pool#create()
 		 * @return neues {@link Item}.
 		 */
 		protected abstract GItem doCreate();
 
 		/**
-		 * Diese Methode wird bei {@link Item#append()} aufgerufen.
+		 * Diese Methode wird bei {@link Item#append()} zur Zustandsüberführung aufgerufen.
 		 * 
 		 * @param item {@link Item}.
 		 */
 		protected abstract void doAppend(final GItem item);
 
 		/**
-		 * Diese Methode wird bei {@link Item#remove()} aufgerufen.
+		 * Diese Methode wird bei {@link Item#remove()} zur Zustandsüberführung aufgerufen.
 		 * 
 		 * @param item {@link Item}.
 		 */
 		protected abstract void doRemove(final GItem item);
 
 		/**
-		 * Diese Methode wird bei {@link Item#update()} aufgerufen.
+		 * Diese Methode wird bei {@link Item#update()} zur Zustandsüberführung aufgerufen.
 		 * 
 		 * @param item {@link Item}.
 		 */
@@ -289,6 +357,26 @@ public final class Items {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public abstract Field<? super GOwner, ? extends Pool<GItem>> field();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public abstract GOwner owner();
+
+		/**
+		 * {@inheritDoc} Diese entspricht der des {@link #type()}s.
+		 */
+		@Override
+		public String label() {
+			return this.type().label();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public int size() {
 			return this.items().size();
 		}
@@ -312,10 +400,9 @@ public final class Items {
 		/**
 		 * {@inheritDoc}
 		 */
-		@SuppressWarnings ("unchecked")
 		@Override
 		public Iterator<GItem> iterator() {
-			return (Iterator<GItem>)this.items().iterator();
+			return Iterators.iterator(this.items().iterator());
 		}
 
 		/**
@@ -332,8 +419,8 @@ public final class Items {
 		@Override
 		public boolean equals(final Object object) {
 			if(object == this) return true;
-			if(!(object instanceof Pool<?, ?>)) return false;
-			final Pool<?, ?> data = (Pool<?, ?>)object;
+			if(!(object instanceof Pool<?>)) return false;
+			final Pool<?> data = (Pool<?>)object;
 			return Objects.equals(this.type(), data.type()) && Objects.equals(this.owner(), data.owner());
 		}
 
@@ -351,9 +438,9 @@ public final class Items {
 	 * Diese Klasse implementiert eine {@link Selection}, die ein {@link FilteredIterable} verwendet.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der {@link Item}s.
+	 * @param <GItem> Typ der Datensätze.
 	 */
-	public static final class FilteredSelection<GItem extends Item<?>> implements Selection<GItem> {
+	public static final class FilteredSelection<GItem> implements Selection<GItem> {
 
 		/**
 		 * Dieses Feld speichert das {@link Iterable}.
@@ -441,7 +528,7 @@ public final class Items {
 		/**
 		 * Dieses Feld speichert das modifizierte {@link Item}.
 		 */
-		public final Item<?> item;
+		public final Item item;
 
 		/**
 		 * Dieser Konstruktor initialisiert das Ereignis.
@@ -451,7 +538,7 @@ public final class Items {
 		 * @throws NullPointerException Wenn das gegebene {@link Item} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public ModifyItemEvent(final int mode, final Item<?> item) throws NullPointerException, IllegalArgumentException {
+		public ModifyItemEvent(final int mode, final Item item) throws NullPointerException, IllegalArgumentException {
 			if((mode < ModifyItemEvent.DEFAULT_MODE) || (mode > ModifyItemEvent.REDOING_MODE)) throw new IllegalArgumentException("mode is invalid");
 			if(item == null) throw new NullPointerException("item is null");
 			this.mode = mode;
@@ -494,7 +581,7 @@ public final class Items {
 		 * @throws NullPointerException Wenn das gegebene {@link Item} bzw. {@link Field} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public ModifyItemFieldEvent(final Item<?> item, final Field<?, ?> field, final Object oldValue, final Object newValue) throws NullPointerException,
+		public ModifyItemFieldEvent(final Item item, final Field<?, ?> field, final Object oldValue, final Object newValue) throws NullPointerException,
 			IllegalArgumentException {
 			this(ModifyItemEvent.DEFAULT_MODE, item, field, oldValue, newValue);
 		}
@@ -510,7 +597,7 @@ public final class Items {
 		 * @throws NullPointerException Wenn das gegebene {@link Item} bzw. {@link Field} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public ModifyItemFieldEvent(final int mode, final Item<?> item, final Field<?, ?> field, final Object oldValue, final Object newValue)
+		public ModifyItemFieldEvent(final int mode, final Item item, final Field<?, ?> field, final Object oldValue, final Object newValue)
 			throws NullPointerException, IllegalArgumentException {
 			super(mode, item);
 			if(field == null) throw new NullPointerException("field is null");
@@ -548,7 +635,7 @@ public final class Items {
 		 * @throws NullPointerException Wenn das gegebene {@link Item} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public ModifyItemStateEvent(final Item<?> item, final int oldState, final int newState) throws NullPointerException, IllegalArgumentException {
+		public ModifyItemStateEvent(final Item item, final int oldState, final int newState) throws NullPointerException, IllegalArgumentException {
 			this(ModifyItemEvent.DEFAULT_MODE, item, oldState, newState);
 		}
 
@@ -562,8 +649,7 @@ public final class Items {
 		 * @throws NullPointerException Wenn das gegebene {@link Item} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Modus ungültig ist.
 		 */
-		public ModifyItemStateEvent(final int mode, final Item<?> item, final int oldState, final int newState) throws NullPointerException,
-			IllegalArgumentException {
+		public ModifyItemStateEvent(final int mode, final Item item, final int oldState, final int newState) throws NullPointerException, IllegalArgumentException {
 			super(mode, item);
 			this.oldState = oldState;
 			this.newState = newState;
@@ -652,7 +738,7 @@ public final class Items {
 	 * @param <GValue> Typ des Werts.
 	 * @throws NullPointerException Wenn bis auf den gegebenen Wert eine der Eingaben {@code null} ist.
 	 */
-	public static <GItem extends Item<?>, GValue> void modifyField(final GItem item, final Field<? super GItem, GValue> field, final GValue value,
+	public static <GItem extends Item, GValue> void modifyField(final GItem item, final Field<? super GItem, GValue> field, final GValue value,
 		final Converter<? super GValue, ? extends GValue> copier, final ModifyItemFieldListener listener) throws NullPointerException {
 		final GValue oldValue = field.get(item);
 		if(Objects.equals(oldValue, value)) return;
@@ -676,8 +762,8 @@ public final class Items {
 	 * @throws IllegalStateException Wenn der Übergang in den gegebenen Status unzulässig ist.
 	 * @throws IllegalArgumentException Wenn der gegebene Status ungültig ist.
 	 */
-	public static void modifyState(final Item<?> item, final int state, final ModifyItemStateListener listener) throws NullPointerException,
-		IllegalStateException, IllegalArgumentException {
+	public static void modifyState(final Item item, final int state, final ModifyItemStateListener listener) throws NullPointerException, IllegalStateException,
+		IllegalArgumentException {
 		final int oldState = item.state();
 		if(oldState == state) return;
 		switch(state){
@@ -706,28 +792,33 @@ public final class Items {
 	 * for(GItem item: source)assigner.assign(item, assigner.get(item));
 	 * </pre>
 	 * 
-	 * @see Assigner
+	 * @see Assignment
 	 * @see Pool
 	 * @param <GItem> Typ der Datensätze.
-	 * @param assigner {@link Assigner}.
+	 * @param assignment {@link Assignment}.
 	 * @param source Quellpool.
 	 * @param target Zielpool.
+	 * @return Liste der Kopien.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GItem extends Item<?>> void assignItems(final Assigner<? extends Item<?>> assigner, final Pool<GItem, ?> source, final Pool<GItem, ?> target)
+	public static <GItem extends Item> List<GItem> assignItems(final Assignment<? extends Item> assignment, final Pool<GItem> source, final Pool<GItem> target)
 		throws NullPointerException {
-		if(assigner == null) throw new NullPointerException();
+		if(assignment == null) throw new NullPointerException();
 		target.items().clear();
+		final List<GItem> result = new ArrayList<GItem>(source.size());
 		for(final GItem item: source){
-			assigner.set(item, target.create());
+			final GItem item2 = target.create();
+			assignment.set(item, item2);
+			result.add(item2);
 		}
 		for(final GItem item: source){
-			assigner.assign(item, assigner.get(item));
+			assignment.assign(item, assignment.get(item));
 		}
+		return result;
 	}
 
 	/**
-	 * Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assigner#get(Object)} zu den Schlüsseln und Werten der Einträge der
+	 * Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge der
 	 * gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht:
 	 * 
 	 * <pre>
@@ -735,27 +826,27 @@ public final class Items {
 	 * for(Entry<GKey, GValue> entry: source.entrySet())target.put(assigner.get(entry.getKey()), assigner.get(entry.getValue()));
 	 * </pre>
 	 * 
-	 * @see Assigner
+	 * @see Assignment
 	 * @see Map
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte.
-	 * @param assigner {@link Assigner}.
+	 * @param assignment {@link Assignment}.
 	 * @param source Quellabbildung.
 	 * @param target Zielabbildung.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GKey, GValue> void assignEntries(final Assigner<?> assigner, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
+	public static <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
 		throws NullPointerException {
-		if(assigner == null) throw new NullPointerException();
+		if(assignment == null) throw new NullPointerException();
 		target.clear();
 		for(final Entry<GKey, GValue> entry: source.entrySet()){
-			target.put(assigner.get(entry.getKey()), assigner.get(entry.getValue()));
+			target.put(assignment.get(entry.getKey()), assignment.get(entry.getValue()));
 		}
 	}
 
 	/**
-	 * Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assigner#get(Object)} zu den Elemente der gegebenen Quellsammlung
+	 * Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
 	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht:
 	 * 
 	 * <pre>
@@ -763,20 +854,20 @@ public final class Items {
 	 * for(GValue value: source)target.add(assigner.get(value));
 	 * </pre>
 	 * 
-	 * @see Assigner
+	 * @see Assignment
 	 * @see Collection
 	 * @param <GValue> Typ der Elemente.
-	 * @param assigner {@link Assigner}.
+	 * @param assignment {@link Assignment}.
 	 * @param source Quellsammlung.
 	 * @param target Zielsammlung.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GValue> void assignValues(final Assigner<?> assigner, final Collection<GValue> source, final Collection<GValue> target)
+	public static <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
 		throws NullPointerException {
-		if(assigner == null) throw new NullPointerException();
+		if(assignment == null) throw new NullPointerException();
 		target.clear();
 		for(final GValue value: source){
-			target.add(assigner.get(value));
+			target.add(assignment.get(value));
 		}
 	}
 

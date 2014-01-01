@@ -2,18 +2,17 @@ package bee.creative.data;
 
 import java.util.Iterator;
 import bee.creative.util.Assignable;
-import bee.creative.util.Assigner;
+import bee.creative.util.Assignment;
 
 /**
  * Diese Schnittstelle definiert ein von einem {@link Pool} verwalteten Datensatz, welcher als Abstraktion eiens Eintrags einer Tabelle einer Datenbank
- * verstanden werden kann. Ein solcher Datensatz hat einen {@link Item#type() Datentyp} und besitzt zur Identifikation einen {@link Item#key() Schlüssel}. Der
- * Schlüssel entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
+ * verstanden werden kann. Ein solcher Datensatz hat einen {@link #type() Datentyp} und besitzt zur Identifikation einen {@link #key() Schlüssel}. Der Schlüssel
+ * entspricht dem Identifikator, den auch die Datenbank verwendet.<br>
  * {@link Item}s werden von {@link Pool}s verwaltet und sind {@link Assignable}.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GOwner> Typ des Besitzers.
  */
-public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
+public interface Item extends Owned, Typed, Labeled, Assignable<Item> {
 
 	/**
 	 * Dieses Feld speichert den Status, der ein flüchtiges {@link Item} als erzeugt und vorübergehend vorhanden kennzeichnet. Ein {@link Item} mit diesem Status
@@ -46,22 +45,23 @@ public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
 	 * @see #pool()
 	 */
 	@Override
-	public GOwner owner();
+	public Object owner();
 
 	/**
-	 * Diese Methode gibt den {@link Pool} zurück, der dieses {@link Item} verwaltet.
-	 * 
-	 * @return {@link Pool}.
-	 */
-	public Pool<? extends Item<? super GOwner>, ? extends GOwner> pool();
-
-	/**
-	 * Diese Methode gibt den {@link Type} zurück. Dieser wird über den {@link #pool()} ermittelt.
+	 * Diese Methode gibt den Datentyp dieses {@link Item}s zurück. Dieser wird über den {@link #pool()} ermittelt.
 	 * 
 	 * @see #pool()
-	 * @return {@link Type}.
+	 * @see Pool#type()
+	 * @return Datentyp.
 	 */
+	@Override
 	public Type<?> type();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String label();
 
 	/**
 	 * Diese Methode gibt den identifizierenden Schlüssel zurück.
@@ -69,6 +69,13 @@ public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
 	 * @return identifizierender Schlüssel.
 	 */
 	public long key();
+
+	/**
+	 * Diese Methode gibt den {@link Pool} zurück, der dieses {@link Item} verwaltet.
+	 * 
+	 * @return {@link Pool}.
+	 */
+	public Pool<? extends Item> pool();
 
 	/**
 	 * Diese Methode gibt den Status zurück.
@@ -80,6 +87,12 @@ public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
 	 * @return Status.
 	 */
 	public int state();
+
+	/**
+	 * Diese Methode überträgt die Informationen des im gegebenen {@link Assignment} gehaltenen {@link Item}s auf dieses {@link Item}.
+	 */
+	@Override
+	public void assign(Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException;
 
 	/**
 	 * Diese Methode überführt das {@link Item} in den Status {@link #APPEND_STATE}.
@@ -101,11 +114,4 @@ public interface Item<GOwner> extends Owned<GOwner>, Assignable<Item<?>> {
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link #APPEND_STATE} befindet.
 	 */
 	public void update() throws IllegalStateException;
-
-	/**
-	 * Diese Methode überträgt die Informationen des im gegebenen {@link Assigner} gehaltenen {@link Item}s auf dieses {@link Item}.
-	 */
-	@Override
-	public void assign(Assigner<? extends Item<?>> assigner) throws NullPointerException, IllegalArgumentException;
-
 }

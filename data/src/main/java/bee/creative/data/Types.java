@@ -22,7 +22,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	public static interface TypeBuilder<GItem extends Item<?>> extends Builder<Type<GItem>> {
+	public static interface TypeBuilder<GItem extends Item> extends Builder<Type<GItem>> {
 
 		/**
 		 * Diese Methode setzt die {@link Type#id()} und gibt diesen {@link TypeBuilder} zurück.
@@ -32,6 +32,15 @@ public final class Types {
 		 * @return {@link TypeBuilder}.
 		 */
 		public TypeBuilder<GItem> id(int value);
+
+		/**
+		 * Diese Methode setzt die {@link Type#label()} und gibt diesen {@link TypeBuilder} zurück.
+		 * 
+		 * @see Type#label()
+		 * @param value Beschriftung.
+		 * @return {@link TypeBuilder}.
+		 */
+		public TypeBuilder<GItem> label(String value);
 
 		/**
 		 * Diese Methode gibt den {@link TypeBuilderClear}-Aspekt zurück, über den die Listen der via {@link #append()} zugeordneten {@link Type}s bzw.
@@ -76,7 +85,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	public static interface TypeBuilderClear<GItem extends Item<?>> {
+	public static interface TypeBuilderClear<GItem extends Item> {
 
 		/**
 		 * Diese Methode leert die Liste der zugeordneten {@link Type}s udn gibt den {@link TypeBuilder} zurück.
@@ -105,7 +114,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	public static interface TypeBuilderModify<GItem extends Item<?>> {
+	public static interface TypeBuilderModify<GItem extends Item> {
 
 		/**
 		 * Diese Methode modifiziert die Liste der zugeordneten {@link Type}s mit dem gegebenen {@link Type} und gibt anschließend den {@link TypeBuilderAnd}-Aspekt
@@ -141,7 +150,7 @@ public final class Types {
 	 * @param <GItem> Typ des {@link Item}s.
 	 * @param <GValue> Typ des Elements, dass in die Liste eingefügt bzw. aus ihr entfernt wird.
 	 */
-	public static interface TypeBuilderAnd<GItem extends Item<?>, GValue> extends TypeBuilder<GItem> {
+	public static interface TypeBuilderAnd<GItem extends Item, GValue> extends TypeBuilder<GItem> {
 
 		/**
 		 * Diese Methode führt die Modifikation des vorangegangenen Aufrufs von {@link TypeBuilderModify#type(Type)} bzw. {@link TypeBuilderModify#field(Field)} mit
@@ -159,17 +168,23 @@ public final class Types {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Type}, der vom {@link TypeBuilder} erzeugt wird.
+	 * Diese Klasse implementiert den {@link Type}, der vom {@link TypeBuilder} erzeugt wird. Die {@link #equals(Object) Äquivalenz} dieses {@link Type}s basiert
+	 * auf dem {@link #id() Identifikator}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	public static class TypeImpl<GItem extends Item<?>> implements Type<GItem> {
+	public static class TypeImpl<GItem extends Item> implements Type<GItem> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
 		 */
 		protected final int id;
+
+		/**
+		 * Dieses Feld speichert die Beschriftung.
+		 */
+		protected final String label;
 
 		/**
 		 * Dieses Feld speichert die {@link Type}s.
@@ -182,19 +197,22 @@ public final class Types {
 		protected final Field<?, ?>[] fields;
 
 		/**
-		 * Dieser Konstruktor initialisiert Identifikator, {@link Type}s und {@link Field}s.
+		 * Dieser Konstruktor initialisiert Identifikator, Beschriftung, {@link Type}s und {@link Field}s.
 		 * 
 		 * @param id Identifikator.
+		 * @param label Beschriftung.
 		 * @param types {@link Type}s.
 		 * @param fields {@link Field}s.
 		 * @throws NullPointerException wenn eine der Eingaben {@code null} ist oder enthält.
 		 */
-		public TypeImpl(final int id, final Type<?>[] types, final Field<?, ?>[] fields) throws NullPointerException {
+		public TypeImpl(final int id, final String label, final Type<?>[] types, final Field<?, ?>[] fields) throws NullPointerException {
+			if(label == null) throw new NullPointerException("label is null");
 			if(types == null) throw new NullPointerException("types is null");
 			if(fields == null) throw new NullPointerException("fields is null");
 			if(Arrays.asList(types).contains(null)) throw new NullPointerException("types contains null");
 			if(Arrays.asList(fields).contains(null)) throw new NullPointerException("tields contains null");
 			this.id = id;
+			this.label = label;
 			this.types = types;
 			this.fields = fields;
 		}
@@ -212,7 +230,8 @@ public final class Types {
 		 */
 		@Override
 		public boolean is(final Type<?> type) throws NullPointerException {
-			if(type.equals(this)) return true;
+			if(type == null) return false;
+			if((this == type) || (this.id() == type.id())) return true;
 			for(final Type<?> type2: this.types)
 				if(type2.is(type)) return true;
 			return false;
@@ -225,6 +244,14 @@ public final class Types {
 		@Override
 		public Iterable<? extends Field<? super GItem, ?>> fields() {
 			return (Iterable<? extends Field<? super GItem, ?>>)Iterables.unmodifiableIterable(Arrays.asList(this.fields));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String label() {
+			return this.label;
 		}
 
 		/**
@@ -251,7 +278,7 @@ public final class Types {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.id, this.types, this.fields);
+			return Objects.toStringCall(this, this.id, this.label, this.types, this.fields);
 		}
 
 	}
@@ -262,12 +289,17 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static final class ParentBuilder<GItem extends Item<?>> implements TypeBuilder<GItem>, TypeBuilderClear<GItem> {
+	static final class ParentBuilder<GItem extends Item> implements TypeBuilder<GItem>, TypeBuilderClear<GItem> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
 		 */
 		Integer id;
+
+		/**
+		 * Dieses Feld speichert die Beschriftung.
+		 */
+		String label;
 
 		/**
 		 * Dieses Feld speichert die Liste der {@link Type}s.
@@ -285,6 +317,15 @@ public final class Types {
 		@Override
 		public TypeBuilder<GItem> id(final int value) {
 			this.id = Integer.valueOf(value);
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public TypeBuilder<GItem> label(final String value) {
+			this.label = value;
 			return this;
 		}
 
@@ -317,7 +358,7 @@ public final class Types {
 		 */
 		@Override
 		public Type<GItem> build() {
-			return new TypeImpl<GItem>(this.id.intValue(), this.types.toArray(new Type<?>[this.types.size()]),
+			return new TypeImpl<GItem>(this.id.intValue(), this.label.intern(), this.types.toArray(new Type<?>[this.types.size()]),
 				this.fields.toArray(new Field<?, ?>[this.fields.size()]));
 		}
 
@@ -347,7 +388,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static abstract class ModifyBuilder<GItem extends Item<?>> implements TypeBuilderModify<GItem>, TypeBuilder<GItem> {
+	static abstract class ModifyBuilder<GItem extends Item> implements TypeBuilderModify<GItem>, TypeBuilder<GItem> {
 
 		/**
 		 * Dieses Feld speichert den {@link ParentBuilder}.
@@ -369,6 +410,14 @@ public final class Types {
 		@Override
 		public final TypeBuilder<GItem> id(final int value) {
 			return this.parent.id(value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public TypeBuilder<GItem> label(final String value) {
+			return this.parent.label(value);
 		}
 
 		/**
@@ -411,7 +460,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static class AppendBuilder<GItem extends Item<?>> extends ModifyBuilder<GItem> {
+	static class AppendBuilder<GItem extends Item> extends ModifyBuilder<GItem> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -446,7 +495,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static final class AppendAndTypeBuilder<GItem extends Item<?>> extends AppendBuilder<GItem> implements TypeBuilderAnd<GItem, Type<? super GItem>> {
+	static final class AppendAndTypeBuilder<GItem extends Item> extends AppendBuilder<GItem> implements TypeBuilderAnd<GItem, Type<? super GItem>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -474,7 +523,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static final class AppendAndFieldBuilder<GItem extends Item<?>> extends AppendBuilder<GItem> implements TypeBuilderAnd<GItem, Field<? super GItem, ?>> {
+	static final class AppendAndFieldBuilder<GItem extends Item> extends AppendBuilder<GItem> implements TypeBuilderAnd<GItem, Field<? super GItem, ?>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -502,7 +551,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static class RemoveBuilder<GItem extends Item<?>> extends ModifyBuilder<GItem> {
+	static class RemoveBuilder<GItem extends Item> extends ModifyBuilder<GItem> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -537,7 +586,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static final class RemoveAndTypeBuilder<GItem extends Item<?>> extends RemoveBuilder<GItem> implements TypeBuilderAnd<GItem, Type<? super GItem>> {
+	static final class RemoveAndTypeBuilder<GItem extends Item> extends RemoveBuilder<GItem> implements TypeBuilderAnd<GItem, Type<? super GItem>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -565,7 +614,7 @@ public final class Types {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des {@link Item}s.
 	 */
-	static final class RemoveAndFieldBuilder<GItem extends Item<?>> extends RemoveBuilder<GItem> implements TypeBuilderAnd<GItem, Field<? super GItem, ?>> {
+	static final class RemoveAndFieldBuilder<GItem extends Item> extends RemoveBuilder<GItem> implements TypeBuilderAnd<GItem, Field<? super GItem, ?>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link ParentBuilder}.
@@ -593,7 +642,7 @@ public final class Types {
 	 * @param <GItem> Typ des {@link Item}s.
 	 * @return {@link TypeBuilder}.
 	 */
-	public static <GItem extends Item<?>> TypeBuilder<GItem> builder() {
+	public static <GItem extends Item> TypeBuilder<GItem> builder() {
 		return new ParentBuilder<GItem>();
 	}
 

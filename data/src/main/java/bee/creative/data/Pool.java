@@ -5,34 +5,41 @@ import java.util.Iterator;
 import bee.creative.util.Field;
 
 /**
- * Diese Schnittstelle definiert einen Sammlung von {@link Item}s und kann als Abstraktion einer eine Tabelle einer Datenbank verstenden werden. Die
- * {@link Item}s können über ihren Schlüssel {@link Pool#get(long) identifiziert} werden. Ein {@link Pool} hat darüber hinaus einen Besitzer.
+ * Diese Schnittstelle definiert einen Sammlung von {@link Item}s und kann als Abstraktion einer Tabelle einer Datenbank verstenden werden. Die {@link Item}s
+ * können über ihren Schlüssel {@link #get(long) identifiziert} werden. Ein {@link Pool} hat darüber hinaus einen Besitzer.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze.
- * @param <GOwner> Typ des Besitzers.
  */
-public interface Pool<GItem extends Item<?>, GOwner> extends Owned<GOwner>, Selection<GItem> {
+public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 
 	/**
-	 * {@inheritDoc}
+	 * Diese Methode gibt den Besitzer zurück, welcher diesen {@link Pool} erzeugt und verwaltet hat.
 	 */
 	@Override
-	public GOwner owner();
+	public Object owner();
+
+	/**
+	 * Diese Methode gibt das {@link Field} zurück, über welches dieser {@link Pool} von seinem {@link #owner()} aus erreichbar ist.
+	 * 
+	 * @return {@link Field} des {@link Pool}s in seinem {@link #owner()}.
+	 */
+	@Override
+	public Field<?, ? extends Pool<GItem>> field();
 
 	/**
 	 * Diese Methode gibt den {@link Type} der {@link Item}s zurück.
 	 * 
 	 * @return {@link Type} der {@link Item}s.
 	 */
-	public Type<? super GItem> type();
+	@Override
+	public Type<GItem> type();
 
 	/**
-	 * Diese Methode gibt das {@link Field} zurück, unter dem dieser {@link Pool} in seinem {@link #owner()} erreichbar ist.
-	 * 
-	 * @return {@link Field} des {@link Pool}s in seinem {@link #owner()}.
+	 * {@inheritDoc}
 	 */
-	public Field<?, ?> field();
+	@Override
+	public String label();
 
 	/**
 	 * Diese Methode gibt den Datensatz mit dem gegebenen Schlüssel oder {@code null} zurück.

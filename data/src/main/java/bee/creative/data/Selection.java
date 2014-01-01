@@ -4,12 +4,13 @@ import java.util.Iterator;
 import bee.creative.util.Field;
 
 /**
- * Diese Schnittstelle definiert eine Teilmenge der {@link Item}s eines {@link Pool}s als Ergebnis eienr Suche, auf welcher auch weiter gesucht werden kann.
+ * Diese Schnittstelle definiert eine Teilmenge der Datensätze (z.B. der {@link Item}s) einer Sammlung (z.B. eines {@link Pool}s) als Ergebnis eienr Suche, auf
+ * welcher auch weiter gesucht werden kann.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze.
  */
-public interface Selection<GItem extends Item<?>> extends Iterable<GItem> {
+public interface Selection<GItem> extends Iterable<GItem> {
 
 	/**
 	 * Diese Methode gibt ein {@link Item} zurück, das für die als {@link Field} gegebene Eigenschaft den gegebenen Wert besitzen.
