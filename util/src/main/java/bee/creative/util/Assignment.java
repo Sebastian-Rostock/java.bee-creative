@@ -67,14 +67,15 @@ public interface Assignment<GValue> {
 	 * {@link Assigner#assign(Object, Assignment)} mit dem Zielobjekts sowie einem {@link Assignment} aufgerufen, das via {@link #assignment(Object)} zu dem
 	 * gegebenen Quellobjekt erzeugt wurde.
 	 * 
-	 * @param <GObject> Typ der Quell- und Zielobjekte.
+	 * @param <GObject> Typ des Quellobjektssowie des Zielobjekts.
 	 * @param source Quellobjekt.
 	 * @param target Zielobjekt.
 	 * @param assigner {@link Assigner}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das Quellobjekt vom Zielobjekt nicht unterstützt wird.
 	 */
-	public <GObject> void assign(GObject source, GObject target, Assigner<? super GObject> assigner) throws NullPointerException, IllegalArgumentException;
+	public <GObject> void assign(GObject source, GObject target, Assigner<? super GObject, ? super GObject> assigner) throws NullPointerException,
+		IllegalArgumentException;
 
 	/**
 	 * Diese Methode erzeugt ein {@link Assignment} mit den gegebenen Quellobjekt sowie den in diesem {@link Assignment} via {@link #set(Object, Object)}

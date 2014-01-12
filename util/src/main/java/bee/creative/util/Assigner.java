@@ -6,9 +6,10 @@ package bee.creative.util;
  * 
  * @see Assignment
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GInput> Typ des Zielobjekt als Eingabe, auf welche die Informationen übertragen werden.
+ * @param <GInput> Typ des Zielobjekts als Eingabe, auf welche die Informationen übertragen werden.
+ * @param <GValue> Typ des Quellobjekts als Wert, dessen die Informationen übertragen werden.
  */
-public interface Assigner<GInput> {
+public interface Assigner<GInput, GValue> {
 
 	/**
 	 * Diese Methode überträgt die Informationen des Quellobjekts des gegebenen {@link Assignment}s auf das gegebene Zielobjekt.
@@ -19,6 +20,6 @@ public interface Assigner<GInput> {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das {@link Assignment#value() Quellobjekt} ungültig ist.
 	 */
-	public void assign(GInput input, Assignment<? extends GInput> assignment) throws NullPointerException, IllegalArgumentException;
+	public void assign(GInput input, Assignment<? extends GValue> assignment) throws NullPointerException, IllegalArgumentException;
 
 }

@@ -80,8 +80,8 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject> assigner) throws NullPointerException,
-			IllegalArgumentException {
+		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
+			throws NullPointerException, IllegalArgumentException {
 			this.parent.assign(source, target, assigner);
 		}
 
@@ -175,8 +175,8 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject> assigner) throws NullPointerException,
-			IllegalArgumentException {
+		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
+			throws NullPointerException, IllegalArgumentException {
 			this.set(source, target);
 			assigner.assign(target, this.assignment(source));
 		}
