@@ -36,12 +36,6 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	public Type<GItem> type();
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String label();
-
-	/**
 	 * Diese Methode gibt den Datensatz mit dem gegebenen Schlüssel oder {@code null} zurück.
 	 * 
 	 * @param key Schlüssel.

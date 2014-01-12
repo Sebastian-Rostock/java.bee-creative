@@ -58,12 +58,6 @@ public interface Item extends Owned, Typed, Labeled, Assignable<Item> {
 	public Type<?> type();
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String label();
-
-	/**
 	 * Diese Methode gibt den identifizierenden Schlüssel zurück.
 	 * 
 	 * @return identifizierender Schlüssel.
@@ -114,4 +108,5 @@ public interface Item extends Owned, Typed, Labeled, Assignable<Item> {
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link #APPEND_STATE} befindet.
 	 */
 	public void update() throws IllegalStateException;
+	
 }

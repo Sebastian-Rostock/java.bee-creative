@@ -10,28 +10,10 @@ import bee.creative.util.Field;
 public interface Part extends Owned, Typed, Labeled {
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object owner();
-
-	/**
 	 * Diese Methode gibt das {@link Field} zurück, über welches dieser {@link Part} von seinem {@link #owner()} aus erreichbar ist.
 	 * 
 	 * @return {@link Field} des {@link Part}s in seinem {@link #owner()}.
 	 */
 	public Field<?, ?> field();
-
-	/**
-	 * {@inheritDoc}
-	*/
-	@Override
-	public Type<?> type();
-
-	/**
-	 * {@inheritDoc}
-	*/
-	@Override
-	public String label();
 
 }

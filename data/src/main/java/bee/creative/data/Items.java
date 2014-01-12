@@ -2,13 +2,10 @@ package bee.creative.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import bee.creative.util.Assigner;
 import bee.creative.util.Assignment;
 import bee.creative.util.Converter;
@@ -37,42 +34,27 @@ public final class Items {
 	 * Schlüssel} und {@link #pool() Pool}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public static abstract class AbstractItem<GOwner> implements Item {
+	public static abstract class AbstractItem implements Item {
 
 		/**
-		 * Dieses Feld speichert den {@link AbstractPool}.
-		 */
-		protected final AbstractPool<? extends Item, ? extends GOwner> pool;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link AbstractPool}.
-		 * 
-		 * @param pool {@link AbstractPool}.
-		 * @throws NullPointerException Wenn der gegebene {@link AbstractPool} {@code null} ist.
-		 */
-		public AbstractItem(final AbstractPool<? extends Item, ? extends GOwner> pool) throws NullPointerException {
-			if(pool == null) throw new NullPointerException("pool is null");
-			this.pool = pool;
-		}
-
-		/**
-		 * Diese Methode gibt die {@link Assigner} zurück, die in {@link #assigners(Item)} zur Übertragung der Informatioenen des gegebenen {@link Item}s auf dieses
-		 * Obejkt verwendet werden.
+		 * Diese Methode gibt die {@link Assigner} zurück, die in {@link #assign(Assignment)} zur Übertragung der Informatioenen des gegebenen {@link Item}s auf
+		 * dieses {@link Item} verwendet werden.
 		 * <p>
-		 * Die Implementation in {@link AbstractItem}
+		 * Die Implementation in {@link AbstractItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item}s definierten {@link Field}s,
+		 * die die {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
+		 * {@code this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.voidIterable())}.
 		 * 
-		 * @param value {@link Item}.
+		 * @param value {@link Item} als Quellobjekt des in {@link #assign(Assignment)} gegebenen {@link Assignment}s.
 		 * @return {@link Assigner}s.
 		 */
-		protected Iterable<? extends Assigner<? super Item>> assigners(final Item value) {
-			return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(new Converter<Field<?, ?>, Assigner<? super Item>>() {
+		protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Item value) {
+			return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(new Converter<Field<?, ?>, Assigner<? super Item, ? super Item>>() {
 
 				@SuppressWarnings ("unchecked")
 				@Override
-				public Assigner<? super Item> convert(final Field<?, ?> input) {
-					return input instanceof Assigner<?> ? (Assigner<? super Item>)input : null;
+				public Assigner<? super Item, ? super Item> convert(final Field<?, ?> input) {
+					return input instanceof Assigner<?, ?> ? (Assigner<? super Item, ? super Item>)input : null;
 				}
 
 			}, this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.<Field<?, ?>>voidIterable()));
@@ -82,24 +64,22 @@ public final class Items {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public AbstractPool<? extends Item, ? extends GOwner> pool() {
-			return this.pool;
-		}
+		public abstract AbstractPool<? extends Item> pool();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Type<?> type() {
-			return this.pool.type();
+			return this.pool().type();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GOwner owner() {
-			return this.pool.owner();
+		public Object owner() {
+			return this.pool().owner();
 		}
 
 		/**
@@ -109,7 +89,7 @@ public final class Items {
 		 */
 		@Override
 		public int state() {
-			return this.pool.state(this);
+			return this.pool().state(this);
 		}
 
 		/**
@@ -124,7 +104,7 @@ public final class Items {
 			if(assignment == null) throw new NullPointerException();
 			final Item value = assignment.value();
 			if(value == null) throw new IllegalArgumentException();
-			for(final Assigner<? super Item> assigner: this.assigners(value)){
+			for(final Assigner<? super Item, ? super Item> assigner: this.assigners(value)){
 				assignment.assign(value, this, assigner);
 			}
 		}
@@ -137,7 +117,7 @@ public final class Items {
 		 */
 		@Override
 		public void append() {
-			this.pool.append(this);
+			this.pool().append(this);
 		}
 
 		/**
@@ -148,7 +128,7 @@ public final class Items {
 		 */
 		@Override
 		public void remove() throws IllegalStateException {
-			this.pool.remove(this);
+			this.pool().remove(this);
 		}
 
 		/**
@@ -159,7 +139,7 @@ public final class Items {
 		 */
 		@Override
 		public void update() throws IllegalStateException {
-			this.pool.update(this);
+			this.pool().update(this);
 		}
 
 		/**
@@ -197,9 +177,8 @@ public final class Items {
 	 * 
 	 * @author Sebastian Rostock 2011.
 	 * @param <GItem> Typ der Datensätze.
-	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public static abstract class AbstractPool<GItem extends Item, GOwner> implements Pool<GItem> {
+	public static abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 
 		/**
 		 * Diese Methode implementiert {@link AbstractItem#state()}.
@@ -208,7 +187,7 @@ public final class Items {
 		 * @return Status.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		protected abstract int state(final AbstractItem<?> item) throws NullPointerException;
+		protected abstract int state(final AbstractItem item) throws NullPointerException;
 
 		/**
 		 * Diese Methode implementiert {@link AbstractItem#append()}.
@@ -218,12 +197,12 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		protected final void append(final AbstractItem<?> item) throws NullPointerException, IllegalArgumentException {
+		protected final void append(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.CREATE_STATE:
 				case Item.REMOVE_STATE:
 				case Item.UPDATE_STATE:
-					if(item.pool != this) throw new IllegalArgumentException();
+					if(!equals(item.pool())) throw new IllegalArgumentException();
 					this.doAppend((GItem)item);
 				case Item.APPEND_STATE:
 					return;
@@ -241,11 +220,11 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		protected final void remove(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		protected final void remove(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.APPEND_STATE:
 				case Item.UPDATE_STATE:
-					if(item.pool != this) throw new IllegalArgumentException();
+					if(!equals(item.pool())) throw new IllegalArgumentException();
 					this.doRemove((GItem)item);
 				case Item.REMOVE_STATE:
 					return;
@@ -265,11 +244,11 @@ public final class Items {
 		 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
 		 */
 		@SuppressWarnings ("unchecked")
-		protected final void update(final AbstractItem<?> item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		protected final void update(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			switch(item.state()){
 				case Item.REMOVE_STATE:
 				case Item.CREATE_STATE:
-					if(item.pool != this) throw new IllegalArgumentException();
+					if(!equals(item.pool())) throw new IllegalArgumentException();
 					this.doUpdate((GItem)item);
 				case Item.UPDATE_STATE:
 					return;
@@ -352,18 +331,6 @@ public final class Items {
 			throws NullPointerException {
 			return new FilteredSelection<GItem>(this.items(states)).findAll(field, value);
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public abstract Field<? super GOwner, ? extends Pool<GItem>> field();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public abstract GOwner owner();
 
 		/**
 		 * {@inheritDoc} Diese entspricht der des {@link #type()}s.
@@ -687,39 +654,6 @@ public final class Items {
 		 */
 		public void onModifyItemField(ModifyItemFieldEvent event);
 
-	}
-
-	/**
-	 * Dieses Feld speichert den {@link Converter} für {@link #autoCopier()}.
-	 */
-	static final Converter<?, ?> AUTO_COPIER = new Converter<Object, Object>() {
-
-		@Override
-		public Object convert(final Object input) {
-			if(input instanceof Set) return new HashSet<Object>((Set<?>)input);
-			if(input instanceof Collection) return new ArrayList<Object>((Collection<?>)input);
-			if(input instanceof Map) return new HashMap<Object, Object>((Map<?, ?>)input);
-			return input;
-		}
-
-	};
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, dessen Ausgabe identisch zur Eingabe oder eine Kopie der Eingabe ist.
-	 * <ul>
-	 * <li>Wenn die Eingabe ein {@link Set} ist, wird ein neues {@link HashSet} mit dessen Elementen als Ausgabe verwendet.</li>
-	 * <li>Wenn die Eingabe eine {@link Collection} ist, wird eine neue {@link ArrayList} mit deren Elementen als Ausgabe verwendet.</li>
-	 * <li>Wenn die Eingabe eine {@link Map} ist, wird eine neue {@link HashMap} mit deren Einträge als Ausgabe verwendet.</li>
-	 * <li>Wenn die Eingabe einen anderen Typ hat, wird sie unverändert als Ausgabe verwendet.</li>
-	 * </ul>
-	 * 
-	 * @see #modifyField(Item, Field, Object, Converter, ModifyItemFieldListener)
-	 * @param <GValue> Typ von Ein- und Ausgabe.
-	 * @return {@link Converter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GValue> Converter<GValue, GValue> autoCopier() {
-		return (Converter<GValue, GValue>)Items.AUTO_COPIER;
 	}
 
 	/**
