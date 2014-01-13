@@ -433,7 +433,7 @@ public final class Types {
 
 		/**
 		 * {@inheritDoc}
-		*/
+		 */
 		@Override
 		public TypeBuilderSet<GItem> set() {
 			return this.parent.set();

@@ -681,36 +681,34 @@ public class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
-	 * Objects.toStringCall(false, false, name, args)
+	 * Objects.toStringCallFormat(false, false, name, args)
 	 * </pre>
 	 * 
-	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
+	 * @see Objects#toStringCallFormat(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
 	public static String toStringCall(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, name, args);
+		return Objects.toStringCallFormat(false, false, name, args);
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
-	 * hierarchische Formatierung aktiviert werden. Der Rückgabewert entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
-	 * Objects.toStringCall(format, false, name, args)
+	 * Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)
 	 * </pre>
 	 * 
-	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
-	 * @param name Funktionsname.
-	 * @param format Formatiermodus.
-	 * @param args Argumente.
+	 * @see #toStringCallFormat(boolean, boolean, String, Object...)
+	 * @param object {@link Object}.
+	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(format, false, name, args);
+	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
+		return Objects.toStringCallFormat(false, false, object.getClass().getSimpleName(), args);
 	}
 
 	/**
@@ -725,7 +723,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+	public static String toStringCallFormat(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
 		if(name == null) throw new NullPointerException("name is null");
 		if(args == null) throw new NullPointerException("args is null");
 		final StringBuilder output = new StringBuilder(name);
@@ -754,55 +752,20 @@ public class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
-	 * Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)
+	 * Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args)
 	 * </pre>
 	 * 
-	 * @see #toStringCall(boolean, boolean, String, Object...)
-	 * @param object {@link Object}.
-	 * @param args Argumente bzw. Parameter.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
-	 */
-	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, object.getClass().getSimpleName(), args);
-	}
-
-	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
-	 * 
-	 * <pre>
-	 * Objects.toStringCall(format, false, object.getClass().getSimpleName(), args)
-	 * </pre>
-	 * 
-	 * @see #toStringCall(boolean, boolean, String, Object...)
-	 * @param format Formatiermodus.
-	 * @param object {@link Object}.
-	 * @param args Argumente bzw. Parameter.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
-	 */
-	public static String toStringCall(final boolean format, final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(format, false, object.getClass().getSimpleName(), args);
-	}
-
-	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
-	 * 
-	 * <pre>
-	 * Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)
-	 * </pre>
-	 * 
-	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @see #toStringCallFormat(boolean, boolean, String, Object...)
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn einde der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if(object == null) throw new NullPointerException("object is null");
-		return Objects.toStringCall(format, label, object.getClass().getSimpleName(), args);
+		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
 	}
 
 	/**

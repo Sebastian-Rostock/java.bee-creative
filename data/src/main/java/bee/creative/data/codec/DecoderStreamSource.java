@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 
 /**
- * Diese Klasse implementiert eine {@link DecoderSource} als {@link DataInputStream}, auf desren internen {@link InputStream} via {@link #stream()}
- * zugegriffen werden kann.
+ * Diese Klasse implementiert eine {@link DecoderSource} als {@link DataInputStream}, auf desren internen {@link InputStream} via {@link #stream()} zugegriffen
+ * werden kann.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.

@@ -176,7 +176,7 @@ public final class Functions {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "function", this.function, "result", this.result, "exception",
+				return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "function", this.function, "result", this.result, "exception",
 					this.exception});
 			}
 
@@ -765,7 +765,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this, new Object[]{"function", this.function, "functions", this.functions});
+			return Objects.toStringCallFormat(true, true, this, new Object[]{"function", this.function, "functions", this.functions});
 		}
 
 	}

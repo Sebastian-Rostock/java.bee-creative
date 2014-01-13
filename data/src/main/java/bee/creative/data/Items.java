@@ -202,7 +202,7 @@ public final class Items {
 				case Item.CREATE_STATE:
 				case Item.REMOVE_STATE:
 				case Item.UPDATE_STATE:
-					if(!equals(item.pool())) throw new IllegalArgumentException();
+					if(!this.equals(item.pool())) throw new IllegalArgumentException();
 					this.doAppend((GItem)item);
 				case Item.APPEND_STATE:
 					return;
@@ -224,7 +224,7 @@ public final class Items {
 			switch(item.state()){
 				case Item.APPEND_STATE:
 				case Item.UPDATE_STATE:
-					if(!equals(item.pool())) throw new IllegalArgumentException();
+					if(!this.equals(item.pool())) throw new IllegalArgumentException();
 					this.doRemove((GItem)item);
 				case Item.REMOVE_STATE:
 					return;
@@ -248,7 +248,7 @@ public final class Items {
 			switch(item.state()){
 				case Item.REMOVE_STATE:
 				case Item.CREATE_STATE:
-					if(!equals(item.pool())) throw new IllegalArgumentException();
+					if(!this.equals(item.pool())) throw new IllegalArgumentException();
 					this.doUpdate((GItem)item);
 				case Item.UPDATE_STATE:
 					return;

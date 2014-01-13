@@ -780,8 +780,8 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "variableResolver", this.variableResolver, "functionResolver",
-				this.functionResolver, "namespaceContext", this.namespaceContext});
+			return Objects.toStringCallFormat(false, true, this, new Object[]{"featureMap", this.featureMap, "variableResolver", this.variableResolver,
+				"functionResolver", this.functionResolver, "namespaceContext", this.namespaceContext});
 		}
 
 	}
@@ -1293,8 +1293,8 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "schema", this.schema,
-				"validating", this.validating, "coalescing", this.coalescing, "errorHandler", this.errorHandler, "entityResolver", this.entityResolver,
+			return Objects.toStringCallFormat(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "schema",
+				this.schema, "validating", this.validating, "coalescing", this.coalescing, "errorHandler", this.errorHandler, "entityResolver", this.entityResolver,
 				"expandEntityReferences", this.expandEntityReferences, "ignoringComments", this.ignoringComments, "ignoringElementContentWhitespace",
 				this.ignoringElementContentWhitespace, "xIncludeAware", this.xIncludeAware, "namespaceAware", this.namespaceAware});
 		}
@@ -1687,7 +1687,7 @@ public class XML {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "parameterMap",
+			return Objects.toStringCallFormat(false, true, this, new Object[]{"featureMap", this.featureMap, "attributeMap", this.attributeMap, "parameterMap",
 				this.parameterMap, "outputPropertyMap", this.outputPropertyMap, "uriResolver", this.uriResolver, "errorListener", this.errorListener});
 		}
 

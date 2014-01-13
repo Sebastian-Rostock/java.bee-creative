@@ -244,7 +244,7 @@ public class Tester {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(false, true, this, new Object[]{"usedTime", this.usedTime, "usedMemory", this.usedMemory, "enterTime", this.enterTime,
+		return Objects.toStringCallFormat(false, true, this, new Object[]{"usedTime", this.usedTime, "usedMemory", this.usedMemory, "enterTime", this.enterTime,
 			"leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory", this.leaveMemory});
 	}
 

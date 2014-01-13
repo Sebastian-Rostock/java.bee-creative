@@ -108,5 +108,5 @@ public interface Item extends Owned, Typed, Labeled, Assignable<Item> {
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link #APPEND_STATE} befindet.
 	 */
 	public void update() throws IllegalStateException;
-	
+
 }

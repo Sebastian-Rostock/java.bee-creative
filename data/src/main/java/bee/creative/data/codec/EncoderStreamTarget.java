@@ -4,8 +4,8 @@ import java.io.DataOutputStream;
 import java.io.OutputStream;
 
 /**
- * Diese Klasse implementiert ein {@link EncoderTarget} als {@link DataOutputStream}, auf dessen internen {@link OutputStream} via {@link #stream()}
- * zugegriffen werden kann.
+ * Diese Klasse implementiert ein {@link EncoderTarget} als {@link DataOutputStream}, auf dessen internen {@link OutputStream} via {@link #stream()} zugegriffen
+ * werden kann.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
