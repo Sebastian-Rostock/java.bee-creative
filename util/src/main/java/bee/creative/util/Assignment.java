@@ -48,6 +48,12 @@ public interface Assignment<GValue> {
 	 * Dazu wird über die Methode {@link #set(Object, Object)} dem Quellobjekt das Zielobjekt zugeordnet. Danach wird die Methode
 	 * {@link Assignable#assign(Assignment)} des Zielobjekts mit einem {@link Assignment} aufgerufen, das via {@link #assignment(Object)} zu dem gegebenen
 	 * Quellobjekt erzeugt wurde.
+	 * <p>
+	 * Die Implementation entspricht folgenden Befehlen:
+	 * 
+	 * <pre>
+	 * this.set(source, target);
+	 * target.assign(this.assignment(source));</pre>
 	 * 
 	 * @see #set(Object, Object)
 	 * @see #value()
@@ -65,7 +71,13 @@ public interface Assignment<GValue> {
 	 * Diese Methode überträgt die Informationen des gegebenen Quellobjekts auf das gegebene Zielobjekt.<br>
 	 * Dazu wird über die Methode {@link #set(Object, Object)} dem Quellobjekt das Zielobjekt zugeordnet. Danach wird die Methode
 	 * {@link Assigner#assign(Object, Assignment)} mit dem Zielobjekts sowie einem {@link Assignment} aufgerufen, das via {@link #assignment(Object)} zu dem
-	 * gegebenen Quellobjekt erzeugt wurde.
+	 * gegebenen Quellobjekt erzeugt wurde. <br>
+	 * <p>
+	 * Die Implementation entspricht folgenden Befehlen:
+	 * 
+	 * <pre>
+	 * this.set(source, target);
+	 * assigner.assign(target, this.assignment(source));</pre>
 	 * 
 	 * @param <GObject> Typ des Quellobjektssowie des Zielobjekts.
 	 * @param source Quellobjekt.
