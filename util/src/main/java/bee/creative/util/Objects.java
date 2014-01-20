@@ -698,7 +698,7 @@ public class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>
-	 * Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)
+	 * Objects.toStringCallFormat(false, false, object.getClass().getSimpleName(), args)
 	 * </pre>
 	 * 
 	 * @see #toStringCallFormat(boolean, boolean, String, Object...)
