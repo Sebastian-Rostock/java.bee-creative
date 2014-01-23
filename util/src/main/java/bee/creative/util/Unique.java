@@ -13,9 +13,9 @@ import java.util.Set;
 
 /**
  * Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene Eingaben
- * über eine interne Abbildung mit berechneten Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen Eingabe assoziierte Ausgabe ermittelt
- * werden soll und diese Ausgabe bereits via {@link #compile(Object)} erzeugt wurde, wird deren Wiederverwendung via {@link #reuse(Object, Object)}
- * signalisiert.
+ * über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen
+ * Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits via {@link #compile(Object)} erzeugt wurde, wird deren Wiederverwendung via
+ * {@link #reuse(Object, Object)} signalisiert.
  * 
  * @see Unique#get(Object)
  * @see Unique#reuse(Object, Object)
@@ -47,10 +47,10 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public GOutput get(GInput key);
 
 		/**
-		 * Diese Methode ordnet dem gegebenen Schlüssel den gegebenen Wert zu. Wenn der Wert {@code null} ist, wird die Zuordnung entfernt.
+		 * Diese Methode ordnet der gegebenen Eingabe die gegebene Ausgabe zu. Wenn die Ausgabe {@code null} ist, wird die Zuordnung entfernt.
 		 * 
-		 * @param key Schlüssel.
-		 * @param value Wert oder {@code null}.
+		 * @param key Eingabe.
+		 * @param value Ausgabe oder {@code null}.
 		 */
 		public void set(GInput key, GOutput value);
 
@@ -62,7 +62,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public int size();
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode gibt einen {@link Iterator} über die Eingaben zurück.
 		 */
 		@Override
 		public Iterator<GInput> iterator();
@@ -610,12 +610,12 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	protected static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> implements Converter<GInput, Entry<GInput, GOutput>> {
+	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> implements Converter<GInput, Entry<GInput, GOutput>> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final Unique<GInput, GOutput> owner;
+		final Unique<GInput, GOutput> owner;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -623,7 +623,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
-		protected EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
+		public EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
 			if(owner == null) throw new NullPointerException("owner is null");
 			this.owner = owner;
 		}
@@ -661,17 +661,17 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	protected static final class EntryMap<GInput, GOutput> extends AbstractMap<GInput, GOutput> {
+	static final class EntryMap<GInput, GOutput> extends AbstractMap<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final Unique<GInput, GOutput> owner;
+		final Unique<GInput, GOutput> owner;
 
 		/**
 		 * Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}.
 		 */
-		protected final EntrySet<GInput, GOutput> entrySet;
+		final EntrySet<GInput, GOutput> entrySet;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
