@@ -4,21 +4,12 @@ import bee.creative.util.Field;
 
 /**
  * Diese Schnittstelle definiert den Identifikator eines Datentyps, welcher eine {@link #label() Beschriftung} besitzt und zur {@link #is(Type) Typprüfung}
- * verwendet werden kann. Der {@link #id() Identifikator} ermöglicht Fallunterscheidungen mit einem {@code switch}-Statement. Die {@link #fields()} ermöglichen
- * den generischen Zugriff auf die Attributen eines Datensatzes dieses Datentyps.
+ * verwendet werden kann. Die {@link #fields()} ermöglichen den generischen Zugriff auf die Attributen eines Datensatzes dieses Datentyps.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ des Datensatzes.
  */
 public interface Type<GItem> extends Labeled {
-
-	/**
-	 * Diese Methode gibt den Identifikator dieses {@link Type}s zurück, dessen Zahlenwert über eine statische Konstante definiert werden sollte, um
-	 * Fallunterscheidungen mit einem {@code switch}-Statement zu ermöglichen.
-	 * 
-	 * @return Identifikator dieses {@link Type}s.
-	 */
-	public int id();
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des {@link Item} ({@code GItem}) in den gegebenen {@link Type} (Vorfahrentyp)
@@ -36,5 +27,11 @@ public interface Type<GItem> extends Labeled {
 	 * @return {@link Field}.
 	 */
 	public Iterable<? extends Field<? super GItem, ?>> fields();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String label();
 
 }

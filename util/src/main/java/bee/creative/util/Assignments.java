@@ -1,7 +1,9 @@
 package bee.creative.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Assignment}n und {@link Assignable}s.
@@ -213,6 +215,60 @@ public class Assignments {
 	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
 	 */
 	Assignments() {
+	}
+
+	/**
+	 * Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge der
+	 * gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht:
+	 * 
+	 * <pre>
+	 * target.clear();
+	 * for(Entry<GKey, GValue> entry: source.entrySet())target.put(assigner.get(entry.getKey()), assigner.get(entry.getValue()));
+	 * </pre>
+	 * 
+	 * @see Assignment
+	 * @see Map
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GKey> Typ der Schlüssel.
+	 * @param <GValue> Typ der Werte.
+	 * @param assignment {@link Assignment}.
+	 * @param source Quellabbildung.
+	 * @param target Zielabbildung.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
+		throws NullPointerException {
+		if(assignment == null) throw new NullPointerException();
+		target.clear();
+		for(final Entry<GKey, GValue> entry: source.entrySet()){
+			target.put(assignment.get(entry.getKey()), assignment.get(entry.getValue()));
+		}
+	}
+
+	/**
+	 * Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
+	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht:
+	 * 
+	 * <pre>
+	 * target.clear();
+	 * for(GValue value: source)target.add(assigner.get(value));
+	 * </pre>
+	 * 
+	 * @see Assignment
+	 * @see Collection
+	 * @param <GValue> Typ der Elemente.
+	 * @param assignment {@link Assignment}.
+	 * @param source Quellsammlung.
+	 * @param target Zielsammlung.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
+		throws NullPointerException {
+		if(assignment == null) throw new NullPointerException();
+		target.clear();
+		for(final GValue value: source){
+			target.add(assignment.get(value));
+		}
 	}
 
 }

@@ -35,7 +35,7 @@ public interface Selection<GItem> extends Iterable<GItem> {
 	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 
 	/**
-	 * Diese Methode gibt den {@link Iterator} über die {@link Items} der {@link Selection} zurück.
+	 * Diese Methode gibt den {@link Iterator} über die {@link Item}s der {@link Selection} zurück.
 	 */
 	@Override
 	public Iterator<GItem> iterator();
