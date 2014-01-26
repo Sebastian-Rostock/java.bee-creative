@@ -7,7 +7,14 @@ import bee.creative.util.Field;
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Part extends Owned, Typed, Labeled {
+public interface Part extends Owned, Labeled {
+
+	/**
+	 * Diese Methode gibt den {@link Type Datentyp} dieses Datensatzes bzw. der in diesem Objekt enthaltenen Datensätze zurück.
+	 * 
+	 * @return Datentyp.
+	 */
+	public Type<?> type();
 
 	/**
 	 * Diese Methode gibt das {@link Field} zurück, über welches dieser {@link Part} von seinem {@link #owner()} aus erreichbar ist.

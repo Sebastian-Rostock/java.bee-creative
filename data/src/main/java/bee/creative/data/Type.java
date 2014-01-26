@@ -28,10 +28,4 @@ public interface Type<GItem> extends Labeled {
 	 */
 	public Iterable<? extends Field<? super GItem, ?>> fields();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String label();
-
 }

@@ -12,7 +12,7 @@ import bee.creative.util.Assignment;
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Item extends Owned, Typed, Labeled, Assignable<Item> {
+public interface Item extends Part, Assignable<Item> {
 
 	/**
 	 * Dieses Feld speichert den Status, der ein flüchtiges {@link Item} als erzeugt und vorübergehend vorhanden kennzeichnet. Ein {@link Item} mit diesem Status

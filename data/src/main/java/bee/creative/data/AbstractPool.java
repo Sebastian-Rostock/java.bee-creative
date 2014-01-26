@@ -86,6 +86,29 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	protected abstract int state(final AbstractItem item) throws NullPointerException;
 
 	/**
+	 * Diese Methode sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} ({@link #items(int)}) zum Entfernen eines {@link Item}s
+	 * verwendet werden, im das gegebene {@link AbstractItem} in den Status {@link Item#CREATE_STATE} zu überführen.
+	 * 
+	 * @param item {@link AbstractItem}.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
+	 */
+	@SuppressWarnings ("unchecked")
+	protected final void delete(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
+		switch(item.state()){
+			case Item.APPEND_STATE:
+			case Item.UPDATE_STATE:
+			case Item.REMOVE_STATE:
+				if(!this.equals(item.pool())) throw new IllegalArgumentException();
+				this.doDelete((GItem)item);
+			case Item.CREATE_STATE:
+				return;
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	/**
 	 * Diese Methode implementiert {@link AbstractItem#append()}.
 	 * 
 	 * @param item {@link AbstractItem}.
@@ -163,6 +186,13 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 * @return neues {@link Item}.
 	 */
 	protected abstract GItem doCreate();
+
+	/**
+	 * Diese Methode wird bei {@link #delete(AbstractItem)} zur Zustandsüberführung in {@link Item#CREATE_STATE} aufgerufen.
+	 * 
+	 * @param item {@link Item}.
+	 */
+	protected abstract void doDelete(final GItem item);
 
 	/**
 	 * Diese Methode wird bei {@link Item#append()} zur Zustandsüberführung aufgerufen.
@@ -284,7 +314,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 		if(object == this) return true;
 		if(!(object instanceof Pool<?>)) return false;
 		final Pool<?> data = (Pool<?>)object;
-		return Objects.equals(this.type(), data.type()) && Objects.equals(this.owner(), data.owner());
+		return Objects.equals(this.type(), data.type()) && Objects.equals(this.field(), data.field()) && Objects.equals(this.owner(), data.owner());
 	}
 
 	/**
