@@ -104,6 +104,17 @@ public abstract class AbstractItem implements Item {
 	/**
 	 * {@inheritDoc}
 	 * 
+	 * @see AbstractPool#delete(AbstractItem)
+	 * @see AbstractPool#doDelete(Item)
+	 */
+	@Override
+	public void delete() {
+		this.pool().delete(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
 	 * @see AbstractPool#append(AbstractItem)
 	 * @see AbstractPool#doAppend(Item)
 	 */

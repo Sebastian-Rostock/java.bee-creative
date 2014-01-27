@@ -86,8 +86,8 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	protected abstract int state(final AbstractItem item) throws NullPointerException;
 
 	/**
-	 * Diese Methode sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} ({@link #items(int)}) zum Entfernen eines {@link Item}s
-	 * verwendet werden, im das gegebene {@link AbstractItem} in den Status {@link Item#CREATE_STATE} zu überführen.
+	 * Diese Methode implementiert {@link AbstractItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
+	 * {@link #items(int)}) zum Entfernen eines {@link Item}s verwendet werden.
 	 * 
 	 * @param item {@link AbstractItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.

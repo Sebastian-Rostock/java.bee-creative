@@ -97,6 +97,11 @@ public interface Item extends Part, Assignable<Item> {
 	public void assign(Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException;
 
 	/**
+	 * Diese Methode überführt das {@link Item} in den Status {@link #CREATE_STATE}.
+	 */
+	public void delete();
+
+	/**
 	 * Diese Methode überführt das {@link Item} in den Status {@link #APPEND_STATE}.
 	 */
 	public void append();
