@@ -36,7 +36,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	public static interface Data<GInput, GOutput> extends Iterable<GInput> {
+	public static interface Data<GInput, GOutput> extends Iterable<Entry<GInput, GOutput>> {
 
 		/**
 		 * Diese Methode gibt die Ausgabe zurück, die der gegebenen Eingabe zugeordnet ist.
@@ -62,10 +62,10 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public int size();
 
 		/**
-		 * Diese Methode gibt einen {@link Iterator} über die Eingaben zurück.
+		 * Diese Methode gibt einen {@link Iterator} über die Paare aus Ein- und Ausgaben zurück.
 		 */
 		@Override
-		public Iterator<GInput> iterator();
+		public Iterator<Entry<GInput, GOutput>> iterator();
 
 	}
 
@@ -184,8 +184,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<GInput> iterator() {
-			return new Iterator<GInput>() {
+		public Iterator<Entry<GInput, GOutput>> iterator() {
+			return new Iterator<Entry<GInput, GOutput>>() {
 
 				int index = 0;
 
@@ -197,8 +197,9 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 				}
 
 				@Override
-				public GInput next() {
-					return ListData.this.inputs.get(this.index++);
+				public Entry<GInput, GOutput> next() {
+					final int index = this.index++;
+					return new SimpleImmutableEntry<GInput, GOutput>(ListData.this.inputs.get(index), ListData.this.outputs.get(index));
 				}
 
 				@Override
@@ -315,7 +316,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GEntry> Typ der Einträge.
 	 */
 	protected static abstract class HashData<GInput, GOutput, GEntry> extends Hash<GInput, GOutput, GEntry> implements Data<GInput, GOutput>,
-		Converter<GEntry, GInput> {
+		Converter<GEntry, Entry<GInput, GOutput>> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
@@ -375,7 +376,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<GInput> iterator() {
+		public Iterator<Entry<GInput, GOutput>> iterator() {
 			return Iterators.convertedIterator(this, this.getEntries());
 		}
 
@@ -383,8 +384,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GInput convert(final GEntry input) {
-			return this.getEntryKey(input);
+		public Entry<GInput, GOutput> convert(final GEntry input) {
+			return new SimpleImmutableEntry<GInput, GOutput>(this.getEntryKey(input), this.getEntryValue(input));
 		}
 
 		/**
@@ -610,7 +611,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> implements Converter<GInput, Entry<GInput, GOutput>> {
+	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
@@ -641,15 +642,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 */
 		@Override
 		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return Iterators.convertedIterator(this, this.owner.data.iterator());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Entry<GInput, GOutput> convert(final GInput input) {
-			return new SimpleImmutableEntry<GInput, GOutput>(input, this.owner.data.get(input));
+			return this.owner.data.iterator();
 		}
 
 	}

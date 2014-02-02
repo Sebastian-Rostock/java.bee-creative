@@ -244,8 +244,7 @@ public class Tester {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCallFormat(false, true, this, new Object[]{"usedTime", this.usedTime, "usedMemory", this.usedMemory, "enterTime", this.enterTime,
-			"leaveTime", this.leaveTime, "enterMemory", this.enterMemory, "leaveMemory", this.leaveMemory});
+		return String.format("usedTime %4.2f ms  usedMemory:  %4.2f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
 	}
 
 }
