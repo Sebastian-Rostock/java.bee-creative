@@ -244,7 +244,7 @@ public class Tester {
 	 */
 	@Override
 	public String toString() {
-		return String.format("usedTime %4.2f ms  usedMemory:  %4.2f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
+		return String.format("usedTime: %4.2f ms  usedMemory:  %4.2f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
 	}
 
 }
