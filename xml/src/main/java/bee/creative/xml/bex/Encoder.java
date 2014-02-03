@@ -18,9 +18,9 @@ import bee.creative.util.Unique.UniqueSet;
  * <p>
  * <h3>BEX – Binary Encoded XML (Document)</h3>
  * <p>
- * Binary Encoded XML (Document) beschreibt das Format einer Binärdatei zur redundanzarmen Abbildung eines XML Dokuments. Ziel dieses Formats ist es, eine nur
- * lesende DOM-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch schreiben könnende
- * Implementation einer Standard XML Softwarebibliothek.
+ * Binary Encoded XML (Document) ist das Format einer Binärdatei zur Abbildung eines XML Dokuments. Ziel dieses Formats ist es, eine nur lesende
+ * DOM-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch schreiben könnende Implementation
+ * einer Standard XML Softwarebibliothek. 
  * <p>
  * <table border="1" style="vertical-align: top">
  * <tr>
@@ -780,7 +780,7 @@ public final class Encoder {
 		this.writeAttributes(target, attributesList);
 		final byte[] array = this.array;
 		Bytes.set4(array, 0, childrenRef.key);
-		System.out.println(childrenRef.key);
+		// System.out.println(childrenRef.key);
 		target.write(array, 0, 4);
 	}
 

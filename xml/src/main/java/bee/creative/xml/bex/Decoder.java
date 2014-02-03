@@ -13,7 +13,6 @@ import bee.creative.xml.view.ChildView;
 import bee.creative.xml.view.ChildrenView;
 import bee.creative.xml.view.DocumentView;
 import bee.creative.xml.view.ElementView;
-import bee.creative.xml.view.NodeView;
 import bee.creative.xml.view.ParentView;
 import bee.creative.xml.view.TextView;
 
@@ -26,184 +25,35 @@ import bee.creative.xml.view.TextView;
 public final class Decoder {
 
 	/**
-	 * Diese Schnittstelle definiert den {@link NodeView} eines {@link BEXDocumentView}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static interface BEXNodeView extends NodeView {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public BEXDocumentView document();
-
-	}
-
-	/**
-	 * Diese Schnittstelle definiert den {@link ParentView} eines {@link BEXDocumentView}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static interface BEXParentView extends ParentView, BEXNodeView {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public BEXDocumentView document();
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link ElementView} eines {@link BEXDocumentView}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static class BEXElementView implements ElementView, BEXParentView {
-
-		final BEXParentView parent;
-
-		final int index;
-
-		final short uriRef;
-
-		final short nameRef;
-
-		final int childrenRef;
-
-		final int attributesRef;
-
-		public BEXElementView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int childrenRef, final int attributesRef) {
-			this.parent = parent;
-			this.index = index;
-			this.uriRef = uriRef;
-			this.nameRef = nameRef;
-			this.childrenRef = childrenRef;
-			this.attributesRef = attributesRef;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public BEXDocumentView document() {
-			return this.parent.document();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ParentView parent() {
-			return this.parent;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int index() {
-			return this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String uri() {
-			return this.parent.document().name(this.uriRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String name() {
-			return this.parent.document().name(this.nameRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildrenView children() {
-			return new SQLChildrenView(this, this.childrenRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public AttributesView attributes() {
-			return new BEXAttributesView(this, this.attributesRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public TextView asText() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ElementView asElement() {
-			return this;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public DocumentView asDocument() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.name(), this.children(), this.attributes());
-		}
-
-	}
-
-	static class SQLElementTextView extends BEXElementView {
-
-		public SQLElementTextView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int contentRef,
-			final int attributesRef) {
-			super(parent, index, uriRef, nameRef, contentRef, attributesRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildrenView children() {
-			return new SQLChildrenTextView(this, this.childrenRef);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert den {@link TextView} eines {@link BEXDocumentView}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SQLTextView implements TextView {
+	static final class BEXTextView implements TextView {
 
+		/**
+		 * Dieses Feld speichert den Elternknoten.
+		 */
 		final BEXParentView parent;
 
+		/**
+		 * Dieses Feld speichert den Kindknotenindex.
+		 */
 		final int index;
 
+		/**
+		 * Dieses Feld speichert die Referenz auf des Wert.
+		 */
 		final int valueRef;
 
-		public SQLTextView(final BEXParentView parent, final int index, final int valueRef) {
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXTextView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Kindknotenindex.
+		 * @param valueRef Referenz auf des Wert.
+		 */
+		public BEXTextView(final BEXParentView parent, final int index, final int valueRef) {
 			this.parent = parent;
 			this.index = index;
 			this.valueRef = valueRef;
@@ -268,11 +118,204 @@ public final class Decoder {
 	}
 
 	/**
+	 * Diese Schnittstelle definiert den {@link ParentView} eines {@link BEXDocumentView}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static abstract class BEXParentView implements ParentView {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public abstract BEXDocumentView document();
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link ElementView} eines {@link BEXDocumentView}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static class BEXElementView extends BEXParentView implements ElementView {
+
+		/**
+		 * Dieses Feld speichert den Elternknoten.
+		 */
+		final BEXParentView parent;
+
+		/**
+		 * Dieses Feld speichert den Kindknotenindex.
+		 */
+		final int index;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf den URI.
+		 */
+		final short uriRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf den Namen.
+		 */
+		final short nameRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf die Kindknotenliste.
+		 */
+		final int childrenRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
+		 */
+		final int attributesRef;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElementView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Kindknotenindex.
+		 * @param uriRef Referenz auf den URI.
+		 * @param nameRef Referenz auf den Namen.
+		 * @param childrenRef Referenz auf die Kindknotenliste.
+		 * @param attributesRef Referenz auf die Attributknotenliste.
+		 */
+		public BEXElementView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int childrenRef, final int attributesRef) {
+			this.parent = parent;
+			this.index = index;
+			this.uriRef = uriRef;
+			this.nameRef = nameRef;
+			this.childrenRef = childrenRef;
+			this.attributesRef = attributesRef;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXDocumentView document() {
+			return this.parent.document();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ParentView parent() {
+			return this.parent;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int index() {
+			return this.index;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String uri() {
+			return this.parent.document().name(this.uriRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String name() {
+			return this.parent.document().name(this.nameRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ChildrenView children() {
+			return new BEXChildrenView(this, this.childrenRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public AttributesView attributes() {
+			return new BEXAttributesView(this, this.attributesRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public TextView asText() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ElementView asElement() {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DocumentView asDocument() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.name(), this.children(), this.attributes());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link BEXElementView} mit genau einem Textknoten als Kindknoten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static class BEXElementTextView extends BEXElementView {
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElementTextView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Kindknotenindex.
+		 * @param uriRef Referenz auf den URI.
+		 * @param nameRef Referenz auf den Namen.
+		 * @param contentRef Referenz auf den Wert des Textknoten.
+		 * @param attributesRef Referenz auf die Attributknotenliste.
+		 */
+		public BEXElementTextView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int contentRef,
+			final int attributesRef) {
+			super(parent, index, uriRef, nameRef, contentRef, attributesRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ChildrenView children() {
+			return new BEXChildrenTextView(this, this.childrenRef);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert den {@link ChildrenView} eines {@link BEXDocumentView}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static class SQLChildrenView implements ChildrenView {
+	static class BEXChildrenView implements ChildrenView {
 
 		/**
 		 * Dieses Feld speichert den {@link BEXParentView}.
@@ -282,19 +325,22 @@ public final class Decoder {
 		/**
 		 * Dieses Feld speichert den Schlüssel der Kindknotenliste.
 		 */
-		final int ref;
+		final int childrenRef;
 
+		/**
+		 * Dieses Feld speichert die Länge der Kindknotenliste.
+		 */
 		int size;
 
 		/**
-		 * Dieser Konstruktor initialisiert {@link BEXParentView} und Schlüssel der Kindknotenliste.
+		 * Dieser Konstruktor initialisiert den {@link BEXChildrenView}.
 		 * 
-		 * @param parent {@link BEXParentView}.
-		 * @param key Schlüssel der Kindknotenliste.
+		 * @param parent Elternknoten.
+		 * @param childrenRef Referenz auf die Kindknotenliste.
 		 */
-		public SQLChildrenView(final BEXParentView parent, final int key) {
+		public BEXChildrenView(final BEXParentView parent, final int childrenRef) {
 			this.parent = parent;
-			this.ref = key;
+			this.childrenRef = childrenRef;
 			this.size = -1;
 		}
 
@@ -320,7 +366,7 @@ public final class Decoder {
 		@Override
 		public ChildView get(final int index) throws IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException();
-			return this.parent.document().childrenItem(this.parent, this.ref, index);
+			return this.parent.document().childrenItem(this.parent, this.childrenRef, index);
 		}
 
 		/**
@@ -329,7 +375,7 @@ public final class Decoder {
 		@Override
 		public int size() {
 			final int size = this.size;
-			return size >= 0 ? size : (this.size = this.parent.document().childrenSize(this.ref));
+			return size >= 0 ? size : (this.size = this.parent.document().childrenSize(this.childrenRef));
 		}
 
 		/**
@@ -342,10 +388,21 @@ public final class Decoder {
 
 	}
 
-	static class SQLChildrenTextView extends SQLChildrenView {
+	/**
+	 * Diese Klasse implementiert einen {@link BEXChildrenView} mit genau einem Textknoten als Kindknoten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static class BEXChildrenTextView extends BEXChildrenView {
 
-		public SQLChildrenTextView(final BEXParentView parent, final int textRef) {
-			super(parent, textRef);
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXChildrenTextView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param contentRef Referenz auf den Wert des Textknoten.
+		 */
+		public BEXChildrenTextView(final BEXParentView parent, final int contentRef) {
+			super(parent, contentRef);
 		}
 
 		/**
@@ -355,7 +412,7 @@ public final class Decoder {
 		public ChildView get(final int index) throws IndexOutOfBoundsException {
 			if(index < 0) throw new IndexOutOfBoundsException();
 			if(index > 0) return null;
-			return new SQLTextView(this.parent, 0, this.ref);
+			return new BEXTextView(this.parent, 0, this.childrenRef);
 		}
 
 		/**
@@ -373,19 +430,43 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class SQLAttributeView implements AttributeView {
+	static final class BEXAttributeView implements AttributeView {
 
+		/**
+		 * Dieses Feld speichert den Elternknoten.
+		 */
 		final BEXElementView parent;
 
+		/**
+		 * Dieses Feld speichert den Attributknotenindex.
+		 */
 		final int index;
 
+		/**
+		 * Dieses Feld speichert die Referenz auf den URI.
+		 */
 		final short uriRef;
 
+		/**
+		 * Dieses Feld speichert die Referenz auf den Namen.
+		 */
 		final short nameRef;
 
+		/**
+		 * Dieses Feld speichert die Referenz auf den Wert.
+		 */
 		final int valueRef;
 
-		public SQLAttributeView(final BEXElementView parent, final int index, final short uriRef, final short nameRef, final int valueRef) {
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXAttributeView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Attributknotenindex.
+		 * @param uriRef Referenz auf den URI.
+		 * @param nameRef Referenz auf den Namen.
+		 * @param valueRef Referenz auf den Wert.
+		 */
+		public BEXAttributeView(final BEXElementView parent, final int index, final short uriRef, final short nameRef, final int valueRef) {
 			this.parent = parent;
 			this.index = index;
 			this.uriRef = uriRef;
@@ -458,15 +539,30 @@ public final class Decoder {
 	 */
 	static final class BEXAttributesView implements AttributesView {
 
+		/**
+		 * Dieses Feld speichert den Elternknoten.
+		 */
 		final BEXElementView parent;
 
-		final int key;
+		/**
+		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
+		 */
+		final int attributesRef;
 
+		/**
+		 * Dieses Feld speichert die Länge der Attributknotenliste.
+		 */
 		int size;
 
-		public BEXAttributesView(final BEXElementView parent, final int key) {
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXAttributesView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param attributesRef Referenz auf die Attributknotenliste.
+		 */
+		public BEXAttributesView(final BEXElementView parent, final int attributesRef) {
 			this.parent = parent;
-			this.key = key;
+			this.attributesRef = attributesRef;
 			this.size = -1;
 		}
 
@@ -491,7 +587,7 @@ public final class Decoder {
 		 */
 		@Override
 		public AttributeView get(final int index) throws IndexOutOfBoundsException {
-			return this.parent.document().attributesItem(this.parent, this.key, index);
+			return this.parent.document().attributesItem(this.parent, this.attributesRef, index);
 		}
 
 		/**
@@ -511,7 +607,7 @@ public final class Decoder {
 		@Override
 		public int size() {
 			final int size = this.size;
-			return size >= 0 ? size : (this.size = this.parent.document().attributesSize(this.key));
+			return size >= 0 ? size : (this.size = this.parent.document().attributesSize(this.attributesRef));
 		}
 
 		/**
@@ -529,7 +625,7 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class BEXDocumentView implements DocumentView, BEXParentView {
+	static final class BEXDocumentView extends BEXParentView implements DocumentView {
 
 		/**
 		 * Diese Klasse implementiert einen wiederverwendbaren Block von 1024 Byte, dessen Wiederverwendungen gezählt werden.
@@ -566,11 +662,6 @@ public final class Decoder {
 		final int length;
 
 		/**
-		 * Dieses Feld speichert den Lesepuffer für {@link DecodeSource#read(byte[], int, int)}.
-		 */
-		final byte[] array;
-
-		/**
 		 * Dieses Feld speichert die {@link Page}s.
 		 */
 		final Page[] pageList;
@@ -585,26 +676,55 @@ public final class Decoder {
 		 */
 		int pageCount;
 
+		/**
+		 * Dieses Feld speichert die Startpositionen der Namen. Der i-te Name beginnt bei Zeichen nameStarts[i] und Endet vor Zeichen nameStarts[i+1].
+		 */
 		final int[] nameStarts;
 
+		/**
+		 * Dieses Feld speichert den Beginn der Zeichen der Namen relativ zu {@link #offset}.
+		 */
 		final int nameOffset;
 
+		/**
+		 * Dieses Feld speichert die Startpositionen der Werte. Der i-te Wert beginnt bei Zeichen valueStarts[i] und Endet vor Zeichen valueStarts[i+1].
+		 */
 		final int[] valueStarts;
 
+		/**
+		 * Dieses Feld speichert den Beginn der Zeichen der Werte relativ zu {@link #offset}.
+		 */
 		final int valueOffset;
 
+		/**
+		 * Dieses Feld speichert die Startpositionen der Kindknotenlisten. Die i-te Kindknotenliste beginnt bei Kindknoten childrenStarts[i] und Endet vor
+		 * Kindknoten childrenStarts[i+1].
+		 */
 		final int[] childrenStarts;
 
+		/**
+		 * Dieses Feld speichert den Beginn der Kindknoten der Kindknotenlisten relativ zu {@link #offset}.
+		 */
 		final int childrenOffset;
 
+		/**
+		 * Dieses Feld speichert die Startpositionen der Attributknotenlisten. Die i-te Attributknotenliste beginnt bei Attributknoten attributesStarts[i] und Endet
+		 * vor Attributknoten attributesStarts[i+1].
+		 */
 		final int[] attributesStarts;
 
+		/**
+		 * Dieses Feld speichert den Beginn der Attributknoten der Attributknotenlisten relativ zu {@link #offset}.
+		 */
 		final int attributesOffset;
 
+		/**
+		 * Dieses Feld speichert die Referenz auf die Kindknotenliste des {@link Document}s.
+		 */
 		final int childrenRef;
 
 		/**
-		 * Dieser Konstruktor initialisiert {@link DecodeSource} und Cache.
+		 * Dieser Konstruktor initialisiert {@link DecodeSource} und Cachegröße.
 		 * 
 		 * @param source {@link DecodeSource}.
 		 * @param cacheSize maximaler Speicherverbrauch des Caches in Byte.
@@ -612,7 +732,6 @@ public final class Decoder {
 		 */
 		public BEXDocumentView(final DecodeSource source, final int cacheSize) throws IOException {
 			int count, length, cursor = 0;
-			this.array = new byte[16];
 			{ // file
 				this.source = source;
 				this.offset = source.index();
@@ -623,7 +742,6 @@ public final class Decoder {
 				length = this.nameStarts[count - 1] * 2;
 				cursor += (count * 4) + 4;
 				this.nameOffset = ((cursor + length + 3) & ~3) - length;
-				// System.out.println("space: "+(nameOffset-cursor));
 				cursor = this.nameOffset + length;
 				source.seek(cursor + this.offset);
 			}
@@ -633,7 +751,6 @@ public final class Decoder {
 				length = this.valueStarts[count - 1] * 2;
 				cursor += (count * 4) + 4;
 				this.valueOffset = ((cursor + length + 3) & ~3) - length;
-				// System.out.println("space: "+(valueOffset-cursor));
 				cursor = this.valueOffset + length;
 				source.seek(cursor + this.offset);
 			}
@@ -643,7 +760,6 @@ public final class Decoder {
 				length = this.childrenStarts[count - 1] * 16;
 				cursor += (count * 4) + 4;
 				this.childrenOffset = (cursor + 15) & ~15;
-				// System.out.println("space: "+(childrenOffset-cursor));
 				cursor = this.childrenOffset + length;
 				source.seek(cursor + this.offset);
 			}
@@ -653,12 +769,11 @@ public final class Decoder {
 				length = this.attributesStarts[count - 1] * 8;
 				cursor += (count * 4) + 4;
 				this.attributesOffset = (cursor + 7) & ~7;
-				// System.out.println("space: "+(attributesOffset-cursor));
 				cursor = this.attributesOffset + length;
 				source.seek(cursor + this.offset);
 			}
 			{ // document
-				final byte[] array = this.array;
+				final byte[] array = new byte[16];
 				source.read(array, 0, 4);
 				this.childrenRef = Bytes.get4(array, 0);
 				cursor += 4;
@@ -672,14 +787,14 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode lödt die Startpositionen ausder gegebenen {@link DecodeSource} und gibt sie zurück.
+		 * Diese Methode lödt die Startpositionen aus der gegebenen {@link DecodeSource} und gibt sie zurück.
 		 * 
 		 * @param source {@link DecodeSource}.
 		 * @return Startpositionen.
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
 		int[] loadStarts(final DecodeSource source) throws IOException {
-			final byte[] array = this.array;
+			final byte[] array = new byte[4];
 			source.read(array, 0, 4);
 			final int length = Bytes.get4(array, 0) + 1;
 			final int[] starts = new int[length];
@@ -730,11 +845,11 @@ public final class Decoder {
 			page = new Page();
 			page.uses = 1;
 			final byte[] data = page.data;
-
 			final int offset = index * 1024;
 			try{
-				this.source.seek(offset + this.offset);
-				this.source.read(data, 0, Math.min(1024, this.length - offset));
+				final DecodeSource source = this.source;
+				source.seek(offset + this.offset);
+				source.read(data, 0, Math.min(1024, this.length - offset));
 			}catch(final Exception e){
 				throw new IllegalStateException(e);
 			}
@@ -743,6 +858,14 @@ public final class Decoder {
 			return data;
 		}
 
+		/**
+		 * Diese Methode gibt den Text mit dem gegebenen Schlüssel zurück und wird von {@link #name(int)} bzw. {@link #value(int)} verwendet.
+		 * 
+		 * @param key Schlüssel des Texts.
+		 * @param starts Startpositionen ({@link #nameStarts} oder {@link #valueStarts}).
+		 * @param offset Beginn der Zeichen relativ zu {@link #offset} ({@link #nameOffset} oder {@link #valueOffset}).
+		 * @return Text.
+		 */
 		String text(final int key, final int[] starts, final int offset) {
 			if(key < 0) return null;
 			int from = starts[key];
@@ -750,33 +873,39 @@ public final class Decoder {
 			from = (from * 2) + offset;
 			int page = from / 1024;
 			final char[] text = new char[size];
-			int textPos = 0;
-			int dataPos = from & 1023;
-			while(textPos < size){
+			from = from & 1023;
+			for(int i = 0; i < size; from = 0, page++){
 				final byte[] data = this.data(page);
-				final int length = Math.min(size, textPos + 512 - (dataPos / 2));
-				while(textPos < length){
-					text[textPos] = (char)Bytes.get2(data, dataPos);
-					textPos += 1;
-					dataPos += 2;
+				for(final int length = Math.min(size, (i + 512) - (from / 2)); i < length; i++, from += 2){
+					text[i] = (char)Bytes.get2(data, from);
 				}
-				page++;
-				dataPos = 0;
 			}
 			return new String(text);
-
 		}
 
+		/**
+		 * Diese Methode implementeirt {@link BEXAttributeView#uri()}, {@link BEXAttributeView#name()}, {@link BEXElementView#uri()} und
+		 * {@link BEXElementView#name()}.
+		 * 
+		 * @param key Schlüssel des Namen.
+		 * @return Name.
+		 */
 		String name(final int key) {
 			return this.text(key, this.nameStarts, this.nameOffset);
 		}
 
+		/**
+		 * Diese Methode implementeirt {@link BEXAttributeView#value()} und {@link BEXTextView#value()}.
+		 * 
+		 * @param key Schlüssel des Werts.
+		 * @return Wert.
+		 */
 		String value(final int key) {
 			return this.text(key, this.valueStarts, this.valueOffset);
 		}
 
 		/**
-		 * Diese Methode implementiert {@link SQLChildrenView#size()}.
+		 * Diese Methode implementiert {@link BEXChildrenView#size()}.
 		 * 
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @return Anzahl der Kindknoten.
@@ -788,12 +917,12 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link SQLChildrenView#get(int)}.
+		 * Diese Methode implementiert {@link BEXChildrenView#get(int)}.
 		 * 
 		 * @param parent {@link BEXParentView}.
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @param index Index des Kindknoten.
-		 * @return {@link SQLTextView}, {@link BEXElementView} oder {@code null}.
+		 * @return {@link BEXTextView}, {@link BEXElementView} oder {@code null}.
 		 */
 		ChildView childrenItem(final BEXParentView parent, final int key, final int index) {
 			if(key < 0) return null;
@@ -801,19 +930,16 @@ public final class Decoder {
 			int offset = starts[key] + index;
 			if(offset >= starts[key + 1]) return null;
 			offset = (offset * 16) + this.childrenOffset;
-			final int page = offset / 1024;
+			final byte[] data = this.data(offset / 1024);
 			offset &= 1023;
-			final byte[] data = this.data(page);
 			final short uriRef = (short)Bytes.get2(data, offset);
 			final short nameRef = (short)Bytes.get2(data, offset + 2);
 			final int contentRef = Bytes.get4(data, offset + 4);
 			final int childrenRef = Bytes.get4(data, offset + 8);
 			final int attributesRef = Bytes.get4(data, offset + 12);
-			// System.out.println("C: " + uriRef + " " + nameRef + " " + contentRef + " " + childrenRef + " " + attributesRef);
-
-			if(nameRef < 0) return new SQLTextView(parent, index, contentRef);
+			if(nameRef < 0) return new BEXTextView(parent, index, contentRef);
 			if(contentRef < 0) return new BEXElementView(parent, index, uriRef, nameRef, childrenRef, attributesRef);
-			return new SQLElementTextView(parent, index, uriRef, nameRef, contentRef, attributesRef);
+			return new BEXElementTextView(parent, index, uriRef, nameRef, contentRef, attributesRef);
 		}
 
 		/**
@@ -834,7 +960,7 @@ public final class Decoder {
 		 * @param parent {@link BEXParentView}.
 		 * @param key Schlüssel der Attributknotenliste.
 		 * @param index Index des Attributknoten.
-		 * @return {@link SQLAttributeView} oder {@code null}.
+		 * @return {@link BEXAttributeView} oder {@code null}.
 		 */
 		AttributeView attributesItem(final BEXElementView parent, final int key, final int index) {
 			if(key < 0) return null;
@@ -842,14 +968,12 @@ public final class Decoder {
 			int offset = starts[key] + index;
 			if(offset >= starts[key + 1]) return null;
 			offset = (offset * 8) + this.attributesOffset;
-			final int page = offset / 1024;
+			final byte[] data = this.data(offset / 1024);
 			offset &= 1023;
-			final byte[] data = this.data(page);
 			final short uriRef = (short)Bytes.get2(data, offset);
 			final short nameRef = (short)Bytes.get2(data, offset + 2);
 			final int valueRef = Bytes.get4(data, offset + 4);
-			// System.out.println("A: " + uriRef + " " + nameRef + " " + valueRef);
-			return new SQLAttributeView(parent, index, uriRef, nameRef, valueRef);
+			return new BEXAttributeView(parent, index, uriRef, nameRef, valueRef);
 		}
 
 		/**
@@ -865,7 +989,7 @@ public final class Decoder {
 		 */
 		@Override
 		public ChildrenView children() {
-			return new SQLChildrenView(this, this.childrenRef);
+			return new BEXChildrenView(this, this.childrenRef);
 		}
 
 		/**
@@ -921,7 +1045,7 @@ public final class Decoder {
 	/**
 	 * Dieses Feld speichert den maximalen Speicherverbrauch des Caches in Byte.
 	 */
-	protected int cacheSize = 1024 * 64;
+	protected int cacheSize = 1024 * 128;
 
 	/**
 	 * Diese Methode erzeugt ein {@link Document}, das seine Daten aus der gegebenen {@link DecodeSource} nachlädt, und gibt es zurück.
@@ -935,7 +1059,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Größe des Caches in Byte zurück.
+	 * Diese Methode gibt die maximale Größe des Caches in Byte zurück. Der Initialwert ist 128 KB.
 	 * 
 	 * @return maximaler Speicherverbrauch des Caches in Byte.
 	 */
