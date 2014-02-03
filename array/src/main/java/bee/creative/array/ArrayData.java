@@ -7,7 +7,7 @@ package bee.creative.array;
  * sondern auch dessen Position.
  * <p>
  * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben. Dadurch vergrößert sich entweder die Größe
- * des Leerraums vor oder die die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht
+ * des Leerraums vor oder  die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht
  * aus, werden alle Elemente verschoben und im internen Array neu ausgerichtet.
  * <p>
  * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des internen Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am
