@@ -291,8 +291,11 @@ public final class Encoder {
 	 */
 	static abstract class Pool<GData, GItem extends Item> extends UniqueSet<GItem> implements Comparator<GItem> {
 
-		int reuses=0;
-		
+		/**
+		 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
+		 */
+		int reuses = 0;
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -308,7 +311,7 @@ public final class Encoder {
 		@Override
 		protected final void reuse(final GItem input, final GItem output) {
 			output.key++;
-			reuses++;
+			this.reuses++;
 		}
 
 		/**
@@ -356,10 +359,13 @@ public final class Encoder {
 			Collections.sort(items, this);
 			return items;
 		}
-		
+
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String toString() {
-			return ""+reuses;
+			return Objects.toStringCall(this, this.entryMap.size(), this.reuses);
 		}
 
 	}
@@ -789,14 +795,13 @@ public final class Encoder {
 		this.writeAttributes(target, attributesList);
 		final byte[] array = this.array;
 		Bytes.set4(array, 0, childrenRef.key);
-
 		target.write(array, 0, 4);
-		System.out.println(Objects.toStringCallFormat(true, true, this, //
-			"namePool", this.namePool, //
-			"valuePool", this.valuePool, //
-			"childrenPool", this.childrenPool, //
-			"attributesPool", this.attributesPool //
-			));
+		// System.out.println(Objects.toStringCallFormat(true, true, this, //
+		// "namePool", this.namePool, //
+		// "valuePool", this.valuePool, //
+		// "childrenPool", this.childrenPool, //
+		// "attributesPool", this.attributesPool //
+		// ));
 	}
 
 }
