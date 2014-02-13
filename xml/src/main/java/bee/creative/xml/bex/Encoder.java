@@ -11,6 +11,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueSet;
 
 /**
@@ -20,7 +21,7 @@ import bee.creative.util.Unique.UniqueSet;
  * <p>
  * Binary Encoded XML (Document) ist das Format einer Binärdatei zur Abbildung eines XML Dokuments. Ziel dieses Formats ist es, eine nur lesende
  * DOM-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch schreiben könnende Implementation
- * einer Standard XML Softwarebibliothek. 
+ * einer Standard XML Softwarebibliothek.
  * <p>
  * <table border="1" style="vertical-align: top">
  * <tr>
@@ -290,6 +291,8 @@ public final class Encoder {
 	 */
 	static abstract class Pool<GData, GItem extends Item> extends UniqueSet<GItem> implements Comparator<GItem> {
 
+		int reuses=0;
+		
 		/**
 		 * {@inheritDoc}
 		 */
@@ -305,6 +308,7 @@ public final class Encoder {
 		@Override
 		protected final void reuse(final GItem input, final GItem output) {
 			output.key++;
+			reuses++;
 		}
 
 		/**
@@ -351,6 +355,11 @@ public final class Encoder {
 			final List<GItem> items = new ArrayList<GItem>(this.entryMap.values());
 			Collections.sort(items, this);
 			return items;
+		}
+		
+		@Override
+		public String toString() {
+			return ""+reuses;
 		}
 
 	}
@@ -780,8 +789,14 @@ public final class Encoder {
 		this.writeAttributes(target, attributesList);
 		final byte[] array = this.array;
 		Bytes.set4(array, 0, childrenRef.key);
-		// System.out.println(childrenRef.key);
+
 		target.write(array, 0, 4);
+		System.out.println(Objects.toStringCallFormat(true, true, this, //
+			"namePool", this.namePool, //
+			"valuePool", this.valuePool, //
+			"childrenPool", this.childrenPool, //
+			"attributesPool", this.attributesPool //
+			));
 	}
 
 }

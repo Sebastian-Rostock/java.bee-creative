@@ -3,20 +3,20 @@ package bee.creative.data.codec;
 import java.io.IOException;
 
 /**
- * Diese Schnittstelle definiert ein Objekt, dass sich selbst in ein {@link EncoderTarget} schreiben kann.
+ * Diese Schnittstelle definiert ein Objekt, dass sich selbst in ein {@link CodecOutput} schreiben kann.
  * 
- * @see EncoderTarget#context()
+ * @see CodecOutput#context()
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  */
 public interface Encodable<GContext> {
 
 	/**
-	 * Diese Methode schreibt dieses Objekt in das gegebene {@link EncoderTarget}.
+	 * Diese Methode schreibt dieses Objekt in das gegebene {@link CodecOutput}.
 	 * 
-	 * @param target {@link EncoderTarget} mit den Ausgabedaten und dem Kontextobjekt.
+	 * @param target {@link CodecOutput} mit den Ausgabedaten und dem Kontextobjekt.
 	 * @throws IOException Wenn ein Fehler beim Schreiben oder Kodieren auftritt.
 	 */
-	public void encode(EncoderTarget<? extends GContext> target) throws IOException;
+	public void encode(CodecOutput<? extends GContext> target) throws IOException;
 
 }

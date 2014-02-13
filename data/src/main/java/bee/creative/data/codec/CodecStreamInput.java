@@ -4,14 +4,14 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 
 /**
- * Diese Klasse implementiert eine {@link DecoderSource} als {@link DataInputStream}, auf desren internen {@link InputStream} via {@link #stream()} zugegriffen
+ * Diese Klasse implementiert eine {@link CodecInput} als {@link DataInputStream}, auf desren internen {@link InputStream} via {@link #stream()} zugegriffen
  * werden kann.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  * @param <GStream> Typ des {@link InputStream}s.
  */
-public class DecoderStreamSource<GContext, GStream extends InputStream> extends DataInputStream implements DecoderSource<GContext> {
+public class CodecStreamInput<GContext, GStream extends InputStream> extends DataInputStream implements CodecInput<GContext> {
 
 	/**
 	 * Dieses Feld speichert den {@link InputStream}.
@@ -30,7 +30,7 @@ public class DecoderStreamSource<GContext, GStream extends InputStream> extends 
 	 * @param stream {@link InputStream}.
 	 * @throws NullPointerException Wenn der gegebene {@link InputStream} {@code null} ist.
 	 */
-	public DecoderStreamSource(final GContext context, final GStream stream) {
+	public CodecStreamInput(final GContext context, final GStream stream) {
 		super(stream);
 		if(stream == null) throw new NullPointerException();
 		this.stream = stream;

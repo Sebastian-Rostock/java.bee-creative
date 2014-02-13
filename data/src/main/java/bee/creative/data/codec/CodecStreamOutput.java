@@ -4,14 +4,14 @@ import java.io.DataOutputStream;
 import java.io.OutputStream;
 
 /**
- * Diese Klasse implementiert ein {@link EncoderTarget} als {@link DataOutputStream}, auf dessen internen {@link OutputStream} via {@link #stream()} zugegriffen
+ * Diese Klasse implementiert ein {@link CodecOutput} als {@link DataOutputStream}, auf dessen internen {@link OutputStream} via {@link #stream()} zugegriffen
  * werden kann.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  * @param <GStream> Typ des {@link OutputStream}s.
  */
-public class EncoderStreamTarget<GContext, GStream extends OutputStream> extends DataOutputStream implements EncoderTarget<GContext> {
+public class CodecStreamOutput<GContext, GStream extends OutputStream> extends DataOutputStream implements CodecOutput<GContext> {
 
 	/**
 	 * Dieses Feld speichert den {@link OutputStream}.
@@ -30,7 +30,7 @@ public class EncoderStreamTarget<GContext, GStream extends OutputStream> extends
 	 * @param stream {@link OutputStream}.
 	 * @throws NullPointerException Wenn der gegebene {@link OutputStream} {@code null} ist.
 	 */
-	public EncoderStreamTarget(final GContext context, final GStream stream) throws NullPointerException {
+	public CodecStreamOutput(final GContext context, final GStream stream) throws NullPointerException {
 		super(stream);
 		if(stream == null) throw new NullPointerException();
 		this.stream = stream;
