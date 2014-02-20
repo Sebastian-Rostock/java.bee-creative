@@ -1572,9 +1572,9 @@ public class Decoder {
 		return new DocumentAdapter(new BEXDocumentView(source, this));
 	}
 
-	public void setCacheSize(final int value) throws IllegalArgumentException {
-		if(value < 0) throw new IllegalArgumentException("value < 0");
-		this.maxFileCachePages = value;
-	}
+//	public void setCacheSize(final int value) throws IllegalArgumentException {
+//		if(value < 0) throw new IllegalArgumentException("value < 0");
+//		this.maxFileCachePages = value;
+//	}
 
 }
