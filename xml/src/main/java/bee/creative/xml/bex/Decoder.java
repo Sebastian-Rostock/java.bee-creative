@@ -17,34 +17,676 @@ import bee.creative.xml.view.ParentView;
 import bee.creative.xml.view.TextView;
 
 /**
- * Diese Klasse implementiert den {@link DocumentView} zu dem in {@link Encoder} beschriebenen Binärformet.
+ * Diese Klasse implementiert das Objekt zur Kofiguration und Erzeugung eines {@link DocumentView} zu dem {@link Document}, dass mit einem {@link Encoder} binär
+ * kodiert wurde.
  * 
  * @see Encoder
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Decoder {
+public class Decoder {
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Vorhaltung von Nutzdaten, deren Wiederverwendungen via {@link #uses} gezählt wird.
+	 * 
+	 * @see MRUCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static abstract class MRUPage {
+
+		/**
+		 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
+		 */
+		public int uses = 1;
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von {@link MRUPage}s.
+	 * 
+	 * @see MRUPage
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static abstract class MRUCache {
+
+		/**
+		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link MRUPage}s. Dies wird in {@link #set(MRUPage[], int, MRUPage)} modifiziert.
+		 */
+		protected int pageCount = 0;
+
+		/**
+		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link MRUPage}s.
+		 */
+		protected int pageLimit;
+
+		public MRUCache(final int pageLimit) {
+			this.pageLimit = Math.max(pageLimit, 1);
+		}
+
+		/**
+		 * Diese Methode setzt die {@code index}-te {@link MRUPage} und verdrängt ggf. überzählige {@link MRUPage}s. <br>
+		 * Es wird nicht geprüft, ob die gegebene bzw. die {@code index}-te {@link MRUPage} im gegebenen Array {@code null} ist.
+		 * 
+		 * @param pages Array der {@link MRUPage}s, in welchen aktuell {@link #pageCount} {@link MRUPage}s verwaltet werden.
+		 * @param index Index der zusetzenden {@link MRUPage}.
+		 * @param page zusetzende {@link MRUPage}.
+		 */
+		protected final void set(final MRUPage[] pages, final int index, final MRUPage page) {
+			int pageCount = this.pageCount, pageLimit = this.pageLimit;
+			if(pageCount >= pageLimit){
+				pageLimit = (pageLimit + 1) / 2;
+				final int size = pages.length;
+				while(pageCount > pageLimit){
+					int uses = 0;
+					{
+						final int maxUses = Integer.MAX_VALUE / pageCount;
+						for(int i = 0; i < size; i++){
+							final MRUPage item = pages[i];
+							if(item != null){
+								uses += (item.uses = Math.min(item.uses, maxUses - i));
+							}
+						}
+					}
+					{
+						final int minUses = uses / pageCount;
+						for(int i = 0; i < size; i++){
+							final MRUPage item = pages[i];
+							if((item != null) && ((item.uses -= minUses) <= 0)){
+								pages[i] = null;
+								pageCount--;
+							}
+						}
+					}
+				}
+			}
+			this.pageCount = pageCount + 1;
+			pages[index] = page;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Teilen einer {@link DecodeSource}.
+	 * 
+	 * @see MRUFileCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUFilePage extends MRUPage {
+
+		/**
+		 * Dieses Feld definiert die Anzahl der Byte in {@link #data}.
+		 */
+		public static final int SIZE = 1024;
+
+		/**
+		 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DecodeSource}.
+		 */
+		public final byte[] data = new byte[MRUFilePage.SIZE];
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Auszügen einer {@link DecodeSource}.
+	 * 
+	 * @see MRUFilePage
+	 * @see DecodeSource
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUFileCache extends MRUCache {
+
+		/**
+		 * Dieses Feld speichert die {@link MRUFilePage}s.
+		 */
+		MRUFilePage[] pages = {};
+
+		/**
+		 * Dieses Feld speichert die Größe der Nutzdatenstrukturen in {@link #source}.
+		 */
+		int length;
+
+		/**
+		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
+		 */
+		public final byte[] array = new byte[16];
+
+		/**
+		 * Dieses Feld speichert den Beginn der Nutzdatenstrukturen in {@link #source}.
+		 */
+		public final long offset;
+
+		/**
+		 * Dieses Feld speichert die {@link DecodeSource}.
+		 */
+		public final DecodeSource source;
+
+		/**
+		 * Dieser Konstruktor initialisiert {@link #source}, {@link #offset} und {@link #pageLimit}. Die {@link #pages} sowie die {@link #length} werden via
+		 * {@link #allocate(int)} gesetzt.
+		 * 
+		 * @param source {@link DecodeSource}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUFilePage}s.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die {@link DecodeSource} {@code null} ist.
+		 */
+		public MRUFileCache(final DecodeSource source, final int pageLimit) throws IOException, NullPointerException {
+			super(pageLimit);
+			this.source = source;
+			this.offset = source.index();
+		}
+
+		/**
+		 * Diese Methode gibt den {@link MRUFilePage#data Nutzdatenblock} der {@code index}-ten {@link MRUFilePage} zurück. Diese wird bei Bedarf aus der
+		 * {@link #source} nachgeladen. Die Vergrängung überzähliger {@link MRUFilePage}s erfolgt gemäß {@link #set(MRUPage[], int, MRUPage)}.
+		 * 
+		 * @param pageIndex Index der {@link MRUFilePage}.
+		 * @return {@link MRUFilePage#data Nutzdatenblock}.
+		 */
+		public byte[] get(final int pageIndex) {
+			final MRUFilePage[] pages = this.pages;
+			{
+				final MRUFilePage page = pages[pageIndex];
+				if(page != null){
+					page.uses++;
+					return page.data;
+				}
+			}
+			{
+				final MRUFilePage page = new MRUFilePage();
+				final byte[] data = page.data;
+				final int offset = pageIndex * MRUFilePage.SIZE;
+				try{
+					final DecodeSource source = this.source;
+					source.seek(this.offset + offset);
+					source.read(data, 0, Math.min(MRUFilePage.SIZE, this.length - offset));
+				}catch(final Exception e){
+					throw new IllegalStateException(e);
+				}
+				this.set(pages, pageIndex, page);
+				return data;
+			}
+		}
+
+		/**
+		 * Diese Methode liest die gegebene Anzahl an {@code byte} via {@link DecodeSource#read(byte[], int, int)} aus der {@link #source} und gibt diese als
+		 * {@code int} interpreteirt zurück.
+		 * 
+		 * @see Decoder#get(byte[], int, int)
+		 * @see DecodeSource#read(byte[], int, int)
+		 * @param size Anzahl der {@code byte}s.
+		 * @return {@code byte}s interpretiert als {@code int}.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public int read(final int size) throws IOException {
+			final byte[] array = this.array;
+			this.source.read(array, 0, size);
+			return Decoder.get(array, 0, size);
+		}
+
+		/**
+		 * Diese Methode überspringt den mit den gegebenen Startpositionen indizierten Datenbereich und gibt den Beginn dieses Datenbereichs zurück.
+		 * 
+		 * @see DecodeSource#index()
+		 * @see DecodeSource#seek(long)
+		 * @param offsets Startpositionen der Datenobjekte.
+		 * @param length Länge eines Datenobjekts.
+		 * @return Beginn des Datenbereichs (d.h. {@link DecodeSource#index() Leseposition} vor dem Überspringen).
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die gegebenen Startpositionen {@code null} sind.
+		 */
+		public int skip(final int[] offsets, final int length) throws IOException, NullPointerException {
+			final long index = this.source.index();
+			this.source.seek(index + (offsets[offsets.length - 1] * length));
+			return (int)(index - this.offset);
+		}
+
+		/**
+		 * Diese Methode lädt die Startpositionen via {@link DecodeSource#read(byte[], int, int)} aus der {@link #source} und gibt sie zurück.<br>
+		 * Die ersten 4 {@code byte} kodieren die um 1 verminderte Anzahl der Startpositionen. Das nächste {@code byte} kodiert die Länge jeder darauf folgenden
+		 * Startposition. Die erste Startposition ist implizit 0.
+		 * 
+		 * @see #source
+		 * @return Startpositionen.
+		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 */
+		public int[] offsets() throws IOException {
+			final int size = this.read(4) + 1, length = this.read(1);
+			final int[] offsets = new int[size];
+			offsets[0] = 0;
+			for(int i = 1; i < size; i++){
+				offsets[i] = this.read(length);
+			}
+			return offsets;
+		}
+
+		/**
+		 * Diese Methode setzt die Größe der Nutzdatenstrukturen in {@link #source} und erzeugt dazu die passende Anzahl an {@link MRUFilePage}s.
+		 * 
+		 * @param length Größe der Nutzdatenstrukturen in {@link #source}.
+		 */
+		public void allocate(final int length) {
+			this.pages = new MRUFilePage[((length + MRUFilePage.SIZE) - 1) / MRUFilePage.SIZE];
+			this.pageCount = 0;
+			this.length = length;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Werten unterschiedlicher Größe, die aus einem {@link MRUFileCache} nachgeladen
+	 * werden.
+	 * 
+	 * @see MRUFileCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static abstract class MRUItemCache extends MRUCache {
+
+		/**
+		 * Dieses Feld speichert die Anzahl der Werte.
+		 */
+		protected int length;
+
+		/**
+		 * Dieses Feld speichert die Startpositionen der Werte.
+		 */
+		protected final int[] offsets;
+
+		/**
+		 * Dieses Feld speichert den Beginn des Datenbereichs mit den Werten.
+		 */
+		protected int offset;
+
+		/**
+		 * Dieses Feld speichert den {@link MRUFileCache} zum Nachladen der Werte.
+		 */
+		public final MRUFileCache source;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link MRUItemCache} mit den aus dem gegebenen {@link MRUFileCache} geladenen Informatioen.
+		 * 
+		 * @param source {@link MRUFileCache}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUTextValuePage}s.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die {@link MRUFileCache} {@code null} ist.
+		 */
+		public MRUItemCache(final MRUFileCache source, final int pageLimit) throws IOException, NullPointerException {
+			super(pageLimit);
+			this.source = source;
+			this.offsets = source.offsets();
+		}
+
+		protected void loadLength(final int itemLength) throws IOException {
+			this.offset = this.source.skip(this.offsets, itemLength);
+			this.length = this.offsets.length - 1;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Zeichenketten.
+	 * 
+	 * @see MRUTextValueCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUTextValuePage extends MRUPage {
+
+		/**
+		 * Dieses Feld definiert die Anzahl der Zeichenketten in {@link #data}.
+		 */
+		static public final int SIZE = 32;
+
+		/**
+		 * Dieses Feld speichert die vorgehaltenen Zeichenketten.
+		 */
+		public final String[] data = new String[MRUTextValuePage.SIZE];
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Zeichenketten, die aus einem {@link MRUFileCache} nachgeladen werden.
+	 * 
+	 * @see MRUFileCache
+	 * @see MRUTextValuePage
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUTextValueCache extends MRUItemCache {
+
+		/**
+		 * Dieses Feld speichert die {@link MRUTextValuePage}s.
+		 */
+		final MRUTextValuePage[] pages;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link MRUTextValueCache} mit den aus dem gegebenen {@link MRUFileCache} geladenen Informatioen.
+		 * 
+		 * @param source {@link MRUFileCache}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUTextValuePage}s.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die {@link MRUFileCache} {@code null} ist.
+		 */
+		public MRUTextValueCache(final MRUFileCache source, final int pageLimit) throws IOException, NullPointerException {
+			super(source, pageLimit);
+			this.loadLength(1);
+			this.pages = new MRUTextValuePage[((this.length + MRUTextValuePage.SIZE) - 1) / MRUTextValuePage.SIZE];
+		}
+
+		/**
+		 * Diese Methode gibt den Text mit dem gegebenen Schlüssel zurück.
+		 * 
+		 * @param itemKey Schlüssel des Texts.
+		 * @return Text.
+		 */
+		public String get(final int itemKey) {
+			try{
+				final MRUTextValuePage[] pages = this.pages;
+				final int pageIndex = itemKey / MRUTextValuePage.SIZE, dataIndex = itemKey & (MRUTextValuePage.SIZE - 1);
+				MRUTextValuePage page = pages[pageIndex];
+				if(page != null){
+					final String value = page.data[dataIndex];
+					if(value != null){
+						page.uses++;
+						return value;
+					}
+				}else{
+					page = new MRUTextValuePage();
+					this.set(pages, pageIndex, page);
+				}
+				final int[] offsets = this.offsets;
+				int offset = offsets[itemKey];
+				final int size = offsets[itemKey + 1] - offset;
+				offset += this.offset;
+				int fileIndex = offset / MRUFilePage.SIZE;
+				final byte[] fileData = new byte[size];
+				offset = offset & (MRUFilePage.SIZE - 1);
+				for(int i = 0; i < size; fileIndex++, offset = 0){
+					final int length = Math.min(size - i, MRUFilePage.SIZE - offset);
+					System.arraycopy(this.source.get(fileIndex), offset, fileData, i, length);
+					i += length;
+				}
+				final String value = new String(fileData, Encoder.CHARSET);
+				page.data[dataIndex] = value;
+				return value;
+			}catch(Exception e){
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Attributknoten.
+	 * 
+	 * @see MRUAttrGroupCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUAttrGroupPage extends MRUPage {
+
+		/**
+		 * Dieses Feld definiert die Anzahl der Attributknoten in {@link #data}.
+		 */
+		public static final int SIZE = 64;
+
+		/**
+		 * Dieses Feld speichert die Daten der Attributknoten als Auflistung der Referenzen auf die URI, die Namen und die Werte.
+		 */
+		public final int[] data = new int[MRUAttrGroupPage.SIZE * 3];
+
+	}
+
+	public static final class MRUAttrGroupCache extends MRUItemCache {
+
+		/**
+		 * Dieses Feld speichert die {@link MRUAttrGroupPage}s.
+		 */
+		MRUAttrGroupPage[] pages;
+
+		/**
+		 * Dieses Feld speichert die Länge eines Attributknoten in Byte.
+		 */
+		final int itemLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
+		 */
+		final int uriRefLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die Namen in Byte.
+		 */
+		final int nameRefLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die Werte in Byte.
+		 */
+		final int valueRefLength;
+
+		public MRUAttrGroupCache(final BEXDocumentView owner, final int pageLimit) throws IOException {
+			super(owner.fileCache, pageLimit);
+			this.uriRefLength = Encoder.computeLength(owner.attrUriCache.length);
+			this.nameRefLength = Encoder.computeLength(owner.attrNameCache.length - 1);
+			this.valueRefLength = Encoder.computeLength(owner.attrValueCache.length - 1);
+			this.itemLength = this.uriRefLength + this.nameRefLength + this.valueRefLength;
+			this.loadLength(this.itemLength);
+			this.pages = new MRUAttrGroupPage[((this.offsets[this.length] + MRUAttrGroupPage.SIZE) - 1) / MRUAttrGroupPage.SIZE];
+		}
+
+		public AttributeView get(final BEXElementView parent, final int groupKey, final int nodeIndex) {
+			try{
+				final int[] offsets = this.offsets;
+				final int itemKey = offsets[groupKey] + nodeIndex;
+				if(itemKey >= offsets[groupKey + 1]) return null;
+				final int pageIndex = itemKey / MRUAttrGroupPage.SIZE, dataIndex = itemKey & (MRUAttrGroupPage.SIZE - 1);
+				final MRUAttrGroupPage[] pages = this.pages;
+				MRUAttrGroupPage page = pages[pageIndex];
+				int uriRef, nameRef, valueRef;
+				final int[] pageData;
+				if(page != null){
+					page.uses++;
+					pageData = page.data;
+					uriRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 0)];
+				}else{
+					page = new MRUAttrGroupPage();
+					pageData = page.data;
+					uriRef = 0;
+					this.set(pages, pageIndex, page);
+				}
+				if(uriRef != 0){
+					nameRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 1)];
+					valueRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 2)];
+				}else{
+					int length = this.itemLength;
+					int offset = (itemKey * length) + this.offset;
+					final int fileIndex = offset / MRUFilePage.SIZE;
+					byte[] fileData = this.source.get(fileIndex);
+					offset = offset & (MRUFilePage.SIZE - 1);
+					final int remain = MRUFilePage.SIZE - offset;
+					if(length > remain){
+						final byte[] array = this.source.array;
+						System.arraycopy(fileData, offset, array, 0, remain);
+						System.arraycopy(this.source.get(fileIndex + 1), 0, array, remain, length - remain);
+						fileData = array;
+						offset = 0;
+					}
+					uriRef = Decoder.get(fileData, offset, length = this.uriRefLength) + 1;
+					nameRef = Decoder.get(fileData, offset = offset + length, length = this.nameRefLength);
+					valueRef = Decoder.get(fileData, offset + length, this.valueRefLength);
+					pageData[dataIndex + (MRUAttrGroupPage.SIZE * 0)] = uriRef;
+					pageData[dataIndex + (MRUAttrGroupPage.SIZE * 1)] = nameRef;
+					pageData[dataIndex + (MRUAttrGroupPage.SIZE * 2)] = valueRef;
+				}
+				return new BEXAttributeView(parent, nodeIndex, uriRef - 2, nameRef, valueRef);
+			}catch(Exception e){
+				return null;
+			}
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Element- und Textknoten.
+	 * 
+	 * @see MRUElemGroupCache
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUElemGroupPage extends MRUPage {
+
+		/**
+		 * Dieses Feld definiert die Anzahl der Element- und Textknoten in {@link #data}.
+		 */
+		public static final int SIZE = 64;
+
+		/**
+		 * Dieses Feld speichert die Daten der Element- und Textknoten als Auflistung der Referenzen auf die URI, die Namen, die Kindknotenlisten und die
+		 * Attributknotenlisten.
+		 */
+		public final int[] data = new int[MRUElemGroupPage.SIZE * 4];
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Element- und Textknoten.
+	 * 
+	 * @see MRUFileCache
+	 * @see MRUElemGroupPage
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class MRUElemGroupCache extends MRUItemCache {
+
+		/**
+		 * Dieses Feld speichert dei {@link MRUElemGroupPage}s.
+		 */
+		final MRUElemGroupPage[] pages;
+
+		/**
+		 * Dieses Feld speichert die Länge eines Kindknoten in Byte.
+		 */
+		final int itemLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
+		 */
+		final int uriRefLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die Namen in Byte.
+		 */
+		final int nameRefLength;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die Kindknotenlisten in Byte.
+		 */
+		final int contentRefLength;
+
+		/**
+		 * Dieses Feld speichert die Anzahl Textwerte als Startreferenz der Kindknotenlisten.
+		 */
+		final int childrenOffset;
+
+		/**
+		 * Dieses Feld speichert die Länge der Referenzen auf die Attributknotenlisten in Byte.
+		 */
+		final int attributesRefLength;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link MRUElemGroupCache} mit den aus dem gegebenen {@link BEXDocumentView} geladenen Informatioen.
+		 * 
+		 * @param owner {@link BEXDocumentView}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUElemGroupPage}s.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn der {@link BEXDocumentView} {@code null} ist.
+		 */
+		public MRUElemGroupCache(final BEXDocumentView owner, final int pageLimit) throws IOException, NullPointerException {
+			super(owner.fileCache, pageLimit);
+			this.uriRefLength = Encoder.computeLength(owner.elemUriCache.length);
+			this.nameRefLength = Encoder.computeLength(owner.elemNameCache.length);
+			this.contentRefLength = Encoder.computeLength((owner.elemValueCache.length + this.offsets.length) - 1);
+			this.attributesRefLength = Encoder.computeLength(owner.attrGroupCache.length);
+			this.itemLength = this.uriRefLength + this.nameRefLength + this.contentRefLength + this.attributesRefLength;
+			this.loadLength(this.itemLength);
+			this.pages = new MRUElemGroupPage[((this.offsets[this.length] + MRUElemGroupPage.SIZE) - 1) / MRUElemGroupPage.SIZE];
+			this.pageLimit = Math.max(pageLimit, 1);
+			this.childrenOffset = owner.elemValueCache.length;
+		}
+
+		public ChildView get(final BEXParentView parent, final int groupKey, final int nodeIndex) {
+			try{
+				final int[] offsets = this.offsets;
+				int offset = offsets[groupKey] + nodeIndex;
+				if(offset >= offsets[groupKey + 1]) return null;
+				final int pageIndex = offset / MRUElemGroupPage.SIZE, dataIndex = offset & (MRUElemGroupPage.SIZE - 1);
+				final MRUElemGroupPage[] pages = this.pages;
+				MRUElemGroupPage page = pages[pageIndex];
+				final int[] pageData;
+				int uriRef, nameRef, contentRef, attributesRef;
+				if(page != null){
+					page.uses++;
+					pageData = page.data;
+					uriRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 0)];
+				}else{
+					this.set(pages, pageIndex, page = new MRUElemGroupPage());
+					pageData = page.data;
+					uriRef = 0;
+				}
+				if(uriRef != 0){
+					nameRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 1)];
+					contentRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 2)];
+					attributesRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 3)];
+				}else{
+					int length = this.itemLength;
+					offset = (offset * length) + this.offset;
+					final int fileIndex = offset / MRUFilePage.SIZE;
+					byte[] fileData = this.source.get(fileIndex);
+					offset = offset & (MRUFilePage.SIZE - 1);
+					final int remain = MRUFilePage.SIZE - offset;
+					if(length > remain){
+						final byte[] array = this.source.array;
+						System.arraycopy(fileData, offset, array, 0, remain);
+						System.arraycopy(this.source.get(fileIndex + 1), 0, array, remain, length - remain);
+						fileData = array;
+						offset = 0;
+					}
+					uriRef = Decoder.get(fileData, offset, length = this.uriRefLength) + 1;
+					offset += length;
+					nameRef = Decoder.get(fileData, offset, length = this.nameRefLength) - 1;
+					offset += length;
+					contentRef = Decoder.get(fileData, offset, length = this.contentRefLength) - 1;
+					offset += length;
+					attributesRef = Decoder.get(fileData, offset, this.attributesRefLength) - 1;
+					pageData[dataIndex + (MRUElemGroupPage.SIZE * 0)] = uriRef;
+					pageData[dataIndex + (MRUElemGroupPage.SIZE * 1)] = nameRef;
+					pageData[dataIndex + (MRUElemGroupPage.SIZE * 2)] = contentRef;
+					pageData[dataIndex + (MRUElemGroupPage.SIZE * 3)] = attributesRef;
+				}
+				final int childrenRef = contentRef - this.childrenOffset;
+				if(nameRef < 0) return new BEXTextView(parent, nodeIndex, contentRef);
+				if(contentRef < 0) return new BEXElementView(parent, nodeIndex, uriRef - 2, nameRef, -1, attributesRef);
+				if(childrenRef < 0) return new BEXElementTextView(parent, nodeIndex, uriRef - 2, nameRef, contentRef, attributesRef);
+				return new BEXElementView(parent, nodeIndex, uriRef - 2, nameRef, childrenRef, attributesRef);
+			}catch(Exception e){
+				return null;
+			}
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert den {@link TextView} eines {@link BEXDocumentView}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class BEXTextView implements TextView {
+	public static final class BEXTextView implements TextView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		final BEXParentView parent;
+		public final BEXParentView parent;
 
 		/**
 		 * Dieses Feld speichert den Kindknotenindex.
 		 */
-		final int index;
+		public final int index;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf des Wert.
 		 */
-		final int valueRef;
+		public final int valueRef;
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link BEXTextView}.
@@ -88,7 +730,7 @@ public final class Decoder {
 		 */
 		@Override
 		public String value() {
-			return this.parent.document().value(this.valueRef);
+			return this.parent.document().elementValue(this.valueRef);
 		}
 
 		/**
@@ -122,7 +764,7 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class BEXParentView implements ParentView {
+	public static abstract class BEXParentView implements ParentView {
 
 		/**
 		 * {@inheritDoc}
@@ -137,37 +779,37 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static class BEXElementView extends BEXParentView implements ElementView {
+	public static class BEXElementView extends BEXParentView implements ElementView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		final BEXParentView parent;
+		public final BEXParentView parent;
 
 		/**
 		 * Dieses Feld speichert den Kindknotenindex.
 		 */
-		final int index;
+		public final int index;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den URI.
 		 */
-		final short uriRef;
+		public final int uriRef;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den Namen.
 		 */
-		final short nameRef;
+		public final int nameRef;
 
 		/**
-		 * Dieses Feld speichert die Referenz auf die Kindknotenliste.
+		 * Dieses Feld speichert die Referenz auf die Kindknotenliste. In {@link BEXElementTextView} ist die Referenz auf den Wert des Textknoten.
 		 */
-		final int childrenRef;
+		public final int childrenRef;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
 		 */
-		final int attributesRef;
+		public final int attributesRef;
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link BEXElementView}.
@@ -179,7 +821,7 @@ public final class Decoder {
 		 * @param childrenRef Referenz auf die Kindknotenliste.
 		 * @param attributesRef Referenz auf die Attributknotenliste.
 		 */
-		public BEXElementView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int childrenRef, final int attributesRef) {
+		public BEXElementView(final BEXParentView parent, final int index, final int uriRef, final int nameRef, final int childrenRef, final int attributesRef) {
 			this.parent = parent;
 			this.index = index;
 			this.uriRef = uriRef;
@@ -192,7 +834,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public BEXDocumentView document() {
+		public final BEXDocumentView document() {
 			return this.parent.document();
 		}
 
@@ -200,7 +842,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ParentView parent() {
+		public final ParentView parent() {
 			return this.parent;
 		}
 
@@ -208,7 +850,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int index() {
+		public final int index() {
 			return this.index;
 		}
 
@@ -216,16 +858,16 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String uri() {
-			return this.parent.document().name(this.uriRef);
+		public final String uri() {
+			return this.parent.document().elementUri(this.uriRef);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String name() {
-			return this.parent.document().name(this.nameRef);
+		public final String name() {
+			return this.parent.document().elementName(this.nameRef);
 		}
 
 		/**
@@ -240,7 +882,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public AttributesView attributes() {
+		public final AttributesView attributes() {
 			return new BEXAttributesView(this, this.attributesRef);
 		}
 
@@ -248,7 +890,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public TextView asText() {
+		public final TextView asText() {
 			return null;
 		}
 
@@ -256,7 +898,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ElementView asElement() {
+		public final ElementView asElement() {
 			return this;
 		}
 
@@ -264,7 +906,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DocumentView asDocument() {
+		public final DocumentView asDocument() {
 			return null;
 		}
 
@@ -283,7 +925,7 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static class BEXElementTextView extends BEXElementView {
+	public static final class BEXElementTextView extends BEXElementView {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link BEXElementTextView}.
@@ -295,8 +937,7 @@ public final class Decoder {
 		 * @param contentRef Referenz auf den Wert des Textknoten.
 		 * @param attributesRef Referenz auf die Attributknotenliste.
 		 */
-		public BEXElementTextView(final BEXParentView parent, final int index, final short uriRef, final short nameRef, final int contentRef,
-			final int attributesRef) {
+		public BEXElementTextView(final BEXParentView parent, final int index, final int uriRef, final int nameRef, final int contentRef, final int attributesRef) {
 			super(parent, index, uriRef, nameRef, contentRef, attributesRef);
 		}
 
@@ -315,17 +956,17 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static class BEXChildrenView implements ChildrenView {
+	public static class BEXChildrenView implements ChildrenView {
 
 		/**
 		 * Dieses Feld speichert den {@link BEXParentView}.
 		 */
-		final BEXParentView parent;
+		public final BEXParentView parent;
 
 		/**
 		 * Dieses Feld speichert den Schlüssel der Kindknotenliste.
 		 */
-		final int childrenRef;
+		public final int childrenRef;
 
 		/**
 		 * Dieses Feld speichert die Länge der Kindknotenliste.
@@ -348,7 +989,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DocumentView document() {
+		public final DocumentView document() {
 			return this.parent.document();
 		}
 
@@ -356,7 +997,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public BEXParentView parent() {
+		public final BEXParentView parent() {
 			return this.parent;
 		}
 
@@ -382,7 +1023,7 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<ChildView> iterator() {
+		public final Iterator<ChildView> iterator() {
 			return new GetIterator<ChildView>(this, 0, this.size());
 		}
 
@@ -393,7 +1034,7 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static class BEXChildrenTextView extends BEXChildrenView {
+	public static final class BEXChildrenTextView extends BEXChildrenView {
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link BEXChildrenTextView}.
@@ -430,32 +1071,32 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class BEXAttributeView implements AttributeView {
+	public static final class BEXAttributeView implements AttributeView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		final BEXElementView parent;
+		public final BEXElementView parent;
 
 		/**
 		 * Dieses Feld speichert den Attributknotenindex.
 		 */
-		final int index;
+		public final int index;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den URI.
 		 */
-		final short uriRef;
+		public final int uriRef;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den Namen.
 		 */
-		final short nameRef;
+		public final int nameRef;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf den Wert.
 		 */
-		final int valueRef;
+		public final int valueRef;
 
 		/**
 		 * Dieser Konstruktor initialisiert den {@link BEXAttributeView}.
@@ -466,7 +1107,7 @@ public final class Decoder {
 		 * @param nameRef Referenz auf den Namen.
 		 * @param valueRef Referenz auf den Wert.
 		 */
-		public BEXAttributeView(final BEXElementView parent, final int index, final short uriRef, final short nameRef, final int valueRef) {
+		public BEXAttributeView(final BEXElementView parent, final int index, final int uriRef, final int nameRef, final int valueRef) {
 			this.parent = parent;
 			this.index = index;
 			this.uriRef = uriRef;
@@ -503,7 +1144,7 @@ public final class Decoder {
 		 */
 		@Override
 		public String uri() {
-			return this.parent.document().name(this.uriRef);
+			return this.parent.document().attributeUri(this.uriRef);
 		}
 
 		/**
@@ -511,7 +1152,7 @@ public final class Decoder {
 		 */
 		@Override
 		public String name() {
-			return this.parent.document().name(this.nameRef);
+			return this.parent.document().attributeName(this.nameRef);
 		}
 
 		/**
@@ -519,7 +1160,7 @@ public final class Decoder {
 		 */
 		@Override
 		public String value() {
-			return this.parent.document().value(this.valueRef);
+			return this.parent.document().attributeValue(this.valueRef);
 		}
 
 		/**
@@ -537,17 +1178,17 @@ public final class Decoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class BEXAttributesView implements AttributesView {
+	public static final class BEXAttributesView implements AttributesView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		final BEXElementView parent;
+		public final BEXElementView parent;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
 		 */
-		final int attributesRef;
+		public final int attributesRef;
 
 		/**
 		 * Dieses Feld speichert die Länge der Attributknotenliste.
@@ -621,102 +1262,32 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link DocumentView} zu einem {@link Document}, welches über einem {@link Decoder} aus einer Datenbank ausgelesen wird.
+	 * Diese Klasse implementiert den {@link DocumentView} zu einem {@link Document}, welches über einem {@link Decoder} aus einer {@link DecodeSource} ausgelesen
+	 * wird.
 	 * 
+	 * @see Encoder
+	 * @see DecodeSource
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class BEXDocumentView extends BEXParentView implements DocumentView {
+	public static final class BEXDocumentView extends BEXParentView implements DocumentView {
 
-		/**
-		 * Diese Klasse implementiert einen wiederverwendbaren Block von 1024 Byte, dessen Wiederverwendungen gezählt werden.
-		 * 
-		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		static final class Page {
+		final MRUFileCache fileCache;
 
-			/**
-			 * Dieses Feld speichert die 1024 Byte Nutzdaten.
-			 */
-			final byte[] data = new byte[1024];
+		final MRUTextValueCache attrUriCache;
 
-			/**
-			 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
-			 */
-			int uses;
+		final MRUTextValueCache attrNameCache;
 
-		}
+		final MRUTextValueCache attrValueCache;
 
-		/**
-		 * Dieses Feld speichert die {@link DecodeSource}.
-		 */
-		final DecodeSource source;
+		final MRUAttrGroupCache attrGroupCache;
 
-		/**
-		 * Dieses Feld speichert den Beginn der Nutzdatenstrukturen in der {@link DecodeSource}.
-		 */
-		final long offset;
+		final MRUTextValueCache elemUriCache;
 
-		/**
-		 * Dieses Feld speichert die Größe der Nutzdatenstrukturen in der {@link DecodeSource}.
-		 */
-		final int length;
+		final MRUTextValueCache elemNameCache;
 
-		/**
-		 * Dieses Feld speichert die {@link Page}s.
-		 */
-		final Page[] pageList;
+		final MRUTextValueCache elemValueCache;
 
-		/**
-		 * Dieses Feld speichert die maximale Anzahl der geladenen {@link Page}s.
-		 */
-		final int pageLimit;
-
-		/**
-		 * Dieses Feld speichert die Anzahl der aktuell geladenen {@link Page}s.
-		 */
-		int pageCount;
-
-		/**
-		 * Dieses Feld speichert die Startpositionen der Namen. Der i-te Name beginnt bei Zeichen nameStarts[i] und Endet vor Zeichen nameStarts[i+1].
-		 */
-		final int[] nameStarts;
-
-		/**
-		 * Dieses Feld speichert den Beginn der Zeichen der Namen relativ zu {@link #offset}.
-		 */
-		final int nameOffset;
-
-		/**
-		 * Dieses Feld speichert die Startpositionen der Werte. Der i-te Wert beginnt bei Zeichen valueStarts[i] und Endet vor Zeichen valueStarts[i+1].
-		 */
-		final int[] valueStarts;
-
-		/**
-		 * Dieses Feld speichert den Beginn der Zeichen der Werte relativ zu {@link #offset}.
-		 */
-		final int valueOffset;
-
-		/**
-		 * Dieses Feld speichert die Startpositionen der Kindknotenlisten. Die i-te Kindknotenliste beginnt bei Kindknoten childrenStarts[i] und Endet vor
-		 * Kindknoten childrenStarts[i+1].
-		 */
-		final int[] childrenStarts;
-
-		/**
-		 * Dieses Feld speichert den Beginn der Kindknoten der Kindknotenlisten relativ zu {@link #offset}.
-		 */
-		final int childrenOffset;
-
-		/**
-		 * Dieses Feld speichert die Startpositionen der Attributknotenlisten. Die i-te Attributknotenliste beginnt bei Attributknoten attributesStarts[i] und Endet
-		 * vor Attributknoten attributesStarts[i+1].
-		 */
-		final int[] attributesStarts;
-
-		/**
-		 * Dieses Feld speichert den Beginn der Attributknoten der Attributknotenlisten relativ zu {@link #offset}.
-		 */
-		final int attributesOffset;
+		final MRUElemGroupCache elemGroupCache;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Kindknotenliste des {@link Document}s.
@@ -727,181 +1298,101 @@ public final class Decoder {
 		 * Dieser Konstruktor initialisiert {@link DecodeSource} und Cachegröße.
 		 * 
 		 * @param source {@link DecodeSource}.
-		 * @param cacheSize maximaler Speicherverbrauch des Caches in Byte.
+		 * @param cacheSize
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
-		public BEXDocumentView(final DecodeSource source, final int cacheSize) throws IOException {
-			int count, length, cursor = 0;
-			{ // file
-				this.source = source;
-				this.offset = source.index();
-			}
-			{ // name
-				this.nameStarts = this.loadStarts(source);
-				count = this.nameStarts.length;
-				length = this.nameStarts[count - 1] * 2;
-				cursor += (count * 4) + 4;
-				this.nameOffset = ((cursor + length + 3) & ~3) - length;
-				cursor = this.nameOffset + length;
-				source.seek(cursor + this.offset);
-			}
-			{ // value
-				this.valueStarts = this.loadStarts(source);
-				count = this.valueStarts.length;
-				length = this.valueStarts[count - 1] * 2;
-				cursor += (count * 4) + 4;
-				this.valueOffset = ((cursor + length + 3) & ~3) - length;
-				cursor = this.valueOffset + length;
-				source.seek(cursor + this.offset);
-			}
-			{ // children
-				this.childrenStarts = this.loadStarts(source);
-				count = this.childrenStarts.length;
-				length = this.childrenStarts[count - 1] * 16;
-				cursor += (count * 4) + 4;
-				this.childrenOffset = (cursor + 15) & ~15;
-				cursor = this.childrenOffset + length;
-				source.seek(cursor + this.offset);
-			}
-			{ // attributes
-				this.attributesStarts = this.loadStarts(source);
-				count = this.attributesStarts.length;
-				length = this.attributesStarts[count - 1] * 8;
-				cursor += (count * 4) + 4;
-				this.attributesOffset = (cursor + 7) & ~7;
-				cursor = this.attributesOffset + length;
-				source.seek(cursor + this.offset);
-			}
-			{ // document
-				final byte[] array = new byte[16];
-				source.read(array, 0, 4);
-				this.childrenRef = Bytes.get4(array, 0);
-				cursor += 4;
-				this.length = cursor;
-			}
-			{ // page
-				this.pageList = new Page[(cursor + 1023) / 1024];
-				this.pageLimit = Math.max(cacheSize / 1024, 1);
-				this.pageCount = 0;
-			}
+		public BEXDocumentView(final DecodeSource source, final Decoder decoder) throws IOException {
+			this.fileCache = new MRUFileCache(source, decoder.maxFileCachePages);
+			this.attrUriCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrUriCachePages);
+			this.attrNameCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrNameCachePages);
+			this.attrValueCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrValueCachePages);
+			this.attrGroupCache = new MRUAttrGroupCache(this, decoder.maxAttributesCachePages);
+			this.elemUriCache = new MRUTextValueCache(this.fileCache, decoder.maxElemUriCachePages);
+			this.elemNameCache = new MRUTextValueCache(this.fileCache, decoder.maxElemNameCachePages);
+			this.elemValueCache = new MRUTextValueCache(this.fileCache, decoder.maxElemValueCachePages);
+			this.elemGroupCache = new MRUElemGroupCache(this, decoder.maxChildrenCachePages);
+			this.childrenRef = this.fileCache.read(this.elemGroupCache.contentRefLength) - this.elemValueCache.length - 1;
+			this.fileCache.allocate((int)(source.index() - this.fileCache.offset));
+
+			System.err.print("RAM: " + ( //
+				(this.fileCache.pages.length * 4) + //
+					(this.attrUriCache.pages.length * 4) + //
+					(this.attrNameCache.pages.length * 4) + //
+					(this.attrValueCache.pages.length * 4) + //
+					(this.attrGroupCache.pages.length * 4) + //
+					(this.elemUriCache.pages.length * 4) + //
+					(this.elemNameCache.pages.length * 4) + //
+					(this.elemValueCache.pages.length * 4) + //
+					(this.elemGroupCache.pages.length * 4) + //
+				4 //
+				) + " ");
+
 		}
 
 		/**
-		 * Diese Methode lödt die Startpositionen aus der gegebenen {@link DecodeSource} und gibt sie zurück.
+		 * Diese Methode implementeirt {@link BEXElementView#uri()}.
 		 * 
-		 * @param source {@link DecodeSource}.
-		 * @return Startpositionen.
-		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
+		 * @param key Schlüssel des URI.
+		 * @return URI.
 		 */
-		int[] loadStarts(final DecodeSource source) throws IOException {
-			final byte[] array = new byte[4];
-			source.read(array, 0, 4);
-			final int length = Bytes.get4(array, 0) + 1;
-			final int[] starts = new int[length];
-			for(int i = 0; i < length; i++){
-				source.read(array, 0, 4);
-				starts[i] = Bytes.get4(array, 0);
-			}
-			return starts;
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Page#data Nutzdatenblock} der {@link Page} mit dem gegebenen Index zurück.
-		 * 
-		 * @param index Index.
-		 * @return {@link Page#data Nutzdatenblock}.
-		 */
-		byte[] data(final int index) {
-			final Page[] pageList = this.pageList;
-			Page page;
-			page = pageList[index];
-			if(page != null){ // reuse
-				page.uses++;
-				return page.data;
-			}
-			int pageCount = this.pageCount, pageLimit = this.pageLimit;
-			if(pageCount >= pageLimit){ // compact
-				pageLimit = pageLimit / 2;
-				final int size = pageList.length;
-				while(pageCount > pageLimit){
-					int uses = 0;
-					final int maxUses = Integer.MAX_VALUE / pageCount;
-					for(int i = 0; i < size; i++){
-						page = pageList[i];
-						if(page != null){
-							uses += (page.uses = Math.min(page.uses, maxUses - i));
-						}
-					}
-					final int minUses = uses / pageCount;
-					for(int i = 0; i < size; i++){
-						page = pageList[i];
-						if((page != null) && ((page.uses -= minUses) <= 0)){
-							pageList[i] = null;
-							pageCount--;
-						}
-					}
-				}
-			}
-			page = new Page();
-			page.uses = 1;
-			final byte[] data = page.data;
-			final int offset = index * 1024;
-			try{
-				final DecodeSource source = this.source;
-				source.seek(offset + this.offset);
-				source.read(data, 0, Math.min(1024, this.length - offset));
-			}catch(final Exception e){
-				throw new IllegalStateException(e);
-			}
-			pageList[index] = page;
-			this.pageCount = pageCount + 1;
-			return data;
-		}
-
-		/**
-		 * Diese Methode gibt den Text mit dem gegebenen Schlüssel zurück und wird von {@link #name(int)} bzw. {@link #value(int)} verwendet.
-		 * 
-		 * @param key Schlüssel des Texts.
-		 * @param starts Startpositionen ({@link #nameStarts} oder {@link #valueStarts}).
-		 * @param offset Beginn der Zeichen relativ zu {@link #offset} ({@link #nameOffset} oder {@link #valueOffset}).
-		 * @return Text.
-		 */
-		String text(final int key, final int[] starts, final int offset) {
+		public String elementUri(final int key) {
 			if(key < 0) return null;
-			int from = starts[key];
-			final int size = starts[key + 1] - from;
-			from = (from * 2) + offset;
-			int page = from / 1024;
-			final char[] text = new char[size];
-			from = from & 1023;
-			for(int i = 0; i < size; from = 0, page++){
-				final byte[] data = this.data(page);
-				for(final int length = Math.min(size, (i + 512) - (from / 2)); i < length; i++, from += 2){
-					text[i] = (char)Bytes.get2(data, from);
-				}
-			}
-			return new String(text);
+			return this.elemUriCache.get(key);
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXAttributeView#uri()}, {@link BEXAttributeView#name()}, {@link BEXElementView#uri()} und
-		 * {@link BEXElementView#name()}.
+		 * Diese Methode implementeirt {@link BEXElementView#name()}.
 		 * 
 		 * @param key Schlüssel des Namen.
 		 * @return Name.
 		 */
-		String name(final int key) {
-			return this.text(key, this.nameStarts, this.nameOffset);
+		public String elementName(final int key) {
+			if(key < 0) return null;
+			return this.elemNameCache.get(key);
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXAttributeView#value()} und {@link BEXTextView#value()}.
+		 * Diese Methode implementeirt {@link BEXTextView#value()}.
 		 * 
 		 * @param key Schlüssel des Werts.
 		 * @return Wert.
 		 */
-		String value(final int key) {
-			return this.text(key, this.valueStarts, this.valueOffset);
+		public String elementValue(final int key) {
+			if(key < 0) return null;
+			return this.elemValueCache.get(key);
+		}
+
+		/**
+		 * Diese Methode implementeirt {@link BEXAttributeView#uri()}.
+		 * 
+		 * @param key Schlüssel des URI.
+		 * @return URI.
+		 */
+		public String attributeUri(final int key) {
+			if(key < 0) return null;
+			return this.attrUriCache.get(key);
+		}
+
+		/**
+		 * Diese Methode implementeirt {@link BEXAttributeView#name()}.
+		 * 
+		 * @param key Schlüssel des Namen.
+		 * @return Name.
+		 */
+		public String attributeName(final int key) {
+			if(key < 0) return null;
+			return this.attrNameCache.get(key);
+		}
+
+		/**
+		 * Diese Methode implementeirt {@link BEXAttributeView#value()}.
+		 * 
+		 * @param key Schlüssel des Werts.
+		 * @return Wert.
+		 */
+		public String attributeValue(final int key) {
+			if(key < 0) return null;
+			return this.attrValueCache.get(key);
 		}
 
 		/**
@@ -910,10 +1401,10 @@ public final class Decoder {
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @return Anzahl der Kindknoten.
 		 */
-		int childrenSize(final int key) {
+		public int childrenSize(final int key) {
 			if(key < 0) return 0;
-			final int[] childrenStarts = this.childrenStarts;
-			return childrenStarts[key + 1] - childrenStarts[key];
+			final int[] offsets = this.elemGroupCache.offsets;
+			return offsets[key + 1] - offsets[key];
 		}
 
 		/**
@@ -924,22 +1415,9 @@ public final class Decoder {
 		 * @param index Index des Kindknoten.
 		 * @return {@link BEXTextView}, {@link BEXElementView} oder {@code null}.
 		 */
-		ChildView childrenItem(final BEXParentView parent, final int key, final int index) {
+		public ChildView childrenItem(final BEXParentView parent, final int key, final int index) {
 			if(key < 0) return null;
-			final int[] starts = this.childrenStarts;
-			int offset = starts[key] + index;
-			if(offset >= starts[key + 1]) return null;
-			offset = (offset * 16) + this.childrenOffset;
-			final byte[] data = this.data(offset / 1024);
-			offset &= 1023;
-			final short uriRef = (short)Bytes.get2(data, offset);
-			final short nameRef = (short)Bytes.get2(data, offset + 2);
-			final int contentRef = Bytes.get4(data, offset + 4);
-			final int childrenRef = Bytes.get4(data, offset + 8);
-			final int attributesRef = Bytes.get4(data, offset + 12);
-			if(nameRef < 0) return new BEXTextView(parent, index, contentRef);
-			if(contentRef < 0) return new BEXElementView(parent, index, uriRef, nameRef, childrenRef, attributesRef);
-			return new BEXElementTextView(parent, index, uriRef, nameRef, contentRef, attributesRef);
+			return this.elemGroupCache.get(parent, key, index);
 		}
 
 		/**
@@ -948,10 +1426,10 @@ public final class Decoder {
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @return Anzahl der Attributknoten.
 		 */
-		int attributesSize(final int key) {
+		public int attributesSize(final int key) {
 			if(key < 0) return 0;
-			final int[] attributesStarts = this.attributesStarts;
-			return attributesStarts[key + 1] - attributesStarts[key];
+			final int[] offsets = this.attrGroupCache.offsets;
+			return offsets[key + 1] - offsets[key];
 		}
 
 		/**
@@ -962,18 +1440,9 @@ public final class Decoder {
 		 * @param index Index des Attributknoten.
 		 * @return {@link BEXAttributeView} oder {@code null}.
 		 */
-		AttributeView attributesItem(final BEXElementView parent, final int key, final int index) {
+		public AttributeView attributesItem(final BEXElementView parent, final int key, final int index) {
 			if(key < 0) return null;
-			final int[] starts = this.attributesStarts;
-			int offset = starts[key] + index;
-			if(offset >= starts[key + 1]) return null;
-			offset = (offset * 8) + this.attributesOffset;
-			final byte[] data = this.data(offset / 1024);
-			offset &= 1023;
-			final short uriRef = (short)Bytes.get2(data, offset);
-			final short nameRef = (short)Bytes.get2(data, offset + 2);
-			final int valueRef = Bytes.get4(data, offset + 4);
-			return new BEXAttributeView(parent, index, uriRef, nameRef, valueRef);
+			return this.attrGroupCache.get(parent, key, index);
 		}
 
 		/**
@@ -1043,9 +1512,54 @@ public final class Decoder {
 	}
 
 	/**
-	 * Dieses Feld speichert den maximalen Speicherverbrauch des Caches in Byte.
+	 * Diese Methode ließt die gegebene Anzahl an {@code byte} ab der gegebenen Position aus dem gegebenen {@code byte}-Array und gib diese als {@code int}
+	 * interpretiert zurück.
+	 * 
+	 * @see Bytes#get1(byte[], int)
+	 * @see Bytes#get2(byte[], int)
+	 * @see Bytes#get3(byte[], int)
+	 * @see Bytes#get4(byte[], int)
+	 * @param array {@code byte}-Array.
+	 * @param index Index.
+	 * @param size Anzahl an {@code byte} (0..4).
+	 * @return {@code byte}s interpretiert als {@code int}.
+	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
+	 * @throws IllegalArgumentException Wenn Anzahl oder Position ungültig sind.
 	 */
-	protected int cacheSize = 1024 * 128;
+	public static final int get(final byte[] array, final int index, final int size) throws NullPointerException, IllegalArgumentException {
+		switch(size){
+			case 0:
+				return 0;
+			case 1:
+				return Bytes.get1(array, index);
+			case 2:
+				return Bytes.get2(array, index);
+			case 3:
+				return Bytes.get3(array, index);
+			case 4:
+				return Bytes.get4(array, index);
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	int maxFileCachePages = 128;
+
+	int maxAttrUriCachePages = 32;
+
+	int maxAttrNameCachePages = 32;
+
+	int maxAttrValueCachePages = 64;
+
+	int maxElemUriCachePages = 32;
+
+	int maxElemNameCachePages = 32;
+
+	int maxElemValueCachePages = 64;
+
+	int maxChildrenCachePages = 128;
+
+	int maxAttributesCachePages = 128;
 
 	/**
 	 * Diese Methode erzeugt ein {@link Document}, das seine Daten aus der gegebenen {@link DecodeSource} nachlädt, und gibt es zurück.
@@ -1055,27 +1569,12 @@ public final class Decoder {
 	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
 	 */
 	public DocumentAdapter decode(final DecodeSource source) throws IOException {
-		return new DocumentAdapter(new BEXDocumentView(source, this.cacheSize));
+		return new DocumentAdapter(new BEXDocumentView(source, this));
 	}
 
-	/**
-	 * Diese Methode gibt die maximale Größe des Caches in Byte zurück. Der Initialwert ist 128 KB.
-	 * 
-	 * @return maximaler Speicherverbrauch des Caches in Byte.
-	 */
-	public int getCacheSize() {
-		return this.cacheSize;
-	}
-
-	/**
-	 * Diese Methode setzt die maximale Größe des Caches in Byte.
-	 * 
-	 * @param value maximaler Speicherverbrauch des Caches in Byte.
-	 * @throws IllegalArgumentException Wenn die gegebene Größe negativ ist.
-	 */
 	public void setCacheSize(final int value) throws IllegalArgumentException {
 		if(value < 0) throw new IllegalArgumentException("value < 0");
-		this.cacheSize = value;
+		this.maxFileCachePages = value;
 	}
 
 }

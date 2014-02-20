@@ -1,17 +1,20 @@
 package bee.creative.xml.bex;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import bee.creative.util.Bytes;
-import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueSet;
 
 /**
@@ -19,244 +22,338 @@ import bee.creative.util.Unique.UniqueSet;
  * <p>
  * <h3>BEX – Binary Encoded XML (Document)</h3>
  * <p>
- * Binary Encoded XML (Document) ist das Format einer Binärdatei zur Abbildung eines XML Dokuments. Ziel dieses Formats ist es, eine nur lesende
- * DOM-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch schreiben könnende Implementation
- * einer Standard XML Softwarebibliothek.
+ * Binary Encoded XML (Document) beschreibt das binäre Datenformat zur redundanzarmen Abbildung eines XML Dokuments. Ziel dieses Formats ist es, eine
+ * leichtgewichtige, nur lesende DOM-Implementation darauf aufsetzen zu können, welche signifikant weniger Arbeitsspeicher verbraucht, als eine zumeist auch
+ * schreiben könnende Implementation einer Standard XML Softwarebibliothek. Diese leichtgewichtige DOM-Implementation kann die Binärdatei Blockweise in den
+ * Arbeitsspeicher laden und dort zur Wiederverwendung gemäß einer most-recently-used Strategie vorhalten. Die offset-Listen sollten dazu vollständig im
+ * Arbeitsspeicher vorgehalten werden.
  * <p>
- * <table border="1" style="vertical-align: top">
- * <tr>
- * <th>Struktur</th>
- * <th>Feld</th>
- * <th>Format</th>
- * <th>Anzahl</th>
- * <th>Beschreibung</th>
+ * <h4>Datenstruktur: BEX</h4>
+ * <p>
+ * Kodiert einen DOM Dokumentknoten mit seinen enthaltenen Text-, Element- und Attributknoten als binäre Datenstruktur zum wahlfreien Zugriff.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td rowspan="5">
- * <code>BEX</code> <br>
- * Kodiert einen DOM Dokumentknoten mit seinen enthaltenen Text-, Element- und Attributknoten als binäre Datenstruktur zum wahlfreien Zugriff.</td>
- * <td><code>namePool</code></td>
- * <td><code>ValuePool</code></td>
+ * <td>attrUriPool</td>
+ * <td>TextValuePool</td>
  * <td>1</td>
- * <td>Auflistung der Zeichenketten für die URIs und die Namen von Element- und Attributknoten.</td>
+ * <td>Auflistung der Zeichenketten für die URIs der Attributknoten.</td>
  * </tr>
  * <tr>
- * <td><code>valuePool</code></td>
- * <td><code>ValuePool</code></td>
- * <td><code>1</code></td>
- * <td>Auflistung der Zeichenketten für die Werte von Text- und Attributknoten.</td>
+ * <td>attrNamePool</td>
+ * <td>TextValuePool</td>
+ * <td>1</td>
+ * <td>Auflistung der Zeichenketten für die Namen der Attributknoten.</td>
  * </tr>
  * <tr>
- * <td><code>childrenPool</code></td>
- * <td><code>ChildrenPool</code></td>
- * <td><code>1</code></td>
+ * <td>attrValuePool</td>
+ * <td>TextValuePool</td>
+ * <td>1</td>
+ * <td>Auflistung der Zeichenketten für die Werte der Attributknoten.</td>
+ * </tr>
+ * <tr>
+ * <td>attrGroupPool</td>
+ * <td>AttrGroupPool</td>
+ * <td>1</td>
+ * <td>Auflistung der Attributknotenlisten.</td>
+ * </tr>
+ * <tr>
+ * <td>elemUriPool</td>
+ * <td>TextValuePool</td>
+ * <td>1</td>
+ * <td>Auflistung der Zeichenketten für die URIs der Elementknoten.</td>
+ * </tr>
+ * <tr>
+ * <td>elemNamePool</td>
+ * <td>TextValuePool</td>
+ * <td>1</td>
+ * <td>Auflistung der Zeichenketten für die Namen der Elementknoten.</td>
+ * </tr>
+ * <tr>
+ * <td>elemValuePool</td>
+ * <td>TextValuePool</td>
+ * <td>1</td>
+ * <td>Auflistung der Zeichenketten für die Werte in Elementknoten.</td>
+ * </tr>
+ * <tr>
+ * <td>elemGroupPool</td>
+ * <td>ElemGroupPool</td>
+ * <td>1</td>
  * <td>Auflistung der Kindknotenlisten für Element- und Dokumentknoten.</td>
  * </tr>
  * <tr>
- * <td><code>attributesPool</code></td>
- * <td><code>AttributesPool</code></td>
- * <td><code>1</code></td>
- * <td>Auflistung der Attributknotenlisten für Elementknoten.</td>
+ * <td>attributesPool</td>
+ * <td>AttributesPool</td>
+ * <td>1</td>
+ * <td>Auflistung der Kindknotenlisten.</td>
  * </tr>
  * <tr>
- * <td><code>documentChildren</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf die Kindknotenliste des Dokumentknoten.</td>
+ * <td>documentGroupRef</td>
+ * <td>INT1..4</td>
+ * <td>1</td>
+ * <td>Kindknotenliste des Dokumentknoten. Ist (i+1+elemValuePool.size) als Referenz auf die i-te Kindknotenliste in elemGroupPool.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: TextValuePool</h4>
+ * <p>
+ * Kodiert eine Auflistung von Zeichenketten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td rowspan="4">
- * <code>ValuePool</code> <br>
- * Kodiert eine Auflistung von Zeichenketten.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
+ * <td>size</td>
+ * <td>INT4</td>
+ * <td>1</td>
  * <td>Anzahl der Zeichenketten.</td>
  * </tr>
  * <tr>
- * <td><code>start[0..size]</code></td>
- * <td><code>int</code></td>
- * <td><code>size+1</code></td>
- * <td>Startpositionen der Zeichenketten im Speicherbereich value.<br>
- * Das erste Zeichen der i-ten Zeichenkette liegt bei Zeichen start[i] und das nach dem letzten bei start[i+1].</td>
+ * <td>length</td>
+ * <td>INT1</td>
+ * <td>1</td>
+ * <td>Anzahl der Byte je Startposition.</td>
  * </tr>
  * <tr>
- * <td><code>-</code></td>
- * <td><code>byte</code></td>
- * <td><code>0..2</code></td>
- * <td>Füllbytes für Datenausrichtung in 4 Byte Blöcken.</td>
+ * <td>offset</td>
+ * <td>INT1..4</td>
+ * <td>size</td>
+ * <td>Startpositionen der Zeichenketten im Speicherbereich item. Das erste Byte der i-ten Zeichenkette liegt bei Position offset[i] und das nach dem letzten
+ * bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
  * </tr>
  * <tr>
- * <td><code>value[0..size-1]</code></td>
- * <td><code>ValueItem</code></td>
- * <td><code>size</code></td>
- * <td>Speicherbereich mit den Daten der Zeichenketten.</td>
+ * <td>item</td>
+ * <td>TextValueItem</td>
+ * <td>size</td>
+ * <td>Speicherbereich mit den Bytes der Zeichenketten.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: TextValueItem</h4>
+ * <p>
+ * Kodiert eine Zeichenkette.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td rowspan="2">
- * <code>ValueItem</code> <br>
- * Kodiert eine Zeichenkette.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>-</code></td>
- * <td>Länge der Zeichenkette.</td>
+ * <td>size</td>
+ * <td>-</td>
+ * <td>-</td>
+ * <td>Anzahl der Bytes in data.</td>
  * </tr>
  * <tr>
- * <td><code>data</code></td>
- * <td><code>char</code></td>
- * <td><code>size</code></td>
- * <td>Zeichen der Zeichenkette.</td>
+ * <td>data</td>
+ * <td>INT1</td>
+ * <td>size</td>
+ * <td>Bytes der UTF-8-kodierten Zeichenkette.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: AttrGroupPool</h4>
+ * <p>
+ * Kodiert eine Auflistung von Attributknotenlisten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td rowspan="4">
- * <code>ChildrenPool<code><br>
- * Kodiert eine Auflistung von Kindknotenlisten.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Anzahl der Kindknotenlisten.</td>
- * </tr>
- * <tr>
- * <td><code>start[0..size]</code></td>
- * <td><code>int</code></td>
- * <td><code>size+1</code></td>
- * <td>Startpositionen der Kindknotenlisten im Speicherbereich entry.<br>
- * Der erste Kindknoten der i-ten Kindknotenliste liegt bei Kindknoten start[i] und der nach dem letzten bei start[i+1].</td>
- * </tr>
- * <tr>
- * <td><code>-</code></td>
- * <td><code>byte</code></td>
- * <td><code>0..12</code></td>
- * <td>Füllbytes für Datenausrichtung in 16 Byte Blöcken.</td>
- * </tr>
- * <tr>
- * <td><code>entry[0..size-1]</code></td>
- * <td><code>ChildrenList</code></td>
- * <td><code>size</code></td>
- * <td>Speicherbereich mit den Kindknoten der Kindknotenlisten.</td>
- * </tr>
- * <tr>
- * <td rowspan="2">
- * <code>ChildrenList</code><br>
- * Kodiert eine Kindknotenliste.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>-</code></td>
- * <td>Länge der Liste.</td>
- * </tr>
- * <tr>
- * <td><code>item[0..size-1]</code></td>
- * <td><code>ChildrenItem</code></td>
- * <td><code>size</code></td>
- * <td>Kindknoten der Liste.</td>
- * </tr>
- * <tr>
- * <td rowspan="5">
- * <code>ChildrenItem</code><br>
- * Kodiert einen Kindknoten als Text- oder Elementknoten.</td>
- * <td><code>uri</code></td>
- * <td><code>short</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den URI des Elementknoten im namePool.<br>
- * Ist bei abwesendem URI oder einem Textknoten -1.</td>
- * </tr>
- * <tr>
- * <td><code>name</code></td>
- * <td><code>short</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den Namen des Elementknoten im namePool.<br>
- * Ist bei einem Textknoten -1.</td>
- * </tr>
- * <tr>
- * <td><code>content</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den Wert des Textknoten bzw. den Textinhalt des kindelementlosen Elementknoten im valuePool.<br>
- * Ist bei einem Elementknoten mit Kindelementen -1.</td>
- * </tr>
- * <tr>
- * <td><code>children</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf die Kindknotenliste des Elementknoten im childrenPool.<br>
- * Ist bei einem kindelementlosen Elementknoten oder einem Textknoten -1.</td>
- * </tr>
- * <tr>
- * <td><code>attributes</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf die Attributknotenliste des Elementknoten im attributesPool.<br>
- * Ist bei einer leeren Attributknotenliste oder einem Textknoten -1.</td>
- * </tr>
- * <tr>
- * <td rowspan="4">
- * <code>AttributesPool</code><br>
- * Kodiert eine Auflistung von Attributknotenlisten.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
+ * <td>size</td>
+ * <td>INT4</td>
+ * <td>1</td>
  * <td>Anzahl der Attributknotenlisten.</td>
  * </tr>
  * <tr>
- * <td><code>start[0..size]</code></td>
- * <td><code>int</code></td>
- * <td><code>size+1</code></td>
- * <td>Startpositionen der Attributknotenlisten im Speicherbereich entry.<br>
- * Der erste Attributknoten der i-ten Attributknotenliste liegt bei Attributknoten start[i] und der nach dem letzten bei start[i+1].</td>
+ * <td>length</td>
+ * <td>INT1</td>
+ * <td>1</td>
+ * <td>Anzahl der Byte je Startposition.</td>
  * </tr>
  * <tr>
- * <td><code>-</code></td>
- * <td><code>byte</code></td>
- * <td><code>0..4</code></td>
- * <td>Füllbytes für Datenausrichtung in 8 Byte Blöcken.</td>
+ * <td>offset</td>
+ * <td>INT1..4</td>
+ * <td>size</td>
+ * <td>Startpositionen der Attributknotenlisten im Speicherbereich item. Der erste Attributknoten der i-ten Attributknotenliste liegt bei Position offset[i] und
+ * der nach dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
  * </tr>
  * <tr>
- * <td><code>entry[0..size-1]</code></td>
- * <td><code>AttributesList</code></td>
- * <td><code>size</code></td>
- * <td>Speicherbereich mit den Attributknoten der Attributknotenlisten.</td>
+ * <td>item</td>
+ * <td>AttrGroupItem</td>
+ * <td>size</td>
+ * <td>Speicherbereich mit den Attributknoten aller Attributknotenlisten.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: AttrGroupItem</h4>
+ * <p>
+ * Kodiert eine Attributknotenliste.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td rowspan="2">
- * <code>AttributesList</code> <br>
- * Kodiert eine Attributknotenliste.</td>
- * <td><code>size</code></td>
- * <td><code>int</code></td>
- * <td><code>-</code></td>
+ * <td>size</td>
+ * <td>-</td>
+ * <td>-</td>
  * <td>Länge der Liste.</td>
  * </tr>
  * <tr>
- * <td><code>item[0..size-1]</code></td>
- * <td><code>AttributeItem</code></td>
- * <td><code>size</code></td>
+ * <td>node</td>
+ * <td>AttrGrpupNode</td>
+ * <td>size</td>
  * <td>Attributknoten der Liste.</td>
  * </tr>
- * <tr>
- * <td rowspan="3">
- * <code>AttributeItem</code> <br>
- * Kodiert einen Attributknoten.</td>
- * <td><code>uri</code></td>
- * <td><code>short</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den URI des Attributknoten im namePool.<br>
- * Ist bei abwesendem URI -1.</td>
+ * </table>
+ * <h4>Datenstruktur: AttrGrpupNode</h4>
+ * <p>
+ * Kodiert einen Attributknoten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
  * </tr>
  * <tr>
- * <td><code>name</code></td>
- * <td><code>short</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den Namen des Attributknoten im namePool.</td>
+ * <td>uriRef</td>
+ * <td>INT1..4</td>
+ * <td>0..1</td> <tdIst abwesend, wenn der attrUriPool leer ist. Ist (0), wenn der Attributknoten keinen URI besitzt. Ist (i+1) als Referenz auf den i-ten URI
+ * im attrUriPool.</td>
  * </tr>
  * <tr>
- * <td><code>value</code></td>
- * <td><code>int</code></td>
- * <td><code>1</code></td>
- * <td>Referenz auf den Wert des Attributknoten im valuePool.</td>
+ * <td>nameRef</td>
+ * <td>INT1..4</td>
+ * <td>1</td>
+ * <td>Ist (i) als Referenz auf den i-ten Namen im attrNamePool.</td>
+ * </tr>
+ * <tr>
+ * <td>valueRef</td>
+ * <td>INT1..4</td>
+ * <td>1</td>
+ * <td>Ist (i) als Referenz auf den i-ten Wert im attrValuePool.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: ElemGroupPool</h4>
+ * <p>
+ * Kodiert eine Auflistung von Kindknotenlisten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
+ * </tr>
+ * <tr>
+ * <td>size</td>
+ * <td>INT4</td>
+ * <td>1</td>
+ * <td>Anzahl der Kindknotenlisten.</td>
+ * </tr>
+ * <tr>
+ * <td>length</td>
+ * <td>INT1</td>
+ * <td>1</td>
+ * <td>Anzahl der Byte je Startposition.</td>
+ * </tr>
+ * <tr>
+ * <td>offset</td>
+ * <td>INT1..4</td>
+ * <td>size</td>
+ * <td>Startpositionen der Kindknotenlisten im Speicherbereich item. Der erste Kindknoten der i-ten Kindknotenliste liegt bei Position offset[i] und der nach
+ * dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
+ * </tr>
+ * <tr>
+ * <td>item</td>
+ * <td>ElemGroupItem</td>
+ * <td>size</td>
+ * <td>Speicherbereich mit den Kindknoten der Kindknotenlisten.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: ElemGroupItem</h4>
+ * <p>
+ * Kodiert eine Auflistung von Kindknotenlisten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
+ * </tr>
+ * <tr>
+ * <td>size</td>
+ * <td>-</td>
+ * <td>-</td>
+ * <td>Länge der Liste.</td>
+ * </tr>
+ * <tr>
+ * <td>node</td>
+ * <td>ElemGrpupNode</td>
+ * <td>size</td>
+ * <td>Kindknoten der Liste.</td>
+ * </tr>
+ * </table>
+ * <h4>Datenstruktur: ElemGrpupNode</h4>
+ * <p>
+ * Kodiert einen Kindknoten meist als Element- und (selten) Textknoten.
+ * </p>
+ * <table style="border: silver solid 2px; border-collapse: collapse" border="1">
+ * <tr style="font-weight:bold">
+ * <td>Feld</td>
+ * <td>Format</td>
+ * <td>Anzahl</td>
+ * <td>Beschreibung</td>
+ * </tr>
+ * <tr>
+ * <td>uriRef</td>
+ * <td>INT1..4</td>
+ * <td>0..1</td>
+ * <td>Ist abwesend, wenn der elemUriPool leer ist. Ist (0), wenn der Kindknoten ein Textknoten oder ein Elementknoten ohne URI ist. Ist (i+1) als Referenz auf
+ * den i-ten URI im elemUriPool, wenn der Kindknoten ein Elementknoten ist.</td>
+ * </tr>
+ * <tr>
+ * <td>nameRef</td>
+ * <td>INT1..4</td>
+ * <td>1</td>
+ * <td>Ist (0), wenn der Kindknoten ein Textknoten ist. Ist (i+1) als Referenz auf den i-ten Namen im elemNamePool, wenn der Kindknoten ein Elementknoten ist.</td>
+ * </tr>
+ * <tr>
+ * <td>contentRef</td>
+ * <td>INT1..4</td>
+ * <td>1</td>
+ * <td>Ist (0), wenn der Kindknoten ein Elementknoten ohne Kindknoten ist. Ist (i+1) als Referenz auf den i-ten Wert im elemValuePool, wenn der Kindknoten ein
+ * Textknoten oder ein kindelementloser Elementknoten ist. Ist (i+1+elemValuePool.size) als Referenz auf die i-te Kindknotenliste im elemGroupPool, wenn der
+ * Kindknoten ein Elementknoten mit Kindelementen ist.</td>
+ * </tr>
+ * <tr>
+ * <td>attributesRef</td>
+ * <td>INT1..4</td>
+ * <td>0..1</td>
+ * <td>Ist abwesend, wenn der attrGroupPool leer ist. Ist (0), wenn der Kindknoten ein Textknoten oder ein Elementknoten ohne Attributknoten ist. Ist (i+1) als
+ * Referenz auf die i-te Attributknotenliste im attrGroupPool, wenn der Kindknoten ein Elementknoten mit Attributknoten ist.</td>
  * </tr>
  * </table>
  * <p>
- * Binärdatei Blockweise in den Arbeitsspeicher laden und dort zur Wiederverwendung gemäß einer most-recently-used Strategie vorhalten. Die size-Listen sollten
- * dazu vollständig im Arbeitsspeicher vorgehalten werden.
  * 
  * @see Decoder
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -271,14 +368,16 @@ public final class Encoder {
 	static class Item {
 
 		/**
-		 * Dieses Feld speichert das leere {@link Item} mit dem Schlüssel {@code -1}.
+		 * Dieses Feld speichert das leere {@link Item} mit dem Schlüssel {@code 0}.
 		 */
 		static final Item VOID = new Item();
 
 		/**
-		 * Dieses Feld speichert den Schlüssel zut Referenzierung.
+		 * Dieses Feld speichert den Schlüssel zur Referenzierung.
 		 */
-		public int key = -1;
+		public int key = 0;
+
+		public int size;
 
 	}
 
@@ -291,9 +390,6 @@ public final class Encoder {
 	 */
 	static abstract class Pool<GData, GItem extends Item> extends UniqueSet<GItem> implements Comparator<GItem> {
 
-		/**
-		 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
-		 */
 		int reuses = 0;
 
 		/**
@@ -360,12 +456,65 @@ public final class Encoder {
 			return items;
 		}
 
+		@Override
+		public String toString() {
+			return "" + this.reuses;
+		}
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Item} zur Abbildung von Textwerten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class TextItem extends Item {
+
+		/**
+		 * Dieses Feld speichert den Textwert.
+		 */
+		public final byte[] data;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Textwert.
+		 * 
+		 * @param data Textwert.
+		 */
+		public TextItem(final String data) {
+			this.data = data.getBytes(Encoder.CHARSET);
+			this.size = this.data.length;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Pool} der {@link TextItem}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class TextPool extends Pool<String, TextItem> {
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.entryMap.size(), this.reuses);
+		public TextItem item(final String data) {
+			return new TextItem(data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hash(final TextItem input) throws NullPointerException {
+			return Arrays.hashCode(input.data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final TextItem input1, final TextItem input2) throws NullPointerException {
+			return Arrays.equals(input1.data, input2.data);
 		}
 
 	}
@@ -386,9 +535,11 @@ public final class Encoder {
 		 * Dieser Konstruktor initialisiert die Kind- bzw. Attributknotenliste.
 		 * 
 		 * @param data Kind- bzw. Attributknotenliste.
+		 * @param size Länge.
 		 */
-		public EntryItem(final Item[] data) {
+		public EntryItem(final Item[] data, final int size) {
 			this.data = data;
+			this.size = size;
 		}
 
 	}
@@ -398,15 +549,7 @@ public final class Encoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class EntryPool extends Pool<Item[], EntryItem> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public EntryItem item(final Item[] data) {
-			return new EntryItem(data);
-		}
+	static abstract class EntryPool extends Pool<Item[], EntryItem> {
 
 		/**
 		 * {@inheritDoc}
@@ -431,61 +574,33 @@ public final class Encoder {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert ein {@link Item} zur Abbildung von Textwerten.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class ValueItem extends Item {
+	static final class ChildrenPool extends EntryPool {
 
 		/**
-		 * Dieses Feld speichert den Textwert.
+		 * {@inheritDoc}
 		 */
-		public final char[] data;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Textwert.
-		 * 
-		 * @param data Textwert.
-		 */
-		public ValueItem(final String data) {
-			this.data = data.toCharArray();
+		@Override
+		public EntryItem item(final Item[] data) {
+			return new EntryItem(data, data.length / 4);
 		}
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den {@link Pool} der {@link ValueItem}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class ValuePool extends Pool<String, ValueItem> {
+	static final class AttributesPool extends EntryPool {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ValueItem item(final String data) {
-			return new ValueItem(data);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hash(final ValueItem input) throws NullPointerException {
-			return Arrays.hashCode(input.data);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final ValueItem input1, final ValueItem input2) throws NullPointerException {
-			return Arrays.equals(input1.data, input2.data);
+		public EntryItem item(final Item[] data) {
+			return new EntryItem(data, data.length / 3);
 		}
 
 	}
+
+	boolean uriEnabled;
+
+	boolean ignoreWhitespace = true;
 
 	/**
 	 * Dieses Feld speichert die Anzahl der bisher geschriebenen Byte.
@@ -503,24 +618,60 @@ public final class Encoder {
 	final StringBuilder text;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Node#getNamespaceURI()} und {@link Node#getNodeName()}.
+	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNamespaceURI()}.
 	 */
-	final ValuePool namePool;
+	final TextPool attrUriPool;
+
+	int attrUriLength;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Node#getNodeValue()}.
+	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNodeName()}.
 	 */
-	final ValuePool valuePool;
+	final TextPool attrNamePool;
+
+	int attrNameLength;
+
+	/**
+	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNodeValue()}.
+	 */
+	final TextPool attrValuePool;
+
+	int attrValueLength;
+
+	/**
+	 * Dieses Feld speichert den {@link TextPool} für {@link Element#getNamespaceURI()}.
+	 */
+	final TextPool elemUriPool;
+
+	int elemUriLength;
+
+	/**
+	 * Dieses Feld speichert den {@link TextPool} für {@link Element#getNodeName()}.
+	 */
+	final TextPool elemNamePool;
+
+	int elemNameLength;
+
+	/**
+	 * Dieses Feld speichert den {@link TextPool} für {@link Text#getNodeValue()}.
+	 */
+	final TextPool elemValuePool;
 
 	/**
 	 * Dieses Feld speichert den {@link EntryPool} für {@link Node#getChildNodes()}.
 	 */
-	final EntryPool childrenPool;
+	final EntryPool elemChildrenPool;
+
+	int elemContentLength;
 
 	/**
 	 * Dieses Feld speichert den {@link EntryPool} für {@link Node#getAttributes()}.
 	 */
-	final EntryPool attributesPool;
+	final EntryPool elemAttributesPool;
+
+	int elemAttributesLength;
+
+	static final Charset CHARSET = Charset.forName("UTF-8");
 
 	/**
 	 * Dieser Konstruktor initialisiert den {@link Encoder}.
@@ -528,57 +679,77 @@ public final class Encoder {
 	public Encoder() {
 		this.text = new StringBuilder();
 		this.array = new byte[16];
-		this.namePool = new ValuePool();
-		this.valuePool = new ValuePool();
-		this.childrenPool = new EntryPool();
-		this.attributesPool = new EntryPool();
+		this.attrUriPool = new TextPool();
+		this.attrNamePool = new TextPool();
+		this.attrValuePool = new TextPool();
+		this.elemUriPool = new TextPool();
+		this.elemNamePool = new TextPool();
+		this.elemValuePool = new TextPool();
+		this.elemChildrenPool = new ChildrenPool();
+		this.elemAttributesPool = new AttributesPool();
 	}
 
-	/**
-	 * Diese Methode schreibt ausrichtende Füllwerte in die Ausgabe.
-	 * 
-	 * @param target Ausgabe.
-	 * @param alignMask Bitmaske ((2^n)-1).
-	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
-	 */
-	void writeSpace(final EncodeTarget target, final int alignMask) throws IOException {
-		final int cursor = this.cursor, insert = ((cursor + alignMask) & ~alignMask) - cursor;
-		final byte[] array = this.array;
-		Arrays.fill(array, 0, insert, (byte)0);
-		target.write(array, 0, insert);
-		// System.out.println("space: " + insert);
-		// System.out.println(((FileEncodeTarget)target).file.getFilePointer());
-		this.cursor = cursor + insert;
+	void clear() {
+		this.cursor = 0;
+		this.text.setLength(0);
+		this.attrUriPool.clear();
+		this.attrNamePool.clear();
+		this.elemChildrenPool.clear();
+		this.elemAttributesPool.clear();
 	}
 
-	/**
-	 * Diese Methode schreibt {@link ValueItem}s in die Ausgabe.
-	 * 
-	 * @param target Ausgabe.
-	 * @param items {@link ValueItem}s.
-	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
-	 */
-	void writeValues(final EncodeTarget target, final List<ValueItem> items) throws IOException {
-		final int size = items.size();
+	void write(final EncodeTarget target, final int value, final int size) throws IOException {
 		final byte[] array = this.array;
-		Bytes.set4(array, 0, size);
-		Bytes.set4(array, 4, 0);
-		target.write(array, 0, 8);
-		int start = 0;
-		for(int i = 0; i < size; i++){
-			start += items.get(i).data.length;
-			Bytes.set4(array, 0, start);
-			target.write(array, 0, 4);
+		switch(size){
+			case 0:
+				return;
+			case 1:
+				Bytes.set1(array, 0, value);
+				break;
+			case 2:
+				Bytes.set2(array, 0, value);
+				break;
+			case 3:
+				Bytes.set3(array, 0, value);
+				break;
+			case 4:
+				Bytes.set4(array, 0, value);
+				break;
+			default:
+				throw new IllegalArgumentException();
 		}
-		this.cursor += 4 + 4 + (size * 4) + (start * 2);
-		this.writeSpace(target, 3);
+		target.write(array, 0, size);
+	}
+
+	void writeOffsets(final EncodeTarget target, final List<? extends Item> items) throws IOException {
+		final int size = items.size();
+		final int[] offsets = new int[size];
+		int offset = 0;
 		for(int i = 0; i < size; i++){
-			final char[] data = items.get(i).data;
-			final int length = data.length;
-			for(int j = 0; j < length; j++){
-				Bytes.set2(array, 0, data[j]);
-				target.write(array, 0, 2);
-			}
+			offset += items.get(i).size;
+			offsets[i] = offset;
+		}
+		final int length = Encoder.computeLength(offset);
+		this.write(target, size, 4);
+		this.write(target, length, 1);
+		for(int i = 0; i < size; i++){
+			this.write(target, offsets[i], length);
+		}
+	}
+
+	/**
+	 * Diese Methode schreibt {@link TextItem}s in die Ausgabe.
+	 * 
+	 * @param target Ausgabe.
+	 * @param items {@link TextItem}s.
+	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
+	 */
+	void writeValues(final EncodeTarget target, final List<TextItem> items) throws IOException {
+		this.writeOffsets(target, items);
+		final int size = items.size();
+		for(int i = 0; i < size; i++){
+			final byte[] data = items.get(i).data;
+			target.write(data, 0, data.length);
 		}
 	}
 
@@ -590,29 +761,16 @@ public final class Encoder {
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
 	void writeChildren(final EncodeTarget target, final List<EntryItem> items) throws IOException {
+		this.writeOffsets(target, items);
 		final int size = items.size();
-		final byte[] array = this.array;
-		Bytes.set4(array, 0, size);
-		Bytes.set4(array, 4, 0);
-		target.write(array, 0, 8);
-		int start = 0;
-		for(int i = 0; i < size; i++){
-			start += items.get(i).data.length / 5;
-			Bytes.set4(array, 0, start);
-			target.write(array, 0, 4);
-		}
-		this.cursor += 4 + 4 + (size * 4) + (start * 16);
-		this.writeSpace(target, 15);
 		for(int i = 0; i < size; i++){
 			final Item[] data = items.get(i).data;
-			final int length = data.length;
-			for(int j = 0; j < length;){
-				Bytes.set2(array, 0, data[j++].key);
-				Bytes.set2(array, 2, data[j++].key);
-				Bytes.set4(array, 4, data[j++].key);
-				Bytes.set4(array, 8, data[j++].key);
-				Bytes.set4(array, 12, data[j++].key);
-				target.write(array, 0, 16);
+			final int count = data.length;
+			for(int j = 0; j < count;){
+				this.write(target, data[j++].key, this.elemUriLength);
+				this.write(target, data[j++].key, this.elemNameLength);
+				this.write(target, data[j++].key, this.elemContentLength);
+				this.write(target, data[j++].key, this.elemAttributesLength);
 			}
 		}
 	}
@@ -625,27 +783,15 @@ public final class Encoder {
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
 	void writeAttributes(final EncodeTarget target, final List<EntryItem> items) throws IOException {
+		this.writeOffsets(target, items);
 		final int size = items.size();
-		final byte[] array = this.array;
-		Bytes.set4(array, 0, size);
-		Bytes.set4(array, 4, 0);
-		target.write(array, 0, 8);
-		int start = 0;
-		for(int i = 0; i < size; i++){
-			start += items.get(i).data.length / 3;
-			Bytes.set4(array, 0, start);
-			target.write(array, 0, 4);
-		}
-		this.cursor += 4 + 4 + (size * 4) + (start * 8);
-		this.writeSpace(target, 7);
 		for(int i = 0; i < size; i++){
 			final Item[] data = items.get(i).data;
-			final int length = data.length;
-			for(int j = 0; j < length;){
-				Bytes.set2(array, 0, data[j++].key);
-				Bytes.set2(array, 2, data[j++].key);
-				Bytes.set4(array, 4, data[j++].key);
-				target.write(array, 0, 8);
+			final int count = data.length;
+			for(int j = 0; j < count;){
+				this.write(target, data[j++].key, this.attrUriLength);
+				this.write(target, data[j++].key, this.attrNameLength);
+				this.write(target, data[j++].key, this.attrValueLength);
 			}
 		}
 	}
@@ -657,9 +803,9 @@ public final class Encoder {
 	 * @param text Text.
 	 * @return Daten eines Textknoten oder {@code null}.
 	 */
-	Item[] encodeText(final String text) {
-		if(text.isEmpty()) return null;
-		return new Item[]{Item.VOID, Item.VOID, this.valuePool.unique(text), Item.VOID, Item.VOID};
+	Item[] encodeText(String text) {
+		if((ignoreWhitespace ? text.trim() : text).isEmpty()) return null;
+		return new Item[]{Item.VOID, Item.VOID, this.elemValuePool.unique(text), Item.VOID};
 	}
 
 	/**
@@ -671,29 +817,25 @@ public final class Encoder {
 	Item[] encodeElement(final Node element) {
 		final Item[] children = this.encodeChildren(element.getChildNodes());
 		final Item[] attributes = this.encodeAttributes(element.getAttributes());
-		final Item uriRef = this.namePool.unique(element.getNamespaceURI());
-		final Item nameRef = this.namePool.unique(element.getNodeName());
+		final Item uriRef = this.uriEnabled ? this.elemUriPool.unique(element.getNamespaceURI()) : Item.VOID;
+		final Item nameRef = this.elemNamePool.unique(element.getNodeName());
 		final Item contentRef;
-		final Item childrenRef;
 		final Item attributesRef;
 		if(children.length > 0){
-			if((children.length == 5) && (children[1] == Item.VOID)){
+			if((children.length == 4) && (children[1] == Item.VOID)){
 				contentRef = children[2];
-				childrenRef = Item.VOID;
 			}else{
-				contentRef = Item.VOID;
-				childrenRef = this.childrenPool.unique(children);
+				contentRef = this.elemChildrenPool.unique(children);
 			}
 		}else{
 			contentRef = Item.VOID;
-			childrenRef = Item.VOID;
 		}
 		if(attributes.length > 1){
-			attributesRef = this.attributesPool.unique(attributes);
+			attributesRef = this.elemAttributesPool.unique(attributes);
 		}else{
 			attributesRef = Item.VOID;
 		}
-		return new Item[]{uriRef, nameRef, contentRef, childrenRef, attributesRef};
+		return new Item[]{uriRef, nameRef, contentRef, attributesRef};
 	}
 
 	/**
@@ -704,8 +846,8 @@ public final class Encoder {
 	 */
 	Item[] encodeChildren(final NodeList nodes) {
 		final StringBuilder text = this.text;
-		final List<Item[]> items = new ArrayList<Item[]>();
 		final int length = nodes.getLength();
+		final List<Item[]> items = new ArrayList<Item[]>(length);
 		for(int i = 0; i < length; i++){
 			final Node node = nodes.item(i);
 			switch(node.getNodeType()){
@@ -726,9 +868,9 @@ public final class Encoder {
 		text.setLength(0);
 		items.removeAll(Collections.singleton(null));
 		final int size = items.size();
-		final Item[] data = new Item[size * 5];
+		final Item[] data = new Item[size * 4];
 		for(int i = 0; i < size; i++){
-			System.arraycopy(items.get(i), 0, data, i * 5, 5);
+			System.arraycopy(items.get(i), 0, data, i * 4, 4);
 		}
 		return data;
 	}
@@ -744,9 +886,9 @@ public final class Encoder {
 		final Item[] data = new Item[length * 3];
 		for(int i = 0, j = 0; i < length; i++){
 			final Node node = nodes.item(i);
-			data[j++] = this.namePool.unique(node.getNamespaceURI());
-			data[j++] = this.namePool.unique(node.getNodeName());
-			data[j++] = this.valuePool.unique(node.getNodeValue());
+			data[j++] = this.uriEnabled ? this.attrUriPool.unique(node.getNamespaceURI()) : Item.VOID;
+			data[j++] = this.attrNamePool.unique(node.getNodeName());
+			data[j++] = this.attrValuePool.unique(node.getNodeValue());
 		}
 		return data;
 	}
@@ -756,12 +898,20 @@ public final class Encoder {
 	 * 
 	 * @see Pool#items()
 	 * @param items {@link Item}s.
+	 * @param offset Schlüssel des ersten {@link Item}s.
 	 */
-	void prepareKeys(final List<? extends Item> items) {
-		int key = 0;
+	void computeKeys(final List<? extends Item> items, int offset) {
 		for(final Item item: items){
-			item.key = key++;
+			item.key = offset++;
 		}
+	}
+
+	static int computeLength(final int maxValue) {
+		if(maxValue >= 0x01000000) return 4;
+		if(maxValue >= 0x010000) return 3;
+		if(maxValue >= 0x0100) return 2;
+		if(maxValue >= 0x01) return 1;
+		return 0;
 	}
 
 	/**
@@ -772,36 +922,63 @@ public final class Encoder {
 	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
 	 */
 	public void encode(final Document source, final EncodeTarget target) throws IOException {
-		this.cursor = 0;
-		this.text.setLength(0);
-		this.namePool.clear();
-		this.valuePool.clear();
-		this.childrenPool.clear();
-		this.attributesPool.clear();
+		this.clear();
 		final Item[] children = this.encodeChildren(source.getChildNodes());
-		if((children.length != 5) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
-		final Item childrenRef = this.childrenPool.unique(children);
-		final List<ValueItem> nameList = this.namePool.items();
-		final List<ValueItem> valueList = this.valuePool.items();
-		final List<EntryItem> childrenList = this.childrenPool.items();
-		final List<EntryItem> attributesList = this.attributesPool.items();
-		this.prepareKeys(nameList);
-		this.prepareKeys(valueList);
-		this.prepareKeys(childrenList);
-		this.prepareKeys(attributesList);
-		this.writeValues(target, nameList);
-		this.writeValues(target, valueList);
-		this.writeChildren(target, childrenList);
-		this.writeAttributes(target, attributesList);
-		final byte[] array = this.array;
-		Bytes.set4(array, 0, childrenRef.key);
-		target.write(array, 0, 4);
+		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
+		final Item childrenRef = this.elemChildrenPool.unique(children);
+		final List<TextItem> attrUriList = this.attrUriPool.items();
+		final List<TextItem> attrNameList = this.attrNamePool.items();
+		final List<TextItem> attrValueList = this.attrValuePool.items();
+		final List<TextItem> elemUriList = this.elemUriPool.items();
+		final List<TextItem> elemNameList = this.elemNamePool.items();
+		final List<TextItem> elemValueList = this.elemValuePool.items();
+		final List<EntryItem> elemGroupList = this.elemChildrenPool.items();
+		final List<EntryItem> attrGroupList = this.elemAttributesPool.items();
+		this.computeKeys(attrUriList, 1);
+		this.computeKeys(attrNameList, 0);
+		this.computeKeys(attrValueList, 0);
+		this.computeKeys(elemUriList, 1);
+		this.computeKeys(elemNameList, 1);
+		this.computeKeys(elemValueList, 1);
+		this.computeKeys(elemGroupList, 1 + elemValueList.size());
+		this.computeKeys(attrGroupList, 1);
+		this.attrUriLength = Encoder.computeLength(attrUriList.size());
+		this.attrNameLength = Encoder.computeLength(attrNameList.size() - 1);
+		this.attrValueLength = Encoder.computeLength(attrValueList.size() - 1);
+		this.elemUriLength = Encoder.computeLength(elemUriList.size());
+		this.elemNameLength = Encoder.computeLength(elemNameList.size());
+		this.elemContentLength = Encoder.computeLength(elemValueList.size() + elemGroupList.size());
+		this.elemAttributesLength = Encoder.computeLength(attrGroupList.size());
+		this.writeValues(target, attrUriList);
+		this.writeValues(target, attrNameList);
+		this.writeValues(target, attrValueList);
+		this.writeAttributes(target, attrGroupList);
+		this.writeValues(target, elemUriList);
+		this.writeValues(target, elemNameList);
+		this.writeValues(target, elemValueList);
+		this.writeChildren(target, elemGroupList);
+		this.write(target, childrenRef.key, this.elemContentLength);
+
 		// System.out.println(Objects.toStringCallFormat(true, true, this, //
-		// "namePool", this.namePool, //
-		// "valuePool", this.valuePool, //
-		// "childrenPool", this.childrenPool, //
-		// "attributesPool", this.attributesPool //
+		// "attrUriPool", this.attrUriPool, //
+		// "attrNamePool", this.attrNamePool, //
+		// "attrValuePool", this.attrValuePool, //
+		// "elemUriPool", this.elemUriPool, //
+		// "elemNamePool", this.elemNamePool, //
+		// "elemValuePool", this.elemValuePool, //
+		// "elemChildrenPool", this.elemChildrenPool, //
+		// "elemAttributesPool", this.elemAttributesPool //
 		// ));
+
+		this.clear();
+	}
+
+	public boolean isUriEnabled() {
+		return this.uriEnabled;
+	}
+
+	public void setUriEnabled(final boolean uriEnabled) {
+		this.uriEnabled = uriEnabled;
 	}
 
 }

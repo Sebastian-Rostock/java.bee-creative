@@ -7,17 +7,17 @@ import java.io.IOException;
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public  class ByteArrayDecodeSource implements DecodeSource {
+public class ByteArrayDecodeSource implements DecodeSource {
 
 	/**
 	 * Dieses Feld speichert das {@code byte}-Array.
 	 */
-	protected	final byte[] data;
+	protected final byte[] data;
 
 	/**
 	 * Dieses Feld speichert die Leseposition.
 	 */
-	protected	int index;
+	protected int index;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@code byte}-Array.
