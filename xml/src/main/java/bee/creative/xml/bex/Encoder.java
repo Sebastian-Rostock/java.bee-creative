@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueSet;
 
 /**
@@ -27,6 +28,8 @@ import bee.creative.util.Unique.UniqueSet;
  * schreiben könnende Implementation einer Standard XML Softwarebibliothek. Diese leichtgewichtige DOM-Implementation kann die Binärdatei Blockweise in den
  * Arbeitsspeicher laden und dort zur Wiederverwendung gemäß einer most-recently-used Strategie vorhalten. Die offset-Listen sollten dazu vollständig im
  * Arbeitsspeicher vorgehalten werden.
+ * <p>
+ * In der Klasse {@link Decoder} wird eine solche leichtgewichtige DOM-Implementation bereit gestellt.
  * <p>
  * <h4>Datenstruktur: BEX</h4>
  * <p>
@@ -361,8 +364,11 @@ import bee.creative.util.Unique.UniqueSet;
 public final class Encoder {
 
 	/**
-	 * Diese Klasse implementiert einen über einen {@link #key Schlüssel} referenzierbaren Datensatz, der in einem {@link Pool} verwaltet wird.
+	 * Diese Klasse implementiert einen abstrakten Datensatz, der über einen {@link #key Schlüssel} eindeutig referenziert und in einem {@link Pool} verwaltet
+	 * werden kann. Die Nutzdaten eines solchen Datensatzes verfügt über eine abstrakte Größe (z.B. Zeichenanzahl, Knotenanzahl).
 	 * 
+	 * @see ValueItem
+	 * @see GroupItem
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	static class Item {
@@ -373,10 +379,15 @@ public final class Encoder {
 		static final Item VOID = new Item();
 
 		/**
-		 * Dieses Feld speichert den Schlüssel zur Referenzierung.
+		 * Dieses Feld speichert den Schlüssel zur Referenzierung. Dieser wird beim Einpflegen in den {@link Pool} hichgezählt.
+		 * 
+		 * @see Pool#reuse(Item, Item)
 		 */
 		public int key = 0;
 
+		/**
+		 * Dieses Feld speichert die abstrakte Größe der Nutzdaten.
+		 */
 		public int size;
 
 	}
@@ -390,10 +401,10 @@ public final class Encoder {
 	 */
 	static abstract class Pool<GData, GItem extends Item> extends UniqueSet<GItem> implements Comparator<GItem> {
 
-		int reuses = 0;
-
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Der Rückgabewert entspricht der Eingabe. Der {@link Item#key Schlüssel} des {@link Item}s wird hier auf {@code 1} gesetzt.
 		 */
 		@Override
 		protected final GItem compile(final GItem input) {
@@ -403,11 +414,12 @@ public final class Encoder {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Der {@link Item#key Schlüssel} des {@link Item}s wird hier auf {@code 1} gesetzt.
 		 */
 		@Override
 		protected final void reuse(final GItem input, final GItem output) {
 			output.key++;
-			this.reuses++;
 		}
 
 		/**
@@ -424,7 +436,7 @@ public final class Encoder {
 		 * 
 		 * @see #get(Object)
 		 * @param data Nutzdaten.
-		 * @return einzigartiges {@link Item}.
+		 * @return einzigartiges {@link Item} oder {@link Item#VOID}.
 		 */
 		public final Item unique(final GData data) {
 			return data == null ? Item.VOID : this.get(this.item(data));
@@ -456,10 +468,23 @@ public final class Encoder {
 			return items;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String toString() {
-			return "" + this.reuses;
+			final int count = this.entryMap.size();
+			int minSize = Integer.MAX_VALUE, maxSize = Integer.MIN_VALUE, avgSize = 0;
+			for(final Item item: this.entryMap.values()){
+				final int size = item.size;
+				minSize = Math.min(minSize, size);
+				maxSize = Math.max(maxSize, size);
+				avgSize += size;
+			}
+			if(count == 0) return Objects.toStringCallFormat(false, true, this, "items", count, "minSize", Float.NaN, "maxSize", Float.NaN, "avgSize", Float.NaN);
+			return Objects.toStringCallFormat(false, true, this, "items", count, "minSize", minSize, "maxSize", maxSize, "avgSize", avgSize / (float)count);
 		}
+
 	}
 
 	/**
@@ -467,10 +492,10 @@ public final class Encoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class TextItem extends Item {
+	static final class ValueItem extends Item {
 
 		/**
-		 * Dieses Feld speichert den Textwert.
+		 * Dieses Feld speichert die URF-8 Kodierten Textwert.
 		 */
 		public final byte[] data;
 
@@ -479,7 +504,7 @@ public final class Encoder {
 		 * 
 		 * @param data Textwert.
 		 */
-		public TextItem(final String data) {
+		public ValueItem(final String data) {
 			this.data = data.getBytes(Encoder.CHARSET);
 			this.size = this.data.length;
 		}
@@ -487,25 +512,25 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Pool} der {@link TextItem}s.
+	 * Diese Klasse implementiert den {@link Pool} der {@link ValueItem}s zur verwaltung einzigartiger Textwerte.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class TextPool extends Pool<String, TextItem> {
+	static final class ValuePool extends Pool<String, ValueItem> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public TextItem item(final String data) {
-			return new TextItem(data);
+		public ValueItem item(final String data) {
+			return new ValueItem(data);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hash(final TextItem input) throws NullPointerException {
+		public int hash(final ValueItem input) throws NullPointerException {
 			return Arrays.hashCode(input.data);
 		}
 
@@ -513,7 +538,7 @@ public final class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean equals(final TextItem input1, final TextItem input2) throws NullPointerException {
+		public boolean equals(final ValueItem input1, final ValueItem input2) throws NullPointerException {
 			return Arrays.equals(input1.data, input2.data);
 		}
 
@@ -524,10 +549,10 @@ public final class Encoder {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class EntryItem extends Item {
+	static final class GroupItem extends Item {
 
 		/**
-		 * Dieses Feld speichert die Kind- bzw. Attributknotenliste. Ein Kindknoten besteht immer aus 5 auf einander folgenden Elementen, ein Attributknoten aus 3.
+		 * Dieses Feld speichert die Kind- bzw. Attributknotenliste. Ein Kindknoten besteht immer aus 4 auf einander folgenden Elementen, ein Attributknoten aus 3.
 		 */
 		public final Item[] data;
 
@@ -537,7 +562,7 @@ public final class Encoder {
 		 * @param data Kind- bzw. Attributknotenliste.
 		 * @param size Länge.
 		 */
-		public EntryItem(final Item[] data, final int size) {
+		public GroupItem(final Item[] data, final int size) {
 			this.data = data;
 			this.size = size;
 		}
@@ -545,17 +570,17 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Pool} der {@link EntryItem}s.
+	 * Diese Klasse implementiert den {@link Pool} der {@link GroupItem}s zur Verwaltung einzigartiger Kind- bzw. Attributknotenlisten.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class EntryPool extends Pool<Item[], EntryItem> {
+	static abstract class GroupPool extends Pool<Item[], GroupItem> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hash(final EntryItem input) throws NullPointerException {
+		public int hash(final GroupItem input) throws NullPointerException {
 			return Arrays.hashCode(input.data);
 		}
 
@@ -563,7 +588,7 @@ public final class Encoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean equals(final EntryItem input1, final EntryItem input2) throws NullPointerException {
+		public boolean equals(final GroupItem input1, final GroupItem input2) throws NullPointerException {
 			final Item[] data1 = input1.data, data2 = input2.data;
 			final int length = data1.length;
 			if(length != data2.length) return false;
@@ -574,38 +599,58 @@ public final class Encoder {
 
 	}
 
-	static final class ChildrenPool extends EntryPool {
+	/**
+	 * Diese Klasse implementiert den {@link GroupPool} für Attributknotenlisten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class AttrGroupPool extends GroupPool {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public EntryItem item(final Item[] data) {
-			return new EntryItem(data, data.length / 4);
+		public GroupItem item(final Item[] data) {
+			return new GroupItem(data, data.length / 3);
 		}
 
 	}
-
-	static final class AttributesPool extends EntryPool {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public EntryItem item(final Item[] data) {
-			return new EntryItem(data, data.length / 3);
-		}
-
-	}
-
-	boolean uriEnabled;
-
-	boolean ignoreWhitespace = true;
 
 	/**
-	 * Dieses Feld speichert die Anzahl der bisher geschriebenen Byte.
+	 * Diese Klasse implementiert den {@link GroupPool} für Kindknotenlisten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	int cursor;
+	static final class ElemGrpupPool extends GroupPool {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GroupItem item(final Item[] data) {
+			return new GroupItem(data, data.length / 4);
+		}
+
+	}
+
+	/**
+	 * Dieses Feld speichert das UTF-8-{@link Charset} zur Kodierung der Textwerte.
+	 */
+	static final Charset CHARSET = Charset.forName("UTF-8");
+
+	/**
+	 * Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
+	 * 
+	 * @param maxValue positiver Wert.
+	 * @return Länge.
+	 */
+	static int lengthOf(final int maxValue) {
+		if(maxValue >= 0x01000000) return 4;
+		if(maxValue >= 0x010000) return 3;
+		if(maxValue >= 0x0100) return 2;
+		if(maxValue >= 0x01) return 1;
+		return 0;
+	}
 
 	/**
 	 * Dieses Feld speichert den Schreibpuffer für {@link EncodeTarget#write(byte[], int, int)}.
@@ -618,60 +663,79 @@ public final class Encoder {
 	final StringBuilder text;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNamespaceURI()}.
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNamespaceURI()}.
 	 */
-	final TextPool attrUriPool;
+	final ValuePool attrUriPool;
 
+	/**
+	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNamespaceURI()}.
+	 */
 	int attrUriLength;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNodeName()}.
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeName()}.
 	 */
-	final TextPool attrNamePool;
+	final ValuePool attrNamePool;
 
+	/**
+	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNodeName()}.
+	 */
 	int attrNameLength;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Attr#getNodeValue()}.
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeValue()}.
 	 */
-	final TextPool attrValuePool;
+	final ValuePool attrValuePool;
 
+	/**
+	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNodeValue()}.
+	 */
 	int attrValueLength;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Element#getNamespaceURI()}.
+	 * Dieses Feld speichert den {@link GroupPool} für {@link Element#getAttributes()}.
 	 */
-	final TextPool elemUriPool;
+	final GroupPool attrGroupPool;
 
+	/**
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Element#getNamespaceURI()}.
+	 */
+	final ValuePool elemUriPool;
+
+	/**
+	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Element#getNamespaceURI()}.
+	 */
 	int elemUriLength;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Element#getNodeName()}.
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Element#getNodeName()}.
 	 */
-	final TextPool elemNamePool;
+	final ValuePool elemNamePool;
 
+	/**
+	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Element#getNodeName()}.
+	 */
 	int elemNameLength;
 
 	/**
-	 * Dieses Feld speichert den {@link TextPool} für {@link Text#getNodeValue()}.
+	 * Dieses Feld speichert den {@link ValuePool} für {@link Text#getNodeValue()}.
 	 */
-	final TextPool elemValuePool;
+	final ValuePool elemValuePool;
 
 	/**
-	 * Dieses Feld speichert den {@link EntryPool} für {@link Node#getChildNodes()}.
+	 * Dieses Feld speichert die Länge einer Referenz auf {@link Text#getNodeValue()} und {@link Node#getChildNodes()}.
 	 */
-	final EntryPool elemChildrenPool;
-
 	int elemContentLength;
 
 	/**
-	 * Dieses Feld speichert den {@link EntryPool} für {@link Node#getAttributes()}.
+	 * Dieses Feld speichert die Länge einer Referenz auf {@link Element#getAttributes()}.
 	 */
-	final EntryPool elemAttributesPool;
-
 	int elemAttributesLength;
 
-	static final Charset CHARSET = Charset.forName("UTF-8");
+	/**
+	 * Dieses Feld speichert den {@link GroupPool} für {@link Node#getChildNodes()}.
+	 */
+	final GroupPool elemGroupPool;
 
 	/**
 	 * Dieser Konstruktor initialisiert den {@link Encoder}.
@@ -679,25 +743,24 @@ public final class Encoder {
 	public Encoder() {
 		this.text = new StringBuilder();
 		this.array = new byte[16];
-		this.attrUriPool = new TextPool();
-		this.attrNamePool = new TextPool();
-		this.attrValuePool = new TextPool();
-		this.elemUriPool = new TextPool();
-		this.elemNamePool = new TextPool();
-		this.elemValuePool = new TextPool();
-		this.elemChildrenPool = new ChildrenPool();
-		this.elemAttributesPool = new AttributesPool();
+		this.attrUriPool = new ValuePool();
+		this.attrNamePool = new ValuePool();
+		this.attrValuePool = new ValuePool();
+		this.elemUriPool = new ValuePool();
+		this.elemNamePool = new ValuePool();
+		this.elemValuePool = new ValuePool();
+		this.elemGroupPool = new ElemGrpupPool();
+		this.attrGroupPool = new AttrGroupPool();
 	}
 
-	void clear() {
-		this.cursor = 0;
-		this.text.setLength(0);
-		this.attrUriPool.clear();
-		this.attrNamePool.clear();
-		this.elemChildrenPool.clear();
-		this.elemAttributesPool.clear();
-	}
-
+	/**
+	 * Diese Methode schreibt den gegebenen Wert mit der gegebenen Länge in das gegebene {@link EncodeTarget}.
+	 * 
+	 * @param target {@link EncodeTarget}.
+	 * @param value Wert.
+	 * @param size Länge des Werts (0..4).
+	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
+	 */
 	void write(final EncodeTarget target, final int value, final int size) throws IOException {
 		final byte[] array = this.array;
 		switch(size){
@@ -721,6 +784,13 @@ public final class Encoder {
 		target.write(array, 0, size);
 	}
 
+	/**
+	 * Diese Methode schreibt die Startpositionen der gegebenen {@link Item}s in das gegebene {@link EncodeTarget}.
+	 * 
+	 * @param target {@link EncodeTarget}.
+	 * @param items {@link Item}s.
+	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
+	 */
 	void writeOffsets(final EncodeTarget target, final List<? extends Item> items) throws IOException {
 		final int size = items.size();
 		final int[] offsets = new int[size];
@@ -729,7 +799,7 @@ public final class Encoder {
 			offset += items.get(i).size;
 			offsets[i] = offset;
 		}
-		final int length = Encoder.computeLength(offset);
+		final int length = Encoder.lengthOf(offset);
 		this.write(target, size, 4);
 		this.write(target, length, 1);
 		for(int i = 0; i < size; i++){
@@ -738,13 +808,13 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt {@link TextItem}s in die Ausgabe.
+	 * Diese Methode schreibt {@link ValueItem}s in das gegebene {@link EncodeTarget}.
 	 * 
-	 * @param target Ausgabe.
-	 * @param items {@link TextItem}s.
+	 * @param target {@link EncodeTarget}.
+	 * @param items {@link ValueItem}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeValues(final EncodeTarget target, final List<TextItem> items) throws IOException {
+	void writeTextValues(final EncodeTarget target, final List<ValueItem> items) throws IOException {
 		this.writeOffsets(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
@@ -754,13 +824,13 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt die {@link EntryItem}s der Kindknotenlisten in die Ausgabe.
+	 * Diese Methode schreibt die {@link GroupItem}s der Kindknotenlisten in das gegebene {@link EncodeTarget}.
 	 * 
-	 * @param target Ausgabe.
-	 * @param items {@link EntryItem}s der Kindknotenlisten.
+	 * @param target {@link EncodeTarget}.
+	 * @param items {@link GroupItem}s der Kindknotenlisten.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeChildren(final EncodeTarget target, final List<EntryItem> items) throws IOException {
+	void writeElemGroups(final EncodeTarget target, final List<GroupItem> items) throws IOException {
 		this.writeOffsets(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
@@ -776,13 +846,13 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt die {@link EntryItem}s der Attributknotenlisten in die Ausgabe.
+	 * Diese Methode schreibt die {@link GroupItem}s der Attributknotenlisten in die Ausgabe.
 	 * 
 	 * @param target Ausgabe.
-	 * @param items {@link EntryItem}s der Attributknotenlisten.
+	 * @param items {@link GroupItem}s der Attributknotenlisten.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeAttributes(final EncodeTarget target, final List<EntryItem> items) throws IOException {
+	void writeAttrGroups(final EncodeTarget target, final List<GroupItem> items) throws IOException {
 		this.writeOffsets(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
@@ -803,8 +873,8 @@ public final class Encoder {
 	 * @param text Text.
 	 * @return Daten eines Textknoten oder {@code null}.
 	 */
-	Item[] encodeText(String text) {
-		if((ignoreWhitespace ? text.trim() : text).isEmpty()) return null;
+	Item[] encodeText(final String text) {
+		if(text.isEmpty()) return null;
 		return new Item[]{Item.VOID, Item.VOID, this.elemValuePool.unique(text), Item.VOID};
 	}
 
@@ -817,7 +887,7 @@ public final class Encoder {
 	Item[] encodeElement(final Node element) {
 		final Item[] children = this.encodeChildren(element.getChildNodes());
 		final Item[] attributes = this.encodeAttributes(element.getAttributes());
-		final Item uriRef = this.uriEnabled ? this.elemUriPool.unique(element.getNamespaceURI()) : Item.VOID;
+		final Item uriRef = this.elemUriPool.unique(element.getNamespaceURI());
 		final Item nameRef = this.elemNamePool.unique(element.getNodeName());
 		final Item contentRef;
 		final Item attributesRef;
@@ -825,13 +895,13 @@ public final class Encoder {
 			if((children.length == 4) && (children[1] == Item.VOID)){
 				contentRef = children[2];
 			}else{
-				contentRef = this.elemChildrenPool.unique(children);
+				contentRef = this.elemGroupPool.unique(children);
 			}
 		}else{
 			contentRef = Item.VOID;
 		}
 		if(attributes.length > 1){
-			attributesRef = this.elemAttributesPool.unique(attributes);
+			attributesRef = this.attrGroupPool.unique(attributes);
 		}else{
 			attributesRef = Item.VOID;
 		}
@@ -886,7 +956,7 @@ public final class Encoder {
 		final Item[] data = new Item[length * 3];
 		for(int i = 0, j = 0; i < length; i++){
 			final Node node = nodes.item(i);
-			data[j++] = this.uriEnabled ? this.attrUriPool.unique(node.getNamespaceURI()) : Item.VOID;
+			data[j++] = this.attrUriPool.unique(node.getNamespaceURI());
 			data[j++] = this.attrNamePool.unique(node.getNodeName());
 			data[j++] = this.attrValuePool.unique(node.getNodeValue());
 		}
@@ -906,12 +976,20 @@ public final class Encoder {
 		}
 	}
 
-	static int computeLength(final int maxValue) {
-		if(maxValue >= 0x01000000) return 4;
-		if(maxValue >= 0x010000) return 3;
-		if(maxValue >= 0x0100) return 2;
-		if(maxValue >= 0x01) return 1;
-		return 0;
+	/**
+	 * Diese Methode entfernt alle intern verwaltenden Datenstrukturen und wird automatisch von {@link #encode(Document, EncodeTarget)} vor der Kodierung eines
+	 * {@link Document}s aufgerufen.
+	 */
+	public void clear() {
+		this.text.setLength(0);
+		this.attrUriPool.clear();
+		this.attrNamePool.clear();
+		this.attrValuePool.clear();
+		this.attrGroupPool.clear();
+		this.elemUriPool.clear();
+		this.elemNamePool.clear();
+		this.elemValuePool.clear();
+		this.elemGroupPool.clear();
 	}
 
 	/**
@@ -925,15 +1003,15 @@ public final class Encoder {
 		this.clear();
 		final Item[] children = this.encodeChildren(source.getChildNodes());
 		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
-		final Item childrenRef = this.elemChildrenPool.unique(children);
-		final List<TextItem> attrUriList = this.attrUriPool.items();
-		final List<TextItem> attrNameList = this.attrNamePool.items();
-		final List<TextItem> attrValueList = this.attrValuePool.items();
-		final List<TextItem> elemUriList = this.elemUriPool.items();
-		final List<TextItem> elemNameList = this.elemNamePool.items();
-		final List<TextItem> elemValueList = this.elemValuePool.items();
-		final List<EntryItem> elemGroupList = this.elemChildrenPool.items();
-		final List<EntryItem> attrGroupList = this.elemAttributesPool.items();
+		final Item childrenRef = this.elemGroupPool.unique(children);
+		final List<ValueItem> attrUriList = this.attrUriPool.items();
+		final List<ValueItem> attrNameList = this.attrNamePool.items();
+		final List<ValueItem> attrValueList = this.attrValuePool.items();
+		final List<GroupItem> attrGroupList = this.attrGroupPool.items();
+		final List<ValueItem> elemUriList = this.elemUriPool.items();
+		final List<ValueItem> elemNameList = this.elemNamePool.items();
+		final List<ValueItem> elemValueList = this.elemValuePool.items();
+		final List<GroupItem> elemGroupList = this.elemGroupPool.items();
 		this.computeKeys(attrUriList, 1);
 		this.computeKeys(attrNameList, 0);
 		this.computeKeys(attrValueList, 0);
@@ -942,43 +1020,32 @@ public final class Encoder {
 		this.computeKeys(elemValueList, 1);
 		this.computeKeys(elemGroupList, 1 + elemValueList.size());
 		this.computeKeys(attrGroupList, 1);
-		this.attrUriLength = Encoder.computeLength(attrUriList.size());
-		this.attrNameLength = Encoder.computeLength(attrNameList.size() - 1);
-		this.attrValueLength = Encoder.computeLength(attrValueList.size() - 1);
-		this.elemUriLength = Encoder.computeLength(elemUriList.size());
-		this.elemNameLength = Encoder.computeLength(elemNameList.size());
-		this.elemContentLength = Encoder.computeLength(elemValueList.size() + elemGroupList.size());
-		this.elemAttributesLength = Encoder.computeLength(attrGroupList.size());
-		this.writeValues(target, attrUriList);
-		this.writeValues(target, attrNameList);
-		this.writeValues(target, attrValueList);
-		this.writeAttributes(target, attrGroupList);
-		this.writeValues(target, elemUriList);
-		this.writeValues(target, elemNameList);
-		this.writeValues(target, elemValueList);
-		this.writeChildren(target, elemGroupList);
+		this.attrUriLength = Encoder.lengthOf(attrUriList.size());
+		this.attrNameLength = Encoder.lengthOf(attrNameList.size() - 1);
+		this.attrValueLength = Encoder.lengthOf(attrValueList.size() - 1);
+		this.elemUriLength = Encoder.lengthOf(elemUriList.size());
+		this.elemNameLength = Encoder.lengthOf(elemNameList.size());
+		this.elemContentLength = Encoder.lengthOf(elemValueList.size() + elemGroupList.size());
+		this.elemAttributesLength = Encoder.lengthOf(attrGroupList.size());
+		this.writeTextValues(target, attrUriList);
+		this.writeTextValues(target, attrNameList);
+		this.writeTextValues(target, attrValueList);
+		this.writeAttrGroups(target, attrGroupList);
+		this.writeTextValues(target, elemUriList);
+		this.writeTextValues(target, elemNameList);
+		this.writeTextValues(target, elemValueList);
+		this.writeElemGroups(target, elemGroupList);
 		this.write(target, childrenRef.key, this.elemContentLength);
-
-		// System.out.println(Objects.toStringCallFormat(true, true, this, //
-		// "attrUriPool", this.attrUriPool, //
-		// "attrNamePool", this.attrNamePool, //
-		// "attrValuePool", this.attrValuePool, //
-		// "elemUriPool", this.elemUriPool, //
-		// "elemNamePool", this.elemNamePool, //
-		// "elemValuePool", this.elemValuePool, //
-		// "elemChildrenPool", this.elemChildrenPool, //
-		// "elemAttributesPool", this.elemAttributesPool //
-		// ));
-
-		this.clear();
 	}
 
-	public boolean isUriEnabled() {
-		return this.uriEnabled;
-	}
-
-	public void setUriEnabled(final boolean uriEnabled) {
-		this.uriEnabled = uriEnabled;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Objects.toStringCallFormat(true, true, this, "attrUriPool", this.attrUriPool, "attrNamePool", this.attrNamePool, "attrValuePool",
+			this.attrValuePool, "attrGroupPool", this.attrGroupPool, "elemUriPool", this.elemUriPool, "elemNamePool", this.elemNamePool, "elemValuePool",
+			this.elemValuePool, "elemGroupPool", this.elemGroupPool);
 	}
 
 }

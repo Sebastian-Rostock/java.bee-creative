@@ -4,7 +4,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Diese Schnittstelle definiert die Ausgabe eines {@link Encoder_OLD}s.
+ * Diese Schnittstelle definiert die Ausgabe eines {@link Encoder}s.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
