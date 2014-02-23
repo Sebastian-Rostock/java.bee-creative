@@ -14,14 +14,32 @@ import bee.creative.xml.view.NodeView;
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class NodeAdapter implements Node {
+public abstract class AbstractNodeAdapter implements Node {
 
 	/**
-	 * Diese Methode gibt den {@link NodeView} mit den Nutzdaten zurück.
+	 * Dieses Feld speichert den {@link NodeView}.
+	 */
+	protected final NodeView nodeView;
+
+	/**
+	 * Dieser Konstruktor initialisiert den {@link NodeView}.
+	 * 
+	 * @param nodeView {@link NodeView}.
+	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
+	 */
+	public AbstractNodeAdapter(final NodeView nodeView) throws NullPointerException {
+		if(nodeView == null) throw new NullPointerException();
+		this.nodeView = nodeView;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link NodeView} zurück.
 	 * 
 	 * @return {@link NodeView}.
 	 */
-	protected abstract NodeView view();
+	public NodeView nodeView() {
+		return this.nodeView;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -148,7 +166,7 @@ public abstract class NodeAdapter implements Node {
 	 */
 	@Override
 	public String lookupPrefix(final String uri) {
-		return this.view().document().lookupPrefix(uri);
+		return this.nodeView.lookupPrefix(uri);
 	}
 
 	/**
@@ -156,7 +174,7 @@ public abstract class NodeAdapter implements Node {
 	 */
 	@Override
 	public String lookupNamespaceURI(final String prefix) {
-		return this.view().document().lookupURI(prefix);
+		return this.nodeView.lookupURI(prefix);
 	}
 
 	/**
@@ -164,7 +182,7 @@ public abstract class NodeAdapter implements Node {
 	 */
 	@Override
 	public boolean isDefaultNamespace(final String uri) {
-		return (uri != null) && Objects.equals(uri, this.view().document().lookupURI(null));
+		return (uri != null) && Objects.equals(uri, this.nodeView.lookupURI(null));
 	}
 
 	/**
@@ -204,7 +222,7 @@ public abstract class NodeAdapter implements Node {
 	 */
 	@Override
 	public Document getOwnerDocument() {
-		return new DocumentAdapter(this.view().document());
+		return new DocumentAdapter(this.nodeView.document());
 	}
 
 	/**

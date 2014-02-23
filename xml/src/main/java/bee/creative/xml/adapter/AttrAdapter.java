@@ -6,38 +6,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.TypeInfo;
 import bee.creative.util.Objects;
-import bee.creative.xml.view.AttributeView;
 import bee.creative.xml.view.NodeView;
 
 /**
- * Diese Klasse implementiert ein {@link Attr} als {@link NodeAdapter}.
+ * Diese Klasse implementiert ein {@link Attr} als {@link AbstractNodeAdapter}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class AttributeAdapter extends NodeAdapter implements Attr {
+public final class AttrAdapter extends AbstractNodeAdapter implements Attr {
 
 	/**
-	 * Dieses Feld speichert den {@link AttributeView}.
-	 */
-	protected final AttributeView attributeView;
-
-	/**
-	 * Dieser Konstruktor initialisiert den {@link AttributeView}.
+	 * Dieser Konstruktor initialisiert den {@link NodeView}.
 	 * 
-	 * @param attributeView {@link AttributeView}.
-	 * @throws NullPointerException Wenn der {@link AttributeView} {@code null} ist.
+	 * @param nodeView {@link NodeView}.
+	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
 	 */
-	public AttributeAdapter(final AttributeView attributeView) throws NullPointerException {
-		if(attributeView == null) throw new NullPointerException();
-		this.attributeView = attributeView;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected NodeView view() {
-		return this.attributeView;
+	public AttrAdapter(final NodeView nodeView) throws NullPointerException {
+		super(nodeView);
 	}
 
 	/**
@@ -45,7 +30,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public String getPrefix() {
-		return this.attributeView.document().lookupPrefix(this.attributeView.uri());
+		return this.nodeView.lookupPrefix(this.nodeView.uri());
 	}
 
 	/**
@@ -53,7 +38,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public String getNamespaceURI() {
-		return this.attributeView.uri();
+		return this.nodeView.uri();
 	}
 
 	/**
@@ -69,8 +54,8 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public String getNodeName() {
-		final String xmlnsName = this.lookupPrefix(this.attributeView.uri());
-		final String attributeName = this.attributeView.name();
+		final String xmlnsName = this.lookupPrefix(this.nodeView.uri());
+		final String attributeName = this.nodeView.name();
 		if(xmlnsName == null) return attributeName;
 		return xmlnsName + ":" + attributeName;
 	}
@@ -80,7 +65,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public String getNodeValue() throws DOMException {
-		return this.attributeView.value();
+		return this.nodeView.value();
 	}
 
 	/**
@@ -88,7 +73,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public String getLocalName() {
-		return this.attributeView.name();
+		return this.nodeView.name();
 	}
 
 	/**
@@ -144,7 +129,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public Element getOwnerElement() {
-		return new ElementAdapter(this.attributeView.parent());
+		return new ElementAdapter(this.nodeView.parent());
 	}
 
 	/**
@@ -184,7 +169,7 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	 */
 	@Override
 	public int hashCode() {
-		return this.attributeView.hashCode();
+		return this.nodeView.hashCode();
 	}
 
 	/**
@@ -193,9 +178,9 @@ public final class AttributeAdapter extends NodeAdapter implements Attr {
 	@Override
 	public boolean equals(final Object object) {
 		if(object == this) return true;
-		if(!(object instanceof AttributeAdapter)) return false;
-		final AttributeAdapter data = (AttributeAdapter)object;
-		return Objects.equals(this.attributeView, data.attributeView);
+		if(!(object instanceof AttrAdapter)) return false;
+		final AttrAdapter data = (AttrAdapter)object;
+		return Objects.equals(this.nodeView, data.nodeView);
 	}
 
 	/**

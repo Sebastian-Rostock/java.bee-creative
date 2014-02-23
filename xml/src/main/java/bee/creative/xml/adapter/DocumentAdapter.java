@@ -23,16 +23,15 @@ import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 import bee.creative.util.Objects;
-import bee.creative.xml.view.ChildrenView;
-import bee.creative.xml.view.DocumentView;
-import bee.creative.xml.view.ElementView;
+import bee.creative.xml.view.NodeListView;
+import bee.creative.xml.view.NodeView;
 
 /**
  * Diese Klasse implementiert ein {@link Document}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class DocumentAdapter extends NodeAdapter implements Document {
+public final class DocumentAdapter extends AbstractNodeAdapter implements Document {
 
 	/**
 	 * Dieses Feld speichert die leere {@link TypeInfo}.
@@ -172,29 +171,16 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 		"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
 
 	/**
-	 * Dieses Feld speichert den {@link DocumentView}.
-	 */
-	protected final DocumentView documentView;
-
-	/**
-	 * Dieser Konstruktor initialisiert den {@link DocumentView}.
+	 * Dieser Konstruktor initialisiert den {@link NodeView}.
 	 * 
-	 * @param documentView {@link DocumentView}.
-	 * @throws NullPointerException Wenn der {@link DocumentView} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der {@link DocumentView} keinen {@link ElementView} als einziges Kindelement besitzt.
+	 * @param nodeView {@link NodeView}.
+	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der {@link NodeView} keinen Elementknoten als einziges Kindelement besitzt.
 	 */
-	public DocumentAdapter(final DocumentView documentView) throws NullPointerException, IllegalArgumentException {
-		final ChildrenView childrenView = documentView.children();
-		if((childrenView.size() != 1) || (childrenView.get(0).asElement() == null)) throw new IllegalArgumentException();
-		this.documentView = documentView;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public DocumentView view() {
-		return this.documentView;
+	public DocumentAdapter(final NodeView nodeView) throws NullPointerException, IllegalArgumentException {
+		super(nodeView);
+		final NodeListView children = nodeView.children();
+		if((children.size() != 1) || (children.get(0).type() != NodeView.TYPE_ELEMENT)) throw new IllegalArgumentException();
 	}
 
 	/**
@@ -250,7 +236,7 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 	 */
 	@Override
 	public NodeList getChildNodes() {
-		return new ChildrenAdapter(this.documentView.children());
+		return new NodeListAdapter(this.nodeView.children());
 	}
 
 	/**
@@ -330,9 +316,9 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 	 */
 	@Override
 	public Element getElementById(final String elementId) {
-		final ElementView elementView = this.documentView.element(elementId);
-		if(elementView == null) return null;
-		return new ElementAdapter(elementView);
+		final NodeView nodeView = this.nodeView.element(elementId);
+		if(nodeView == null) return null;
+		return new ElementAdapter(nodeView);
 	}
 
 	/**
@@ -348,7 +334,7 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 	 */
 	@Override
 	public NodeList getElementsByTagNameNS(final String uri, final String name) {
-		return new ElementsAdapter(this.documentView.children(), uri, name);
+		return new ElementCollector(this.nodeView.children(), uri, name);
 	}
 
 	/**
@@ -356,7 +342,7 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 	 */
 	@Override
 	public Element getDocumentElement() {
-		return new ElementAdapter(this.documentView.children().get(0).asElement());
+		return new ElementAdapter(this.nodeView.children().get(0));
 	}
 
 	/**
@@ -585,7 +571,7 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 	 */
 	@Override
 	public int hashCode() {
-		return this.documentView.hashCode();
+		return this.nodeView.hashCode();
 	}
 
 	/**
@@ -596,7 +582,7 @@ public final class DocumentAdapter extends NodeAdapter implements Document {
 		if(object == this) return true;
 		if(!(object instanceof DocumentAdapter)) return false;
 		final DocumentAdapter data = (DocumentAdapter)object;
-		return Objects.equals(this.documentView, data.documentView);
+		return Objects.equals(this.nodeView, data.nodeView);
 	}
 
 	/**

@@ -7,14 +7,8 @@ import bee.creative.util.Bytes;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 import bee.creative.xml.adapter.DocumentAdapter;
-import bee.creative.xml.view.AttributeView;
-import bee.creative.xml.view.AttributesView;
-import bee.creative.xml.view.ChildView;
-import bee.creative.xml.view.ChildrenView;
-import bee.creative.xml.view.DocumentView;
-import bee.creative.xml.view.ElementView;
-import bee.creative.xml.view.ParentView;
-import bee.creative.xml.view.TextView;
+import bee.creative.xml.view.NodeListView;
+import bee.creative.xml.view.NodeView;
 
 /**
  * Diese Klasse implementiert das Objekt zur Dekodierung eines dem {@link Document}s, dass mit einem {@link Encoder} binär kodiert wurde.
@@ -496,7 +490,7 @@ public final class Decoder {
 		 * @param nodeIndex Index des Attributknoten.
 		 * @return Attributknoten oder {@code null}.
 		 */
-		public AttributeView item(final BEXElemNode parent, final int groupKey, final int nodeIndex) {
+		public BEXAttrNodeView item(final BEXElemNodeView parent, final int groupKey, final int nodeIndex) {
 			if((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
 			final int[] offsets = this.itemOffset;
 			final int itemKey = offsets[groupKey] + nodeIndex;
@@ -540,7 +534,7 @@ public final class Decoder {
 				pageData[dataIndex + (MRUAttrGroupPage.SIZE * 1)] = nameRef;
 				pageData[dataIndex + (MRUAttrGroupPage.SIZE * 2)] = valueRef;
 			}
-			return new BEXAttrNode(parent, nodeIndex, uriRef - 2, nameRef, valueRef);
+			return new BEXAttrNodeView(parent, nodeIndex, uriRef - 2, nameRef, valueRef);
 		}
 
 	}
@@ -640,7 +634,7 @@ public final class Decoder {
 		 * @param nodeIndex Index des Kindknoten.
 		 * @return Attributknoten oder {@code null}.
 		 */
-		public ChildView item(final BEXNode parent, final int groupKey, final int nodeIndex) {
+		public BEXNodeView item(final BEXNodeView parent, final int groupKey, final int nodeIndex) {
 			if((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
 			final int[] offsets = this.itemOffset;
 			int offset = offsets[groupKey] + nodeIndex;
@@ -690,40 +684,123 @@ public final class Decoder {
 				pageData[dataIndex + (MRUElemGroupPage.SIZE * 3)] = attributesRef;
 			}
 			final int childrenRef = contentRef - this.valueRefOffset;
-			if(nameRef < 0) return new BEXTextNode(parent, nodeIndex, contentRef);
-			if(contentRef < 0) return new BEXElemNode(parent, nodeIndex, uriRef - 2, nameRef, -1, attributesRef);
-			if(childrenRef < 0) return new BEXElemTextView(parent, nodeIndex, uriRef - 2, nameRef, contentRef, attributesRef);
-			return new BEXElemNode(parent, nodeIndex, uriRef - 2, nameRef, childrenRef, attributesRef);
+			if(nameRef < 0) return new BEXTextNodeView(parent, nodeIndex, contentRef);
+			if(contentRef < 0) return new BEXElemNodeView(parent, nodeIndex, uriRef - 2, nameRef, -1, attributesRef);
+			if(childrenRef < 0) return new BEXElemTextNodeView(parent, nodeIndex, uriRef - 2, nameRef, contentRef, attributesRef);
+			return new BEXElemNodeView(parent, nodeIndex, uriRef - 2, nameRef, childrenRef, attributesRef);
 		}
 
 	}
 
 	/**
-	 * Diese Schnittstelle definiert den {@link ParentView} eines {@link BEXDocuNode}s.
+	 * Diese Klasse implementiert den abstrakten {@link NodeView} für die Knoten eines {@link BEXDocuNode}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class BEXNode implements ParentView {
+	public static abstract class BEXNodeView implements NodeView {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public abstract BEXDocuNode document();
+		public String uri() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String name() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String value() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int index() {
+			return -1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public abstract BEXNodeView parent();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NodeView element(final String id) {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXElemNodeListView children() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXAttrListView attributes() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXDocuNode document() {
+			return this.parent().document();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String lookupURI(final String prefix) {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String lookupPrefix(final String uri) {
+			return null;
+		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link TextView} eines {@link BEXDocuNode}s.
+	 * Diese Klasse implementiert den Textknoten eines {@link BEXDocuNode}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BEXTextNode implements TextView {
+	public static final class BEXTextNodeView extends BEXNodeView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		public final BEXNode parent;
+		public final BEXNodeView parent;
 
 		/**
 		 * Dieses Feld speichert den Kindknotenindex.
@@ -736,13 +813,13 @@ public final class Decoder {
 		public final int valueRef;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXTextNode}.
+		 * Dieser Konstruktor initialisiert den Textknoten.
 		 * 
 		 * @param parent Elternknoten.
 		 * @param index Kindknotenindex.
-		 * @param valueRef Referenz auf des Wert.
+		 * @param valueRef Referenz auf den Wert.
 		 */
-		public BEXTextNode(final BEXNode parent, final int index, final int valueRef) {
+		public BEXTextNodeView(final BEXNodeView parent, final int index, final int valueRef) {
 			this.parent = parent;
 			this.index = index;
 			this.valueRef = valueRef;
@@ -752,24 +829,8 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DocumentView document() {
-			return this.parent.document();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ParentView parent() {
-			return this.parent;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int index() {
-			return this.index;
+		public int type() {
+			return NodeView.TYPE_TEXT;
 		}
 
 		/**
@@ -784,16 +845,16 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public TextView asText() {
-			return this;
+		public int index() {
+			return this.index;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ElementView asElement() {
-			return null;
+		public BEXNodeView parent() {
+			return this.parent;
 		}
 
 		/**
@@ -807,16 +868,304 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link AttributeView} eines {@link BEXDocuNode}s.
+	 * Diese Klasse implementiert den Elementknoten eines {@link BEXDocuNode}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BEXAttrNode implements AttributeView {
+	public static class BEXElemNodeView extends BEXNodeView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		public final BEXElemNode parent;
+		public final BEXNodeView parent;
+
+		/**
+		 * Dieses Feld speichert den Kindknotenindex.
+		 */
+		public final int index;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf den URI.
+		 */
+		public final int uriRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf den Namen.
+		 */
+		public final int nameRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf die Kindknotenliste. In {@link BEXElemTextNodeView} ist dies die Referenz auf den Wert des Textknoten.
+		 */
+		public final int contentRef;
+
+		/**
+		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
+		 */
+		public final int attributesRef;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElemNodeView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Kindknotenindex.
+		 * @param uriRef Referenz auf den URI.
+		 * @param nameRef Referenz auf den Namen.
+		 * @param contentRef Referenz auf die Kindknotenliste.
+		 * @param attributesRef Referenz auf die Attributknotenliste.
+		 */
+		public BEXElemNodeView(final BEXNodeView parent, final int index, final int uriRef, final int nameRef, final int contentRef, final int attributesRef) {
+			this.parent = parent;
+			this.index = index;
+			this.uriRef = uriRef;
+			this.nameRef = nameRef;
+			this.contentRef = contentRef;
+			this.attributesRef = attributesRef;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final int type() {
+			return NodeView.TYPE_ELEMENT;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final String uri() {
+			return this.parent.document().elemNodeUri(this.uriRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final String name() {
+			return this.parent.document().elemNodeName(this.nameRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final BEXNodeView parent() {
+			return this.parent;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final int index() {
+			return this.index;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXElemNodeListView children() {
+			return new BEXElemNodeListView(this, this.contentRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final BEXAttrListView attributes() {
+			return new BEXAttrListView(this, this.attributesRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.name(), this.children(), this.attributes());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die Kindknotenliste eines {@link BEXDocuNode}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class BEXElemNodeListView implements NodeListView {
+
+		/**
+		 * Dieses Feld speichert den {@link BEXNodeView}.
+		 */
+		public final BEXNodeView owner;
+
+		/**
+		 * Dieses Feld speichert den Schlüssel der Kindknotenliste.
+		 */
+		public final int childrenRef;
+
+		/**
+		 * Dieses Feld speichert die Länge der Kindknotenliste.
+		 */
+		protected int size;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElemNodeListView}.
+		 * 
+		 * @param owner Elternknoten.
+		 * @param childrenRef Referenz auf die Kindknotenliste.
+		 */
+		public BEXElemNodeListView(final BEXNodeView owner, final int childrenRef) {
+			this.owner = owner;
+			this.childrenRef = childrenRef;
+			this.size = -1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final BEXNodeView owner() {
+			return this.owner;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXNodeView get(final int index) throws IndexOutOfBoundsException {
+			if(index < 0) throw new IndexOutOfBoundsException();
+			return this.owner.document().elemGroupItem(this.owner, this.childrenRef, index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NodeView get(final String uri, final String name, final int index) throws NullPointerException {
+			for(int i = index, size = this.size(); index < size; i++){
+				final BEXNodeView item = this.get(i);
+				if((item.type() == NodeView.TYPE_ELEMENT) && Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			final int size = this.size;
+			return size >= 0 ? size : (this.size = this.owner.document().elemGroupSize(this.childrenRef));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final Iterator<NodeView> iterator() {
+			return new GetIterator<NodeView>(this, 0, this.size());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen Elementknoten mit genau einem Textknoten als Kindknoten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class BEXElemTextNodeView extends BEXElemNodeView {
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElemTextNodeView}.
+		 * 
+		 * @param parent Elternknoten.
+		 * @param index Kindknotenindex.
+		 * @param uriRef Referenz auf den URI.
+		 * @param nameRef Referenz auf den Namen.
+		 * @param contentRef Referenz auf den Wert des Textknoten.
+		 * @param attributesRef Referenz auf die Attributknotenliste.
+		 */
+		public BEXElemTextNodeView(final BEXNodeView parent, final int index, final int uriRef, final int nameRef, final int contentRef, final int attributesRef) {
+			super(parent, index, uriRef, nameRef, contentRef, attributesRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String value() {
+			return this.parent.document().elemNodeValue(this.contentRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXElemTextNodeListView children() {
+			return new BEXElemTextNodeListView(this, this.contentRef);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen Kindknotenliste mit genau einem Textknoten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class BEXElemTextNodeListView extends BEXElemNodeListView {
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link BEXElemTextNodeListView}.
+		 * 
+		 * @param owner Elternknoten.
+		 * @param contentRef Referenz auf den Wert des Textknoten.
+		 */
+		public BEXElemTextNodeListView(final BEXNodeView owner, final int contentRef) {
+			super(owner, contentRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public BEXTextNodeView get(final int index) throws IndexOutOfBoundsException {
+			if(index < 0) throw new IndexOutOfBoundsException();
+			if(index > 0) return null;
+			return new BEXTextNodeView(this.owner, 0, this.childrenRef);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public NodeView get(final String uri, final String name, final int index) throws NullPointerException {
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return 1;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Attributknoten eines {@link BEXDocuNode}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class BEXAttrNodeView extends BEXNodeView {
+
+		/**
+		 * Dieses Feld speichert den Elternknoten.
+		 */
+		public final BEXElemNodeView parent;
 
 		/**
 		 * Dieses Feld speichert den Attributknotenindex.
@@ -839,7 +1188,7 @@ public final class Decoder {
 		public final int valueRef;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXAttrNode}.
+		 * Dieser Konstruktor initialisiert den {@link BEXAttrNodeView}.
 		 * 
 		 * @param parent Elternknoten.
 		 * @param index Attributknotenindex.
@@ -847,7 +1196,7 @@ public final class Decoder {
 		 * @param nameRef Referenz auf den Namen.
 		 * @param valueRef Referenz auf den Wert.
 		 */
-		public BEXAttrNode(final BEXElemNode parent, final int index, final int uriRef, final int nameRef, final int valueRef) {
+		public BEXAttrNodeView(final BEXElemNodeView parent, final int index, final int uriRef, final int nameRef, final int valueRef) {
 			this.parent = parent;
 			this.index = index;
 			this.uriRef = uriRef;
@@ -859,15 +1208,15 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DocumentView document() {
-			return this.parent.document();
+		public int type() {
+			return NodeView.TYPE_ATTRIBUTE;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ElementView parent() {
+		public BEXElemNodeView parent() {
 			return this.parent;
 		}
 
@@ -914,16 +1263,16 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link AttributesView} eines {@link BEXDocuNode}s.
+	 * Diese Klasse implementiert die Attributknotenliste eines {@link BEXDocuNode}s.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BEXAttrList implements AttributesView {
+	public static final class BEXAttrListView implements NodeListView {
 
 		/**
 		 * Dieses Feld speichert den Elternknoten.
 		 */
-		public final BEXElemNode parent;
+		public final BEXElemNodeView owner;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
@@ -936,13 +1285,13 @@ public final class Decoder {
 		int size;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXAttrList}.
+		 * Dieser Konstruktor initialisiert den {@link BEXAttrListView}.
 		 * 
-		 * @param parent Elternknoten.
+		 * @param owner Elternknoten.
 		 * @param attributesRef Referenz auf die Attributknotenliste.
 		 */
-		public BEXAttrList(final BEXElemNode parent, final int attributesRef) {
-			this.parent = parent;
+		public BEXAttrListView(final BEXElemNodeView owner, final int attributesRef) {
+			this.owner = owner;
 			this.attributesRef = attributesRef;
 			this.size = -1;
 		}
@@ -951,33 +1300,26 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public DocumentView document() {
-			return this.parent.document();
+		public BEXElemNodeView owner() {
+			return this.owner;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ElementView parent() {
-			return this.parent;
+		public BEXAttrNodeView get(final int index) throws IndexOutOfBoundsException {
+			return this.owner.document().attrGroupItem(this.owner, this.attributesRef, index);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public AttributeView get(final int index) throws IndexOutOfBoundsException {
-			return this.parent.document().attrGroupItem(this.parent, this.attributesRef, index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public AttributeView get(final String uri, final String name) throws NullPointerException {
-			for(final AttributeView attributeView: this){
-				if(name.equals(attributeView.name())) return attributeView;
+		public BEXAttrNodeView get(final String uri, final String name, final int index) throws NullPointerException {
+			for(int i = index, size = this.size(); i < size; i++){
+				final BEXAttrNodeView item = this.get(i);
+				if(Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
 			}
 			return null;
 		}
@@ -988,320 +1330,27 @@ public final class Decoder {
 		@Override
 		public int size() {
 			final int size = this.size;
-			return size >= 0 ? size : (this.size = this.parent.document().attrGroupSize(this.attributesRef));
+			return size >= 0 ? size : (this.size = this.owner.document().attrGroupSize(this.attributesRef));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<AttributeView> iterator() {
-			return new GetIterator<AttributeView>(this, 0, this.size());
+		public Iterator<NodeView> iterator() {
+			return new GetIterator<NodeView>(this, 0, this.size());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link ElementView} eines {@link BEXDocuNode}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class BEXElemNode extends BEXNode implements ElementView {
-
-		/**
-		 * Dieses Feld speichert den Elternknoten.
-		 */
-		public final BEXNode parent;
-
-		/**
-		 * Dieses Feld speichert den Kindknotenindex.
-		 */
-		public final int index;
-
-		/**
-		 * Dieses Feld speichert die Referenz auf den URI.
-		 */
-		public final int uriRef;
-
-		/**
-		 * Dieses Feld speichert die Referenz auf den Namen.
-		 */
-		public final int nameRef;
-
-		/**
-		 * Dieses Feld speichert die Referenz auf die Kindknotenliste. In {@link BEXElemTextView} ist die Referenz auf den Wert des Textknoten.
-		 */
-		public final int childrenRef;
-
-		/**
-		 * Dieses Feld speichert die Referenz auf die Attributknotenliste.
-		 */
-		public final int attributesRef;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXElemNode}.
-		 * 
-		 * @param parent Elternknoten.
-		 * @param index Kindknotenindex.
-		 * @param uriRef Referenz auf den URI.
-		 * @param nameRef Referenz auf den Namen.
-		 * @param childrenRef Referenz auf die Kindknotenliste.
-		 * @param attributesRef Referenz auf die Attributknotenliste.
-		 */
-		public BEXElemNode(final BEXNode parent, final int index, final int uriRef, final int nameRef, final int childrenRef, final int attributesRef) {
-			this.parent = parent;
-			this.index = index;
-			this.uriRef = uriRef;
-			this.nameRef = nameRef;
-			this.childrenRef = childrenRef;
-			this.attributesRef = attributesRef;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final BEXDocuNode document() {
-			return this.parent.document();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final ParentView parent() {
-			return this.parent;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final int index() {
-			return this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final String uri() {
-			return this.parent.document().elemNodeUri(this.uriRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final String name() {
-			return this.parent.document().elemNodeName(this.nameRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildrenView children() {
-			return new BEXElemList(this, this.childrenRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final AttributesView attributes() {
-			return new BEXAttrList(this, this.attributesRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final TextView asText() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final ElementView asElement() {
-			return this;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final DocumentView asDocument() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.name(), this.children(), this.attributes());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link ChildrenView} eines {@link BEXDocuNode}s.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class BEXElemList implements ChildrenView {
-
-		/**
-		 * Dieses Feld speichert den {@link BEXNode}.
-		 */
-		public final BEXNode parent;
-
-		/**
-		 * Dieses Feld speichert den Schlüssel der Kindknotenliste.
-		 */
-		public final int childrenRef;
-
-		/**
-		 * Dieses Feld speichert die Länge der Kindknotenliste.
-		 */
-		protected int size;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXElemList}.
-		 * 
-		 * @param parent Elternknoten.
-		 * @param childrenRef Referenz auf die Kindknotenliste.
-		 */
-		public BEXElemList(final BEXNode parent, final int childrenRef) {
-			this.parent = parent;
-			this.childrenRef = childrenRef;
-			this.size = -1;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final DocumentView document() {
-			return this.parent.document();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final BEXNode parent() {
-			return this.parent;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildView get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
-			return this.parent.document().elemGroupItem(this.parent, this.childrenRef, index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			final int size = this.size;
-			return size >= 0 ? size : (this.size = this.parent.document().elemGroupSize(this.childrenRef));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final Iterator<ChildView> iterator() {
-			return new GetIterator<ChildView>(this, 0, this.size());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link BEXElemNode} mit genau einem Textknoten als Kindknoten.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class BEXElemTextView extends BEXElemNode {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXElemTextView}.
-		 * 
-		 * @param parent Elternknoten.
-		 * @param index Kindknotenindex.
-		 * @param uriRef Referenz auf den URI.
-		 * @param nameRef Referenz auf den Namen.
-		 * @param contentRef Referenz auf den Wert des Textknoten.
-		 * @param attributesRef Referenz auf die Attributknotenliste.
-		 */
-		public BEXElemTextView(final BEXNode parent, final int index, final int uriRef, final int nameRef, final int contentRef, final int attributesRef) {
-			super(parent, index, uriRef, nameRef, contentRef, attributesRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildrenView children() {
-			return new BEXElemTextList(this, this.childrenRef);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link BEXElemList} mit genau einem Textknoten als Kindknoten.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class BEXElemTextList extends BEXElemList {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link BEXElemTextList}.
-		 * 
-		 * @param parent Elternknoten.
-		 * @param contentRef Referenz auf den Wert des Textknoten.
-		 */
-		public BEXElemTextList(final BEXNode parent, final int contentRef) {
-			super(parent, contentRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ChildView get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
-			if(index > 0) return null;
-			return new BEXTextNode(this.parent, 0, this.childrenRef);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return 1;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link DocumentView} zu einem {@link Document}, welches über einem {@link Decoder} aus einer {@link DecodeSource} ausgelesen
-	 * wird.
+	 * Diese Klasse implementiert den Dokumentknoten zu einem {@link Document}, welches über einem {@link Decoder} aus einer {@link DecodeSource} ausgelesen wird.
 	 * 
 	 * @see Encoder
 	 * @see DecodeSource
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BEXDocuNode extends BEXNode implements DocumentView {
+	public static final class BEXDocuNode extends BEXNodeView {
 
 		/**
 		 * Dieses Feld speichert den {@link MRUFileCache} zur Verwaltung von Auszügen einer {@link DecodeSource}.
@@ -1309,42 +1358,42 @@ public final class Decoder {
 		final MRUFileCache fileCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNode#uri()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
 		 */
 		final MRUTextValueCache attrUriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNode#name()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#name()}.
 		 */
 		final MRUTextValueCache attrNameCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNode#value()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#value()}.
 		 */
 		final MRUTextValueCache attrValueCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Attributknotenlisten für {@link BEXElemNode#attributes()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Attributknotenlisten für {@link BEXElemNodeView#attributes()}.
 		 */
 		final MRUAttrGroupCache attrGroupCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNode#uri()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#uri()}.
 		 */
 		final MRUTextValueCache elemUriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNode#name()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#name()}.
 		 */
 		final MRUTextValueCache elemNameCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXTextNode#value()}.
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXTextNodeView#value()}.
 		 */
 		final MRUTextValueCache elemValueCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Kindknotenlisten für {@link BEXElemNode#children()} und
+		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Kindknotenlisten für {@link BEXElemNodeView#children()} und
 		 * {@link BEXDocuNode#children()}.
 		 */
 		final MRUElemGroupCache elemGroupCache;
@@ -1376,7 +1425,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXAttrNode#uri()}.
+		 * Diese Methode implementeirt {@link BEXAttrNodeView#uri()}.
 		 * 
 		 * @param key Schlüssel des URI.
 		 * @return URI.
@@ -1386,7 +1435,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXAttrNode#name()}.
+		 * Diese Methode implementeirt {@link BEXAttrNodeView#name()}.
 		 * 
 		 * @param key Schlüssel des Namen.
 		 * @return Name.
@@ -1396,7 +1445,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXAttrNode#value()}.
+		 * Diese Methode implementeirt {@link BEXAttrNodeView#value()}.
 		 * 
 		 * @param key Schlüssel des Werts.
 		 * @return Wert.
@@ -1406,7 +1455,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link BEXAttrList#size()}.
+		 * Diese Methode implementiert {@link BEXAttrListView#size()}.
 		 * 
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @return Anzahl der Attributknoten.
@@ -1416,19 +1465,19 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link BEXAttrList#get(int)}.
+		 * Diese Methode implementiert {@link BEXAttrListView#get(int)}.
 		 * 
-		 * @param parent {@link BEXNode}.
+		 * @param parent Elternknoten.
 		 * @param key Schlüssel der Attributknotenliste.
 		 * @param index Index des Attributknoten.
-		 * @return {@link BEXAttrNode} oder {@code null}.
+		 * @return {@link BEXAttrNodeView} oder {@code null}.
 		 */
-		public AttributeView attrGroupItem(final BEXElemNode parent, final int key, final int index) {
+		public BEXAttrNodeView attrGroupItem(final BEXElemNodeView parent, final int key, final int index) {
 			return this.attrGroupCache.item(parent, key, index);
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXElemNode#uri()}.
+		 * Diese Methode implementeirt {@link BEXElemNodeView#uri()}.
 		 * 
 		 * @param key Schlüssel des URI.
 		 * @return URI.
@@ -1438,7 +1487,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXElemNode#name()}.
+		 * Diese Methode implementeirt {@link BEXElemNodeView#name()}.
 		 * 
 		 * @param key Schlüssel des Namen.
 		 * @return Name.
@@ -1448,7 +1497,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementeirt {@link BEXTextNode#value()}.
+		 * Diese Methode implementeirt {@link BEXTextNodeView#value()}.
 		 * 
 		 * @param key Schlüssel des Werts.
 		 * @return Wert.
@@ -1458,7 +1507,7 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link BEXElemList#size()}.
+		 * Diese Methode implementiert {@link BEXElemNodeListView#size()}.
 		 * 
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @return Anzahl der Kindknoten.
@@ -1468,14 +1517,14 @@ public final class Decoder {
 		}
 
 		/**
-		 * Diese Methode implementiert {@link BEXElemList#get(int)}.
+		 * Diese Methode implementiert {@link BEXElemNodeListView#get(int)}.
 		 * 
-		 * @param parent {@link BEXNode}.
+		 * @param parent {@link BEXNodeView}.
 		 * @param key Schlüssel der Kindknotenliste.
 		 * @param index Index des Kindknoten.
-		 * @return {@link BEXTextNode}, {@link BEXElemNode} oder {@code null}.
+		 * @return {@link BEXTextNodeView}, {@link BEXElemNodeView} oder {@code null}.
 		 */
-		public ChildView elemGroupItem(final BEXNode parent, final int key, final int index) {
+		public BEXNodeView elemGroupItem(final BEXNodeView parent, final int key, final int index) {
 			return this.elemGroupCache.item(parent, key, index);
 		}
 
@@ -1483,7 +1532,15 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ElementView element(final String id) {
+		public int type() {
+			return NodeView.TYPE_DOCUMENT;
+		}
+
+		/**
+		 * {@inheritDoc}
+		*/
+		@Override
+		public BEXNodeView parent() {
 			return null;
 		}
 
@@ -1491,8 +1548,8 @@ public final class Decoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ChildrenView children() {
-			return new BEXElemList(this, this.childrenRef);
+		public BEXElemNodeListView children() {
+			return new BEXElemNodeListView(this, this.childrenRef);
 		}
 
 		/**
@@ -1501,38 +1558,6 @@ public final class Decoder {
 		@Override
 		public BEXDocuNode document() {
 			return this;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ElementView asElement() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public DocumentView asDocument() {
-			return this;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String lookupURI(final String prefix) {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String lookupPrefix(final String uri) {
-			return null;
 		}
 
 		/**
@@ -1583,42 +1608,42 @@ public final class Decoder {
 	int maxFileCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNode#uri()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}.
 	 */
 	int maxAttrUriCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNode#name()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()}.
 	 */
 	int maxAttrNameCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNode#value()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}.
 	 */
 	int maxAttrValueCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNode#attributes()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()}.
 	 */
 	int maxAttrGroupCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNode#uri()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}.
 	 */
 	int maxElemUriCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNode#name()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()}.
 	 */
 	int maxElemNameCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNode#value()}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()}.
 	 */
 	int maxElemValueCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNode#children()} und
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
 	 * {@link BEXDocuNode#children()}.
 	 */
 	int maxElemGroupCachePages;
@@ -1682,7 +1707,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNode#uri()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} URIs.
 	 * 
 	 * @return maximale Anzahl.
@@ -1692,7 +1717,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNode#uri()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} URIs.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1702,7 +1727,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNode#name()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Namen.
 	 * 
 	 * @return maximale Anzahl.
@@ -1712,7 +1737,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNode#name()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Namen.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1722,7 +1747,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNode#value()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Werte.
 	 * 
 	 * @return maximale Anzahl.
@@ -1732,7 +1757,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNode#value()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Werte.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1742,8 +1767,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNode#attributes()} zurück. Jeder Block enthält
-	 * bis zu {@value MRUAttrGroupPage#SIZE} Kindknoten.
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()} zurück. Jeder Block
+	 * enthält bis zu {@value MRUAttrGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1752,8 +1777,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNode#attributes()}. Jeder Block enthält bis zu
-	 * {@value MRUAttrGroupPage#SIZE} Kindknoten.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()}. Jeder Block enthält bis
+	 * zu {@value MRUAttrGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1762,7 +1787,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNode#uri()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} URIs.
 	 * 
 	 * @return maximale Anzahl.
@@ -1772,7 +1797,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNode#uri()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} URIs.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1782,7 +1807,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNode#name()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Namen.
 	 * 
 	 * @return maximale Anzahl.
@@ -1792,7 +1817,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNode#name()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Namen.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1802,7 +1827,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNode#value()} zurück. Jeder Block enthält bis zu
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()} zurück. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Werte.
 	 * 
 	 * @return maximale Anzahl.
@@ -1812,7 +1837,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNode#value()}. Jeder Block enthält bis zu
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()}. Jeder Block enthält bis zu
 	 * {@value MRUTextValuePage#SIZE} Werte.
 	 * 
 	 * @param value maximale Anzahl.
@@ -1822,8 +1847,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNode#children()} und {@link BEXDocuNode#children()}
-	 * zurück. Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
+	 * {@link BEXDocuNode#children()} zurück. Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1832,8 +1857,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNode#children()} und {@link BEXDocuNode#children()}
-	 * . Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
+	 * {@link BEXDocuNode#children()} . Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @param value maximale Anzahl.
 	 */

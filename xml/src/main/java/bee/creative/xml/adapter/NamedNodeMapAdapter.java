@@ -5,30 +5,30 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import bee.creative.xml.view.AttributeView;
-import bee.creative.xml.view.AttributesView;
+import bee.creative.xml.view.NodeListView;
+import bee.creative.xml.view.NodeView;
 
 /**
  * Diese Klasse implementiert die {@link NamedNodeMap} für {@link Element#getAttributes()}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class AttributesAdapter implements NamedNodeMap {
+public final class NamedNodeMapAdapter implements NamedNodeMap {
 
 	/**
-	 * Dieses Feld speichert den {@link AttributesView}.
+	 * Dieses Feld speichert den {@link NodeListView}.
 	 */
-	protected final AttributesView attributesView;
+	protected final NodeListView listView;
 
 	/**
-	 * Dieser Konstruktor initialisiert den {@link AttributesView}.
+	 * Dieser Konstruktor initialisiert den {@link NodeListView}.
 	 * 
-	 * @param attributesView {@link AttributesView}.
-	 * @throws NullPointerException Wenn der {@link AttributesView} {@code null} ist.
+	 * @param attributesView {@link NodeListView}.
+	 * @throws NullPointerException Wenn der {@link NodeListView} {@code null} ist.
 	 */
-	public AttributesAdapter(final AttributesView attributesView) throws NullPointerException {
+	public NamedNodeMapAdapter(final NodeListView attributesView) throws NullPointerException {
 		if(attributesView == null) throw new NullPointerException();
-		this.attributesView = attributesView;
+		this.listView = attributesView;
 	}
 
 	/**
@@ -36,9 +36,9 @@ public final class AttributesAdapter implements NamedNodeMap {
 	 */
 	@Override
 	public Node item(final int index) {
-		final AttributeView attributeView = this.attributesView.get(index);
+		final NodeView attributeView = this.listView.get(index);
 		if(attributeView == null) return null;
-		return new AttributeAdapter(attributeView);
+		return new AttrAdapter(attributeView);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public final class AttributesAdapter implements NamedNodeMap {
 	 */
 	@Override
 	public int getLength() {
-		return this.attributesView.size();
+		return this.listView.size();
 	}
 
 	/**
@@ -70,9 +70,9 @@ public final class AttributesAdapter implements NamedNodeMap {
 	 */
 	@Override
 	public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
-		final AttributeView attributeView = this.attributesView.get(namespaceURI, localName);
-		if(attributeView == null) return null;
-		return new AttributeAdapter(attributeView);
+		final NodeView nodeView = this.listView.get(namespaceURI, localName, 0);
+		if(nodeView == null) return null;
+		return new AttrAdapter(nodeView);
 	}
 
 	/**

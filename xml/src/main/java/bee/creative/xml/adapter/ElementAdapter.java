@@ -9,59 +9,41 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 import bee.creative.util.Objects;
-import bee.creative.xml.view.AttributeView;
-import bee.creative.xml.view.ChildView;
-import bee.creative.xml.view.ChildrenView;
-import bee.creative.xml.view.ElementView;
-import bee.creative.xml.view.TextView;
+import bee.creative.xml.view.NodeListView;
+import bee.creative.xml.view.NodeView;
 
 /**
  * Diese Klasse implementiert ein {@link Element}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class ElementAdapter extends ChildAdapter implements Element {
+public final class ElementAdapter extends AbstractChildNodeAdapter implements Element {
 
 	/**
 	 * Diese Methode implementeirt {@link #getTextContent()}.
 	 * 
 	 * @param content {@link StringBuffer} mit dem bisher gesammelten Texten.
-	 * @param children {@link ChildrenView} der rekursiv analysierten Kindknoten.
+	 * @param children {@link NodeListView} der rekursiv analysierten Kindknoten.
 	 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist.
 	 */
-	static final void collectContent(final StringBuffer content, final ChildrenView children) throws NullPointerException {
-		for(final ChildView child: children){
-			final TextView text = child.asText();
-			if(text != null){
-				content.append(text.value());
+	static final void collectContent(final StringBuffer content, final NodeListView children) throws NullPointerException {
+		for(final NodeView child: children){
+			if(child.type() == NodeView.TYPE_ELEMENT){
+				ElementAdapter.collectContent(content, child.children());
 			}else{
-				ElementAdapter.collectContent(content, child.asElement().children());
+				content.append(child.value());
 			}
 		}
 	}
 
 	/**
-	 * Dieses Feld speichert den {@link ElementView}.
-	 */
-	protected final ElementView elementView;
-
-	/**
-	 * Dieser Konstruktor initialisiert den {@link ElementView}.
+	 * Dieser Konstruktor initialisiert den {@link NodeView}.
 	 * 
-	 * @param elementView {@link ElementView}.
-	 * @throws NullPointerException Wenn der {@link ElementView} {@code null} ist.
+	 * @param nodeView {@link NodeView}.
+	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
 	 */
-	public ElementAdapter(final ElementView elementView) throws NullPointerException {
-		if(elementView == null) throw new NullPointerException();
-		this.elementView = elementView;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected ChildView view() {
-		return this.elementView;
+	public ElementAdapter(final NodeView nodeView) throws NullPointerException {
+		super(nodeView);
 	}
 
 	/**
@@ -69,7 +51,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String getPrefix() {
-		return this.elementView.document().lookupPrefix(this.elementView.uri());
+		return this.nodeView.document().lookupPrefix(this.nodeView.uri());
 	}
 
 	/**
@@ -77,7 +59,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String getNamespaceURI() {
-		return this.elementView.uri();
+		return this.nodeView.uri();
 	}
 
 	/**
@@ -93,8 +75,8 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String getNodeName() {
-		final String xmlnsName = this.lookupPrefix(this.elementView.uri());
-		final String elementName = this.elementView.name();
+		final String xmlnsName = this.lookupPrefix(this.nodeView.uri());
+		final String elementName = this.nodeView.name();
 		if(xmlnsName == null) return elementName;
 		return xmlnsName + ":" + elementName;
 	}
@@ -120,7 +102,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String getLocalName() {
-		return this.elementView.name();
+		return this.nodeView.name();
 	}
 
 	/**
@@ -146,7 +128,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public boolean hasChildNodes() {
-		return this.elementView.children().size() != 0;
+		return this.nodeView.children().size() != 0;
 	}
 
 	/**
@@ -154,7 +136,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public NodeList getChildNodes() {
-		return new ChildrenAdapter(this.elementView.children());
+		return new NodeListAdapter(this.nodeView.children());
 	}
 
 	/**
@@ -162,7 +144,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public NamedNodeMap getAttributes() {
-		return new AttributesAdapter(this.elementView.attributes());
+		return new NamedNodeMapAdapter(this.nodeView.attributes());
 	}
 
 	/**
@@ -170,7 +152,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public boolean hasAttributes() {
-		return this.elementView.attributes().size() != 0;
+		return this.nodeView.attributes().size() != 0;
 	}
 
 	/**
@@ -202,9 +184,9 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String getAttributeNS(final String uri, final String name) throws DOMException {
-		final AttributeView attributeView = this.elementView.attributes().get(uri, name);
-		if(attributeView == null) return "";
-		return attributeView.value();
+		final NodeView nodeView = this.nodeView.attributes().get(uri, name, 0);
+		if(nodeView == null) return "";
+		return nodeView.value();
 	}
 
 	/**
@@ -212,7 +194,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public boolean hasAttributeNS(final String uri, final String name) throws DOMException {
-		return this.elementView.attributes().get(uri, name) != null;
+		return this.nodeView.attributes().get(uri, name, 0) != null;
 	}
 
 	/**
@@ -244,9 +226,9 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public Attr getAttributeNodeNS(final String uri, final String name) throws DOMException {
-		final AttributeView attributeView = this.elementView.attributes().get(uri, name);
-		if(attributeView == null) return null;
-		return new AttributeAdapter(attributeView);
+		final NodeView nodeView = this.nodeView.attributes().get(uri, name, 0);
+		if(nodeView == null) return null;
+		return new AttrAdapter(nodeView);
 	}
 
 	/**
@@ -287,7 +269,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	@Override
 	public String getTextContent() throws DOMException {
 		final StringBuffer content = new StringBuffer();
-		ElementAdapter.collectContent(content, this.elementView.children());
+		ElementAdapter.collectContent(content, this.nodeView.children());
 		return content.toString();
 	}
 
@@ -328,7 +310,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String lookupPrefix(final String uri) {
-		return this.elementView.document().lookupPrefix(uri);
+		return this.nodeView.document().lookupPrefix(uri);
 	}
 
 	/**
@@ -336,7 +318,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public String lookupNamespaceURI(final String prefix) {
-		return this.elementView.document().lookupURI(prefix);
+		return this.nodeView.document().lookupURI(prefix);
 	}
 
 	/**
@@ -360,7 +342,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public NodeList getElementsByTagNameNS(final String uri, final String name) throws DOMException {
-		return new ElementsAdapter(this.elementView.children(), uri, name);
+		return new ElementCollector(this.nodeView.children(), uri, name);
 	}
 
 	/**
@@ -384,7 +366,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 	 */
 	@Override
 	public int hashCode() {
-		return this.elementView.hashCode();
+		return this.nodeView.hashCode();
 	}
 
 	/**
@@ -395,7 +377,7 @@ public final class ElementAdapter extends ChildAdapter implements Element {
 		if(object == this) return true;
 		if(!(object instanceof ElementAdapter)) return false;
 		final ElementAdapter data = (ElementAdapter)object;
-		return Objects.equals(this.elementView, data.elementView);
+		return Objects.equals(this.nodeView, data.nodeView);
 	}
 
 	/**

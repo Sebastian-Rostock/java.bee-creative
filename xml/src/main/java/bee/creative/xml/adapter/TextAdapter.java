@@ -4,37 +4,23 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import bee.creative.util.Objects;
-import bee.creative.xml.view.TextView;
+import bee.creative.xml.view.NodeView;
 
 /**
  * Diese Klasse implementiert ein {@link Text}.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class TextAdapter extends ChildAdapter implements Text {
+public final class TextAdapter extends AbstractChildNodeAdapter implements Text {
 
 	/**
-	 * Dieses Feld speichert den {@link TextView}.
-	 */
-	protected final TextView textView;
-
-	/**
-	 * Dieser Konstruktor initialisiert den {@link TextView}.
+	 * Dieser Konstruktor initialisiert den {@link NodeView}.
 	 * 
-	 * @param textView {@link TextView}.
-	 * @throws NullPointerException Wenn der {@link TextView} {@code null} ist.
+	 * @param nodeView {@link NodeView}.
+	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
 	 */
-	public TextAdapter(final TextView textView) throws NullPointerException {
-		if(textView == null) throw new NullPointerException();
-		this.textView = textView;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected TextView view() {
-		return this.textView;
+	public TextAdapter(final NodeView nodeView) throws NullPointerException {
+		super(nodeView);
 	}
 
 	/**
@@ -58,7 +44,7 @@ public final class TextAdapter extends ChildAdapter implements Text {
 	 */
 	@Override
 	public String getNodeValue() throws DOMException {
-		return this.textView.value();
+		return this.nodeView.value();
 	}
 
 	/**
@@ -196,7 +182,7 @@ public final class TextAdapter extends ChildAdapter implements Text {
 	 */
 	@Override
 	public int hashCode() {
-		return this.textView.hashCode();
+		return this.nodeView.hashCode();
 	}
 
 	/**
@@ -207,7 +193,7 @@ public final class TextAdapter extends ChildAdapter implements Text {
 		if(object == this) return true;
 		if(!(object instanceof TextAdapter)) return false;
 		final TextAdapter data = (TextAdapter)object;
-		return Objects.equals(this.textView, data.textView);
+		return Objects.equals(this.nodeView, data.nodeView);
 	}
 
 	/**
