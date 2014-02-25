@@ -1,5 +1,7 @@
 package bee.creative.xml.bex;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -14,7 +16,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 import bee.creative.util.Bytes;
+import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueSet;
 
@@ -390,6 +400,26 @@ public final class Encoder {
 		 */
 		public int size;
 
+		/**
+		 * Diese Methode gibt die Nutzdaten dieses {@link Item}s oder {@code null} zurück.
+		 * 
+		 * @see ValueItem
+		 * @return Nutzdaten oder null.
+		 */
+		public String asValue() {
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt die Nutzdaten dieses {@link Item}s oder {@code null} zurück.
+		 * 
+		 * @see GroupItem
+		 * @return Nutzdaten oder null.
+		 */
+		public Item[] asGroup() {
+			return null;
+		}
+
 	}
 
 	/**
@@ -509,6 +539,14 @@ public final class Encoder {
 			this.size = this.data.length;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String asValue() {
+			return new String(this.data, Encoder.CHARSET);
+		}
+
 	}
 
 	/**
@@ -554,17 +592,25 @@ public final class Encoder {
 		/**
 		 * Dieses Feld speichert die Kind- bzw. Attributknotenliste. Ein Kindknoten besteht immer aus 4 auf einander folgenden Elementen, ein Attributknoten aus 3.
 		 */
-		public final Item[] data;
+		public final Item[] group;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Kind- bzw. Attributknotenliste.
 		 * 
-		 * @param data Kind- bzw. Attributknotenliste.
+		 * @param group Kind- bzw. Attributknotenliste.
 		 * @param size Länge.
 		 */
-		public GroupItem(final Item[] data, final int size) {
-			this.data = data;
+		public GroupItem(final Item[] group, final int size) {
+			this.group = group;
 			this.size = size;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Item[] asGroup() {
+			return this.group;
 		}
 
 	}
@@ -581,7 +627,7 @@ public final class Encoder {
 		 */
 		@Override
 		public int hash(final GroupItem input) throws NullPointerException {
-			return Arrays.hashCode(input.data);
+			return Arrays.hashCode(input.group);
 		}
 
 		/**
@@ -589,7 +635,7 @@ public final class Encoder {
 		 */
 		@Override
 		public boolean equals(final GroupItem input1, final GroupItem input2) throws NullPointerException {
-			final Item[] data1 = input1.data, data2 = input2.data;
+			final Item[] data1 = input1.group, data2 = input2.group;
 			final int length = data1.length;
 			if(length != data2.length) return false;
 			for(int i = 0; i < length; i++)
@@ -629,6 +675,185 @@ public final class Encoder {
 		@Override
 		public GroupItem item(final Item[] data) {
 			return new GroupItem(data, data.length / 4);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung der schrittweise ermittelten Daten eines ElementknotenInhalte während des Einlesens eines
+	 * XML-Dokuments.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class Stack {
+
+		/**
+		 * Dieses Feld speichert das {@link Item} für {@link Element#getNamespaceURI()}.
+		 */
+		public final Item uri;
+
+		/**
+		 * Dieses Feld speichert das {@link Item} für {@link Element#getLocalName()}.
+		 */
+		public final Item name;
+
+		/**
+		 * Dieses Feld speichert die {@link Item}s für {@link Element#getChildNodes()}.
+		 */
+		public final List<Item> children;
+
+		/**
+		 * Dieses Feld speichert die {@link Item}s für {@link Element#getAttributes()}.
+		 */
+		public final Item[] attributes;
+
+		/**
+		 * Dieses Feld speichert den {@link Stack} des Elternknoten oder {@code null}.
+		 */
+		public final Stack parent;
+
+		/**
+		 * Dieser Konstruktor initialisiert den leeren {@link Stack}.
+		 */
+		public Stack() {
+			this(null, null, null, null);
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link Stack}.
+		 * 
+		 * @param uri {@link Item} für {@link Element#getNamespaceURI()}.
+		 * @param name {@link Item} für {@link Element#getLocalName()}.
+		 * @param attributes {@link Item}s für {@link Element#getAttributes()}.
+		 * @param parent {@link Stack} des Elternknoten oder {@code null}.
+		 */
+		public Stack(final Item uri, final Item name, final Item[] attributes, final Stack parent) {
+			this.uri = uri;
+			this.name = name;
+			this.children = new ArrayList<Item>();
+			this.attributes = attributes;
+			this.parent = parent;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link ContentHandler} zum Einlsenen eines XML-Dokuments mit Hilfe eines {@link XMLReader}s.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class Handler implements ContentHandler {
+
+		/**
+		 * Dieses Feld speichert den {@link Encoder}.
+		 */
+		protected final Encoder encoder;
+
+		/**
+		 * Dieses Feld speichert den {@link Stack} für den aktuellen Knoten.
+		 */
+		protected Stack stack;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link Encoder}.
+		 * 
+		 * @param encoder {@link Encoder}.
+		 */
+		public Handler(final Encoder encoder) {
+			this.encoder = encoder;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void endPrefixMapping(final String prefix) {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void startPrefixMapping(final String prefix, final String uri) {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void endElement(final String uri, final String name, final String qName) {
+			final Encoder encoder = this.encoder;
+			final Stack stack = this.stack;
+			encoder.encodeText(stack.children);
+			stack.parent.children.addAll(Arrays.asList(stack.uri, stack.name, encoder.elemGroupPool.unique(encoder.encodeChildren(stack.children)),
+				encoder.attrGroupPool.unique(stack.attributes)));
+			this.stack = stack.parent;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void startElement(final String uri, final String name, final String qName, final Attributes attributes) {
+			final Encoder encoder = this.encoder;
+			final Stack stack = this.stack;
+			encoder.encodeText(stack.children);
+			this.stack = new Stack(encoder.elemUriPool.unique(uri), encoder.elemNamePool.unique(name), encoder.encodeAttributes(attributes), stack);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void endDocument() {
+			final Encoder encoder = this.encoder;
+			encoder.documentChildren = encoder.elemGroupPool.unique(encoder.encodeChildren(this.stack.children));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void startDocument() {
+			if(this.stack != null) throw new IllegalStateException("document already built");
+			this.stack = new Stack();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void characters(final char[] ch, final int start, final int length) {
+			this.encoder.text.append(ch, start, length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void ignorableWhitespace(final char[] ch, final int start, final int length) {
+			this.characters(ch, start, length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void skippedEntity(final String name) {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void processingInstruction(final String target, final String data) {
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setDocumentLocator(final Locator locator) {
 		}
 
 	}
@@ -738,6 +963,11 @@ public final class Encoder {
 	final GroupPool elemGroupPool;
 
 	/**
+	 * Dieses Feld speichert die Kindknotenliste des Dokuments.
+	 */
+	Item documentChildren;
+
+	/**
 	 * Dieser Konstruktor initialisiert den {@link Encoder}.
 	 */
 	public Encoder() {
@@ -791,7 +1021,7 @@ public final class Encoder {
 	 * @param items {@link Item}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeOffsets(final EncodeTarget target, final List<? extends Item> items) throws IOException {
+	void writeOffset(final EncodeTarget target, final List<? extends Item> items) throws IOException {
 		final int size = items.size();
 		final int[] offsets = new int[size];
 		int offset = 0;
@@ -814,8 +1044,8 @@ public final class Encoder {
 	 * @param items {@link ValueItem}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeTextValues(final EncodeTarget target, final List<ValueItem> items) throws IOException {
-		this.writeOffsets(target, items);
+	void writeValues(final EncodeTarget target, final List<ValueItem> items) throws IOException {
+		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
 			final byte[] data = items.get(i).data;
@@ -830,11 +1060,11 @@ public final class Encoder {
 	 * @param items {@link GroupItem}s der Kindknotenlisten.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeElemGroups(final EncodeTarget target, final List<GroupItem> items) throws IOException {
-		this.writeOffsets(target, items);
+	void writeChildren(final EncodeTarget target, final List<GroupItem> items) throws IOException {
+		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
-			final Item[] data = items.get(i).data;
+			final Item[] data = items.get(i).group;
 			final int count = data.length;
 			for(int j = 0; j < count;){
 				this.write(target, data[j++].key, this.elemUriLength);
@@ -852,11 +1082,11 @@ public final class Encoder {
 	 * @param items {@link GroupItem}s der Attributknotenlisten.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeAttrGroups(final EncodeTarget target, final List<GroupItem> items) throws IOException {
-		this.writeOffsets(target, items);
+	void writeAttributes(final EncodeTarget target, final List<GroupItem> items) throws IOException {
+		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
-			final Item[] data = items.get(i).data;
+			final Item[] data = items.get(i).group;
 			final int count = data.length;
 			for(int j = 0; j < count;){
 				this.write(target, data[j++].key, this.attrUriLength);
@@ -867,143 +1097,12 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode kodiert den gegebenen {@link String} in die Daten eines Textknoten und gibt diese zurück. Wenn der {@link String} leer ist, wird {@code null}
-	 * zurück gegeben.
+	 * Diese Methode schreibt alle gesammelten Daten des Dokumentknoten in die Ausgabe.
 	 * 
-	 * @param text Text.
-	 * @return Daten eines Textknoten oder {@code null}.
+	 * @param target Ausgabe.
+	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	Item[] encodeText(final String text) {
-		if(text.isEmpty()) return null;
-		return new Item[]{Item.VOID, Item.VOID, this.elemValuePool.unique(text), Item.VOID};
-	}
-
-	/**
-	 * Diese Methode kodiert den gegebenen {@link Node} in die Daten eines Elementknoten und gibt diese zurück.
-	 * 
-	 * @param element {@link Node}.
-	 * @return Daten eines Elementknoten.
-	 */
-	Item[] encodeElement(final Node element) {
-		final Item[] children = this.encodeChildren(element.getChildNodes());
-		final Item[] attributes = this.encodeAttributes(element.getAttributes());
-		final Item uriRef = this.elemUriPool.unique(element.getNamespaceURI());
-		final Item nameRef = this.elemNamePool.unique(element.getNodeName());
-		final Item contentRef;
-		final Item attributesRef;
-		if(children.length > 0){
-			if((children.length == 4) && (children[1] == Item.VOID)){
-				contentRef = children[2];
-			}else{
-				contentRef = this.elemGroupPool.unique(children);
-			}
-		}else{
-			contentRef = Item.VOID;
-		}
-		if(attributes.length > 1){
-			attributesRef = this.attrGroupPool.unique(attributes);
-		}else{
-			attributesRef = Item.VOID;
-		}
-		return new Item[]{uriRef, nameRef, contentRef, attributesRef};
-	}
-
-	/**
-	 * Diese Methode kodiert die gegebene {@link NodeList} in die Daten einer Kindknotenliste und gibt diese zurück.
-	 * 
-	 * @param nodes {@link NodeList}.
-	 * @return Daten einer Kindknotenliste.
-	 */
-	Item[] encodeChildren(final NodeList nodes) {
-		final StringBuilder text = this.text;
-		final int length = nodes.getLength();
-		final List<Item[]> items = new ArrayList<Item[]>(length);
-		for(int i = 0; i < length; i++){
-			final Node node = nodes.item(i);
-			switch(node.getNodeType()){
-				case Node.TEXT_NODE:
-				case Node.CDATA_SECTION_NODE:
-					text.append(node.getNodeValue());
-					break;
-				case Node.ELEMENT_NODE:
-					items.add(this.encodeText(text.toString()));
-					text.setLength(0);
-					items.add(this.encodeElement(node));
-					break;
-				default:
-					throw new IllegalArgumentException("Type of node not supported: " + node.getNodeType());
-			}
-		}
-		items.add(this.encodeText(text.toString()));
-		text.setLength(0);
-		items.removeAll(Collections.singleton(null));
-		final int size = items.size();
-		final Item[] data = new Item[size * 4];
-		for(int i = 0; i < size; i++){
-			System.arraycopy(items.get(i), 0, data, i * 4, 4);
-		}
-		return data;
-	}
-
-	/**
-	 * Diese Methode kodiert die gegebene {@link NamedNodeMap} in die Daten einer Attributknotenliste und gibt diese zurück.
-	 * 
-	 * @param nodes {@link NamedNodeMap}.
-	 * @return Daten einer Attributknotenliste.
-	 */
-	Item[] encodeAttributes(final NamedNodeMap nodes) {
-		final int length = nodes.getLength();
-		final Item[] data = new Item[length * 3];
-		for(int i = 0, j = 0; i < length; i++){
-			final Node node = nodes.item(i);
-			data[j++] = this.attrUriPool.unique(node.getNamespaceURI());
-			data[j++] = this.attrNamePool.unique(node.getNodeName());
-			data[j++] = this.attrValuePool.unique(node.getNodeValue());
-		}
-		return data;
-	}
-
-	/**
-	 * Diese Methode nummeriert die Schlüssel der gegebenen {@link Item}s aufsteigend.
-	 * 
-	 * @see Pool#items()
-	 * @param items {@link Item}s.
-	 * @param offset Schlüssel des ersten {@link Item}s.
-	 */
-	void computeKeys(final List<? extends Item> items, int offset) {
-		for(final Item item: items){
-			item.key = offset++;
-		}
-	}
-
-	/**
-	 * Diese Methode entfernt alle intern verwaltenden Datenstrukturen und wird automatisch von {@link #encode(Document, EncodeTarget)} vor der Kodierung eines
-	 * {@link Document}s aufgerufen.
-	 */
-	public void clear() {
-		this.text.setLength(0);
-		this.attrUriPool.clear();
-		this.attrNamePool.clear();
-		this.attrValuePool.clear();
-		this.attrGroupPool.clear();
-		this.elemUriPool.clear();
-		this.elemNamePool.clear();
-		this.elemValuePool.clear();
-		this.elemGroupPool.clear();
-	}
-
-	/**
-	 * Diese Methode kodiert das gegebene {@link Document} in das Binärformat und schreibt dieses in das gegebene {@link EncodeTarget}.
-	 * 
-	 * @param source {@link Document}.
-	 * @param target {@link EncodeTarget}.
-	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
-	 */
-	public void encode(final Document source, final EncodeTarget target) throws IOException {
-		this.clear();
-		final Item[] children = this.encodeChildren(source.getChildNodes());
-		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
-		final Item childrenRef = this.elemGroupPool.unique(children);
+	void writeDocument(final EncodeTarget target) throws IOException {
 		final List<ValueItem> attrUriList = this.attrUriPool.items();
 		final List<ValueItem> attrNameList = this.attrNamePool.items();
 		final List<ValueItem> attrValueList = this.attrValuePool.items();
@@ -1027,15 +1126,248 @@ public final class Encoder {
 		this.elemNameLength = Encoder.lengthOf(elemNameList.size());
 		this.elemContentLength = Encoder.lengthOf(elemValueList.size() + elemGroupList.size());
 		this.elemAttributesLength = Encoder.lengthOf(attrGroupList.size());
-		this.writeTextValues(target, attrUriList);
-		this.writeTextValues(target, attrNameList);
-		this.writeTextValues(target, attrValueList);
-		this.writeAttrGroups(target, attrGroupList);
-		this.writeTextValues(target, elemUriList);
-		this.writeTextValues(target, elemNameList);
-		this.writeTextValues(target, elemValueList);
-		this.writeElemGroups(target, elemGroupList);
-		this.write(target, childrenRef.key, this.elemContentLength);
+		this.writeValues(target, attrUriList);
+		this.writeValues(target, attrNameList);
+		this.writeValues(target, attrValueList);
+		this.writeAttributes(target, attrGroupList);
+		this.writeValues(target, elemUriList);
+		this.writeValues(target, elemNameList);
+		this.writeValues(target, elemValueList);
+		this.writeChildren(target, elemGroupList);
+		this.write(target, this.documentChildren.key, this.elemContentLength);
+	}
+
+	/**
+	 * Diese Methode kodiert den Textwert in {@link #text} in eine Folge von {@link Item}s und fügt diese in die gegebene Kindknotenliste ein. Wenn der Textwert
+	 * leer ist, wird die Kindknotenliste nicht verändert.
+	 * 
+	 * @param items Kindknotenliste.
+	 * @see #text
+	 */
+	void encodeText(final List<Item> items) {
+		final StringBuilder text = this.text;
+		if(text.length() == 0) return;
+		items.addAll(Arrays.asList(Item.VOID, Item.VOID, this.elemValuePool.unique(text.toString()), Item.VOID));
+		text.setLength(0);
+	}
+
+	/**
+	 * Diese Methode kodiert den gegebenen Elementknoten in eine Folge von {@link Item}s und fügt diese in die gegebene Kindknotenliste ein.
+	 * 
+	 * @see #encodeChildren(NodeList)
+	 * @see #encodeAttributes(NamedNodeMap)
+	 * @param items Kindknotenliste.
+	 * @param element Elementknoten.
+	 */
+	void encodeElement(final List<Item> items, final Node element) {
+		final Item[] children = this.encodeChildren(element.getChildNodes());
+		final Item[] attributes = this.encodeAttributes(element.getAttributes());
+		final Item uriRef = this.elemUriPool.unique(element.getNamespaceURI());
+		final Item nameRef = this.elemNamePool.unique(element.getNodeName());
+		final Item contentRef;
+		final Item attributesRef;
+		if(children.length > 0){
+			if((children.length == 4) && (children[1] == Item.VOID)){
+				contentRef = children[2];
+			}else{
+				contentRef = this.elemGroupPool.unique(children);
+			}
+		}else{
+			contentRef = Item.VOID;
+		}
+		if(attributes.length > 1){
+			attributesRef = this.attrGroupPool.unique(attributes);
+		}else{
+			attributesRef = Item.VOID;
+		}
+		items.addAll(Arrays.asList(uriRef, nameRef, contentRef, attributesRef));
+	}
+
+	/**
+	 * Diese Methode kodiert die gegebene Kindknotenliste in eine Folge von {@link Item}s und gibt diese zurück.
+	 * 
+	 * @param nodes Kindknotenliste.
+	 * @return Folge von {@link Item}s.
+	 */
+	Item[] encodeChildren(final NodeList nodes) {
+		final int length = nodes.getLength();
+		final List<Item> items = new ArrayList<Item>(length * 4);
+		for(int i = 0; i < length; i++){
+			final Node node = nodes.item(i);
+			switch(node.getNodeType()){
+				case Node.TEXT_NODE:
+				case Node.CDATA_SECTION_NODE:
+					this.text.append(node.getNodeValue());
+					break;
+				case Node.ELEMENT_NODE:
+					this.encodeText(items);
+					this.encodeElement(items, node);
+					break;
+				default:
+					throw new IllegalArgumentException("Type of node not supported: " + node.getNodeType());
+			}
+		}
+		this.encodeText(items);
+		return this.encodeChildren(items);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Item}s de rgegebenen Kindknotenliste als Folge von {@link Item}s zurück.
+	 * 
+	 * @see List#toArray(Object[])
+	 * @param items {@link Item}s einer Kindknotenliste.
+	 * @return Folge von {@link Item}s.
+	 */
+	Item[] encodeChildren(final List<Item> items) {
+		return items.toArray(new Item[items.size()]);
+	}
+
+	/**
+	 * Diese Methode gibt die {@link Item}s der gegebenen Attributknotenliste als sortierte Folge von {@link Item}s zurück.
+	 * 
+	 * @see List#toArray(Object[])
+	 * @param items {@link Item}s einer Attributknotenliste.
+	 * @return Folge von {@link Item}s.
+	 */
+	Item[] encodeAttributes(final Item[][] items) {
+		Arrays.sort(items, new Comparator<Item[]>() {
+
+			@Override
+			public int compare(final Item[] o1, final Item[] o2) {
+				final int comp = Comparators.compare(o1[0].toString(), o2[0].toString());
+				if(comp != 0) return comp;
+				return Comparators.compare(o1[1].toString(), o2[1].toString());
+			}
+
+		});
+		final int size = items.length;
+		final Item[] data = new Item[size * 3];
+		for(int i = 0; i < size; i++){
+			System.arraycopy(items[i], 0, data, i * 3, 3);
+		}
+		return data;
+	}
+
+	/**
+	 * Diese Methode kodiert die gegebene Attributknotenliste in eine Folge von {@link Item}s und gibt diese zurück.
+	 * 
+	 * @param nodes Attributknotenliste.
+	 * @return Folge von {@link Item}s.
+	 */
+	Item[] encodeAttributes(final Attributes nodes) {
+		final int size = nodes.getLength();
+		final Item[][] items = new Item[size][3];
+		for(int i = 0; i < size; i++){
+			final Item[] item = items[i];
+			item[0] = this.attrUriPool.unique(nodes.getURI(i));
+			item[1] = this.attrNamePool.unique(nodes.getLocalName(i));
+			item[2] = this.attrValuePool.unique(nodes.getValue(i));
+		}
+		return this.encodeAttributes(items);
+	}
+
+	/**
+	 * Diese Methode kodiert die gegebene Attributknotenliste in eine Folge von {@link Item}s und gibt diese zurück.
+	 * 
+	 * @param nodes Attributknotenliste.
+	 * @return Folge von {@link Item}s.
+	 */
+	Item[] encodeAttributes(final NamedNodeMap nodes) {
+		final int size = nodes.getLength();
+		final Item[][] items = new Item[size][3];
+		for(int i = 0; i < size; i++){
+			final Node node = nodes.item(i);
+			final Item[] item = items[i];
+			item[0] = this.attrUriPool.unique(node.getNamespaceURI());
+			item[1] = this.attrNamePool.unique(node.getNodeName());
+			item[2] = this.attrValuePool.unique(node.getNodeValue());
+		}
+		return this.encodeAttributes(items);
+	}
+
+	/**
+	 * Diese Methode nummeriert die Schlüssel der gegebenen {@link Item}s aufsteigend.
+	 * 
+	 * @see Item#key
+	 * @see Pool#items()
+	 * @param items {@link Item}s.
+	 * @param offset Schlüssel des ersten {@link Item}s.
+	 */
+	void computeKeys(final List<? extends Item> items, int offset) {
+		for(final Item item: items){
+			item.key = offset++;
+		}
+	}
+
+	/**
+	 * Diese Methode leert alle intern verwaltenden Datenstrukturen und wird automatisch von {@link #encode(Document, EncodeTarget)} vor der Kodierung eines
+	 * {@link Document}s aufgerufen.
+	 */
+	public void clear() {
+		this.text.setLength(0);
+		this.attrUriPool.clear();
+		this.attrNamePool.clear();
+		this.attrValuePool.clear();
+		this.attrGroupPool.clear();
+		this.elemUriPool.clear();
+		this.elemNamePool.clear();
+		this.elemValuePool.clear();
+		this.elemGroupPool.clear();
+		this.documentChildren = null;
+	}
+
+	/**
+	 * Diese Methode kodiert das in der Quelldatei gegebene XML-Dokument und speichert diese in der Zieldatei.
+	 * 
+	 * @see FileReader
+	 * @see InputSource
+	 * @see FileEncodeTarget
+	 * @see XMLReaderFactory#createXMLReader()
+	 * @see #encode(XMLReader, InputSource, EncodeTarget)
+	 * @param source Quelldatei.
+	 * @param target Zieldatei.
+	 * @throws IOException Wenn ein I/O-Fehler auftritt.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
+		if(source == null || target == null) throw new NullPointerException();
+		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new FileEncodeTarget(target));
+	}
+
+	/**
+	 * Diese Methode kodiert das gegebene {@link Document} und speichert dieses im gegebenen {@link EncodeTarget}.
+	 * 
+	 * @param source {@link Document}.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
+	 */
+	public void encode(final Document source, final EncodeTarget target) throws IOException {
+		this.clear();
+		final Item[] children = this.encodeChildren(source.getChildNodes());
+		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
+		this.documentChildren = this.elemGroupPool.unique(children);
+		this.writeDocument(target);
+	}
+
+	/**
+	 * Diese Methode ließt ein XML-Dokument über die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} ein und speichert dieses im gegebenen
+	 * {@link EncodeTarget}.
+	 * 
+	 * @param reader {@link XMLReader}.
+	 * @param source {@link InputSource}.
+	 * @param target {@link EncodeTarget}.
+	 * @throws IOException Wenn ein I/O-Fehler auftritt.
+	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
+	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
+	 */
+	public void encode(final XMLReader reader, final InputSource source, EncodeTarget target) throws IOException, SAXException, NullPointerException {
+		if(reader == null || source == null || target == null) throw new NullPointerException();
+		this.clear();
+		reader.setContentHandler(new Handler(this));
+		reader.setFeature("http://xml.org/sax/features/external-general-entities", true);
+		reader.parse(source);
+		this.writeDocument(target);
 	}
 
 	/**
