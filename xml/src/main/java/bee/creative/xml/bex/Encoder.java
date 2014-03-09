@@ -41,6 +41,14 @@ import bee.creative.util.Unique.UniqueSet;
  * <p>
  * In der Klasse {@link Decoder} wird eine solche leichtgewichtige DOM-Implementation bereit gestellt.
  * <p>
+ * <h4>Notation</h4>
+ * <p>
+ * Die folgenden, aufeinander aufbauenden Datenstrukturen werden jeweils als Auflistung ihrer Datenfeldern angegeben, wobei zu jedem der Felder dessen
+ * Datenformat, Anzahl und Beschreibung angegeben sind. Virtuelle Datenfelder, die nicht explizit in der Datei gespeichert werden, werden ohne Format und Anzahl
+ * angegeben. Das Datenformat INT(X) steht für eine positive, ganze Zahl mit X Byte Länge in Big-Endian. Die in den Beschreibungen verwendete Funktion
+ * lengthOf(V) gibt die kleinste Anzahl an Byte an, die für die Abbildung des Zahlenwerts V notwendig sind (
+ * {@code lengthOf(V) ∶= v >= 16777216 ? 4 : v >= 65536 ? 3 : v >= 256 ? 2 : v >= 1 ? 1 : 0} ).
+ * </p>
  * <h4>Datenstruktur: BEX</h4>
  * <p>
  * Kodiert einen DOM Dokumentknoten mit seinen enthaltenen Text-, Element- und Attributknoten als binäre Datenstruktur zum wahlfreien Zugriff.
@@ -108,9 +116,10 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>documentGroupRef</td>
- * <td>INT1..4</td>
+ * <td>INT(contentLength)</td>
  * <td>1</td>
- * <td>Kindknotenliste des Dokumentknoten. Ist (i+1+elemValuePool.size) als Referenz auf die i-te Kindknotenliste in elemGroupPool.</td>
+ * <td>Kindknotenliste des Dokumentknoten. Ist (i+elemValuePool.size+1) als Referenz auf die i-te Kindknotenliste in elemGroupPool. Die contentLength ist
+ * lengthOf(elemValuePool.size+ elemGroupPool.size).</td>
  * </tr>
  * </table>
  * <h4>Datenstruktur: TextValuePool</h4>
@@ -126,19 +135,19 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>size</td>
- * <td>INT4</td>
+ * <td>INT(4)</td>
  * <td>1</td>
  * <td>Anzahl der Zeichenketten.</td>
  * </tr>
  * <tr>
  * <td>length</td>
- * <td>INT1</td>
+ * <td>INT(1)</td>
  * <td>1</td>
  * <td>Anzahl der Byte je Startposition.</td>
  * </tr>
  * <tr>
  * <td>offset</td>
- * <td>INT1..4</td>
+ * <td>INT(length)</td>
  * <td>size</td>
  * <td>Startpositionen der Zeichenketten im Speicherbereich item. Das erste Byte der i-ten Zeichenkette liegt bei Position offset[i] und das nach dem letzten
  * bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
@@ -169,7 +178,7 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>data</td>
- * <td>INT1</td>
+ * <td>INT(1)</td>
  * <td>size</td>
  * <td>Bytes der UTF-8-kodierten Zeichenkette.</td>
  * </tr>
@@ -187,19 +196,19 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>size</td>
- * <td>INT4</td>
+ * <td>INT(4)</td>
  * <td>1</td>
  * <td>Anzahl der Attributknotenlisten.</td>
  * </tr>
  * <tr>
  * <td>length</td>
- * <td>INT1</td>
+ * <td>INT(1)</td>
  * <td>1</td>
  * <td>Anzahl der Byte je Startposition.</td>
  * </tr>
  * <tr>
  * <td>offset</td>
- * <td>INT1..4</td>
+ * <td>INT(length)</td>
  * <td>size</td>
  * <td>Startpositionen der Attributknotenlisten im Speicherbereich item. Der erste Attributknoten der i-ten Attributknotenliste liegt bei Position offset[i] und
  * der nach dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
@@ -248,21 +257,22 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>uriRef</td>
- * <td>INT1..4</td>
- * <td>0..1</td> <tdIst abwesend, wenn der attrUriPool leer ist. Ist (0), wenn der Attributknoten keinen URI besitzt. Ist (i+1) als Referenz auf den i-ten URI
- * im attrUriPool.</td>
+ * <td>INT(uriLength)</td>
+ * <td>1</td>
+ * <td>Ist abwesend, wenn der attrUriPool leer ist. Ist (0), wenn der Attributknoten keinen URI besitzt. Ist (i+1) als Referenz auf den i-ten URI im
+ * attrUriPool. Die uriLength ist lengthOf(attrUriPool.size).</td>
  * </tr>
  * <tr>
  * <td>nameRef</td>
- * <td>INT1..4</td>
+ * <td>INT(nameLength)</td>
  * <td>1</td>
- * <td>Ist (i) als Referenz auf den i-ten Namen im attrNamePool.</td>
+ * <td>Ist (i) als Referenz auf den i-ten Namen im attrNamePool. Die nameLength ist lengthOf(attrNamePool.size-1).</td>
  * </tr>
  * <tr>
  * <td>valueRef</td>
- * <td>INT1..4</td>
+ * <td>INT(valueLength)</td>
  * <td>1</td>
- * <td>Ist (i) als Referenz auf den i-ten Wert im attrValuePool.</td>
+ * <td>Ist (i) als Referenz auf den i-ten Wert im attrValuePool. Die valueLength ist lengthOf(attrValuePool.size-1).</td>
  * </tr>
  * </table>
  * <h4>Datenstruktur: ElemGroupPool</h4>
@@ -278,19 +288,19 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>size</td>
- * <td>INT4</td>
+ * <td>INT(4)</td>
  * <td>1</td>
  * <td>Anzahl der Kindknotenlisten.</td>
  * </tr>
  * <tr>
  * <td>length</td>
- * <td>INT1</td>
+ * <td>INT(1)</td>
  * <td>1</td>
  * <td>Anzahl der Byte je Startposition.</td>
  * </tr>
  * <tr>
  * <td>offset</td>
- * <td>INT1..4</td>
+ * <td>INT(length)</td>
  * <td>size</td>
  * <td>Startpositionen der Kindknotenlisten im Speicherbereich item. Der erste Kindknoten der i-ten Kindknotenliste liegt bei Position offset[i] und der nach
  * dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
@@ -339,31 +349,33 @@ import bee.creative.util.Unique.UniqueSet;
  * </tr>
  * <tr>
  * <td>uriRef</td>
- * <td>INT1..4</td>
- * <td>0..1</td>
+ * <td>INT(uriLength)</td>
+ * <td>1</td>
  * <td>Ist abwesend, wenn der elemUriPool leer ist. Ist (0), wenn der Kindknoten ein Textknoten oder ein Elementknoten ohne URI ist. Ist (i+1) als Referenz auf
- * den i-ten URI im elemUriPool, wenn der Kindknoten ein Elementknoten ist.</td>
+ * den i-ten URI im elemUriPool, wenn der Kindknoten ein Elementknoten ist. Die uriLength ist lengthOf(elemUriPool.size).</td>
  * </tr>
  * <tr>
  * <td>nameRef</td>
- * <td>INT1..4</td>
+ * <td>INT(nameLength)</td>
  * <td>1</td>
- * <td>Ist (0), wenn der Kindknoten ein Textknoten ist. Ist (i+1) als Referenz auf den i-ten Namen im elemNamePool, wenn der Kindknoten ein Elementknoten ist.</td>
+ * <td>Ist (0), wenn der Kindknoten ein Textknoten ist. Ist (i+1) als Referenz auf den i-ten Namen im elemNamePool, wenn der Kindknoten ein Elementknoten ist.
+ * Die nameLength ist lengthOf(elemNamePool.size).
  * </tr>
  * <tr>
  * <td>contentRef</td>
- * <td>INT1..4</td>
+ * <td>INT(contentLength)</td>
  * <td>1</td>
  * <td>Ist (0), wenn der Kindknoten ein Elementknoten ohne Kindknoten ist. Ist (i+1) als Referenz auf den i-ten Wert im elemValuePool, wenn der Kindknoten ein
  * Textknoten oder ein kindelementloser Elementknoten ist. Ist (i+1+elemValuePool.size) als Referenz auf die i-te Kindknotenliste im elemGroupPool, wenn der
- * Kindknoten ein Elementknoten mit Kindelementen ist.</td>
+ * Kindknoten ein Elementknoten mit Kindelementen ist. Die contentLength ist lengthOf(elemValuePool.size+ elemGroupPool.size).</td>
  * </tr>
  * <tr>
  * <td>attributesRef</td>
- * <td>INT1..4</td>
- * <td>0..1</td>
+ * <td>INT(attributesLength)</td>
+ * <td>1</td>
  * <td>Ist abwesend, wenn der attrGroupPool leer ist. Ist (0), wenn der Kindknoten ein Textknoten oder ein Elementknoten ohne Attributknoten ist. Ist (i+1) als
- * Referenz auf die i-te Attributknotenliste im attrGroupPool, wenn der Kindknoten ein Elementknoten mit Attributknoten ist.</td>
+ * Referenz auf die i-te Attributknotenliste im attrGroupPool, wenn der Kindknoten ein Elementknoten mit Attributknoten ist. Die attributesLength ist
+ * lengthOf(attrGroupPool.size).
  * </tr>
  * </table>
  * <p>
@@ -866,15 +878,11 @@ public final class Encoder {
 	/**
 	 * Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
 	 * 
-	 * @param maxValue positiver Wert.
+	 * @param v positiver Wert.
 	 * @return Länge.
 	 */
-	static int lengthOf(final int maxValue) {
-		if(maxValue >= 0x01000000) return 4;
-		if(maxValue >= 0x010000) return 3;
-		if(maxValue >= 0x0100) return 2;
-		if(maxValue >= 0x01) return 1;
-		return 0;
+	static int lengthOf(final int v) {
+		return v >= 16777216 ? 4 : v >= 65536 ? 3 : v >= 256 ? 2 : v >= 1 ? 1 : 0;
 	}
 
 	/**
