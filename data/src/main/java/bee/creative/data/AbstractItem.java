@@ -75,16 +75,6 @@ public abstract class AbstractItem implements Item {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see AbstractPool#state(AbstractItem)
-	 */
-	@Override
-	public int state() {
-		return this.pool().state(this);
-	}
-
-	/**
 	 * {@inheritDoc} Hierbei werden die {@link Assigner} verwendet, die über die Methode {@link #assigners(Assignment)} aus dem {@link Item} des gegebenen
 	 * {@link Assignment}s ({@link Assignment#value() Quellobjekt}) ermittelt werden.
 	 * 

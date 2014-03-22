@@ -77,15 +77,6 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/**
-	 * Diese Methode implementiert {@link AbstractItem#state()}.
-	 * 
-	 * @param item {@link AbstractItem}.
-	 * @return Status.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
-	protected abstract int state(final AbstractItem item) throws NullPointerException;
-
-	/**
 	 * Diese Methode implementiert {@link AbstractItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
 	 * {@link #items(int)}) zum Entfernen eines {@link Item}s verwendet werden.
 	 * 
@@ -188,28 +179,28 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	protected abstract GItem doCreate();
 
 	/**
-	 * Diese Methode wird bei {@link #delete(AbstractItem)} zur Zustandsüberführung in {@link Item#CREATE_STATE} aufgerufen.
+	 * Diese Methode wird bei {@link #delete(AbstractItem)} zur Überführung des Zustands zu {@link Item#CREATE_STATE} aufgerufen.
 	 * 
 	 * @param item {@link Item}.
 	 */
 	protected abstract void doDelete(final GItem item);
 
 	/**
-	 * Diese Methode wird bei {@link Item#append()} zur Zustandsüberführung aufgerufen.
+	 * Diese Methode wird bei {@link Item#append()} zur Überführung des Zustands zu {@link Item#APPEND_STATE} aufgerufen.
 	 * 
 	 * @param item {@link Item}.
 	 */
 	protected abstract void doAppend(final GItem item);
 
 	/**
-	 * Diese Methode wird bei {@link Item#remove()} zur Zustandsüberführung aufgerufen.
+	 * Diese Methode wird bei {@link Item#remove()} zur Überführung des Zustands zu {@link Item#REMOVE_STATE} aufgerufen.
 	 * 
 	 * @param item {@link Item}.
 	 */
 	protected abstract void doRemove(final GItem item);
 
 	/**
-	 * Diese Methode wird bei {@link Item#update()} zur Zustandsüberführung aufgerufen.
+	 * Diese Methode wird bei {@link Item#update()} zur Überführung des Zustands zu {@link Item#UPDATE_STATE} aufgerufen.
 	 * 
 	 * @param item {@link Item}.
 	 */
