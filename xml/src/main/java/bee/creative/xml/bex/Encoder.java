@@ -23,6 +23,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+import bee.creative.data.Data.DataTarget;
+import bee.creative.data.Data.DataTargetFile;
 import bee.creative.util.Bytes;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
@@ -46,8 +48,7 @@ import bee.creative.util.Unique.UniqueSet;
  * Die folgenden, aufeinander aufbauenden Datenstrukturen werden jeweils als Auflistung ihrer Datenfeldern angegeben, wobei zu jedem der Felder dessen
  * Datenformat, Anzahl und Beschreibung angegeben sind. Virtuelle Datenfelder, die nicht explizit in der Datei gespeichert werden, werden ohne Format und Anzahl
  * angegeben. Das Datenformat INT(X) steht für eine positive, ganze Zahl mit X Byte Länge in Big-Endian. Die in den Beschreibungen verwendete Funktion
- * lengthOf(V) gibt die kleinste Anzahl an Byte an, die für die Abbildung des Zahlenwerts V notwendig sind (
- * {@code lengthOf(V) ∶= v >= 16777216 ? 4 : v >= 65536 ? 3 : v >= 256 ? 2 : v >= 1 ? 1 : 0} ).
+ * lengthOf(V) gibt die kleinste Anzahl an Byte an, die für die Abbildung des Zahlenwerts V notwendig sind.
  * </p>
  * <h4>Datenstruktur: BEX</h4>
  * <p>
@@ -873,22 +874,7 @@ public final class Encoder {
 	/**
 	 * Dieses Feld speichert das UTF-8-{@link Charset} zur Kodierung der Textwerte.
 	 */
-	static final Charset CHARSET = Charset.forName("UTF-8");
-
-	/**
-	 * Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
-	 * 
-	 * @param v positiver Wert.
-	 * @return Länge.
-	 */
-	static int lengthOf(final int v) {
-		return v >= 16777216 ? 4 : v >= 65536 ? 3 : v >= 256 ? 2 : v >= 1 ? 1 : 0;
-	}
-
-	/**
-	 * Dieses Feld speichert den Schreibpuffer für {@link EncodeTarget#write(byte[], int, int)}.
-	 */
-	final byte[] array;
+	public static final Charset CHARSET = Charset.forName("UTF-8");
 
 	/**
 	 * Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten.
@@ -901,29 +887,14 @@ public final class Encoder {
 	final ValuePool attrUriPool;
 
 	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNamespaceURI()}.
-	 */
-	int attrUriLength;
-
-	/**
 	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeName()}.
 	 */
 	final ValuePool attrNamePool;
 
 	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNodeName()}.
-	 */
-	int attrNameLength;
-
-	/**
 	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeValue()}.
 	 */
 	final ValuePool attrValuePool;
-
-	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Attr#getNodeValue()}.
-	 */
-	int attrValueLength;
 
 	/**
 	 * Dieses Feld speichert den {@link GroupPool} für {@link Element#getAttributes()}.
@@ -936,34 +907,14 @@ public final class Encoder {
 	final ValuePool elemUriPool;
 
 	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Element#getNamespaceURI()}.
-	 */
-	int elemUriLength;
-
-	/**
 	 * Dieses Feld speichert den {@link ValuePool} für {@link Element#getNodeName()}.
 	 */
 	final ValuePool elemNamePool;
 
 	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf den {@link Element#getNodeName()}.
-	 */
-	int elemNameLength;
-
-	/**
 	 * Dieses Feld speichert den {@link ValuePool} für {@link Text#getNodeValue()}.
 	 */
 	final ValuePool elemValuePool;
-
-	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf {@link Text#getNodeValue()} und {@link Node#getChildNodes()}.
-	 */
-	int elemContentLength;
-
-	/**
-	 * Dieses Feld speichert die Länge einer Referenz auf {@link Element#getAttributes()}.
-	 */
-	int elemAttributesLength;
 
 	/**
 	 * Dieses Feld speichert den {@link GroupPool} für {@link Node#getChildNodes()}.
@@ -980,7 +931,6 @@ public final class Encoder {
 	 */
 	public Encoder() {
 		this.text = new StringBuilder();
-		this.array = new byte[16];
 		this.attrUriPool = new ValuePool();
 		this.attrNamePool = new ValuePool();
 		this.attrValuePool = new ValuePool();
@@ -992,44 +942,13 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt den gegebenen Wert mit der gegebenen Länge in das gegebene {@link EncodeTarget}.
+	 * Diese Methode schreibt die Startpositionen der gegebenen {@link Item}s in das gegebene {@link DataTarget}.
 	 * 
-	 * @param target {@link EncodeTarget}.
-	 * @param value Wert.
-	 * @param size Länge des Werts (0..4).
-	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
-	 */
-	void write(final EncodeTarget target, final int value, final int size) throws IOException {
-		final byte[] array = this.array;
-		switch(size){
-			case 0:
-				return;
-			case 1:
-				Bytes.set1(array, 0, value);
-				break;
-			case 2:
-				Bytes.set2(array, 0, value);
-				break;
-			case 3:
-				Bytes.set3(array, 0, value);
-				break;
-			case 4:
-				Bytes.set4(array, 0, value);
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
-		target.write(array, 0, size);
-	}
-
-	/**
-	 * Diese Methode schreibt die Startpositionen der gegebenen {@link Item}s in das gegebene {@link EncodeTarget}.
-	 * 
-	 * @param target {@link EncodeTarget}.
+	 * @param target {@link DataTarget}.
 	 * @param items {@link Item}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeOffset(final EncodeTarget target, final List<? extends Item> items) throws IOException {
+	void writeOffset(final DataTarget target, final List<? extends Item> items) throws IOException {
 		final int size = items.size();
 		final int[] offsets = new int[size];
 		int offset = 0;
@@ -1037,22 +956,22 @@ public final class Encoder {
 			offset += items.get(i).size;
 			offsets[i] = offset;
 		}
-		final int length = Encoder.lengthOf(offset);
-		this.write(target, size, 4);
-		this.write(target, length, 1);
+		final int length = Bytes.lengthOf(offset);
+		target.writeInt(size);
+		target.writeByte(length);
 		for(int i = 0; i < size; i++){
-			this.write(target, offsets[i], length);
+			target.writeInt(offsets[i], length);
 		}
 	}
 
 	/**
-	 * Diese Methode schreibt {@link ValueItem}s in das gegebene {@link EncodeTarget}.
+	 * Diese Methode schreibt {@link ValueItem}s in das gegebene {@link DataTarget}.
 	 * 
-	 * @param target {@link EncodeTarget}.
+	 * @param target {@link DataTarget}.
 	 * @param items {@link ValueItem}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeValues(final EncodeTarget target, final List<ValueItem> items) throws IOException {
+	void writeValues(final DataTarget target, final List<ValueItem> items) throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
@@ -1062,23 +981,28 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt die {@link GroupItem}s der Kindknotenlisten in das gegebene {@link EncodeTarget}.
+	 * Diese Methode schreibt die {@link GroupItem}s der Kindknotenlisten in das gegebene {@link DataTarget}.
 	 * 
-	 * @param target {@link EncodeTarget}.
+	 * @param target {@link DataTarget}.
 	 * @param items {@link GroupItem}s der Kindknotenlisten.
+	 * @param uriLength Länge einer Referenz auf den {@link Element#getNamespaceURI()}.
+	 * @param nameLength Länge einer Referenz auf den {@link Element#getNodeName()}.
+	 * @param contentLength Länge einer Referenz auf {@link Text#getNodeValue()} und {@link Node#getChildNodes()}.
+	 * @param attributesLength Länge einer Referenz auf {@link Element#getAttributes()}.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeChildren(final EncodeTarget target, final List<GroupItem> items) throws IOException {
+	void writeChildren(final DataTarget target, final List<GroupItem> items, final int uriLength, final int nameLength, final int contentLength,
+		final int attributesLength) throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
 			final Item[] data = items.get(i).group;
 			final int count = data.length;
 			for(int j = 0; j < count;){
-				this.write(target, data[j++].key, this.elemUriLength);
-				this.write(target, data[j++].key, this.elemNameLength);
-				this.write(target, data[j++].key, this.elemContentLength);
-				this.write(target, data[j++].key, this.elemAttributesLength);
+				target.writeInt(data[j++].key, uriLength);
+				target.writeInt(data[j++].key, nameLength);
+				target.writeInt(data[j++].key, contentLength);
+				target.writeInt(data[j++].key, attributesLength);
 			}
 		}
 	}
@@ -1088,18 +1012,22 @@ public final class Encoder {
 	 * 
 	 * @param target Ausgabe.
 	 * @param items {@link GroupItem}s der Attributknotenlisten.
+	 * @param uriLength Länge einer Referenz auf den {@link Attr#getNodeName()}.
+	 * @param nameLength Länge einer Referenz auf den {@link Attr#getNodeValue()}.
+	 * @param valueLength Länge einer Referenz auf den {@link Attr#getNodeValue()}.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeAttributes(final EncodeTarget target, final List<GroupItem> items) throws IOException {
+	void writeAttributes(final DataTarget target, final List<GroupItem> items, final int uriLength, final int nameLength, final int valueLength)
+		throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
 			final Item[] data = items.get(i).group;
 			final int count = data.length;
 			for(int j = 0; j < count;){
-				this.write(target, data[j++].key, this.attrUriLength);
-				this.write(target, data[j++].key, this.attrNameLength);
-				this.write(target, data[j++].key, this.attrValueLength);
+				target.writeInt(data[j++].key, uriLength);
+				target.writeInt(data[j++].key, nameLength);
+				target.writeInt(data[j++].key, valueLength);
 			}
 		}
 	}
@@ -1110,7 +1038,7 @@ public final class Encoder {
 	 * @param target Ausgabe.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeDocument(final EncodeTarget target) throws IOException {
+	void writeDocument(final DataTarget target) throws IOException {
 		final List<ValueItem> attrUriList = this.attrUriPool.items();
 		final List<ValueItem> attrNameList = this.attrNamePool.items();
 		final List<ValueItem> attrValueList = this.attrValuePool.items();
@@ -1127,22 +1055,22 @@ public final class Encoder {
 		this.computeKeys(elemValueList, 1);
 		this.computeKeys(elemGroupList, 1 + elemValueList.size());
 		this.computeKeys(attrGroupList, 1);
-		this.attrUriLength = Encoder.lengthOf(attrUriList.size());
-		this.attrNameLength = Encoder.lengthOf(attrNameList.size() - 1);
-		this.attrValueLength = Encoder.lengthOf(attrValueList.size() - 1);
-		this.elemUriLength = Encoder.lengthOf(elemUriList.size());
-		this.elemNameLength = Encoder.lengthOf(elemNameList.size());
-		this.elemContentLength = Encoder.lengthOf(elemValueList.size() + elemGroupList.size());
-		this.elemAttributesLength = Encoder.lengthOf(attrGroupList.size());
+		final int attrUriLength = Bytes.lengthOf(attrUriList.size());
+		final int attrNameLength = Bytes.lengthOf(attrNameList.size() - 1);
+		final int attrValueLength = Bytes.lengthOf(attrValueList.size() - 1);
+		final int elemUriLength = Bytes.lengthOf(elemUriList.size());
+		final int elemNameLength = Bytes.lengthOf(elemNameList.size());
+		final int elemContentLength = Bytes.lengthOf(elemValueList.size() + elemGroupList.size());
+		final int elemAttributesLength = Bytes.lengthOf(attrGroupList.size());
 		this.writeValues(target, attrUriList);
 		this.writeValues(target, attrNameList);
 		this.writeValues(target, attrValueList);
-		this.writeAttributes(target, attrGroupList);
+		this.writeAttributes(target, attrGroupList, attrUriLength, attrNameLength, attrValueLength);
 		this.writeValues(target, elemUriList);
 		this.writeValues(target, elemNameList);
 		this.writeValues(target, elemValueList);
-		this.writeChildren(target, elemGroupList);
-		this.write(target, this.documentChildren.key, this.elemContentLength);
+		this.writeChildren(target, elemGroupList, elemUriLength, elemNameLength, elemContentLength, elemAttributesLength);
+		target.writeInt(this.documentChildren.key, elemContentLength);
 	}
 
 	/**
@@ -1308,7 +1236,7 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode leert alle intern verwaltenden Datenstrukturen und wird automatisch von {@link #encode(Document, EncodeTarget)} vor der Kodierung eines
+	 * Diese Methode leert alle intern verwaltenden Datenstrukturen und wird automatisch von {@link #encode(Document, DataTarget)} vor der Kodierung eines
 	 * {@link Document}s aufgerufen.
 	 */
 	public void clear() {
@@ -1329,9 +1257,9 @@ public final class Encoder {
 	 * 
 	 * @see FileReader
 	 * @see InputSource
-	 * @see FileEncodeTarget
+	 * @see DataTargetFile
 	 * @see XMLReaderFactory#createXMLReader()
-	 * @see #encode(XMLReader, InputSource, EncodeTarget)
+	 * @see #encode(XMLReader, InputSource, DataTarget)
 	 * @param source Quelldatei.
 	 * @param target Zieldatei.
 	 * @throws IOException Wenn ein I/O-Fehler auftritt.
@@ -1339,18 +1267,18 @@ public final class Encoder {
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
 	public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
-		if(source == null || target == null) throw new NullPointerException();
-		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new FileEncodeTarget(target));
+		if((source == null) || (target == null)) throw new NullPointerException();
+		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new DataTargetFile(target));
 	}
 
 	/**
-	 * Diese Methode kodiert das gegebene {@link Document} und speichert dieses im gegebenen {@link EncodeTarget}.
+	 * Diese Methode kodiert das gegebene {@link Document} und speichert dieses im gegebenen {@link DataTarget}.
 	 * 
 	 * @param source {@link Document}.
-	 * @param target {@link EncodeTarget}.
+	 * @param target {@link DataTarget}.
 	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
 	 */
-	public void encode(final Document source, final EncodeTarget target) throws IOException {
+	public void encode(final Document source, final DataTarget target) throws IOException {
 		this.clear();
 		final Item[] children = this.encodeChildren(source.getChildNodes());
 		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
@@ -1360,17 +1288,17 @@ public final class Encoder {
 
 	/**
 	 * Diese Methode ließt ein XML-Dokument über die gegebene {@link InputSource} mit dem gegebenen {@link XMLReader} ein und speichert dieses im gegebenen
-	 * {@link EncodeTarget}.
+	 * {@link DataTarget}.
 	 * 
 	 * @param reader {@link XMLReader}.
 	 * @param source {@link InputSource}.
-	 * @param target {@link EncodeTarget}.
+	 * @param target {@link DataTarget}.
 	 * @throws IOException Wenn ein I/O-Fehler auftritt.
 	 * @throws SAXException Wenn der verwendete {@link XMLReader} eine {@link SAXException} auslöst.
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
-	public void encode(final XMLReader reader, final InputSource source, EncodeTarget target) throws IOException, SAXException, NullPointerException {
-		if(reader == null || source == null || target == null) throw new NullPointerException();
+	public void encode(final XMLReader reader, final InputSource source, final DataTarget target) throws IOException, SAXException, NullPointerException {
+		if((reader == null) || (source == null) || (target == null)) throw new NullPointerException();
 		this.clear();
 		reader.setContentHandler(new Handler(this));
 		reader.setFeature("http://xml.org/sax/features/external-general-entities", true);

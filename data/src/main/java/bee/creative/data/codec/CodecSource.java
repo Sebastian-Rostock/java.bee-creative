@@ -1,6 +1,6 @@
 package bee.creative.data.codec;
 
-import java.io.DataInput;
+import bee.creative.data.Data.DataSource;
 
 /**
  * Diese Schnittstelle definiert die Eingabedaten eines {@link Decoder}s.
@@ -8,6 +8,6 @@ import java.io.DataInput;
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  */
-public interface CodecInput<GContext> extends CodecData<GContext>, DataInput {
+public interface CodecSource<GContext> extends CodecData<GContext>, DataSource {
 
 }

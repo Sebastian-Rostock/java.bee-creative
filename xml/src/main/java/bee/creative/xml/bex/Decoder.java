@@ -3,6 +3,11 @@ package bee.creative.xml.bex;
 import java.io.IOException;
 import java.util.Iterator;
 import org.w3c.dom.Document;
+import bee.creative.data.Data.DataSource;
+import bee.creative.data.cache.MFUCache;
+import bee.creative.data.cache.MFUCachePage;
+import bee.creative.data.cache.MFUDataSourceCache;
+import bee.creative.data.cache.MFUDataSourceCachePage;
 import bee.creative.util.Bytes;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
@@ -19,233 +24,18 @@ import bee.creative.xml.view.NodeView;
 public final class Decoder {
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Vorhaltung von Nutzdaten, deren Wiederverwendungen via {@link #uses} gezählt wird.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Werten unterschiedlicher Größe, die aus einem {@link MFUDataSourceCache}
+	 * nachgeladen werden.
 	 * 
-	 * @see MRUCache
+	 * @see MFUDataSourceCache
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class MRUPage {
+	static abstract class MFUItemCache extends MFUCache {
 
 		/**
-		 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
+		 * Dieses Feld speichert den {@link MFUDataSourceCache} zum Nachladen der Werte.
 		 */
-		public int uses = 1;
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von {@link MRUPage}s.
-	 * 
-	 * @see MRUPage
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static abstract class MRUCache {
-
-		/**
-		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link MRUPage}s. Dies wird in {@link #set(MRUPage[], int, MRUPage)} modifiziert.
-		 */
-		protected int pageCount;
-
-		/**
-		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link MRUPage}s.
-		 */
-		protected int pageLimit;
-
-		/**
-		 * Dieser Konstruktor initialisiert {@link #pageLimit}.
-		 * 
-		 * @param pageLimit {@link #pageLimit}.
-		 */
-		public MRUCache(final int pageLimit) {
-			this.pageLimit = Math.max(pageLimit, 1);
-			this.pageCount = 0;
-		}
-
-		/**
-		 * Diese Methode setzt die {@code index}-te {@link MRUPage} und verdrängt ggf. überzählige {@link MRUPage}s. <br>
-		 * Es wird nicht geprüft, ob die gegebene bzw. die {@code index}-te {@link MRUPage} im gegebenen Array {@code null} ist.
-		 * 
-		 * @param pages Array der {@link MRUPage}s, in welchen aktuell {@link #pageCount} {@link MRUPage}s verwaltet werden.
-		 * @param index Index der zusetzenden {@link MRUPage}.
-		 * @param page zusetzende {@link MRUPage}.
-		 */
-		protected final void set(final MRUPage[] pages, final int index, final MRUPage page) {
-			int pageCount = this.pageCount, pageLimit = this.pageLimit;
-			if(pageCount >= pageLimit){
-				pageLimit = (pageLimit + 1) / 2;
-				final int size = pages.length;
-				while(pageCount > pageLimit){
-					int uses = 0;
-					{
-						final int maxUses = Integer.MAX_VALUE / pageCount;
-						for(int i = 0; i < size; i++){
-							final MRUPage item = pages[i];
-							if(item != null){
-								uses += (item.uses = Math.min(item.uses, maxUses - i));
-							}
-						}
-					}
-					{
-						final int minUses = uses / pageCount;
-						for(int i = 0; i < size; i++){
-							final MRUPage item = pages[i];
-							if((item != null) && ((item.uses -= minUses) <= 0)){
-								pages[i] = null;
-								pageCount--;
-							}
-						}
-					}
-				}
-			}
-			this.pageCount = pageCount + 1;
-			pages[index] = page;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Teilen einer {@link DecodeSource}.
-	 * 
-	 * @see MRUFileCache
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class MRUFilePage extends MRUPage {
-
-		/**
-		 * Dieses Feld definiert die Anzahl der Byte in {@link #data}.
-		 */
-		public static final int SIZE = 1024;
-
-		/**
-		 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DecodeSource}.
-		 */
-		public final byte[] data = new byte[MRUFilePage.SIZE];
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Auszügen einer {@link DecodeSource}.
-	 * 
-	 * @see MRUFilePage
-	 * @see DecodeSource
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class MRUFileCache extends MRUCache {
-
-		/**
-		 * Dieses Feld speichert die {@link MRUFilePage}s.
-		 */
-		protected MRUFilePage[] pages = {};
-
-		/**
-		 * Dieses Feld speichert die Größe der Nutzdatenstrukturen in {@link #source}.
-		 */
-		protected int length;
-
-		/**
-		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
-		 */
-		public final byte[] array = new byte[16];
-
-		/**
-		 * Dieses Feld speichert den Beginn der Nutzdatenstrukturen in {@link #source}.
-		 */
-		public final long offset;
-
-		/**
-		 * Dieses Feld speichert die {@link DecodeSource}.
-		 */
-		public final DecodeSource source;
-
-		/**
-		 * Dieser Konstruktor initialisiert {@link #source}, {@link #offset} und {@link #pageLimit}. Die {@link #pages} sowie die {@link #length} werden via
-		 * {@link #allocate(int)} gesetzt.
-		 * 
-		 * @param source {@link DecodeSource}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUFilePage}s.
-		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link DecodeSource} {@code null} ist.
-		 */
-		public MRUFileCache(final DecodeSource source, final int pageLimit) throws IOException, NullPointerException {
-			super(pageLimit);
-			this.source = source;
-			this.offset = source.index();
-		}
-
-		/**
-		 * Diese Methode gibt den {@link MRUFilePage#data Nutzdatenblock} der {@code index}-ten {@link MRUFilePage} zurück. Diese wird bei Bedarf aus der
-		 * {@link #source} nachgeladen. Die Vergrängung überzähliger {@link MRUFilePage}s erfolgt gemäß {@link #set(MRUPage[], int, MRUPage)}.
-		 * 
-		 * @param pageIndex Index der {@link MRUFilePage}.
-		 * @return {@link MRUFilePage#data Nutzdatenblock}.
-		 */
-		public byte[] get(final int pageIndex) {
-			final MRUFilePage[] pages = this.pages;
-			{
-				final MRUFilePage page = pages[pageIndex];
-				if(page != null){
-					page.uses++;
-					return page.data;
-				}
-			}
-			{
-				final MRUFilePage page = new MRUFilePage();
-				final byte[] data = page.data;
-				final int offset = pageIndex * MRUFilePage.SIZE;
-				try{
-					final DecodeSource source = this.source;
-					source.seek(this.offset + offset);
-					source.read(data, 0, Math.min(MRUFilePage.SIZE, this.length - offset));
-				}catch(final Exception e){
-					throw new IllegalStateException(e);
-				}
-				this.set(pages, pageIndex, page);
-				return data;
-			}
-		}
-
-		/**
-		 * Diese Methode liest die gegebene Anzahl an {@code byte} via {@link DecodeSource#read(byte[], int, int)} aus der {@link #source} und gibt diese als
-		 * {@code int} interpreteirt zurück.
-		 * 
-		 * @see Decoder#get(byte[], int, int)
-		 * @see DecodeSource#read(byte[], int, int)
-		 * @param size Anzahl der {@code byte}s.
-		 * @return {@code byte}s interpretiert als {@code int}.
-		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
-		 */
-		public int read(final int size) throws IOException {
-			final byte[] array = this.array;
-			this.source.read(array, 0, size);
-			return Decoder.get(array, 0, size);
-		}
-
-		/**
-		 * Diese Methode setzt die Größe der Nutzdatenstrukturen in {@link #source} und erzeugt dazu die passende Anzahl an {@link MRUFilePage}s.
-		 * 
-		 * @param length Größe der Nutzdatenstrukturen in {@link #source}.
-		 */
-		public void allocate(final int length) {
-			this.pages = new MRUFilePage[((length + MRUFilePage.SIZE) - 1) / MRUFilePage.SIZE];
-			this.pageCount = 0;
-			this.length = length;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Werten unterschiedlicher Größe, die aus einem {@link MRUFileCache} nachgeladen
-	 * werden.
-	 * 
-	 * @see MRUFileCache
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static abstract class MRUItemCache extends MRUCache {
-
-		/**
-		 * Dieses Feld speichert den {@link MRUFileCache} zum Nachladen der Werte.
-		 */
-		protected final MRUFileCache fileCache;
+		protected final MFUDataSourceCache fileCache;
 
 		/**
 		 * Dieses Feld speichert den Beginn des Datenbereichs mit den Werten.
@@ -263,14 +53,14 @@ public final class Decoder {
 		protected int[] itemOffset;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MRUItemCache} mit den aus dem gegebenen {@link MRUFileCache} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link MFUItemCache} mit den aus dem gegebenen {@link MFUDataSourceCache} geladenen Informatioen.
 		 * 
-		 * @param source {@link MRUFileCache}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUTextValuePage}s.
+		 * @param source {@link MFUDataSourceCache}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUTextValuePage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link MRUFileCache} {@code null} ist.
+		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
 		 */
-		public MRUItemCache(final MRUFileCache source, final int pageLimit) throws IOException, NullPointerException {
+		public MFUItemCache(final MFUDataSourceCache source, final int pageLimit) throws IOException, NullPointerException {
 			super(pageLimit);
 			this.fileCache = source;
 		}
@@ -281,7 +71,7 @@ public final class Decoder {
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
 		protected void loadItemOffset() throws IOException {
-			final MRUFileCache fileCache = this.fileCache;
+			final MFUDataSourceCache fileCache = this.fileCache;
 			final int size = fileCache.read(4) + 1, length = fileCache.read(1);
 			final int[] offsets = new int[size];
 			offsets[0] = 0;
@@ -299,11 +89,11 @@ public final class Decoder {
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 */
 		protected void loadFileOffset(final int itemLength) throws IOException {
-			final MRUFileCache fileCache = this.fileCache;
+			final MFUDataSourceCache fileCache = this.fileCache;
 			final int[] itemOffset = this.itemOffset;
-			final long index = fileCache.source.index();
-			fileCache.source.seek(index + (itemOffset[itemOffset.length - 1] * itemLength));
-			this.fileOffset = (int)(index - fileCache.offset);
+			final long index = fileCache.source().index();
+			fileCache.source().seek(index + (itemOffset[itemOffset.length - 1] * itemLength));
+			this.fileOffset = (int)(index - fileCache.offset());
 		}
 
 		/**
@@ -321,12 +111,12 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Zeichenketten.
+	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Zeichenketten.
 	 * 
-	 * @see MRUTextValueCache
+	 * @see MFUTextValueCache
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUTextValuePage extends MRUPage {
+	static final class MFUTextValuePage extends MFUCachePage {
 
 		/**
 		 * Dieses Feld definiert die Anzahl der Zeichenketten in {@link #data}.
@@ -336,37 +126,37 @@ public final class Decoder {
 		/**
 		 * Dieses Feld speichert die vorgehaltenen Zeichenketten.
 		 */
-		public final String[] data = new String[MRUTextValuePage.SIZE];
+		public final String[] data = new String[MFUTextValuePage.SIZE];
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Zeichenketten, die aus einem {@link MRUFileCache} nachgeladen werden.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Zeichenketten, die aus einem {@link MFUDataSourceCache} nachgeladen werden.
 	 * 
-	 * @see MRUFileCache
-	 * @see MRUTextValuePage
+	 * @see MFUDataSourceCache
+	 * @see MFUTextValuePage
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUTextValueCache extends MRUItemCache {
+	static final class MFUTextValueCache extends MFUItemCache {
 
 		/**
-		 * Dieses Feld speichert die {@link MRUTextValuePage}s.
+		 * Dieses Feld speichert die {@link MFUTextValuePage}s.
 		 */
-		protected final MRUTextValuePage[] pages;
+		protected final MFUTextValuePage[] pages;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MRUTextValueCache} mit den aus dem gegebenen {@link MRUFileCache} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link MFUTextValueCache} mit den aus dem gegebenen {@link MFUDataSourceCache} geladenen Informatioen.
 		 * 
-		 * @param source {@link MRUFileCache}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUTextValuePage}s.
+		 * @param source {@link MFUDataSourceCache}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUTextValuePage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link MRUFileCache} {@code null} ist.
+		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
 		 */
-		public MRUTextValueCache(final MRUFileCache source, final int pageLimit) throws IOException, NullPointerException {
+		public MFUTextValueCache(final MFUDataSourceCache source, final int pageLimit) throws IOException, NullPointerException {
 			super(source, pageLimit);
 			this.loadItemOffset();
 			this.loadFileOffset(1);
-			this.pages = new MRUTextValuePage[((this.itemCount + MRUTextValuePage.SIZE) - 1) / MRUTextValuePage.SIZE];
+			this.pages = new MFUTextValuePage[((this.itemCount + MFUTextValuePage.SIZE) - 1) / MFUTextValuePage.SIZE];
 		}
 
 		/**
@@ -377,9 +167,9 @@ public final class Decoder {
 		 */
 		public String valueItem(final int itemKey) {
 			if((itemKey < 0) || (itemKey >= this.itemCount)) return null;
-			final MRUTextValuePage[] pages = this.pages;
-			final int pageIndex = itemKey / MRUTextValuePage.SIZE, dataIndex = itemKey & (MRUTextValuePage.SIZE - 1);
-			MRUTextValuePage page = pages[pageIndex];
+			final MFUTextValuePage[] pages = this.pages;
+			final int pageIndex = itemKey / MFUTextValuePage.SIZE, dataIndex = itemKey & (MFUTextValuePage.SIZE - 1);
+			MFUTextValuePage page = pages[pageIndex];
 			if(page != null){
 				final String value = page.data[dataIndex];
 				if(value != null){
@@ -387,18 +177,18 @@ public final class Decoder {
 					return value;
 				}
 			}else{
-				page = new MRUTextValuePage();
+				page = new MFUTextValuePage();
 				this.set(pages, pageIndex, page);
 			}
 			final int[] offsets = this.itemOffset;
 			int offset = offsets[itemKey];
 			final int size = offsets[itemKey + 1] - offset;
 			offset += this.fileOffset;
-			int fileIndex = offset / MRUFilePage.SIZE;
+			int fileIndex = offset / MFUDataSourceCachePage.SIZE;
 			final byte[] fileData = new byte[size];
-			offset = offset & (MRUFilePage.SIZE - 1);
+			offset = offset & (MFUDataSourceCachePage.SIZE - 1);
 			for(int i = 0; i < size; fileIndex++, offset = 0){
-				final int length = Math.min(size - i, MRUFilePage.SIZE - offset);
+				final int length = Math.min(size - i, MFUDataSourceCachePage.SIZE - offset);
 				System.arraycopy(this.fileCache.get(fileIndex), offset, fileData, i, length);
 				i += length;
 			}
@@ -409,13 +199,14 @@ public final class Decoder {
 
 	}
 
+	// TODO enfernen
 	/**
-	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Attributknoten.
+	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Attributknoten.
 	 * 
-	 * @see MRUAttrGroupCache
+	 * @see MFUAttrGroupCache
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUAttrGroupPage extends MRUPage {
+	static final class MFUAttrGroupPage extends MFUCachePage {
 
 		/**
 		 * Dieses Feld definiert die Anzahl der Attributknoten in {@link #data}.
@@ -425,28 +216,35 @@ public final class Decoder {
 		/**
 		 * Dieses Feld speichert die Daten der Attributknoten als Auflistung der Referenzen auf die URI, die Namen und die Werte.
 		 */
-		public final int[] data = new int[MRUAttrGroupPage.SIZE * 3];
+		public final int[] data = new int[MFUAttrGroupPage.SIZE * 3];
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Attributknoten, die aus einem {@link MRUFileCache} nachgeladen werden.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Attributknoten, die aus einem {@link MFUDataSourceCache} nachgeladen werden.
 	 * 
-	 * @see MRUFileCache
-	 * @see MRUAttrGroupPage
+	 * @see MFUDataSourceCache
+	 * @see MFUAttrGroupPage
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUAttrGroupCache extends MRUItemCache {
+	static final class MFUAttrGroupCache extends MFUItemCache {
 
 		/**
-		 * Dieses Feld speichert die {@link MRUAttrGroupPage}s.
+		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
 		 */
-		protected final MRUAttrGroupPage[] pages;
+		public final byte[] array = new byte[16];
+
+		/**
+		 * Dieses Feld speichert die {@link MFUAttrGroupPage}s.
+		 */
+		protected final MFUAttrGroupPage[] pages;
 
 		/**
 		 * Dieses Feld speichert die Länge eines Attributknoten in Byte.
 		 */
 		protected final int itemLength;
+
+		// TODO refs zusammenfassen
 
 		/**
 		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
@@ -464,22 +262,22 @@ public final class Decoder {
 		protected final int valueRefLength;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MRUAttrGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link MFUAttrGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
 		 * 
 		 * @param owner {@link BEXDocuNode}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUAttrGroupPage}s.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUAttrGroupPage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn der {@link BEXDocuNode} {@code null} ist.
 		 */
-		public MRUAttrGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException {
+		public MFUAttrGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException {
 			super(owner.fileCache, pageLimit);
 			this.loadItemOffset();
-			this.uriRefLength = Encoder.lengthOf(owner.attrUriCache.itemCount);
-			this.nameRefLength = Encoder.lengthOf(owner.attrNameCache.itemCount - 1);
-			this.valueRefLength = Encoder.lengthOf(owner.attrValueCache.itemCount - 1);
+			this.uriRefLength = Bytes.lengthOf(owner.attrUriCache.itemCount);
+			this.nameRefLength = Bytes.lengthOf(owner.attrNameCache.itemCount - 1);
+			this.valueRefLength = Bytes.lengthOf(owner.attrValueCache.itemCount - 1);
 			this.itemLength = this.uriRefLength + this.nameRefLength + this.valueRefLength;
 			this.loadFileOffset(this.itemLength);
-			this.pages = new MRUAttrGroupPage[((this.itemOffset[this.itemCount] + MRUAttrGroupPage.SIZE) - 1) / MRUAttrGroupPage.SIZE];
+			this.pages = new MFUAttrGroupPage[((this.itemOffset[this.itemCount] + MFUAttrGroupPage.SIZE) - 1) / MFUAttrGroupPage.SIZE];
 		}
 
 		/**
@@ -495,44 +293,44 @@ public final class Decoder {
 			final int[] offsets = this.itemOffset;
 			final int itemKey = offsets[groupKey] + nodeIndex;
 			if(itemKey >= offsets[groupKey + 1]) return null;
-			final int pageIndex = itemKey / MRUAttrGroupPage.SIZE, dataIndex = itemKey & (MRUAttrGroupPage.SIZE - 1);
-			final MRUAttrGroupPage[] pages = this.pages;
-			MRUAttrGroupPage page = pages[pageIndex];
+			final int pageIndex = itemKey / MFUAttrGroupPage.SIZE, dataIndex = itemKey & (MFUAttrGroupPage.SIZE - 1);
+			final MFUAttrGroupPage[] pages = this.pages;
+			MFUAttrGroupPage page = pages[pageIndex];
 			int uriRef, nameRef, valueRef;
 			final int[] pageData;
 			if(page != null){
 				page.uses++;
 				pageData = page.data;
-				uriRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 0)];
+				uriRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 0)];
 			}else{
-				page = new MRUAttrGroupPage();
+				page = new MFUAttrGroupPage();
 				pageData = page.data;
 				uriRef = 0;
 				this.set(pages, pageIndex, page);
 			}
 			if(uriRef != 0){
-				nameRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 1)];
-				valueRef = pageData[dataIndex + (MRUAttrGroupPage.SIZE * 2)];
+				nameRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 1)];
+				valueRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 2)];
 			}else{
 				int length = this.itemLength;
 				int offset = (itemKey * length) + this.fileOffset;
-				final int fileIndex = offset / MRUFilePage.SIZE;
+				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
 				byte[] fileData = this.fileCache.get(fileIndex);
-				offset = offset & (MRUFilePage.SIZE - 1);
-				final int remain = MRUFilePage.SIZE - offset;
+				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
+				final int remain = MFUDataSourceCachePage.SIZE - offset;
 				if(length > remain){
-					final byte[] array = this.fileCache.array;
+					final byte[] array = this.array;
 					System.arraycopy(fileData, offset, array, 0, remain);
 					System.arraycopy(this.fileCache.get(fileIndex + 1), 0, array, remain, length - remain);
 					fileData = array;
 					offset = 0;
 				}
-				uriRef = Decoder.get(fileData, offset, length = this.uriRefLength) + 1;
-				nameRef = Decoder.get(fileData, offset = offset + length, length = this.nameRefLength);
-				valueRef = Decoder.get(fileData, offset + length, this.valueRefLength);
-				pageData[dataIndex + (MRUAttrGroupPage.SIZE * 0)] = uriRef;
-				pageData[dataIndex + (MRUAttrGroupPage.SIZE * 1)] = nameRef;
-				pageData[dataIndex + (MRUAttrGroupPage.SIZE * 2)] = valueRef;
+				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
+				nameRef = Bytes.getInt(fileData, offset = offset + length, length = this.nameRefLength);
+				valueRef = Bytes.getInt(fileData, offset + length, this.valueRefLength);
+				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 0)] = uriRef;
+				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 1)] = nameRef;
+				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 2)] = valueRef;
 			}
 			return new BEXAttrNodeView(parent, nodeIndex, uriRef - 2, nameRef, valueRef);
 		}
@@ -540,12 +338,12 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link MRUPage} zur Vorhaltung von Element- und Textknoten.
+	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Element- und Textknoten.
 	 * 
-	 * @see MRUElemGroupCache
+	 * @see MFUElemGroupCache
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUElemGroupPage extends MRUPage {
+	static final class MFUElemGroupPage extends MFUCachePage {
 
 		/**
 		 * Dieses Feld definiert die Anzahl der Element- und Textknoten in {@link #data}.
@@ -556,28 +354,36 @@ public final class Decoder {
 		 * Dieses Feld speichert die Daten der Element- und Textknoten als Auflistung der Referenzen auf die URI, die Namen, die Kindknotenlisten und die
 		 * Attributknotenlisten.
 		 */
-		public final int[] data = new int[MRUElemGroupPage.SIZE * 4];
+		public final int[] data = new int[MFUElemGroupPage.SIZE * 4];
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Element- und Textknoten, die aus einem {@link MRUFileCache} nachgeladen werden.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Element- und Textknoten, die aus einem {@link MFUDataSourceCache} nachgeladen
+	 * werden.
 	 * 
-	 * @see MRUFileCache
-	 * @see MRUElemGroupPage
+	 * @see MFUDataSourceCache
+	 * @see MFUElemGroupPage
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MRUElemGroupCache extends MRUItemCache {
+	static final class MFUElemGroupCache extends MFUItemCache {
 
 		/**
-		 * Dieses Feld speichert dei {@link MRUElemGroupPage}s.
+		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
 		 */
-		protected final MRUElemGroupPage[] pages;
+		public final byte[] array = new byte[16];
+
+		/**
+		 * Dieses Feld speichert dei {@link MFUElemGroupPage}s.
+		 */
+		protected final MFUElemGroupPage[] pages;
 
 		/**
 		 * Dieses Feld speichert die Länge eines Kindknoten in Byte.
 		 */
 		protected final int itemLength;
+
+		// TODO refs zusammenfassen
 
 		/**
 		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
@@ -605,23 +411,23 @@ public final class Decoder {
 		protected final int attributesRefLength;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MRUElemGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link MFUElemGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
 		 * 
 		 * @param owner {@link BEXDocuNode}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MRUElemGroupPage}s.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUElemGroupPage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn der {@link BEXDocuNode} {@code null} ist.
 		 */
-		public MRUElemGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
+		public MFUElemGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
 			super(owner.fileCache, pageLimit);
 			this.loadItemOffset();
-			this.uriRefLength = Encoder.lengthOf(owner.elemUriCache.itemCount);
-			this.nameRefLength = Encoder.lengthOf(owner.elemNameCache.itemCount);
-			this.contentRefLength = Encoder.lengthOf((owner.elemValueCache.itemCount + this.itemOffset.length) - 1);
-			this.attributesRefLength = Encoder.lengthOf(owner.attrGroupCache.itemCount);
+			this.uriRefLength = Bytes.lengthOf(owner.elemUriCache.itemCount);
+			this.nameRefLength = Bytes.lengthOf(owner.elemNameCache.itemCount);
+			this.contentRefLength = Bytes.lengthOf((owner.elemValueCache.itemCount + this.itemOffset.length) - 1);
+			this.attributesRefLength = Bytes.lengthOf(owner.attrGroupCache.itemCount);
 			this.itemLength = this.uriRefLength + this.nameRefLength + this.contentRefLength + this.attributesRefLength;
 			this.loadFileOffset(this.itemLength);
-			this.pages = new MRUElemGroupPage[((this.itemOffset[this.itemCount] + MRUElemGroupPage.SIZE) - 1) / MRUElemGroupPage.SIZE];
+			this.pages = new MFUElemGroupPage[((this.itemOffset[this.itemCount] + MFUElemGroupPage.SIZE) - 1) / MFUElemGroupPage.SIZE];
 			this.pageLimit = Math.max(pageLimit, 1);
 			this.valueRefOffset = owner.elemValueCache.itemCount;
 		}
@@ -639,49 +445,49 @@ public final class Decoder {
 			final int[] offsets = this.itemOffset;
 			int offset = offsets[groupKey] + nodeIndex;
 			if(offset >= offsets[groupKey + 1]) return null;
-			final int pageIndex = offset / MRUElemGroupPage.SIZE, dataIndex = offset & (MRUElemGroupPage.SIZE - 1);
-			final MRUElemGroupPage[] pages = this.pages;
-			MRUElemGroupPage page = pages[pageIndex];
+			final int pageIndex = offset / MFUElemGroupPage.SIZE, dataIndex = offset & (MFUElemGroupPage.SIZE - 1);
+			final MFUElemGroupPage[] pages = this.pages;
+			MFUElemGroupPage page = pages[pageIndex];
 			final int[] pageData;
 			int uriRef, nameRef, contentRef, attributesRef;
 			if(page != null){
 				page.uses++;
 				pageData = page.data;
-				uriRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 0)];
+				uriRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 0)];
 			}else{
-				this.set(pages, pageIndex, page = new MRUElemGroupPage());
+				this.set(pages, pageIndex, page = new MFUElemGroupPage());
 				pageData = page.data;
 				uriRef = 0;
 			}
 			if(uriRef != 0){
-				nameRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 1)];
-				contentRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 2)];
-				attributesRef = pageData[dataIndex + (MRUElemGroupPage.SIZE * 3)];
+				nameRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 1)];
+				contentRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 2)];
+				attributesRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 3)];
 			}else{
 				int length = this.itemLength;
 				offset = (offset * length) + this.fileOffset;
-				final int fileIndex = offset / MRUFilePage.SIZE;
+				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
 				byte[] fileData = this.fileCache.get(fileIndex);
-				offset = offset & (MRUFilePage.SIZE - 1);
-				final int remain = MRUFilePage.SIZE - offset;
+				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
+				final int remain = MFUDataSourceCachePage.SIZE - offset;
 				if(length > remain){
-					final byte[] array = this.fileCache.array;
+					final byte[] array = this.array;
 					System.arraycopy(fileData, offset, array, 0, remain);
 					System.arraycopy(this.fileCache.get(fileIndex + 1), 0, array, remain, length - remain);
 					fileData = array;
 					offset = 0;
 				}
-				uriRef = Decoder.get(fileData, offset, length = this.uriRefLength) + 1;
+				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
 				offset += length;
-				nameRef = Decoder.get(fileData, offset, length = this.nameRefLength) - 1;
+				nameRef = Bytes.getInt(fileData, offset, length = this.nameRefLength) - 1;
 				offset += length;
-				contentRef = Decoder.get(fileData, offset, length = this.contentRefLength) - 1;
+				contentRef = Bytes.getInt(fileData, offset, length = this.contentRefLength) - 1;
 				offset += length;
-				attributesRef = Decoder.get(fileData, offset, this.attributesRefLength) - 1;
-				pageData[dataIndex + (MRUElemGroupPage.SIZE * 0)] = uriRef;
-				pageData[dataIndex + (MRUElemGroupPage.SIZE * 1)] = nameRef;
-				pageData[dataIndex + (MRUElemGroupPage.SIZE * 2)] = contentRef;
-				pageData[dataIndex + (MRUElemGroupPage.SIZE * 3)] = attributesRef;
+				attributesRef = Bytes.getInt(fileData, offset, this.attributesRefLength) - 1;
+				pageData[dataIndex + (MFUElemGroupPage.SIZE * 0)] = uriRef;
+				pageData[dataIndex + (MFUElemGroupPage.SIZE * 1)] = nameRef;
+				pageData[dataIndex + (MFUElemGroupPage.SIZE * 2)] = contentRef;
+				pageData[dataIndex + (MFUElemGroupPage.SIZE * 3)] = attributesRef;
 			}
 			final int childrenRef = contentRef - this.valueRefOffset;
 			if(nameRef < 0) return new BEXTextNodeView(parent, nodeIndex, contentRef);
@@ -1344,59 +1150,59 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Dokumentknoten zu einem {@link Document}, welches über einem {@link Decoder} aus einer {@link DecodeSource} ausgelesen wird.
+	 * Diese Klasse implementiert den Dokumentknoten zu einem {@link Document}, welches über einem {@link Decoder} aus einer {@link DataSource} ausgelesen wird.
 	 * 
 	 * @see Encoder
-	 * @see DecodeSource
+	 * @see DataSource
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class BEXDocuNode extends BEXNodeView {
 
 		/**
-		 * Dieses Feld speichert den {@link MRUFileCache} zur Verwaltung von Auszügen einer {@link DecodeSource}.
+		 * Dieses Feld speichert den {@link MFUDataSourceCache} zur Verwaltung von Auszügen einer {@link DataSource}.
 		 */
-		final MRUFileCache fileCache;
+		final MFUDataSourceCache fileCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
 		 */
-		final MRUTextValueCache attrUriCache;
+		final MFUTextValueCache attrUriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#name()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#name()}.
 		 */
-		final MRUTextValueCache attrNameCache;
+		final MFUTextValueCache attrNameCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#value()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#value()}.
 		 */
-		final MRUTextValueCache attrValueCache;
+		final MFUTextValueCache attrValueCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Attributknotenlisten für {@link BEXElemNodeView#attributes()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Attributknotenlisten für {@link BEXElemNodeView#attributes()}.
 		 */
-		final MRUAttrGroupCache attrGroupCache;
+		final MFUAttrGroupCache attrGroupCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#uri()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#uri()}.
 		 */
-		final MRUTextValueCache elemUriCache;
+		final MFUTextValueCache elemUriCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#name()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#name()}.
 		 */
-		final MRUTextValueCache elemNameCache;
+		final MFUTextValueCache elemNameCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXTextNodeView#value()}.
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXTextNodeView#value()}.
 		 */
-		final MRUTextValueCache elemValueCache;
+		final MFUTextValueCache elemValueCache;
 
 		/**
-		 * Dieses Feld speichert den {@link MRUTextValueCache} zur Verwaltung der Kindknotenlisten für {@link BEXElemNodeView#children()} und
+		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Kindknotenlisten für {@link BEXElemNodeView#children()} und
 		 * {@link BEXDocuNode#children()}.
 		 */
-		final MRUElemGroupCache elemGroupCache;
+		final MFUElemGroupCache elemGroupCache;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Kindknotenliste des {@link Document}s.
@@ -1404,24 +1210,24 @@ public final class Decoder {
 		final int childrenRef;
 
 		/**
-		 * Dieser Konstruktor initialisiert {@link DecodeSource} und Konfigurationsgrößen.
+		 * Dieser Konstruktor initialisiert {@link DataSource} und Konfigurationsgrößen.
 		 * 
-		 * @param source {@link DecodeSource}.
+		 * @param source {@link DataSource}.
 		 * @param decoder {@link Decoder} zur Konfiguration.
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
-		public BEXDocuNode(final DecodeSource source, final Decoder decoder) throws IOException {
-			this.fileCache = new MRUFileCache(source, decoder.maxFileCachePages);
-			this.attrUriCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrUriCachePages);
-			this.attrNameCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrNameCachePages);
-			this.attrValueCache = new MRUTextValueCache(this.fileCache, decoder.maxAttrValueCachePages);
-			this.attrGroupCache = new MRUAttrGroupCache(this, decoder.maxAttrGroupCachePages);
-			this.elemUriCache = new MRUTextValueCache(this.fileCache, decoder.maxElemUriCachePages);
-			this.elemNameCache = new MRUTextValueCache(this.fileCache, decoder.maxElemNameCachePages);
-			this.elemValueCache = new MRUTextValueCache(this.fileCache, decoder.maxElemValueCachePages);
-			this.elemGroupCache = new MRUElemGroupCache(this, decoder.maxElemGroupCachePages);
+		public BEXDocuNode(final DataSource source, final Decoder decoder) throws IOException {
+			this.fileCache = new MFUDataSourceCache(source, decoder.maxFileCachePages);
+			this.attrUriCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrUriCachePages);
+			this.attrNameCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrNameCachePages);
+			this.attrValueCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrValueCachePages);
+			this.attrGroupCache = new MFUAttrGroupCache(this, decoder.maxAttrGroupCachePages);
+			this.elemUriCache = new MFUTextValueCache(this.fileCache, decoder.maxElemUriCachePages);
+			this.elemNameCache = new MFUTextValueCache(this.fileCache, decoder.maxElemNameCachePages);
+			this.elemValueCache = new MFUTextValueCache(this.fileCache, decoder.maxElemValueCachePages);
+			this.elemGroupCache = new MFUElemGroupCache(this, decoder.maxElemGroupCachePages);
 			this.childrenRef = this.fileCache.read(this.elemGroupCache.contentRefLength) - this.elemValueCache.itemCount - 1;
-			this.fileCache.allocate((int)(source.index() - this.fileCache.offset));
+			this.fileCache.allocate((int)(source.index() - this.fileCache.offset()));
 		}
 
 		/**
@@ -1538,7 +1344,7 @@ public final class Decoder {
 
 		/**
 		 * {@inheritDoc}
-		*/
+		 */
 		@Override
 		public BEXNodeView parent() {
 			return null;
@@ -1571,39 +1377,7 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode ließt die gegebene Anzahl an {@code byte} ab der gegebenen Position aus dem gegebenen {@code byte}-Array und gib diese als {@code int}
-	 * interpretiert zurück.
-	 * 
-	 * @see Bytes#get1(byte[], int)
-	 * @see Bytes#get2(byte[], int)
-	 * @see Bytes#get3(byte[], int)
-	 * @see Bytes#get4(byte[], int)
-	 * @param array {@code byte}-Array.
-	 * @param index Index.
-	 * @param size Anzahl an {@code byte} (0..4).
-	 * @return {@code byte}s interpretiert als {@code int}.
-	 * @throws NullPointerException Wenn das gegebene {@code byte}-Array {@code null} ist.
-	 * @throws IllegalArgumentException Wenn Anzahl oder Position ungültig sind.
-	 */
-	public static final int get(final byte[] array, final int index, final int size) throws NullPointerException, IllegalArgumentException {
-		switch(size){
-			case 0:
-				return 0;
-			case 1:
-				return Bytes.get1(array, index);
-			case 2:
-				return Bytes.get2(array, index);
-			case 3:
-				return Bytes.get3(array, index);
-			case 4:
-				return Bytes.get4(array, index);
-			default:
-				throw new IllegalArgumentException();
-		}
-	}
-
-	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DecodeSource}.
+	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource}.
 	 */
 	int maxFileCachePages;
 
@@ -1676,19 +1450,19 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein {@link Document}, das seine Daten aus der gegebenen {@link DecodeSource} nachlädt, und gibt es zurück.
+	 * Diese Methode erzeugt ein {@link Document}, das seine Daten aus der gegebenen {@link DataSource} nachlädt, und gibt es zurück.
 	 * 
-	 * @param source {@link DecodeSource}.
+	 * @param source {@link DataSource}.
 	 * @return {@link DocumentAdapter}.
 	 * @throws IOException Wenn beim Schreiben ein Fehler euftritt.
 	 */
-	public DocumentAdapter decode(final DecodeSource source) throws IOException {
+	public DocumentAdapter decode(final DataSource source) throws IOException {
 		return new DocumentAdapter(new BEXDocuNode(source, this));
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DecodeSource} zurück. Jeder Block enthält bis zu
-	 * {@value MRUFilePage#SIZE} Byte.
+	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource} zurück. Jeder Block enthält bis zu
+	 * {@value MFUDataSourceCachePage#SIZE} Byte.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1697,8 +1471,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DecodeSource}. Jeder Block enthält bis zu
-	 * {@value MRUFilePage#SIZE} Byte.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource}. Jeder Block enthält bis zu
+	 * {@value MFUDataSourceCachePage#SIZE} Byte.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1708,7 +1482,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} URIs.
+	 * {@value MFUTextValuePage#SIZE} URIs.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1718,7 +1492,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} URIs.
+	 * {@value MFUTextValuePage#SIZE} URIs.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1728,7 +1502,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Namen.
+	 * {@value MFUTextValuePage#SIZE} Namen.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1738,7 +1512,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Namen.
+	 * {@value MFUTextValuePage#SIZE} Namen.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1748,7 +1522,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Werte.
+	 * {@value MFUTextValuePage#SIZE} Werte.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1758,7 +1532,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Werte.
+	 * {@value MFUTextValuePage#SIZE} Werte.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1768,7 +1542,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()} zurück. Jeder Block
-	 * enthält bis zu {@value MRUAttrGroupPage#SIZE} Kindknoten.
+	 * enthält bis zu {@value MFUAttrGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1778,7 +1552,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()}. Jeder Block enthält bis
-	 * zu {@value MRUAttrGroupPage#SIZE} Kindknoten.
+	 * zu {@value MFUAttrGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1788,7 +1562,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} URIs.
+	 * {@value MFUTextValuePage#SIZE} URIs.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1798,7 +1572,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} URIs.
+	 * {@value MFUTextValuePage#SIZE} URIs.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1808,7 +1582,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Namen.
+	 * {@value MFUTextValuePage#SIZE} Namen.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1818,7 +1592,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Namen.
+	 * {@value MFUTextValuePage#SIZE} Namen.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1828,7 +1602,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()} zurück. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Werte.
+	 * {@value MFUTextValuePage#SIZE} Werte.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1838,7 +1612,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()}. Jeder Block enthält bis zu
-	 * {@value MRUTextValuePage#SIZE} Werte.
+	 * {@value MFUTextValuePage#SIZE} Werte.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1848,7 +1622,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
-	 * {@link BEXDocuNode#children()} zurück. Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
+	 * {@link BEXDocuNode#children()} zurück. Jeder Block enthält bis zu {@value MFUElemGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1858,7 +1632,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
-	 * {@link BEXDocuNode#children()} . Jeder Block enthält bis zu {@value MRUElemGroupPage#SIZE} Kindknoten.
+	 * {@link BEXDocuNode#children()} . Jeder Block enthält bis zu {@value MFUElemGroupPage#SIZE} Kindknoten.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
