@@ -99,21 +99,21 @@ public final class Values {
 			return this.value().data();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
-			return this.value().dataAs(type);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
-			return this.value().dataTo(type);
-		}
+//		/**
+//		 * {@inheritDoc}
+//		 */
+//		@Override
+//		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
+//			return this.value().dataAs(type);
+//		}
+//
+//		/**
+//		 * {@inheritDoc}
+//		 */
+//		@Override
+//		public <GData> GData dataTo(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+//			return this.value().dataTo(type);
+//		}
 
 		/**
 		 * Diese Methode gibt den {@link Value Ergebniswert} der Ausführung der {@link Function Funktion} mit dem {@link Scope Ausführungskontext} zurück.
@@ -136,8 +136,7 @@ public final class Values {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
-		public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+		public <GValue> GValue valueTo(Type<GValue> type) throws NullPointerException ,IllegalArgumentException {
 			return this.value().valueTo(type);
 		}
 
@@ -195,45 +194,42 @@ public final class Values {
 	 * Datentyp} fehlen.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ des Datensatzes.
+	 * @param <GValue> Typ des Datensatzes.
 	 */
-	public static abstract class AbstractValue<GData> implements Value {
+	public static abstract class AbstractValue implements Value {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public abstract GData data();
+		public abstract Object data();
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public abstract Type<GData> type();
+		public abstract Type<?> type();
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		@SuppressWarnings ("unchecked")
-		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
-			if(this.type().is(type)) return (GData)this.data();
-			throw new ClassCastException();
-		}
+//		/**
+//		 * {@inheritDoc}
+//		 */
+//		@Override
+//		@SuppressWarnings ("unchecked")
+//		public <GData> GData dataAs(final Type<GData> type) throws NullPointerException, ClassCastException {
+//			if(this.type().is(type)) return (GData)this.data();
+//			throw new ClassCastException();
+//		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GData2> GData2 dataTo(final Type<GData2> type) throws NullPointerException, IllegalArgumentException {
-			return type.dataOf(this);
-		}
+//		/**
+//		 * {@inheritDoc}
+//		 */
+//		@Override
+//		public <GData2> GData2 dataTo(final Type<GData2> type) throws NullPointerException, IllegalArgumentException {
+//			return type.dataOf(this);
+//		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Value valueTo(final Type<?> type) throws NullPointerException, IllegalArgumentException {
+		public <GValue> GValue valueTo( Type<GValue> type) throws NullPointerException ,IllegalArgumentException 
+  {
 			return type.valueOf(this);
 		}
 
@@ -277,7 +273,7 @@ public final class Values {
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes.
 	 */
-	public static abstract class AbstractValue2<GData> extends AbstractValue<GData> {
+	public static abstract class AbstractValue2<GData> extends AbstractValue {
 
 		/**
 		 * Dieses Feld speichert den Datensatz.
@@ -311,7 +307,7 @@ public final class Values {
 	 * @see NullType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NullValue extends AbstractValue<Object> {
+	public static final class NullValue extends AbstractValue {
 
 		/**
 		 * Dieses Feld speichert den {@link NullType}.

@@ -2,7 +2,7 @@ package bee.creative.function;
 
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
-import bee.creative.util.Iterators;
+import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
@@ -28,29 +28,7 @@ public final class Scopes {
 		 */
 		@Override
 		public Iterator<Value> iterator() {
-			if(this.size() == 0) return Iterators.voidIterator();
-			return new Iterator<Value>() {
-
-				int size = AbstractScope.this.size();
-
-				int index = 0;
-
-				@Override
-				public boolean hasNext() {
-					return this.index < this.size;
-				}
-
-				@Override
-				public Value next() {
-					return AbstractScope.this.get(this.index++);
-				}
-
-				@Override
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-
-			};
+			return new GetIterator<Value>(this, size());
 		}
 
 		/**
@@ -358,10 +336,7 @@ public final class Scopes {
 			if(index >= length) return this.scope.get(index - length);
 			Value value = values[index];
 			if(value != null) return value;
-			// final Function function = this.functions[index];
-			// final Object functionClass = function.getClass();
-			// if(functionClass == ValueFunction.class) return values[index] = function.execute(null);
-			// if(functionClass != ParamFunction.class) return values[index] = new ReturnValue(this.scope, function);
+			// return values[index] = new ReturnValue(this.scope, this.functions[index]);
 			value = this.functions[index].execute(this.scope);
 			if(value == null) throw new NullPointerException();
 			return values[index] = value;

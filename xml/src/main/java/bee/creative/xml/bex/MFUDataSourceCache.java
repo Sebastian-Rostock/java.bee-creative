@@ -1,4 +1,4 @@
-package bee.creative.data.cache;
+package bee.creative.xml.bex;
 
 import java.io.IOException;
 import bee.creative.data.Data.DataSource;
@@ -58,7 +58,7 @@ public final class MFUDataSourceCache extends MFUCache {
 	 * @param pageIndex Index der {@link MFUDataSourceCachePage}.
 	 * @return {@link MFUDataSourceCachePage#data Nutzdatenblock}.
 	 */
-	public byte[] get(final int pageIndex) {
+	public byte[] data(final int pageIndex) {
 		final MFUDataSourceCachePage[] pages = this.pages;
 		{
 			final MFUDataSourceCachePage page = pages[pageIndex];
@@ -82,6 +82,20 @@ public final class MFUDataSourceCache extends MFUCache {
 			return data;
 		}
 	}
+
+	public void data(final byte[] dest, final int offset, final int length) {
+		int page = offset >> MFUDataSourceCachePage.BITS;
+		int srcPos = offset & (MFUDataSourceCachePage.SIZE - 1);
+		for(int destPos = 0; destPos < length; page++){
+			final int count = Math.min(length - destPos, MFUDataSourceCachePage.SIZE - srcPos);
+			System.arraycopy(this.data(page), srcPos, dest, destPos, count);
+			destPos += count;
+			srcPos = 0;
+		}
+	}
+	
+	 
+	
 
 	/**
 	 * Diese Methode liest die gegebene Anzahl an {@code byte} via {@link DataSource#readInt(int)} aus {@link #source()} und gibt diese als {@code int}

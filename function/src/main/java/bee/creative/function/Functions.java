@@ -39,7 +39,7 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			if(scope.size() != 2) throw new IllegalArgumentException();
-			return scope.get(0).dataAs(FunctionValue.TYPE).execute(new ValueScope(scope, scope.get(1).dataAs(ArrayValue.TYPE)));
+			return scope.get(0).valueTo(FunctionValue.TYPE).data().execute(new ValueScope(scope, scope.get(1).valueTo(ArrayValue.TYPE).data()));
 		}
 
 		/**
@@ -97,7 +97,7 @@ public final class Functions {
 			for(int i = 0; i < size; i++){
 				values[i] = scope.get(i);
 			}
-			final Function function = scope.get(size).dataAs(FunctionValue.TYPE);
+			final Function function = scope.get(size).valueTo(FunctionValue.TYPE).data();
 			return function.execute(new ValueScope(scope, values));
 		}
 
@@ -738,7 +738,7 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return (this.chained ? this.function.execute(scope).dataAs(FunctionValue.TYPE) : this.function).execute(new CompositeScope(scope, this.functions));
+			return (this.chained ? this.function.execute(scope).valueTo(FunctionValue.TYPE).data() : this.function).execute(new CompositeScope(scope, this.functions));
 		}
 
 		/**

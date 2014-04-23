@@ -1,4 +1,4 @@
-package bee.creative.data.cache;
+package bee.creative.xml.bex;
 
 /**
  * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von {@link MFUCachePage}s.<br>

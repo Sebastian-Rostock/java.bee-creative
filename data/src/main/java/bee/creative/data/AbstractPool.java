@@ -29,7 +29,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 		/**
 		 * Dieses Feld speichert das {@link Iterable}.
 		 */
-		final Iterable<? extends GItem> iterable;
+		private final Iterable<? extends GItem> iterable;
 
 		/**
 		 * Dieser Konstruktor initialisiert das {@link Iterable}.

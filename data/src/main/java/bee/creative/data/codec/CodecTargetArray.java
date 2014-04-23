@@ -14,7 +14,7 @@ public class CodecTargetArray<GContext> extends DataTargetArray implements Codec
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	final GContext context;
+	private final GContext context;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Kontextobjekt sowie die Nutzdaten mit 128 Byte Größe.
@@ -22,7 +22,6 @@ public class CodecTargetArray<GContext> extends DataTargetArray implements Codec
 	 * @param context Kontextobjekt.
 	 */
 	public CodecTargetArray(final GContext context) {
-		super();
 		this.context = context;
 	}
 

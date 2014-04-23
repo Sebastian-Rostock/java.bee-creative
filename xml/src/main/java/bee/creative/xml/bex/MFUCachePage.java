@@ -1,4 +1,4 @@
-package bee.creative.data.cache;
+package bee.creative.xml.bex;
 
 /**
  * Diese Klasse implementiert ein Objekt zur Vorhaltung von Nutzdaten, deren Wiederverwendungen via {@link #uses} gezählt wird.

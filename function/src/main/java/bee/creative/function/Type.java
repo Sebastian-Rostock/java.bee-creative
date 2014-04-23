@@ -6,9 +6,9 @@ package bee.creative.function;
  * Datentypen.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ des Datensatzes.
+ 
  */
-public interface Type<GData> {
+public interface Type<GValue >  {
 
 	/**
 	 * Diese Methode gibt den Identifikator dieses {@link Type}{@code s} zurück, dessen Zahlenwert über eine statische Konstante definiert werden sollte, um
@@ -20,29 +20,29 @@ public interface Type<GData> {
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} in den gegebenen {@link Type} zulässig ist. Dies kann der Fall sein, wenn der
-	 * generische Datentyp des gegebenen {@link Type}{@code s} gleich dem oder ein Vorfahre des generischen Datentyps dieses {@link Type}{@code s} ist. Wenn der
-	 * gegebene {@link Type} {@code null} ist, wird {@code false} zurück gegeben
+	 *   gegebene {@link Type}  gleich dem oder ein Vorfahre   dieses {@link Type}s ist. Wenn der
+	 * gegebene {@link Type} {@code null} ist, wird {@code false} zurück gegeben.
 	 * 
 	 * @see Class#isAssignableFrom(Class)
 	 * @param type {@link Type}.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen {@link Type} zulässig ist.
 	 */
-	public boolean is(Type<?> type);
+	public boolean is(Type<?>  type);
 
-	/**
-	 * Diese Methode gibt den in den generischen Datentyp dieses {@link Type}{@code s} konvertierten Datensatz des gegebenen {@link Value}{@code s} zurück.
-	 * 
-	 * @see Type#id()
-	 * @see Value#type()
-	 * @see Value#data()
-	 * @param value {@link Value}.
-	 * @return konvertierter Datensatz.
-	 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s}
-	 *         konvertiert werden kann.
-	 */
-	public GData dataOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
+//	/**
+//	 * Diese Methode gibt den in den generischen Datentyp dieses {@link Type}{@code s} konvertierten Datensatz des gegebenen {@link Value}{@code s} zurück.
+//	 * 
+//	 * @see Type#id()
+//	 * @see Value#type()
+//	 * @see Value#data()
+//	 * @param value {@link Value}.
+//	 * @return konvertierter Datensatz.
+//	 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
+//	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
+//	 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s}
+//	 *         konvertiert werden kann.
+//	 */
+//	public GData dataOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 	/**
 	 * Diese Methode gibt den in den generischen Datentyp dieses {@link Type}{@code s} konvertierten Datensatz des gegebenen {@link Value}{@code s} als neuen
@@ -58,6 +58,6 @@ public interface Type<GData> {
 	 * @throws IllegalArgumentException Wenn der Datensatz des gegebenen {@link Value}{@code s} nicht in den generische Datentyp dieses {@link Type}{@code s}
 	 *         konvertiert werden kann.
 	 */
-	public Value valueOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public GValue valueOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

@@ -17,7 +17,7 @@ public interface Value {
 	 * 
 	 * @return {@link Type Datentyp}.
 	 */
-	public Type<?> type();
+	public Type<?>  type();
 
 	/**
 	 * Diese Methode gibt den Datensatz zurück.
@@ -26,44 +26,44 @@ public interface Value {
 	 */
 	public Object data();
 
-	/**
-	 * Diese Methode gibt den Datensatz mit dem generischen Datentyp des gegebenen {@link Type}{@code s} zurück. <br>
-	 * Die Implementation entspricht {@code if(this.type().is(type)) return (GData)this.data(); else throw new ClassCastException();}.
-	 * 
-	 * @see ClassCastException
-	 * @param <GData> Typ des Datensatzes.
-	 * @param type {@link Type}.
-	 * @return Datensatz.
-	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
-	 * @throws ClassCastException Wenn ein {@code cast} in den gegebenen {@link Type} unzulässig ist.
-	 */
-	public <GData> GData dataAs(Type<GData> type) throws NullPointerException, ClassCastException;
+//	/**
+//	 * Diese Methode gibt den Datensatz mit dem generischen Datentyp des gegebenen {@link Type}{@code s} zurück. <br>
+//	 * Die Implementation entspricht {@code if(this.type().is(type)) return (GData)this.data(); else throw new ClassCastException();}.
+//	 * 
+//	 * @see ClassCastException
+//	 * @param <GData> Typ des Datensatzes.
+//	 * @param type {@link Type}.
+//	 * @return Datensatz.
+//	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
+//	 * @throws ClassCastException Wenn ein {@code cast} in den gegebenen {@link Type} unzulässig ist.
+//	 */
+//	public <GData> GData dataAs(Type<GData> type) throws NullPointerException, ClassCastException;
 
-	/**
-	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz zurück. Der Rückgabewert entspricht
-	 * {@code type.dataOf(this)}.
-	 * 
-	 * @see Type#dataOf(Value)
-	 * @see Value#data()
-	 * @param <GData> Typ des Datensatzes.
-	 * @param type {@link Type}.
-	 * @return konvertierter Datensatz.
-	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
-	 */
-	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, IllegalArgumentException;
+//	/**
+//	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz zurück. Der Rückgabewert entspricht
+//	 * {@code type.dataOf(this)}.
+//	 * 
+//	 * @see Type#dataOf(Value)
+//	 * @see Value#data()
+//	 * @param <GData> Typ des Datensatzes.
+//	 * @param type {@link Type}.
+//	 * @return konvertierter Datensatz.
+//	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
+//	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
+//	 */
+//	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, IllegalArgumentException;
 
 	/**
 	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz als {@link Value} zurück. Der Rückgabewert
 	 * entspricht {@code type.valueOf(this)}.
 	 * 
-	 * @see Type#dataOf(Value)
+	 * @see Type#valueOf(Value)
 	 * @see Value#data()
 	 * @param type {@link Type}.
 	 * @return konvertierter Datensatz.
 	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
 	 */
-	public Value valueTo(Type<?> type) throws NullPointerException, IllegalArgumentException;
+	public <GValue> GValue valueTo(Type<GValue>  type) throws NullPointerException, IllegalArgumentException;
 
 }

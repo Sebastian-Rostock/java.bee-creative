@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import org.w3c.dom.Document;
 import bee.creative.data.Data.DataSource;
-import bee.creative.data.cache.MFUCache;
-import bee.creative.data.cache.MFUCachePage;
-import bee.creative.data.cache.MFUDataSourceCache;
-import bee.creative.data.cache.MFUDataSourceCachePage;
 import bee.creative.util.Bytes;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
@@ -189,7 +185,7 @@ public final class Decoder {
 			offset = offset & (MFUDataSourceCachePage.SIZE - 1);
 			for(int i = 0; i < size; fileIndex++, offset = 0){
 				final int length = Math.min(size - i, MFUDataSourceCachePage.SIZE - offset);
-				System.arraycopy(this.fileCache.get(fileIndex), offset, fileData, i, length);
+				System.arraycopy(this.fileCache.data(fileIndex), offset, fileData, i, length);
 				i += length;
 			}
 			final String value = new String(fileData, Encoder.CHARSET);
@@ -315,13 +311,13 @@ public final class Decoder {
 				int length = this.itemLength;
 				int offset = (itemKey * length) + this.fileOffset;
 				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-				byte[] fileData = this.fileCache.get(fileIndex);
+				byte[] fileData = this.fileCache.data(fileIndex);
 				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
 				final int remain = MFUDataSourceCachePage.SIZE - offset;
 				if(length > remain){
 					final byte[] array = this.array;
 					System.arraycopy(fileData, offset, array, 0, remain);
-					System.arraycopy(this.fileCache.get(fileIndex + 1), 0, array, remain, length - remain);
+					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
 					fileData = array;
 					offset = 0;
 				}
@@ -467,13 +463,13 @@ public final class Decoder {
 				int length = this.itemLength;
 				offset = (offset * length) + this.fileOffset;
 				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-				byte[] fileData = this.fileCache.get(fileIndex);
+				byte[] fileData = this.fileCache.data(fileIndex);
 				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
 				final int remain = MFUDataSourceCachePage.SIZE - offset;
 				if(length > remain){
 					final byte[] array = this.array;
 					System.arraycopy(fileData, offset, array, 0, remain);
-					System.arraycopy(this.fileCache.get(fileIndex + 1), 0, array, remain, length - remain);
+					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
 					fileData = array;
 					offset = 0;
 				}

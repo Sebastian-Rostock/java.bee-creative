@@ -10,27 +10,27 @@ public class Parser {
 	/**
 	 * Dieses Feld speichert die Eingabe.
 	 */
-	protected final String source;
+	private final String source;
 
 	/**
 	 * Dieses Feld speichert die Ausgabe.
 	 */
-	final StringBuffer target;
+	private final StringBuffer target;
 
 	/**
 	 * Dieses Feld speichert die aktuelle Position.
 	 */
-	int index;
+	private int index;
 
 	/**
 	 * Dieses Feld speichert die Anzahl der Zeichen.
 	 */
-	int length;
+	private final int length;
 
 	/**
 	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
 	 */
-	int symbol;
+	private int symbol;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Eingabe.
@@ -164,6 +164,15 @@ public class Parser {
 	 */
 	public final int symbol() {
 		return this.symbol;
+	}
+
+	/**
+	 * Diese Methode gibt die Eingabe zurück.
+	 * 
+	 * @return Eingabe.
+	 */
+	public final String source() {
+		return this.source;
 	}
 
 	/**

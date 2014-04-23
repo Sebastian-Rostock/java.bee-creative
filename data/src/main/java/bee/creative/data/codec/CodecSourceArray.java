@@ -14,7 +14,7 @@ public class CodecSourceArray<GContext> extends DataSourceArray implements Codec
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	final GContext context;
+	private final GContext context;
 
 	/**
 	 * Dieser Konstruktor initialisiert Kontextobjekt und Nutzdaten.

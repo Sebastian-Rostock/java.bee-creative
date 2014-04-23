@@ -1,7 +1,6 @@
 package bee.creative.function;
 
 import bee.creative.util.Comparables.Get;
-import bee.creative.util.Objects.UseToString;
 
 /**
  * Diese Schnittstelle definiert den Ausführungskontext einer {@link Function Funktion}. Ein solcher {@link Scope Ausführungskontext} stellt eine Liste von
@@ -12,7 +11,7 @@ import bee.creative.util.Objects.UseToString;
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Scope extends Get<Value>, Iterable<Value>, UseToString {
+public interface Scope extends Get<Value>, Iterable<Value> {
 
 	/**
 	 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch

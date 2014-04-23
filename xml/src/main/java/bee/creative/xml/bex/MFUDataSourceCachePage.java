@@ -1,4 +1,4 @@
-package bee.creative.data.cache;
+package bee.creative.xml.bex;
 
 import bee.creative.data.Data.DataSource;
 
@@ -11,9 +11,14 @@ import bee.creative.data.Data.DataSource;
 public final class MFUDataSourceCachePage extends MFUCachePage {
 
 	/**
+	 * Dieses Feld definiert die Bitbreite von {@link #SIZE}.
+	 */
+	public static final int BITS = 11;
+
+	/**
 	 * Dieses Feld definiert die Anzahl der Byte in {@link #data}.
 	 */
-	public static final int SIZE = 2048;
+	public static final int SIZE = 1 << MFUDataSourceCachePage.BITS;
 
 	/**
 	 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DataSource}.
