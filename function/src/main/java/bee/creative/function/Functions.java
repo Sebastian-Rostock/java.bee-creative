@@ -2,24 +2,25 @@ package bee.creative.function;
 
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Scopes.ValueScope;
+import bee.creative.function.Types.NullType;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.function.Values.NullValue;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert Hilfsklassen und Hilfsmethoden zur Erzeugung von {@link Function}{@code s}.
+ * Diese Klasse implementiert Hilfsklassen und Hilfsmethoden zur Erzeugung von Funktionen.
  * 
  * @see Value
- * @see Scopes
+ * @see Scope
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Functions {
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function Funktion} mit der Signatur {@code (function: Function, params: Value[]): Value}. Der {@link Value
-	 * Ergebniswert} entspricht {@code function(params[0], params[1], ...)} entspricht.
+	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (function: FunctionValue, params: ArrayValue): Value}. Der Ergebniswert entspricht
+	 * {@code function(params[0], params[1], ...)}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -33,8 +34,8 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht dem der {@link Function Funktion}, die als erster {@link Value Parameterwerte} des gegebenen {@link Scope
-		 * Ausführungskontext}s gegeben ist und mit den {@link Value Werten} im {@link ArrayValue} des zweiten {@link Value Parameterwerte}s aufgerufen wird.
+		 * Der Ergebniswert entspricht dem der Funktion, die als erster Parameterwerte des gegebenen Ausführungskontexts gegeben ist und mit den Werten im
+		 * {@link ArrayValue} des zweiten Parameterwertes aufgerufen wird.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
@@ -69,8 +70,8 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function Funktion} mit der Signatur {@code (function: FunctionValue, params... Value): Value}. Der {@link Value
-	 * Ergebniswert} entspricht {@code function(params[0], params[1], ...)} entspricht.
+	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, function: FunctionValue): Value}. Der Ergebniswert
+	 * entspricht {@code function(params1, ..., paramsN)} entspricht.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -84,8 +85,8 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht dem der {@link Function Funktion}, die als letzter {@link Value Parameterwert} des gegebenen {@link Scope
-		 * Ausführungskontext}s gegeben ist und mit den davor liegenden {@link Value Parameterwerten} aufgerufen wird.
+		 * Der Ergebniswert entspricht dem der Funktion, die als letzter Parameterwert des gegebenen Ausführungskontexts gegeben ist und mit den davor liegenden
+		 * Parameterwerten aufgerufen wird.
 		 * 
 		 * @see Scope#get(int)
 		 * @see Scope#size()
@@ -128,17 +129,17 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function Funktion} zur Verfolgung bzw. Überwachung der Verarbeitung von {@link Function Funktionen} über einem
-	 * {@link TraceHandler} und {@link TraceEvent}s. Die genaue Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
+	 * Diese Klasse implementiert eine Funktion zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen mit Hilfe eines {@link TraceHandler}s und
+	 * {@link TraceEvent}s. Die genaue Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see TraceEvent
 	 * @see TraceHandler
 	 */
-	public static class TraceFunction implements Function {
+	public static final class TraceFunction implements Function {
 
 		/**
-		 * Diese Klasse implementiert das Argument für die Methoden des {@link TraceHandler}.
+		 * Diese Klasse implementiert das Argument für die Methoden des {@link TraceHandler}s.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @see TraceHandler
@@ -147,26 +148,26 @@ public final class Functions {
 		public static final class TraceEvent {
 
 			/**
-			 * Dieses Feld speichert den {@link Scope Ausführungskontext} der {@link Function Funktion}. Dieser kann in der Methode
-			 * {@link TraceHandler#onExecute(TraceEvent)} für den Aufruf angepasst werden.
+			 * Dieses Feld speichert den Ausführungskontext der Funktion. Dieser kann in der Methode {@link TraceHandler#onExecute(TraceEvent)} für den Aufruf
+			 * angepasst werden.
 			 */
 			public Scope scope;
 
 			/**
-			 * Dieses Feld speichert die {@link Function}, die nach {@link TraceHandler#onExecute(TraceEvent)} aufgerufen wird bzw. vor
+			 * Dieses Feld speichert die Function, die nach {@link TraceHandler#onExecute(TraceEvent)} aufgerufen wird bzw. vor
 			 * {@link TraceHandler#onThrow(TraceEvent)} oder {@link TraceHandler#onReturn(TraceEvent)} aufgerufen wurde. Diese kann in der Methode
 			 * {@link TraceHandler#onExecute(TraceEvent)} für den Aufruf angepasst werden.
 			 */
 			public Function function;
 
 			/**
-			 * Dieses Feld speichert den {@link Value Ergebniswert}, der von der {@link Function Funktion} zurück gegeben wurde. Dieser kann in der Methode
-			 * {@link TraceHandler#onReturn(TraceEvent)} angepasst werden.
+			 * Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode {@link TraceHandler#onReturn(TraceEvent)}
+			 * angepasst werden.
 			 */
 			public Value result;
 
 			/**
-			 * Dieses Feld speichert die {@link RuntimeException}, die von der {@link Function Funktion} ausgelöst wurde. Diese kann in der Methode
+			 * Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode
 			 * {@link TraceHandler#onThrow(TraceEvent)} angepasst werden.
 			 */
 			public RuntimeException exception;
@@ -183,7 +184,7 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Schnittstelle definiert die Methoden zur Verfolgung bzw. Überwachung der Verarbeitung von {@link Function Funktionen}.
+		 * Diese Schnittstelle definiert die Methoden zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen.
 		 * 
 		 * @see TraceEvent
 		 * @see TraceFunction
@@ -192,8 +193,8 @@ public final class Functions {
 		public static interface TraceHandler {
 
 			/**
-			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer {@link Function Funktion} via {@code throw}
-			 * aufgerufen. Das Feld {@link TraceEvent#exception} kann hierbei angepasst werden.
+			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
+			 * {@link TraceEvent#exception} kann hierbei angepasst werden.
 			 * 
 			 * @see TraceEvent#exception
 			 * @param event {@link TraceEvent}.
@@ -201,8 +202,8 @@ public final class Functions {
 			public void onThrow(TraceEvent event);
 
 			/**
-			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer {@link Function Funktion} via {@code return}
-			 * aufgerufen. Das Feld {@link TraceEvent#result} kann hierbei angepasst werden.
+			 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
+			 * {@link TraceEvent#result} kann hierbei angepasst werden.
 			 * 
 			 * @see TraceEvent#result
 			 * @param event {@link TraceEvent}.
@@ -210,9 +211,8 @@ public final class Functions {
 			public void onReturn(TraceEvent event);
 
 			/**
-			 * Diese Methode wird vor dem Aufruf einer {@link Function Funktion} aufgerufen. Die Felder {@link TraceEvent#scope} und {@link TraceEvent#function}
-			 * können hierbei angepasst werden, um den Aufruf auf eine andere {@link Function Funktion} umzulenken bzw. mit einem anderen {@link Scope
-			 * Ausführungskontext} durchzuführen.
+			 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link TraceEvent#scope} und {@link TraceEvent#function} können hierbei
+			 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Ausführungskontext durchzuführen.
 			 * 
 			 * @see TraceEvent#scope
 			 * @see TraceEvent#function
@@ -223,15 +223,17 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt die gegebenen {@link Function Funktion} als {@link TraceFunction} mit dem gegebenen {@link TraceHandler} oder unverändert zurück. Wenn
-		 * die {@link Function Funktion} {@link CompositeFunction komponiert} ist, wird eine {@link CompositeFunction komponierte Funktion} zurück gegeben, deren
-		 * {@link Function Parameterfunktionen} mit dieser Methode umgewandelt wurden. Wenn die {@link Function Funktion} eine {@link ValueFunction Konstante} ist
-		 * und ihr {@link Value Ergebniswert} eine {@link FunctionValue Funktion} ist, wird diese mit dieser Methode umgewandelt und als {@link ValueFunction
-		 * konstante Funktion} zurück gegeben. Andernfalls wird die gegebene {@link Function Funktion} zurück gegeben.
+		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link TraceHandler} oder unverändert zurück. Sie sollte zur
+		 * rekursiven Weiterverfolgung in {@link TraceHandler#onExecute(TraceEvent)} aufgerufen und zur Modifikation von {@link TraceEvent#function} verwendet
+		 * werden.
+		 * <p>
+		 * Wenn die Funktion eine {@link CompositeFunction} ist, wird eine {@link CompositeFunction} zurück gegeben, deren Parameterfunktionen in eine
+		 * {@link TraceFunction} umgewandelt wurden. Wenn die Funktion eine {@link ValueFunction} ist und ihr Ergebniswert ein {@link FunctionValue} ist, wird diese
+		 * ebenfalls in eine {@link TraceFunction} umgewandelt und als {@link ValueFunction} zurück gegeben. Andernfalls wird die gegebene Funktion zurück gegeben.
 		 * 
 		 * @param handler {@link TraceHandler}.
-		 * @param function {@link Function Funktion}.
-		 * @return {@link Function Funktion}.
+		 * @param function Funktion.
+		 * @return Funktion.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public static final Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
@@ -239,7 +241,7 @@ public final class Functions {
 			final Object clazz = function.getClass();
 			if(clazz == CompositeFunction.class){
 				final CompositeFunction function2 = (CompositeFunction)function;
-				final Function[] functions2 = function2.functions.clone();
+				final Function[] functions2 = function2.functions();
 				for(int i = 0, size = functions2.length; i < size; i++){
 					functions2[i] = new TraceFunction(handler, functions2[i]);
 				}
@@ -257,15 +259,15 @@ public final class Functions {
 		final TraceHandler handler;
 
 		/**
-		 * Dieses Feld speichert die aufzurufende {@link Function Funktion}.
+		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
 		final Function function;
 
 		/**
-		 * Dieser Konstruktor initialisiert {@link Function Funktion} und {@link TraceHandler}.
+		 * Dieser Konstruktor initialisiert Funktion und {@link TraceHandler}.
 		 * 
 		 * @param handler {@link TraceHandler}.
-		 * @param function {@link Function Funktion}.
+		 * @param function Funktion.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public TraceFunction(final TraceHandler handler, final Function function) throws NullPointerException {
@@ -284,9 +286,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt die aufzurufende {@link Function Funktion} zurück.
+		 * Diese Methode gibt die aufzurufende Funktion zurück.
 		 * 
-		 * @return aufzurufende {@link Function Funktion}.
+		 * @return aufzurufende Funktion.
 		 */
 		public Function function() {
 			return this.function;
@@ -295,12 +297,12 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Hierbei werden zuerst ein {@link TraceEvent} mit dem gegebenen {@link Scope Ausführungskontext} sowie der {@link #function() aufzurufenden Funktion}
-		 * erzeugt und die Methode {@link TraceHandler#onExecute(TraceEvent)} aufgerufen. Anschließend werden die {@link Function Funktion}
-		 * {@link TraceEvent#function} mit dem {@link Scope Ausführungskontext} {@link TraceEvent#scope} ausgewertet und das Ergebnis auf {@link TraceEvent#result}
-		 * respeichert. Abschließend werden dann {@link TraceHandler#onReturn(TraceEvent)} aufgerufen und der Ergebniswert von {@link TraceEvent#result} zurück
-		 * gegeben. Wenn eine {@link RuntimeException} auftritt, werden diese auf {@link TraceEvent#exception} gespeichert, {@link TraceHandler#onThrow(TraceEvent)}
-		 * aufgerufen und die {@link RuntimeException} von {@link TraceEvent#exception} ausgelöst.
+		 * Hierbei werden zuerst ein {@link TraceEvent} mit dem gegebenen Ausführungskontext sowie der {@link #function() aufzurufenden Funktion} erzeugt und die
+		 * Methode {@link TraceHandler#onExecute(TraceEvent)} aufgerufen. Anschließend werden die Funktion {@link TraceEvent#function} mit dem Ausführungskontext
+		 * {@link TraceEvent#scope} ausgewertet und das Ergebnis auf {@link TraceEvent#result} respeichert. Abschließend werden dann
+		 * {@link TraceHandler#onReturn(TraceEvent)} aufgerufen und der Ergebniswert von {@link TraceEvent#result} zurück gegeben. Wenn eine
+		 * {@link RuntimeException} auftritt, werden diese auf {@link TraceEvent#exception} gespeichert, {@link TraceHandler#onThrow(TraceEvent)} aufgerufen und die
+		 * {@link RuntimeException} von {@link TraceEvent#exception} ausgelöst.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
@@ -352,8 +354,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function}, deren {@link Value Ergebniswert} dem {@link ArrayValue} der {@link Scope#get(int) Parameterwerte} des
-	 * {@link Scope Ausführungskontexts} entspricht.
+	 * Diese Klasse implementiert eine Funktion, deren Ergebniswert dem {@link ArrayValue} der Parameterwerte des Ausführungskontexts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ArrayFunction#execute(Scope)
@@ -368,7 +369,7 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht dem {@link ArrayValue} der {@link Value Parameterwerte} des gegebenen {@link Scope Ausführungskontext}s.
+		 * Der Ergebniswert entspricht dem {@link ArrayValue} der Parameterwerte des gegebenen Ausführungskontexts.
 		 * 
 		 * @see Scope#get(int)
 		 * @see Scope#size()
@@ -410,7 +411,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link Function} mit konstantem {@link Value Ergebniswert}.
+	 * Diese Klasse implementiert eine Funktion mit konstantem Ergebniswert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ValueFunction#execute(Scope)
@@ -418,15 +419,15 @@ public final class Functions {
 	public static final class ValueFunction implements Function {
 
 		/**
-		 * Dieses Feld speichert die {@code null}-{@link Function}.
+		 * Dieses Feld speichert die {@link ValueFunction}, die immer {@link NullValue#INSTANCE} liefert.
 		 */
-		static final Function NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
+		public static final ValueFunction NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
 
 		/**
-		 * Diese Methode erzeugt eine {@link Function} mit konstantem {@link Value Ergebniswert} und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
 		 * 
 		 * @see Values#valueOf(Object)
-		 * @param data {@link Value Ergebniswert}.
+		 * @param data Nutzdaten des Ergebniswerts.
 		 * @return {@link ValueFunction}.
 		 */
 		public static Function valueOf(final Object data) {
@@ -435,26 +436,26 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode erzeugt eine {@link Function} mit konstantem {@link Value Ergebniswert} und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
 		 * 
-		 * @param data {@link Value Ergebniswert}.
+		 * @param value Ergebniswert.
 		 * @return {@link ValueFunction}.
 		 */
-		public static Function valueOf(final Value data) {
-			if((data == null) || (data.data() == null)) return ValueFunction.NULL_FUNCTION;
-			return new ValueFunction(data);
+		public static Function valueOf(final Value value) {
+			if((value == null) || (value.type().id() == NullType.ID)) return ValueFunction.NULL_FUNCTION;
+			return new ValueFunction(value);
 		}
 
 		/**
-		 * Dieses Feld speichert den {@link Value Ergebniswert}.
+		 * Dieses Feld speichert den Ergebniswert.
 		 */
-		final Value value;
+		private final Value value;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link Value Ergebniswert}.
+		 * Dieser Konstruktor initialisiert den Ergebniswert.
 		 * 
-		 * @param value {@link Value}.
-		 * @throws NullPointerException Wenn der gegebene {@link Value} {@code null} ist.
+		 * @param value Ergebniswert.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ValueFunction(final Value value) throws NullPointerException {
 			if(value == null) throw new NullPointerException();
@@ -462,9 +463,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Value Ergebniswert} zurück.
+		 * Diese Methode gibt den Ergebniswert zurück.
 		 * 
-		 * @return {@link Value Ergebniswert}.
+		 * @return Ergebniswert.
 		 */
 		public Value value() {
 			return this.value;
@@ -473,7 +474,7 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht {@code this.value()}.
+		 * Der Ergebniswert entspricht {@code this.value()}.
 		 * 
 		 * @see #value()
 		 */
@@ -512,8 +513,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine projizierende {@link Function}, deren {@link Value Ergebniswert} einem der {@link Scope#get(int) Parameterwerte} des
-	 * {@link Scope Ausführungskontexts} entspricht.
+	 * Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte des Ausführungskontexts entspricht.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ParamFunction#execute(Scope)
@@ -521,34 +521,33 @@ public final class Functions {
 	public static final class ParamFunction implements Function {
 
 		/**
-		 * Dieses Feld speichert die projezierenden {@link Function Funktionen} für die Indizes {@code 0} bis {@code 9}.
+		 * Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0} bis {@code 9}.
 		 */
 		static final Function[] INSTANCES = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
 			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
 
 		/**
-		 * Diese Methode erzeugt eine eine projizierende {@link Function}, deren {@link Value Ergebniswert} dem {@code index}-ten {@link Scope#get(int)
-		 * Parameterwert} des {@link Scope Ausführungskontexts} entspricht, und gibt diese zurück.
+		 * Diese Methode erzeugt eine eine projizierende Funktion, deren Ergebniswert dem {@code index}-ten Parameterwert des Ausführungskontexts entspricht, und
+		 * gibt diese zurück.
 		 * 
-		 * @param index Index des {@link Scope#get(int) Parameterwerts}.
+		 * @param index Index des Parameterwerts.
 		 * @return {@link ParamFunction}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
 		public static Function valueOf(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
 			if(index < ParamFunction.INSTANCES.length) return ParamFunction.INSTANCES[index];
 			return new ParamFunction(index);
 		}
 
 		/**
-		 * Dieses Feld speichert den Index des {@link Scope#get(int) Parameterwerts}.
+		 * Dieses Feld speichert den Index des Parameterwerts.
 		 */
 		final int index;
 
 		/**
-		 * Dieser Konstruktor initialisiert den Index des {@link Scope#get(int) Parameterwerts}.
+		 * Dieser Konstruktor initialisiert den Index des Parameterwerts.
 		 * 
-		 * @param index Index des {@link Scope#get(int) Parameterwerts}.
+		 * @param index Index des Parameterwerts.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
 		public ParamFunction(final int index) throws IndexOutOfBoundsException {
@@ -557,9 +556,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt den Index des {@link Scope#get(int) Parameterwerts} zurück.
+		 * Diese Methode gibt den Index des Parameterwerts zurück.
 		 * 
-		 * @return Index des {@link Scope#get(int) Parameterwerts}.
+		 * @return Index des Parameterwerts.
 		 * @see #execute(Scope)
 		 */
 		public int index() {
@@ -569,7 +568,7 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht {@code scope.get(this.index())}.
+		 * Der Ergebniswert entspricht {@code scope.get(this.index())}.
 		 * 
 		 * @see #index()
 		 */
@@ -608,8 +607,8 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse definiert eine komponierte {@link Function}, die den Aufruf einer gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten}
-	 * mehrerer gegebener {@link Function Parameterfunktionen} berechnet.
+	 * Diese Klasse definiert eine komponierte Funktion, die den Aufruf einer gegebenen Funktion mit den Ergebniswerten mehrerer gegebener Parameterfunktionen
+	 * berechnet.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see CompositeFunction#execute(Scope)
@@ -617,13 +616,12 @@ public final class Functions {
 	public static final class CompositeFunction implements Function {
 
 		/**
-		 * Diese Methode erzeugt eine {@link Function}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen
-		 * {@link Function Parameterfunktionen} berechnet, und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion, die den Aufruf der gegebenen Funktion mit den Ergebniswerten der gegebenen Parameterfunktionen berechnet, und gibt
+		 * diese zurück.
 		 * 
-		 * @param function {@link Function Funktion}.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der
-		 *        {@link Function Funktion} verwendet werden sollen.
-		 * @return {@link CompositeFunction komponierte Funktion}.
+		 * @param function aufzurufende Funktion.
+		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
+		 * @return {@link CompositeFunction}.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public static CompositeFunction valueOf(final Function function, final Function... functions) throws NullPointerException {
@@ -631,14 +629,13 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode erzeugt eine {@link Function}, die den Aufruf der gegebenen {@link Function Funktion} mit den {@link Value Ergebniswerten} der gegebenen
-		 * {@link Function Parameterfunktionen} berechnet, und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion, die den Aufruf der gegebenen Funktion mit den Ergebniswerten der gegebenen Parameterfunktionen berechnet, und gibt
+		 * diese zurück.
 		 * 
-		 * @param function {@link Function Funktion}.
+		 * @param function aufzurufende Funktion.
 		 * @param chained Verketung.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der
-		 *        {@link Function Funktion} verwendet werden sollen.
-		 * @return {@link CompositeFunction komponierte Funktion}.
+		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
+		 * @return {@link CompositeFunction}.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public static CompositeFunction valueOf(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
@@ -651,22 +648,20 @@ public final class Functions {
 		final boolean chained;
 
 		/**
-		 * Dieses Feld speichert die aufzurufende {@link Function Funktion}.
+		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
 		final Function function;
 
 		/**
-		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} verwendet
-		 * werden sollen.
+		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden sollen.
 		 */
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstruktor initialisiert die aufzurufende {@link Function Funktion} und die {@link Function Parameterfunktionen}.
+		 * Dieser Konstruktor initialisiert die aufzurufende Funktion und die Parameterfunktionen.
 		 * 
-		 * @param function {@link Function Funktion}.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der
-		 *        {@link Function Funktion} verwendet werden sollen.
+		 * @param function aufzurufende Funktion.
+		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
@@ -674,12 +669,11 @@ public final class Functions {
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert die aufzurufende {@link Function Funktion}, die Verketung und die {@link Function Parameterfunktionen}.
+		 * Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verketung und die Parameterfunktionen.
 		 * 
-		 * @param function {@link Function Funktion}.
+		 * @param function aufzurufende Funktion.
 		 * @param chained Verketung.
-		 * @param functions {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Scope#get(int) Parameterwerte} beim Aufruf der
-		 *        {@link Function Funktion} verwendet werden sollen.
+		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
@@ -700,9 +694,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt die aufzurufende {@link Function Funktion} zurück.
+		 * Diese Methode gibt die aufzurufende Funktion zurück.
 		 * 
-		 * @return aufzurufende {@link Function Funktion}.
+		 * @return aufzurufende Funktion.
 		 * @see #execute(Scope)
 		 */
 		public Function function() {
@@ -710,9 +704,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt eine Kopie der {@link Function Parameterfunktionen} zurück.
+		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
 		 * 
-		 * @return Kopie der {@link Function Parameterfunktionen}.
+		 * @return Kopie der Parameterfunktionen.
 		 * @see #execute(Scope)
 		 */
 		public Function[] functions() {
@@ -722,14 +716,13 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Wenn die {@link #chained() Verkettung} deaktiviert ist, ergibt sich dieser {@link Value Ergebniswert} aus dem Aufruf der {@link #function() aufzurufende
-		 * Funktion} mit den {@link Value Parameterwerten}, die sich aus der Auswertung der {@link #functions() Parameterfunktionen} mit dem gegebenen {@link Scope
-		 * Ausführungskontext} ergeben. Ist die {@link #chained() Verkettung} dagegen deaktiviert, wird statt der {@link #function() aufzurufende Funktion} die
-		 * {@link Function Funktion} verwendet, die bei der Auswertung der {@link #function() aufzurufenden Funktion} mit dem gegebenen {@link Scope
-		 * Ausführungskontext} ermittelt wurde. <br>
+		 * Wenn die {@link #chained() Verkettung} deaktiviert ist, ergibt sich dieser Ergebniswert aus dem Aufruf der {@link #function() aufzurufende Funktion} mit
+		 * den Parameterwerten, die sich aus der Auswertung der {@link #functions() Parameterfunktionen} mit dem gegebenen Ausführungskontext ergeben. Ist die
+		 * {@link #chained() Verkettung} dagegen aktiviert, wird statt der {@link #function() aufzurufende Funktion} die Funktion verwendet, die bei der Auswertung
+		 * der {@link #function() aufzurufenden Funktion} mit dem gegebenen Ausführungskontext ermittelt wurde.<br>
 		 * <p>
-		 * Der {@link Value Ergebniswert} entspricht
-		 * {@code (this.chained() ? this.function().execute(scope).dataAs(FunctionValue.TYPE) : this.function()).execute(new CompositeScope(scope, this.functions()))}.
+		 * Der Ergebniswert entspricht
+		 * {@code (this.chained() ? this.function().execute(scope).valueTo(FunctionValue.TYPE).data() : this.function()).execute(new CompositeScope(scope, this.functions()))}.
 		 * 
 		 * @see #chained()
 		 * @see #function()
@@ -738,7 +731,8 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return (this.chained ? this.function.execute(scope).valueTo(FunctionValue.TYPE).data() : this.function).execute(new CompositeScope(scope, this.functions));
+			return (this.chained ? this.function.execute(scope).valueTo(FunctionValue.TYPE).data() : this.function)
+				.execute(new CompositeScope(scope, this.functions));
 		}
 
 		/**

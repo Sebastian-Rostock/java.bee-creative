@@ -1,69 +1,42 @@
 package bee.creative.function;
 
 /**
- * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link Function Funktion} oder als Parameter in einem {@link Scope Ausführungskontext}
- * verwendet werden kann. Ein solcher {@link Value Wert} besitzt dazu einen {@link Value#type() Datentyp}, einen {@link Value#data() Datensatz} sowie Methoden
- * zur Konvertierung des {@link Value#data() Datensatzes} in andere {@link Value#type() Datentypen}.
+ * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer Funktion oder als Parameter in einem Ausführungskontext verwendet werden kann. Ein solcher
+ * Wert besitzt dazu {@link Value#data() Nutzdaten}, einen {@link Value#type() Datentyp} und eine {@link #valueTo(Type) Konvertierungsmethode}.
  * 
  * @see Scope
- * @see Value
+ * @see Values
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public interface Value {
 
 	/**
-	 * Diese Methode gibt den {@link Type Datentyp} zurück.
+	 * Diese Methode gibt den Datentyp zurück.
 	 * 
-	 * @return {@link Type Datentyp}.
+	 * @return Datentyp.
 	 */
-	public Type<?>  type();
+	public Type<?> type();
 
 	/**
-	 * Diese Methode gibt den Datensatz zurück.
+	 * Diese Methode gibt die Nutzdaten zurück.
 	 * 
-	 * @return Datensatz.
+	 * @return Nutzdaten.
 	 */
 	public Object data();
 
-//	/**
-//	 * Diese Methode gibt den Datensatz mit dem generischen Datentyp des gegebenen {@link Type}{@code s} zurück. <br>
-//	 * Die Implementation entspricht {@code if(this.type().is(type)) return (GData)this.data(); else throw new ClassCastException();}.
-//	 * 
-//	 * @see ClassCastException
-//	 * @param <GData> Typ des Datensatzes.
-//	 * @param type {@link Type}.
-//	 * @return Datensatz.
-//	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
-//	 * @throws ClassCastException Wenn ein {@code cast} in den gegebenen {@link Type} unzulässig ist.
-//	 */
-//	public <GData> GData dataAs(Type<GData> type) throws NullPointerException, ClassCastException;
-
-//	/**
-//	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz zurück. Der Rückgabewert entspricht
-//	 * {@code type.dataOf(this)}.
-//	 * 
-//	 * @see Type#dataOf(Value)
-//	 * @see Value#data()
-//	 * @param <GData> Typ des Datensatzes.
-//	 * @param type {@link Type}.
-//	 * @return konvertierter Datensatz.
-//	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
-//	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
-//	 */
-//	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, IllegalArgumentException;
-
 	/**
-	 * Diese Methode gibt den in den generischen Datentyp des gegebenen {@link Type}s konvertierten Datensatz als {@link Value} zurück. Der Rückgabewert
-	 * entspricht {@code type.valueOf(this)}.
+	 * Diese Methode konvertiert diesen Wert in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
+	 * Der Rückgabewert entspricht {@code type.valueOf(this)}.
 	 * 
+	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
 	 * @see Type#valueOf(Value)
-	 * @see Value#data()
-	 * @param type {@link Type}.
-	 * @return konvertierter Datensatz.
+	 * @param type Datentyp.
+	 * @return konvertierter Wert.
 	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
+	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
 	 */
-	public <GValue> GValue valueTo(Type<GValue>  type) throws NullPointerException, IllegalArgumentException;
+	public <GValue> GValue valueTo(Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

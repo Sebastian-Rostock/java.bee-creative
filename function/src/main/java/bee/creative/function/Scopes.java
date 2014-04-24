@@ -2,12 +2,13 @@ package bee.creative.function;
 
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
+import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Verarbeitung von {@link Scope Ausführungskontexten}.
+ * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Verarbeitung von Ausführungskontexten.
  * 
  * @see Value
  * @see Scope
@@ -17,7 +18,7 @@ import bee.creative.util.Objects.UseToString;
 public final class Scopes {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Scope Ausführungskontext}.
+	 * Diese Klasse implementiert einen abstrakten Ausführungskontext.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -28,7 +29,7 @@ public final class Scopes {
 		 */
 		@Override
 		public Iterator<Value> iterator() {
-			return new GetIterator<Value>(this, size());
+			return new GetIterator<Value>(this, this.size());
 		}
 
 		/**
@@ -69,20 +70,19 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert den leeren {@link Scope Ausführungskontext} zum Aufruf einer {@link Function Funktion} ohne Kontextobjekt und ohne {@link Value
-	 * Parameterwerte}.
+	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Kontextobjekt und ohne Parameterwerte.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class VoidScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den leeren {@link Scope Ausführungskontext} ohne Kontextobjekt und ohne {@link Value Parameterwerte}.
+		 * Dieses Feld speichert den leeren Ausführungskontext ohne Kontextobjekt und ohne Parameterwerte.
 		 */
 		public static final VoidScope INSTANCE = new VoidScope();
 
 		/**
-		 * Diese Methode gibt den {@code index}-ten {@link Value Parameterwert} zurück.
+		 * {@inheritDoc} Die {@link IndexOutOfBoundsException} wird immer ausgelöst.
 		 */
 		@Override
 		public Value get(final int index) throws IndexOutOfBoundsException {
@@ -112,30 +112,30 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Scope Ausführungskontext} zum Aufruf einer {@link Function Funktion} mit gegebenen {@link Value Parameterwerten} im
-	 * Kontext eines übergeordneten {@link Scope Ausführungskontexts}. Über die Methode {@link #get(int)} kann dabei auf die zusätzlichen {@link Value
-	 * Parameterwerte} des übergeordneten {@link Scope Ausführungskontexts} zugegriffen werden.
+	 * Diese Klasse implementiert einen Ausführungskontext zum Aufruf einer Funktion mit gegebenen Parameterwerten im Rahmen eines übergeordneten
+	 * Ausführungskontexts. Über die Methode {@link #get(int)} kann dabei auf die zusätzlichen Parameterwerte des übergeordneten Ausführungskontexts zugegriffen
+	 * werden.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ValueScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den übergeordneten {@link Scope Ausführungskontext}, dessen {@link Value Parameterwerte} virtuell ersetzt werden.
+		 * Dieses Feld speichert den übergeordneten Ausführungskontext, dessen Parameterwerte virtuell ergänzt werden.
 		 */
 		final Scope scope;
 
 		/**
-		 * Dieses Feld speichert die {@link Value Parameterwerte}.
+		 * Dieses Feld speichert die Parameterwerte.
 		 */
 		final Value[] values;
 
 		/**
-		 * Dieser Konstruktor initialisiert den übergeordneten {@link Scope Ausführungskontext} und die {@link Value Parameterwerte}. Das Kontextobjekt sowie die
-		 * zusätzlichen {@link Value Parameterwerte} entsprechen denen des gegebenen {@link Scope Ausführungskontexts}.
+		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterwerte. Das Kontextobjekt sowie die zusätzlichen Parameterwerte
+		 * entsprechen denen des gegebenen Ausführungskontexts.
 		 * 
-		 * @param scope übergeordneter {@link Scope Ausführungskontext}.
-		 * @param values {@link Value Parameterwerte}.
+		 * @param scope übergeordneter Ausführungskontext.
+		 * @param values Parameterwerte.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ValueScope(final Scope scope, final Value... values) throws NullPointerException {
@@ -145,11 +145,11 @@ public final class Scopes {
 		}
 
 		/**
-		 * {@inheritDoc} Diese entsprechen hierbei dem zusätzlichen {@link Value Parameterwerten} des übergeordneten {@link Scope Ausführungskontext}, die über
+		 * {@inheritDoc} Diese entsprechen hierbei dem zusätzlichen Parameterwerten des übergeordneten Ausführungskontexts, die über
 		 * {@code this.scope().get(index - this.size() + this.scope.size())} ermittelt werden.
 		 * 
 		 * @see #scope()
-		 * @throws NullPointerException Wenn der {@code index}-te {@link Value Parameterwert} {@code null} ist.
+		 * @throws NullPointerException Wenn der {@code index}-te Parameterwert {@code null} ist.
 		 */
 		@Override
 		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
@@ -173,9 +173,9 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den übergeordneten {@link Scope Ausführungskontext} zurück, dessen zusätzliche {@link Value Parameterwerte} übernommen werden.
+		 * Diese Methode gibt den übergeordneten Ausführungskontext zurück, dessen Parameterwerte als zusätzliche übernommen werden.
 		 * 
-		 * @return übergeordneter {@link Scope Ausführungskontext}.
+		 * @return übergeordneter Ausführungskontext.
 		 */
 		public Scope scope() {
 			return this.scope;
@@ -190,9 +190,9 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt eine Kopie der {@link Value Parameterwerte} zurück.
+		 * Diese Methode gibt eine Kopie der Parameterwerte zurück.
 		 * 
-		 * @return Kopie der {@link Value Parameterwerte}.
+		 * @return Kopie der Parameterwerte.
 		 */
 		public Value[] values() {
 			return this.values.clone();
@@ -209,16 +209,15 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Scope Ausführungskontext} zum Aufruf einer {@link Function Funktion} mit den {@link Value Parameterwerten} eines
-	 * gegebenen {@link Scope Ausführungskontexts} und einem gegebenem Kontextobjekt. Über die Methode {@link #get(int)} kann auf die {@link Value Parameterwerte}
-	 * des gegebenen {@link Scope Ausführungskontexts} zugegriffen werden.
+	 * Diese Klasse implementiert einen Ausführungskontext zum Aufruf einer Funktion mit den Parameterwerten eines gegebenen Ausführungskontexts und einem
+	 * gegebenem Kontextobjekt. Über die Methode {@link #get(int)} kann auf die Parameterwerte des gegebenen Ausführungskontexts zugegriffen werden.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ContextScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den {@link Scope Ausführungskontext}.
+		 * Dieses Feld speichert den Ausführungskontext.
 		 */
 		final Scope scope;
 
@@ -228,11 +227,11 @@ public final class Scopes {
 		final Object context;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link Scope Ausführungskontext} und das Kontextobjekt.
+		 * Dieser Konstruktor initialisiert den Ausführungskontext und das Kontextobjekt.
 		 * 
-		 * @param scope {@link Scope Ausführungskontext}.
+		 * @param scope Ausführungskontext.
 		 * @param context Kontextobjekt.
-		 * @throws NullPointerException Wenn der gegebene {@link Scope Ausführungskontext} {@code null} ist.
+		 * @throws NullPointerException Wenn der gegebene Ausführungskontext {@code null} ist.
 		 */
 		public ContextScope(final Scope scope, final Object context) throws NullPointerException {
 			if(scope == null) throw new NullPointerException();
@@ -257,9 +256,9 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Scope Ausführungskontext} zurück, dessen {@link Value Parameterwerte} übernommen werden.
+		 * Diese Methode gibt den Ausführungskontext zurück, dessen Parameterwerte übernommen werden.
 		 * 
-		 * @return {@link Scope Ausführungskontext}.
+		 * @return Ausführungskontext.
 		 */
 		public Scope scope() {
 			return this.scope;
@@ -284,35 +283,36 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert den {@link Scope Ausführungskontext} einer {@link CompositeFunction Komposition}, deren {@link Value Parameterwerte} mit Hilfe
-	 * eines gegebenen {@link Scope Ausführungskontexts} und gegebener {@link Function Parameterfunktionen} ermittelt werden. Die {@link Function
-	 * Parameterfunktionen} werden zur Ermittlung der {@link Value Parameterwerte} einmalig mit dem gegebenen {@link Scope Ausführungskontext} aufgerufen. Deren
-	 * {@link Value Ergebniswerte} werden dann zur Wiederverwendung zwischengespeichert.
+	 * Diese Klasse implementiert den Ausführungskontext einer Funktionskomposition, deren Parameterwerte mit Hilfe eines gegebenen Ausführungskontexts und
+	 * gegebener Parameterfunktionen ermittelt werden. Die Parameterfunktionen werden zur Ermittlung der Parameterwerte einmalig mit dem gegebenen
+	 * Ausführungskontext aufgerufen. Deren Ergebniswerte werden dann zur Wiederverwendung zwischengespeichert.
 	 * 
+	 * @see ReturnValue
+	 * @see CompositeFunction
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class CompositeScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den übergeordneten {@link Scope Ausführungskontext}, der für die {@link Function Parameterfunktionen} genutzt wird.
+		 * Dieses Feld speichert den übergeordneten Ausführungskontext, der für die Parameterfunktionen genutzt wird.
 		 */
 		final Scope scope;
 
 		/**
-		 * Dieses Feld speichert die {@link Value Parameterwerte}.
+		 * Dieses Feld speichert die Parameterwerte.
 		 */
 		final Value[] values;
 
 		/**
-		 * Dieses Feld speichert die {@link Function Parameterfunktionen}, deren {@link Value Ergebniswerte} als {@link Value Parameterwerte} verwendet werden.
+		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden.
 		 */
 		final Function[] functions;
 
 		/**
-		 * Dieser Konstruktor initialisiert den übergeordneten {@link Scope Ausführungskontext} und die {@link Function Parameterfunktionen}.
+		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterfunktionen.
 		 * 
-		 * @param scope übergeordneter {@link Scope Ausführungskontext}.
-		 * @param functions {@link Function Parameterfunktionen}.
+		 * @param scope übergeordneter Ausführungskontext.
+		 * @param functions Parameterfunktionen.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
@@ -323,23 +323,20 @@ public final class Scopes {
 		}
 
 		/**
-		 * {@inheritDoc} Diese entsprechen hierbei den {@link Value Parameterwerten} des übergeordneten {@link Scope Ausführungskontext}, die über
-		 * {@code this.scope().get(index - this.size())} ermittelt werden.
+		 * {@inheritDoc} Diese entsprechen hierbei den Parameterwerten des übergeordneten Ausführungskontext, die über {@code this.scope().get(index - this.size())}
+		 * ermittelt werden. Die Auswertung der Parameterfunktionen erfolgt über {@link ReturnValue}s.
 		 * 
 		 * @see #scope()
-		 * @throws NullPointerException Wenn die {@code index}-te {@link Function Parameterfunktion} {@code null} ist.
+		 * @throws NullPointerException Wenn die {@code index}-te Parameterfunktion {@code null} ist.
 		 */
 		@Override
 		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 			final Value[] values = this.values;
 			final int length = values.length;
 			if(index >= length) return this.scope.get(index - length);
-			Value value = values[index];
+			final Value value = values[index];
 			if(value != null) return value;
-			// return values[index] = new ReturnValue(this.scope, this.functions[index]);
-			value = this.functions[index].execute(this.scope);
-			if(value == null) throw new NullPointerException();
-			return values[index] = value;
+			return values[index] = new ReturnValue(this.scope, this.functions[index]);
 		}
 
 		/**
@@ -351,9 +348,9 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen} zurück.
+		 * Diese Methode gibt den Ausführungskontext der Parameterfunktionen zurück.
 		 * 
-		 * @return {@link Scope Ausführungskontext} der {@link Function Parameterfunktionen}.
+		 * @return Ausführungskontext der Parameterfunktionen.
 		 */
 		public Scope scope() {
 			return this.scope;
@@ -368,9 +365,9 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt eine Kopie der {@link Function Parameterfunktionen} zurück.
+		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
 		 * 
-		 * @return Kopie der {@link Function Parameterfunktionen}.
+		 * @return Kopie der Parameterfunktionen.
 		 */
 		public Function[] functions() {
 			return this.functions.clone();
