@@ -31,7 +31,7 @@ public final class Decoder {
 		/**
 		 * Dieses Feld speichert den {@link MFUDataSourceCache} zum Nachladen der Werte.
 		 */
-		protected final MFUDataSourceCache fileCache;
+		protected final DataSource fileCache;
 
 		/**
 		 * Dieses Feld speichert den Beginn des Datenbereichs mit den Werten.
@@ -56,7 +56,7 @@ public final class Decoder {
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
 		 */
-		public MFUItemCache(final MFUDataSourceCache source, final int pageLimit) throws IOException, NullPointerException {
+		public MFUItemCache(final DataSource source, final int pageLimit) throws IOException, NullPointerException {
 			super(pageLimit);
 			this.fileCache = source;
 		}
@@ -67,12 +67,12 @@ public final class Decoder {
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
 		protected void loadItemOffset() throws IOException {
-			final MFUDataSourceCache fileCache = this.fileCache;
-			final int size = fileCache.read(4) + 1, length = fileCache.read(1);
+			final DataSource fileCache = this.fileCache;
+			final int size = fileCache.readInt() + 1, length = fileCache.readUnsignedByte();
 			final int[] offsets = new int[size];
 			offsets[0] = 0;
 			for(int i = 1; i < size; i++){
-				offsets[i] = fileCache.read(length);
+				offsets[i] = fileCache.readInt(length);
 			}
 			this.itemCount = size - 1;
 			this.itemOffset = offsets;
@@ -85,11 +85,10 @@ public final class Decoder {
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 */
 		protected void loadFileOffset(final int itemLength) throws IOException {
-			final MFUDataSourceCache fileCache = this.fileCache;
+			final DataSource fileCache = this.fileCache;
 			final int[] itemOffset = this.itemOffset;
-			final long index = fileCache.source().index();
-			fileCache.source().seek(index + (itemOffset[itemOffset.length - 1] * itemLength));
-			this.fileOffset = (int)(index - fileCache.offset());
+			this.fileOffset = (int)fileCache.index();
+			fileCache.seek(fileOffset + (itemOffset[itemOffset.length - 1] * itemLength));
 		}
 
 		/**
@@ -148,8 +147,8 @@ public final class Decoder {
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
 		 */
-		public MFUTextValueCache(final MFUDataSourceCache source, final int pageLimit) throws IOException, NullPointerException {
-			super(source, pageLimit);
+		public MFUTextValueCache(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
+			super(owner.fileCache, pageLimit);
 			this.loadItemOffset();
 			this.loadFileOffset(1);
 			this.pages = new MFUTextValuePage[((this.itemCount + MFUTextValuePage.SIZE) - 1) / MFUTextValuePage.SIZE];
@@ -162,6 +161,7 @@ public final class Decoder {
 		 * @return Text.
 		 */
 		public String valueItem(final int itemKey) {
+
 			if((itemKey < 0) || (itemKey >= this.itemCount)) return null;
 			final MFUTextValuePage[] pages = this.pages;
 			final int pageIndex = itemKey / MFUTextValuePage.SIZE, dataIndex = itemKey & (MFUTextValuePage.SIZE - 1);
@@ -180,14 +180,23 @@ public final class Decoder {
 			int offset = offsets[itemKey];
 			final int size = offsets[itemKey + 1] - offset;
 			offset += this.fileOffset;
-			int fileIndex = offset / MFUDataSourceCachePage.SIZE;
 			final byte[] fileData = new byte[size];
-			offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-			for(int i = 0; i < size; fileIndex++, offset = 0){
-				final int length = Math.min(size - i, MFUDataSourceCachePage.SIZE - offset);
-				System.arraycopy(this.fileCache.data(fileIndex), offset, fileData, i, length);
-				i += length;
+
+			try{
+				fileCache.seek(offset);
+				fileCache.readFully(fileData);
+			}catch(IOException e){
+				throw new IllegalArgumentException(e);
 			}
+
+			//
+			// int fileIndex = offset / MFUDataSourceCachePage.SIZE;
+			// offset = offset & (MFUDataSourceCachePage.SIZE - 1);
+			// for(int i = 0; i < size; fileIndex++, offset = 0){
+			// final int length = Math.min(size - i, MFUDataSourceCachePage.SIZE - offset);
+			// System.arraycopy(this.fileCache.data(fileIndex), offset, fileData, i, length);
+			// i += length;
+			// }
 			final String value = new String(fileData, Encoder.CHARSET);
 			page.data[dataIndex] = value;
 			return value;
@@ -276,6 +285,8 @@ public final class Decoder {
 			this.pages = new MFUAttrGroupPage[((this.itemOffset[this.itemCount] + MFUAttrGroupPage.SIZE) - 1) / MFUAttrGroupPage.SIZE];
 		}
 
+		final byte[] buff = new byte[16];
+		
 		/**
 		 * Diese Methode gibt den referenzierten Attributknoten zurück.
 		 * 
@@ -310,17 +321,31 @@ public final class Decoder {
 			}else{
 				int length = this.itemLength;
 				int offset = (itemKey * length) + this.fileOffset;
-				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-				byte[] fileData = this.fileCache.data(fileIndex);
-				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-				final int remain = MFUDataSourceCachePage.SIZE - offset;
-				if(length > remain){
-					final byte[] array = this.array;
-					System.arraycopy(fileData, offset, array, 0, remain);
-					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
-					fileData = array;
-					offset = 0;
+				byte[] fileData = buff;
+				
+				try{
+					fileCache.seek(offset);
+					fileCache.readFully(fileData, 0, length);
+				}catch(IOException e){
+					throw new IllegalArgumentException(e);
 				}
+				
+				offset=0;
+//				byte[] fileData = this.fileCache.data(fileIndex);
+//
+//				
+//				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
+//				
+//				
+//				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
+//				final int remain = MFUDataSourceCachePage.SIZE - offset;
+//				if(length > remain){
+//					final byte[] array = this.array;
+//					System.arraycopy(fileData, offset, array, 0, remain);
+//					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
+//					fileData = array;
+//					offset = 0;
+//				}
 				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
 				nameRef = Bytes.getInt(fileData, offset = offset + length, length = this.nameRefLength);
 				valueRef = Bytes.getInt(fileData, offset + length, this.valueRefLength);
@@ -427,7 +452,8 @@ public final class Decoder {
 			this.pageLimit = Math.max(pageLimit, 1);
 			this.valueRefOffset = owner.elemValueCache.itemCount;
 		}
-
+		final byte[] buff = new byte[16];
+		
 		/**
 		 * Diese Methode gibt den referenzierten Kindknoten zurück.
 		 * 
@@ -462,17 +488,27 @@ public final class Decoder {
 			}else{
 				int length = this.itemLength;
 				offset = (offset * length) + this.fileOffset;
-				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-				byte[] fileData = this.fileCache.data(fileIndex);
-				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-				final int remain = MFUDataSourceCachePage.SIZE - offset;
-				if(length > remain){
-					final byte[] array = this.array;
-					System.arraycopy(fileData, offset, array, 0, remain);
-					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
-					fileData = array;
-					offset = 0;
+				byte[] fileData = buff;
+				
+				try{
+					fileCache.seek(offset);
+					fileCache.readFully(fileData, 0, length);
+				}catch(IOException e){
+					throw new IllegalArgumentException(e);
 				}
+				offset = 0;
+				
+//				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
+//				byte[] fileData = this.fileCache.data(fileIndex);
+//				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
+//				final int remain = MFUDataSourceCachePage.SIZE - offset;
+//				if(length > remain){
+//					final byte[] array = this.array;
+//					System.arraycopy(fileData, offset, array, 0, remain);
+//					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
+//					fileData = array;
+//					offset = 0;
+//				}
 				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
 				offset += length;
 				nameRef = Bytes.getInt(fileData, offset, length = this.nameRefLength) - 1;
@@ -1155,9 +1191,9 @@ public final class Decoder {
 	public static final class BEXDocuNode extends BEXNodeView {
 
 		/**
-		 * Dieses Feld speichert den {@link MFUDataSourceCache} zur Verwaltung von Auszügen einer {@link DataSource}.
+		 * Dieses Feld speichert die {@link DataSource}.
 		 */
-		final MFUDataSourceCache fileCache;
+		final DataSource fileCache;
 
 		/**
 		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
@@ -1213,17 +1249,17 @@ public final class Decoder {
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
 		public BEXDocuNode(final DataSource source, final Decoder decoder) throws IOException {
-			this.fileCache = new MFUDataSourceCache(source, decoder.maxFileCachePages);
-			this.attrUriCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrUriCachePages);
-			this.attrNameCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrNameCachePages);
-			this.attrValueCache = new MFUTextValueCache(this.fileCache, decoder.maxAttrValueCachePages);
+			this.fileCache = source;
+			this.attrUriCache = new MFUTextValueCache(this, decoder.maxAttrUriCachePages);
+			this.attrNameCache = new MFUTextValueCache(this, decoder.maxAttrNameCachePages);
+			this.attrValueCache = new MFUTextValueCache(this, decoder.maxAttrValueCachePages);
 			this.attrGroupCache = new MFUAttrGroupCache(this, decoder.maxAttrGroupCachePages);
-			this.elemUriCache = new MFUTextValueCache(this.fileCache, decoder.maxElemUriCachePages);
-			this.elemNameCache = new MFUTextValueCache(this.fileCache, decoder.maxElemNameCachePages);
-			this.elemValueCache = new MFUTextValueCache(this.fileCache, decoder.maxElemValueCachePages);
+			this.elemUriCache = new MFUTextValueCache(this, decoder.maxElemUriCachePages);
+			this.elemNameCache = new MFUTextValueCache(this, decoder.maxElemNameCachePages);
+			this.elemValueCache = new MFUTextValueCache(this, decoder.maxElemValueCachePages);
 			this.elemGroupCache = new MFUElemGroupCache(this, decoder.maxElemGroupCachePages);
-			this.childrenRef = this.fileCache.read(this.elemGroupCache.contentRefLength) - this.elemValueCache.itemCount - 1;
-			this.fileCache.allocate((int)(source.index() - this.fileCache.offset()));
+			this.childrenRef = this.fileCache.readInt(this.elemGroupCache.contentRefLength) - this.elemValueCache.itemCount - 1;
+			// this.fileCache.allocate((int)(source.index() - this.fileCache.offset()));
 		}
 
 		/**

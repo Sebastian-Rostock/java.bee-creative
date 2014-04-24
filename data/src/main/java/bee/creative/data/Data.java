@@ -439,218 +439,6 @@ public interface Data {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine gepufferte {@link DataSource}, welche Datenauszüge einer gegebenen {@link DataSource} in einer internen Verwaltung zur
-	 * Wiederverwendung vorhält. Wenn der {@link #getCacheSize() Pufferspeicher} voll ist, wird die weniger häufig genutzte Hälfte der Datenauszüge wieder
-	 * freigegeben. Die Auszüge werden in Blöcken von {@code 2 KB} Größe verwaltet.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class DataSourceCache extends AbstractDataSource {
-
-		/**
-		 * Diese Klasse implementiert einen Datenauszug.
-		 * 
-		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 */
-		private static final class Page {
-
-			/**
-			 * Dieses Feld definiert die Bitbreite der Anzahl der Byte in {@link #data}.
-			 */
-			public static final int BITS = 11;
-
-			/**
-			 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DataSource}.
-			 */
-			public final byte[] data;
-
-			/**
-			 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
-			 */
-			public int uses = 1;
-
-			/**
-			 * Dieser Konstruktor initialisiert den Datenauszug.
-			 */
-			public Page() {
-				this.data = new byte[1 << Page.BITS];
-				this.uses = 1;
-			}
-
-		}
-
-		/**
-		 * Dieses Feld speichert die {@link DataSource}.
-		 */
-		private final DataSource source;
-
-		/**
-		 * Dieses Feld speichert die Größe der {@link #source}.
-		 */
-		private final int length;
-
-		/**
-		 * Dieses Feld speichert die Datenauszüge.
-		 */
-		private final Page[] pages;
-
-		/**
-		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link Page}s.
-		 */
-		private int limit;
-
-		/**
-		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link Page}s. Dies wird in {@link #page(int)} modifiziert.
-		 */
-		private int count;
-
-		/**
-		 * Dieses Feld speichert die Navigationsposition.
-		 */
-		private int index;
-
-		/**
-		 * Dieser Konstruktor initialisiert das die {@link DataSource}. Wenn sich die {@link DataSource#length() Länge} der Nutzdaten in der gegebenen
-		 * {@link DataSource} später ändert, ist das Verhalten des {@link DataSourceCache} undefiniert.
-		 * 
-		 * @param source {@link DataSource}.
-		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link DataSource} {@code null} ist.
-		 */
-		public DataSourceCache(final DataSource source) throws IOException, NullPointerException {
-			this.source = source;
-			this.length = (int)source.length();
-			this.pages = new Page[((this.length + (1 << Page.BITS)) - 1) >> Page.BITS];
-			this.setCacheSize(0x010000);
-		}
-
-		/**
-		 * Diese Methode gibt den {@link Page#data Nutzdatenblock} der {@code index}-ten {@link Page} zurück. Diese wird bei Bedarf aus der {@link #source}
-		 * nachgeladen.
-		 * 
-		 * @param index Index der {@link Page}.
-		 * @return {@link Page#data Nutzdatenblock}.
-		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 */
-		private byte[] page(final int index) throws IOException {
-			final Page[] pages = this.pages;
-			Page page = pages[index];
-			if(page == null){
-				page = new Page();
-				final byte[] data = page.data;
-				final int offset = index << Page.BITS;
-				final DataSource source = this.source;
-				source.seek(offset);
-				source.readFully(data, 0, Math.min(1 << Page.BITS, this.length - offset));
-				int pageCount = this.count, pageLimit = this.limit;
-				if(pageCount < pageLimit) return data;
-				pageLimit = pageLimit < 0 ? 1 : (pageLimit + 1) / 2;
-				for(final int size = pages.length; pageCount > pageLimit;){
-					int uses = 0;
-					final int maxUses = Integer.MAX_VALUE / pageCount;
-					for(int i = 0; i < size; i++){
-						final Page item = pages[i];
-						if(item != null){
-							uses += (item.uses = Math.min(item.uses, maxUses - i));
-						}
-					}
-					final int minUses = uses / pageCount;
-					for(int i = 0; i < size; i++){
-						final Page item = pages[i];
-						if((item != null) && ((item.uses -= minUses) <= 0)){
-							pages[i] = null;
-							pageCount--;
-						}
-					}
-				}
-				this.count = pageCount + 1;
-				pages[index] = page;
-				return data;
-			}else{
-				page.uses++;
-				return page.data;
-			}
-		}
-
-		/**
-		 * Diese Methode gibt die Größe des Pufferspeichers zurück.
-		 * 
-		 * @return Größe des Pufferspeichers.
-		 */
-		public int getCacheSize() {
-			return this.limit << Page.BITS;
-		}
-
-		/**
-		 * Diese Methode setzt die Größe des Pufferspeichers.
-		 * 
-		 * @param value Größe des Pufferspeichers.
-		 */
-		public void setCacheSize(final int value) {
-			this.limit = Math.min(Math.max(1, value >> Page.BITS), this.pages.length);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public DataSource data() {
-			return this.source;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void seek(final long index) throws IOException {
-			this.index = (int)index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public long index() throws IOException {
-			return this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public long length() throws IOException {
-			return this.length;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-			final int index = this.index;
-			int page = index >> Page.BITS;
-			int srcPos = index & ((1 << Page.BITS) - 1);
-			final int destLength = offset + length;
-			for(int destPos = offset; destPos < destLength; page++){
-				final int count = Math.min(destLength - destPos, (1 << Page.BITS) - srcPos);
-				System.arraycopy(this.page(page), srcPos, array, destPos, count);
-				destPos += count;
-				srcPos = 0;
-			}
-			this.index = index + length;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void close() throws IOException {
-			this.source.close();
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einem {@link RandomAccessFile}.
 	 * 
 	 * @see RandomAccessFile
@@ -836,6 +624,218 @@ public interface Data {
 		public final void close() throws IOException {
 		}
 
+	}
+
+	/**
+	 * Diese Klasse implementiert eine gepufferte {@link DataSource}, welche Datenauszüge einer gegebenen {@link DataSource} in einer internen Verwaltung zur
+	 * Wiederverwendung vorhält. Wenn der {@link #getCacheSize() Pufferspeicher} voll ist, wird die weniger häufig genutzte Hälfte der Datenauszüge wieder
+	 * freigegeben. Die Auszüge werden in Blöcken von {@code 2 KB} Größe verwaltet.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class DataSourceCache extends AbstractDataSource {
+	
+		/**
+		 * Diese Klasse implementiert einen Datenauszug.
+		 * 
+		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
+		private static final class Page {
+	
+			/**
+			 * Dieses Feld definiert die Bitbreite der Anzahl der Byte in {@link #data}.
+			 */
+			public static final int BITS = 11;
+	
+			/**
+			 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DataSource}.
+			 */
+			public final byte[] data;
+	
+			/**
+			 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
+			 */
+			public int uses = 1;
+	
+			/**
+			 * Dieser Konstruktor initialisiert den Datenauszug.
+			 */
+			public Page() {
+				this.data = new byte[1 << Page.BITS];
+				this.uses = 1;
+			}
+	
+		}
+	
+		/**
+		 * Dieses Feld speichert die {@link DataSource}.
+		 */
+		private final DataSource source;
+	
+		/**
+		 * Dieses Feld speichert die Größe der {@link #source}.
+		 */
+		private final int length;
+	
+		/**
+		 * Dieses Feld speichert die Datenauszüge.
+		 */
+		private final Page[] pages;
+	
+		/**
+		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link Page}s.
+		 */
+		private int limit;
+	
+		/**
+		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link Page}s. Dies wird in {@link #page(int)} modifiziert.
+		 */
+		private int count;
+	
+		/**
+		 * Dieses Feld speichert die Navigationsposition.
+		 */
+		private int index;
+	
+		/**
+		 * Dieser Konstruktor initialisiert das die {@link DataSource}. Wenn sich die {@link DataSource#length() Länge} der Nutzdaten in der gegebenen
+		 * {@link DataSource} später ändert, ist das Verhalten des {@link DataSourceCache} undefiniert.
+		 * 
+		 * @param source {@link DataSource}.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die {@link DataSource} {@code null} ist.
+		 */
+		public DataSourceCache(final DataSource source) throws IOException, NullPointerException {
+			this.source = source;
+			this.length = (int)source.length();
+			this.pages = new Page[((this.length + (1 << Page.BITS)) - 1) >> Page.BITS];
+			this.setCacheSize(0x010000);
+		}
+	
+		/**
+		 * Diese Methode gibt den {@link Page#data Nutzdatenblock} der {@code index}-ten {@link Page} zurück. Diese wird bei Bedarf aus der {@link #source}
+		 * nachgeladen.
+		 * 
+		 * @param index Index der {@link Page}.
+		 * @return {@link Page#data Nutzdatenblock}.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 */
+		private byte[] page(final int index) throws IOException {
+			final Page[] pages = this.pages;
+			Page page = pages[index];
+			if(page == null){
+				page = new Page();
+				final byte[] data = page.data;
+				final int offset = index << Page.BITS;
+				final DataSource source = this.source;
+				source.seek(offset);
+				source.readFully(data, 0, Math.min(1 << Page.BITS, this.length - offset));
+				int pageCount = this.count, pageLimit = this.limit;
+				if(pageCount < pageLimit) return data;
+				pageLimit = pageLimit < 0 ? 1 : (pageLimit + 1) / 2;
+				for(final int size = pages.length; pageCount > pageLimit;){
+					int uses = 0;
+					final int maxUses = Integer.MAX_VALUE / pageCount;
+					for(int i = 0; i < size; i++){
+						final Page item = pages[i];
+						if(item != null){
+							uses += (item.uses = Math.min(item.uses, maxUses - i));
+						}
+					}
+					final int minUses = uses / pageCount;
+					for(int i = 0; i < size; i++){
+						final Page item = pages[i];
+						if((item != null) && ((item.uses -= minUses) <= 0)){
+							pages[i] = null;
+							pageCount--;
+						}
+					}
+				}
+				this.count = pageCount + 1;
+				pages[index] = page;
+				return data;
+			}else{
+				page.uses++;
+				return page.data;
+			}
+		}
+	
+		/**
+		 * Diese Methode gibt die Größe des Pufferspeichers zurück.
+		 * 
+		 * @return Größe des Pufferspeichers.
+		 */
+		public int getCacheSize() {
+			return this.limit << Page.BITS;
+		}
+	
+		/**
+		 * Diese Methode setzt die Größe des Pufferspeichers.
+		 * 
+		 * @param value Größe des Pufferspeichers.
+		 */
+		public void setCacheSize(final int value) {
+			this.limit = Math.min(Math.max(1, value >> Page.BITS), this.pages.length);
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DataSource data() {
+			return this.source;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void seek(final long index) throws IOException {
+			this.index = (int)index;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long index() throws IOException {
+			return this.index;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long length() throws IOException {
+			return this.length;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
+			final int index = this.index;
+			int page = index >> Page.BITS;
+			int srcPos = index & ((1 << Page.BITS) - 1);
+			final int destLength = offset + length;
+			for(int destPos = offset; destPos < destLength; page++){
+				final int count = Math.min(destLength - destPos, (1 << Page.BITS) - srcPos);
+				System.arraycopy(this.page(page), srcPos, array, destPos, count);
+				destPos += count;
+				srcPos = 0;
+			}
+			this.index = index + length;
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void close() throws IOException {
+			this.source.close();
+		}
+	
 	}
 
 	/**
