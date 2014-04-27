@@ -20,28 +20,38 @@ import bee.creative.xml.view.NodeView;
 public final class Decoder {
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Werten unterschiedlicher Größe, die aus einem {@link MFUDataSourceCache}
-	 * nachgeladen werden.
+	 * Diese Klasse implementiert ein Objekt zur Vorhaltung von Nutzdaten, deren Wiederverwendungen via {@link #uses} gezählt wird.
 	 * 
-	 * @see MFUDataSourceCache
+	 * @see AbstractPool
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static abstract class MFUItemCache extends MFUCache {
+	static abstract class AbstractPage {
 
 		/**
-		 * Dieses Feld speichert den {@link MFUDataSourceCache} zum Nachladen der Werte.
+		 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
 		 */
-		protected final DataSource fileCache;
+		public int uses = 1;
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Werten unterschiedlicher Größe, die aus einer {@link DataSource} nachgeladen
+	 * werden. Die verdrängung überzähliger vorgehaltener Daten erfolgt gemäß einer <i>most frequently used</i> Strategie.
+	 * 
+	 * @see DataSource
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static abstract class AbstractPool {
+
+		/**
+		 * Dieses Feld speichert die {@link DataSource} zum Nachladen der Werte.
+		 */
+		protected final DataSource source;
 
 		/**
 		 * Dieses Feld speichert den Beginn des Datenbereichs mit den Werten.
 		 */
-		protected int fileOffset;
-
-		/**
-		 * Dieses Feld speichert die Anzahl der Werte.
-		 */
-		protected int itemCount;
+		protected int offset;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Werte.
@@ -49,16 +59,82 @@ public final class Decoder {
 		protected int[] itemOffset;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MFUItemCache} mit den aus dem gegebenen {@link MFUDataSourceCache} geladenen Informatioen.
-		 * 
-		 * @param source {@link MFUDataSourceCache}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUTextValuePage}s.
-		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
+		 * Dieses Feld speichert die Anzahl der Werte.
 		 */
-		public MFUItemCache(final DataSource source, final int pageLimit) throws IOException, NullPointerException {
-			super(pageLimit);
-			this.fileCache = source;
+		protected int itemCount;
+
+		/**
+		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link AbstractPage}s.
+		 */
+		protected int pageLimit;
+
+		/**
+		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link AbstractPage}s. Dies wird in {@link #set(AbstractPage[], int, AbstractPage)} modifiziert.
+		 */
+		protected int pageCount;
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link AbstractPool} mit den aus dem gegebenen {@link DataSource} geladenen Informatioen.
+		 * 
+		 * @param source {@link DataSource}.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link TextValuePage}s.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 * @throws NullPointerException Wenn die {@link DataSource} {@code null} ist.
+		 */
+		public AbstractPool(final DataSource source, final int pageLimit) throws IOException, NullPointerException {
+			if(source == null) throw new NullPointerException();
+			this.source = source;
+			this.pageLimit = Math.max(pageLimit, 1);
+			this.pageCount = 0;
+		}
+
+		/**
+		 * Diese Methode setzt die {@code index}-te {@link AbstractPage} und verdrängt ggf. überzählige {@link AbstractPage}s. <br>
+		 * Es wird nicht geprüft, ob die gegebene bzw. die {@code index}-te {@link AbstractPage} im gegebenen Array {@code null} ist.
+		 * 
+		 * @param pages Array der {@link AbstractPage}s, in welchen aktuell {@link #pageCount} {@link AbstractPage}s verwaltet werden.
+		 * @param index Index der zusetzenden {@link AbstractPage}.
+		 * @param page zusetzende {@link AbstractPage}.
+		 */
+		protected final void set(final AbstractPage[] pages, final int index, final AbstractPage page) {
+			int pageCount = this.pageCount, pageLimit = this.pageLimit;
+			if(pageCount >= pageLimit){
+				pageLimit = pageLimit < 0 ? 1 : (pageLimit + 1) / 2;
+				final int size = pages.length;
+				while(pageCount > pageLimit){
+					int uses = 0;
+					final int maxUses = Integer.MAX_VALUE / pageCount;
+					for(int i = 0; i < size; i++){
+						final AbstractPage item = pages[i];
+						if(item != null){
+							uses += (item.uses = Math.min(item.uses, maxUses - i));
+						}
+					}
+					final int minUses = uses / pageCount;
+					for(int i = 0; i < size; i++){
+						final AbstractPage item = pages[i];
+						if((item != null) && ((item.uses -= minUses) <= 0)){
+							pages[i] = null;
+							pageCount--;
+						}
+					}
+				}
+			}
+			this.pageCount = pageCount + 1;
+			pages[index] = page;
+		}
+
+		/**
+		 * Diese Methode lädt {@link #offset} und überspringt den mit {@link #itemOffset} indizierten Datenbereich.
+		 * 
+		 * @param itemLength Länge eines Datenobjekts.
+		 * @throws IOException Wenn ein I/O-Fehler auftritt.
+		 */
+		protected final void loadFileOffset(final int itemLength) throws IOException {
+			final DataSource fileCache = this.source;
+			final int[] itemOffset = this.itemOffset;
+			this.offset = (int)fileCache.index();
+			fileCache.seek(this.offset + (itemOffset[itemOffset.length - 1] * itemLength));
 		}
 
 		/**
@@ -66,8 +142,8 @@ public final class Decoder {
 		 * 
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
-		protected void loadItemOffset() throws IOException {
-			final DataSource fileCache = this.fileCache;
+		protected final void loadItemOffset() throws IOException {
+			final DataSource fileCache = this.source;
 			final int size = fileCache.readInt() + 1, length = fileCache.readUnsignedByte();
 			final int[] offsets = new int[size];
 			offsets[0] = 0;
@@ -76,19 +152,6 @@ public final class Decoder {
 			}
 			this.itemCount = size - 1;
 			this.itemOffset = offsets;
-		}
-
-		/**
-		 * Diese Methode lädt {@link #fileOffset} und überspringt den mit {@link #itemOffset} indizierten Datenbereich.
-		 * 
-		 * @param itemLength Länge eines Datenobjekts.
-		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 */
-		protected void loadFileOffset(final int itemLength) throws IOException {
-			final DataSource fileCache = this.fileCache;
-			final int[] itemOffset = this.itemOffset;
-			this.fileOffset = (int)fileCache.index();
-			fileCache.seek(fileOffset + (itemOffset[itemOffset.length - 1] * itemLength));
 		}
 
 		/**
@@ -103,55 +166,73 @@ public final class Decoder {
 			return offsets[itemKey + 1] - offsets[itemKey];
 		}
 
+		/**
+		 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten {@link AbstractPage}s zurück.
+		 * 
+		 * @return maximale Anzahl der gleichzeitig verwalteten {@link AbstractPage}s.
+		 */
+		public int getPageLimit() {
+			return this.pageLimit;
+		}
+
+		/**
+		 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten {@link AbstractPage}s. <br>
+		 * Wenn die Anzahl der aktuell verwalteten {@link AbstractPage}s die maximale Anzahl überschreitet, wird die hälfte der {@link AbstractPage}s entfernt.
+		 * 
+		 * @param value maximale Anzahl der gleichzeitig verwalteten {@link AbstractPage}s.
+		 */
+		public void setPageLimit(final int value) {
+			this.pageLimit = value;
+		}
+
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Zeichenketten.
+	 * Diese Klasse implementiert eine {@link AbstractPage} zur Vorhaltung von Zeichenketten.
 	 * 
-	 * @see MFUTextValueCache
+	 * @see TextValuePool
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MFUTextValuePage extends MFUCachePage {
+	static final class TextValuePage extends AbstractPage {
 
 		/**
 		 * Dieses Feld definiert die Anzahl der Zeichenketten in {@link #data}.
 		 */
-		static public final int SIZE = 32;
+		static public final int BITS = 5;
 
 		/**
 		 * Dieses Feld speichert die vorgehaltenen Zeichenketten.
 		 */
-		public final String[] data = new String[MFUTextValuePage.SIZE];
+		public final String[] data = new String[1 << TextValuePage.BITS];
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Zeichenketten, die aus einem {@link MFUDataSourceCache} nachgeladen werden.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Zeichenketten, die aus eienr {@link DataSource} nachgeladen werden.
 	 * 
-	 * @see MFUDataSourceCache
-	 * @see MFUTextValuePage
+	 * @see TextValuePage
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MFUTextValueCache extends MFUItemCache {
+	static final class TextValuePool extends AbstractPool {
 
 		/**
-		 * Dieses Feld speichert die {@link MFUTextValuePage}s.
+		 * Dieses Feld speichert die {@link TextValuePage}s.
 		 */
-		protected final MFUTextValuePage[] pages;
+		final TextValuePage[] pages;
 
 		/**
-		 * Dieser Konstruktor initialisiert den {@link MFUTextValueCache} mit den aus dem gegebenen {@link MFUDataSourceCache} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
-		 * @param source {@link MFUDataSourceCache}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUTextValuePage}s.
+		 * @param owner Besitzer.
+		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link TextValuePage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
-		 * @throws NullPointerException Wenn die {@link MFUDataSourceCache} {@code null} ist.
+		 * @throws NullPointerException Wenn die {@link DataSource} {@code null} ist.
 		 */
-		public MFUTextValueCache(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
-			super(owner.fileCache, pageLimit);
+		public TextValuePool(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
+			super(owner.source, pageLimit);
 			this.loadItemOffset();
 			this.loadFileOffset(1);
-			this.pages = new MFUTextValuePage[((this.itemCount + MFUTextValuePage.SIZE) - 1) / MFUTextValuePage.SIZE];
+			this.pages = new TextValuePage[((this.itemCount + (1 << TextValuePage.BITS)) - 1) >> TextValuePage.BITS];
 		}
 
 		/**
@@ -163,9 +244,9 @@ public final class Decoder {
 		public String valueItem(final int itemKey) {
 
 			if((itemKey < 0) || (itemKey >= this.itemCount)) return null;
-			final MFUTextValuePage[] pages = this.pages;
-			final int pageIndex = itemKey / MFUTextValuePage.SIZE, dataIndex = itemKey & (MFUTextValuePage.SIZE - 1);
-			MFUTextValuePage page = pages[pageIndex];
+			final TextValuePage[] pages = this.pages;
+			final int pageIndex = itemKey >> TextValuePage.BITS, dataIndex = itemKey & ((1 << TextValuePage.BITS) - 1);
+			TextValuePage page = pages[pageIndex];
 			if(page != null){
 				final String value = page.data[dataIndex];
 				if(value != null){
@@ -173,120 +254,60 @@ public final class Decoder {
 					return value;
 				}
 			}else{
-				page = new MFUTextValuePage();
+				page = new TextValuePage();
 				this.set(pages, pageIndex, page);
 			}
 			final int[] offsets = this.itemOffset;
-			int offset = offsets[itemKey];
-			final int size = offsets[itemKey + 1] - offset;
-			offset += this.fileOffset;
-			final byte[] fileData = new byte[size];
-
+			final int offset = offsets[itemKey], length = offsets[itemKey + 1] - offset;
+			final byte[] array = new byte[length];
 			try{
-				fileCache.seek(offset);
-				fileCache.readFully(fileData);
-			}catch(IOException e){
+				final DataSource source = this.source;
+				source.seek(offset + this.offset);
+				source.readFully(array);
+			}catch(final IOException e){
 				throw new IllegalArgumentException(e);
 			}
-
-			//
-			// int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-			// offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-			// for(int i = 0; i < size; fileIndex++, offset = 0){
-			// final int length = Math.min(size - i, MFUDataSourceCachePage.SIZE - offset);
-			// System.arraycopy(this.fileCache.data(fileIndex), offset, fileData, i, length);
-			// i += length;
-			// }
-			final String value = new String(fileData, Encoder.CHARSET);
+			final String value = new String(array, Encoder.CHARSET);
 			page.data[dataIndex] = value;
 			return value;
 		}
 
 	}
 
-	// TODO enfernen
 	/**
-	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Attributknoten.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Attributknoten, die aus einem {@link DataSource} nachgeladen werden.
 	 * 
-	 * @see MFUAttrGroupCache
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MFUAttrGroupPage extends MFUCachePage {
-
-		/**
-		 * Dieses Feld definiert die Anzahl der Attributknoten in {@link #data}.
-		 */
-		public static final int SIZE = 64;
-
-		/**
-		 * Dieses Feld speichert die Daten der Attributknoten als Auflistung der Referenzen auf die URI, die Namen und die Werte.
-		 */
-		public final int[] data = new int[MFUAttrGroupPage.SIZE * 3];
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Attributknoten, die aus einem {@link MFUDataSourceCache} nachgeladen werden.
-	 * 
-	 * @see MFUDataSourceCache
-	 * @see MFUAttrGroupPage
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class MFUAttrGroupCache extends MFUItemCache {
+	static final class AttrGroupPool extends AbstractPool {
 
 		/**
 		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
 		 */
-		public final byte[] array = new byte[16];
+		final byte[] array = new byte[16];
 
 		/**
-		 * Dieses Feld speichert die {@link MFUAttrGroupPage}s.
+		 * Dieses Feld speichert die Länge der Referenzen auf die URIs, Namen und Werte sowie deren Summe in Byte.
 		 */
-		protected final MFUAttrGroupPage[] pages;
+		final int lengths;
 
 		/**
-		 * Dieses Feld speichert die Länge eines Attributknoten in Byte.
-		 */
-		protected final int itemLength;
-
-		// TODO refs zusammenfassen
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
-		 */
-		protected final int uriRefLength;
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die Namen in Byte.
-		 */
-		protected final int nameRefLength;
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die Werte in Byte.
-		 */
-		protected final int valueRefLength;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link MFUAttrGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link AttrGroupPool} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
 		 * 
 		 * @param owner {@link BEXDocuNode}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUAttrGroupPage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn der {@link BEXDocuNode} {@code null} ist.
 		 */
-		public MFUAttrGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException {
-			super(owner.fileCache, pageLimit);
+		public AttrGroupPool(final BEXDocuNode owner) throws IOException {
+			super(owner.source, 0);
 			this.loadItemOffset();
-			this.uriRefLength = Bytes.lengthOf(owner.attrUriCache.itemCount);
-			this.nameRefLength = Bytes.lengthOf(owner.attrNameCache.itemCount - 1);
-			this.valueRefLength = Bytes.lengthOf(owner.attrValueCache.itemCount - 1);
-			this.itemLength = this.uriRefLength + this.nameRefLength + this.valueRefLength;
-			this.loadFileOffset(this.itemLength);
-			this.pages = new MFUAttrGroupPage[((this.itemOffset[this.itemCount] + MFUAttrGroupPage.SIZE) - 1) / MFUAttrGroupPage.SIZE];
+			final int uriLength = Bytes.lengthOf(owner.attrUriPool.itemCount);
+			final int nameLength = Bytes.lengthOf(owner.attrNamePool.itemCount - 1);
+			final int valueLength = Bytes.lengthOf(owner.attrValuePool.itemCount - 1);
+			this.lengths = (uriLength << 15) | (nameLength << 10) | (valueLength << 5) | (uriLength + nameLength + valueLength);
+			this.loadFileOffset(this.lengths & 31);
 		}
 
-		final byte[] buff = new byte[16];
-		
 		/**
 		 * Diese Methode gibt den referenzierten Attributknoten zurück.
 		 * 
@@ -300,160 +321,66 @@ public final class Decoder {
 			final int[] offsets = this.itemOffset;
 			final int itemKey = offsets[groupKey] + nodeIndex;
 			if(itemKey >= offsets[groupKey + 1]) return null;
-			final int pageIndex = itemKey / MFUAttrGroupPage.SIZE, dataIndex = itemKey & (MFUAttrGroupPage.SIZE - 1);
-			final MFUAttrGroupPage[] pages = this.pages;
-			MFUAttrGroupPage page = pages[pageIndex];
-			int uriRef, nameRef, valueRef;
-			final int[] pageData;
-			if(page != null){
-				page.uses++;
-				pageData = page.data;
-				uriRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 0)];
-			}else{
-				page = new MFUAttrGroupPage();
-				pageData = page.data;
-				uriRef = 0;
-				this.set(pages, pageIndex, page);
+			final byte[] array = this.array;
+			final int lengths = this.lengths;
+			int length = lengths & 31, offset;
+			try{
+				this.source.seek((itemKey * length) + this.offset);
+				this.source.readFully(array, 0, length);
+			}catch(final IOException e){
+				throw new IllegalArgumentException(e);
 			}
-			if(uriRef != 0){
-				nameRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 1)];
-				valueRef = pageData[dataIndex + (MFUAttrGroupPage.SIZE * 2)];
-			}else{
-				int length = this.itemLength;
-				int offset = (itemKey * length) + this.fileOffset;
-				byte[] fileData = buff;
-				
-				try{
-					fileCache.seek(offset);
-					fileCache.readFully(fileData, 0, length);
-				}catch(IOException e){
-					throw new IllegalArgumentException(e);
-				}
-				
-				offset=0;
-//				byte[] fileData = this.fileCache.data(fileIndex);
-//
-//				
-//				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-//				
-//				
-//				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-//				final int remain = MFUDataSourceCachePage.SIZE - offset;
-//				if(length > remain){
-//					final byte[] array = this.array;
-//					System.arraycopy(fileData, offset, array, 0, remain);
-//					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
-//					fileData = array;
-//					offset = 0;
-//				}
-				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
-				nameRef = Bytes.getInt(fileData, offset = offset + length, length = this.nameRefLength);
-				valueRef = Bytes.getInt(fileData, offset + length, this.valueRefLength);
-				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 0)] = uriRef;
-				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 1)] = nameRef;
-				pageData[dataIndex + (MFUAttrGroupPage.SIZE * 2)] = valueRef;
-			}
+			final int uriRef = Bytes.getInt(array, 0, offset = (lengths >> 15) & 31) + 1;
+			final int nameRef = Bytes.getInt(array, offset, length = (lengths >> 10) & 31);
+			final int valueRef = Bytes.getInt(array, offset + length, (lengths >> 5) & 31);
 			return new BEXAttrNodeView(parent, nodeIndex, uriRef - 2, nameRef, valueRef);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link MFUCachePage} zur Vorhaltung von Element- und Textknoten.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Element- und Textknoten, die aus einem {@link DataSource} nachgeladen werden.
 	 * 
-	 * @see MFUElemGroupCache
+	 * @see DataSource
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	static final class MFUElemGroupPage extends MFUCachePage {
-
-		/**
-		 * Dieses Feld definiert die Anzahl der Element- und Textknoten in {@link #data}.
-		 */
-		public static final int SIZE = 64;
-
-		/**
-		 * Dieses Feld speichert die Daten der Element- und Textknoten als Auflistung der Referenzen auf die URI, die Namen, die Kindknotenlisten und die
-		 * Attributknotenlisten.
-		 */
-		public final int[] data = new int[MFUElemGroupPage.SIZE * 4];
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Verwaltung und Vorhaltung von Element- und Textknoten, die aus einem {@link MFUDataSourceCache} nachgeladen
-	 * werden.
-	 * 
-	 * @see MFUDataSourceCache
-	 * @see MFUElemGroupPage
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class MFUElemGroupCache extends MFUItemCache {
+	static final class ElemGroupPool extends AbstractPool {
 
 		/**
 		 * Dieses Feld speichert einen allgemein nutzbaren Lesepuffer mit 16 {@code byte}.
 		 */
-		public final byte[] array = new byte[16];
+		final byte[] array = new byte[16];
 
 		/**
-		 * Dieses Feld speichert dei {@link MFUElemGroupPage}s.
+		 * Dieses Feld speichert die Länge der Referenzen auf die URIs, Namen, Kindknotenlisten und Attributknotenlisten sowie deren Summe in Byte.
 		 */
-		protected final MFUElemGroupPage[] pages;
-
-		/**
-		 * Dieses Feld speichert die Länge eines Kindknoten in Byte.
-		 */
-		protected final int itemLength;
-
-		// TODO refs zusammenfassen
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die URIs in Byte.
-		 */
-		protected final int uriRefLength;
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die Namen in Byte.
-		 */
-		protected final int nameRefLength;
+		final int lengths;
 
 		/**
 		 * Dieses Feld speichert die Anzahl Textwerte als Startreferenz der Kindknotenlisten.
 		 */
-		protected final int valueRefOffset;
+		final int contentRef;
 
 		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die Kindknotenlisten in Byte.
-		 */
-		protected final int contentRefLength;
-
-		/**
-		 * Dieses Feld speichert die Länge der Referenzen auf die Attributknotenlisten in Byte.
-		 */
-		protected final int attributesRefLength;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link MFUElemGroupCache} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
+		 * Dieser Konstruktor initialisiert den {@link ElemGroupPool} mit den aus dem gegebenen {@link BEXDocuNode} geladenen Informatioen.
 		 * 
 		 * @param owner {@link BEXDocuNode}.
-		 * @param pageLimit maximale Anzahl der gleichzeitig verwalteten {@link MFUElemGroupPage}s.
 		 * @throws IOException Wenn ein I/O-Fehler auftritt.
 		 * @throws NullPointerException Wenn der {@link BEXDocuNode} {@code null} ist.
 		 */
-		public MFUElemGroupCache(final BEXDocuNode owner, final int pageLimit) throws IOException, NullPointerException {
-			super(owner.fileCache, pageLimit);
+		public ElemGroupPool(final BEXDocuNode owner) throws IOException, NullPointerException {
+			super(owner.source, 0);
 			this.loadItemOffset();
-			this.uriRefLength = Bytes.lengthOf(owner.elemUriCache.itemCount);
-			this.nameRefLength = Bytes.lengthOf(owner.elemNameCache.itemCount);
-			this.contentRefLength = Bytes.lengthOf((owner.elemValueCache.itemCount + this.itemOffset.length) - 1);
-			this.attributesRefLength = Bytes.lengthOf(owner.attrGroupCache.itemCount);
-			this.itemLength = this.uriRefLength + this.nameRefLength + this.contentRefLength + this.attributesRefLength;
-			this.loadFileOffset(this.itemLength);
-			this.pages = new MFUElemGroupPage[((this.itemOffset[this.itemCount] + MFUElemGroupPage.SIZE) - 1) / MFUElemGroupPage.SIZE];
-			this.pageLimit = Math.max(pageLimit, 1);
-			this.valueRefOffset = owner.elemValueCache.itemCount;
+			final int uriLength = Bytes.lengthOf(owner.elemUriPool.itemCount);
+			final int nameLength = Bytes.lengthOf(owner.elemNamePool.itemCount);
+			final int contentLength = Bytes.lengthOf((owner.elemValuePool.itemCount + this.itemOffset.length) - 1);
+			final int attributesLength = Bytes.lengthOf(owner.attrGroupPool.itemCount);
+			final int itemLength = uriLength + nameLength + contentLength + attributesLength;
+			this.lengths = (uriLength << 20) | (nameLength << 15) | (contentLength << 10) | (attributesLength << 5) | itemLength;
+			this.loadFileOffset(itemLength);
+			this.contentRef = owner.elemValuePool.itemCount;
 		}
-		final byte[] buff = new byte[16];
-		
+
 		/**
 		 * Diese Methode gibt den referenzierten Kindknoten zurück.
 		 * 
@@ -465,67 +392,27 @@ public final class Decoder {
 		public BEXNodeView item(final BEXNodeView parent, final int groupKey, final int nodeIndex) {
 			if((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
 			final int[] offsets = this.itemOffset;
-			int offset = offsets[groupKey] + nodeIndex;
-			if(offset >= offsets[groupKey + 1]) return null;
-			final int pageIndex = offset / MFUElemGroupPage.SIZE, dataIndex = offset & (MFUElemGroupPage.SIZE - 1);
-			final MFUElemGroupPage[] pages = this.pages;
-			MFUElemGroupPage page = pages[pageIndex];
-			final int[] pageData;
-			int uriRef, nameRef, contentRef, attributesRef;
-			if(page != null){
-				page.uses++;
-				pageData = page.data;
-				uriRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 0)];
-			}else{
-				this.set(pages, pageIndex, page = new MFUElemGroupPage());
-				pageData = page.data;
-				uriRef = 0;
+			final int itemKey = offsets[groupKey] + nodeIndex;
+			if(itemKey >= offsets[groupKey + 1]) return null;
+			final byte[] array = this.array;
+			final int lengths = this.lengths;
+			int length = lengths & 31, offset;
+			try{
+				final DataSource source = this.source;
+				source.seek((itemKey * length) + this.offset);
+				source.readFully(array, 0, length);
+			}catch(final IOException e){
+				throw new IllegalArgumentException(e);
 			}
-			if(uriRef != 0){
-				nameRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 1)];
-				contentRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 2)];
-				attributesRef = pageData[dataIndex + (MFUElemGroupPage.SIZE * 3)];
-			}else{
-				int length = this.itemLength;
-				offset = (offset * length) + this.fileOffset;
-				byte[] fileData = buff;
-				
-				try{
-					fileCache.seek(offset);
-					fileCache.readFully(fileData, 0, length);
-				}catch(IOException e){
-					throw new IllegalArgumentException(e);
-				}
-				offset = 0;
-				
-//				final int fileIndex = offset / MFUDataSourceCachePage.SIZE;
-//				byte[] fileData = this.fileCache.data(fileIndex);
-//				offset = offset & (MFUDataSourceCachePage.SIZE - 1);
-//				final int remain = MFUDataSourceCachePage.SIZE - offset;
-//				if(length > remain){
-//					final byte[] array = this.array;
-//					System.arraycopy(fileData, offset, array, 0, remain);
-//					System.arraycopy(this.fileCache.data(fileIndex + 1), 0, array, remain, length - remain);
-//					fileData = array;
-//					offset = 0;
-//				}
-				uriRef = Bytes.getInt(fileData, offset, length = this.uriRefLength) + 1;
-				offset += length;
-				nameRef = Bytes.getInt(fileData, offset, length = this.nameRefLength) - 1;
-				offset += length;
-				contentRef = Bytes.getInt(fileData, offset, length = this.contentRefLength) - 1;
-				offset += length;
-				attributesRef = Bytes.getInt(fileData, offset, this.attributesRefLength) - 1;
-				pageData[dataIndex + (MFUElemGroupPage.SIZE * 0)] = uriRef;
-				pageData[dataIndex + (MFUElemGroupPage.SIZE * 1)] = nameRef;
-				pageData[dataIndex + (MFUElemGroupPage.SIZE * 2)] = contentRef;
-				pageData[dataIndex + (MFUElemGroupPage.SIZE * 3)] = attributesRef;
-			}
-			final int childrenRef = contentRef - this.valueRefOffset;
+			final int uriRef = Bytes.getInt(array, 0, offset = (lengths >> 20) & 31) - 1;
+			final int nameRef = Bytes.getInt(array, offset, length = (lengths >> 15) & 31) - 1;
+			final int contentRef = Bytes.getInt(array, offset = offset + length, length = (lengths >> 10) & 31) - 1;
+			final int childrenRef = contentRef - this.contentRef;
+			final int attributesRef = Bytes.getInt(array, offset + length, (lengths >> 5) & 31) - 1;
 			if(nameRef < 0) return new BEXTextNodeView(parent, nodeIndex, contentRef);
-			if(contentRef < 0) return new BEXElemNodeView(parent, nodeIndex, uriRef - 2, nameRef, -1, attributesRef);
-			if(childrenRef < 0) return new BEXElemTextNodeView(parent, nodeIndex, uriRef - 2, nameRef, contentRef, attributesRef);
-			return new BEXElemNodeView(parent, nodeIndex, uriRef - 2, nameRef, childrenRef, attributesRef);
+			if(contentRef < 0) return new BEXElemNodeView(parent, nodeIndex, uriRef, nameRef, -1, attributesRef);
+			if(childrenRef < 0) return new BEXElemTextNodeView(parent, nodeIndex, uriRef, nameRef, contentRef, attributesRef);
+			return new BEXElemNodeView(parent, nodeIndex, uriRef, nameRef, childrenRef, attributesRef);
 		}
 
 	}
@@ -599,9 +486,6 @@ public final class Decoder {
 			return null;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		/**
 		 * {@inheritDoc}
 		 */
@@ -1193,48 +1077,48 @@ public final class Decoder {
 		/**
 		 * Dieses Feld speichert die {@link DataSource}.
 		 */
-		final DataSource fileCache;
+		final DataSource source;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#uri()}.
 		 */
-		final MFUTextValueCache attrUriCache;
+		final TextValuePool attrUriPool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#name()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#name()}.
 		 */
-		final MFUTextValueCache attrNameCache;
+		final TextValuePool attrNamePool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#value()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXAttrNodeView#value()}.
 		 */
-		final MFUTextValueCache attrValueCache;
+		final TextValuePool attrValuePool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Attributknotenlisten für {@link BEXElemNodeView#attributes()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Attributknotenlisten für {@link BEXElemNodeView#attributes()}.
 		 */
-		final MFUAttrGroupCache attrGroupCache;
+		final AttrGroupPool attrGroupPool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#uri()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#uri()}.
 		 */
-		final MFUTextValueCache elemUriCache;
+		final TextValuePool elemUriPool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#name()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXElemNodeView#name()}.
 		 */
-		final MFUTextValueCache elemNameCache;
+		final TextValuePool elemNamePool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Zeichenketten für {@link BEXTextNodeView#value()}.
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Zeichenketten für {@link BEXTextNodeView#value()}.
 		 */
-		final MFUTextValueCache elemValueCache;
+		final TextValuePool elemValuePool;
 
 		/**
-		 * Dieses Feld speichert den {@link MFUTextValueCache} zur Verwaltung der Kindknotenlisten für {@link BEXElemNodeView#children()} und
+		 * Dieses Feld speichert den {@link TextValuePool} zur Verwaltung der Kindknotenlisten für {@link BEXElemNodeView#children()} und
 		 * {@link BEXDocuNode#children()}.
 		 */
-		final MFUElemGroupCache elemGroupCache;
+		final ElemGroupPool elemGroupPool;
 
 		/**
 		 * Dieses Feld speichert die Referenz auf die Kindknotenliste des {@link Document}s.
@@ -1249,17 +1133,16 @@ public final class Decoder {
 		 * @throws IOException Wenn beim Lesen ein Fehler auftritt.
 		 */
 		public BEXDocuNode(final DataSource source, final Decoder decoder) throws IOException {
-			this.fileCache = source;
-			this.attrUriCache = new MFUTextValueCache(this, decoder.maxAttrUriCachePages);
-			this.attrNameCache = new MFUTextValueCache(this, decoder.maxAttrNameCachePages);
-			this.attrValueCache = new MFUTextValueCache(this, decoder.maxAttrValueCachePages);
-			this.attrGroupCache = new MFUAttrGroupCache(this, decoder.maxAttrGroupCachePages);
-			this.elemUriCache = new MFUTextValueCache(this, decoder.maxElemUriCachePages);
-			this.elemNameCache = new MFUTextValueCache(this, decoder.maxElemNameCachePages);
-			this.elemValueCache = new MFUTextValueCache(this, decoder.maxElemValueCachePages);
-			this.elemGroupCache = new MFUElemGroupCache(this, decoder.maxElemGroupCachePages);
-			this.childrenRef = this.fileCache.readInt(this.elemGroupCache.contentRefLength) - this.elemValueCache.itemCount - 1;
-			// this.fileCache.allocate((int)(source.index() - this.fileCache.offset()));
+			this.source = source;
+			this.attrUriPool = new TextValuePool(this, decoder.maxAttrUriCachePages);
+			this.attrNamePool = new TextValuePool(this, decoder.maxAttrNameCachePages);
+			this.attrValuePool = new TextValuePool(this, decoder.maxAttrValueCachePages);
+			this.attrGroupPool = new AttrGroupPool(this);
+			this.elemUriPool = new TextValuePool(this, decoder.maxElemUriCachePages);
+			this.elemNamePool = new TextValuePool(this, decoder.maxElemNameCachePages);
+			this.elemValuePool = new TextValuePool(this, decoder.maxElemValueCachePages);
+			this.elemGroupPool = new ElemGroupPool(this);
+			this.childrenRef = this.source.readInt((this.elemGroupPool.lengths >> 10) & 31) - this.elemValuePool.itemCount - 1;
 		}
 
 		/**
@@ -1269,7 +1152,7 @@ public final class Decoder {
 		 * @return URI.
 		 */
 		public String attrNodeUri(final int key) {
-			return this.attrUriCache.valueItem(key);
+			return this.attrUriPool.valueItem(key);
 		}
 
 		/**
@@ -1279,7 +1162,7 @@ public final class Decoder {
 		 * @return Name.
 		 */
 		public String attrNodeName(final int key) {
-			return this.attrNameCache.valueItem(key);
+			return this.attrNamePool.valueItem(key);
 		}
 
 		/**
@@ -1289,7 +1172,7 @@ public final class Decoder {
 		 * @return Wert.
 		 */
 		public String attrNodeValue(final int key) {
-			return this.attrValueCache.valueItem(key);
+			return this.attrValuePool.valueItem(key);
 		}
 
 		/**
@@ -1299,7 +1182,7 @@ public final class Decoder {
 		 * @return Anzahl der Attributknoten.
 		 */
 		public int attrGroupSize(final int key) {
-			return this.attrGroupCache.size(key);
+			return this.attrGroupPool.size(key);
 		}
 
 		/**
@@ -1311,7 +1194,7 @@ public final class Decoder {
 		 * @return {@link BEXAttrNodeView} oder {@code null}.
 		 */
 		public BEXAttrNodeView attrGroupItem(final BEXElemNodeView parent, final int key, final int index) {
-			return this.attrGroupCache.item(parent, key, index);
+			return this.attrGroupPool.item(parent, key, index);
 		}
 
 		/**
@@ -1321,7 +1204,7 @@ public final class Decoder {
 		 * @return URI.
 		 */
 		public String elemNodeUri(final int key) {
-			return this.elemUriCache.valueItem(key);
+			return this.elemUriPool.valueItem(key);
 		}
 
 		/**
@@ -1331,7 +1214,7 @@ public final class Decoder {
 		 * @return Name.
 		 */
 		public String elemNodeName(final int key) {
-			return this.elemNameCache.valueItem(key);
+			return this.elemNamePool.valueItem(key);
 		}
 
 		/**
@@ -1341,7 +1224,7 @@ public final class Decoder {
 		 * @return Wert.
 		 */
 		public String elemNodeValue(final int key) {
-			return this.elemValueCache.valueItem(key);
+			return this.elemValuePool.valueItem(key);
 		}
 
 		/**
@@ -1351,7 +1234,7 @@ public final class Decoder {
 		 * @return Anzahl der Kindknoten.
 		 */
 		public int elemGroupSize(final int key) {
-			return this.elemGroupCache.size(key);
+			return this.elemGroupPool.size(key);
 		}
 
 		/**
@@ -1363,7 +1246,7 @@ public final class Decoder {
 		 * @return {@link BEXTextNodeView}, {@link BEXElemNodeView} oder {@code null}.
 		 */
 		public BEXNodeView elemGroupItem(final BEXNodeView parent, final int key, final int index) {
-			return this.elemGroupCache.item(parent, key, index);
+			return this.elemGroupPool.item(parent, key, index);
 		}
 
 		/**
@@ -1409,11 +1292,6 @@ public final class Decoder {
 	}
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource}.
-	 */
-	int maxFileCachePages;
-
-	/**
 	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}.
 	 */
 	int maxAttrUriCachePages;
@@ -1427,11 +1305,6 @@ public final class Decoder {
 	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}.
 	 */
 	int maxAttrValueCachePages;
-
-	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()}.
-	 */
-	int maxAttrGroupCachePages;
 
 	/**
 	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}.
@@ -1449,36 +1322,24 @@ public final class Decoder {
 	int maxElemValueCachePages;
 
 	/**
-	 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
-	 * {@link BEXDocuNode#children()}.
-	 */
-	int maxElemGroupCachePages;
-
-	/**
 	 * Dieser Konstruktor initialisiert die maximalen Anzahlen der vorgehaltenen Datenblöcke wie folgt:
 	 * 
 	 * <pre>
-	 * setMaxFileCachePages(128);
 	 * setMaxAttrUriCachePages(32);
 	 * setMaxAttrNameCachePages(32);
 	 * setMaxAttrValueCachePages(64);
-	 * setMaxAttrGroupCachePages(128);
 	 * setMaxElemUriCachePages(32);
 	 * setMaxElemNameCachePages(32);
 	 * setMaxElemValueCachePages(64);
-	 * setMaxElemGroupCachePages(128);
 	 * </pre>
 	 */
 	public Decoder() {
-		this.setMaxFileCachePages(128);
 		this.setMaxAttrUriCachePages(32);
 		this.setMaxAttrNameCachePages(32);
 		this.setMaxAttrValueCachePages(64);
-		this.setMaxAttrGroupCachePages(128);
 		this.setMaxElemUriCachePages(32);
 		this.setMaxElemNameCachePages(32);
 		this.setMaxElemValueCachePages(64);
-		this.setMaxElemGroupCachePages(128);
 	}
 
 	/**
@@ -1493,28 +1354,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource} zurück. Jeder Block enthält bis zu
-	 * {@value MFUDataSourceCachePage#SIZE} Byte.
-	 * 
-	 * @return maximale Anzahl.
-	 */
-	public int getMaxFileCachePages() {
-		return this.maxFileCachePages;
-	}
-
-	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten {@code byte}-Blöcke einer {@link DataSource}. Jeder Block enthält bis zu
-	 * {@value MFUDataSourceCachePage#SIZE} Byte.
-	 * 
-	 * @param value maximale Anzahl.
-	 */
-	public void setMaxFileCachePages(final int value) {
-		this.maxFileCachePages = value;
-	}
-
-	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} URIs.
+	 * {@code 32} URIs.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1523,8 +1364,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} URIs.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXAttrNodeView#uri()}. Jeder Block enthält bis zu {@code 32}
+	 * URIs.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1534,7 +1375,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Namen.
+	 * {@code 32} Namen.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1543,8 +1384,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Namen.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXAttrNodeView#name()}. Jeder Block enthält bis zu {@code 32}
+	 * Namen.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1554,7 +1395,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Werte.
+	 * {@code 32} Werte.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1563,8 +1404,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Werte.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXAttrNodeView#value()}. Jeder Block enthält bis zu {@code 32}
+	 * Werte.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1573,28 +1414,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()} zurück. Jeder Block
-	 * enthält bis zu {@value MFUAttrGroupPage#SIZE} Kindknoten.
-	 * 
-	 * @return maximale Anzahl.
-	 */
-	public int getMaxAttrGroupCachePages() {
-		return this.maxAttrGroupCachePages;
-	}
-
-	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Attributknoten-Blöcke zu {@link BEXElemNodeView#attributes()}. Jeder Block enthält bis
-	 * zu {@value MFUAttrGroupPage#SIZE} Kindknoten.
-	 * 
-	 * @param value maximale Anzahl.
-	 */
-	public void setMaxAttrGroupCachePages(final int value) {
-		this.maxAttrGroupCachePages = value;
-	}
-
-	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} URIs.
+	 * {@code 32} URIs.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1603,8 +1424,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} URIs.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten URI-Blöcke zu {@link BEXElemNodeView#uri()}. Jeder Block enthält bis zu {@code 32}
+	 * URIs.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1614,7 +1435,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Namen.
+	 * {@code 32} Namen.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1623,8 +1444,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Namen.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Name-Blöcke zu {@link BEXElemNodeView#name()}. Jeder Block enthält bis zu {@code 32}
+	 * Namen.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1634,7 +1455,7 @@ public final class Decoder {
 
 	/**
 	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()} zurück. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Werte.
+	 * {@code 32} Werte.
 	 * 
 	 * @return maximale Anzahl.
 	 */
@@ -1643,8 +1464,8 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()}. Jeder Block enthält bis zu
-	 * {@value MFUTextValuePage#SIZE} Werte.
+	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Wert-Blöcke zu {@link BEXTextNodeView#value()}. Jeder Block enthält bis zu {@code 32}
+	 * Werte.
 	 * 
 	 * @param value maximale Anzahl.
 	 */
@@ -1653,34 +1474,13 @@ public final class Decoder {
 	}
 
 	/**
-	 * Diese Methode gibt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
-	 * {@link BEXDocuNode#children()} zurück. Jeder Block enthält bis zu {@value MFUElemGroupPage#SIZE} Kindknoten.
-	 * 
-	 * @return maximale Anzahl.
-	 */
-	public int getMaxElemGroupCachePages() {
-		return this.maxElemGroupCachePages;
-	}
-
-	/**
-	 * Diese Methode setzt die maximale Anzahl der gleichzeitig verwalteten Kindknoten-Blöcke zu {@link BEXElemNodeView#children()} und
-	 * {@link BEXDocuNode#children()} . Jeder Block enthält bis zu {@value MFUElemGroupPage#SIZE} Kindknoten.
-	 * 
-	 * @param value maximale Anzahl.
-	 */
-	public void setMaxElemGroupCachePages(final int value) {
-		this.maxElemGroupCachePages = value;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCallFormat(true, true, this, "maxFileCachePages", this.maxFileCachePages, "maxAttrUriCachePages", this.maxAttrUriCachePages,
-			"maxAttrNameCachePages", this.maxAttrNameCachePages, "maxAttrValueCachePages", this.maxAttrValueCachePages, "maxAttrGroupCachePages",
-			this.maxAttrGroupCachePages, "maxElemUriCachePages", this.maxElemUriCachePages, "maxElemNameCachePages", this.maxElemNameCachePages,
-			"maxElemValueCachePages", this.maxElemValueCachePages, "maxElemGroupCachePages", this.maxElemGroupCachePages);
+		return Objects.toStringCallFormat(true, true, this, "maxFileCachePages", this.maxAttrUriCachePages, "maxAttrNameCachePages", this.maxAttrNameCachePages,
+			"maxAttrValueCachePages", this.maxAttrValueCachePages, "maxElemUriCachePages", this.maxElemUriCachePages, "maxElemNameCachePages",
+			this.maxElemNameCachePages, "maxElemValueCachePages", this.maxElemValueCachePages);
 	}
 
 }
