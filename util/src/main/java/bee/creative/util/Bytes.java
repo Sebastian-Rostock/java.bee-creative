@@ -635,20 +635,20 @@ public final class Bytes {
 	 * Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
 	 * 
 	 * @param value positiver Wert.
-	 * @return Länge.
+	 * @return Länge (0..4).
 	 */
 	public static int lengthOf(final int value) {
-		return value == 0 ? 0 : value > 0x0FFFF ? (value > 0xFFFFFF ? 4 : 3) : (value > 0xFF ? 2 : 1);
+		return (value > 0xFFFF) ? (value > 0xFFFFFF ? 4 : 3) : (value > 0xFF ? 2 : value > 0x00 ? 1 : 0);
 	}
 
 	/**
 	 * Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
 	 * 
 	 * @param value positiver Wert.
-	 * @return Länge.
+	 * @return Länge (0..8).
 	 */
 	public static int lengthOf(final long value) {
-		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) : Bytes.lengthOf((int)value);
+		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
 	}
 
 	/**

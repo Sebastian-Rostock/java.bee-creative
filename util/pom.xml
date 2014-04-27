@@ -6,6 +6,6 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>3.2.11</version>
+	<version>3.2.12</version>
 	<artifactId>bee-creative.util</artifactId>
 </project>
