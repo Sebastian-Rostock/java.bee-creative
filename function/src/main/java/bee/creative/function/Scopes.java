@@ -2,7 +2,6 @@ package bee.creative.function;
 
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
-import bee.creative.function.Values.ReturnValue;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
@@ -37,11 +36,7 @@ public final class Scopes {
 		 */
 		@Override
 		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for(int i = 0, size = this.size(); i < size; i++){
-				hash = (hash * 0x01000193) ^ Objects.hash(this.get(i));
-			}
-			return hash;
+			return Array.valueOf(this).hashCode();
 		}
 
 		/**
@@ -52,11 +47,7 @@ public final class Scopes {
 			if(object == this) return true;
 			if(!(object instanceof Scope)) return false;
 			final Scope data = (Scope)object;
-			final int size = this.size();
-			if(data.size() != size) return false;
-			for(int i = 0; i < size; i++)
-				if(!Objects.equals(this.get(i), data.get(i))) return false;
-			return true;
+			return Array.valueOf(this).equals(Array.valueOf(data));
 		}
 
 		/**
@@ -128,7 +119,17 @@ public final class Scopes {
 		/**
 		 * Dieses Feld speichert die Parameterwerte.
 		 */
-		final Value[] values;
+		final Array values;
+
+		/**
+		 * Dieses Feld speichert die Anzahl der Parameterwerte.
+		 */
+		final int length;
+
+		/**
+		 * Dieses Feld speichert den Korrekturwert für den Index der zusätzlichen Parameterwerte.
+		 */
+		final int offset;
 
 		/**
 		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterwerte. Das Kontextobjekt sowie die zusätzlichen Parameterwerte
@@ -138,10 +139,8 @@ public final class Scopes {
 		 * @param values Parameterwerte.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ValueScope(final Scope scope, final Value... values) throws NullPointerException {
-			if((scope == null) || (values == null)) throw new NullPointerException();
-			this.scope = scope;
-			this.values = values;
+		public ValueScope(final Scope scope, final Array values) throws NullPointerException {
+			this.offset = (this.scope = scope).size() - (this.length = (this.values = values).length());
 		}
 
 		/**
@@ -153,15 +152,7 @@ public final class Scopes {
 		 */
 		@Override
 		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
-			final Value[] values = this.values;
-			final int length = values.length;
-			if(index >= length){
-				final Scope scope = this.scope;
-				return scope.get((index - length) + scope.size());
-			}
-			final Value value = values[index];
-			if(value == null) throw new NullPointerException();
-			return value;
+			return index >= this.length ? this.scope.get(index + this.offset) : this.values.get(index);
 		}
 
 		/**
@@ -169,7 +160,7 @@ public final class Scopes {
 		 */
 		@Override
 		public int size() {
-			return this.values.length;
+			return this.length;
 		}
 
 		/**
@@ -190,12 +181,12 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt eine Kopie der Parameterwerte zurück.
+		 * Diese Methode gibt die Parameterwerte zurück.
 		 * 
-		 * @return Kopie der Parameterwerte.
+		 * @return Parameterwerte.
 		 */
-		public Value[] values() {
-			return this.values.clone();
+		public Array values() {
+			return this.values;
 		}
 
 		/**
@@ -287,7 +278,6 @@ public final class Scopes {
 	 * gegebener Parameterfunktionen ermittelt werden. Die Parameterfunktionen werden zur Ermittlung der Parameterwerte einmalig mit dem gegebenen
 	 * Ausführungskontext aufgerufen. Deren Ergebniswerte werden dann zur Wiederverwendung zwischengespeichert.
 	 * 
-	 * @see ReturnValue
 	 * @see CompositeFunction
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -324,19 +314,21 @@ public final class Scopes {
 
 		/**
 		 * {@inheritDoc} Diese entsprechen hierbei den Parameterwerten des übergeordneten Ausführungskontext, die über {@code this.scope().get(index - this.size())}
-		 * ermittelt werden. Die Auswertung der Parameterfunktionen erfolgt über {@link ReturnValue}s.
+		 * ermittelt werden.
 		 * 
 		 * @see #scope()
-		 * @throws NullPointerException Wenn die {@code index}-te Parameterfunktion {@code null} ist.
+		 * @throws NullPointerException Wenn die {@code index}-te Parameterfunktion bzw. ihr Ergebniswert {@code null} ist.
 		 */
 		@Override
 		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 			final Value[] values = this.values;
 			final int length = values.length;
 			if(index >= length) return this.scope.get(index - length);
-			final Value value = values[index];
+			Value value = values[index];
 			if(value != null) return value;
-			return values[index] = new ReturnValue(this.scope, this.functions[index]);
+			value = this.functions[index].execute(this.scope);
+			if(value == null) throw new NullPointerException();
+			return values[index] = value;
 		}
 
 		/**

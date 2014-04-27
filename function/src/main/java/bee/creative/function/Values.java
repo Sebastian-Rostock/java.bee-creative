@@ -1,6 +1,5 @@
 package bee.creative.function;
 
-import java.util.Arrays;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
@@ -21,6 +20,88 @@ import bee.creative.util.Objects;
 public final class Values {
 
 	/**
+	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch die {@link #data() Nutzdaten} und der {@link #type() Datentyp} fehlen.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static abstract class AbstractValue implements Value {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
+			return type.valueOf(this);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see Objects#hash(Object)
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.data());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see Objects#equals(Object, Object)
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof Value)) return false;
+			final Value data = (Value)object;
+			return Objects.equals(this.type(), data.type()) && Objects.equals(this.data(), data.data());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.data());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen abstrakten Wert mit {@link #data() Nutzdaten}, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
+	 * 
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GData> Typ der Nutzdaten.
+	 */
+	public static abstract class AbstractValue2<GData> extends AbstractValue {
+
+		/**
+		 * Dieses Feld speichert die Nutzdaten.
+		 */
+		final GData data;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public AbstractValue2(final GData data) throws NullPointerException {
+			if(data == null) throw new NullPointerException();
+			this.data = data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GData data() {
+			return this.data;
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert den Ergebniswert einer Funktion mit {@code call-by-reference}-Semantik, welcher eine gegebene Funktion erst dann mit einem
 	 * gegebenen Ausführungskontext einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Nutzdaten} gelesen werden. Der von der Funktion
 	 * berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der Funktion werden die Verweise auf
@@ -29,7 +110,19 @@ public final class Values {
 	 * @see CompositeScope
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ReturnValue implements Value {
+	public static final class LazyValue implements Value {
+
+		/**
+		 * Diese Methode konvertiert den gegebenen Funktionsaufruf in einen {@link LazyValue} und gibt diesen zurück.
+		 * 
+		 * @param scope Ausführungskontext.
+		 * @param function auszuwertende Funktion.
+		 * @return {@link LazyValue}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public static LazyValue valueOf(final Scope scope, final Function function) throws NullPointerException {
+			return new LazyValue(scope, function);
+		}
 
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
@@ -59,7 +152,7 @@ public final class Values {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
+		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
 			if((scope == null) || (function == null)) throw new NullPointerException();
 			this.scope = scope;
 			this.function = function;
@@ -155,88 +248,6 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch die {@link #data() Nutzdaten} und der {@link #type() Datentyp} fehlen.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static abstract class AbstractValue implements Value {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return type.valueOf(this);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * 
-		 * @see Objects#hashEx(Object)
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hashEx(this.data());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * 
-		 * @see Objects#equalsEx(Object, Object)
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Value)) return false;
-			final Value data = (Value)object;
-			return Objects.equals(this.type(), data.type()) && Objects.equalsEx(this.data(), data.data());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.data());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten Wert mit {@link #data() Nutzdaten}, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Nutzdaten.
-	 */
-	public static abstract class AbstractValue2<GData> extends AbstractValue {
-
-		/**
-		 * Dieses Feld speichert die Nutzdaten.
-		 */
-		final GData data;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public AbstractValue2(final GData data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GData data() {
-			return this.data;
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert den Wert zu {@code null}.
 	 * 
 	 * @see NullType
@@ -290,198 +301,12 @@ public final class Values {
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends AbstractValue2<Value[]> {
+	public static final class ArrayValue extends AbstractValue2<Array> {
 
 		/**
 		 * Dieses Feld speichert den {@link ArrayType}.
 		 */
 		public static final ArrayType TYPE = new ArrayType();
-
-		/**
-		 * Diese Methode konvertiert die gegebenen Nutzdaten in einen {@link ArrayValue} und gibt diesen oder {@code null} zurück. Wenn der Datensatz kein Array
-		 * ist, wird {@code null} zurück gegeben.
-		 * 
-		 * @see ArrayValue#valueOf(int[])
-		 * @see ArrayValue#valueOf(long[])
-		 * @see ArrayValue#valueOf(byte[])
-		 * @see ArrayValue#valueOf(char[])
-		 * @see ArrayValue#valueOf(short[])
-		 * @see ArrayValue#valueOf(float[])
-		 * @see ArrayValue#valueOf(double[])
-		 * @see ArrayValue#valueOf(boolean[])
-		 * @see ArrayValue#valueOf(Value[])
-		 * @see ArrayValue#valueOf(Object[])
-		 * @param data Datensatz.
-		 * @return {@link ArrayValue} oder {@code null}.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final Object data) throws NullPointerException {
-			final Class<?> clazz = data.getClass();
-			if(!clazz.isArray()) return null;
-			if(clazz == int[].class) return ArrayValue.valueOf((int[])data);
-			if(clazz == long[].class) return ArrayValue.valueOf((long[])data);
-			if(clazz == byte[].class) return ArrayValue.valueOf((byte[])data);
-			if(clazz == char[].class) return ArrayValue.valueOf((char[])data);
-			if(clazz == short[].class) return ArrayValue.valueOf((short[])data);
-			if(clazz == float[].class) return ArrayValue.valueOf((float[])data);
-			if(clazz == double[].class) return ArrayValue.valueOf((double[])data);
-			if(clazz == boolean[].class) return ArrayValue.valueOf((boolean[])data);
-			if(clazz == Value[].class) return ArrayValue.valueOf((Value[])data);
-			return ArrayValue.valueOf((Object[])data);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(int)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final byte[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(int)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final short[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(int)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final char[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(int)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final int[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(long)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final long[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(float)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final float[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Zahlenliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see NumberValue#valueOf(double)
-		 * @param data Zahlenliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final double[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NumberValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Wahrheitswertliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see BooleanValue#valueOf(boolean)
-		 * @param data Wahrheitswertliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final boolean[] data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = BooleanValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Objektliste in einen {@link ArrayValue} und gibt diesen zurück.
-		 * 
-		 * @see Values#valueOf(Object)
-		 * @param data Objektliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final Object... data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = Values.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
 
 		/**
 		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück.
@@ -490,23 +315,8 @@ public final class Values {
 		 * @return {@link ArrayValue}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public static ArrayValue valueOf(final Value... data) throws NullPointerException {
-			final int size = data.length;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = NullValue.valueOf(data[i]);
-			}
-			return new ArrayValue(0, values);
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert den Datensatz ohne Prüfung.
-		 * 
-		 * @param IGNORE IGNORTIERT.
-		 * @param data Datensatz.
-		 */
-		ArrayValue(final int IGNORE, final Value[] data) {
-			super(data);
+		public static ArrayValue valueOf(final Array data) throws NullPointerException {
+			return new ArrayValue(data);
 		}
 
 		/**
@@ -515,9 +325,8 @@ public final class Values {
 		 * @param data Datensatz.
 		 * @throws NullPointerException Wenn der Datensatz {@code null} ist oder enthält.
 		 */
-		public ArrayValue(final Value... data) throws NullPointerException {
+		public ArrayValue(final Array data) throws NullPointerException {
 			super(data);
-			if(Arrays.asList(data).contains(null)) throw new NullPointerException();
 		}
 
 		/**
@@ -680,46 +489,6 @@ public final class Values {
 		 * 
 		 * @param data Zahlenwert.
 		 * @return {@link NumberValue}.
-		 */
-		public static NumberValue valueOf(final int data) {
-			return new NumberValue(Integer.valueOf(data));
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
-		 * 
-		 * @param data Zahlenwert.
-		 * @return {@link NumberValue}.
-		 */
-		public static NumberValue valueOf(final long data) {
-			return new NumberValue(Long.valueOf(data));
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
-		 * 
-		 * @param data Zahlenwert.
-		 * @return {@link NumberValue}.
-		 */
-		public static NumberValue valueOf(final float data) {
-			return new NumberValue(Float.valueOf(data));
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
-		 * 
-		 * @param data Zahlenwert.
-		 * @return {@link NumberValue}.
-		 */
-		public static NumberValue valueOf(final double data) {
-			return new NumberValue(Double.valueOf(data));
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
-		 * 
-		 * @param data Zahlenwert.
-		 * @return {@link NumberValue}.
 		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
 		 */
 		public static NumberValue valueOf(final Number data) throws NullPointerException {
@@ -854,8 +623,8 @@ public final class Values {
 		if(data instanceof Number) return NumberValue.valueOf((Number)data);
 		if(data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
 		if(data instanceof Function) return FunctionValue.valueOf((Function)data);
-		final Value value = ArrayValue.valueOf(data);
-		if(value != null) return value;
+		final Array array = Array.from(data);
+		if(array != null) return ArrayValue.valueOf(array);
 		return ObjectValue.valueOf(data);
 	}
 

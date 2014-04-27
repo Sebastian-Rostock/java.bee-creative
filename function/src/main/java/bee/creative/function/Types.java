@@ -179,7 +179,7 @@ public class Types {
 	 * @see ArrayValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayType extends AbstractType2<ArrayValue> implements Converter<Value, Value[]> {
+	public static final class ArrayType extends AbstractType2<ArrayValue> implements Converter<Value, Array> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -191,7 +191,7 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den leeren {@link ArrayValue}.
 		 */
-		public static final ArrayValue NULL_VALUE = new ArrayValue(0, new Value[0]);
+		public static final ArrayValue NULL_VALUE = new ArrayValue(Array.valueOf());
 
 		/**
 		 * {@inheritDoc}
@@ -204,7 +204,7 @@ public class Types {
 				case ArrayType.ID:
 					return (ArrayValue)value;
 				default:
-					return new ArrayValue(0, new Value[]{value});
+					return ArrayValue.valueOf(Array.valueOf(value));
 			}
 		}
 
@@ -235,7 +235,7 @@ public class Types {
 		 * @see #valueOf(Value)
 		 */
 		@Override
-		public Value[] convert(final Value input) {
+		public Array convert(final Value input) {
 			return this.valueOf(input).data();
 		}
 

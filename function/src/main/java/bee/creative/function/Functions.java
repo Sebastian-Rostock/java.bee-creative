@@ -5,6 +5,7 @@ import bee.creative.function.Scopes.ValueScope;
 import bee.creative.function.Types.NullType;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
+import bee.creative.function.Values.LazyValue;
 import bee.creative.function.Values.NullValue;
 import bee.creative.util.Objects;
 
@@ -17,6 +18,110 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Functions {
+
+	/**
+	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link LazyValue} zu einer gegebenen,
+	 * auszuwertenden Funktion ist.
+	 * 
+	 * @see LazyValue
+	 * @see LazyFunction#execute(Scope)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class LazyFunction implements Function {
+
+		/**
+		 * Diese Methode konvertiert die gegebene Funktion in eine {@link LazyFunction} und gibt diese zurück.
+		 * 
+		 * @param value auszuwertende Funktion.
+		 * @return {@link LazyFunction}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public static LazyFunction valueOf(final Function value) throws NullPointerException {
+			return new LazyFunction(value);
+		}
+
+		/**
+		 * Diese Methode überführt die gegebenen, komponierte Funktion in eine komponierte Funktion, bei der jede Parameterfunktion in eine {@link LazyFunction}
+		 * konvertiert wurde, und gibt diese zurück.
+		 * 
+		 * @param function komponierte Funktion.
+		 * @return komponierte Funktion mit {@link LazyFunction}s als Parameterfunktionen.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public static CompositeFunction applyTo(final CompositeFunction function) throws NullPointerException {
+			final Function[] functions = function.functions.clone();
+			for(int i = 0, size = functions.length; i < size; i++){
+				functions[i] = LazyFunction.valueOf(functions[i]);
+			}
+			return new CompositeFunction(function.function, function.chained, functions);
+		}
+
+		/**
+		 * Dieses Feld speichert die auszuwertende Funktion.
+		 */
+		final Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert die auszuwertende Funktion.
+		 * 
+		 * @param function auszuwertende Funktion.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public LazyFunction(final Function function) throws NullPointerException {
+			if(function == null) throw new NullPointerException();
+			this.function = function;
+		}
+
+		/**
+		 * Diese Methode gibt die auszuwertende Funktion zurück.
+		 * 
+		 * @return auszuwertende Funktion.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Der Ergebniswert entspricht {@code LazyValue.valueOf(scope, this.function())}.
+		 * 
+		 * @see #function()
+		 * @see LazyValue#valueOf(Scope, Function)
+		 */
+		@Override
+		public LazyValue execute(final Scope scope) {
+			return new LazyValue(scope, this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof LazyFunction)) return false;
+			final LazyFunction data = (LazyFunction)object;
+			return Objects.equals(this.function, data.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.function);
+		}
+
+	}
 
 	/**
 	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (function: FunctionValue, params: ArrayValue): Value}. Der Ergebniswert entspricht
@@ -93,13 +198,8 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			final int size = scope.size() - 1;
-			final Value[] values = new Value[size];
-			for(int i = 0; i < size; i++){
-				values[i] = scope.get(i);
-			}
-			final Function function = scope.get(size).valueTo(FunctionValue.TYPE).data();
-			return function.execute(new ValueScope(scope, values));
+			final int index = scope.size() - 1;
+			return scope.get(index).valueTo(FunctionValue.TYPE).data().execute(new ValueScope(scope, Array.valueOf(scope).section(0, index)));
 		}
 
 		/**
@@ -116,6 +216,57 @@ public final class Functions {
 		@Override
 		public boolean equals(final Object object) {
 			return (object == this) || (object instanceof ApplyFunction);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine Funktion, deren Ergebniswert dem {@link ArrayValue} der Parameterwerte des Ausführungskontexts entspricht.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see ArrayFunction#execute(Scope)
+	 */
+	public static final class ArrayFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert die {@link ArrayFunction}.
+		 */
+		public static final ArrayFunction INSTANCE = new ArrayFunction();
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Der Ergebniswert entspricht dem {@link ArrayValue} der Parameterwerte des gegebenen Ausführungskontexts.
+		 * 
+		 * @see Array#valueOf(Scope)
+		 */
+		@Override
+		public ArrayValue execute(final Scope scope) {
+			return new ArrayValue(Array.valueOf(scope));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || (object instanceof ArrayFunction);
 		}
 
 		/**
@@ -354,63 +505,6 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion, deren Ergebniswert dem {@link ArrayValue} der Parameterwerte des Ausführungskontexts entspricht.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see ArrayFunction#execute(Scope)
-	 */
-	public static final class ArrayFunction implements Function {
-
-		/**
-		 * Dieses Feld speichert die {@link ArrayFunction}.
-		 */
-		public static final ArrayFunction INSTANCE = new ArrayFunction();
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Ergebniswert entspricht dem {@link ArrayValue} der Parameterwerte des gegebenen Ausführungskontexts.
-		 * 
-		 * @see Scope#get(int)
-		 * @see Scope#size()
-		 */
-		@Override
-		public ArrayValue execute(final Scope scope) {
-			final int size = scope.size();
-			final Value[] array = new Value[size];
-			for(int i = 0; i < size; i++){
-				array[i] = scope.get(i);
-			}
-			return new ArrayValue(0, array);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return 0;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof ArrayFunction);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine Funktion mit konstantem Ergebniswert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -430,7 +524,7 @@ public final class Functions {
 		 * @param data Nutzdaten des Ergebniswerts.
 		 * @return {@link ValueFunction}.
 		 */
-		public static Function valueOf(final Object data) {
+		public static ValueFunction valueOf(final Object data) {
 			if(data == null) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(Values.valueOf(data));
 		}
@@ -441,7 +535,7 @@ public final class Functions {
 		 * @param value Ergebniswert.
 		 * @return {@link ValueFunction}.
 		 */
-		public static Function valueOf(final Value value) {
+		public static ValueFunction valueOf(final Value value) {
 			if((value == null) || (value.type().id() == NullType.ID)) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(value);
 		}
@@ -449,7 +543,7 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
 		 */
-		private final Value value;
+		final Value value;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Ergebniswert.
@@ -523,7 +617,7 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0} bis {@code 9}.
 		 */
-		static final Function[] INSTANCES = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
+		static final ParamFunction[] INSTANCES = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
 			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
 
 		/**
@@ -534,7 +628,7 @@ public final class Functions {
 		 * @return {@link ParamFunction}.
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
-		public static Function valueOf(final int index) throws IndexOutOfBoundsException {
+		public static ParamFunction valueOf(final int index) throws IndexOutOfBoundsException {
 			if(index < ParamFunction.INSTANCES.length) return ParamFunction.INSTANCES[index];
 			return new ParamFunction(index);
 		}
