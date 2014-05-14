@@ -8,9 +8,9 @@ package bee.creative.util;
 public class Parser {
 
 	/**
-	 * Dieses Feld speichert die Eingabe.
+	 * Dieses Feld speichert die aktuelle Position.
 	 */
-	private final String source;
+	private int index;
 
 	/**
 	 * Dieses Feld speichert die Ausgabe.
@@ -18,19 +18,19 @@ public class Parser {
 	private final StringBuffer target;
 
 	/**
-	 * Dieses Feld speichert die aktuelle Position.
+	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
 	 */
-	private int index;
+	private int symbol;
+
+	/**
+	 * Dieses Feld speichert die Eingabe.
+	 */
+	protected final String source;
 
 	/**
 	 * Dieses Feld speichert die Anzahl der Zeichen.
 	 */
-	private final int length;
-
-	/**
-	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
-	 */
-	private int symbol;
+	protected final int length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Eingabe.
@@ -51,7 +51,7 @@ public class Parser {
 	 * @see #index()
 	 * @see #symbol()
 	 * @param index Position.
-	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
 	 */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
@@ -68,20 +68,21 @@ public class Parser {
 	 * @see #index()
 	 * @see #symbol()
 	 * @see #string()
-	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int skip() {
-		if(this.symbol < 0) return -1;
-		final int index = this.index, symbol = index < this.length ? this.source.charAt(index) : -1;
-		this.index = index + 1;
+		final int index = this.index + 1, symbol = index < this.length ? this.source.charAt(index) : -1;
+		this.index = index;
 		this.symbol = symbol;
 		return symbol;
 	}
 
 	/**
 	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses oder
-	 * {@code -1} zurück.
+	 * {@code -1} zurück. Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befimdet, wird kein Zeichen in die
+	 * Ausgabe übernommen.
 	 * 
+	 * @see #take(int)
 	 * @see #skip()
 	 * @see #index()
 	 * @see #symbol()
@@ -94,14 +95,15 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode übernimmt das gegebene Zeichen in die {@link #string() Ausgabe}.
+	 * Diese Methode übernimmt das gegebene Zeichen in die {@link #string() Ausgabe}, sofern diese nicht negativ ist.
 	 * 
-	 * @param symbol Zeichen.
 	 * @see #take()
 	 * @see #string()
+	 * @param symbol Zeichen oder <code>-1</code>.
 	 */
-	public final void take(final char symbol) {
-		this.target.append(symbol);
+	public final void take(final int symbol) {
+		if(symbol < 0) return;
+		this.target.append((char)symbol);
 	}
 
 	/**
@@ -119,7 +121,7 @@ public class Parser {
 	 * Diese Methode leert die {@link #string() Ausgabe}.
 	 * 
 	 * @see #take()
-	 * @see #take(char)
+	 * @see #take(int)
 	 * @see #take(String)
 	 * @see #string()
 	 */
@@ -140,11 +142,11 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt die via {@link #take()}, {@link #take(char)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
+	 * Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
 	 * 
 	 * @see #skip()
 	 * @see #take()
-	 * @see #take(char)
+	 * @see #take(int)
 	 * @see #take(String)
 	 * @see #clear()
 	 * @see #symbol()
@@ -152,6 +154,19 @@ public class Parser {
 	 */
 	public final String string() {
 		return this.target.toString();
+	}
+
+	/**
+	 * Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
+	 * 
+	 * @see #seek(int)
+	 * @see #index()
+	 * @see #source()
+	 * @see String#length()
+	 * @return Länge Eingabe.
+	 */
+	public final int length() {
+		return this.length;
 	}
 
 	/**
