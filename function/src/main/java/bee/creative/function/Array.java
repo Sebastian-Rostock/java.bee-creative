@@ -1,9 +1,9 @@
 package bee.creative.function;
 
+import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
-import bee.creative.function.Values.NullValue;
 import bee.creative.function.Values.NumberValue;
 import bee.creative.util.Comparables.Get;
 import bee.creative.util.Iterators.GetIterator;
@@ -285,23 +285,6 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	}
 
 	/**
-	 * Diese Methode konvertiert die gegebene Wertliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see NullValue#valueOf(Object)
-	 * @param data Wertliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
-	public static Array valueOf(final Value... data) throws NullPointerException {
-		final int size = data.length;
-		final Value[] values = new Value[size];
-		for(int i = 0; i < size; i++){
-			values[i] = NullValue.valueOf(data[i]);
-		}
-		return new ValueArray(values);
-	}
-
-	/**
 	 * Diese Methode gibt eine Wertliste als Sicht auf die Parameterwerte des gegebenen Ausführungskontexts zurück.
 	 * 
 	 * @see Scope#get(int)
@@ -312,6 +295,29 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final Scope scope) throws NullPointerException {
 		return new ScopeArray(scope);
+	}
+
+	/**
+	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 * 
+	 * @param data Werte.
+	 * @return {@link Array}.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public static Array valueOf(final Value... data) throws NullPointerException {
+		return new ValueArray(data.clone());
+	}
+
+	/**
+	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 * 
+	 * @see #valueOf(Value...)
+	 * @param data Werte.
+	 * @return {@link Array}.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public static Array valueOf(final Collection<? extends Value> data) throws NullPointerException {
+		return Array.valueOf(data.toArray(new Value[data.size()]));
 	}
 
 	/**

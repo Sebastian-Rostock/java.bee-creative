@@ -1,6 +1,15 @@
 package bee.creative.function;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import bee.creative.function.Functions.ArrayFunction;
+import bee.creative.function.Functions.ParamFunction;
+import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Scopes.CompositeScope;
+import bee.creative.function.Script.Range;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
 import bee.creative.function.Types.FunctionType;
@@ -10,6 +19,7 @@ import bee.creative.function.Types.ObjectType;
 import bee.creative.function.Types.StringType;
 import bee.creative.util.Converter;
 import bee.creative.util.Objects;
+import bee.creative.util.Parser;
 
 /**
  * Diese Klasse implementiert {@link Value}s für {@code null}-, {@link Value}{@code []}-, {@link Object}-, {@link Function}-, {@link String}-, {@link Number}-
@@ -18,6 +28,491 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Values {
+
+	/**
+	 * Diese Klasse implementiert den Parser für {@link Values#parse(String)}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	private static final class ValueParser extends Parser {
+
+		/**
+		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
+		 */
+		private int value;
+
+		/**
+		 * Dieses Feld speichert die bisher ermittelten Bereiche.
+		 */
+		private final List<Range> ranges;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Eingabe.
+		 * 
+		 * @param source Eingabe.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ValueParser(final String source) throws NullPointerException {
+			super(source);
+			this.value = -1;
+			this.ranges = new ArrayList<Range>((this.length / 10) + 5);
+		}
+
+		/**
+		 * Diese Methode fügt eine neue {@link Range} mit den gegebenen Parametern hinzu, die bei {@link #index()} endet.
+		 * 
+		 * @param type Typ.
+		 * @param start Startposition.
+		 */
+		private void range(final int type, final int start) {
+			this.ranges.add(new Range((char)type, start, this.index() - start));
+		}
+
+		/**
+		 * Diese Methode beendet das einlesen des Wertbereichs.
+		 */
+		private void closeValue() {
+			final int start = this.value;
+			if(start < 0) return;
+			this.value = -1;
+			if(this.index() <= start) return;
+			this.range('?', start);
+		}
+
+		/**
+		 * Diese Methode beginnt das parsen eines Wertbereichs, welches mit {@link #closeValue()} beendet werden muss.
+		 */
+		private void parseValue() {
+			if(this.value >= 0) return;
+			this.value = this.index();
+		}
+
+		/**
+		 * Diese Methode parst einen Bereich, der mit dem gegebenen Zeichen beginnt, endet, in dem das Zeichen durch Verdopplung maskiert werden kann und welcher
+		 * das Zeichen als Typ verwendet.
+		 * 
+		 * @param type Zeichen als Bereichstyp.
+		 */
+		private void parseMask(final int type) {
+			final int start = this.index();
+			for(int symbol = this.skip(); (symbol >= 0) && ((symbol != type) || (this.skip() == type)); symbol = this.skip()){}
+			this.range(type, start);
+		}
+
+		/**
+		 * Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind.
+		 */
+		private void parseSpace() {
+			final int start = this.index();
+			for(int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()){}
+			this.range('_', start);
+		}
+
+		/**
+		 * Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
+		 * 
+		 * @param type Zeichen als Bereichstyp.
+		 */
+		private void parseSymbol(final int type) {
+			final int start = this.index();
+			this.skip();
+			this.range(type, start);
+		}
+
+		/**
+		 * Diese Methode parst die Eingabe und gibt die Liste der ermittelten Bereiche zurück.
+		 * 
+		 * @return Bereiche.
+		 */
+		public List<Range> parse() {
+			for(int symbol; true;){
+				switch(symbol = this.symbol()){
+					case -1:{
+						this.closeValue();
+						return this.ranges;
+					}
+					case '\'':
+					case '\"':
+					case '/':{
+						this.closeValue();
+						this.parseMask(symbol);
+						break;
+					}
+					case '$':
+					case ':':
+					case ';':
+					case '(':
+					case ')':
+					case '[':
+					case ']':
+					case '{':
+					case '}':{
+						this.closeValue();
+						this.parseSymbol(symbol);
+						break;
+					}
+					default:{
+						if(symbol <= ' '){
+							this.closeValue();
+							this.parseSpace();
+						}else{
+							this.parseValue();
+							this.skip();
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Kompiler für {@link Values#compileValue(Script, ScriptCompiler, String...)} bzw.
+	 * {@link Values#compileFunction(Script, ScriptCompiler, String...)}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	private static final class ValueCompiler {
+
+		/**
+		 * Dieses Feld speichert den aktuellen Bereich.
+		 */
+		private Range range;
+
+		/**
+		 * Dieses Feld speichert den Quelltext.
+		 */
+		private final Script script;
+
+		/**
+		 * Dieses Feld speichert die Parameternamen.
+		 */
+		private final LinkedList<String> params;
+
+		/**
+		 * Dieses Feld speichert den {@link Iterator} über die Bereiche von {@link #script}.
+		 */
+		private final Iterator<Range> iterator;
+
+		/**
+		 * Dieses Feld speichert die Kompilationsmethoden.
+		 */
+		private final ScriptCompiler compiler;
+
+		/**
+		 * Dieser Konstruktor initialisiert Quelltext, Kompilationsmethoden und Parameternamen.
+		 * 
+		 * @param script Quelltext.
+		 * @param compiler Kompilationsmethoden.
+		 * @param params Parameternamen.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist oder enthält.
+		 */
+		public ValueCompiler(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException {
+			this.script = script;
+			this.iterator = script.iterator();
+			if(compiler == null) throw new NullPointerException();
+			this.compiler = compiler;
+			this.params = new LinkedList<String>(Arrays.asList(params));
+			if(this.params.contains(null)) throw new NullPointerException();
+			this.skip();
+		}
+
+		/**
+		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#NULL} zurück. Der {@link #range aktuelle Bereich} wird durch
+		 * diese Methode verändert. Am Ende der
+		 * 
+		 * @return aktueller Bereich oder {@link Range#NULL}.
+		 */
+		private Range skip() {
+			if(!this.iterator.hasNext()) return this.range = Range.NULL;
+			return this.range = this.iterator.next();
+		}
+
+		/**
+		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den ersten bedeutsamen Bereich oder {@link Range#NULL}
+		 * zurück. Der {@link #range aktuelle Bereich} wird durch diese Methode verändert.
+		 * 
+		 * @see #skip()
+		 * @return aktueller Bereich oder {@link Range#NULL}.
+		 */
+		private Range skipSpace() {
+			for(int type = this.range.type; (type == '_') || (type == '/'); type = this.skip().type){}
+			return this.range;
+		}
+
+		/**
+		 * Diese Methode erzeugt die Fehlermeldung einer {@link IllegalArgumentException} und gibt diese zurück.
+		 * 
+		 * @return Fehlermeldung.
+		 */
+		private String message() {
+			return this.range.type == 0 ? //
+				"Unerwartetes Ende der Eingabe." : //
+				"Unerwartete Zeichenkette '" + this.range.extract(this.script.source) + "' an Position " + this.range.start + ".";
+		}
+
+		/**
+		 * Diese Methode interpretiert die gegebene Zeichenkette als positive Zahl und gibt diese oder {@code -1} zurück.
+		 * 
+		 * @param string Zeichenkette.
+		 * @return Zahl.
+		 */
+		private int compileIndex(final String string) {
+			if(string.isEmpty()) return -1;
+			final char symbol = string.charAt(0);
+			if((symbol < '0') || (symbol > '9')) return -1;
+			try{
+				return Integer.parseInt(string);
+			}catch(final NumberFormatException e){
+				return -1;
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert den beim aktuellen Bereich beginnende Wert und gibt diesen zurück.
+		 * 
+		 * @return Wert.
+		 */
+		private Value compileValue() {
+			switch(this.skipSpace().type){
+				case 0:
+				case '$':
+				case ';':
+				case ':':
+				case '(':
+				case ')':
+				case ']':
+				case '}':{
+					throw new IllegalArgumentException(this.message());
+				}
+				case '[':{
+					return this.compileArray();
+				}
+				case '{':{
+					return FunctionValue.valueOf(this.compileScope());
+				}
+				default:{
+					return NullValue.valueOf(this.compiler.valueOf(this.script, this.skipSpace()));
+				}
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link ArrayValue} und gibt diesen zurück.
+		 * 
+		 * @return Wertliste als {@link ArrayValue}.
+		 */
+		private ArrayValue compileArray() {
+			this.skip();
+			if(this.skipSpace().type == ']'){
+				this.skip();
+				return ArrayType.NULL_VALUE;
+			}
+			for(final LinkedList<Value> array = new LinkedList<Value>(); true;){
+				final Value value;
+				switch(this.range.type){
+					case 0:
+					case ';':
+					case '$':
+					case '(':
+					case ')':
+					case '}':
+						throw new IllegalArgumentException(this.message());
+					case '[':
+						value = this.compileArray();
+						break;
+					case '{':
+						value = FunctionValue.valueOf(this.compileScope());
+						break;
+					default:
+						value = NullValue.valueOf(this.compiler.valueOf(this.script, this.skipSpace()));
+						break;
+				}
+				array.add(value);
+				switch(this.skipSpace().type){
+					case ';':
+						this.skip();
+						break;
+					case ']':
+						this.skip();
+						return ArrayValue.valueOf(Array.valueOf(array));
+					default:
+						throw new IllegalArgumentException(this.message());
+				}
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert den aktuellen Bereich zu einen Parameternamen und gibt diesen oder {@code null} zurück.
+		 * 
+		 * @return Parametername oder {@code null}.
+		 */
+		private String compileParam() {
+			switch(this.skipSpace().type){
+				case 0:
+				case '\'':
+				case '\"':
+				case '$':
+				case '(':
+				case '[':
+				case ']':
+				case '{':
+					throw new IllegalArgumentException(this.message());
+				case ':':
+				case ';':
+				case ')':
+				case '}':
+					return null;
+			}
+			final String name = this.compiler.paramOf(this.script, this.range);
+			if(name.isEmpty()) throw new IllegalArgumentException();
+			return name;
+		}
+
+		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
+		 * 
+		 * @return Funktion als {@link FunctionValue}.
+		 */
+		private Function compileScope() {
+			this.skip();
+			int count = 0;
+			while(true){
+				if(this.skipSpace().type == 0) throw new IllegalArgumentException(this.message());
+				final String name = this.compileParam();
+				if(name != null){
+					if(this.compileIndex(name) >= 0) throw new IllegalArgumentException("Illegal param name " + Objects.toString(name) + ".");
+					this.params.add(count++, name);
+				}
+				switch(this.range.type){
+					case ';':
+						if(name == null) throw new IllegalArgumentException(this.message());
+						this.skip();
+						break;
+					case ':':{
+						this.skip();
+						final Function function = this.compileFunction();
+						if(this.skipSpace().type != '}') throw new IllegalArgumentException(this.message());
+						this.skip();
+						this.params.subList(0, count).clear();
+						return function;
+					}
+					default:
+						throw new IllegalArgumentException(this.message());
+				}
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diesen zurück.
+		 * 
+		 * @return Funktion.
+		 */
+		private Function compileFunction() {
+			Function function;
+			boolean chained = false;
+			switch(this.skipSpace().type){
+				case '$':{
+					this.skip();
+					final String name = this.compileParam();
+					if(name == null) return Functions.ArrayFunction.INSTANCE;
+					final int index = this.compileIndex(name);
+					final int index2 = (index < 0) ? this.params.indexOf(name) : (index - 1);
+					if(index2 < 0) throw new IllegalArgumentException("Unknown parameter name " + Objects.toString(name) + ".");
+					return Functions.ParamFunction.valueOf(index2);
+				}
+				case '{':{
+					chained = true;
+					function = this.compileScope();
+					if(this.skipSpace().type() != '(') return ValueFunction.valueOf(FunctionValue.valueOf(function));
+					break;
+				}
+				default:{
+					final Value value = this.compileValue();
+					if(!value.type().is(FunctionValue.TYPE)) return ValueFunction.valueOf(value);
+					chained = false;
+					function = FunctionValue.TYPE.valueOf(value).data();
+					if(this.skipSpace().type() != '(') throw new IllegalArgumentException(this.message());
+				}
+			}
+			do{
+				this.skip();
+				this.skipSpace();
+				final LinkedList<Function> functions = new LinkedList<Function>();
+				while(true){
+					if(this.range.type == ')'){
+						this.skip();
+						function = Functions.CompositeFunction.valueOf(function, chained, functions.toArray(new Function[functions.size()]));
+						break;
+					}
+					functions.add(this.compileFunction());
+					switch(this.skipSpace().type){
+						default:
+							throw new IllegalArgumentException(this.message());
+						case ';':
+							this.skip();
+						case ')':
+					}
+				}
+				chained = true;
+			}while(this.skipSpace().type() == '(');
+			return function;
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
+		 * 
+		 * @return Wert.
+		 */
+		public Value compileToValue() {
+			final Value value = this.compileValue();
+			if(this.skipSpace().type() == 0) return value;
+			throw new IllegalArgumentException(this.message());
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext zu einer Funktion und gibt diese zurück.
+		 * 
+		 * @return Funktion.
+		 */
+		public Function compileToFunction() {
+			final Function function = this.compileFunction();
+			if(this.skipSpace().type() == 0) return function;
+			throw new IllegalArgumentException(this.message());
+		}
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link Values#compileValue(Script, ScriptCompiler, String...)} und
+	 * {@link Values#compileFunction(Script, ScriptCompiler, String...)} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface ScriptCompiler {
+
+		/**
+		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue} geliefert
+		 * werden.
+		 * 
+		 * @param script Quelltext.
+		 * @param range Bereich.
+		 * @return Wert oder Funktionen als {@link FunctionValue}.
+		 * @throws IllegalArgumentException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
+		 */
+		public Value valueOf(Script script, final Range range) throws IllegalArgumentException;
+
+		/**
+		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Parameternamen zurück.
+		 * 
+		 * @param script Quelltext.
+		 * @param range Bereich.
+		 * @return Parametername.
+		 * @throws IllegalArgumentException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
+		 */
+		public String paramOf(Script script, final Range range) throws IllegalArgumentException;
+
+	}
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch die {@link #data() Nutzdaten} und der {@link #type() Datentyp} fehlen.
@@ -626,6 +1121,73 @@ public final class Values {
 		final Array array = Array.from(data);
 		if(array != null) return ArrayValue.valueOf(array);
 		return ObjectValue.valueOf(data);
+	}
+
+	/**
+	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück. Die Erzeugung von Bereichen erfolgt gemäß dieser
+	 * Regeln:
+	 * <ul>
+	 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
+	 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
+	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
+	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '?'}.</li>
+	 * </ul>
+	 * 
+	 * @see Script
+	 * @param source Zeichenkette.
+	 * @return aufbereiteter Quelltext.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public static Script parse(final String source) throws NullPointerException {
+		return new Script(source, new ValueParser(source).parse());
+	}
+
+	/**
+	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
+	 * 
+	 * @see #compileFunction(Script, ScriptCompiler, String...)
+	 * @param script Quelltext.
+	 * @param compiler Kompilationsmethoden.
+	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
+	 * @return kompilierter Wert.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
+	 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
+	 */
+	public static Value compileValue(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
+		IllegalArgumentException {
+		return new ValueCompiler(script, compiler, params).compileToValue();
+	}
+
+	/**
+	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
+	 * zurück. Die Bereichestypen des Quelltexts haben folgende Bedeutung:
+	 * <ul>
+	 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) dürfen an jeder Position vorkommen und werden ignoriert.</li>
+	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
+	 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente unzulässig.</li>
+	 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
+	 * Bereichen vom Typ {@code ';'} separiert werden müssen.</li>
+	 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
+	 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
+	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompiler#paramOf(Script, Range)} aufgelöst werden
+	 * kann. Fpr Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einem
+	 * {@link FunctionValue} kompilieren müssen.</li>
+	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
+	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für die {@link ArrayFunction}.</li>
+	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompiler#valueOf(Script, Range)} in Werte überführt. Funktionen werden hierbei zu
+	 * {@link FunctionValue}s.</li>
+	 * </ul>
+	 * 
+	 * @param script Quelltext.
+	 * @param compiler Kompilationsmethoden.
+	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
+	 * @return kompilierte Funktion.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
+	 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
+	 */
+	public static Function compileFunction(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
+		IllegalArgumentException {
+		return new ValueCompiler(script, compiler, params).compileToFunction();
 	}
 
 	/**
