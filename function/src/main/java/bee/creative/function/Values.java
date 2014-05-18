@@ -275,17 +275,6 @@ public final class Values {
 		}
 
 		/**
-		 * Diese Methode erzeugt die Fehlermeldung einer {@link IllegalArgumentException} und gibt diese zurück.
-		 * 
-		 * @return Fehlermeldung.
-		 */
-		private String message() {
-			return this.range.type == 0 ? //
-				"Unerwartetes Ende der Eingabe." : //
-				"Unerwartete Zeichenkette '" + this.range.extract(this.script.source) + "' an Position " + this.range.start + ".";
-		}
-
-		/**
 		 * Diese Methode interpretiert die gegebene Zeichenkette als positive Zahl und gibt diese oder {@code -1} zurück.
 		 * 
 		 * @param string Zeichenkette.
@@ -306,8 +295,9 @@ public final class Values {
 		 * Diese Methode kompiliert den beim aktuellen Bereich beginnende Wert und gibt diesen zurück.
 		 * 
 		 * @return Wert.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		private Value compileValue() {
+		private Value compileValue() throws ScriptCompilerException {
 			switch(this.skipSpace().type){
 				case 0:
 				case '$':
@@ -317,7 +307,7 @@ public final class Values {
 				case ')':
 				case ']':
 				case '}':{
-					throw new IllegalArgumentException(this.message());
+					throw new ScriptCompilerException(this.script, this.range);
 				}
 				case '[':{
 					return this.compileArray();
@@ -327,7 +317,7 @@ public final class Values {
 				}
 				default:{
 					final Value value = this.compiler.valueOf(this.script, this.range);
-					if(value == null) throw new IllegalArgumentException(this.message());
+					if(value == null) throw new ScriptCompilerException(this.script, this.range);
 					this.skip();
 					return value;
 				}
@@ -338,8 +328,9 @@ public final class Values {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link ArrayValue} und gibt diesen zurück.
 		 * 
 		 * @return Wertliste als {@link ArrayValue}.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		private ArrayValue compileArray() {
+		private ArrayValue compileArray() throws ScriptCompilerException {
 			this.skip();
 			if(this.skipSpace().type == ']'){
 				this.skip();
@@ -354,7 +345,7 @@ public final class Values {
 					case '(':
 					case ')':
 					case '}':
-						throw new IllegalArgumentException(this.message());
+						throw new ScriptCompilerException(this.script, this.range);
 					case '[':
 						value = this.compileArray();
 						break;
@@ -374,7 +365,7 @@ public final class Values {
 						this.skip();
 						return ArrayValue.valueOf(Array.valueOf(array));
 					default:
-						throw new IllegalArgumentException(this.message());
+						throw new ScriptCompilerException(this.script, this.range);
 				}
 			}
 		}
@@ -383,8 +374,9 @@ public final class Values {
 		 * Diese Methode kompiliert den aktuellen Bereich zu einen Parameternamen und gibt diesen oder {@code null} zurück.
 		 * 
 		 * @return Parametername oder {@code null}.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		private String compileParam() {
+		private String compileParam() throws ScriptCompilerException {
 			switch(this.skipSpace().type){
 				case 0:
 				case '\'':
@@ -394,7 +386,7 @@ public final class Values {
 				case '[':
 				case ']':
 				case '{':
-					throw new IllegalArgumentException(this.message());
+					throw new ScriptCompilerException(this.script, this.range);
 				case ':':
 				case ';':
 				case ')':
@@ -411,12 +403,13 @@ public final class Values {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
 		 * 
 		 * @return Funktion als {@link FunctionValue}.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		private Function compileScope() {
+		private Function compileScope() throws ScriptCompilerException {
 			this.skip();
 			int count = 0;
 			while(true){
-				if(this.skipSpace().type == 0) throw new IllegalArgumentException(this.message());
+				if(this.skipSpace().type == 0) throw new ScriptCompilerException(this.script, this.range);
 				final String name = this.compileParam();
 				if(name != null){
 					if(this.compileIndex(name) >= 0) throw new IllegalArgumentException("Illegal param name " + Objects.toString(name) + ".");
@@ -424,19 +417,19 @@ public final class Values {
 				}
 				switch(this.skipSpace().type){
 					case ';':
-						if(name == null) throw new IllegalArgumentException(this.message());
+						if(name == null) throw new ScriptCompilerException(this.script, this.range);
 						this.skip();
 						break;
 					case ':':{
 						this.skip();
 						final Function function = this.compileFunction();
-						if(this.skipSpace().type != '}') throw new IllegalArgumentException(this.message());
+						if(this.skipSpace().type != '}') throw new ScriptCompilerException(this.script, this.range);
 						this.skip();
 						this.params.subList(0, count).clear();
 						return function;
 					}
 					default:
-						throw new IllegalArgumentException(this.message());
+						throw new ScriptCompilerException(this.script, this.range);
 				}
 			}
 		}
@@ -445,8 +438,9 @@ public final class Values {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diesen zurück.
 		 * 
 		 * @return Funktion.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		private Function compileFunction() {
+		private Function compileFunction() throws ScriptCompilerException {
 			Function function;
 			boolean chained = false;
 			switch(this.skipSpace().type){
@@ -468,7 +462,7 @@ public final class Values {
 					final Value value = this.compileValue();
 					if(!value.type().is(FunctionValue.TYPE)) return ValueFunction.valueOf(value);
 					function = FunctionValue.TYPE.valueOf(value).data();
-					if(this.skipSpace().type != '(') throw new IllegalArgumentException(this.message());
+					if(this.skipSpace().type != '(') return function;
 				}
 			}
 			do{
@@ -484,7 +478,7 @@ public final class Values {
 					functions.add(this.compileFunction());
 					switch(this.skipSpace().type){
 						default:
-							throw new IllegalArgumentException(this.message());
+							throw new ScriptCompilerException(this.script, this.range);
 						case ';':
 							this.skip();
 						case ')':
@@ -499,22 +493,24 @@ public final class Values {
 		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
 		 * 
 		 * @return Wert.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		public Value compileToValue() {
+		public Value compileToValue() throws ScriptCompilerException {
 			final Value value = this.compileValue();
 			if(this.skipSpace().type == 0) return value;
-			throw new IllegalArgumentException(this.message());
+			throw new ScriptCompilerException(this.script, this.range);
 		}
 
 		/**
 		 * Diese Methode kompiliert den Quelltext zu einer Funktion und gibt diese zurück.
 		 * 
 		 * @return Funktion.
+		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
-		public Function compileToFunction() {
+		public Function compileToFunction() throws ScriptCompilerException {
 			final Function function = this.compileFunction();
 			if(this.skipSpace().type == 0) return function;
-			throw new IllegalArgumentException(this.message());
+			throw new ScriptCompilerException(this.script, this.range);
 		}
 
 	}
@@ -534,9 +530,9 @@ public final class Values {
 		 * @param script Quelltext.
 		 * @param range Bereich.
 		 * @return Wert oder Funktionen als {@link FunctionValue}.
-		 * @throws IllegalArgumentException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
+		 * @throws ScriptCompilerException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
-		public Value valueOf(Script script, final Range range) throws IllegalArgumentException;
+		public Value valueOf(Script script, final Range range) throws ScriptCompilerException;
 
 		/**
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Parameternamen zurück.
@@ -544,9 +540,47 @@ public final class Values {
 		 * @param script Quelltext.
 		 * @param range Bereich.
 		 * @return Parametername.
-		 * @throws IllegalArgumentException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
+		 * @throws ScriptCompilerException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
-		public String paramOf(Script script, final Range range) throws IllegalArgumentException;
+		public String paramOf(Script script, final Range range) throws ScriptCompilerException;
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die {@link IllegalArgumentException}, die bei Syntaxfehlern von einem {@link ScriptCompiler} oder den Methoden
+	 * {@link Values#compileValue(Script, ScriptCompiler, String...)} und {@link Values#compileValue(Script, ScriptCompiler, String...)} ausgelöst wird.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class ScriptCompilerException extends IllegalArgumentException {
+
+		/**
+		 * Dieses Feld speichert die Serial-Version-UID.
+		 */
+		private static final long serialVersionUID = 5626029522273462062L;
+
+		/**
+		 * Dieses Feld speichert den Quelltext.
+		 */
+		public final Script script;
+
+		/**
+		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
+		 */
+		public final Range range;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Quelltext und den Bereich mit dem Syntaxfehler.
+		 * 
+		 * @param script Quelltext.
+		 * @param range Bereich mit dem Syntaxfehler.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ScriptCompilerException(final Script script, final Range range) throws NullPointerException {
+			super("Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".");
+			this.script = script;
+			this.range = range;
+		}
 
 	}
 
@@ -1196,10 +1230,10 @@ public final class Values {
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierter Wert.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
+	 * @throws ScriptCompilerException Wenn eine der Eingaben ungültig ist.
 	 */
 	public static Value compileValue(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
-		IllegalArgumentException {
+		ScriptCompilerException {
 		return new ValueCompiler(script, compiler, params).compileToValue();
 	}
 
@@ -1230,10 +1264,10 @@ public final class Values {
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierte Funktion.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
+	 * @throws ScriptCompilerException Wenn eine der Eingaben ungültig ist.
 	 */
 	public static Function compileFunction(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
-		IllegalArgumentException {
+		ScriptCompilerException {
 		return new ValueCompiler(script, compiler, params).compileToFunction();
 	}
 
