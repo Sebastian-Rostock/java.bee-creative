@@ -30,7 +30,7 @@ import bee.creative.util.Parser;
 public final class Values {
 
 	/**
-	 * Diese Klasse implementiert den Parser für {@link Values#parse(String)}.
+	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -95,8 +95,37 @@ public final class Values {
 		 */
 		private void parseMask(final int type) {
 			final int start = this.index();
-			for(int symbol = this.skip(); (symbol >= 0) && ((symbol != type) || (this.skip() == type)); symbol = this.skip()){}
-			this.range(type, start);
+			for(int symbol = this.skip(); symbol >= 0; symbol = this.skip()){
+				if(symbol == type){
+					if(this.skip() != type){
+						this.range(type, start);
+						return;
+					}
+				}
+			}
+			this.range('?', start);
+		}
+
+		/**
+		 * Diese Methode parst einen Bereich, der mit dem Zeichen <code>'&lt;'</code> beginnt, mit dem Zeichen <code>'&gt;'</code> ende und in dem diese Zeichen nur
+		 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
+		 * Bereichstyp {@code '?'}.
+		 */
+		private void parseName() {
+			final int start = this.index();
+			for(int symbol = this.skip(); symbol >= 0; symbol = this.skip()){
+				if(symbol == '>'){
+					if(this.skip() != '>'){
+						this.range('!', start);
+						return;
+					}
+				}else if(symbol == '<'){
+					if(this.skip() != '<'){
+						break;
+					}
+				}
+			}
+			this.range('?', start);
 		}
 
 		/**
@@ -136,6 +165,11 @@ public final class Values {
 					case '/':{
 						this.closeValue();
 						this.parseMask(symbol);
+						break;
+					}
+					case '<':{
+						this.closeValue();
+						this.parseName();
 						break;
 					}
 					case '$':
@@ -292,7 +326,10 @@ public final class Values {
 					return FunctionValue.valueOf(this.compileScope());
 				}
 				default:{
-					return NullValue.valueOf(this.compiler.valueOf(this.script, this.skipSpace()));
+					final Value value = this.compiler.valueOf(this.script, this.range);
+					if(value == null) throw new IllegalArgumentException(this.message());
+					this.skip();
+					return value;
 				}
 			}
 		}
@@ -366,6 +403,7 @@ public final class Values {
 			}
 			final String name = this.compiler.paramOf(this.script, this.range);
 			if(name.isEmpty()) throw new IllegalArgumentException();
+			this.skip();
 			return name;
 		}
 
@@ -384,7 +422,7 @@ public final class Values {
 					if(this.compileIndex(name) >= 0) throw new IllegalArgumentException("Illegal param name " + Objects.toString(name) + ".");
 					this.params.add(count++, name);
 				}
-				switch(this.range.type){
+				switch(this.skipSpace().type){
 					case ';':
 						if(name == null) throw new IllegalArgumentException(this.message());
 						this.skip();
@@ -422,21 +460,19 @@ public final class Values {
 					return Functions.ParamFunction.valueOf(index2);
 				}
 				case '{':{
-					chained = true;
 					function = this.compileScope();
-					if(this.skipSpace().type() != '(') return ValueFunction.valueOf(FunctionValue.valueOf(function));
+					if(this.skipSpace().type != '(') return ValueFunction.valueOf(FunctionValue.valueOf(function));
 					break;
 				}
 				default:{
 					final Value value = this.compileValue();
 					if(!value.type().is(FunctionValue.TYPE)) return ValueFunction.valueOf(value);
-					chained = false;
 					function = FunctionValue.TYPE.valueOf(value).data();
-					if(this.skipSpace().type() != '(') throw new IllegalArgumentException(this.message());
+					if(this.skipSpace().type != '(') throw new IllegalArgumentException(this.message());
 				}
 			}
 			do{
-				this.skip();
+				this.skip(); // '('
 				this.skipSpace();
 				final LinkedList<Function> functions = new LinkedList<Function>();
 				while(true){
@@ -455,7 +491,7 @@ public final class Values {
 					}
 				}
 				chained = true;
-			}while(this.skipSpace().type() == '(');
+			}while(this.skipSpace().type == '(');
 			return function;
 		}
 
@@ -466,7 +502,7 @@ public final class Values {
 		 */
 		public Value compileToValue() {
 			final Value value = this.compileValue();
-			if(this.skipSpace().type() == 0) return value;
+			if(this.skipSpace().type == 0) return value;
 			throw new IllegalArgumentException(this.message());
 		}
 
@@ -477,7 +513,7 @@ public final class Values {
 		 */
 		public Function compileToFunction() {
 			final Function function = this.compileFunction();
-			if(this.skipSpace().type() == 0) return function;
+			if(this.skipSpace().type == 0) return function;
 			throw new IllegalArgumentException(this.message());
 		}
 
@@ -1127,6 +1163,12 @@ public final class Values {
 	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück. Die Erzeugung von Bereichen erfolgt gemäß dieser
 	 * Regeln:
 	 * <ul>
+	 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
+	 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
+	 * Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
+	 * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und letzten
+	 * jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp
+	 * {@code '?'}. Andernfalls hat er den Bereichstyp {@code '!'}.</li>
 	 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
 	 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
 	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
@@ -1134,17 +1176,20 @@ public final class Values {
 	 * </ul>
 	 * 
 	 * @see Script
+	 * @see #compileValue(Script, ScriptCompiler, String...)
+	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param source Zeichenkette.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public static Script parse(final String source) throws NullPointerException {
+	public static Script parseScript(final String source) throws NullPointerException {
 		return new Script(source, new ValueParser(source).parse());
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
 	 * 
+	 * @see #parseScript(String)
 	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
@@ -1178,6 +1223,8 @@ public final class Values {
 	 * {@link FunctionValue}s.</li>
 	 * </ul>
 	 * 
+	 * @see #parseScript(String)
+	 * @see #compileValue(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
