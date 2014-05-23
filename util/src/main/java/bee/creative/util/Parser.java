@@ -25,22 +25,43 @@ public class Parser {
 	/**
 	 * Dieses Feld speichert die Eingabe.
 	 */
-	protected final String source;
+	private final String source;
 
 	/**
-	 * Dieses Feld speichert die Anzahl der Zeichen.
+	 * Dieses Feld speichert den Beginn des Abschnitts, auf dem der {@link Parser} arbeitet.
 	 */
-	protected final int length;
+	private final int offset;
 
 	/**
-	 * Dieser Konstruktor initialisiert die Eingabe.
+	 * Dieses Feld speichert die Anzahl der Zeichen in den Abschnitt, auf dem der {@link Parser} arbeitet.
+	 */
+	private final int length;
+
+	/**
+	 * Dieser Konstruktor initialisiert die Eingabe auf dem dieser {@link Parser} arbeitet.
 	 * 
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public Parser(final String source) throws NullPointerException {
+		this(source, 0, source.length());
+	}
+
+	/**
+	 * Dieser Konstruktor initialisiert die Eingabe sowie Beginn und Länge des Abschnitts, auf dem dieser {@link Parser} arbeitet.
+	 * 
+	 * @param source Eingabe.
+	 * @param offset Beginn des Abschnitts
+	 * @param length Länge des Abschnitts.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws IllegalArgumentException Wenn Beginn ider Länge ungültig sind.
+	 */
+	public Parser(final String source, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+		if(source == null) throw new NullPointerException();
+		if((offset < 0) || (length < 0) || ((offset + length) > source.length())) throw new IllegalArgumentException();
 		this.source = source;
-		this.length = source.length();
+		this.offset = offset;
+		this.length = offset + length;
 		this.target = new StringBuffer();
 		this.seek(0);
 	}
@@ -55,7 +76,7 @@ public class Parser {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
 	 */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
-		if(index < 0) throw new IndexOutOfBoundsException("Index out of range: " + index);
+		if(index < this.offset) throw new IndexOutOfBoundsException("Index out of range: " + index);
 		if(index < this.length) return this.symbol = this.source.codePointAt(this.index = index);
 		this.index = this.length;
 		return this.symbol = -1;
@@ -112,9 +133,10 @@ public class Parser {
 	 * @param symbols Zeichenkette.
 	 * @see #take()
 	 * @see #string()
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public final void take(final String symbols) {
-		this.target.append(symbols);
+	public final void take(final String symbols) throws NullPointerException {
+		this.target.append(symbols.toString());
 	}
 
 	/**
@@ -157,16 +179,28 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
+	 * Diese Methode gibt den Beginn des Abschnitts der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
 	 * 
 	 * @see #seek(int)
 	 * @see #index()
+	 * @see #length()
+	 * @return Beginn des Abschnitts der Eingabe.
+	 */
+	public final int offset() {
+		return this.offset;
+	}
+
+	/**
+	 * Diese Methode gibt die Länge des Abschnitts der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
+	 * 
+	 * @see #seek(int)
+	 * @see #index()
+	 * @see #offset()
 	 * @see #source()
-	 * @see String#length()
-	 * @return Länge Eingabe.
+	 * @return Länge des Abschnitts der Eingabe.
 	 */
 	public final int length() {
-		return this.length;
+		return this.length - this.offset;
 	}
 
 	/**

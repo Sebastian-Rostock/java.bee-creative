@@ -30,7 +30,7 @@ import bee.creative.util.Parser;
 public final class Values {
 
 	/**
-	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String)}.
+	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String, int, int)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -47,15 +47,18 @@ public final class Values {
 		private final List<Range> ranges;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Eingabe.
+		 * Dieser Konstruktor initialisiert die Eingabe sowie Beginn und Länge des Abschnitts, auf dem dieser {@link Parser} arbeitet.
 		 * 
 		 * @param source Eingabe.
+		 * @param offset Beginn des Abschnitts
+		 * @param length Länge des Abschnitts.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn Beginn ider Länge ungültig sind.
 		 */
-		public ValueParser(final String source) throws NullPointerException {
-			super(source);
+		public ValueParser(final String source, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
+			super(source, offset, length);
 			this.value = -1;
-			this.ranges = new ArrayList<Range>((this.length / 10) + 5);
+			this.ranges = new ArrayList<Range>((length / 10) + 5);
 		}
 
 		/**
@@ -306,15 +309,12 @@ public final class Values {
 				case '(':
 				case ')':
 				case ']':
-				case '}':{
+				case '}':
 					throw new ScriptCompilerException(this.script, this.range);
-				}
-				case '[':{
+				case '[':
 					return this.compileArray();
-				}
-				case '{':{
+				case '{':
 					return FunctionValue.valueOf(this.compileScope());
-				}
 				default:{
 					final Value value = this.compiler.valueOf(this.script, this.range);
 					if(value == null) throw new ScriptCompilerException(this.script, this.range);
@@ -1213,17 +1213,19 @@ public final class Values {
 	 * @see #compileValue(Script, ScriptCompiler, String...)
 	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param source Zeichenkette.
+	 * @param offset Beginn des Abschnitts, auf dem der {@link Parser} arbeitet.
+	 * @param length Länge des Abschnitts, auf dem der {@link Parser} arbeitet.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public static Script parseScript(final String source) throws NullPointerException {
-		return new Script(source, new ValueParser(source).parse());
+	public static Script parseScript(final String source, int offset, int length) throws NullPointerException {
+		return new Script(source, new ValueParser(source, offset, length).parse());
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
 	 * 
-	 * @see #parseScript(String)
+	 * @see #parseScript(String, int, int)
 	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
@@ -1257,7 +1259,7 @@ public final class Values {
 	 * {@link FunctionValue}s.</li>
 	 * </ul>
 	 * 
-	 * @see #parseScript(String)
+	 * @see #parseScript(String, int, int)
 	 * @see #compileValue(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.

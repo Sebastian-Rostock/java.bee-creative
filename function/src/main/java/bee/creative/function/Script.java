@@ -14,7 +14,7 @@ import bee.creative.util.Objects;
 /**
  * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * 
- * @see Values#parseScript(String)
+ * @see Values#parseScript(String, int, int)
  * @see Values#compileValue(Script, ScriptCompiler, String...)
  * @see Values#compileFunction(Script, ScriptCompiler, String...)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
