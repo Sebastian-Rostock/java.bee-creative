@@ -6,12 +6,12 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>2.3.7</version>
+	<version>2.3.8</version>
 	<artifactId>bee-creative.compact</artifactId>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
-			<version>3.1.10-SNAPSHOT</version>
+			<version>[3.2.15,)</version>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative.util</artifactId>
 			<scope>provided</scope>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>bee-creative</groupId>
 			<artifactId>bee-creative.array</artifactId>
-			<version>[2.4.8,)</version>
+			<version>[2.4.9,)</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Klasse implementiert ein Objekt zum Parsen der Zeichen eines {@link String}s.
+ * Diese Klasse implementiert ein Objekt zum Parsen eines Abschnitts einer Zeichenkette.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -50,6 +50,9 @@ public class Parser {
 	/**
 	 * Dieser Konstruktor initialisiert die Eingabe sowie Beginn und Länge des Abschnitts, auf dem dieser {@link Parser} arbeitet.
 	 * 
+	 * @see #source()
+	 * @see #offset()
+	 * @see #length()
 	 * @param source Eingabe.
 	 * @param offset Beginn des Abschnitts
 	 * @param length Länge des Abschnitts.
@@ -63,11 +66,11 @@ public class Parser {
 		this.offset = offset;
 		this.length = offset + length;
 		this.target = new StringBuffer();
-		this.seek(0);
+		this.reset();
 	}
 
 	/**
-	 * Diese Methode setzt die {@link #index() aktuelle Position} und gibt das das {@link #symbol() aktuelle Zeichen} oder {@code -1} zurück.
+	 * Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
 	 * 
 	 * @see #index()
 	 * @see #symbol()
@@ -83,7 +86,7 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses oder {@code -1} zurück.
+	 * Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * 
 	 * @see #take()
 	 * @see #index()
@@ -99,19 +102,19 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses oder
-	 * {@code -1} zurück. Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befimdet, wird kein Zeichen in die
-	 * Ausgabe übernommen.
+	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
+	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende des zu bearbeitenden Bereichs der {@link #source() Eingabe} befindet, wird kein Zeichen in
+	 * die Ausgabe übernommen.
 	 * 
 	 * @see #take(int)
 	 * @see #skip()
 	 * @see #index()
 	 * @see #symbol()
 	 * @see #string()
-	 * @return {@link #symbol() aktuelle Zeichen} oder {@code -1}.
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int take() {
-		this.target.append((char)this.symbol);
+		this.take(this.symbol);
 		return this.skip();
 	}
 
@@ -120,7 +123,7 @@ public class Parser {
 	 * 
 	 * @see #take()
 	 * @see #string()
-	 * @param symbol Zeichen oder <code>-1</code>.
+	 * @param symbol Zeichen.
 	 */
 	public final void take(final int symbol) {
 		if(symbol < 0) return;
@@ -133,7 +136,7 @@ public class Parser {
 	 * @param symbols Zeichenkette.
 	 * @see #take()
 	 * @see #string()
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist.
 	 */
 	public final void take(final String symbols) throws NullPointerException {
 		this.target.append(symbols.toString());
@@ -149,6 +152,16 @@ public class Parser {
 	 */
 	public final void clear() {
 		this.target.setLength(0);
+	}
+
+	/**
+	 * Diese Methode setzt die {@link #index() aktuelle Position} auf den {@link #offset() Anfang des Abschnitts} der {@link #source() Eingabe} zurück.
+	 * 
+	 * @see #seek(int)
+	 * @see #offset()
+	 */
+	public final void reset() {
+		this.seek(this.offset);
 	}
 
 	/**
@@ -182,6 +195,7 @@ public class Parser {
 	 * Diese Methode gibt den Beginn des Abschnitts der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
 	 * 
 	 * @see #seek(int)
+	 * @see #reset()
 	 * @see #index()
 	 * @see #length()
 	 * @return Beginn des Abschnitts der Eingabe.
@@ -204,7 +218,8 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt das aktuelle Zeichen oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der Eingabe erreicht wurde.
+	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende des
+	 * Abschnitts der Eingabe erreicht wurde.
 	 * 
 	 * @see #skip()
 	 * @see #take()
@@ -222,6 +237,43 @@ public class Parser {
 	 */
 	public final String source() {
 		return this.source;
+	}
+
+	/**
+	 * Diese Methode gibt eine Zeichenkette mit dem Abschnitt der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
+	 * 
+	 * @return Zeichenkette.
+	 */
+	public final String section() {
+		return this.source.substring(this.offset, this.offset + this.length);
+	}
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} am {@link #offset() Anfang} des zu bearbeitenden Abschnitts
+	 * der {@link #source() Eingabe} ist.
+	 * 
+	 * @see #seek(int)
+	 * @see #reset()
+	 * @see #index()
+	 * @see #offset()
+	 * @return {@code true}, wenn die aktuelle Position minimal ist.
+	 */
+	public final boolean isReset() {
+		return this.index == this.offset;
+	}
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} am Ende des des zu bearbeitenden Abschnitts der
+	 * {@link #source() Eingabe} und das {@link #symbol() aktuelle Zeichen} damit {@code -1} ist.
+	 * 
+	 * @see #seek(int)
+	 * @see #index()
+	 * @see #length()
+	 * @see #symbol()
+	 * @return {@code true}, wenn die aktuelle Position maximal ist.
+	 */
+	public final boolean isParsed() {
+		return this.symbol < 0;
 	}
 
 	/**

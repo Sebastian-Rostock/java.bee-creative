@@ -79,7 +79,7 @@ public final class Values {
 			if(start < 0) return;
 			this.value = -1;
 			if(this.index() <= start) return;
-			this.range('?', start);
+			this.range('.', start);
 		}
 
 		/**
@@ -1206,7 +1206,7 @@ public final class Values {
 	 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
 	 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
 	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
-	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '?'}.</li>
+	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
 	 * </ul>
 	 * 
 	 * @see Script
