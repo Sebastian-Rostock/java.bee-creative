@@ -30,7 +30,7 @@ import bee.creative.util.Parser;
 public final class Values {
 
 	/**
-	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String, int, int)}.
+	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -47,18 +47,15 @@ public final class Values {
 		private final List<Range> ranges;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Eingabe sowie Beginn und Länge des Abschnitts, auf dem dieser {@link Parser} arbeitet.
+		 * Dieser Konstruktor initialisiert die Eingabe.
 		 * 
 		 * @param source Eingabe.
-		 * @param offset Beginn des Abschnitts
-		 * @param length Länge des Abschnitts.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 * @throws IllegalArgumentException Wenn Beginn ider Länge ungültig sind.
 		 */
-		public ValueParser(final String source, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-			super(source, offset, length);
+		public ValueParser(final String source) throws NullPointerException {
+			super(source);
 			this.value = -1;
-			this.ranges = new ArrayList<Range>((length / 10) + 5);
+			this.ranges = new ArrayList<Range>((length() / 10) + 5);
 		}
 
 		/**
@@ -1194,8 +1191,8 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück. Die Erzeugung von Bereichen erfolgt gemäß dieser
-	 * Regeln:
+	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück. Die Erzeugung von {@link Range Bereichen} erfolgt
+	 * gemäß dieser Regeln:
 	 * <ul>
 	 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
 	 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
@@ -1213,19 +1210,17 @@ public final class Values {
 	 * @see #compileValue(Script, ScriptCompiler, String...)
 	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param source Zeichenkette.
-	 * @param offset Beginn des Abschnitts, auf dem der {@link Parser} arbeitet.
-	 * @param length Länge des Abschnitts, auf dem der {@link Parser} arbeitet.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public static Script parseScript(final String source, int offset, int length) throws NullPointerException {
-		return new Script(source, new ValueParser(source, offset, length).parse());
+	public static Script parseScript(final String source) throws NullPointerException {
+		return new Script(source, new ValueParser(source).parse());
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
 	 * 
-	 * @see #parseScript(String, int, int)
+	 * @see #parseScript(String)
 	 * @see #compileFunction(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
@@ -1259,7 +1254,7 @@ public final class Values {
 	 * {@link FunctionValue}s.</li>
 	 * </ul>
 	 * 
-	 * @see #parseScript(String, int, int)
+	 * @see #parseScript(String)
 	 * @see #compileValue(Script, ScriptCompiler, String...)
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.

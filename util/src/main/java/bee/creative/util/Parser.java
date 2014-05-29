@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Klasse implementiert ein Objekt zum Parsen eines Abschnitts einer Zeichenkette.
+ * Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -11,6 +11,11 @@ public class Parser {
 	 * Dieses Feld speichert die aktuelle Position.
 	 */
 	private int index;
+
+	/**
+	 * Dieses Feld speichert die Zeichen der Eingabe.
+	 */
+	private final char[] chars;
 
 	/**
 	 * Dieses Feld speichert die Ausgabe.
@@ -28,43 +33,18 @@ public class Parser {
 	private final String source;
 
 	/**
-	 * Dieses Feld speichert den Beginn des Abschnitts, auf dem der {@link Parser} arbeitet.
-	 */
-	private final int offset;
-
-	/**
-	 * Dieses Feld speichert die Anzahl der Zeichen in den Abschnitt, auf dem der {@link Parser} arbeitet.
+	 * Dieses Feld speichert die Anzahl der Zeichen in der Eingabe.
 	 */
 	private final int length;
 
 	/**
-	 * Dieser Konstruktor initialisiert die Eingabe auf dem dieser {@link Parser} arbeitet.
+	 * Dieser Konstruktor initialisiert die Eingabe.
 	 * 
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public Parser(final String source) throws NullPointerException {
-		this(source, 0, source.length());
-	}
-
-	/**
-	 * Dieser Konstruktor initialisiert die Eingabe sowie Beginn und Länge des Abschnitts, auf dem dieser {@link Parser} arbeitet.
-	 * 
-	 * @see #source()
-	 * @see #offset()
-	 * @see #length()
-	 * @param source Eingabe.
-	 * @param offset Beginn des Abschnitts
-	 * @param length Länge des Abschnitts.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 * @throws IllegalArgumentException Wenn Beginn ider Länge ungültig sind.
-	 */
-	public Parser(final String source, final int offset, final int length) throws NullPointerException, IllegalArgumentException {
-		if(source == null) throw new NullPointerException();
-		if((offset < 0) || (length < 0) || ((offset + length) > source.length())) throw new IllegalArgumentException();
-		this.source = source;
-		this.offset = offset;
-		this.length = offset + length;
+		this.length = (this.chars = (this.source = source).toCharArray()).length;
 		this.target = new StringBuffer();
 		this.reset();
 	}
@@ -79,8 +59,8 @@ public class Parser {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
 	 */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
-		if(index < this.offset) throw new IndexOutOfBoundsException("Index out of range: " + index);
-		if(index < this.length) return this.symbol = this.source.codePointAt(this.index = index);
+		if(index < 0) throw new IndexOutOfBoundsException();
+		if(index < this.length) return this.symbol = this.chars[this.index = index];
 		this.index = this.length;
 		return this.symbol = -1;
 	}
@@ -95,7 +75,7 @@ public class Parser {
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int skip() {
-		final int index = this.index + 1, symbol = index < this.length ? this.source.charAt(index) : -1;
+		final int index = this.index + 1, symbol = index < this.length ? this.chars[index] : -1;
 		this.index = index;
 		this.symbol = symbol;
 		return symbol;
@@ -103,8 +83,7 @@ public class Parser {
 
 	/**
 	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
-	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende des zu bearbeitenden Bereichs der {@link #source() Eingabe} befindet, wird kein Zeichen in
-	 * die Ausgabe übernommen.
+	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
 	 * 
 	 * @see #take(int)
 	 * @see #skip()
@@ -155,13 +134,12 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode setzt die {@link #index() aktuelle Position} auf den {@link #offset() Anfang des Abschnitts} der {@link #source() Eingabe} zurück.
+	 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
 	 * 
 	 * @see #seek(int)
-	 * @see #offset()
 	 */
 	public final void reset() {
-		this.seek(this.offset);
+		this.seek(0);
 	}
 
 	/**
@@ -192,34 +170,20 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt den Beginn des Abschnitts der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
-	 * 
-	 * @see #seek(int)
-	 * @see #reset()
-	 * @see #index()
-	 * @see #length()
-	 * @return Beginn des Abschnitts der Eingabe.
-	 */
-	public final int offset() {
-		return this.offset;
-	}
-
-	/**
-	 * Diese Methode gibt die Länge des Abschnitts der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
+	 * Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
 	 * 
 	 * @see #seek(int)
 	 * @see #index()
-	 * @see #offset()
 	 * @see #source()
-	 * @return Länge des Abschnitts der Eingabe.
+	 * @return Länge der Eingabe.
 	 */
 	public final int length() {
-		return this.length - this.offset;
+		return this.length;
 	}
 
 	/**
-	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende des
-	 * Abschnitts der Eingabe erreicht wurde.
+	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
+	 * {@link #source() Eingabe} erreicht wurde.
 	 * 
 	 * @see #skip()
 	 * @see #take()
@@ -240,31 +204,21 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zeichenkette mit dem Abschnitt der {@link #source() Eingabe} zurück, auf dem dieser {@link Parser} arbeitet.
-	 * 
-	 * @return Zeichenkette.
-	 */
-	public final String section() {
-		return this.source.substring(this.offset, this.offset + this.length);
-	}
-
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} am {@link #offset() Anfang} des zu bearbeitenden Abschnitts
-	 * der {@link #source() Eingabe} ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
+	 * Eingabe} ist.
 	 * 
 	 * @see #seek(int)
 	 * @see #reset()
 	 * @see #index()
-	 * @see #offset()
 	 * @return {@code true}, wenn die aktuelle Position minimal ist.
 	 */
 	public final boolean isReset() {
-		return this.index == this.offset;
+		return this.index == 0;
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} am Ende des des zu bearbeitenden Abschnitts der
-	 * {@link #source() Eingabe} und das {@link #symbol() aktuelle Zeichen} damit {@code -1} ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
+	 * Position} am Ende der {@link #source() Eingabe} ist.
 	 * 
 	 * @see #seek(int)
 	 * @see #index()

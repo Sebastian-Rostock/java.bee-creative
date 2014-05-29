@@ -14,7 +14,7 @@ import bee.creative.util.Objects;
 /**
  * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * 
- * @see Values#parseScript(String, int, int)
+ * @see Values#parseScript(String)
  * @see Values#compileValue(Script, ScriptCompiler, String...)
  * @see Values#compileFunction(Script, ScriptCompiler, String...)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -273,27 +273,29 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	}
 
 	/**
-	 * Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} das Zeichenkette zurück.
-	 * 
-	 * @see Range#type()
-	 * @see #ranges()
-	 * @return Bereichstypen als Zeichenkette.
-	 */
-	public String types() {
-		final StringBuilder builder = new StringBuilder();
-		for(final Range range: this.ranges){
-			builder.append(range.type);
-		}
-		return builder.toString();
-	}
-
-	/**
 	 * Diese Methode gibt die Zeichenkette zurück.
 	 * 
 	 * @return Zeichenkette.
 	 */
 	public String source() {
 		return this.source;
+	}
+
+	/**
+	 * Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} das Zeichenkette zurück.
+	 * 
+	 * @see Range#type()
+	 * @see #ranges()
+	 * @return Bereichstypen als Zeichenkette.
+	 */
+	public char[] types() {
+		final Range[] ranges = this.ranges;
+		final int length = ranges.length;
+		final char[] types = new char[length];
+		for(int i = 0; i < length; i++){
+			types[i] = ranges[i].type;
+		}
+		return types;
 	}
 
 	/**
