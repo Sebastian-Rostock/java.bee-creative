@@ -554,7 +554,7 @@ public final class Values {
 		/**
 		 * Dieses Feld speichert die Serial-Version-UID.
 		 */
-		private static final long serialVersionUID = 5626029522273462062L;
+		private static final long serialVersionUID = -2729122475649970656L;
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
@@ -574,7 +574,19 @@ public final class Values {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ScriptCompilerException(final Script script, final Range range) throws NullPointerException {
-			super("Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".");
+			this(script, range, null);
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert den Quelltext und den Bereich mit dem Syntaxfehler.
+		 * 
+		 * @param script Quelltext.
+		 * @param range Bereich mit dem Syntaxfehler.
+		 * @param cause Verursachende Ausnahme.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ScriptCompilerException(final Script script, final Range range, Throwable cause) throws NullPointerException {
+			super("Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
 			this.script = script;
 			this.range = range;
 		}
