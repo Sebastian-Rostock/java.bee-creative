@@ -94,7 +94,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public AbstractNamedConverter(final String name) throws NullPointerException {
-			if(name == null) throw new NullPointerException("name is null");
+			if(name == null) throw new NullPointerException();
 			this.name = name;
 		}
 
@@ -148,7 +148,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
 		public AbstractDelegatingConverter(final Converter<? super GInput2, ? extends GOutput2> converter) throws NullPointerException {
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -225,7 +225,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn das gegebene {@link bee.creative.util.Field} null ist.
 		 */
 		public FieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -288,7 +288,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
 		public FixedFieldConverter(final Field field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -356,7 +356,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
 		 */
 		public FixedMethodConverter(final Method method) throws NullPointerException {
-			if(method == null) throw new NullPointerException("method is null");
+			if(method == null) throw new NullPointerException();
 			this.method = method;
 		}
 
@@ -431,7 +431,7 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException("input is null");
+			if(input == null) throw new NullPointerException();
 			try{
 				return (GOutput)input.getClass().getField(this.name).get(input);
 			}catch(final IllegalAccessException e){
@@ -482,7 +482,7 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException("input is null");
+			if(input == null) throw new NullPointerException();
 			try{
 				return (GOutput)input.getClass().getMethod(this.name).invoke(input);
 			}catch(final InvocationTargetException e){
@@ -727,8 +727,7 @@ public class Converters {
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1, final Converter<? super GValue, ? extends GOutput> converter2)
 			throws NullPointerException {
-			if(converter1 == null) throw new NullPointerException("converter1 is null");
-			if(converter2 == null) throw new NullPointerException("converter2 is null");
+			if((converter1 == null) || (converter2 == null)) throw new NullPointerException();
 			this.converter1 = converter1;
 			this.converter2 = converter2;
 		}
@@ -806,9 +805,7 @@ public class Converters {
 		 */
 		public ConditionalConverter(final Filter<? super GInput> condition, final Converter<? super GInput, ? extends GOutput> accept,
 			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-			if(condition == null) throw new NullPointerException("condition is null");
-			if(accept == null) throw new NullPointerException("accept is null");
-			if(reject == null) throw new NullPointerException("reject is null");
+			if((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
 			this.condition = condition;
 			this.accept = accept;
 			this.reject = reject;

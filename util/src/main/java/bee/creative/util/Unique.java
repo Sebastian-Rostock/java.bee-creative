@@ -104,9 +104,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn eines der Argumente {@code null} ist.
 		 */
 		public ListData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			if(owner == null) throw new NullPointerException("owner is null");
-			if(inputs == null) throw new NullPointerException("inputs is null");
-			if(outputs == null) throw new NullPointerException("outputs is null");
+			if((owner == null) || (inputs == null) || (outputs == null)) throw new NullPointerException();
 			this.owner = owner;
 			this.inputs = inputs;
 			this.outputs = outputs;
@@ -330,7 +328,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public HashData(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException("owner is null");
+			if(owner == null) throw new NullPointerException();
 			this.owner = owner;
 			this.verifyLength(16);
 		}
@@ -625,7 +623,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException("owner is null");
+			if(owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -673,7 +671,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public EntryMap(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException("owner is null");
+			if(owner == null) throw new NullPointerException();
 			this.owner = owner;
 			this.entrySet = new EntrySet<GInput, GOutput>(owner);
 		}
@@ -776,7 +774,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn die gegebenen {@link Unique.Data} {@code null} ist.
 		 */
 		public UniqueSet(final Data<GValue, GValue> data) throws NullPointerException {
-			if(data == null) throw new NullPointerException("data is null");
+			if(data == null) throw new NullPointerException();
 			this.data = data;
 		}
 
@@ -840,7 +838,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @throws NullPointerException Wenn die gegebenen {@link Unique.Data} {@code null} ist.
 		 */
 		public UniqueMap(final Data<GInput, GOutput> data) throws NullPointerException {
-			if(data == null) throw new NullPointerException("data is null");
+			if(data == null) throw new NullPointerException();
 			this.data = data;
 		}
 

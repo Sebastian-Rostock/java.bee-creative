@@ -724,8 +724,7 @@ public class Objects {
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
 	 */
 	public static String toStringCallFormat(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
-		if(name == null) throw new NullPointerException("name is null");
-		if(args == null) throw new NullPointerException("args is null");
+		if((name == null) || (args == null)) throw new NullPointerException();
 		final StringBuilder output = new StringBuilder(name);
 		if(args.length != 0){
 			String join = (format ? "(\n  " : "( ");
@@ -764,7 +763,7 @@ public class Objects {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		if(object == null) throw new NullPointerException("object is null");
+		if(object == null) throw new NullPointerException();
 		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
 	}
 

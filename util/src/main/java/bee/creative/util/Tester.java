@@ -69,7 +69,7 @@ public class Tester {
 		 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner oder gleich {@code 0} ist.
 		 */
 		public Updater(final int millis) throws IllegalArgumentException {
-			if(millis <= 0) throw new IllegalArgumentException("millis <= 0");
+			if(millis <= 0) throw new IllegalArgumentException();
 			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
@@ -192,8 +192,8 @@ public class Tester {
 	 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner als {@code 0} ist.
 	 */
 	public Tester(final int millis, final Test method) throws NullPointerException, IllegalArgumentException {
-		if(millis < 0) throw new IllegalArgumentException("millis < 0");
-		if(method == null) throw new NullPointerException("method is null");
+		if(millis < 0) throw new IllegalArgumentException();
+		if(method == null) throw new NullPointerException();
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable throwable = null;
 		if(millis > 0){

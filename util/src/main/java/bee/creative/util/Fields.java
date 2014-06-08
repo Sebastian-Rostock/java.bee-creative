@@ -68,7 +68,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
 		public AbstractDelegatingField(final Field<? super GInput2, GValue2> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -589,7 +589,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingSetField(final Field<? super GInput, Set<GEntry>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -659,7 +659,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingListField(final Field<? super GInput, List<GEntry>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -730,7 +730,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingMapField(final Field<? super GInput, Map<GKey, GValue>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException("field is null");
+			if(field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -1039,7 +1039,7 @@ public final class Fields {
 		 */
 		public ConvertedField(final Converter<? super GInput, ? extends GOutput> converter, final Field<? super GOutput, GValue> field) throws NullPointerException {
 			super(field);
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -1214,9 +1214,7 @@ public final class Fields {
 		 */
 		public ConditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject)
 			throws NullPointerException {
-			if(condition == null) throw new NullPointerException("condition is null");
-			if(accept == null) throw new NullPointerException("accept is null");
-			if(reject == null) throw new NullPointerException("reject is null");
+			if((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
 			this.condition = condition;
 			this.accept = accept;
 			this.reject = reject;

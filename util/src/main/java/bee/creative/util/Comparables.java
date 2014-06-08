@@ -142,7 +142,7 @@ public class Comparables {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 		 */
 		public AbstractDelegatingComparable(final Comparable<? super GEntry2> comparable) throws NullPointerException {
-			if(comparable == null) throw new NullPointerException("comparable is null");
+			if(comparable == null) throw new NullPointerException();
 			this.comparable = comparable;
 		}
 
@@ -245,7 +245,7 @@ public class Comparables {
 		 */
 		public EntryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
 			this.entry = entry;
-			if(comparator == null) throw new NullPointerException("comparator is null");
+			if(comparator == null) throw new NullPointerException();
 			this.comparator = comparator;
 		}
 
@@ -357,8 +357,7 @@ public class Comparables {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2) throws NullPointerException {
-			if(comparable1 == null) throw new NullPointerException("comparable1 is null");
-			if(comparable2 == null) throw new NullPointerException("comparable2 is null");
+			if((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
 			this.comparable1 = comparable1;
 			this.comparable2 = comparable2;
 		}
@@ -429,7 +428,7 @@ public class Comparables {
 		public ConvertedComparable(final Comparable<? super GOutput> comparable, final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
 			super(comparable);
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -477,7 +476,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
 	 */
 	static void check(final Comparable<?> comparable) throws NullPointerException {
-		if(comparable == null) throw new NullPointerException("comparable is null");
+		if(comparable == null) throw new NullPointerException();
 	}
 
 	/**
@@ -486,10 +485,9 @@ public class Comparables {
 	 * @param fromIndex Anfang des Suchraums (inklusiv).
 	 * @param toIndex Ende des Suchraums (exklusiv).
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > length}.
 	 */
-	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
-		if(fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
+	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
+		if(fromIndex > toIndex) throw new IllegalArgumentException();
 	}
 
 	/**
@@ -503,8 +501,8 @@ public class Comparables {
 	 */
 	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
 		Comparables.check(fromIndex, toIndex);
-		if(fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex out of range: " + fromIndex);
-		if(toIndex > length) throw new IndexOutOfBoundsException("toIndex out of range: " + toIndex);
+		if(fromIndex < 0) throw new IndexOutOfBoundsException();
+		if(toIndex > length) throw new IndexOutOfBoundsException();
 	}
 
 	/**
@@ -520,7 +518,7 @@ public class Comparables {
 	 */
 	static void check(final Object[] array, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException, IndexOutOfBoundsException {
-		if(array == null) throw new NullPointerException("array is null");
+		if(array == null) throw new NullPointerException();
 		Comparables.check(comparable);
 		Comparables.check(array.length, fromIndex, toIndex);
 	}
@@ -538,7 +536,7 @@ public class Comparables {
 	 */
 	static void check(final List<?> list, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException, IndexOutOfBoundsException {
-		if(list == null) throw new NullPointerException("list is null");
+		if(list == null) throw new NullPointerException();
 		Comparables.check(comparable);
 		Comparables.check(list.size(), fromIndex, toIndex);
 	}
@@ -555,7 +553,7 @@ public class Comparables {
 	 */
 	static void check(final Get<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException {
-		if(items == null) throw new NullPointerException("items is null");
+		if(items == null) throw new NullPointerException();
 		Comparables.check(comparable);
 		Comparables.check(fromIndex, toIndex);
 	}

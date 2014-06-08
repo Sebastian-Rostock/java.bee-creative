@@ -247,8 +247,7 @@ public class Pointers {
 		 * @throws NullPointerException Wenn der gegebenen {@link Pointer} bzw. der gegebenen {@link Converter} {@code null} ist.
 		 */
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter, final Pointer<? extends GInput> pointer) throws NullPointerException {
-			if(pointer == null) throw new NullPointerException("pointer is null");
-			if(converter == null) throw new NullPointerException("converter is null");
+			if((pointer == null) || (converter == null)) throw new NullPointerException();
 			this.pointer = pointer;
 			this.converter = converter;
 		}
@@ -350,7 +349,7 @@ public class Pointers {
 	 * @throws NullPointerException Wenn der gegebenen {@link Pointer} {@code null} ist.
 	 */
 	public static boolean isValid(final Pointer<?> pointer) throws NullPointerException {
-		if(pointer == null) throw new NullPointerException("pointer is null");
+		if(pointer == null) throw new NullPointerException();
 		return (pointer == NullPointer.INSTANCE) || (pointer.data() != null);
 	}
 
@@ -387,7 +386,7 @@ public class Pointers {
 			case SOFT:
 				return Pointers.softPointer(data);
 		}
-		throw new IllegalArgumentException("mode out of range: " + mode);
+		throw new IllegalArgumentException();
 	}
 
 	/**

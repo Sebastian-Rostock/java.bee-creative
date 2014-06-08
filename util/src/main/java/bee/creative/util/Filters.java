@@ -65,8 +65,7 @@ public class Filters {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public AbstractJunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if(filter1 == null) throw new NullPointerException("filter1 is null");
-			if(filter2 == null) throw new NullPointerException("filter2 is null");
+			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
 			this.filter1 = filter1;
 			this.filter2 = filter2;
 		}
@@ -118,10 +117,10 @@ public class Filters {
 		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public AbstractDelegatingFilter(final Filter<? super GInput2> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException("filter is null");
+			if(filter == null) throw new NullPointerException();
 			this.filter = filter;
 		}
 
@@ -183,6 +182,60 @@ public class Filters {
 		@Override
 		public boolean equals(final Object object) {
 			return (object == this) || (object instanceof NullFilter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Filter}, der nur die Eingaben akzeptiert, die Instanzen einer gegebenen Klasse oder ihrer Nachfahren sind.
+	 * 
+	 * @see Class#isInstance(Object)
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 */
+	public static final class ClassFilter<GInput> extends AbstractFilter<GInput> {
+
+		/**
+		 * Dieses Feld speichert die Klasse.
+		 */
+		final Class<?> clazz;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Klasse.
+		 * 
+		 * @param clazz Klasse.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ClassFilter(final Class<?> clazz) throws NullPointerException {
+			if(clazz == null) throw new NullPointerException();
+			this.clazz = clazz;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean accept(final GInput input) {
+			return this.clazz.isInstance(input);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.clazz);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ClassFilter<?>)) return false;
+			final ClassFilter<?> data = (ClassFilter<?>)object;
+			return Objects.equals(this.clazz, data.clazz);
 		}
 
 	}
@@ -263,7 +316,7 @@ public class Filters {
 		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public NegationFilter(final Filter<? super GInput> filter) throws NullPointerException {
 			super(filter);
@@ -309,10 +362,10 @@ public class Filters {
 		 * Dieser Konstruktor initialisiert die {@link Collection}.
 		 * 
 		 * @param collection {@link Collection}.
-		 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ContainsFilter(final Collection<?> collection) {
-			if(collection == null) throw new NullPointerException("collection is null");
+			if(collection == null) throw new NullPointerException();
 			this.collection = collection;
 		}
 
@@ -382,7 +435,7 @@ public class Filters {
 		 */
 		public ConvertedFilter(final Converter<? super GInput, ? extends GOutput> converter, final Filter<? super GOutput> filter) {
 			super(filter);
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -568,7 +621,7 @@ public class Filters {
 		 * Dieser Konstruktor initialisiert den {@link Filter}.
 		 * 
 		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public SynchronizedFilter(final Filter<? super GInput> filter) {
 			super(filter);
@@ -602,7 +655,7 @@ public class Filters {
 	 * 
 	 * <pre>input != null</pre>
 	 * 
-	 * @see NullFilter
+	 * @see NullFilter#INSTANCE
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link NullFilter}.
 	 */
@@ -612,10 +665,23 @@ public class Filters {
 	}
 
 	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode der nur die Eingaben akzeptiert, die Instanzen der gegebenen
+	 * {@link Class} oder ihrer Nachfahren sind.
+	 * 
+	 * @see ClassFilter
+	 * @param <GInput> Typ der Eingabe.
+	 * @param clazz {@link Class}.
+	 * @return {@link ClassFilter}.
+	 */
+	public static <GInput> ClassFilter<GInput> classFilter(final Class<?> clazz) {
+		return new ClassFilter<GInput>(clazz);
+	}
+
+	/**
 	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer
 	 * {@code true}.
 	 * 
-	 * @see AcceptFilter
+	 * @see AcceptFilter#INSTANCE
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link AcceptFilter}.
 	 */
@@ -628,7 +694,7 @@ public class Filters {
 	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer
 	 * {@code false}.
 	 * 
-	 * @see RejectFilter
+	 * @see RejectFilter#INSTANCE
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link RejectFilter}.
 	 */
@@ -648,11 +714,11 @@ public class Filters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@link NegationFilter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if(filter == null) throw new NullPointerException("filter is null");
+		if(filter == null) throw new NullPointerException();
 		if(filter == AcceptFilter.INSTANCE) return Filters.rejectFilter();
 		if(filter == RejectFilter.INSTANCE) return Filters.acceptFilter();
 		if(filter instanceof NegationFilter<?>) return (Filter<GInput>)((NegationFilter<?>)filter).filter;
@@ -666,7 +732,7 @@ public class Filters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param inputs Eingaben.
 	 * @return {@link Filter}.
-	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GInput> Filter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
 		if(inputs.length == 0) return Filters.<GInput>rejectFilter();
@@ -684,7 +750,7 @@ public class Filters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param collection {@link Collection}.
 	 * @return {@link ContainsFilter}.
-	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GInput> ContainsFilter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
 		return new ContainsFilter<GInput>(collection);
@@ -782,7 +848,7 @@ public class Filters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@link SynchronizedFilter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Filter} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GInput> SynchronizedFilter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		return new SynchronizedFilter<GInput>(filter);

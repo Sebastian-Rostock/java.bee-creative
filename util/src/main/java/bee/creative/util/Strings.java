@@ -92,14 +92,13 @@ public class Strings {
 	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if(regex == null) throw new NullPointerException("regex is null");
-		if(string == null) throw new NullPointerException("string is null");
-		if(index < 0) throw new IllegalArgumentException("index out of range: " + index);
+		if((regex == null) || (string == null)) throw new NullPointerException();
+		if(index < 0) throw new IllegalArgumentException();
 		return Strings.apply(Strings.PATTERN_CONVERTER.convert(regex), string, index, split, match);
 	}
 
@@ -114,16 +113,15 @@ public class Strings {
 	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der gegebenen Index ungültig ist.
 	 */
 	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if(pattern == null) throw new NullPointerException("pattern is null");
-		if(string == null) throw new NullPointerException("string is null");
-		if(index < 0) throw new IllegalArgumentException("index out of range: " + index);
+		if((pattern == null) || (string == null)) throw new NullPointerException();
+		if(index < 0) throw new IllegalArgumentException();
 		final Matcher matcher = pattern.matcher(string);
-		if(index > matcher.groupCount()) throw new IllegalArgumentException("index out of range: " + index);
+		if(index > matcher.groupCount()) throw new IllegalArgumentException();
 		final List<String> stringList = new ArrayList<String>();
 		int cursor = 0;
 		while(matcher.find()){
@@ -158,8 +156,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if(regex == null) throw new NullPointerException("regex is null");
-		if(string == null) throw new NullPointerException("string is null");
+		if((regex == null) || (string == null)) throw new NullPointerException();
 		return Strings.applyAll(Strings.PATTERN_CONVERTER.convert(regex), string, split, match);
 	}
 
@@ -173,11 +170,10 @@ public class Strings {
 	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
-	 * @throws NullPointerException Wenn der gegebenen kompilierte reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if(pattern == null) throw new NullPointerException("pattern is null");
-		if(string == null) throw new NullPointerException("string is null");
+		if((pattern == null) || (string == null)) throw new NullPointerException();
 		final Matcher matcher = pattern.matcher(string);
 		final int count = matcher.groupCount() + 1;
 		final List<List<String>> stringListList = new ArrayList<List<String>>();
@@ -231,7 +227,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn das gegebenen Array {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
-		if(items == null) throw new NullPointerException("items is null");
+		if(items == null) throw new NullPointerException();
 		return Strings.join("", items);
 	}
 
@@ -246,8 +242,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn das gegebenen Array bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
-		if(space == null) throw new NullPointerException("space is null");
-		if(items == null) throw new NullPointerException("items is null");
+		if((space == null) || (items == null)) throw new NullPointerException();
 		return Strings.join(space, Arrays.asList(items));
 	}
 
@@ -264,7 +259,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
 	public static String join(final Iterable<?> items) {
-		if(items == null) throw new NullPointerException("items is null");
+		if(items == null) throw new NullPointerException();
 		return Strings.join("", items);
 	}
 
@@ -278,8 +273,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Iterable<?> items) {
-		if(space == null) throw new NullPointerException("space is null");
-		if(items == null) throw new NullPointerException("items is null");
+		if((space == null) || (items == null)) throw new NullPointerException();
 		final StringBuilder builder = new StringBuilder();
 		if(!space.isEmpty()){
 			String join = "";

@@ -38,10 +38,10 @@ public class Assignments {
 		 * 
 		 * @param parent {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
 		 * @param source Quellobjekt.
-		 * @throws NullPointerException wenn das gegebene {@link Assignment} {@code null} ist.
+		 * @throws NullPointerException Wenn das gegebene {@link Assignment} {@code null} ist.
 		 */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
-			if(parent == null) throw new NullPointerException("parent is null");
+			if(parent == null) throw new NullPointerException();
 			this.parent = parent;
 			this.source = source;
 		}
@@ -129,10 +129,10 @@ public class Assignments {
 		 * Dieser Konstruktor initialisiert die {@link Map}. Diese muss keine {@code null} Schlüssel unterstützen.
 		 * 
 		 * @param map {@link Map}.
-		 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ParentAssignment(final Map<Object, Object> map) throws NullPointerException {
-			if(map == null) throw new NullPointerException("map is null");
+			if(map == null) throw new NullPointerException();
 			this.map = map;
 		}
 
@@ -160,7 +160,7 @@ public class Assignments {
 		 */
 		@Override
 		public <GValue> void set(final GValue source, final GValue target) throws NullPointerException {
-			if(source == null) throw new NullPointerException("source is null");
+			if(source == null) throw new NullPointerException();
 			this.map.put(source, target);
 		}
 

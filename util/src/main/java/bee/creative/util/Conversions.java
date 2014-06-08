@@ -163,7 +163,7 @@ public class Conversions {
 		 * @throws NullPointerException Wenn die gegebene {@link Conversion} {@code null} ist.
 		 */
 		public InverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) throws NullPointerException {
-			if(conversion == null) throw new NullPointerException("conversion is null");
+			if(conversion == null) throw new NullPointerException();
 			this.conversion = conversion;
 		}
 
@@ -254,7 +254,7 @@ public class Conversions {
 		 * @throws NullPointerException Wenn der gegebenen {@link Converter} {@code null} ist.
 		 */
 		public DynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.input = input;
 			this.converter = converter;
 		}

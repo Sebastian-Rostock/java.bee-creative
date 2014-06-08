@@ -56,10 +56,10 @@ public class Builders {
 		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public AbstractDelegatingBuilder(final Builder<? extends GValue2> builder) throws NullPointerException {
-			if(builder == null) throw new NullPointerException("builder is null");
+			if(builder == null) throw new NullPointerException();
 			this.builder = builder;
 		}
 
@@ -242,7 +242,7 @@ public class Builders {
 		 */
 		public ConvertedBuilder(final Converter<? super GInput, ? extends GOutput> converter, final Builder<? extends GInput> builder) throws NullPointerException {
 			super(builder);
-			if(converter == null) throw new NullPointerException("converter is null");
+			if(converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -296,7 +296,7 @@ public class Builders {
 		 * Dieser Konstruktor initialisiert den {@link Builder}.
 		 * 
 		 * @param builder {@link Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public SynchronizedBuilder(final Builder<? extends GValue> builder) {
 			super(builder);
@@ -344,7 +344,7 @@ public class Builders {
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link CachedBuilder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GValue> CachedBuilder<GValue> cachedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
 		return Builders.cachedBuilder(Pointers.SOFT, builder);
@@ -391,7 +391,7 @@ public class Builders {
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
 	 * @return {@link SynchronizedBuilder}.
-	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GValue> SynchronizedBuilder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
 		return new SynchronizedBuilder<GValue>(builder);

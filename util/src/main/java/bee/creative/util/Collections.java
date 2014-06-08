@@ -2,11 +2,18 @@ package bee.creative.util;
 
 import java.util.AbstractCollection;
 import java.util.AbstractList;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.RandomAccess;
+import java.util.Set;
+import javax.management.ListenerNotFoundException;
+import bee.creative.util.Filters.AcceptFilter;
+import bee.creative.util.Filters.ClassFilter;
 
 /**
  * Diese Klasse implementiert verkettete und rückwärts geordnete {@link List}-Sichten sowie eine verkettete {@link Collection}-Sicht.
@@ -21,10 +28,10 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	static class ReverseList<GValue> extends AbstractList<GValue> {
+	static abstract class AbstractReverseList<GValue> extends AbstractList<GValue> {
 
 		/**
-		 * Diese Klasse implementiert den {@link ListIterator} einer {@link ReverseList}.
+		 * Diese Klasse implementiert den {@link ListIterator} einer {@link AbstractReverseList}.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Elemente.
@@ -32,27 +39,27 @@ public class Collections {
 		static final class ReverseIterator<GValue> implements ListIterator<GValue> {
 
 			/**
-			 * Dieses Feld speichert die {@link ReverseList}.
+			 * Dieses Feld speichert die {@link AbstractReverseList}.
 			 */
-			final ReverseList<GValue> list;
+			final AbstractReverseList<GValue> list;
 
 			/**
-			 * Dieses Feld speichert die Größe der {@link ReverseList}.
+			 * Dieses Feld speichert die Größe der {@link AbstractReverseList}.
 			 */
 			int size;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link ReverseList#values}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractReverseList#list}.
 			 */
 			final ListIterator<GValue> iterator;
 
 			/**
-			 * Dieser Konstruktor initialisiert {@link ReverseList} und Index.
+			 * Dieser Konstruktor initialisiert {@link AbstractReverseList} und Index.
 			 * 
-			 * @param list {@link ReverseList}.
+			 * @param list {@link AbstractReverseList}.
 			 * @param index Index.
 			 */
-			public ReverseIterator(final ReverseList<GValue> list, final int index) {
+			public ReverseIterator(final AbstractReverseList<GValue> list, final int index) {
 				this.size = list.size();
 				this.list = list;
 				this.iterator = list.listIterator(this.size - index);
@@ -139,17 +146,17 @@ public class Collections {
 		/**
 		 * Dieses Feld speichert die {@link List}.
 		 */
-		List<GValue> values;
+		final List<GValue> list;
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link List}.
 		 * 
 		 * @param list {@link List}
-		 * @throws NullPointerException wenn die gegebene {@link List} {@code null} ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public ReverseList(final List<GValue> list) throws NullPointerException {
+		public AbstractReverseList(final List<GValue> list) throws NullPointerException {
 			if(list == null) throw new NullPointerException();
-			this.values = list;
+			this.list = list;
 		}
 
 		/**
@@ -157,15 +164,8 @@ public class Collections {
 		 */
 		@Override
 		protected void removeRange(final int fromIndex, final int toIndex) {
-			this.values.subList(this.values.size() - toIndex - 2, this.values.size() - fromIndex - 2).clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public List<GValue> subList(final int fromIndex, final int toIndex) {
-			return new ReverseList<GValue>(this.values.subList(this.values.size() - toIndex - 2, this.values.size() - fromIndex - 2));
+			final int size = this.list.size();
+			this.list.subList(size - toIndex, size - fromIndex).clear();
 		}
 
 		/**
@@ -173,7 +173,7 @@ public class Collections {
 		 */
 		@Override
 		public GValue get(final int index) {
-			return this.values.get(this.values.size() - index - 1);
+			return this.list.get(this.list.size() - index - 1);
 		}
 
 		/**
@@ -181,7 +181,7 @@ public class Collections {
 		 */
 		@Override
 		public GValue set(final int index, final GValue element) {
-			return this.values.set(this.values.size() - index - 1, element);
+			return this.list.set(this.list.size() - index - 1, element);
 		}
 
 		/**
@@ -189,81 +189,7 @@ public class Collections {
 		 */
 		@Override
 		public void add(final int index, final GValue element) {
-			this.values.add(this.values.size() - index, element);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GValue remove(final int index) {
-			return this.values.remove(this.values.size() - index - 1);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void clear() {
-			this.values.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.values.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean isEmpty() {
-			return this.values.isEmpty();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int indexOf(final Object o) {
-			final int index = this.values.lastIndexOf(o);
-			return index < 0 ? index : this.values.size() - index - 1;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int lastIndexOf(final Object o) {
-			final int index = this.values.lastIndexOf(o);
-			return index < 0 ? index : this.values.size() - index - 1;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean contains(final Object o) {
-			return this.values.contains(o);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean containsAll(final Collection<?> c) {
-			return this.values.containsAll(c);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean removeAll(final Collection<?> c) {
-			return this.values.removeAll(c);
+			this.list.add(this.list.size() - index, element);
 		}
 
 		/**
@@ -271,7 +197,81 @@ public class Collections {
 		 */
 		@Override
 		public boolean retainAll(final Collection<?> c) {
-			return this.values.retainAll(c);
+			return this.list.retainAll(c);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GValue remove(final int index) {
+			return this.list.remove(this.list.size() - index - 1);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			return this.list.removeAll(c);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.list.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.list.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.list.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int indexOf(final Object o) {
+			final int index = this.list.lastIndexOf(o);
+			return index < 0 ? -1 : this.list.size() - index - 1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int lastIndexOf(final Object o) {
+			final int index = this.list.indexOf(o);
+			return index < 0 ? -1 : this.list.size() - index - 1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean contains(final Object o) {
+			return this.list.contains(o);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean containsAll(final Collection<?> c) {
+			return this.list.containsAll(c);
 		}
 
 		/**
@@ -293,43 +293,15 @@ public class Collections {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link ReverseList} mit {@link RandomAccess}.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Elemente.
-	 */
-	static class ReverseRandomAccessList<GValue> extends ReverseList<GValue> implements RandomAccess {
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link List}.
-		 * 
-		 * @param list {@link List}
-		 * @throws NullPointerException wenn die gegebene {@link List} {@code null} ist.
-		 */
-		public ReverseRandomAccessList(final List<GValue> list) throws NullPointerException {
-			super(list);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public List<GValue> subList(final int fromIndex, final int toIndex) {
-			return new ReverseRandomAccessList<GValue>(this.values.subList(this.values.size() - toIndex - 2, this.values.size() - fromIndex - 2));
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine {@link List} als verkettete Sicht auf zwei gegebenen {@link List}s.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	static final class ChainedList<GValue> extends AbstractList<GValue> {
+	static abstract class AbstractChainedList<GValue> extends AbstractList<GValue> {
 
 		/**
-		 * Diese Klasse implementiert den {@link ListIterator} zu {@link ChainedList}.
+		 * Diese Klasse implementiert den {@link ListIterator} zu {@link AbstractChainedList}.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Elemente.
@@ -337,12 +309,12 @@ public class Collections {
 		static final class ChainedIterator<GValue> implements ListIterator<GValue> {
 
 			/**
-			 * Dieses Feld speichert die {@link ChainedList}.
+			 * Dieses Feld speichert die {@link AbstractChainedList}.
 			 */
-			final ChainedList<GValue> list;
+			final AbstractChainedList<GValue> list;
 
 			/**
-			 * Dieses Feld speichert die Größe von {@link ChainedList#values1}.
+			 * Dieses Feld speichert die Größe von {@link AbstractChainedList#list1}.
 			 */
 			int size;
 
@@ -352,30 +324,30 @@ public class Collections {
 			ListIterator<GValue> iterator;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link ChainedList#values1}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractChainedList#list1}.
 			 */
 			final ListIterator<GValue> iterator1;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link ChainedList#values2}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractChainedList#list2}.
 			 */
 			final ListIterator<GValue> iterator2;
 
 			/**
-			 * Dieser Konstruktor initialisiert {@link ChainedList} und Index.
+			 * Dieser Konstruktor initialisiert {@link AbstractChainedList} und Index.
 			 * 
-			 * @param list {@link ChainedList}.
+			 * @param list {@link AbstractChainedList}.
 			 * @param index Index.
 			 */
-			public ChainedIterator(final ChainedList<GValue> list, final int index) {
-				this.size = list.values1.size();
+			public ChainedIterator(final AbstractChainedList<GValue> list, final int index) {
+				this.size = list.list1.size();
 				this.list = list;
 				if(index < this.size){
-					this.iterator1 = this.iterator = list.values1.listIterator(index);
-					this.iterator2 = list.values2.listIterator(0);
+					this.iterator1 = this.iterator = list.list1.listIterator(index);
+					this.iterator2 = list.list2.listIterator(0);
 				}else{
-					this.iterator1 = list.values1.listIterator(this.size);
-					this.iterator2 = this.iterator = list.values2.listIterator(index - this.size);
+					this.iterator1 = list.list1.listIterator(this.size);
+					this.iterator2 = this.iterator = list.list2.listIterator(index - this.size);
 				}
 			}
 
@@ -415,7 +387,7 @@ public class Collections {
 				}else{
 					this.iterator2.add(e);
 				}
-				this.size = this.list.values1.size();
+				this.size = this.list.list1.size();
 			}
 
 			/**
@@ -457,7 +429,7 @@ public class Collections {
 			public void remove() {
 				this.iterator.remove();
 				if(this.iterator == this.iterator2) return;
-				this.size = this.list.values1.size();
+				this.size = this.list.list1.size();
 			}
 
 		}
@@ -465,12 +437,12 @@ public class Collections {
 		/**
 		 * Dieses Feld speichert die erste {@link List}.
 		 */
-		final List<GValue> values1;
+		final List<GValue> list1;
 
 		/**
 		 * Dieses Feld speichert die zweite {@link List}.
 		 */
-		final List<GValue> values2;
+		final List<GValue> list2;
 
 		/**
 		 * Dieses Feld speichert den Erweiterungsmodus.
@@ -487,11 +459,11 @@ public class Collections {
 		 * @param extendMode Erweiterungsmodus.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ChainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
+		public AbstractChainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
 			if((values1 == null) || (values2 == null)) throw new NullPointerException();
 			this.extendMode = extendMode;
-			this.values1 = values1;
-			this.values2 = values2;
+			this.list1 = values1;
+			this.list2 = values2;
 		}
 
 		/**
@@ -499,7 +471,8 @@ public class Collections {
 		 */
 		@Override
 		public GValue get(final int index) {
-			return index < this.values1.size() ? this.values1.get(index) : this.values2.get(index - this.values1.size());
+			final int size = this.list1.size();
+			return index < size ? this.list1.get(index) : this.list2.get(index - size);
 		}
 
 		/**
@@ -507,24 +480,8 @@ public class Collections {
 		 */
 		@Override
 		public GValue set(final int index, final GValue element) {
-			return index < this.values1.size() ? this.values1.set(index, element) : this.values2.set(index - this.values1.size(), element);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.values1.size() + this.values2.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void clear() {
-			this.values1.clear();
-			this.values2.clear();
+			final int size = this.list1.size();
+			return index < size ? this.list1.set(index, element) : this.list2.set(index - size, element);
 		}
 
 		/**
@@ -532,11 +489,11 @@ public class Collections {
 		 */
 		@Override
 		public void add(final int index, final GValue element) {
-			final int size = this.values1.size();
+			final int size = this.list1.size();
 			if((index < size) || ((index == size) && this.extendMode)){
-				this.values1.add(index, element);
+				this.list1.add(index, element);
 			}else{
-				this.values2.add(index - size, element);
+				this.list2.add(index - size, element);
 			}
 		}
 
@@ -545,27 +502,9 @@ public class Collections {
 		 */
 		@Override
 		public boolean addAll(final int index, final Collection<? extends GValue> c) {
-			final int size = this.values1.size();
-			if((index < size) || ((index == size) && this.extendMode)) return this.values1.addAll(index, c);
-			return this.values2.addAll(index - size, c);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean remove(final Object o) {
-			return this.values1.remove(o) || this.values2.remove(o);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean removeAll(final Collection<?> c) {
-			if(!this.values1.removeAll(c)) return this.values2.removeAll(c);
-			this.values2.removeAll(c);
-			return true;
+			final int size = this.list1.size();
+			if((index < size) || ((index == size) && this.extendMode)) return this.list1.addAll(index, c);
+			return this.list2.addAll(index - size, c);
 		}
 
 		/**
@@ -573,10 +512,82 @@ public class Collections {
 		 */
 		@Override
 		public boolean retainAll(final Collection<?> c) {
-			if(this.values1.retainAll(c)){
-				this.values2.retainAll(c);
-				return true;
-			}else return this.values2.retainAll(c);
+			if(!this.list1.retainAll(c)) return this.list2.retainAll(c);
+			this.list2.retainAll(c);
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GValue remove(final int index) {
+			final int size = this.list1.size();
+			return index < size ? this.list1.remove(index) : this.list2.remove(index - size);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean remove(final Object o) {
+			return this.list1.remove(o) || this.list2.remove(o);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			if(!this.list1.removeAll(c)) return this.list2.removeAll(c);
+			this.list2.removeAll(c);
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.list1.size() + this.list2.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.list1.clear();
+			this.list2.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.list1.isEmpty() && this.list2.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int indexOf(final Object o) {
+			int index = this.list1.indexOf(o);
+			if(index >= 0) return index;
+			index = this.list2.indexOf(o);
+			return index < 0 ? -1 : index + this.list1.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int lastIndexOf(final Object o) {
+			final int index = this.list2.lastIndexOf(o);
+			if(index >= 0) return index + this.list1.size();
+			return this.list1.lastIndexOf(o);
 		}
 
 		/**
@@ -584,7 +595,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean contains(final Object o) {
-			return this.values1.contains(o) || this.values2.contains(o);
+			return this.list1.contains(o) || this.list2.contains(o);
 		}
 
 		/**
@@ -592,7 +603,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GValue> iterator() {
-			return Iterators.chainedIterator(this.values1.iterator(), this.values2.iterator());
+			return Iterators.chainedIterator(this.list1.iterator(), this.list2.iterator());
 		}
 
 		/**
@@ -606,12 +617,272 @@ public class Collections {
 	}
 
 	/**
+	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente dieser {@link List}.
+	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
+	 */
+	static abstract class AbstractTranscodedList<GEntry, GEntry2> extends AbstractList<GEntry> {
+
+		/**
+		 * Dieses Feld speichert die {@link List} mit den internen Elementen.
+		 */
+		final List<GEntry2> list;
+
+		/**
+		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
+		 * {@link #lastIndexOf(Object)}.
+		 */
+		final Filter<? super Object> checker;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 */
+		final Converter<? super GEntry, ? extends GEntry2> parser;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 */
+		final Converter<? super GEntry2, ? extends GEntry> formatter;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
+		 * 
+		 * @param list {@link List} mit den internen Elementen.
+		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
+		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
+		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public AbstractTranscodedList(final List<GEntry2> list, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
+			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			if((list == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.list = list;
+			this.checker = checker;
+			this.parser = parser;
+			this.formatter = formatter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void removeRange(final int fromIndex, final int toIndex) {
+			this.list.subList(fromIndex, toIndex).clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry get(final int index) {
+			return this.formatter.convert(this.list.get(index));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry set(final int index, final GEntry element) {
+			return this.formatter.convert(this.list.set(index, this.parser.convert(element)));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final int index, final GEntry element) {
+			this.list.add(index, this.parser.convert(element));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GEntry remove(final int index) {
+			return this.formatter.convert(this.list.remove(index));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean remove(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.list.remove(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.list.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.list.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.list.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean contains(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.list.contains(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public int indexOf(final Object o) {
+			if(!this.checker.accept(o)) return -1;
+			return this.list.indexOf(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public int lastIndexOf(final Object o) {
+			if(!this.checker.accept(o)) return -1;
+			return this.list.lastIndexOf(((Converter)this.parser).convert(o));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als rückwärts geordnete Sicht auf eine gegebene {@link List}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Elemente.
+	 */
+	public static final class ReverseList<GValue> extends AbstractReverseList<GValue> {
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link List}.
+		 * 
+		 * @param list {@link List}
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ReverseList(final List<GValue> list) throws NullPointerException {
+			super(list);
+
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public List<GValue> subList(final int fromIndex, final int toIndex) {
+			return new ReverseList<GValue>(this.list.subList(this.list.size() - toIndex - 2, this.list.size() - fromIndex - 2));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als rückwärts geordnete Sicht auf eine gegebene {@link List} mit {@link RandomAccess}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Elemente.
+	 */
+	public static final class ReverseRandomAccessList<GValue> extends AbstractReverseList<GValue> implements RandomAccess {
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link List}.
+		 * 
+		 * @param list {@link List}
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ReverseRandomAccessList(final List<GValue> list) throws NullPointerException {
+			super(list);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public List<GValue> subList(final int fromIndex, final int toIndex) {
+			return new ReverseRandomAccessList<GValue>(this.list.subList(this.list.size() - toIndex - 2, this.list.size() - fromIndex - 2));
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als verkettete Sicht auf zwei gegebenen {@link List}s.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Elemente.
+	 */
+	public static final class ChainedList<GValue> extends AbstractChainedList<GValue> {
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen,
+		 * entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste
+		 * {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
+		 * 
+		 * @param list1 {@link List} der ersten Elemente.
+		 * @param list2 {@link List} der letzten Elemente.
+		 * @param extendMode Erweiterungsmodus.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ChainedList(final List<GValue> list1, final List<GValue> list2, final boolean extendMode) throws NullPointerException {
+			super(list1, list2, extendMode);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als verkettete Sicht auf zwei gegebenen {@link List}s mit {@link RandomAccess}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Elemente.
+	 */
+	public static final class ChainedRandomAccessList<GValue> extends AbstractChainedList<GValue> implements RandomAccess {
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen,
+		 * entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus {@code true}, wird die erste
+		 * {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
+		 * 
+		 * @param list1 {@link List} der ersten Elemente.
+		 * @param list2 {@link List} der letzten Elemente.
+		 * @param extendMode Erweiterungsmodus.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ChainedRandomAccessList(final List<GValue> list1, final List<GValue> list2, final boolean extendMode) throws NullPointerException {
+			super(list1, list2, extendMode);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert eine {@link Collection} als verkettete Sicht auf zwei gegebenen {@link Collection}s.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	static class ChainedCollection<GValue> extends AbstractCollection<GValue> {
+	public static final class ChainedCollection<GValue> extends AbstractCollection<GValue> {
 
 		/**
 		 * Dieses Feld speichert die erste {@link Collection}.
@@ -649,23 +920,6 @@ public class Collections {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int size() {
-			return this.values1.size() + this.values2.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void clear() {
-			this.values1.clear();
-			this.values2.clear();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public boolean add(final GValue e) {
 			return (this.extendMode ? this.values1 : this.values2).add(e);
 		}
@@ -676,6 +930,16 @@ public class Collections {
 		@Override
 		public boolean addAll(final Collection<? extends GValue> c) {
 			return (this.extendMode ? this.values1 : this.values2).addAll(c);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			if(!this.values1.retainAll(c)) return this.values2.retainAll(c);
+			this.values2.retainAll(c);
+			return true;
 		}
 
 		/**
@@ -700,10 +964,17 @@ public class Collections {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean retainAll(final Collection<?> c) {
-			if(!this.values1.retainAll(c)) return this.values2.retainAll(c);
-			this.values2.retainAll(c);
-			return true;
+		public int size() {
+			return this.values1.size() + this.values2.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.values1.clear();
+			this.values2.clear();
 		}
 
 		/**
@@ -720,6 +991,513 @@ public class Collections {
 		@Override
 		public Iterator<GValue> iterator() {
 			return Iterators.chainedIterator(this.values1.iterator(), this.values2.iterator());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link Map} als umkodierende Sicht auf eine gegebene {@link Map}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel dieser {@link Map}.
+	 * @param <GValue> Typ der Werte dieser {@link Map}.
+	 * @param <GKey2> Typ der Schlüssel der internen {@link Map}.
+	 * @param <GValue2> Typ der Werte der internen {@link Map}.
+	 */
+	public static final class TranscodedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> {
+
+		/**
+		 * Diese Klasse implementiert einrn abstrakten Eintrag einer {@link TranscodedMap}.
+		 * 
+		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 * @param <GKey> Typ des Schlüssels.
+		 * @param <GValue> Typ des Werts.
+		 */
+		static abstract class TranscodedEntry<GKey, GValue> implements Entry<GKey, GValue> {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int hashCode() {
+				return Objects.hash(this.getKey()) ^ Objects.hash(this.getValue());
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean equals(final Object object) {
+				if(!(object instanceof Entry<?, ?>)) return false;
+				final Entry<?, ?> data = (Entry<?, ?>)object;
+				return Objects.equals(this.getKey(), data.getKey()) && Objects.equals(this.getValue(), data.getValue());
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return this.getKey() + "=" + this.getValue();
+			}
+
+		}
+
+		/**
+		 * Dieses Feld speichert die {@link Map} mit den internen Einträgen.
+		 */
+		final Map<GKey2, GValue2> map;
+
+		/**
+		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
+		 */
+		final Filter<? super Object> keyChecker;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
+		 */
+		final Converter<? super GKey, ? extends GKey2> keyParser;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
+		 */
+		final Converter<? super GKey2, ? extends GKey> keyFormatter;
+
+		/**
+		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}.
+		 */
+		final Filter<? super Object> valueChecker;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
+		 */
+		final Converter<? super GValue, ? extends GValue2> valueParser;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
+		 */
+		final Converter<? super GValue2, ? extends GValue> valueFormatter;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link Map}.
+		 * 
+		 * @param map {@link Map} mit den internen einträgen.
+		 * @param keyChecker {@link Filter} zur Erkennung von Elementen in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
+		 * @param keyParser {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
+		 * @param keyFormatter {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
+		 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}.
+		 * @param valueParser {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
+		 * @param valueFormatter {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TranscodedMap(final Map<GKey2, GValue2> map, final Filter<? super Object> keyChecker, final Converter<? super GKey, ? extends GKey2> keyParser,
+			final Converter<? super GKey2, ? extends GKey> keyFormatter, final Filter<? super Object> valueChecker,
+			final Converter<? super GValue, ? extends GValue2> valueParser, final Converter<? super GValue2, ? extends GValue> valueFormatter)
+			throws NullPointerException {
+			if(map == null || keyChecker == null || keyParser == null || keyFormatter == null || valueChecker == null || valueParser == null
+				|| valueFormatter == null) throw new NullPointerException();
+			this.map = map;
+			this.keyChecker = keyChecker;
+			this.keyParser = keyParser;
+			this.keyFormatter = keyFormatter;
+			this.valueChecker = valueChecker;
+			this.valueParser = valueParser;
+			this.valueFormatter = valueFormatter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.map.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"rawtypes", "unchecked"})
+		@Override
+		public boolean containsKey(final Object key) {
+			if(!this.keyChecker.accept(key)) return false;
+			return this.map.containsKey(((Converter)this.keyParser).convert(key));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"rawtypes", "unchecked"})
+		@Override
+		public boolean containsValue(final Object value) {
+			if(!this.valueChecker.accept(value)) return false;
+			return this.map.containsValue(((Converter)this.valueParser).convert(value));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"rawtypes", "unchecked"})
+		@Override
+		public GValue get(final Object key) {
+			if(!this.keyChecker.accept(key)) return null;
+			return this.valueFormatter.convert(this.map.get(((Converter)this.keyParser).convert(key)));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.map.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Set<GKey> keySet() {
+			return new TranscodedSet<GKey, GKey2>(this.map.keySet(), this.keyChecker, this.keyParser, this.keyFormatter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public GValue put(final GKey key, final GValue value) {
+			return this.valueFormatter.convert(this.map.put(this.keyParser.convert(key), this.valueParser.convert(value)));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"rawtypes", "unchecked"})
+		@Override
+		public GValue remove(final Object key) {
+			if(!this.keyChecker.accept(key)) return null;
+			return this.valueFormatter.convert(this.map.remove(((Converter)this.keyParser).convert(key)));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.map.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Collection<GValue> values() {
+			return new TranscodedCollection<GValue, GValue2>(this.map.values(), this.valueChecker, this.valueParser, this.valueFormatter);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Set<Entry<GKey, GValue>> entrySet() {
+			return new TranscodedSet<Entry<GKey, GValue>, Entry<GKey2, GValue2>>(this.map.entrySet(), new Filter<Object>() {
+
+				@Override
+				public boolean accept(final Object input) {
+					if(!(input instanceof Entry)) return false;
+					final Entry<?, ?> entry = (Entry<?, ?>)input;
+					return TranscodedMap.this.keyChecker.accept(entry.getKey()) && TranscodedMap.this.valueChecker.accept(entry.getValue());
+				}
+
+			}, new Converter<Entry<GKey, GValue>, Entry<GKey2, GValue2>>() {
+
+				@Override
+				public Entry<GKey2, GValue2> convert(final Entry<GKey, GValue> input) {
+					return new TranscodedEntry<GKey2, GValue2>() {
+
+						@Override
+						public GKey2 getKey() {
+							return TranscodedMap.this.keyParser.convert(input.getKey());
+						}
+
+						@Override
+						public GValue2 getValue() {
+							return TranscodedMap.this.valueParser.convert(input.getValue());
+						}
+
+						@Override
+						public GValue2 setValue(final GValue2 value) {
+							return TranscodedMap.this.valueParser.convert(input.setValue(TranscodedMap.this.valueFormatter.convert(value)));
+						}
+
+					};
+				}
+
+			}, new Converter<Entry<GKey2, GValue2>, Entry<GKey, GValue>>() {
+
+				@Override
+				public Entry<GKey, GValue> convert(final Entry<GKey2, GValue2> input) {
+					return new TranscodedEntry<GKey, GValue>() {
+
+						@Override
+						public GKey getKey() {
+							return TranscodedMap.this.keyFormatter.convert(input.getKey());
+						}
+
+						@Override
+						public GValue getValue() {
+							return TranscodedMap.this.valueFormatter.convert(input.getValue());
+						}
+
+						@Override
+						public GValue setValue(final GValue value) {
+							return TranscodedMap.this.valueFormatter.convert(input.setValue(TranscodedMap.this.valueParser.convert(value)));
+						}
+
+					};
+				}
+
+			});
+		}
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Set} als umkodierende Sicht auf ein gegebenes {@link Set}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente dieses {@link Set}s.
+	 * @param <GEntry2> Typ der Elemente des internen {@link Set}s.
+	 */
+	public static final class TranscodedSet<GEntry, GEntry2> extends AbstractSet<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das {@link Set} mit den internen Elementen.
+		 */
+		final Set<GEntry2> set;
+
+		/**
+		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)} und {@link #contains(Object)}.
+		 */
+		final Filter<? super Object> checker;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 */
+		final Converter<? super GEntry, ? extends GEntry2> parser;
+
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 */
+		final Converter<? super GEntry2, ? extends GEntry> formatter;
+
+		/**
+		 * Dieser Konstruktor initialisiert das Konvertierte {@link Set}.
+		 * 
+		 * @param set {@link Set} mit den internen Elementen.
+		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)} und {@link #contains(Object)}. Zulässige Elemente werden in
+		 *        interne Elemente umgewandelt und an das interne {@link Set} delegiert.
+		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TranscodedSet(final Set<GEntry2> set, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
+			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			if((set == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.set = set;
+			this.checker = checker;
+			this.parser = parser;
+			this.formatter = formatter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean add(final GEntry e) {
+			return this.set.add(this.parser.convert(e));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean remove(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.set.remove(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.set.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.set.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.set.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean contains(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.set.contains(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return Iterators.convertedIterator(this.formatter, this.set.iterator());
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente dieser {@link List}.
+	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
+	 */
+	public static final class TranscodedList<GEntry, GEntry2> extends AbstractTranscodedList<GEntry, GEntry2> {
+
+		/**
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
+		 * 
+		 * @param list {@link List} mit den internen Elementen.
+		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
+		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
+		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TranscodedList(final List<GEntry2> list, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
+			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			super(list, checker, parser, formatter);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List} mit {@link RandomAccess}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente dieser {@link List}.
+	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
+	 */
+	public static final class TranscodedRandomAccessList<GEntry, GEntry2> extends AbstractTranscodedList<GEntry, GEntry2> implements RandomAccess {
+
+		/**
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
+		 * 
+		 * @param list {@link List} mit den internen Elementen.
+		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
+		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
+		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TranscodedRandomAccessList(final List<GEntry2> list, final Filter<? super Object> checker,
+			final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			super(list, checker, parser, formatter);
+		}
+
+	}
+
+	public static final class TranscodedCollection<GEntry, GValue> extends AbstractCollection<GEntry> {
+
+		final Collection<GValue> collection;
+
+		final Filter<? super Object> checker;
+
+		final Converter<? super GEntry, ? extends GValue> parser;
+
+		final Converter<? super GValue, ? extends GEntry> formatter;
+
+		public TranscodedCollection(final Collection<GValue> collection, final Filter<? super Object> checker,
+			final Converter<? super GEntry, ? extends GValue> parser, final Converter<? super GValue, ? extends GEntry> formatter) throws NullPointerException {
+			if((collection == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.collection = collection;
+			this.checker = checker;
+			this.parser = parser;
+			this.formatter = formatter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean add(final GEntry e) {
+			return this.collection.add(this.parser.convert(e));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean remove(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.collection.remove(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.collection.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void clear() {
+			this.collection.clear();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isEmpty() {
+			return this.collection.isEmpty();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean contains(final Object o) {
+			if(!this.checker.accept(o)) return false;
+			return this.collection.contains(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return Iterators.convertedIterator(this.formatter, this.collection.iterator());
 		}
 
 	}
@@ -766,7 +1544,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GValue> List<GValue> chainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
-		return new ChainedList<GValue>(values1, values2, extendMode);
+		return ((values1 instanceof RandomAccess) && (values2 instanceof RandomAccess)) ? //
+			new ChainedRandomAccessList<GValue>(values1, values2, extendMode) : new ChainedList<GValue>(values1, values2, extendMode);
 	}
 
 	/**
@@ -801,6 +1580,63 @@ public class Collections {
 	public static <GValue> Collection<GValue> chainedCollection(final Collection<GValue> values1, final Collection<GValue> values2, final boolean extendMode)
 		throws NullPointerException {
 		return new ChainedCollection<GValue>(values1, values2, extendMode);
+	}
+
+	/**
+	 * Diese Methode erzeugt eine {@link List} als umkodierende Sicht auf die gegebene {@link List} und gibt diese zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente der erzeugten {@link List}.
+	 * @param <GEntry2> Typ der Elemente der gegebenen {@link List}.
+	 * @param list gegebene {@link List}.
+	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link List#remove(Object)}, {@link List#contains(Object)},
+	 *        {@link List#indexOf(Object)} und {@link List#lastIndexOf(Object)} der erzeugten {@link List}. Zulässige Elemente werden in Elemente der gegebenen
+	 *        {@link List} umgewandelt und an die gegebene {@link List} delegiert.
+	 * @param parser {@link Converter} zur Umwandlung eines Elements der erzeugeten {@link List} in ein Element der gegebenen {@link List}.
+	 * @param formatter {@link Converter} zur Umwandlung eines Elements der gegebenen {@link List} in ein Element der erzeugten {@link List}.
+	 * @return umkodierende {@link List}-Sicht.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GEntry, GEntry2> List<GEntry> transcodedList(final List<GEntry2> list, final Filter<? super Object> checker,
+		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+		return list instanceof RandomAccess ? new TranscodedRandomAccessList<GEntry, GEntry2>(list, checker, parser, formatter)
+			: new TranscodedList<GEntry, GEntry2>(list, checker, parser, formatter);
+	}
+
+	/**
+	 * Diese Methode erzeugt ein {@link Set} als umkodierende Sicht auf das gegebene {@link Set} und gibt dieses zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente des erzeugten {@link Set}s.
+	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Set}s.
+	 * @param set gegebenes {@link Set}.
+	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link Set#remove(Object)} und {@link Set#contains(Object)} des erzeugten {@link Set}s.
+	 *        Zulässige Elemente werden in Elemente des gegebenen {@link Set} umgewandelt und an das gegebene {@link Set} delegiert.
+	 * @param parser {@link Converter} zur Umwandlung eines Elements des erzeugeten {@link Set}s in ein Element des gegebenen {@link Set}s.
+	 * @param formatter {@link Converter} zur Umwandlung eines Elements des gegebenen {@link Set}s in ein Element des erzeugten {@link Set}s.
+	 * @return umkodierende {@link Set}-Sicht.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GEntry, GEntry2> Set<GEntry> transcodedSet(final Set<GEntry2> set, final Filter<? super Object> checker,
+		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+		return new TranscodedSet<GEntry, GEntry2>(set, checker, parser, formatter);
+	}
+
+	/**
+	 * Diese Methode erzeugt eine {@link Collection} als umkodierende Sicht auf die gegebene {@link Collection} und gibt diese zurück.
+	 * 
+	 * @param <GEntry> Typ der Elemente der erzeugten {@link Collection}.
+	 * @param <GEntry2> Typ der Elemente der gegebenen {@link Collection}.
+	 * @param collection gegebene {@link Collection}.
+	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link Collection#remove(Object)} und {@link Collection#contains(Object)} der erzeugten
+	 *        {@link Collection}. Zulässige Elemente werden in Elemente der gegebenen {@link Collection} umgewandelt und an die gegebene {@link Collection}
+	 *        delegiert.
+	 * @param parser {@link Converter} zur Umwandlung eines Elements der erzeugeten {@link Collection} in ein Element der gegebenen {@link Collection}.
+	 * @param formatter {@link Converter} zur Umwandlung eines Elements der gegebenen {@link Collection} in ein Element der erzeugten {@link Collection}.
+	 * @return umkodierende {@link Collection}-Sicht.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GEntry, GEntry2> Collection<GEntry> transcodedCollection(final Collection<GEntry2> collection, final Filter<? super Object> checker,
+		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+		return new TranscodedCollection<GEntry, GEntry2>(collection, checker, parser, formatter);
 	}
 
 }
