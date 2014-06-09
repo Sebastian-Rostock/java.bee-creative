@@ -353,6 +353,16 @@ public final class Fields {
 	public static abstract class AbstractSetField<GInput, GEntry> extends AbstractField<GInput, Set<GEntry>> implements SetField<GInput, GEntry> {
 
 		/**
+		 * Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set}s zurück.
+		 * 
+		 * @param set {@link Set}.
+		 * @return Bearbeitungskopie.
+		 */
+		protected Set<GEntry> copy(Set<GEntry> set) {
+			return new HashSet<GEntry>(set);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -368,7 +378,7 @@ public final class Fields {
 		public void append(final GInput input, final GEntry entry) {
 			Set<GEntry> set = this.get(input);
 			if(set.contains(entry)) return;
-			set = new HashSet<GEntry>(this.get(input));
+			set = copy(this.get(input));
 			set.add(entry);
 			this.set(input, set);
 		}
@@ -378,7 +388,7 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GEntry> entries) {
-			final Set<GEntry> set = new HashSet<GEntry>(this.get(input));
+			final Set<GEntry> set = copy(this.get(input));
 			if(!Iterables.appendAll(set, entries)) return;
 			this.set(input, set);
 		}
@@ -390,7 +400,7 @@ public final class Fields {
 		public void remove(final GInput input, final Object entry) {
 			Set<GEntry> set = this.get(input);
 			if(!set.contains(entry)) return;
-			set = new HashSet<GEntry>(this.get(input));
+			set = copy(this.get(input));
 			set.remove(entry);
 			this.set(input, set);
 		}
@@ -400,7 +410,7 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> entries) {
-			final Set<GEntry> set = new HashSet<GEntry>(this.get(input));
+			final Set<GEntry> set = copy(this.get(input));
 			if(!Iterables.removeAll(set, entries)) return;
 			this.set(input, set);
 		}
@@ -417,6 +427,16 @@ public final class Fields {
 	public static abstract class AbstractListField<GInput, GEntry> extends AbstractField<GInput, List<GEntry>> implements ListField<GInput, GEntry> {
 
 		/**
+		 * Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
+		 * 
+		 * @param list {@link List}.
+		 * @return Bearbeitungskopie.
+		 */
+		protected List<GEntry> copy(List<GEntry> list) {
+			return new ArrayList<GEntry>(list);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -430,7 +450,7 @@ public final class Fields {
 		 */
 		@Override
 		public void append(final GInput input, final GEntry entry) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			list.add(entry);
 			this.set(input, list);
 		}
@@ -440,7 +460,7 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GEntry> entries) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			if(!Iterables.appendAll(list, entries)) return;
 			this.set(input, list);
 		}
@@ -450,7 +470,7 @@ public final class Fields {
 		 */
 		@Override
 		public void append(final GInput input, final int index, final GEntry entry) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			list.add(index, entry);
 			this.set(input, list);
 		}
@@ -460,7 +480,7 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final int index, final Iterable<? extends GEntry> entries) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			if(!Iterables.appendAll(list.subList(index, index), entries)) return;
 			this.set(input, list);
 		}
@@ -470,7 +490,7 @@ public final class Fields {
 		 */
 		@Override
 		public void remove(final GInput input, final int index) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			list.remove(index);
 			this.set(input, list);
 		}
@@ -491,7 +511,7 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> entries) {
-			final List<GEntry> list = new ArrayList<GEntry>(this.get(input));
+			final List<GEntry> list = copy(this.get(input));
 			if(!Iterables.removeAll(list, entries)) return;
 			this.set(input, list);
 		}
@@ -510,6 +530,16 @@ public final class Fields {
 		MapField<GInput, GKey, GValue> {
 
 		/**
+		 * Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
+		 * 
+		 * @param map {@link Map}.
+		 * @return Bearbeitungskopie.
+		 */
+		protected Map<GKey, GValue> copy(Map<GKey, GValue> map) {
+			return new HashMap<GKey, GValue>(map);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -525,7 +555,7 @@ public final class Fields {
 		public void append(final GInput input, final GKey key, final GValue value) {
 			Map<GKey, GValue> map = this.get(input);
 			if(Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
-			map = new HashMap<GKey, GValue>(this.get(input));
+			map = copy(this.get(input));
 			map.put(key, value);
 			this.set(input, map);
 		}
@@ -535,7 +565,7 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			final Map<GKey, GValue> map = new HashMap<GKey, GValue>(this.get(input));
+			final Map<GKey, GValue> map = copy(this.get(input));
 			boolean modified = false;
 			for(final Entry<? extends GKey, ? extends GValue> entry: entries){
 				modified = !Objects.equals(map.put(entry.getKey(), entry.getValue()), entry.getValue()) || modified;
@@ -551,7 +581,7 @@ public final class Fields {
 		public void remove(final GInput input, final Object key) {
 			Map<GKey, GValue> map = this.get(input);
 			if(!map.containsKey(key)) return;
-			map = new HashMap<GKey, GValue>(map);
+			map = copy(map);
 			map.remove(key);
 			this.set(input, map);
 		}
@@ -561,7 +591,7 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> keys) {
-			final Map<GKey, GValue> map = new HashMap<GKey, GValue>(this.get(input));
+			final Map<GKey, GValue> map = copy(this.get(input));
 			if(!Iterables.removeAll(map.keySet(), keys)) return;
 			this.set(input, map);
 		}

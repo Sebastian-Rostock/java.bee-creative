@@ -11,12 +11,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.RandomAccess;
 import java.util.Set;
-import javax.management.ListenerNotFoundException;
-import bee.creative.util.Filters.AcceptFilter;
-import bee.creative.util.Filters.ClassFilter;
 
 /**
- * Diese Klasse implementiert verkettete und rückwärts geordnete {@link List}-Sichten sowie eine verkettete {@link Collection}-Sicht.
+ * Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}s, {@link Map}s, {@link List}s und {@link Collection}s.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -1081,11 +1078,13 @@ public class Collections {
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link Map}.
 		 * 
-		 * @param map {@link Map} mit den internen einträgen.
-		 * @param keyChecker {@link Filter} zur Erkennung von Elementen in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
+		 * @param map {@link Map} mit den internen Einträgen.
+		 * @param keyChecker {@link Filter} zur Erkennung von Schlüsseln in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
+		 *        Zulässige Schlüssel werden in Schlüssel der internen {@link Map} umgewandelt und an diese delegiert.
 		 * @param keyParser {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
 		 * @param keyFormatter {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
-		 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}.
+		 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}. Zulässige Werte werden in Werte der internen {@link Map}
+		 *        umgewandelt und an diese delegiert.
 		 * @param valueParser {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
 		 * @param valueFormatter {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
@@ -1094,8 +1093,8 @@ public class Collections {
 			final Converter<? super GKey2, ? extends GKey> keyFormatter, final Filter<? super Object> valueChecker,
 			final Converter<? super GValue, ? extends GValue2> valueParser, final Converter<? super GValue2, ? extends GValue> valueFormatter)
 			throws NullPointerException {
-			if(map == null || keyChecker == null || keyParser == null || keyFormatter == null || valueChecker == null || valueParser == null
-				|| valueFormatter == null) throw new NullPointerException();
+			if((map == null) || (keyChecker == null) || (keyParser == null) || (keyFormatter == null) || (valueChecker == null) || (valueParser == null)
+				|| (valueFormatter == null)) throw new NullPointerException();
 			this.map = map;
 			this.keyChecker = keyChecker;
 			this.keyParser = keyParser;
@@ -1421,18 +1420,47 @@ public class Collections {
 
 	}
 
-	public static final class TranscodedCollection<GEntry, GValue> extends AbstractCollection<GEntry> {
+	/**
+	 * Diese Klasse implementiert eine {@link Collection} als umkodierende Sicht auf eine gegebene {@link Collection}.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente dieser {@link Collection}.
+	 * @param <GEntry2> Typ der Elemente der internen {@link Collection}.
+	 */
+	public static final class TranscodedCollection<GEntry, GEntry2> extends AbstractCollection<GEntry> {
 
-		final Collection<GValue> collection;
+		/**
+		 * Dieses Feld speichert die {@link Collection} mit den internen Elementen.
+		 */
+		final Collection<GEntry2> collection;
 
+		/**
+		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)} und {@link #contains(Object)}.
+		 */
 		final Filter<? super Object> checker;
 
-		final Converter<? super GEntry, ? extends GValue> parser;
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 */
+		final Converter<? super GEntry, ? extends GEntry2> parser;
 
-		final Converter<? super GValue, ? extends GEntry> formatter;
+		/**
+		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 */
+		final Converter<? super GEntry2, ? extends GEntry> formatter;
 
-		public TranscodedCollection(final Collection<GValue> collection, final Filter<? super Object> checker,
-			final Converter<? super GEntry, ? extends GValue> parser, final Converter<? super GValue, ? extends GEntry> formatter) throws NullPointerException {
+		/**
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link Collection}.
+		 * 
+		 * @param collection {@link Collection} mit den internen Elementen.
+		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)} und {@link #contains(Object)}. Zulässige Elemente werden in
+		 *        interne Elemente umgewandelt und an die interne {@link Collection} delegiert.
+		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public TranscodedCollection(final Collection<GEntry2> collection, final Filter<? super Object> checker,
+			final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
 			if((collection == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
 			this.collection = collection;
 			this.checker = checker;
@@ -1503,6 +1531,126 @@ public class Collections {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein {@link Set} als unmodifizierbare Sicht auf die Vereinigungsmenge zweier {@link Set}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class UnionSet<GEntry> extends AbstractSet<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das erste {@link Set}.
+		 */
+		final Set<? extends GEntry> set1;
+
+		/**
+		 * Dieses Feld speichert das zweite {@link Set}.
+		 */
+		final Set<? extends GEntry> set2;
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link Set}s der Vereinigungsmenge.
+		 * 
+		 * @param set1 erstes {@link Set}.
+		 * @param set2 zweites {@link Set}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public UnionSet(final Set<? extends GEntry> set1, final Set<? extends GEntry> set2) throws NullPointerException {
+			if((set1 == null) || (set2 == null)) throw new NullPointerException();
+			this.set1 = set1;
+			this.set2 = set2;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return -Iterators.skip(this.iterator(), -1) - 1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			if(this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.chainedIterator(Iterators.filteredIterator( //
+				Filters.negationFilter(Filters.containsFilter(this.set2)), this.set1.iterator()), this.set2.iterator()));
+			return Iterators.unmodifiableIterator(Iterators.chainedIterator(Iterators.filteredIterator( //
+				Filters.negationFilter(Filters.containsFilter(this.set1)), this.set2.iterator()), this.set1.iterator()));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean contains(final Object o) {
+			return this.set1.contains(o) || this.set2.contains(o);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Set} als unmodifizierbare Sicht auf die Schnittmenge zweier {@link Set}s.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class IntersectionSet<GEntry> extends AbstractSet<GEntry> {
+
+		/**
+		 * Dieses Feld speichert das erste {@link Set}.
+		 */
+		final Set<? extends GEntry> set1;
+
+		/**
+		 * Dieses Feld speichert das zweite {@link Set}.
+		 */
+		final Set<? extends GEntry> set2;
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link Set}s der Schnittmenge.
+		 * 
+		 * @param set1 erstes {@link Set}.
+		 * @param set2 zweites {@link Set}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public IntersectionSet(final Set<? extends GEntry> set1, final Set<? extends GEntry> set2) throws NullPointerException {
+			if((set1 == null) || (set2 == null)) throw new NullPointerException();
+			this.set1 = set1;
+			this.set2 = set2;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return -Iterators.skip(this.iterator(), -1) - 1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			if(this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.filteredIterator( //
+				Filters.containsFilter(this.set2), this.set1.iterator()));
+			return Iterators.unmodifiableIterator(Iterators.filteredIterator( //
+				Filters.containsFilter(this.set1), this.set2.iterator()));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean contains(final Object o) {
+			return this.set1.contains(o) && this.set2.contains(o);
+		}
+
+	}
+
+	/**
 	 * Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
 	 * 
 	 * @param <GValue> Typ der Werte.
@@ -1544,8 +1692,8 @@ public class Collections {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GValue> List<GValue> chainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
-		return ((values1 instanceof RandomAccess) && (values2 instanceof RandomAccess)) ? //
-			new ChainedRandomAccessList<GValue>(values1, values2, extendMode) : new ChainedList<GValue>(values1, values2, extendMode);
+		return ((values1 instanceof RandomAccess) && (values2 instanceof RandomAccess)) ? new ChainedRandomAccessList<GValue>(values1, values2, extendMode)
+			: new ChainedList<GValue>(values1, values2, extendMode);
 	}
 
 	/**
@@ -1580,6 +1728,32 @@ public class Collections {
 	public static <GValue> Collection<GValue> chainedCollection(final Collection<GValue> values1, final Collection<GValue> values2, final boolean extendMode)
 		throws NullPointerException {
 		return new ChainedCollection<GValue>(values1, values2, extendMode);
+	}
+
+	/**
+	 * Diese Methode erzeugt eine {@link Map} als umkodierende Sicht auf die gegebene {@link Map} und gibt diese zurück.
+	 * 
+	 * @param <GKey> Typ der Schlüssel der erzeugten {@link Map}.
+	 * @param <GValue> Typ der Werte der erzeugten {@link Map}.
+	 * @param <GKey2> Typ der Schlüssel der gegebenen {@link Map}.
+	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}.
+	 * @param map {@link Map} mit den internen Einträgen.
+	 * @param keyChecker {@link Filter} zur Erkennung von Schlüsseln in {@link Map#get(Object)}, {@link Map#remove(Object)} und {@link Map#containsKey(Object)}
+	 *        der erzeugten {@link Map}. Zulässige Schlüssel werden in Schlüssel der gegebenen {@link Map} umgewandelt und an die gegebene {@link Map} delegiert.
+	 * @param keyParser {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
+	 * @param keyFormatter {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
+	 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link Map#containsValue(Object)}. Zulässige Werte werden in Werte der gegebenen {@link Map}
+	 *        umgewandelt und an die gegebene {@link Map} delegiert.
+	 * @param valueParser {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
+	 * @param valueFormatter {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
+	 * @return umkodierende {@link Map}-Sicht.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public static <GKey, GValue, GKey2, GValue2> Map<GKey, GValue> transcodedMap(final Map<GKey2, GValue2> map, final Filter<? super Object> keyChecker,
+		final Converter<? super GKey, ? extends GKey2> keyParser, final Converter<? super GKey2, ? extends GKey> keyFormatter,
+		final Filter<? super Object> valueChecker, final Converter<? super GValue, ? extends GValue2> valueParser,
+		final Converter<? super GValue2, ? extends GValue> valueFormatter) throws NullPointerException {
+		return new TranscodedMap<GKey, GValue, GKey2, GValue2>(map, keyChecker, keyParser, keyFormatter, valueChecker, valueParser, valueFormatter);
 	}
 
 	/**
