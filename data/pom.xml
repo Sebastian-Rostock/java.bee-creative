@@ -6,7 +6,7 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>1.3.6</version>
+	<version>1.4.7</version>
 	<artifactId>bee-creative.data</artifactId>
 	<packaging>jar</packaging>
 	<dependencies>

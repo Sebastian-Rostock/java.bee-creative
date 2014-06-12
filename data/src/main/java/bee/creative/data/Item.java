@@ -83,12 +83,12 @@ public interface Item extends Part, Assignable<Item> {
 	public int state();
 
 	/**
-	 * Diese Methode gibt eine Auflistung der {@link Item}s zurück, die dieses {@link Item} verwenden und darauf verweisen. Über {@link Iterator#remove()} wird
-	 * die Assoziation des verwendenden {@link Item}s zu diesem {@link Item} aufgelöst.
+	 * Diese Methode gibt eine Auflistung der Assoziationen zurück, in denen dieses {@link Item} verwenden wird. Über {@link Iterator#remove()} kann
+	 * die Assoziation zu diesem {@link Item} aufgelöst werden.
 	 * 
-	 * @return {@link Item}s, die dieses {@link Item} verwenden und darauf verweisen.
+	 * @return Assoziationen, die dieses {@link Item} verwenden.
 	 */
-	public Iterable<? extends Item> users();
+	public Iterable<?> links();
 
 	/**
 	 * Diese Methode überträgt die Informationen des im gegebenen {@link Assignment} gehaltenen {@link Item}s auf dieses {@link Item}.
