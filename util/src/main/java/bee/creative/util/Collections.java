@@ -625,39 +625,34 @@ public class Collections {
 		/**
 		 * Dieses Feld speichert die {@link List} mit den internen Elementen.
 		 */
-		final List<GEntry2> list;
+		final List<GEntry2> data;
 
 		/**
-		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
-		 * {@link #lastIndexOf(Object)}.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements dieser {@link List} in ein Element von {@link #data} sowie zur Erkennung
+		 * einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Filter<? super Object> checker;
+		final FilterConverter<? super GEntry, ? extends GEntry2> parser;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements von {@link #data} in ein Element dieser {@link List} sowie zur Erkennung
+		 * einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Converter<? super GEntry, ? extends GEntry2> parser;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
-		 */
-		final Converter<? super GEntry2, ? extends GEntry> formatter;
+		final FilterConverter<? super GEntry2, ? extends GEntry> formatter;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
 		 * 
-		 * @param list {@link List} mit den internen Elementen.
-		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
-		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
-		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
-		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @param data {@link List} mit den internen Elementen.
+		 * @param parser {@link FilterConverter} zur Umwandlung eines Elements dieser {@link List} in ein Element von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements von {@code data} in ein Element dieser {@link List} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public AbstractTranscodedList(final List<GEntry2> list, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
-			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((list == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
-			this.list = list;
-			this.checker = checker;
+		public AbstractTranscodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
 		}
@@ -667,7 +662,7 @@ public class Collections {
 		 */
 		@Override
 		protected void removeRange(final int fromIndex, final int toIndex) {
-			this.list.subList(fromIndex, toIndex).clear();
+			this.data.subList(fromIndex, toIndex).clear();
 		}
 
 		/**
@@ -675,7 +670,8 @@ public class Collections {
 		 */
 		@Override
 		public GEntry get(final int index) {
-			return this.formatter.convert(this.list.get(index));
+			final GEntry2 entry2 = this.data.get(index);
+			return this.formatter.accept(entry2) ? this.formatter.convert(entry2) : null;
 		}
 
 		/**
@@ -683,15 +679,44 @@ public class Collections {
 		 */
 		@Override
 		public GEntry set(final int index, final GEntry element) {
-			return this.formatter.convert(this.list.set(index, this.parser.convert(element)));
+			final GEntry2 entry2 = this.parser.accept(element) ? this.data.set(index, this.parser.convert(element)) : this.data.get(index);
+			return this.formatter.accept(entry2) ? this.formatter.convert(entry2) : null;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void add(final int index, final GEntry element) {
-			this.list.add(index, this.parser.convert(element));
+		public boolean add(final GEntry entry) {
+			if(!this.parser.accept(entry)) throw new IllegalArgumentException();
+			return this.data.add(this.parser.convert(entry));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void add(final int index, final GEntry entry) {
+			if(!this.parser.accept(entry)) throw new IllegalArgumentException();
+			this.data.add(index, this.parser.convert(entry));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean addAll(final Collection<? extends GEntry> c) {
+			return this.data.addAll(new TranscodedCollection(c, this.formatter, this.parser));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean addAll(final int index, final Collection<? extends GEntry> c) {
+			return this.data.addAll(index, new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -699,7 +724,9 @@ public class Collections {
 		 */
 		@Override
 		public GEntry remove(final int index) {
-			return this.formatter.convert(this.list.remove(index));
+			final GEntry2 entry2 = this.data.remove(index);
+			if(!this.formatter.accept(entry2)) throw new IllegalArgumentException();
+			return this.formatter.convert(entry2);
 		}
 
 		/**
@@ -707,9 +734,27 @@ public class Collections {
 		 */
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
-		public boolean remove(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.list.remove(((Converter)this.parser).convert(o));
+		public boolean remove(final Object entry) {
+			if(!this.parser.accept(entry)) return false;
+			return this.data.remove(((Converter)this.parser).convert(entry));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			return this.data.removeAll(new TranscodedCollection(c, this.formatter, this.parser));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			return this.data.retainAll(new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -717,7 +762,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return this.list.size();
+			return this.data.size();
 		}
 
 		/**
@@ -725,7 +770,7 @@ public class Collections {
 		 */
 		@Override
 		public void clear() {
-			this.list.clear();
+			this.data.clear();
 		}
 
 		/**
@@ -733,7 +778,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean isEmpty() {
-			return this.list.isEmpty();
+			return this.data.isEmpty();
 		}
 
 		/**
@@ -741,9 +786,17 @@ public class Collections {
 		 */
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
-		public boolean contains(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.list.contains(((Converter)this.parser).convert(o));
+		public boolean contains(final Object enrty) {
+			if(!this.parser.accept(enrty)) return false;
+			return this.data.contains(((Converter)this.parser).convert(enrty));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 		/**
@@ -751,9 +804,9 @@ public class Collections {
 		 */
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
-		public int indexOf(final Object o) {
-			if(!this.checker.accept(o)) return -1;
-			return this.list.indexOf(((Converter)this.parser).convert(o));
+		public int indexOf(final Object entry) {
+			if(!this.parser.accept(entry)) return -1;
+			return this.data.indexOf(((Converter)this.parser).convert(entry));
 		}
 
 		/**
@@ -761,10 +814,22 @@ public class Collections {
 		 */
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
-		public int lastIndexOf(final Object o) {
-			if(!this.checker.accept(o)) return -1;
-			return this.list.lastIndexOf(((Converter)this.parser).convert(o));
+		public int lastIndexOf(final Object entry) {
+			if(!this.parser.accept(entry)) return -1;
+			return this.data.lastIndexOf(((Converter)this.parser).convert(entry));
 		}
+
+	}
+
+	/**
+	 * Diese Schnittstelle definiert eine Kombination aus einem {@link Filter} und einem {@link Converter}, bei welcher über {@link #accept(Object)} eine gültige
+	 * Eingabe Eingabe für {@link #convert(Object)} erkannt werden kann.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	public static interface FilterConverter<GInput, GOutput> extends Filter<Object>, Converter<GInput, GOutput> {
 
 	}
 
@@ -1004,102 +1069,128 @@ public class Collections {
 	public static final class TranscodedMap<GKey, GValue, GKey2, GValue2> extends AbstractMap<GKey, GValue> {
 
 		/**
-		 * Diese Klasse implementiert einrn abstrakten Eintrag einer {@link TranscodedMap}.
+		 * Diese Methode erzeugt einen {@link FilterConverter} für das {@link Map#entrySet()} einer {@link TranscodedMap} und gibt diesen zurück.
 		 * 
-		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GKey> Typ des Schlüssels.
-		 * @param <GValue> Typ des Werts.
+		 * @param <GKey> Typ der Schlüssel der Eingabe.
+		 * @param <GValue> Typ der Werte der Eingabe.
+		 * @param <GKey2> Typ der Schlüssel der Ausgabe.
+		 * @param <GValue2> Typ der Werte der Ausgabe.
+		 * @param keyParser {@link FilterConverter} zum Lesen der Schlüssel.
+		 * @param valueParser {@link FilterConverter} zum Lesen der Werte.
+		 * @param valueFormatter {@link FilterConverter} zum schreiben der Werte.
+		 * @return {@link FilterConverter} für ein {@link Map#entrySet()}.
 		 */
-		static abstract class TranscodedEntry<GKey, GValue> implements Entry<GKey, GValue> {
+		private static final <GKey, GValue, GKey2, GValue2> FilterConverter<Entry<GKey, GValue>, Entry<GKey2, GValue2>> newEntryConverter(
+			final FilterConverter<? super GKey, ? extends GKey2> keyParser, final FilterConverter<? super GValue, ? extends GValue2> valueParser,
+			final FilterConverter<? super GValue2, ? extends GValue> valueFormatter) {
+			return new FilterConverter<Entry<GKey, GValue>, Entry<GKey2, GValue2>>() {
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public int hashCode() {
-				return Objects.hash(this.getKey()) ^ Objects.hash(this.getValue());
-			}
+				@Override
+				public boolean accept(final Object input) {
+					if(!(input instanceof Entry)) return false;
+					final Entry<?, ?> entry = (Entry<?, ?>)input;
+					return keyParser.accept(entry.getKey()) && valueParser.accept(entry.getValue());
+				}
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean equals(final Object object) {
-				if(!(object instanceof Entry<?, ?>)) return false;
-				final Entry<?, ?> data = (Entry<?, ?>)object;
-				return Objects.equals(this.getKey(), data.getKey()) && Objects.equals(this.getValue(), data.getValue());
-			}
+				@Override
+				public Entry<GKey2, GValue2> convert(final Entry<GKey, GValue> input) {
+					return new Entry<GKey2, GValue2>() {
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return this.getKey() + "=" + this.getValue();
-			}
+						@Override
+						public GKey2 getKey() {
+							final GKey key = input.getKey();
+							if(!keyParser.accept(key)) throw new IllegalArgumentException();
+							return keyParser.convert(key);
+						}
 
+						@Override
+						public GValue2 getValue() {
+							final GValue value = input.getValue();
+							if(!valueParser.accept(value)) throw new IllegalArgumentException();
+							return valueParser.convert(value);
+						}
+
+						@Override
+						public GValue2 setValue(final GValue2 value2) {
+							if(!valueFormatter.accept(value2)) throw new IllegalArgumentException();
+							final GValue value = input.setValue(valueFormatter.convert(value2));
+							if(!valueParser.accept(value)) throw new IllegalArgumentException();
+							return valueParser.convert(value);
+						}
+
+						@Override
+						public int hashCode() {
+							return Objects.hash(this.getKey()) ^ Objects.hash(this.getValue());
+						}
+
+						@Override
+						public boolean equals(final Object object) {
+							if(!(object instanceof Entry<?, ?>)) return false;
+							final Entry<?, ?> data = (Entry<?, ?>)object;
+							return Objects.equals(this.getKey(), data.getKey()) && Objects.equals(this.getValue(), data.getValue());
+						}
+
+						@Override
+						public String toString() {
+							return this.getKey() + "=" + this.getValue();
+						}
+
+					};
+				}
+
+			};
 		}
 
 		/**
 		 * Dieses Feld speichert die {@link Map} mit den internen Einträgen.
 		 */
-		final Map<GKey2, GValue2> map;
+		final Map<GKey2, GValue2> data;
 
 		/**
-		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Schlüssels dieser {@link Map} in einen Schlüssel von {@link #data} sowie zur
+		 * Erkennung einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Filter<? super Object> keyChecker;
+		final FilterConverter<? super GKey, ? extends GKey2> keyParser;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Schlüssels von {@link #data} in einen Schlüssel dieser {@link Map} sowie zur
+		 * Erkennung einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Converter<? super GKey, ? extends GKey2> keyParser;
+		final FilterConverter<? super GKey2, ? extends GKey> keyFormatter;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Werts dieser {@link Map} in einen Wert von {@link #data} sowie zur Erkennung einer
+		 * gültigen Eingabe für die Umwandlung.
 		 */
-		final Converter<? super GKey2, ? extends GKey> keyFormatter;
+		final FilterConverter<? super GValue, ? extends GValue2> valueParser;
 
 		/**
-		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Werts von {@link #data} in einen Wert dieser {@link Map} sowie zur Erkennung einer
+		 * gültigen Eingabe für die Umwandlung.
 		 */
-		final Filter<? super Object> valueChecker;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
-		 */
-		final Converter<? super GValue, ? extends GValue2> valueParser;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
-		 */
-		final Converter<? super GValue2, ? extends GValue> valueFormatter;
+		final FilterConverter<? super GValue2, ? extends GValue> valueFormatter;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link Map}.
 		 * 
 		 * @param map {@link Map} mit den internen Einträgen.
-		 * @param keyChecker {@link Filter} zur Erkennung von Schlüsseln in {@link #get(Object)}, {@link #remove(Object)} und {@link #containsKey(Object)}.
-		 *        Zulässige Schlüssel werden in Schlüssel der internen {@link Map} umgewandelt und an diese delegiert.
-		 * @param keyParser {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
-		 * @param keyFormatter {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
-		 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link #containsValue(Object)}. Zulässige Werte werden in Werte der internen {@link Map}
-		 *        umgewandelt und an diese delegiert.
-		 * @param valueParser {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
-		 * @param valueFormatter {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
+		 * @param keyParser {@link FilterConverter} zur Umwandlung eines Schlüssels dieser {@link Map} in einen Schlüssel von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param keyFormatter {@link FilterConverter} zur Umwandlung eines Schlüssels von {@code data} in einen Schlüssel dieser {@link Map} sowie zur Erkennung
+		 *        einer gültigen Eingabe für die Umwandlung.
+		 * @param valueParser {@link FilterConverter} zur Umwandlung eines Werts dieser {@link Map} in einen Wert von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param valueFormatter {@link FilterConverter} zur Umwandlung eines Werts von {@code data} in einen Wert dieser {@link Map} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public TranscodedMap(final Map<GKey2, GValue2> map, final Filter<? super Object> keyChecker, final Converter<? super GKey, ? extends GKey2> keyParser,
-			final Converter<? super GKey2, ? extends GKey> keyFormatter, final Filter<? super Object> valueChecker,
-			final Converter<? super GValue, ? extends GValue2> valueParser, final Converter<? super GValue2, ? extends GValue> valueFormatter)
-			throws NullPointerException {
-			if((map == null) || (keyChecker == null) || (keyParser == null) || (keyFormatter == null) || (valueChecker == null) || (valueParser == null)
-				|| (valueFormatter == null)) throw new NullPointerException();
-			this.map = map;
-			this.keyChecker = keyChecker;
+		public TranscodedMap(final Map<GKey2, GValue2> map, final FilterConverter<? super GKey, ? extends GKey2> keyParser,
+			final FilterConverter<? super GKey2, ? extends GKey> keyFormatter, final FilterConverter<? super GValue, ? extends GValue2> valueParser,
+			final FilterConverter<? super GValue2, ? extends GValue> valueFormatter) throws NullPointerException {
+			if((map == null) || (keyParser == null) || (keyFormatter == null) || (valueParser == null) || (valueFormatter == null)) throw new NullPointerException();
+			this.data = map;
 			this.keyParser = keyParser;
 			this.keyFormatter = keyFormatter;
-			this.valueChecker = valueChecker;
 			this.valueParser = valueParser;
 			this.valueFormatter = valueFormatter;
 		}
@@ -1109,7 +1200,7 @@ public class Collections {
 		 */
 		@Override
 		public void clear() {
-			this.map.clear();
+			this.data.clear();
 		}
 
 		/**
@@ -1118,8 +1209,8 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public boolean containsKey(final Object key) {
-			if(!this.keyChecker.accept(key)) return false;
-			return this.map.containsKey(((Converter)this.keyParser).convert(key));
+			if(!this.keyParser.accept(key)) return false;
+			return this.data.containsKey(((Converter)this.keyParser).convert(key));
 		}
 
 		/**
@@ -1128,8 +1219,8 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public boolean containsValue(final Object value) {
-			if(!this.valueChecker.accept(value)) return false;
-			return this.map.containsValue(((Converter)this.valueParser).convert(value));
+			if(!this.valueParser.accept(value)) return false;
+			return this.data.containsValue(((Converter)this.valueParser).convert(value));
 		}
 
 		/**
@@ -1138,8 +1229,10 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public GValue get(final Object key) {
-			if(!this.keyChecker.accept(key)) return null;
-			return this.valueFormatter.convert(this.map.get(((Converter)this.keyParser).convert(key)));
+			if(!this.keyParser.accept(key)) return null;
+			final GValue2 value2 = this.data.get(((Converter)this.keyParser).convert(key));
+			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			return this.valueFormatter.convert(value2);
 		}
 
 		/**
@@ -1147,7 +1240,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean isEmpty() {
-			return this.map.isEmpty();
+			return this.data.isEmpty();
 		}
 
 		/**
@@ -1155,7 +1248,7 @@ public class Collections {
 		 */
 		@Override
 		public Set<GKey> keySet() {
-			return new TranscodedSet<GKey, GKey2>(this.map.keySet(), this.keyChecker, this.keyParser, this.keyFormatter);
+			return new TranscodedSet<GKey, GKey2>(this.data.keySet(), this.keyParser, this.keyFormatter);
 		}
 
 		/**
@@ -1163,7 +1256,19 @@ public class Collections {
 		 */
 		@Override
 		public GValue put(final GKey key, final GValue value) {
-			return this.valueFormatter.convert(this.map.put(this.keyParser.convert(key), this.valueParser.convert(value)));
+			if(!this.keyParser.accept(key) || !this.valueParser.accept(value)) throw new IllegalArgumentException();
+			final GValue2 value2 = this.data.put(this.keyParser.convert(key), this.valueParser.convert(value));
+			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			return this.valueFormatter.convert(value2);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"rawtypes", "unchecked"})
+		@Override
+		public void putAll(final Map<? extends GKey, ? extends GValue> map) {
+			this.data.putAll(new TranscodedMap(map, this.keyFormatter, this.keyParser, this.valueFormatter, this.valueParser));
 		}
 
 		/**
@@ -1172,8 +1277,10 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public GValue remove(final Object key) {
-			if(!this.keyChecker.accept(key)) return null;
-			return this.valueFormatter.convert(this.map.remove(((Converter)this.keyParser).convert(key)));
+			if(!this.keyParser.accept(key)) return null;
+			final GValue2 value2 = this.data.remove(((Converter)this.keyParser).convert(key));
+			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			return this.valueFormatter.convert(value2);
 		}
 
 		/**
@@ -1181,7 +1288,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return this.map.size();
+			return this.data.size();
 		}
 
 		/**
@@ -1189,7 +1296,7 @@ public class Collections {
 		 */
 		@Override
 		public Collection<GValue> values() {
-			return new TranscodedCollection<GValue, GValue2>(this.map.values(), this.valueChecker, this.valueParser, this.valueFormatter);
+			return new TranscodedCollection<GValue, GValue2>(this.data.values(), this.valueParser, this.valueFormatter);
 		}
 
 		/**
@@ -1197,65 +1304,10 @@ public class Collections {
 		 */
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
-			return new TranscodedSet<Entry<GKey, GValue>, Entry<GKey2, GValue2>>(this.map.entrySet(), new Filter<Object>() {
-
-				@Override
-				public boolean accept(final Object input) {
-					if(!(input instanceof Entry)) return false;
-					final Entry<?, ?> entry = (Entry<?, ?>)input;
-					return TranscodedMap.this.keyChecker.accept(entry.getKey()) && TranscodedMap.this.valueChecker.accept(entry.getValue());
-				}
-
-			}, new Converter<Entry<GKey, GValue>, Entry<GKey2, GValue2>>() {
-
-				@Override
-				public Entry<GKey2, GValue2> convert(final Entry<GKey, GValue> input) {
-					return new TranscodedEntry<GKey2, GValue2>() {
-
-						@Override
-						public GKey2 getKey() {
-							return TranscodedMap.this.keyParser.convert(input.getKey());
-						}
-
-						@Override
-						public GValue2 getValue() {
-							return TranscodedMap.this.valueParser.convert(input.getValue());
-						}
-
-						@Override
-						public GValue2 setValue(final GValue2 value) {
-							return TranscodedMap.this.valueParser.convert(input.setValue(TranscodedMap.this.valueFormatter.convert(value)));
-						}
-
-					};
-				}
-
-			}, new Converter<Entry<GKey2, GValue2>, Entry<GKey, GValue>>() {
-
-				@Override
-				public Entry<GKey, GValue> convert(final Entry<GKey2, GValue2> input) {
-					return new TranscodedEntry<GKey, GValue>() {
-
-						@Override
-						public GKey getKey() {
-							return TranscodedMap.this.keyFormatter.convert(input.getKey());
-						}
-
-						@Override
-						public GValue getValue() {
-							return TranscodedMap.this.valueFormatter.convert(input.getValue());
-						}
-
-						@Override
-						public GValue setValue(final GValue value) {
-							return TranscodedMap.this.valueFormatter.convert(input.setValue(TranscodedMap.this.valueParser.convert(value)));
-						}
-
-					};
-				}
-
-			});
+			return new TranscodedSet<Entry<GKey, GValue>, Entry<GKey2, GValue2>>(this.data.entrySet(), TranscodedMap.newEntryConverter(this.keyParser,
+				this.valueParser, this.valueFormatter), TranscodedMap.newEntryConverter(this.keyFormatter, this.valueFormatter, this.valueParser));
 		}
+
 	}
 
 	/**
@@ -1268,40 +1320,36 @@ public class Collections {
 	public static final class TranscodedSet<GEntry, GEntry2> extends AbstractSet<GEntry> {
 
 		/**
-		 * Dieses Feld speichert das {@link Set} mit den internen Elementen.
+		 * Dieses Feld speichert die {@link Set} mit den internen Elementen.
 		 */
-		final Set<GEntry2> set;
+		final Set<GEntry2> data;
 
 		/**
-		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)} und {@link #contains(Object)}.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements dieser {@link Set} in ein Element von {@link #data} sowie zur Erkennung
+		 * einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Filter<? super Object> checker;
+		final FilterConverter<? super GEntry, ? extends GEntry2> parser;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements von {@link #data} in ein Element dieser {@link Set} sowie zur Erkennung
+		 * einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Converter<? super GEntry, ? extends GEntry2> parser;
+		final FilterConverter<? super GEntry2, ? extends GEntry> formatter;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
-		 */
-		final Converter<? super GEntry2, ? extends GEntry> formatter;
-
-		/**
-		 * Dieser Konstruktor initialisiert das Konvertierte {@link Set}.
+		 * Dieser Konstruktor initialisiert die Konvertierte {@link Set}.
 		 * 
-		 * @param set {@link Set} mit den internen Elementen.
-		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)} und {@link #contains(Object)}. Zulässige Elemente werden in
-		 *        interne Elemente umgewandelt und an das interne {@link Set} delegiert.
-		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
-		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @param data {@link Set} mit den internen Elementen.
+		 * @param parser {@link FilterConverter} zur Umwandlung eines Elements dieses {@link Set}s in ein Element von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements von {@code data} in ein Element dieses {@link Set}s sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public TranscodedSet(final Set<GEntry2> set, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
-			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((set == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
-			this.set = set;
-			this.checker = checker;
+		public TranscodedSet(final Set<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
 		}
@@ -1311,7 +1359,17 @@ public class Collections {
 		 */
 		@Override
 		public boolean add(final GEntry e) {
-			return this.set.add(this.parser.convert(e));
+			if(!this.parser.accept(e)) throw new IllegalArgumentException();
+			return this.data.add(this.parser.convert(e));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean addAll(final Collection<? extends GEntry> c) {
+			return this.data.addAll(new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -1320,8 +1378,26 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean remove(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.set.remove(((Converter)this.parser).convert(o));
+			if(!this.parser.accept(o)) return false;
+			return this.data.remove(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			return this.data.removeAll(new TranscodedCollection(c, this.formatter, this.parser));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			return this.data.retainAll(new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -1329,7 +1405,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return this.set.size();
+			return this.data.size();
 		}
 
 		/**
@@ -1337,7 +1413,7 @@ public class Collections {
 		 */
 		@Override
 		public void clear() {
-			this.set.clear();
+			this.data.clear();
 		}
 
 		/**
@@ -1345,7 +1421,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean isEmpty() {
-			return this.set.isEmpty();
+			return this.data.isEmpty();
 		}
 
 		/**
@@ -1354,8 +1430,8 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean contains(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.set.contains(((Converter)this.parser).convert(o));
+			if(!this.parser.accept(o)) return false;
+			return this.data.contains(((Converter)this.parser).convert(o));
 		}
 
 		/**
@@ -1363,13 +1439,14 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			return Iterators.convertedIterator(this.formatter, this.set.iterator());
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List}.
+	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List}. Die Methoden {@link ListIterator#next()} und
+	 * {@link ListIterator#previous()} können eine {@link IllegalArgumentException} auslösen.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente dieser {@link List}.
@@ -1380,22 +1457,23 @@ public class Collections {
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
 		 * 
-		 * @param list {@link List} mit den internen Elementen.
-		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
-		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
-		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
-		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @param data {@link List} mit den internen Elementen.
+		 * @param parser {@link FilterConverter} zur Umwandlung eines Elements dieser {@link List} in ein Element von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements von {@code data} in ein Element dieser {@link List} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public TranscodedList(final List<GEntry2> list, final Filter<? super Object> checker, final Converter<? super GEntry, ? extends GEntry2> parser,
-			final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			super(list, checker, parser, formatter);
+		public TranscodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			super(data, parser, formatter);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List} mit {@link RandomAccess}.
+	 * Diese Klasse implementiert eine {@link List} als umkodierende Sicht auf eine gegebenen {@link List} mit {@link RandomAccess}. Die Methoden
+	 * {@link ListIterator#next()} und {@link ListIterator#previous()} können eine {@link IllegalArgumentException} auslösen.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GEntry> Typ der Elemente dieser {@link List}.
@@ -1406,16 +1484,16 @@ public class Collections {
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
 		 * 
-		 * @param list {@link List} mit den internen Elementen.
-		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)}, {@link #contains(Object)}, {@link #indexOf(Object)} und
-		 *        {@link #lastIndexOf(Object)}. Zulässige Elemente werden in interne Elemente umgewandelt und an die interne {@link List} delegiert.
-		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
-		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @param data {@link List} mit den internen Elementen.
+		 * @param parser {@link FilterConverter} zur Umwandlung eines Elements dieser {@link List} in ein Element von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements von {@code data} in ein Element dieser {@link List} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public TranscodedRandomAccessList(final List<GEntry2> list, final Filter<? super Object> checker,
-			final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			super(list, checker, parser, formatter);
+		public TranscodedRandomAccessList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			super(data, parser, formatter);
 		}
 
 	}
@@ -1432,38 +1510,34 @@ public class Collections {
 		/**
 		 * Dieses Feld speichert die {@link Collection} mit den internen Elementen.
 		 */
-		final Collection<GEntry2> collection;
+		final Collection<GEntry2> data;
 
 		/**
-		 * Dieses Feld speichert den {@link Filter} zur Erkennung von Elementen in {@link #remove(Object)} und {@link #contains(Object)}.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements dieser {@link Collection} in ein Element von {@link #data} sowie zur
+		 * Erkennung einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Filter<? super Object> checker;
+		final FilterConverter<? super GEntry, ? extends GEntry2> parser;
 
 		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
+		 * Dieses Feld speichert den {@link FilterConverter} zur Umwandlung eines Elements von {@link #data} in ein Element dieser {@link Collection} sowie zur
+		 * Erkennung einer gültigen Eingabe für die Umwandlung.
 		 */
-		final Converter<? super GEntry, ? extends GEntry2> parser;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter} zur Umwandlung eines internen Elements in ein Element.
-		 */
-		final Converter<? super GEntry2, ? extends GEntry> formatter;
+		final FilterConverter<? super GEntry2, ? extends GEntry> formatter;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link Collection}.
 		 * 
-		 * @param collection {@link Collection} mit den internen Elementen.
-		 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link #remove(Object)} und {@link #contains(Object)}. Zulässige Elemente werden in
-		 *        interne Elemente umgewandelt und an die interne {@link Collection} delegiert.
-		 * @param parser {@link Converter} zur Umwandlung eines Elements in ein internes Elemente.
-		 * @param formatter {@link Converter} zur Umwandlung eines internen Elements in ein Element.
+		 * @param data {@link Collection} mit den internen Elementen.
+		 * @param parser {@link FilterConverter} zur Umwandlung eines Elements dieser {@link Collection} in ein Element von {@code data} sowie zur Erkennung einer
+		 *        gültigen Eingabe für die Umwandlung.
+		 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements von {@code data} in ein Element dieser {@link Collection} sowie zur Erkennung
+		 *        einer gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public TranscodedCollection(final Collection<GEntry2> collection, final Filter<? super Object> checker,
-			final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((collection == null) || (checker == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
-			this.collection = collection;
-			this.checker = checker;
+		public TranscodedCollection(final Collection<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
 		}
@@ -1473,7 +1547,17 @@ public class Collections {
 		 */
 		@Override
 		public boolean add(final GEntry e) {
-			return this.collection.add(this.parser.convert(e));
+			if(!this.parser.accept(e)) throw new IllegalArgumentException();
+			return this.data.add(this.parser.convert(e));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean addAll(final Collection<? extends GEntry> c) {
+			return this.data.addAll(new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -1482,8 +1566,26 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean remove(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.collection.remove(((Converter)this.parser).convert(o));
+			if(!this.parser.accept(o)) return false;
+			return this.data.remove(((Converter)this.parser).convert(o));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean removeAll(final Collection<?> c) {
+			return this.data.removeAll(new TranscodedCollection(c, this.formatter, this.parser));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ({"unchecked", "rawtypes"})
+		@Override
+		public boolean retainAll(final Collection<?> c) {
+			return this.data.retainAll(new TranscodedCollection(c, this.formatter, this.parser));
 		}
 
 		/**
@@ -1491,7 +1593,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return this.collection.size();
+			return this.data.size();
 		}
 
 		/**
@@ -1499,7 +1601,7 @@ public class Collections {
 		 */
 		@Override
 		public void clear() {
-			this.collection.clear();
+			this.data.clear();
 		}
 
 		/**
@@ -1507,7 +1609,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean isEmpty() {
-			return this.collection.isEmpty();
+			return this.data.isEmpty();
 		}
 
 		/**
@@ -1516,8 +1618,8 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean contains(final Object o) {
-			if(!this.checker.accept(o)) return false;
-			return this.collection.contains(((Converter)this.parser).convert(o));
+			if(!this.parser.accept(o)) return false;
+			return this.data.contains(((Converter)this.parser).convert(o));
 		}
 
 		/**
@@ -1525,7 +1627,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			return Iterators.convertedIterator(this.formatter, this.collection.iterator());
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}
@@ -1738,42 +1840,42 @@ public class Collections {
 	 * @param <GKey2> Typ der Schlüssel der gegebenen {@link Map}.
 	 * @param <GValue2> Typ der Werte der gegebenen {@link Map}.
 	 * @param map {@link Map} mit den internen Einträgen.
-	 * @param keyChecker {@link Filter} zur Erkennung von Schlüsseln in {@link Map#get(Object)}, {@link Map#remove(Object)} und {@link Map#containsKey(Object)}
-	 *        der erzeugten {@link Map}. Zulässige Schlüssel werden in Schlüssel der gegebenen {@link Map} umgewandelt und an die gegebene {@link Map} delegiert.
-	 * @param keyParser {@link Converter} zur Umwandlung eines Schlüssels in einen internen Schlüssel.
-	 * @param keyFormatter {@link Converter} zur Umwandlung eines internen Schlüssels in einen Schlüssel.
-	 * @param valueChecker {@link Filter} zur Erkennung von Werten in {@link Map#containsValue(Object)}. Zulässige Werte werden in Werte der gegebenen {@link Map}
-	 *        umgewandelt und an die gegebene {@link Map} delegiert.
-	 * @param valueParser {@link Converter} zur Umwandlung eines Werts in einen internen Wert.
-	 * @param valueFormatter {@link Converter} zur Umwandlung eines internen Werts in einen Wert.
+	 * @param keyParser {@link FilterConverter} zur Umwandlung eines Schlüssels der erzeugten {@link Map} in einen Schlüssel der gegebenen {@link Map} sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
+	 * @param keyFormatter {@link FilterConverter} zur Umwandlung eines Schlüssels der gegebenen {@link Map} in einen Schlüssel der erzeugten {@link Map} sowie
+	 *        zur Erkennung einer gültigen Eingabe für die Umwandlung.
+	 * @param valueParser {@link FilterConverter} zur Umwandlung eines Werts der erzeugten {@link Map} in einen Wert der gegebenen {@link Map} sowie zur Erkennung
+	 *        einer gültigen Eingabe für die Umwandlung.
+	 * @param valueFormatter {@link FilterConverter} zur Umwandlung eines Werts der gegebenen {@link Map} in einen Wert der erzeugten {@link Map} sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
 	 * @return umkodierende {@link Map}-Sicht.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GKey, GValue, GKey2, GValue2> Map<GKey, GValue> transcodedMap(final Map<GKey2, GValue2> map, final Filter<? super Object> keyChecker,
-		final Converter<? super GKey, ? extends GKey2> keyParser, final Converter<? super GKey2, ? extends GKey> keyFormatter,
-		final Filter<? super Object> valueChecker, final Converter<? super GValue, ? extends GValue2> valueParser,
-		final Converter<? super GValue2, ? extends GValue> valueFormatter) throws NullPointerException {
-		return new TranscodedMap<GKey, GValue, GKey2, GValue2>(map, keyChecker, keyParser, keyFormatter, valueChecker, valueParser, valueFormatter);
+	public static <GKey, GValue, GKey2, GValue2> Map<GKey, GValue> transcodedMap(final Map<GKey2, GValue2> map,
+		final FilterConverter<? super GKey, ? extends GKey2> keyParser, final FilterConverter<? super GKey2, ? extends GKey> keyFormatter,
+		final FilterConverter<? super GValue, ? extends GValue2> valueParser, final FilterConverter<? super GValue2, ? extends GValue> valueFormatter)
+		throws NullPointerException {
+		return new TranscodedMap<GKey, GValue, GKey2, GValue2>(map, keyParser, keyFormatter, valueParser, valueFormatter);
 	}
 
 	/**
-	 * Diese Methode erzeugt eine {@link List} als umkodierende Sicht auf die gegebene {@link List} und gibt diese zurück.
+	 * Diese Methode erzeugt eine {@link List} als umkodierende Sicht auf die gegebene {@link List} und gibt diese zurück. Die Methoden
+	 * {@link ListIterator#next()} und {@link ListIterator#previous()} können eine {@link IllegalArgumentException} auslösen.
 	 * 
 	 * @param <GEntry> Typ der Elemente der erzeugten {@link List}.
 	 * @param <GEntry2> Typ der Elemente der gegebenen {@link List}.
-	 * @param list gegebene {@link List}.
-	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link List#remove(Object)}, {@link List#contains(Object)},
-	 *        {@link List#indexOf(Object)} und {@link List#lastIndexOf(Object)} der erzeugten {@link List}. Zulässige Elemente werden in Elemente der gegebenen
-	 *        {@link List} umgewandelt und an die gegebene {@link List} delegiert.
-	 * @param parser {@link Converter} zur Umwandlung eines Elements der erzeugeten {@link List} in ein Element der gegebenen {@link List}.
-	 * @param formatter {@link Converter} zur Umwandlung eines Elements der gegebenen {@link List} in ein Element der erzeugten {@link List}.
+	 * @param data gegebene {@link List}.
+	 * @param parser {@link FilterConverter} zur Umwandlung eines Elements der erzeugeten {@link List} in ein Element der gegebenen {@link List} sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
+	 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements der gegebenen {@link List} in ein Element der erzeugten {@link List} sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
 	 * @return umkodierende {@link List}-Sicht.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GEntry, GEntry2> List<GEntry> transcodedList(final List<GEntry2> list, final Filter<? super Object> checker,
-		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-		return list instanceof RandomAccess ? new TranscodedRandomAccessList<GEntry, GEntry2>(list, checker, parser, formatter)
-			: new TranscodedList<GEntry, GEntry2>(list, checker, parser, formatter);
+	public static <GEntry, GEntry2> List<GEntry> transcodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+		final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+		return data instanceof RandomAccess ? new TranscodedRandomAccessList<GEntry, GEntry2>(data, parser, formatter) : new TranscodedList<GEntry, GEntry2>(data,
+			parser, formatter);
 	}
 
 	/**
@@ -1782,16 +1884,16 @@ public class Collections {
 	 * @param <GEntry> Typ der Elemente des erzeugten {@link Set}s.
 	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Set}s.
 	 * @param set gegebenes {@link Set}.
-	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link Set#remove(Object)} und {@link Set#contains(Object)} des erzeugten {@link Set}s.
-	 *        Zulässige Elemente werden in Elemente des gegebenen {@link Set} umgewandelt und an das gegebene {@link Set} delegiert.
-	 * @param parser {@link Converter} zur Umwandlung eines Elements des erzeugeten {@link Set}s in ein Element des gegebenen {@link Set}s.
-	 * @param formatter {@link Converter} zur Umwandlung eines Elements des gegebenen {@link Set}s in ein Element des erzeugten {@link Set}s.
+	 * @param parser {@link FilterConverter} zur Umwandlung eines Elements des erzeugeten {@link Set}s in ein Element des gegebenen {@link Set}s sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
+	 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements des gegebenen {@link Set}s in ein Element des erzeugten {@link Set}s sowie zur
+	 *        Erkennung einer gültigen Eingabe für die Umwandlung.
 	 * @return umkodierende {@link Set}-Sicht.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GEntry, GEntry2> Set<GEntry> transcodedSet(final Set<GEntry2> set, final Filter<? super Object> checker,
-		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-		return new TranscodedSet<GEntry, GEntry2>(set, checker, parser, formatter);
+	public static <GEntry, GEntry2> Set<GEntry> transcodedSet(final Set<GEntry2> set, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+		final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
+		return new TranscodedSet<GEntry, GEntry2>(set, parser, formatter);
 	}
 
 	/**
@@ -1799,18 +1901,18 @@ public class Collections {
 	 * 
 	 * @param <GEntry> Typ der Elemente der erzeugten {@link Collection}.
 	 * @param <GEntry2> Typ der Elemente der gegebenen {@link Collection}.
-	 * @param collection gegebene {@link Collection}.
-	 * @param checker {@link Filter} zur Erkennung zulässiger Elementen in {@link Collection#remove(Object)} und {@link Collection#contains(Object)} der erzeugten
-	 *        {@link Collection}. Zulässige Elemente werden in Elemente der gegebenen {@link Collection} umgewandelt und an die gegebene {@link Collection}
-	 *        delegiert.
-	 * @param parser {@link Converter} zur Umwandlung eines Elements der erzeugeten {@link Collection} in ein Element der gegebenen {@link Collection}.
-	 * @param formatter {@link Converter} zur Umwandlung eines Elements der gegebenen {@link Collection} in ein Element der erzeugten {@link Collection}.
+	 * @param data gegebene {@link Collection}.
+	 * @param parser {@link FilterConverter} zur Umwandlung eines Elements der erzeugeten {@link Collection} in ein Element der gegebenen {@link Collection} sowie
+	 *        zur Erkennung einer gültigen Eingabe für die Umwandlung.
+	 * @param formatter {@link FilterConverter} zur Umwandlung eines Elements der gegebenen {@link Collection} in ein Element der erzeugten {@link Collection}
+	 *        sowie zur Erkennung einer gültigen Eingabe für die Umwandlung.
 	 * @return umkodierende {@link Collection}-Sicht.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GEntry, GEntry2> Collection<GEntry> transcodedCollection(final Collection<GEntry2> collection, final Filter<? super Object> checker,
-		final Converter<? super GEntry, ? extends GEntry2> parser, final Converter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-		return new TranscodedCollection<GEntry, GEntry2>(collection, checker, parser, formatter);
+	public static <GEntry, GEntry2> Collection<GEntry> transcodedCollection(final Collection<GEntry2> data,
+		final FilterConverter<? super GEntry, ? extends GEntry2> parser, final FilterConverter<? super GEntry2, ? extends GEntry> formatter)
+		throws NullPointerException {
+		return new TranscodedCollection<GEntry, GEntry2>(data, parser, formatter);
 	}
 
 }
