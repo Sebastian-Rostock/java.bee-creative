@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import bee.creative.function.Functions.ArrayFunction;
+import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Functions.ParamFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Scopes.CompositeScope;
@@ -55,7 +56,7 @@ public final class Values {
 		public ValueParser(final String source) throws NullPointerException {
 			super(source);
 			this.value = -1;
-			this.ranges = new ArrayList<Range>((length() / 10) + 5);
+			this.ranges = new ArrayList<Range>((this.length() / 10) + 5);
 		}
 
 		/**
@@ -281,7 +282,6 @@ public final class Values {
 		 * @return Zahl.
 		 */
 		private int compileIndex(final String string) {
-			if(string.isEmpty()) return -1;
 			final char symbol = string.charAt(0);
 			if((symbol < '0') || (symbol > '9')) return -1;
 			try{
@@ -298,6 +298,7 @@ public final class Values {
 		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
 		 */
 		private Value compileValue() throws ScriptCompilerException {
+			final Value value;
 			switch(this.skipSpace().type){
 				case 0:
 				case '$':
@@ -312,12 +313,17 @@ public final class Values {
 					return this.compileArray();
 				case '{':
 					return FunctionValue.valueOf(this.compileScope());
-				default:{
-					final Value value = this.compiler.valueOf(this.script, this.range);
+				default:
+					try{
+						value = this.compiler.valueOf(this.script, this.range);
+					}catch(final ScriptCompilerException e){
+						throw e;
+					}catch(final RuntimeException e){
+						throw new ScriptCompilerException(this.script, this.range, e);
+					}
 					if(value == null) throw new ScriptCompilerException(this.script, this.range);
 					this.skip();
 					return value;
-				}
 			}
 		}
 
@@ -342,6 +348,7 @@ public final class Values {
 					case '(':
 					case ')':
 					case '}':
+					case ']':
 						throw new ScriptCompilerException(this.script, this.range);
 					case '[':
 						value = this.compileArray();
@@ -350,13 +357,20 @@ public final class Values {
 						value = FunctionValue.valueOf(this.compileScope());
 						break;
 					default:
-						value = NullValue.valueOf(this.compiler.valueOf(this.script, this.skipSpace()));
+						try{
+							value = this.compiler.valueOf(this.script, this.range);
+						}catch(final ScriptCompilerException e){
+							throw e;
+						}catch(final RuntimeException e){
+							throw new ScriptCompilerException(this.script, this.range, e);
+						}
 						break;
 				}
 				array.add(value);
 				switch(this.skipSpace().type){
 					case ';':
 						this.skip();
+						this.skipSpace();
 						break;
 					case ']':
 						this.skip();
@@ -376,8 +390,6 @@ public final class Values {
 		private String compileParam() throws ScriptCompilerException {
 			switch(this.skipSpace().type){
 				case 0:
-				case '\'':
-				case '\"':
 				case '$':
 				case '(':
 				case '[':
@@ -390,8 +402,15 @@ public final class Values {
 				case '}':
 					return null;
 			}
-			final String name = this.compiler.paramOf(this.script, this.range);
-			if(name.isEmpty()) throw new IllegalArgumentException();
+			final String name;
+			try{
+				name = this.compiler.paramOf(this.script, this.range);
+				if(name.isEmpty()) throw new IllegalArgumentException();
+			}catch(final ScriptCompilerException e){
+				throw e;
+			}catch(final RuntimeException e){
+				throw new ScriptCompilerException(this.script, this.range, e);
+			}
 			this.skip();
 			return name;
 		}
@@ -409,7 +428,7 @@ public final class Values {
 				if(this.skipSpace().type == 0) throw new ScriptCompilerException(this.script, this.range);
 				final String name = this.compileParam();
 				if(name != null){
-					if(this.compileIndex(name) >= 0) throw new IllegalArgumentException("Illegal param name " + Objects.toString(name) + ".");
+					if(this.compileIndex(name) >= 0) throw new ScriptCompilerException(this.script, this.range);
 					this.params.add(count++, name);
 				}
 				switch(this.skipSpace().type){
@@ -444,11 +463,11 @@ public final class Values {
 				case '$':{
 					this.skip();
 					final String name = this.compileParam();
-					if(name == null) return Functions.ArrayFunction.INSTANCE;
+					if(name == null) return ArrayFunction.INSTANCE;
 					final int index = this.compileIndex(name);
 					final int index2 = (index < 0) ? this.params.indexOf(name) : (index - 1);
-					if(index2 < 0) throw new IllegalArgumentException("Unknown parameter name " + Objects.toString(name) + ".");
-					return Functions.ParamFunction.valueOf(index2);
+					if(index2 < 0) throw new ScriptCompilerException(this.script, this.range);
+					return ParamFunction.valueOf(index2);
 				}
 				case '{':{
 					function = this.compileScope();
@@ -465,11 +484,10 @@ public final class Values {
 			do{
 				this.skip(); // '('
 				this.skipSpace();
-				final LinkedList<Function> functions = new LinkedList<Function>();
-				while(true){
+				for(final LinkedList<Function> functions = new LinkedList<Function>(); true;){
 					if(this.range.type == ')'){
 						this.skip();
-						function = Functions.CompositeFunction.valueOf(function, chained, functions.toArray(new Function[functions.size()]));
+						function = CompositeFunction.valueOf(function, chained, functions.toArray(new Function[functions.size()]));
 						break;
 					}
 					functions.add(this.compileFunction());
@@ -585,7 +603,7 @@ public final class Values {
 		 * @param cause Verursachende Ausnahme.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ScriptCompilerException(final Script script, final Range range, Throwable cause) throws NullPointerException {
+		public ScriptCompilerException(final Script script, final Range range, final Throwable cause) throws NullPointerException {
 			super("Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
 			this.script = script;
 			this.range = range;

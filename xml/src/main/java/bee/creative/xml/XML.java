@@ -39,10 +39,13 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -782,6 +785,326 @@ public class XML {
 		public String toString() {
 			return Objects.toStringCallFormat(false, true, this, new Object[]{"featureMap", this.featureMap, "variableResolver", this.variableResolver,
 				"functionResolver", this.functionResolver, "namespaceContext", this.namespaceContext});
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur vereinfachten Befüllung eines {@link Document}s mit {@link Attr}-, {@link Text}-, {@link Comment} und
+	 * {@link Element}-Knoten. Die Methoden zur Erzeugung von Knoten geben diesen oder einen neuen {@link NodeBuilder} zurück, sodass mehrere Befehle analog zu
+	 * einem {@link StringBuilder} hintereinander geschrieben werden können.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class NodeBuilder {
+
+		/**
+		 * Dieses Feld speichert den aktuelle Knoten.
+		 */
+		final Node node;
+
+		/**
+		 * Dieses Feld speichert den aufrufenden {@link NodeBuilder}.
+		 */
+		final NodeBuilder owner;
+
+		/**
+		 * Dieses Feld speichert die aktuelle Position.
+		 */
+		int index;
+
+		/**
+		 * Dieser Konstruktor initialisiert den aktuellen Knoten und den aufrufenden {@link NodeBuilder}.
+		 * 
+		 * @param node aktuellen Knoten.
+		 * @param owner aufrufender {@link NodeBuilder}
+		 */
+		private NodeBuilder(final Node node, final NodeBuilder owner) {
+			this.node = node;
+			this.owner = owner;
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link Document}, das über diesen {@link NodeBuilder} befüllt werden soll.
+		 * 
+		 * @param document {@link Document}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public NodeBuilder(final Document document) throws NullPointerException {
+			if(document == null) throw new NullPointerException();
+			this.node = document;
+			this.owner = null;
+		}
+
+		/**
+		 * Diese Methode gibt den aktuellen Knoten zurück, in dennen Kontext Kind- und Attributknoten erzeugt werden. Dieser kann nur ein {@link Element} oder ein
+		 * {@link Document} sein.
+		 * 
+		 * @see Element
+		 * @see Document
+		 * @return aktueller Knoten.
+		 */
+		public Node node() {
+			return this.node;
+		}
+
+		/**
+		 * Diese Methode gibt das {@link Document} des {@link #node() aktuellen Knoten} zurück.
+		 * 
+		 * @see Node#getOwnerDocument()
+		 * @return {@link Document} des {@link #node() aktuellen Knoten}.
+		 */
+		public Document document() {
+			return this.node().getOwnerDocument();
+		}
+
+		/**
+		 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code index() - 1} aus und gibt {@code this} das zurück.
+		 * 
+		 * @see #hasPrev()
+		 * @return {@code this}.
+		 * @throws IllegalStateException wenn es keine vorherige Position gibt.
+		 */
+		public NodeBuilder prev() throws IllegalStateException {
+			if(!this.hasPrev()) throw new IllegalStateException();
+			this.index--;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code index() + 1} aus und gibt {@code this} das zurück.
+		 * 
+		 * @see #hasNext()
+		 * @return {@code this}.
+		 * @throws IllegalStateException wenn es keine nächste Position gibt.
+		 */
+		public NodeBuilder next() throws IllegalStateException {
+			if(!this.hasNext()) throw new IllegalStateException();
+			this.index++;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die {@link #index() aktuelle Position}, an welcher neue Kindelemente eingefügt werden. Negative Positionen zählen vom Ende der
+		 * Kindknotenliste, d.h. {@code -1 => length()}, {@code -2 => (length() - 1)} usw.
+		 * 
+		 * @see #index()
+		 * @see #length()
+		 * @param index Positioh.
+		 * @return {@code this}.
+		 * @throws IllegalArgumentException Wenn {@code index > length()} oder {@code (-index - 1) > length()}.
+		 */
+		public NodeBuilder seek(final int index) throws IllegalArgumentException {
+			final int length = this.length(), offset = index >= 0 ? index : length + index + 1;
+			if((offset < 0) || (offset > length)) throw new IllegalArgumentException();
+			this.index = offset;
+			return this;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} größer als {@code 0} ist.
+		 * 
+		 * @see #index()
+		 * @see #length()
+		 * @return {@code true}, wenn {@code index() > 0}.
+		 */
+		public boolean hasPrev() {
+			return this.index > 0;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} kleiner als {@link #length()} ist.
+		 * 
+		 * @see #index()
+		 * @see #length()
+		 * @return {@code true}, wenn {@code index() < length()}.
+		 */
+		public boolean hasNext() {
+			return this.index < this.length();
+		}
+
+		/**
+		 * Diese Methode gibt die aktuelle Position zurück, an welcher neue Kindelemente eingefügt werden. für eine gültige Position gilt
+		 * {@code 0 <= index() <= length()}.
+		 * 
+		 * @see #seek(int)
+		 * @see #length()
+		 * @return aktuelle Position.
+		 */
+		public int index() {
+			return this.index;
+		}
+
+		/**
+		 * Diese Methode gibt die Anzahl der Kondknoten zurück.
+		 * 
+		 * @see Node#getChildNodes()
+		 * @see NodeList#getLength()
+		 * @return Anzahl der Kondknoten.
+		 */
+		public int length() {
+			return this.node().getChildNodes().getLength();
+		}
+
+		/**
+		 * Diese Methode gibt einen neuen {@link NodeBuilder} zu dem {@link Element} zurück, das sich in der Kondknotenliste an der {@link #index() aktuellen
+		 * Position} befindet.
+		 * 
+		 * @see #index()
+		 * @return {@link NodeBuilder} zum {@link Element} an der {@link #index() aktuellen Position}.
+		 * @throws IllegalStateException Wenn die Kondknotenliste an der {@link #index() aktuellen Position} kein {@link Element} enthält.
+		 */
+		public NodeBuilder open() throws IllegalStateException {
+			final Node node = NodeBuilder.this.node().getChildNodes().item(NodeBuilder.this.index);
+			if(!(node instanceof Element)) throw new IllegalStateException();
+			return new NodeBuilder(node, this);
+		}
+
+		/**
+		 * Diese Methode schließt die Bearbeitung des {@link #node() aktuelle Knoten} ab und gibt den {@link NodeBuilder} zurück, von dem aus dieser erzeugt wurde.
+		 * 
+		 * @see #open()
+		 * @see #element(String)
+		 * @see #element(String, String)
+		 * @return erzeugenden {@link NodeBuilder}.
+		 * @throws IllegalStateException Wenn es keinen erzeugenden {@link NodeBuilder} gibt.
+		 */
+		public NodeBuilder close() throws IllegalStateException {
+			if(this.owner == null) throw new IllegalStateException();
+			return this.owner;
+		}
+
+		/**
+		 * Diese Methode fügt den gegebenen {@link Node} an der {@link #index() aktuellen Position} ein, bewegt die {@link #index() aktuelle Position} hinter den
+		 * eingefügten Knoten und gibt {@code this} zurück.
+		 * 
+		 * @see #index()
+		 * @see Node#insertBefore(Node, Node)
+		 * @param node {@link Node}.
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 */
+		public NodeBuilder insert(final Node node) throws DOMException {
+			final Node root = this.node(), next = root.getChildNodes().item(this.index);
+			root.insertBefore(node, next);
+			this.index++;
+			return this;
+		}
+
+		/**
+		 * Diese Methode entfernt den Kindknoten an der {@link #index() aktuellen Position} und gibt {@code this} zurück.
+		 * 
+		 * @see #index()
+		 * @see Node#removeChild(Node)
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 * @throws IllegalStateException Wenn die Kondknotenliste an der {@link #index() aktuellen Position} kein Knoten existiert.
+		 */
+		public NodeBuilder delete() throws DOMException, IllegalStateException {
+			final Node root = this.node(), next = root.getChildNodes().item(this.index);
+			if(next == null) throw new IllegalStateException();
+			root.removeChild(next);
+			return this;
+		}
+
+		/**
+		 * Diese Methode fügt an der {@link #index() aktuellen Position} einen neuen {@link Text} mit dem gegebenen Wert ein, bewegt die {@link #index() aktuelle
+		 * Position} hinter den eingefügten Knoten und gibt {@code this} zurück.
+		 * 
+		 * @see #insert(Node)
+		 * @see Document#createTextNode(String)
+		 * @param text Wert.
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 */
+		public NodeBuilder text(final String text) throws DOMException {
+			return this.insert(this.document().createTextNode(text));
+		}
+
+		/**
+		 * Diese Methode fügt an der {@link #index() aktuellen Position} einen neuen {@link Comment} mit dem gegebenen Wert ein, bewegt die {@link #index() aktuelle
+		 * Position} hinter den eingefügten Knoten und gibt {@code this} zurück.
+		 * 
+		 * @see #insert(Node)
+		 * @see Document#createComment(String)
+		 * @param text Wert.
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 */
+		public NodeBuilder comment(final String text) throws DOMException {
+			return this.insert(this.document().createComment(text));
+		}
+
+		/**
+		 * Diese Methode fügt an der {@link #index() aktuellen Position} ein neues {@link Element} mit dem gegebenen Namen ein, bewegt die {@link #index() aktuelle
+		 * Position} hinter den eingefügten Knoten und gibt einen neuen {@link NodeBuilder} zum eingefügten {@link Element} zurück.
+		 * 
+		 * @see Document#createElement(String)
+		 * @param name Name.
+		 * @return {@link NodeBuilder} zum erzeugten Knoten.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 */
+		public NodeBuilder element(final String name) throws DOMException {
+			return this.insert(this.document().createElement(name)).prev().open();
+		}
+
+		/**
+		 * Diese Methode fügt an der {@link #index() aktuellen Position} ein neues {@link Element} mit den gegebenen Eigenschaften ein, bewegt die {@link #index()
+		 * aktuelle Position} hinter den eingefügten Knoten und gibt einen neuen {@link NodeBuilder} zum eingefügten {@link Element} zurück.
+		 * 
+		 * @see Document#createElementNS(String, String)
+		 * @param uri Uri.
+		 * @param name Name.
+		 * @return {@link NodeBuilder} zum erzeugten Knoten.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 */
+		public NodeBuilder element(final String uri, final String name) throws DOMException {
+			return this.insert(this.document().createElementNS(uri, name)).prev().open();
+		}
+
+		/**
+		 * Diese Methode modifiziert das {@link Attr} mit den gegebenen Eigenschaften und gibt {@code this} zurück. Wenn der gegebene Wert {@code null} ist, wird
+		 * das {@link Attr} entfernt. Andernfalls wird es erzeugt bzw. geändert.
+		 * 
+		 * @see Element#setAttribute(String, String)
+		 * @see Element#removeAttribute(String)
+		 * @param name Name.
+		 * @param value Wert.
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 * @throws IllegalStateException Wenn das {@link #node() aktuelle Knoten} kein {@link Element} ist.
+		 */
+		public NodeBuilder attribute(final String name, final String value) throws DOMException, IllegalStateException {
+			if(this.owner == null) throw new IllegalStateException();
+			if(value == null){
+				((Element)this.node).removeAttribute(name);
+			}else{
+				((Element)this.node).setAttribute(name, value);
+			}
+			return this;
+		}
+
+		/**
+		 * Diese Methode modifiziert das {@link Attr} mit den gegebenen Eigenschaften und gibt {@code this} zurück. Wenn der gegebene Wert {@code null} ist, wird
+		 * das {@link Attr} entfernt. Andernfalls wird es erzeugt bzw. geändert.
+		 * 
+		 * @see Element#setAttributeNS(String, String, String)
+		 * @see Element#removeAttributeNS(String, String)
+		 * @param uri Uri.
+		 * @param name Name.
+		 * @param value Wert.
+		 * @return {@code this}.
+		 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+		 * @throws IllegalStateException Wenn das {@link #node() aktuelle Knoten} kein {@link Element} ist.
+		 */
+		public NodeBuilder attribute(final String uri, final String name, final String value) throws DOMException, IllegalStateException {
+			if(this.owner == null) throw new IllegalStateException();
+			if(value == null){
+				((Element)this.node).removeAttributeNS(uri, name);
+			}else{
+				((Element)this.node).setAttributeNS(uri, name, value);
+			}
+			return this;
 		}
 
 	}
@@ -1796,6 +2119,17 @@ public class XML {
 	 */
 	public static FormatOptions formatOptions() {
 		return new FormatOptions();
+	}
+
+	/**
+	 * Diese Methode erzeugt einen {@link NodeBuilder} für das gegebene {@link Document} und gibt ihn zurück.
+	 * 
+	 * @param document {@link Document}.
+	 * @return {@link NodeBuilder}.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public static NodeBuilder builder(final Document document) throws NullPointerException {
+		return new NodeBuilder(document);
 	}
 
 	/**
