@@ -175,6 +175,61 @@ public final class Functions {
 	}
 
 	/**
+	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (function: FunctionValue): FunctionValue}, die die zusätzlichen Parameterwerte eines
+	 * gegebenen Ausführungskontexts über eine {@link ClosureFunction} an die Parameterfunktion bindet.
+	 * 
+	 * @see ClosureFunction
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class BindFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert die {@link BindFunction}.
+		 */
+		public static final BindFunction INSTANCE = new BindFunction();
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Der Ergebniswert ist ein {@link FunctionValue} mit einer {@link ClosureFunction}, die aus den gegebenen Ausführungskontext und der Funktion im einzigen
+		 * Parameterwert erzeugt wird.
+		 * 
+		 * @throws IllegalArgumentException Wenn der Ausführungskontext nicht genau einen Parameterwert liefert oder dieser nicht in einen {@link FunctionValue}
+		 *         konvertiert werden kann.
+		 */
+		@Override
+		public Value execute(final Scope scope) throws IllegalArgumentException {
+			if(scope.size() != 1) throw new IllegalArgumentException();
+			return FunctionValue.valueOf(new ClosureFunction(scope, scope.get(0).valueTo(FunctionValue.TYPE).data()));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return BindFunction.class.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			return (object == this) || (object instanceof BindFunction);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, function: FunctionValue): Value}. Der Ergebniswert
 	 * entspricht {@code function(params1, ..., paramsN)} entspricht.
 	 * 
@@ -696,6 +751,77 @@ public final class Functions {
 		@Override
 		public String toString() {
 			return Objects.toStringCall(this, this.index);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine Funktion, die die zusätzlichen Parameterwerte eines gegebenen Ausführungskontexts an eine gegebene Funktion bindet.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class ClosureFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
+		 */
+		final Scope scope;
+
+		/**
+		 * Dieses Feld speichert die auszuwertende Funktion.
+		 */
+		final Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert Ausführungskontext und Funktion.
+		 * 
+		 * @param scope gebundener Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
+		 * @param function auszuwertende Funktion.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
+			if((scope == null) || (function == null)) throw new NullPointerException();
+			this.scope = scope;
+			this.function = function;
+		}
+
+		/**
+		 * Diese Methode gibt den gebundene Ausführungskontext zurück, dessen zusätzliche Parameterwerte genutzt werden.
+		 * 
+		 * @return gebundener Ausführungskontext.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		/**
+		 * Diese Methode gibt die auszuwertende Funktion zurück.
+		 * 
+		 * @return auszuwertende Funktion.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Die {@link #function() auszuwertende Funktion} wird hierfür mit einem Ausführungskontext aufgerufen, der die Parameterwerte des gegebenen
+		 * Ausführungskontexts {@code scope} sowie die zusätzlichen Parameterwerte des gebundenen Ausführungskontexts {@link #scope()} enthält.
+		 * <p>
+		 * Der Ergebniswert entspricht {@code this.function().execute(new ValueScope(this.scope(), Array.valueOf(scope)))}.
+		 */
+		@Override
+		public Value execute(final Scope scope) {
+			return this.function.execute(new ValueScope(this.scope, Array.valueOf(scope)));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this.scope, this.function);
 		}
 
 	}

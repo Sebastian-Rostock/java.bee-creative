@@ -364,6 +364,8 @@ public final class Values {
 						}catch(final RuntimeException e){
 							throw new ScriptCompilerException(this.script, this.range, e);
 						}
+						if(value == null) throw new ScriptCompilerException(this.script, this.range);
+						this.skip();
 						break;
 				}
 				array.add(value);
@@ -477,8 +479,8 @@ public final class Values {
 				default:{
 					final Value value = this.compileValue();
 					if(!value.type().is(FunctionValue.TYPE)) return ValueFunction.valueOf(value);
+					if(this.skipSpace().type != '(') throw new ScriptCompilerException(this.script, this.range);
 					function = FunctionValue.TYPE.valueOf(value).data();
-					if(this.skipSpace().type != '(') return function;
 				}
 			}
 			do{
@@ -604,7 +606,9 @@ public final class Values {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ScriptCompilerException(final Script script, final Range range, final Throwable cause) throws NullPointerException {
-			super("Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
+			super(range == Range.NULL ? //
+				"Unerwartetes Ende der Zeichenkette." : //
+				"Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
 			this.script = script;
 			this.range = range;
 		}

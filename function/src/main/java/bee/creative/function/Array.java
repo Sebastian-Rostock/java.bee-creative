@@ -18,6 +18,31 @@ import bee.creative.util.Objects;
 public abstract class Array implements Get<Value>, Iterable<Value> {
 
 	/**
+	 * Diese Klasse implementiert eine leere Wertliste.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class VoidArray extends Array {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value get(int index) throws IndexOutOfBoundsException {
+			throw new IndexOutOfBoundsException();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int length() {
+			return 0;
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert eine Wertliste als Sicht auf die Parameterwerte eines Ausführungskontexts.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -97,6 +122,11 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		}
 
 	}
+
+	/**
+	 * Dieses Feld speichert eine leere Wertliste.
+	 */
+	public static final Array EMPTY_ARRAY = new VoidArray();
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese oder {@code null} zurück. Wenn das gegebene Objekt {@link Class#isArray()
@@ -330,9 +360,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * Diese Methode gibt den {@code index}-ten Wert zurück.
 	 */
 	@Override
-	public Value get(final int index) throws IndexOutOfBoundsException {
-		return null;
-	}
+	public abstract Value get(final int index) throws IndexOutOfBoundsException;
 
 	/**
 	 * Diese Methode gibt die Länge dieser eine Wertliste zurück.

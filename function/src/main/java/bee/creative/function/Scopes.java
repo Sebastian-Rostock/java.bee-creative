@@ -63,6 +63,7 @@ public final class Scopes {
 	/**
 	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Kontextobjekt und ohne Parameterwerte.
 	 * 
+	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class VoidScope extends AbstractScope {
@@ -107,12 +108,13 @@ public final class Scopes {
 	 * Ausführungskontexts. Über die Methode {@link #get(int)} kann dabei auf die zusätzlichen Parameterwerte des übergeordneten Ausführungskontexts zugegriffen
 	 * werden.
 	 * 
+	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ValueScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den übergeordneten Ausführungskontext, dessen Parameterwerte virtuell ergänzt werden.
+		 * Dieses Feld speichert den übergeordneten Ausführungskontext, dessen zusätzlichen Parameterwerte genutzt werden.
 		 */
 		final Scope scope;
 
@@ -135,7 +137,7 @@ public final class Scopes {
 		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterwerte. Das Kontextobjekt sowie die zusätzlichen Parameterwerte
 		 * entsprechen denen des gegebenen Ausführungskontexts.
 		 * 
-		 * @param scope übergeordneter Ausführungskontext.
+		 * @param scope übergeordneter Ausführungskontext, dessen zusätzlichen Parameterwerte genutzt werden.
 		 * @param values Parameterwerte.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
@@ -278,6 +280,7 @@ public final class Scopes {
 	 * gegebener Parameterfunktionen ermittelt werden. Die Parameterfunktionen werden zur Ermittlung der Parameterwerte einmalig mit dem gegebenen
 	 * Ausführungskontext aufgerufen. Deren Ergebniswerte werden dann zur Wiederverwendung zwischengespeichert.
 	 * 
+	 * @see #get(int)
 	 * @see CompositeFunction
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */

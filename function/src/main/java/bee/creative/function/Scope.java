@@ -4,7 +4,8 @@ import bee.creative.util.Comparables.Get;
 
 /**
  * Diese Schnittstelle definiert den Ausführungskontext einer Funktion. Ein solcher Ausführungskontext stellt eine Liste von Parameterwerten sowie ein
- * Kontextobjekt zur Verfügung.
+ * Kontextobjekt zur Verfügung. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können von der Methode {@link #get(int)} auch zusätzliche
+ * Parameterwerte eines übergeordneten Ausführungskontexts bereitgestellt werden.
  * 
  * @see Value
  * @see Scopes
