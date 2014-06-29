@@ -1,5 +1,6 @@
 package bee.creative.function;
 
+import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Scopes.ValueScope;
 import bee.creative.function.Types.NullType;
@@ -41,11 +42,11 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode überführt die gegebenen, komponierte Funktion in eine komponierte Funktion, bei der jede Parameterfunktion in eine {@link LazyFunction}
-		 * konvertiert wurde, und gibt diese zurück.
+		 * Diese Methode überführt die gegebenen, komponierte Funktion in eine neue komponierte Funktion, bei der jede Parameterfunktion in eine
+		 * {@link LazyFunction} konvertiert wurde, und gibt diese zurück.
 		 * 
 		 * @param function komponierte Funktion.
-		 * @return komponierte Funktion mit {@link LazyFunction}s als Parameterfunktionen.
+		 * @return neue komponierte Funktion mit {@link LazyFunction}s als Parameterfunktionen.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static CompositeFunction applyTo(final CompositeFunction function) throws NullPointerException {
@@ -91,7 +92,7 @@ public final class Functions {
 		 */
 		@Override
 		public LazyValue execute(final Scope scope) {
-			return new LazyValue(scope, this.function);
+			return LazyValue.valueOf(scope, this.function);
 		}
 
 		/**
@@ -175,63 +176,8 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (function: FunctionValue): FunctionValue}, die die zusätzlichen Parameterwerte eines
-	 * gegebenen Ausführungskontexts über eine {@link ClosureFunction} an die Parameterfunktion bindet.
-	 * 
-	 * @see ClosureFunction
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class BindFunction implements Function {
-
-		/**
-		 * Dieses Feld speichert die {@link BindFunction}.
-		 */
-		public static final BindFunction INSTANCE = new BindFunction();
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Ergebniswert ist ein {@link FunctionValue} mit einer {@link ClosureFunction}, die aus den gegebenen Ausführungskontext und der Funktion im einzigen
-		 * Parameterwert erzeugt wird.
-		 * 
-		 * @throws IllegalArgumentException Wenn der Ausführungskontext nicht genau einen Parameterwert liefert oder dieser nicht in einen {@link FunctionValue}
-		 *         konvertiert werden kann.
-		 */
-		@Override
-		public Value execute(final Scope scope) throws IllegalArgumentException {
-			if(scope.size() != 1) throw new IllegalArgumentException();
-			return FunctionValue.valueOf(new ClosureFunction(scope, scope.get(0).valueTo(FunctionValue.TYPE).data()));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return BindFunction.class.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof BindFunction);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, function: FunctionValue): Value}. Der Ergebniswert
-	 * entspricht {@code function(params1, ..., paramsN)} entspricht.
+	 * entspricht {@code function(params1, ..., paramsN)}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -284,27 +230,76 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion, deren Ergebniswert dem {@link ArrayValue} der Parameterwerte des Ausführungskontexts entspricht.
+	 * Diese Klasse implementiert eine Funktion, deren Ergebniswert einem {@link ArrayValue} mit den Parameterwerten des Ausführungskontexts entspricht.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ArrayFunction#execute(Scope)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ArrayFunction implements Function {
 
 		/**
-		 * Dieses Feld speichert die {@link ArrayFunction}.
+		 * Dieses Feld speichert die {@link ArrayFunction}, die eine Kopie der Parameterwerte liefert.
 		 */
-		public static final ArrayFunction INSTANCE = new ArrayFunction();
+		public static final ArrayFunction COPY = new ArrayFunction(true);
+
+		/**
+		 * Dieses Feld speichert die {@link ArrayFunction}, die eine Sicht auf die Parameterwerte liefert.
+		 */
+		public static final ArrayFunction VIEW = new ArrayFunction(false);
+
+		/**
+		 * Diese Methode gibt eine {@link ArrayFunction} zurück, die entwerder eine {@link Array#valueOf(Scope) Sicht} auf oder eine {@link Array#valueOf(Value...)
+		 * Kopie} der Parameterwerte des ihr übergebenen Ausführungskontexts liefert.
+		 * 
+		 * @see #COPY
+		 * @see #VIEW
+		 * @param mode {@code true}, wenn die {@link ArrayFunction} statt einer Sicht eine Kopie der Parameterwerte liefern soll.
+		 * @return {@link ArrayFunction}.
+		 */
+		public static ArrayFunction valueOf(final boolean mode) {
+			return mode ? ArrayFunction.COPY : ArrayFunction.VIEW;
+		}
+
+		/**
+		 * Dieses Feld ist {@code true}, wenn {@link #execute(Scope)} statt einer Sicht eine Kopie der Parameterwerte liefern soll.
+		 */
+		final boolean mode;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Modus.
+		 * 
+		 * @param mode {@code true}, wenn {@link #execute(Scope)} statt einer {@link Array#valueOf(Scope) Sicht} eine {@link Array#valueOf(Value...) Kopie} der
+		 *        Parameterwerte liefern soll.
+		 */
+		public ArrayFunction(final boolean mode) {
+			this.mode = mode;
+		}
+
+		/**
+		 * Diese Methode gibt den Modus.
+		 * 
+		 * @return {@code true}, wenn {@link #execute(Scope)} statt einer {@link Array#valueOf(Scope) Sicht} eine {@link Array#valueOf(Value...) Kopie} der
+		 *         Parameterwerte liefert.
+		 */
+		public boolean mode() {
+			return this.mode;
+		}
 
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der Ergebniswert entspricht dem {@link ArrayValue} der Parameterwerte des gegebenen Ausführungskontexts.
+		 * Der Ergebniswert entspricht dem {@link ArrayValue} der Parameterwerte des gegebenen Ausführungskontexts. Das {@link Array} wird hierbei entweder als
+		 * {@link Array#valueOf(Scope) Sicht} oder als {@link Array#valueOf(Value...) Kopie} bereit gestellt. <br>
+		 * Wenn {@link #mode()} {@code true} ist, entspricht der Ergebniswert {@code ArrayValue.valueOf(Array.valueOf(scope))}. Andernfalls entspricht er
+		 * {@code ArrayValue.valueOf(Array.valueOf(Array.valueOf(scope).toArray()))}.
 		 * 
 		 * @see Array#valueOf(Scope)
+		 * @see Array#valueOf(Value...)
 		 */
 		@Override
 		public ArrayValue execute(final Scope scope) {
+			if(this.mode) return new ArrayValue(new ValueArray(Array.valueOf(scope).toArray()));
+			;
 			return new ArrayValue(Array.valueOf(scope));
 		}
 
@@ -435,14 +430,15 @@ public final class Functions {
 		 * <p>
 		 * Wenn die Funktion eine {@link CompositeFunction} ist, wird eine {@link CompositeFunction} zurück gegeben, deren Parameterfunktionen in eine
 		 * {@link TraceFunction} umgewandelt wurden. Wenn die Funktion eine {@link ValueFunction} ist und ihr Ergebniswert ein {@link FunctionValue} ist, wird diese
-		 * ebenfalls in eine {@link TraceFunction} umgewandelt und als {@link ValueFunction} zurück gegeben. Andernfalls wird die gegebene Funktion zurück gegeben.
+		 * ebenfalls in eine {@link TraceFunction} umgewandelt und als {@link ValueFunction} zurück gegeben. Wenn die Funktion eine {@link ClosureFunction} ist,
+		 * wird deren Funktion ebenfalls in eine {@link TraceFunction} umgewandelt. Andernfalls wird die gegebene Funktion zurück gegeben.
 		 * 
 		 * @param handler {@link TraceHandler}.
 		 * @param function Funktion.
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public static final Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
+		public static Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
 			if((handler == null) || (function == null)) throw new NullPointerException();
 			final Object clazz = function.getClass();
 			if(clazz == CompositeFunction.class){
@@ -453,8 +449,13 @@ public final class Functions {
 				}
 				return new CompositeFunction(new TraceFunction(handler, function2.function), function2.chained, functions2);
 			}else if(clazz == ValueFunction.class){
-				final Value value = function.execute(null);
+				final ValueFunction function2 = (ValueFunction)function;
+				final Value value = function2.value;
 				if(value.getClass() == FunctionValue.class) return new ValueFunction(new FunctionValue(new TraceFunction(handler, (Function)value.data())));
+			}else if(clazz == ClosureFunction.class){
+				final ClosureFunction function2 = (ClosureFunction)function;
+				if(function2.scope == null) return new ClosureFunction(new TraceFunction(handler, function2.function));
+				return new ClosureFunction(function2.scope, new TraceFunction(handler, function2.function));
 			}
 			return function;
 		}
@@ -573,7 +574,7 @@ public final class Functions {
 		public static final ValueFunction NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
 
 		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
 		 * 
 		 * @see Values#valueOf(Object)
 		 * @param data Nutzdaten des Ergebniswerts.
@@ -585,7 +586,7 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
+		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
 		 * 
 		 * @param value Ergebniswert.
 		 * @return {@link ValueFunction}.
@@ -756,11 +757,24 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion, die die zusätzlichen Parameterwerte eines gegebenen Ausführungskontexts an eine gegebene Funktion bindet.
+	 * Diese Klasse implementiert eine Funktion, die einen Ausführungskontext an eine gegebene Funktion binden kann.
 	 * 
+	 * @see #execute(Scope)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ClosureFunction implements Function {
+
+		/**
+		 * Diese Methode konvertiert die gegebene Funktion in eine {@link ClosureFunction} und gibt diese zurück.
+		 * 
+		 * @see ClosureFunction#ClosureFunction(Function)
+		 * @param function auszuwertende Funktion.
+		 * @return {@link ClosureFunction}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public static ClosureFunction valueOf(final Function function) throws NullPointerException {
+			return new ClosureFunction(function);
+		}
 
 		/**
 		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
@@ -773,9 +787,26 @@ public final class Functions {
 		final Function function;
 
 		/**
-		 * Dieser Konstruktor initialisiert Ausführungskontext und Funktion.
+		 * Dieser Konstruktor initialisiert die Funktion. Die {@link #execute(Scope)}-Methode bindet den ihr übergebenen Ausführungskontext an die gegebene Funktion
+		 * und gibt die so erzeugte Funktion als {@link FunctionValue} zurück.
 		 * 
-		 * @param scope gebundener Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
+		 * @see #execute(Scope)
+		 * @param function auszuwertende Funktion.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ClosureFunction(final Function function) throws NullPointerException {
+			if(function == null) throw new NullPointerException();
+			this.scope = null;
+			this.function = function;
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert den gebundenen Ausführungskontext und die Funktion. Die {@link #execute(Scope)}-Methode delegiert die Parameterwerte des
+		 * ihr übergebenen Ausführungskontext zusammen mit den Parameterwerten des gebundenen Ausführungskontext als zusätzliche Parameterwerte an die gegebene
+		 * Funktion und gibt deren Ergebniswert zurück.
+		 * 
+		 * @see #execute(Scope)
+		 * @param scope gebundener Ausführungskontext.
 		 * @param function auszuwertende Funktion.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
@@ -786,9 +817,13 @@ public final class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt den gebundene Ausführungskontext zurück, dessen zusätzliche Parameterwerte genutzt werden.
+		 * Diese Methode gibt den gebundene Ausführungskontext oder {@code null} zurück. Der Ausführungskontext ist {@code null}, wenn diese {@link ClosureFunction}
+		 * über dem Konstruktor {@link #ClosureFunction(Function)} erzeugt wurde.
 		 * 
-		 * @return gebundener Ausführungskontext.
+		 * @see #ClosureFunction(Function)
+		 * @see #ClosureFunction(Scope, Function)
+		 * @see #execute(Scope)
+		 * @return gebundener Ausführungskontext oder {@code null}.
 		 */
 		public Scope scope() {
 			return this.scope;
@@ -806,14 +841,34 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Die {@link #function() auszuwertende Funktion} wird hierfür mit einem Ausführungskontext aufgerufen, der die Parameterwerte des gegebenen
-		 * Ausführungskontexts {@code scope} sowie die zusätzlichen Parameterwerte des gebundenen Ausführungskontexts {@link #scope()} enthält.
-		 * <p>
-		 * Der Ergebniswert entspricht {@code this.function().execute(new ValueScope(this.scope(), Array.valueOf(scope)))}.
+		 * Wenn diese Funktion über {@link #ClosureFunction(Function)} erzeugt wurde, entspricht der Ergebniswert
+		 * {@code new FunctionValue(new ClosureFunction(scope, this.function()))}. Wenn sie dagegen über {@link #ClosureFunction(Scope, Function)} erzeugt wurde,
+		 * entspricht der Ergebniswert {@code this.function().execute(new ValueScope(this.scope(), Array.valueOf(scope), false))}.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return this.function.execute(new ValueScope(this.scope, Array.valueOf(scope)));
+			final Scope scope2 = this.scope;
+			if(scope2 == null) return new FunctionValue(new ClosureFunction(scope, this.function));
+			return this.function.execute(new ValueScope(scope2, Array.valueOf(scope), false));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.scope, this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ClosureFunction)) return false;
+			final ClosureFunction data = (ClosureFunction)object;
+			return Objects.equals(this.scope, data.scope) && Objects.equals(this.function, data.function);
 		}
 
 		/**
@@ -821,7 +876,8 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this.scope, this.function);
+			if(this.scope == null) return Objects.toStringCall(this, this.function);
+			return Objects.toStringCall(this, this.scope, this.function);
 		}
 
 	}

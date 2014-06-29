@@ -191,7 +191,7 @@ public class Types {
 		/**
 		 * Dieses Feld speichert den leeren {@link ArrayValue}.
 		 */
-		public static final ArrayValue NULL_VALUE = new ArrayValue(Array.valueOf());
+		public static final ArrayValue NULL_VALUE = new ArrayValue(Array.EMPTY_ARRAY);
 
 		/**
 		 * {@inheritDoc}

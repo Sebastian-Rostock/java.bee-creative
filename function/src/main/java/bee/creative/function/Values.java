@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Functions.ArrayFunction;
+import bee.creative.function.Functions.ClosureFunction;
 import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Functions.ParamFunction;
 import bee.creative.function.Functions.ValueFunction;
@@ -35,7 +37,7 @@ public final class Values {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class ValueParser extends Parser {
+	public static final class ScriptParser extends Parser {
 
 		/**
 		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
@@ -53,7 +55,7 @@ public final class Values {
 		 * @param source Eingabe.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public ValueParser(final String source) throws NullPointerException {
+		public ScriptParser(final String source) throws NullPointerException {
 			super(source);
 			this.value = -1;
 			this.ranges = new ArrayList<Range>((this.length() / 10) + 5);
@@ -150,7 +152,20 @@ public final class Values {
 		}
 
 		/**
-		 * Diese Methode parst die Eingabe und gibt die Liste der ermittelten Bereiche zurück.
+		 * Diese Methode parst die Eingabe und gibt die Liste der ermittelten Bereiche zurück. Die Erzeugung von {@link Range Bereichen} erfolgt gemäß dieser
+		 * Regeln:
+		 * <ul>
+		 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
+		 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet
+		 * der Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
+		 * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und
+		 * letzten jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp
+		 * {@code '?'}. Andernfalls hat er den Bereichstyp {@code '!'}.</li>
+		 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
+		 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
+		 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
+		 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
+		 * </ul>
 		 * 
 		 * @return Bereiche.
 		 */
@@ -202,17 +217,12 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Kompiler für {@link Values#compileValue(Script, ScriptCompiler, String...)} bzw.
-	 * {@link Values#compileFunction(Script, ScriptCompiler, String...)}.
+	 * Diese Klasse implementiert den Kompiler für {@link Values#compileToValue(Script, ScriptRangeCompiler, String...)} bzw.
+	 * {@link Values#compileToFunction(Script, ScriptRangeCompiler, String...)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	private static final class ValueCompiler {
-
-		/**
-		 * Dieses Feld speichert den aktuellen Bereich.
-		 */
-		private Range range;
+	public static final class ScriptCompiler {
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
@@ -230,9 +240,34 @@ public final class Values {
 		private final Iterator<Range> iterator;
 
 		/**
+		 * Dieses Feld speichert den aktuellen Bereich.
+		 */
+		private Range range;
+
+		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
 		 */
-		private final ScriptCompiler compiler;
+		private final ScriptRangeCompiler compiler;
+
+		/**
+		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
+		 */
+		private boolean arrayEnabled = true;
+
+		/**
+		 * Dieses Feld speichert die Zulässigkeit von Funktionszeigern.
+		 */
+		private boolean handlerEnabled = true;
+
+		/**
+		 * Dieses Feld speichert die Zulässigkeit der Bindung des Ausführungskontexts.
+		 */
+		private boolean closureEnabled = true;
+
+		/**
+		 * Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen.
+		 */
+		private boolean chainingEnabled = true;
 
 		/**
 		 * Dieser Konstruktor initialisiert Quelltext, Kompilationsmethoden und Parameternamen.
@@ -242,7 +277,7 @@ public final class Values {
 		 * @param params Parameternamen.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist oder enthält.
 		 */
-		public ValueCompiler(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException {
+		public ScriptCompiler(final Script script, final ScriptRangeCompiler compiler, final String... params) throws NullPointerException {
 			this.script = script;
 			this.iterator = script.iterator();
 			if(compiler == null) throw new NullPointerException();
@@ -292,12 +327,51 @@ public final class Values {
 		}
 
 		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} oder eine {@link Function} und gibt diesen zurück.
+		 * 
+		 * @return Wertliste.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
+		 */
+		private Object compileArray() throws ScriptRangeException {
+			if(!this.arrayEnabled) throw new ScriptRangeException(this.script, this.range);
+			this.skip();
+			if(this.skipSpace().type == ']'){
+				this.skip();
+				return ArrayType.NULL_VALUE;
+			}
+			boolean value = true;
+			for(final LinkedList<Function> array = new LinkedList<Function>(); true;){
+				final Function item = this.compileFunction();
+				array.add(item);
+				value = value && (item instanceof ValueFunction);
+				switch(this.skipSpace().type){
+					case ';':
+						this.skip();
+						this.skipSpace();
+						break;
+					case ']':{
+						this.skip();
+						final int size = array.size();
+						if(!value) return new CompositeFunction(ArrayFunction.COPY, array.toArray(new Function[size]));
+						final Value[] values = new Value[size];
+						for(int i = 0; i < size; i++){
+							values[i] = array.get(i).execute(null);
+						}
+						return new ArrayValue(new ValueArray(values));
+					}
+					default:
+						throw new ScriptRangeException(this.script, this.range);
+				}
+			}
+		}
+
+		/**
 		 * Diese Methode kompiliert den beim aktuellen Bereich beginnende Wert und gibt diesen zurück.
 		 * 
 		 * @return Wert.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		private Value compileValue() throws ScriptCompilerException {
+		private Value compileValue() throws ScriptRangeException {
 			final Value value;
 			switch(this.skipSpace().type){
 				case 0:
@@ -308,110 +382,67 @@ public final class Values {
 				case ')':
 				case ']':
 				case '}':
-					throw new ScriptCompilerException(this.script, this.range);
+					throw new ScriptRangeException(this.script, this.range);
 				case '[':
-					return this.compileArray();
+					return this.compileValueArray();
 				case '{':
-					return FunctionValue.valueOf(this.compileScope());
+					if(this.closureEnabled) throw new ScriptRangeException(this.script, this.range);
+					return new FunctionValue(this.compileScope());
 				default:
 					try{
 						value = this.compiler.valueOf(this.script, this.range);
-					}catch(final ScriptCompilerException e){
+					}catch(final ScriptRangeException e){
 						throw e;
 					}catch(final RuntimeException e){
-						throw new ScriptCompilerException(this.script, this.range, e);
+						throw new ScriptRangeException(this.script, this.range, e);
 					}
-					if(value == null) throw new ScriptCompilerException(this.script, this.range);
+					if(value == null) throw new ScriptRangeException(this.script, this.range);
 					this.skip();
 					return value;
 			}
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link ArrayValue} und gibt diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} und gibt diesen zurück.
 		 * 
-		 * @return Wertliste als {@link ArrayValue}.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @return Wertliste als {@link Value}.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		private ArrayValue compileArray() throws ScriptCompilerException {
-			this.skip();
-			if(this.skipSpace().type == ']'){
-				this.skip();
-				return ArrayType.NULL_VALUE;
-			}
-			for(final LinkedList<Value> array = new LinkedList<Value>(); true;){
-				final Value value;
-				switch(this.range.type){
-					case 0:
-					case ';':
-					case '$':
-					case '(':
-					case ')':
-					case '}':
-					case ']':
-						throw new ScriptCompilerException(this.script, this.range);
-					case '[':
-						value = this.compileArray();
-						break;
-					case '{':
-						value = FunctionValue.valueOf(this.compileScope());
-						break;
-					default:
-						try{
-							value = this.compiler.valueOf(this.script, this.range);
-						}catch(final ScriptCompilerException e){
-							throw e;
-						}catch(final RuntimeException e){
-							throw new ScriptCompilerException(this.script, this.range, e);
-						}
-						if(value == null) throw new ScriptCompilerException(this.script, this.range);
-						this.skip();
-						break;
-				}
-				array.add(value);
-				switch(this.skipSpace().type){
-					case ';':
-						this.skip();
-						this.skipSpace();
-						break;
-					case ']':
-						this.skip();
-						return ArrayValue.valueOf(Array.valueOf(array));
-					default:
-						throw new ScriptCompilerException(this.script, this.range);
-				}
-			}
+		private Value compileValueArray() throws ScriptRangeException {
+			final Object array = this.compileArray();
+			if(array instanceof Value) return (Value)array;
+			throw new ScriptRangeException(this.script, this.range);
 		}
 
 		/**
 		 * Diese Methode kompiliert den aktuellen Bereich zu einen Parameternamen und gibt diesen oder {@code null} zurück.
 		 * 
 		 * @return Parametername oder {@code null}.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		private String compileParam() throws ScriptCompilerException {
+		private String compileParam() throws ScriptRangeException {
 			switch(this.skipSpace().type){
 				case 0:
 				case '$':
 				case '(':
 				case '[':
-				case ']':
 				case '{':
-					throw new ScriptCompilerException(this.script, this.range);
+					throw new ScriptRangeException(this.script, this.range);
 				case ':':
 				case ';':
 				case ')':
 				case '}':
+				case ']':
 					return null;
 			}
 			final String name;
 			try{
 				name = this.compiler.paramOf(this.script, this.range);
 				if(name.isEmpty()) throw new IllegalArgumentException();
-			}catch(final ScriptCompilerException e){
+			}catch(final ScriptRangeException e){
 				throw e;
 			}catch(final RuntimeException e){
-				throw new ScriptCompilerException(this.script, this.range, e);
+				throw new ScriptRangeException(this.script, this.range, e);
 			}
 			this.skip();
 			return name;
@@ -421,33 +452,33 @@ public final class Values {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
 		 * 
 		 * @return Funktion als {@link FunctionValue}.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		private Function compileScope() throws ScriptCompilerException {
+		private Function compileScope() throws ScriptRangeException {
 			this.skip();
 			int count = 0;
 			while(true){
-				if(this.skipSpace().type == 0) throw new ScriptCompilerException(this.script, this.range);
+				if(this.skipSpace().type == 0) throw new ScriptRangeException(this.script, this.range);
 				final String name = this.compileParam();
 				if(name != null){
-					if(this.compileIndex(name) >= 0) throw new ScriptCompilerException(this.script, this.range);
+					if(this.compileIndex(name) >= 0) throw new ScriptRangeException(this.script, this.range);
 					this.params.add(count++, name);
 				}
 				switch(this.skipSpace().type){
 					case ';':
-						if(name == null) throw new ScriptCompilerException(this.script, this.range);
+						if(name == null) throw new ScriptRangeException(this.script, this.range);
 						this.skip();
 						break;
 					case ':':{
 						this.skip();
 						final Function function = this.compileFunction();
-						if(this.skipSpace().type != '}') throw new ScriptCompilerException(this.script, this.range);
+						if(this.skipSpace().type != '}') throw new ScriptRangeException(this.script, this.range);
 						this.skip();
 						this.params.subList(0, count).clear();
 						return function;
 					}
 					default:
-						throw new ScriptCompilerException(this.script, this.range);
+						throw new ScriptRangeException(this.script, this.range);
 				}
 			}
 		}
@@ -456,34 +487,42 @@ public final class Values {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diesen zurück.
 		 * 
 		 * @return Funktion.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		private Function compileFunction() throws ScriptCompilerException {
+		private Function compileFunction() throws ScriptRangeException {
 			Function function;
 			boolean chained = false;
 			switch(this.skipSpace().type){
 				case '$':{
 					this.skip();
 					final String name = this.compileParam();
-					if(name == null) return ArrayFunction.INSTANCE;
+					if(name == null) return ArrayFunction.VIEW;
 					final int index = this.compileIndex(name);
 					final int index2 = (index < 0) ? this.params.indexOf(name) : (index - 1);
-					if(index2 < 0) throw new ScriptCompilerException(this.script, this.range);
+					if(index2 < 0) throw new ScriptRangeException(this.script, this.range);
 					return ParamFunction.valueOf(index2);
 				}
 				case '{':{
 					function = this.compileScope();
-					if(this.skipSpace().type != '(') return ValueFunction.valueOf(FunctionValue.valueOf(function));
+					if(this.skipSpace().type != '(') return this.closureEnabled ? new ClosureFunction(function) : new ValueFunction(new FunctionValue(function));
+					break;
+				}
+				case '[':{
+					function = this.compileFunctionArray();
 					break;
 				}
 				default:{
 					final Value value = this.compileValue();
-					if(!value.type().is(FunctionValue.TYPE)) return ValueFunction.valueOf(value);
-					if(this.skipSpace().type != '(') throw new ScriptCompilerException(this.script, this.range);
+					if(!value.type().is(FunctionValue.TYPE)) return new ValueFunction(value);
+					if(this.skipSpace().type != '('){
+						if(this.handlerEnabled) return new ValueFunction(value);
+						throw new ScriptRangeException(this.script, this.range);
+					}
 					function = FunctionValue.TYPE.valueOf(value).data();
 				}
 			}
 			do{
+				if(chained && !this.chainingEnabled) throw new ScriptRangeException(this.script, this.range);
 				this.skip(); // '('
 				this.skipSpace();
 				for(final LinkedList<Function> functions = new LinkedList<Function>(); true;){
@@ -495,7 +534,7 @@ public final class Values {
 					functions.add(this.compileFunction());
 					switch(this.skipSpace().type){
 						default:
-							throw new ScriptCompilerException(this.script, this.range);
+							throw new ScriptRangeException(this.script, this.range);
 						case ';':
 							this.skip();
 						case ')':
@@ -507,38 +546,153 @@ public final class Values {
 		}
 
 		/**
-		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
 		 * 
-		 * @return Wert.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @return Wertliste als {@link Function}.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		public Value compileToValue() throws ScriptCompilerException {
-			final Value value = this.compileValue();
-			if(this.skipSpace().type == 0) return value;
-			throw new ScriptCompilerException(this.script, this.range);
+		private Function compileFunctionArray() throws ScriptRangeException {
+			final Object array = this.compileArray();
+			if(array instanceof Value) return new ValueFunction((Value)array);
+			return (Function)array;
 		}
 
 		/**
-		 * Diese Methode kompiliert den Quelltext zu einer Funktion und gibt diese zurück.
+		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
+		 * 
+		 * @see #compileToFunction()
+		 * @return Wert.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
+		 */
+		public Value compileToValue() throws ScriptRangeException {
+			final Value value = this.compileValue();
+			if(this.skipSpace().type == 0) return value;
+			throw new ScriptRangeException(this.script, this.range);
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext im Kontext der Kompilationsmethoden sowie der Funktionsparameter in eine Funktion und gibt diese Funktion zurück.
+		 * Die Bereichestypen des Quelltexts haben folgende Bedeutung:
+		 * <ul>
+		 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) dürfen an jeder Position vorkommen und werden ignoriert.</li>
+		 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
+		 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente unzulässig .</li>
+		 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
+		 * Bereichen vom Typ {@code ';'} separiert werden müssen.</li>
+		 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
+		 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ
+		 * {@code ':'} abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über
+		 * {@link ScriptRangeCompiler#paramOf(Script, Range)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java.
+		 * Nach der Parameterliste folgen dann die Bereiche, die zu genau einem {@link FunctionValue} kompilieren müssen.</li>
+		 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
+		 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link ArrayFunction#VIEW}.</li>
+		 * <li>Alle restlichen Bereiche werden über {@link ScriptRangeCompiler#valueOf(Script, Range)} in Werte überführt. Funktionen werden hierbei zu
+		 * {@link FunctionValue}s.</li>
+		 * </ul>
 		 * 
 		 * @return Funktion.
-		 * @throws ScriptCompilerException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptRangeException Wenn {@link #script} ungültig ist.
 		 */
-		public Function compileToFunction() throws ScriptCompilerException {
+		public Function compileToFunction() throws ScriptRangeException {
 			final Function function = this.compileFunction();
 			if(this.skipSpace().type == 0) return function;
-			throw new ScriptCompilerException(this.script, this.range);
+			throw new ScriptRangeException(this.script, this.range);
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn Wertlisten zulässig sind (z.B. {@code [1;2]}).
+		 * 
+		 * @see #compileToFunction()
+		 * @return Zulässigkeit von Wertlisten.
+		 */
+		public boolean isArrayEnabled() {
+			return this.arrayEnabled;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit von Wertlisten.
+		 * 
+		 * @see #isArrayEnabled()
+		 * @param value Zulässigkeit von Wertlisten.
+		 */
+		public void setArrayEnabled(final boolean value) {
+			this.arrayEnabled = value;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptRangeCompiler#valueOf(Script, Range)} als {@link FunctionValue} gelieferten
+		 * Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
+		 * 
+		 * @see #compileToFunction()
+		 * @return Zulässigkeit von Funktionszeigern.
+		 */
+		public boolean isHandlerEnabled() {
+			return this.handlerEnabled;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit von Funktionszeigern.
+		 * 
+		 * @see #isHandlerEnabled()
+		 * @param value Zulässigkeit von Funktionszeigern.
+		 */
+		public void setHandlerEnabled(final boolean value) {
+			this.handlerEnabled = value;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link ClosureFunction}s kompiliert werden.
+		 * 
+		 * @see #compileToFunction()
+		 * @return Zulässigkeit der Bindung des Ausführungskontexts.
+		 */
+		public boolean isClosureEnabled() {
+			return this.closureEnabled;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit der Bindung des Ausführungskontexts.
+		 * 
+		 * @see #isClosureEnabled()
+		 * @param value Zulässigkeit der Bindung des Ausführungskontexts.
+		 */
+		public void setClosureEnabled(final boolean value) {
+			this.closureEnabled = value;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die Verkettung von Funktionen zulässig ist, d.h. ob die Funktion, die von einem Funktionsaufruf
+		 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
+		 * 
+		 * @see #compileToFunction()
+		 * @see CompositeFunction#chained()
+		 * @see CompositeFunction#execute(Scope)
+		 * @return Zulässigkeit der Verkettung von Funktionen.
+		 */
+		public boolean isChainingEnabled() {
+			return this.chainingEnabled;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit der Verkettung von Funktionen.
+		 * 
+		 * @see #isChainingEnabled()
+		 * @param value Zulässigkeit der Verkettung von Funktionen.
+		 */
+		public void setChainingEnabled(final boolean value) {
+			this.chainingEnabled = value;
 		}
 
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link Values#compileValue(Script, ScriptCompiler, String...)} und
-	 * {@link Values#compileFunction(Script, ScriptCompiler, String...)} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
+	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link Values#compileToValue(Script, ScriptRangeCompiler, String...)} und
+	 * {@link Values#compileToFunction(Script, ScriptRangeCompiler, String...)} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt
+	 * werden.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface ScriptCompiler {
+	public static interface ScriptRangeCompiler {
 
 		/**
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue} geliefert
@@ -547,9 +701,9 @@ public final class Values {
 		 * @param script Quelltext.
 		 * @param range Bereich.
 		 * @return Wert oder Funktionen als {@link FunctionValue}.
-		 * @throws ScriptCompilerException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
+		 * @throws ScriptRangeException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
-		public Value valueOf(Script script, final Range range) throws ScriptCompilerException;
+		public Value valueOf(Script script, final Range range) throws ScriptRangeException;
 
 		/**
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Parameternamen zurück.
@@ -557,19 +711,20 @@ public final class Values {
 		 * @param script Quelltext.
 		 * @param range Bereich.
 		 * @return Parametername.
-		 * @throws ScriptCompilerException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
+		 * @throws ScriptRangeException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
-		public String paramOf(Script script, final Range range) throws ScriptCompilerException;
+		public String paramOf(Script script, final Range range) throws ScriptRangeException;
 
 	}
 
 	/**
-	 * Diese Klasse implementiert die {@link IllegalArgumentException}, die bei Syntaxfehlern von einem {@link ScriptCompiler} oder den Methoden
-	 * {@link Values#compileValue(Script, ScriptCompiler, String...)} und {@link Values#compileValue(Script, ScriptCompiler, String...)} ausgelöst wird.
+	 * Diese Klasse implementiert die {@link IllegalArgumentException}, die bei Syntaxfehlern von einem {@link ScriptRangeCompiler} oder den Methoden
+	 * {@link Values#compileToValue(Script, ScriptRangeCompiler, String...)} und {@link Values#compileToValue(Script, ScriptRangeCompiler, String...)} ausgelöst
+	 * wird.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class ScriptCompilerException extends IllegalArgumentException {
+	public static class ScriptRangeException extends IllegalArgumentException {
 
 		/**
 		 * Dieses Feld speichert die Serial-Version-UID.
@@ -593,7 +748,7 @@ public final class Values {
 		 * @param range Bereich mit dem Syntaxfehler.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ScriptCompilerException(final Script script, final Range range) throws NullPointerException {
+		public ScriptRangeException(final Script script, final Range range) throws NullPointerException {
 			this(script, range, null);
 		}
 
@@ -605,7 +760,7 @@ public final class Values {
 		 * @param cause Verursachende Ausnahme.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public ScriptCompilerException(final Script script, final Range range, final Throwable cause) throws NullPointerException {
+		public ScriptRangeException(final Script script, final Range range, final Throwable cause) throws NullPointerException {
 			super(range == Range.NULL ? //
 				"Unerwartetes Ende der Zeichenkette." : //
 				"Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
@@ -1225,81 +1380,55 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück. Die Erzeugung von {@link Range Bereichen} erfolgt
-	 * gemäß dieser Regeln:
-	 * <ul>
-	 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
-	 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
-	 * Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
-	 * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und letzten
-	 * jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp
-	 * {@code '?'}. Andernfalls hat er den Bereichstyp {@code '!'}.</li>
-	 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
-	 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
-	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
-	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
-	 * </ul>
+	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück.
 	 * 
 	 * @see Script
-	 * @see #compileValue(Script, ScriptCompiler, String...)
-	 * @see #compileFunction(Script, ScriptCompiler, String...)
+	 * @see ScriptParser#parse()
+	 * @see #compileToValue(Script, ScriptRangeCompiler, String...)
+	 * @see #compileToFunction(Script, ScriptRangeCompiler, String...)
 	 * @param source Zeichenkette.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static Script parseScript(final String source) throws NullPointerException {
-		return new Script(source, new ValueParser(source).parse());
+		return new Script(source, new ScriptParser(source).parse());
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
 	 * 
 	 * @see #parseScript(String)
-	 * @see #compileFunction(Script, ScriptCompiler, String...)
+	 * @see #compileToFunction(Script, ScriptRangeCompiler, String...)
+	 * @see ScriptCompiler#compileToValue()
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierter Wert.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptCompilerException Wenn eine der Eingaben ungültig ist.
+	 * @throws ScriptRangeException Wenn eine der Eingaben ungültig ist.
 	 */
-	public static Value compileValue(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
-		ScriptCompilerException {
-		return new ValueCompiler(script, compiler, params).compileToValue();
+	public static Value compileToValue(final Script script, final ScriptRangeCompiler compiler, final String... params) throws NullPointerException,
+		ScriptRangeException {
+		return new ScriptCompiler(script, compiler, params).compileToValue();
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
-	 * zurück. Die Bereichestypen des Quelltexts haben folgende Bedeutung:
-	 * <ul>
-	 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) dürfen an jeder Position vorkommen und werden ignoriert.</li>
-	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
-	 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente unzulässig.</li>
-	 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
-	 * Bereichen vom Typ {@code ';'} separiert werden müssen.</li>
-	 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
-	 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
-	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompiler#paramOf(Script, Range)} aufgelöst werden
-	 * kann. Fpr Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einem
-	 * {@link FunctionValue} kompilieren müssen.</li>
-	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für die {@link ArrayFunction}.</li>
-	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompiler#valueOf(Script, Range)} in Werte überführt. Funktionen werden hierbei zu
-	 * {@link FunctionValue}s.</li>
-	 * </ul>
+	 * zurück.
 	 * 
 	 * @see #parseScript(String)
-	 * @see #compileValue(Script, ScriptCompiler, String...)
+	 * @see #compileToValue(Script, ScriptRangeCompiler, String...)
+	 * @see ScriptCompiler#compileToFunction()
 	 * @param script Quelltext.
 	 * @param compiler Kompilationsmethoden.
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierte Funktion.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptCompilerException Wenn eine der Eingaben ungültig ist.
+	 * @throws ScriptRangeException Wenn eine der Eingaben ungültig ist.
 	 */
-	public static Function compileFunction(final Script script, final ScriptCompiler compiler, final String... params) throws NullPointerException,
-		ScriptCompilerException {
-		return new ValueCompiler(script, compiler, params).compileToFunction();
+	public static Function compileToFunction(final Script script, final ScriptRangeCompiler compiler, final String... params) throws NullPointerException,
+		ScriptRangeException {
+		return new ScriptCompiler(script, compiler, params).compileToFunction();
 	}
 
 	/**

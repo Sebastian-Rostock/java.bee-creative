@@ -142,12 +142,29 @@ public final class Scopes {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ValueScope(final Scope scope, final Array values) throws NullPointerException {
-			this.offset = (this.scope = scope).size() - (this.length = (this.values = values).length());
+			this(scope, values, true);
 		}
 
 		/**
-		 * {@inheritDoc} Diese entsprechen hierbei dem zusätzlichen Parameterwerten des übergeordneten Ausführungskontexts, die über
-		 * {@code this.scope().get(index - this.size() + this.scope.size())} ermittelt werden.
+		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterwerte. Das Kontextobjekt sowie die zusätzlichen Parameterwerte
+		 * stammen aus dem gegebenen Ausführungskontext.
+		 * 
+		 * @param scope übergeordneter Ausführungskontext, dessen (zusätzlichen) Parameterwerte genutzt werden.
+		 * @param values Parameterwerte.
+		 * @param replace {@code true}, wenn statt aller nur die zusätzlichen Parameterwerte des gegebenen Ausführungskontexts als zusätzliche Parameterwerte
+		 *        genutzt werden sollen.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public ValueScope(final Scope scope, final Array values, final boolean replace) throws NullPointerException {
+			this.scope = scope;
+			this.values = values;
+			this.length = values.length();
+			this.offset = (replace ? scope.size() : 0) - this.length;
+		}
+
+		/**
+		 * {@inheritDoc} Diese entsprechen hierbei entweder allen oder nur den zusätzlichen Parameterwerten des übergeordneten Ausführungskontexts, welche über
+		 * {@code this.scope().get(index - this.size())} bzw. {@code this.scope().get(index - this.size() + this.scope().size())} ermittelt werden.
 		 * 
 		 * @see #scope()
 		 * @throws NullPointerException Wenn der {@code index}-te Parameterwert {@code null} ist.
