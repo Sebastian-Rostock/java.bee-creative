@@ -505,11 +505,11 @@ public final class Values {
 				case '{':{
 					function = this.compileScope();
 					if(this.skipSpace().type != '(') return this.closureEnabled ? new ClosureFunction(function) : new ValueFunction(new FunctionValue(function));
+					if(!this.chainingEnabled) throw new ScriptRangeException(this.script, this.range);
 					break;
 				}
 				case '[':{
-					function = this.compileFunctionArray();
-					break;
+					return this.compileFunctionArray();
 				}
 				default:{
 					final Value value = this.compileValue();
