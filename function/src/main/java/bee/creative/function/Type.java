@@ -6,7 +6,7 @@ package bee.creative.function;
  * 
  * @see Value
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} konvertiert werden kann.
+ * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} bzw. {@link #valueOf(Value, Context)} konvertiert werden kann.
  */
 public interface Type<GValue> {
 
@@ -29,11 +29,13 @@ public interface Type<GValue> {
 	public boolean is(Type<?> type);
 
 	/**
-	 * Diese Methode konvertiert den gegebenen Wert in einen Wert dieses Datentyps und gibt diesen zurück.
+	 * Diese Methode konvertiert den gegebenen Wert kontextfrei in einen Wert dieses Datentyps und gibt ihn zurück.<br>
+	 * Der Rückgabewert entspricht {@code Contexts.getDefault().cast(value, this)}.
 	 * 
 	 * @see Type#id()
 	 * @see Value#type()
-	 * @see Value#data()
+	 * @see Contexts#getDefault()
+	 * @see #valueOf(Value, Context)
 	 * @param value gegebener Wert.
 	 * @return konvertierter Wert.
 	 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
@@ -41,5 +43,21 @@ public interface Type<GValue> {
 	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 	 */
 	public GValue valueOf(Value value) throws NullPointerException, ClassCastException, IllegalArgumentException;
+
+	/**
+	 * Diese Methode konvertiert den gegebenen Wert kontextsensitiv in einen Wert dieses Datentyps und gibt ihn zurück.<br>
+	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
+	 * 
+	 * @see Type#id()
+	 * @see Value#type()
+	 * @see Context#cast(Value, Type)
+	 * @param value gegebener Wert.
+	 * @param context Kontextobjekt.
+	 * @return konvertierter Wert.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
+	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
+	 */
+	public GValue valueOf(Value value, Context context) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

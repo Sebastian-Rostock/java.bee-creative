@@ -40,6 +40,6 @@ public interface Scope extends Get<Value>, Iterable<Value> {
 	 * 
 	 * @return Kontextobjekt.
 	 */
-	public Object context();
+	public Context context();
 
 }

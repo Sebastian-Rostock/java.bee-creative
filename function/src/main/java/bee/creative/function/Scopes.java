@@ -74,6 +74,12 @@ public final class Scopes {
 		public static final VoidScope INSTANCE = new VoidScope();
 
 		/**
+		 * Dieser Konstruktor ist versteckt.
+		 */
+		VoidScope() {
+		}
+
+		/**
 		 * {@inheritDoc} Die {@link IndexOutOfBoundsException} wird immer ausgelöst.
 		 */
 		@Override
@@ -94,11 +100,11 @@ public final class Scopes {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der Rückgabewert ist {@code null}.
+		 * Der Rückgabewert ist {@link Contexts#getDefault()}.
 		 */
 		@Override
-		public Object context() {
-			return null;
+		public Context context() {
+			return Contexts.defaultContext;
 		}
 
 	}
@@ -195,7 +201,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object context() {
+		public Context context() {
 			return this.scope.context();
 		}
 
@@ -234,7 +240,7 @@ public final class Scopes {
 		/**
 		 * Dieses Feld speichert das Kontextobjekt.
 		 */
-		final Object context;
+		final Context context;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Ausführungskontext und das Kontextobjekt.
@@ -243,7 +249,7 @@ public final class Scopes {
 		 * @param context Kontextobjekt.
 		 * @throws NullPointerException Wenn der gegebene Ausführungskontext {@code null} ist.
 		 */
-		public ContextScope(final Scope scope, final Object context) throws NullPointerException {
+		public ContextScope(final Scope scope, final Context context) throws NullPointerException {
 			if(scope == null) throw new NullPointerException();
 			this.scope = scope;
 			this.context = context;
@@ -278,7 +284,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object context() {
+		public Context context() {
 			return this.context;
 		}
 
@@ -372,7 +378,7 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object context() {
+		public Context context() {
 			return this.scope.context();
 		}
 

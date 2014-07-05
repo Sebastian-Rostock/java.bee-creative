@@ -26,11 +26,12 @@ public interface Value {
 	public Object data();
 
 	/**
-	 * Diese Methode konvertiert diesen Wert in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
-	 * Der Rückgabewert entspricht {@code type.valueOf(this)}.
+	 * Diese Methode konvertiert diesen Wert kontextfrei in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
+	 * Der Rückgabewert entspricht {@code type.cast(this)}, d.h. {@code Contexts.getDefault().cast(this, type)}.
 	 * 
-	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
 	 * @see Type#valueOf(Value)
+	 * @see Context#cast(Value, Type)
+	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
 	 * @param type Datentyp.
 	 * @return konvertierter Wert.
 	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
@@ -38,5 +39,21 @@ public interface Value {
 	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
 	 */
 	public <GValue> GValue valueTo(Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
+
+	/**
+	 * Diese Methode konvertiert diesen Wert kontextsensitiv in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
+	 * Der Rückgabewert entspricht {@code type.cast(this, context)}, d.h. {@code context.cast(this, type)}.
+	 * 
+	 * @see Type#valueOf(Value, Context)
+	 * @see Context#cast(Value, Type)
+	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
+	 * @param type Datentyp.
+	 * @param context Kontext.
+	 * @return konvertierter Wert.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
+	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
+	 */
+	public <GValue> GValue valueTo(Type<GValue> type, Context context) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

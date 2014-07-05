@@ -337,7 +337,7 @@ public final class Values {
 			this.skip();
 			if(this.skipSpace().type == ']'){
 				this.skip();
-				return ArrayType.NULL_VALUE;
+				return new ArrayValue(Array.EMPTY_ARRAY);
 			}
 			boolean value = true;
 			for(final LinkedList<Function> array = new LinkedList<Function>(); true;){
@@ -513,12 +513,12 @@ public final class Values {
 				}
 				default:{
 					final Value value = this.compileValue();
-					if(!value.type().is(FunctionValue.TYPE)) return new ValueFunction(value);
+					if(!(value instanceof FunctionValue)) return new ValueFunction(value);
 					if(this.skipSpace().type != '('){
 						if(this.handlerEnabled) return new ValueFunction(value);
 						throw new ScriptRangeException(this.script, this.range);
 					}
-					function = FunctionValue.TYPE.valueOf(value).data();
+					function = ((FunctionValue)value).data();
 				}
 			}
 			do{
@@ -614,9 +614,11 @@ public final class Values {
 		 * 
 		 * @see #isArrayEnabled()
 		 * @param value Zulässigkeit von Wertlisten.
+		 * @return {@code this}.
 		 */
-		public void setArrayEnabled(final boolean value) {
+		public ScriptCompiler setArrayEnabled(final boolean value) {
 			this.arrayEnabled = value;
+			return this;
 		}
 
 		/**
@@ -635,9 +637,11 @@ public final class Values {
 		 * 
 		 * @see #isHandlerEnabled()
 		 * @param value Zulässigkeit von Funktionszeigern.
+		 * @return {@code this}.
 		 */
-		public void setHandlerEnabled(final boolean value) {
+		public ScriptCompiler setHandlerEnabled(final boolean value) {
 			this.handlerEnabled = value;
+			return this;
 		}
 
 		/**
@@ -655,9 +659,11 @@ public final class Values {
 		 * 
 		 * @see #isClosureEnabled()
 		 * @param value Zulässigkeit der Bindung des Ausführungskontexts.
+		 * @return {@code this}.
 		 */
-		public void setClosureEnabled(final boolean value) {
+		public ScriptCompiler setClosureEnabled(final boolean value) {
 			this.closureEnabled = value;
+			return this;
 		}
 
 		/**
@@ -678,9 +684,11 @@ public final class Values {
 		 * 
 		 * @see #isChainingEnabled()
 		 * @param value Zulässigkeit der Verkettung von Funktionen.
+		 * @return {@code this}.
 		 */
-		public void setChainingEnabled(final boolean value) {
+		public ScriptCompiler setChainingEnabled(final boolean value) {
 			this.chainingEnabled = value;
+			return this;
 		}
 
 	}
@@ -771,18 +779,59 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch die {@link #data() Nutzdaten} und der {@link #type() Datentyp} fehlen.
+	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GData> Typ der Nutzdaten.
 	 */
-	public static abstract class AbstractValue implements Value {
+	public static abstract class AbstractValue<GData> implements Value {
+
+		/**
+		 * Dieses Feld speichert die Nutzdaten.
+		 */
+		final GData data;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten nit {@code null}.
+		 */
+		AbstractValue() {
+			this.data = null;
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public AbstractValue(final GData data) throws NullPointerException {
+			if(data == null) throw new NullPointerException();
+			this.data = data;
+		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return type.valueOf(this);
+		public GData data() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
+			return Contexts.defaultContext.cast(this, type);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException,
+			IllegalArgumentException {
+			return context.cast(this, type);
 		}
 
 		/**
@@ -814,40 +863,6 @@ public final class Values {
 		@Override
 		public String toString() {
 			return Objects.toStringCall(this, this.data());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten Wert mit {@link #data() Nutzdaten}, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Nutzdaten.
-	 */
-	public static abstract class AbstractValue2<GData> extends AbstractValue {
-
-		/**
-		 * Dieses Feld speichert die Nutzdaten.
-		 */
-		final GData data;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public AbstractValue2(final GData data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
-			this.data = data;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GData data() {
-			return this.data;
 		}
 
 	}
@@ -952,6 +967,14 @@ public final class Values {
 		}
 
 		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			return this.value().valueTo(type, context);
+		}
+
+		/**
 		 * Diese Methode gibt den Ausführungskontext oder {@code null} zurück. Der erste Aufruf von {@link #value()} setzt den Ausführungskontext auf {@code null}.
 		 * 
 		 * @return Ausführungskontext oder {@code null}.
@@ -1004,7 +1027,7 @@ public final class Values {
 	 * @see NullType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NullValue extends AbstractValue {
+	public static final class NullValue extends AbstractValue<Object> {
 
 		/**
 		 * Dieses Feld speichert den {@link NullType}.
@@ -1032,14 +1055,6 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object data() {
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public NullType type() {
 			return NullValue.TYPE;
 		}
@@ -1052,7 +1067,7 @@ public final class Values {
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends AbstractValue2<Array> {
+	public static final class ArrayValue extends AbstractValue<Array> {
 
 		/**
 		 * Dieses Feld speichert den {@link ArrayType}.
@@ -1096,7 +1111,7 @@ public final class Values {
 	 * @see ObjectType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectValue extends AbstractValue2<Object> {
+	public static final class ObjectValue extends AbstractValue<Object> {
 
 		/**
 		 * Dieses Feld speichert den {@link ObjectType}.
@@ -1140,7 +1155,7 @@ public final class Values {
 	 * @see FunctionType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionValue extends AbstractValue2<Function> {
+	public static final class FunctionValue extends AbstractValue<Function> {
 
 		/**
 		 * Dieses Feld speichert den {@link FunctionType}.
@@ -1184,7 +1199,7 @@ public final class Values {
 	 * @see StringType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringValue extends AbstractValue2<String> {
+	public static final class StringValue extends AbstractValue<String> {
 
 		/**
 		 * Dieses Feld speichert den {@link StringType}.
@@ -1228,7 +1243,7 @@ public final class Values {
 	 * @see NumberType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NumberValue extends AbstractValue2<Number> {
+	public static final class NumberValue extends AbstractValue<Number> {
 
 		/**
 		 * Dieses Feld speichert den {@link NumberType}.
@@ -1272,7 +1287,7 @@ public final class Values {
 	 * @see BooleanType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BooleanValue extends AbstractValue2<Boolean> {
+	public static final class BooleanValue extends AbstractValue<Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanType}.
@@ -1344,20 +1359,22 @@ public final class Values {
 	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
 	 * <li>Wenn der via {@link #setConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
 	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
+	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt eine {@link Number} ist, wird dieser als {@link NumberValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link Boolean} ist, wird dieser als {@link BooleanValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt eine {@link Function} ist, wird dieser als {@link FunctionValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein Array ist, wird dieser als {@link ArrayValue} zurück gegeben.</li>
+	 * <li>Wenn das Objekt ein Array ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
 	 * <li>In allen anderen Fällen wird der Datensatz als {@link ObjectValue} zurück gegeben.</li>
 	 * </ul>
 	 * 
 	 * @see Converter#convert(Object)
+	 * @see Array#from(Object)
+	 * @see ArrayValue#valueOf(Array)
 	 * @see StringValue#valueOf(String)
 	 * @see NumberValue#valueOf(Number)
 	 * @see BooleanValue#valueOf(Boolean)
 	 * @see FunctionValue#valueOf(Function)
-	 * @see ArrayValue#valueOf(Object)
 	 * @see ObjectValue#valueOf(Object)
 	 * @param data Datensatz oder {@code null}.
 	 * @return {@link Value}.
@@ -1370,6 +1387,7 @@ public final class Values {
 			final Value value = converter.convert(data);
 			if(value != null) return value;
 		}
+		if(data instanceof Array) return ArrayValue.valueOf((Array)data);
 		if(data instanceof String) return StringValue.valueOf((String)data);
 		if(data instanceof Number) return NumberValue.valueOf((Number)data);
 		if(data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);

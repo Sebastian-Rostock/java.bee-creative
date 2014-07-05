@@ -3,7 +3,6 @@ package bee.creative.function;
 import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Scopes.ValueScope;
-import bee.creative.function.Types.NullType;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.function.Values.LazyValue;
@@ -138,31 +137,22 @@ public final class Functions {
 		public static final CallFunction INSTANCE = new CallFunction();
 
 		/**
+		 * Dieser Konstruktor ist versteckt.
+		 */
+		CallFunction() {
+		}
+
+		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der Ergebniswert entspricht dem der Funktion, die als erster Parameterwerte des gegebenen Ausführungskontexts gegeben ist und mit den Werten im
-		 * {@link ArrayValue} des zweiten Parameterwertes aufgerufen wird.
+		 * Der Ergebniswert entspricht dem Ergebnis der Funktion, die als erster Parameterwerte ({@link FunctionValue}) des gegebenen Ausführungskontexts gegeben
+		 * ist und mit den Werten im {@link ArrayValue} des zweiten Parameterwertes aufgerufen wird.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
 			if(scope.size() != 2) throw new IllegalArgumentException();
-			return scope.get(0).valueTo(FunctionValue.TYPE).data().execute(new ValueScope(scope, scope.get(1).valueTo(ArrayValue.TYPE).data()));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return CallFunction.class.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof CallFunction);
+			final Context context = scope.context();
+			return context.cast(scope.get(0), FunctionValue.TYPE).data().execute(new ValueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data()));
 		}
 
 		/**
@@ -189,6 +179,12 @@ public final class Functions {
 		public static final ApplyFunction INSTANCE = new ApplyFunction();
 
 		/**
+		 * Dieser Konstruktor ist versteckt.
+		 */
+		ApplyFunction() {
+		}
+
+		/**
 		 * {@inheritDoc}
 		 * <p>
 		 * Der Ergebniswert entspricht dem der Funktion, die als letzter Parameterwert des gegebenen Ausführungskontexts gegeben ist und mit den davor liegenden
@@ -200,23 +196,8 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			final int index = scope.size() - 1;
-			return scope.get(index).valueTo(FunctionValue.TYPE).data().execute(new ValueScope(scope, Array.valueOf(scope).section(0, index)));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return ApplyFunction.class.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof ApplyFunction);
+			final Context context = scope.context();
+			return context.cast(scope.get(index), FunctionValue.TYPE).data().execute(new ValueScope(scope, Array.valueOf(scope).section(0, index)));
 		}
 
 		/**
@@ -235,17 +216,35 @@ public final class Functions {
 	 * @see ArrayFunction#execute(Scope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayFunction implements Function {
+	public static abstract class ArrayFunction implements Function {
 
 		/**
 		 * Dieses Feld speichert die {@link ArrayFunction}, die eine Kopie der Parameterwerte liefert.
+		 * 
+		 * @see Array#valueOf(Value...)
 		 */
-		public static final ArrayFunction COPY = new ArrayFunction(true);
+		public static final ArrayFunction COPY = new ArrayFunction() {
+
+			@Override
+			public boolean mode() {
+				return true;
+			}
+
+		};
 
 		/**
 		 * Dieses Feld speichert die {@link ArrayFunction}, die eine Sicht auf die Parameterwerte liefert.
+		 * 
+		 * @see Array#valueOf(Scope)
 		 */
-		public static final ArrayFunction VIEW = new ArrayFunction(false);
+		public static final ArrayFunction VIEW = new ArrayFunction() {
+
+			@Override
+			public boolean mode() {
+				return false;
+			}
+
+		};
 
 		/**
 		 * Diese Methode gibt eine {@link ArrayFunction} zurück, die entwerder eine {@link Array#valueOf(Scope) Sicht} auf oder eine {@link Array#valueOf(Value...)
@@ -261,18 +260,9 @@ public final class Functions {
 		}
 
 		/**
-		 * Dieses Feld ist {@code true}, wenn {@link #execute(Scope)} statt einer Sicht eine Kopie der Parameterwerte liefern soll.
+		 * Dieser Konstruktor ist versteckt.
 		 */
-		final boolean mode;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Modus.
-		 * 
-		 * @param mode {@code true}, wenn {@link #execute(Scope)} statt einer {@link Array#valueOf(Scope) Sicht} eine {@link Array#valueOf(Value...) Kopie} der
-		 *        Parameterwerte liefern soll.
-		 */
-		public ArrayFunction(final boolean mode) {
-			this.mode = mode;
+		ArrayFunction() {
 		}
 
 		/**
@@ -281,9 +271,7 @@ public final class Functions {
 		 * @return {@code true}, wenn {@link #execute(Scope)} statt einer {@link Array#valueOf(Scope) Sicht} eine {@link Array#valueOf(Value...) Kopie} der
 		 *         Parameterwerte liefert.
 		 */
-		public boolean mode() {
-			return this.mode;
-		}
+		public abstract boolean mode();
 
 		/**
 		 * {@inheritDoc}
@@ -298,8 +286,7 @@ public final class Functions {
 		 */
 		@Override
 		public ArrayValue execute(final Scope scope) {
-			if(this.mode) return new ArrayValue(new ValueArray(Array.valueOf(scope).toArray()));
-			;
+			if(this.mode()) return new ArrayValue(new ValueArray(Array.valueOf(scope).toArray()));
 			return new ArrayValue(Array.valueOf(scope));
 		}
 
@@ -307,24 +294,8 @@ public final class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hashCode() {
-			return 0;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof ArrayFunction);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toStringCall(ArrayFunction.class.getSimpleName(), this.mode());
 		}
 
 	}
@@ -577,7 +548,7 @@ public final class Functions {
 		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
 		 * 
 		 * @see Values#valueOf(Object)
-		 * @param data Nutzdaten des Ergebniswerts.
+		 * @param data Nutzdaten des Ergebniswerts oder {@code null}.
 		 * @return {@link ValueFunction}.
 		 */
 		public static ValueFunction valueOf(final Object data) {
@@ -588,11 +559,11 @@ public final class Functions {
 		/**
 		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
 		 * 
-		 * @param value Ergebniswert.
+		 * @param value Ergebniswert oder {@code null}.
 		 * @return {@link ValueFunction}.
 		 */
 		public static ValueFunction valueOf(final Value value) {
-			if((value == null) || (value.type().id() == NullType.ID)) return ValueFunction.NULL_FUNCTION;
+			if((value == null) || (value == NullValue.INSTANCE)) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(value);
 		}
 
@@ -765,7 +736,9 @@ public final class Functions {
 	public static final class ClosureFunction implements Function {
 
 		/**
-		 * Diese Methode konvertiert die gegebene Funktion in eine {@link ClosureFunction} und gibt diese zurück.
+		 * Diese Methode konvertiert die gegebene Funktion in eine {@link ClosureFunction} und gibt diese zurück. Die {@link #execute(Scope)}-Methode der erzeugten
+		 * {@link ClosureFunction} {@link ClosureFunction#ClosureFunction(Scope, Function) bindet} den ihr übergebenen Ausführungskontext an die gegebene Funktion
+		 * und gibt die so erzeugte Funktion als {@link FunctionValue} zurück.
 		 * 
 		 * @see ClosureFunction#ClosureFunction(Function)
 		 * @param function auszuwertende Funktion.
@@ -998,7 +971,7 @@ public final class Functions {
 		 * der {@link #function() aufzurufenden Funktion} mit dem gegebenen Ausführungskontext ermittelt wurde.<br>
 		 * <p>
 		 * Der Ergebniswert entspricht
-		 * {@code (this.chained() ? this.function().execute(scope).valueTo(FunctionValue.TYPE).data() : this.function()).execute(new CompositeScope(scope, this.functions()))}.
+		 * {@code (this.chained() ? this.function().execute(scope).valueTo(FunctionValue.TYPE, scope.context()).data() : this.function()).execute(new CompositeScope(scope, this.functions()))}.
 		 * 
 		 * @see #chained()
 		 * @see #function()
@@ -1007,8 +980,8 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			return (this.chained ? this.function.execute(scope).valueTo(FunctionValue.TYPE).data() : this.function)
-				.execute(new CompositeScope(scope, this.functions));
+			return (this.chained ? scope.context().cast(this.function.execute(scope), FunctionValue.TYPE).data() : this.function).execute(new CompositeScope(scope,
+				this.functions));
 		}
 
 		/**
