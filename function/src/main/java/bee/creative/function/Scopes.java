@@ -61,7 +61,8 @@ public final class Scopes {
 	}
 
 	/**
-	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Kontextobjekt und ohne Parameterwerte.
+	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Parameterwerte. Als Kontextobjekt wird
+	 * {@link Contexts#getDefault()} verwendet.
 	 * 
 	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -69,7 +70,8 @@ public final class Scopes {
 	public static final class VoidScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den leeren Ausführungskontext ohne Kontextobjekt und ohne Parameterwerte.
+		 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefault()}
+		 * verwendet.
 		 */
 		public static final VoidScope INSTANCE = new VoidScope();
 
