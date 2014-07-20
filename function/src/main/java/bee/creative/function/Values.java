@@ -1062,7 +1062,7 @@ public final class Values {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert mit {@link Value}{@code []} als Nutzdaten.
+	 * Diese Klasse implementiert den Wert mit Wertlisten als Nutzdaten.
 	 * 
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

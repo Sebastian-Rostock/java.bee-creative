@@ -1,7 +1,8 @@
 package bee.creative.function;
 
 /**
- * Diese Schnittstelle definiert das Kontextobjekt, das von einem Ausführungskontext zur Auswertung von Funktionen bereitgestellt wird.
+ * Diese Schnittstelle definiert das Kontextobjekt, das von einem Ausführungskontext zur Auswertung von Funktionen bereitgestellt wird und in Funktionen zur
+ * Umwandlung von Werten genutzt werden kann.
  * 
  * @see Scope#context()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

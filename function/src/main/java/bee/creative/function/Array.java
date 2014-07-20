@@ -2,6 +2,7 @@ package bee.creative.function;
 
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.function.Scopes.ValueScope;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.NumberValue;
@@ -10,37 +11,13 @@ import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert ein unmodifizierbares Wertliste sowie Methoden zur Erzeugung solcher Wertlisten aus primitiven Arrays.
+ * Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus primitiven Arrays, {@link Collection}s
+ * und {@link Scope}s.
  * 
  * @see ArrayValue
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public abstract class Array implements Get<Value>, Iterable<Value> {
-
-	/**
-	 * Diese Klasse implementiert eine leere Wertliste.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class VoidArray extends Array {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Value get(int index) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int length() {
-			return 0;
-		}
-
-	}
 
 	/**
 	 * Diese Klasse implementiert eine Wertliste als Sicht auf die Parameterwerte eines Ausführungskontexts.
@@ -126,7 +103,19 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Dieses Feld speichert eine leere Wertliste.
 	 */
-	public static final Array EMPTY_ARRAY = new VoidArray();
+	public static final Array EMPTY_ARRAY = new Array() {
+
+		@Override
+		public Value get(final int index) throws IndexOutOfBoundsException {
+			throw new IndexOutOfBoundsException();
+		}
+
+		@Override
+		public int length() {
+			return 0;
+		}
+
+	};
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese oder {@code null} zurück. Wenn das gegebene Objekt {@link Class#isArray()
@@ -171,6 +160,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final byte[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Byte.valueOf(data[i]));
@@ -188,6 +178,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final short[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Short.valueOf(data[i]));
@@ -205,6 +196,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final char[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Integer.valueOf(data[i]));
@@ -222,6 +214,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final int[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Integer.valueOf(data[i]));
@@ -239,6 +232,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final long[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Long.valueOf(data[i]));
@@ -256,6 +250,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final float[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Float.valueOf(data[i]));
@@ -273,6 +268,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final double[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = NumberValue.valueOf(Double.valueOf(data[i]));
@@ -290,6 +286,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final boolean[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = BooleanValue.valueOf(data[i]);
@@ -307,6 +304,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public static Array valueOf(final Object[] data) throws NullPointerException {
 		final int size = data.length;
+		if(size == 0) return Array.EMPTY_ARRAY;
 		final Value[] values = new Value[size];
 		for(int i = 0; i < size; i++){
 			values[i] = Values.valueOf(data[i]);
@@ -324,6 +322,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static Array valueOf(final Scope scope) throws NullPointerException {
+		if(scope.size() == 0) return Array.EMPTY_ARRAY;
 		return new ScopeArray(scope);
 	}
 
@@ -335,6 +334,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static Array valueOf(final Value... data) throws NullPointerException {
+		if(data.length == 0) return Array.EMPTY_ARRAY;
 		return new ValueArray(data.clone());
 	}
 
@@ -347,11 +347,12 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static Array valueOf(final Collection<? extends Value> data) throws NullPointerException {
+		if(data.size() == 0) return Array.EMPTY_ARRAY;
 		return Array.valueOf(data.toArray(new Value[data.size()]));
 	}
 
 	/**
-	 * Dieser Konstruktor ist versteckt, damit nur die hier definierten Nachfahren existieren.
+	 * Dieser Konstruktor ist versteckt.
 	 */
 	Array() {
 	}
@@ -363,7 +364,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	public abstract Value get(final int index) throws IndexOutOfBoundsException;
 
 	/**
-	 * Diese Methode gibt die Länge dieser eine Wertliste zurück.
+	 * Diese Methode gibt die Länge dieser Wertliste zurück.
 	 * 
 	 * @return Länge.
 	 */
@@ -380,6 +381,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	public Array section(final int start, final int length) throws IllegalArgumentException {
 		if((start == 0) && (length == this.length())) return this;
 		if((start < 0) || (length < 0) || ((start + length) > this.length())) throw new IllegalArgumentException();
+		if(length == 0) return Array.EMPTY_ARRAY;
 		return new Array() {
 
 			@Override

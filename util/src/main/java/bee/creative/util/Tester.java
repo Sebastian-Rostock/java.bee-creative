@@ -196,46 +196,43 @@ public class Tester {
 		if(method == null) throw new NullPointerException();
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable throwable = null;
+		final long enterMemory, enterTime, leaveMemory, leaveTime;
 		if(millis > 0){
 			final Updater updater = new Updater(millis);
 			runtime.gc();
 			updater.activate();
-			final long enterMemory = runtime.totalMemory() - runtime.freeMemory();
-			final long enterTime = System.nanoTime();
+			enterMemory = runtime.totalMemory() - runtime.freeMemory();
+			enterTime = System.nanoTime();
 			try{
 				method.run();
 			}catch(final Throwable e){
 				throwable = e;
 			}
-			final long leaveTime = System.nanoTime();
+			leaveTime = System.nanoTime();
 			updater.deactivate();
 			runtime.gc();
-			final long leaveMemory = runtime.totalMemory() - runtime.freeMemory();
+			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 			this.usedTime = leaveTime - enterTime - updater.usedTime;
 			this.usedMemory = Math.max(updater.usedMemory, leaveMemory) - enterMemory;
-			this.enterTime = enterTime;
-			this.enterMemory = enterMemory;
-			this.leaveTime = leaveTime;
-			this.leaveMemory = leaveMemory;
 		}else{
 			runtime.gc();
-			final long enterMemory = runtime.totalMemory() - runtime.freeMemory();
-			final long enterTime = System.nanoTime();
+			enterMemory = runtime.totalMemory() - runtime.freeMemory();
+			enterTime = System.nanoTime();
 			try{
 				method.run();
 			}catch(final Throwable e){
 				throwable = e;
 			}
-			final long leaveTime = System.nanoTime();
+			leaveTime = System.nanoTime();
 			runtime.gc();
-			final long leaveMemory = runtime.totalMemory() - runtime.freeMemory();
+			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 			this.usedTime = leaveTime - enterTime;
 			this.usedMemory = leaveMemory - enterMemory;
-			this.enterTime = enterTime;
-			this.enterMemory = enterMemory;
-			this.leaveTime = leaveTime;
-			this.leaveMemory = leaveMemory;
 		}
+		this.enterTime = enterTime;
+		this.enterMemory = enterMemory;
+		this.leaveTime = leaveTime;
+		this.leaveMemory = leaveMemory;
 		this.throwable = throwable;
 	}
 
@@ -244,7 +241,7 @@ public class Tester {
 	 */
 	@Override
 	public String toString() {
-		return String.format("usedTime: %4.2f ms  usedMemory:  %4.2f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
+		return String.format("usedTime: %4.3f ms  usedMemory:  %+4.3f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
 	}
 
 }

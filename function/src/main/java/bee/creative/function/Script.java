@@ -242,9 +242,9 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		int offset = 0;
 		final int length = source.length();
 		for(final Range range: ranges){
-			final int start = range.start, end = start + range.length;
+			final int start = range.start;
 			if(start < offset) throw new IllegalArgumentException();
-			offset = end;
+			offset = start + range.length;
 		}
 		if(offset > length) throw new IllegalArgumentException();
 		this.source = source;
