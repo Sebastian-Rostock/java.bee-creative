@@ -51,5 +51,6 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 		<module>xml</module>
 		<module>data</module>
 		<module>virtual</module>
+		<module>iam</module>
   </modules>
 </project>
