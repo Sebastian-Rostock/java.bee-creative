@@ -2,7 +2,6 @@ package bee.creative.function;
 
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.function.Scopes.ValueScope;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.NumberValue;
@@ -349,12 +348,6 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	public static Array valueOf(final Collection<? extends Value> data) throws NullPointerException {
 		if(data.size() == 0) return Array.EMPTY_ARRAY;
 		return Array.valueOf(data.toArray(new Value[data.size()]));
-	}
-
-	/**
-	 * Dieser Konstruktor ist versteckt.
-	 */
-	Array() {
 	}
 
 	/**
