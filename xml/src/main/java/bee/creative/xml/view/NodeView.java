@@ -7,7 +7,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 /**
- * Diese Schnittstelle definiert eine vereinfachte Sicht auf die Knoten eines XML Dikuments.
+ * Diese Schnittstelle definiert eine vereinfachte Sicht auf die Knoten eines XML Dokuments.
  * 
  * @see Node
  * @see Attr
