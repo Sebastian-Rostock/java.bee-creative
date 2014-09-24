@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.util.Objects;
@@ -518,6 +519,35 @@ public final class IAM {
 		 */
 		public List<int[]> entries() {
 			return this.entryList;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			int hash = 0x811C9DC5;
+			for(final int[] item: this.entryList){
+				hash = (hash * 0x01000193) ^ Arrays.hashCode(item);
+			}
+			return hash;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof AbstractUniqueList)) return false;
+			final AbstractUniqueList data = (AbstractUniqueList)object;
+			final List<int[]> list1 = this.entryList, list2 = data.entryList;
+			final int size = list1.size();
+			if(size != list2.size()) return false;
+			for(int i = 0; i < size; i++){
+				if(!Arrays.equals(list1.get(i), list2.get(i))) return false;
+			}
+			return true;
 		}
 
 	};

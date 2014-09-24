@@ -28,11 +28,6 @@ public final class Encoder extends AbstractIndexView {
 	public static final class MapEncoder extends AbstractMapView {
 
 		/**
-		 * Dieses Feld speichert den Index für {@link #index()}.
-		 */
-		final int index;
-
-		/**
 		 * Dieses Feld speichert die Größe der Schlüssel.
 		 */
 		final int keySize;
@@ -68,17 +63,14 @@ public final class Encoder extends AbstractIndexView {
 		 * Dieser Konstruktor initialisiert die internen Datenstrukturen zum Sammeln der Einträge, den Index dieses {@link MapView} sowie die Größen der Schlüssel
 		 * und Werte.
 		 * 
-		 * @see #index()
 		 * @see #keySize()
 		 * @see #valueSize()
-		 * @param index Index (größer oder gleich 0).
 		 * @param keySize Größe der Schlüssel (größer oder gleich 1).
 		 * @param valueSize Größe der Werte (größer oder gleich 0).
 		 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
 		 */
-		public MapEncoder(final int index, final int keySize, final int valueSize) throws IllegalArgumentException {
-			if((index < 0) || (keySize < 1) || (valueSize < 0)) throw new IllegalArgumentException();
-			this.index = index;
+		public MapEncoder(final int keySize, final int valueSize) throws IllegalArgumentException {
+			if((keySize < 1) || (valueSize < 0)) throw new IllegalArgumentException();
 			this.entrySize = (this.keySize = keySize) + (this.valueSize = valueSize);
 		}
 
@@ -172,15 +164,6 @@ public final class Encoder extends AbstractIndexView {
 		}
 
 		/**
-		 * Diese Methode gibt den Index dieses {@link MapEncoder}s zurück, unter welchem er im übergeordneten {@link Encoder} verwaltet wird.
-		 * 
-		 * @return Index dieses {@link MapEncoder}s.
-		 */
-		public int index() {
-			return this.index;
-		}
-
-		/**
 		 * Diese Methode kompiliert die gesammelten Einträge in eine optimierte Datenstruktur und gibt diese zurück.
 		 * 
 		 * @see MapDecoder
@@ -248,6 +231,25 @@ public final class Encoder extends AbstractIndexView {
 			return result;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.entryList.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof MapEncoder)) return false;
+			final MapEncoder data = (MapEncoder)object;
+			return this.entryList.equals(data.entryList);
+		}
+
 	}
 
 	/**
@@ -257,11 +259,6 @@ public final class Encoder extends AbstractIndexView {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ListEncoder extends AbstractListView {
-
-		/**
-		 * Dieses Feld speichert den Index für {@link #index()}.
-		 */
-		final int index;
 
 		/**
 		 * Dieses Feld speichert die bisher gesammelten Elemente.
@@ -282,14 +279,8 @@ public final class Encoder extends AbstractIndexView {
 
 		/**
 		 * Dieser Konstruktor initialisiert die internen Datenstrukturen zum Sammeln der Elemente sowie den Index dieses {@link ListView}.
-		 * 
-		 * @see #index()
-		 * @param index Index (größer oder gleich 0).
-		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
-		public ListEncoder(final int index) throws IllegalArgumentException {
-			if(index < 0) throw new IllegalArgumentException();
-			this.index = index;
+		public ListEncoder() {
 		}
 
 		/**
@@ -328,16 +319,6 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		public int put(final int... value) throws NullPointerException {
 			return this.itemList.get(value).intValue();
-		}
-
-		/**
-		 * Diese Methode gibt den Index dieses {@link ListEncoder}s zurück, unter welchem er im übergeordneten {@link Encoder} verwaltet wird.
-		 * 
-		 * @return Index dieses {@link ListEncoder}s.
-		 */
-
-		public int index() {
-			return this.index;
 		}
 
 		/**
@@ -385,24 +366,41 @@ public final class Encoder extends AbstractIndexView {
 			return result;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return this.itemList.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if(object == this) return true;
+			if(!(object instanceof ListEncoder)) return false;
+			final ListEncoder data = (ListEncoder)object;
+			return this.itemList.equals(data.itemList);
+		}
+
 	}
 
 	/**
 	 * Dieses Feld speichert die {@link MapEncoder}.
 	 */
-	final List<MapEncoder> mapList;
+	final List<MapEncoder> mapList = new ArrayList<MapEncoder>();
 
 	/**
 	 * Dieses Feld speichert die {@link ListEncoder}.
 	 */
-	final List<ListEncoder> listList;
+	final List<ListEncoder> listList = new ArrayList<ListEncoder>();
 
 	/**
 	 * Dieser Konstruktor initialisiert die internen Datenstrukturen zum Sammeln der Einträge von {@link MapView}s und Elementen der {@link ListView}s.
 	 */
 	public Encoder() {
-		this.mapList = new ArrayList<MapEncoder>();
-		this.listList = new ArrayList<ListEncoder>();
 	}
 
 	/**
@@ -438,35 +436,38 @@ public final class Encoder extends AbstractIndexView {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link MapEncoder} und gibt ihn zurück.
+	 * Diese Methode fügt den gegebene {@link MapEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
 	 * 
-	 * @param keySize Größe der Schlüssel (größer oder gleich 1).
-	 * @param valueSize Größe der Werte (größer oder gleich 0).
-	 * @return neuer {@link MapEncoder}.
-	 * @throws IllegalArgumentException Wenn eine der Eingaben ungültig ist.
+	 * @param map {@link MapEncoder}.
+	 * @return Index des {@link MapEncoder}s.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public MapEncoder newMap(final int keySize, final int valueSize) throws IllegalArgumentException {
-		final MapEncoder result = new MapEncoder(this.mapList.size(), keySize, valueSize);
-		this.mapList.add(result.index, result);
+	public int put(final MapEncoder map) throws NullPointerException {
+		if(map == null) throw new NullPointerException();
+		final int result = this.mapList.size();
+		this.mapList.add(result, map);
 		return result;
 	}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link ListEncoder} und gibt ihn zurück.
+	 * Diese Methode fügt den gegebene {@link ListEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
 	 * 
-	 * @return neuer {@link ListEncoder}.
+	 * @param list {@link ListEncoder}.
+	 * @return Index des {@link ListEncoder}s.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public ListEncoder newList() {
-		final ListEncoder result = new ListEncoder(this.listList.size());
-		this.listList.add(result.index, result);
+	public int put(final ListEncoder list) throws NullPointerException {
+		if(list == null) throw new NullPointerException();
+		final int result = this.listList.size();
+		this.listList.add(result, list);
 		return result;
 	}
 
 	/**
 	 * Diese Methode kompiliert die gesammelten Informationen in eine optimierte Datenstruktur und gibt diese zurück.
 	 * 
-	 * @see #newMap(int, int)
-	 * @see #newList()
+	 * @see #put(MapEncoder)
+	 * @see #put(ListEncoder)
 	 * @see MapEncoder#encode()
 	 * @see ListEncoder#encode()
 	 * @return optimierte Datenstruktur.
