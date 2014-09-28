@@ -259,7 +259,7 @@ public final class Decoder {
 			}
 			final int[] offsets = this.itemOffset;
 			final int offset = offsets[itemKey], length = offsets[itemKey + 1] - offset;
-			final byte[] array = new byte[length];
+			final byte[] array = new byte[length-1];
 			try{
 				final DataSource source = this.source;
 				source.seek(offset + this.offset);

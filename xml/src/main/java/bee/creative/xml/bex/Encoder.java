@@ -181,7 +181,7 @@ import bee.creative.util.Unique.UniqueSet;
  * <td>data</td>
  * <td>INT(1)</td>
  * <td>size</td>
- * <td>Bytes der UTF-8-kodierten Zeichenkette.</td>
+ * <td>Bytes der UTF-8-kodierten und nullterminierten Zeichenkette.</td>
  * </tr>
  * </table>
  * <h4>Datenstruktur: AttrGroupPool</h4>
@@ -390,7 +390,7 @@ public final class Encoder {
 	 * Diese Klasse implementiert einen abstrakten Datensatz, der über einen {@link #key Schlüssel} eindeutig referenziert und in einem {@link Pool} verwaltet
 	 * werden kann. Die Nutzdaten eines solchen Datensatzes verfügt über eine abstrakte Größe (z.B. Zeichenanzahl, Knotenanzahl).
 	 * 
-	 * @see ValueItem
+	 * @see TextValueItem
 	 * @see GroupItem
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -416,7 +416,7 @@ public final class Encoder {
 		/**
 		 * Diese Methode gibt die Nutzdaten dieses {@link Item}s oder {@code null} zurück.
 		 * 
-		 * @see ValueItem
+		 * @see TextValueItem
 		 * @return Nutzdaten oder null.
 		 */
 		public String asValue() {
@@ -531,71 +531,6 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Item} zur Abbildung von Textwerten.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class ValueItem extends Item {
-
-		/**
-		 * Dieses Feld speichert die URF-8 Kodierten Textwert.
-		 */
-		public final byte[] data;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Textwert.
-		 * 
-		 * @param data Textwert.
-		 */
-		public ValueItem(final String data) {
-			this.data = data.getBytes(Encoder.CHARSET);
-			this.size = this.data.length;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String asValue() {
-			return new String(this.data, Encoder.CHARSET);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Pool} der {@link ValueItem}s zur verwaltung einzigartiger Textwerte.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class ValuePool extends Pool<String, ValueItem> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public ValueItem item(final String data) {
-			return new ValueItem(data);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hash(final ValueItem input) throws NullPointerException {
-			return Arrays.hashCode(input.data);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final ValueItem input1, final ValueItem input2) throws NullPointerException {
-			return Arrays.equals(input1.data, input2.data);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert ein {@link Item} zur Abbildung von Kind- bzw. Attributknotenlisten.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -654,6 +589,73 @@ public final class Encoder {
 			for(int i = 0; i < length; i++)
 				if(data1[i] != data2[i]) return false;
 			return true;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Item} zur Abbildung von Textwerten.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class TextValueItem extends Item {
+
+		/**
+		 * Dieses Feld speichert die URF-8 Kodierten Textwert.
+		 */
+		public final byte[] data;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Textwert.
+		 * 
+		 * @param data Textwert.
+		 */
+		public TextValueItem(final String data) {
+			final byte[] bytes = data.getBytes(Encoder.CHARSET);
+			final int length = bytes.length;
+			this.data = new byte[this.size = (length + 1)];
+			System.arraycopy(bytes, 0, this.data, 0, length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String asValue() {
+			return new String(this.data, 0, this.size - 1, Encoder.CHARSET);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den {@link Pool} der {@link TextValueItem}s zur verwaltung einzigartiger Textwerte.
+	 * 
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	static final class TextValuePool extends Pool<String, TextValueItem> {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public TextValueItem item(final String data) {
+			return new TextValueItem(data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hash(final TextValueItem input) throws NullPointerException {
+			return Arrays.hashCode(input.data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final TextValueItem input1, final TextValueItem input2) throws NullPointerException {
+			return Arrays.equals(input1.data, input2.data);
 		}
 
 	}
@@ -882,19 +884,19 @@ public final class Encoder {
 	final StringBuilder text;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNamespaceURI()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Attr#getNamespaceURI()}.
 	 */
-	final ValuePool attrUriPool;
+	final TextValuePool attrUriPool;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeName()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Attr#getNodeName()}.
 	 */
-	final ValuePool attrNamePool;
+	final TextValuePool attrNamePool;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Attr#getNodeValue()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Attr#getNodeValue()}.
 	 */
-	final ValuePool attrValuePool;
+	final TextValuePool attrValuePool;
 
 	/**
 	 * Dieses Feld speichert den {@link GroupPool} für {@link Element#getAttributes()}.
@@ -902,19 +904,19 @@ public final class Encoder {
 	final GroupPool attrGroupPool;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Element#getNamespaceURI()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Element#getNamespaceURI()}.
 	 */
-	final ValuePool elemUriPool;
+	final TextValuePool elemUriPool;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Element#getNodeName()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Element#getNodeName()}.
 	 */
-	final ValuePool elemNamePool;
+	final TextValuePool elemNamePool;
 
 	/**
-	 * Dieses Feld speichert den {@link ValuePool} für {@link Text#getNodeValue()}.
+	 * Dieses Feld speichert den {@link TextValuePool} für {@link Text#getNodeValue()}.
 	 */
-	final ValuePool elemValuePool;
+	final TextValuePool elemValuePool;
 
 	/**
 	 * Dieses Feld speichert den {@link GroupPool} für {@link Node#getChildNodes()}.
@@ -931,12 +933,12 @@ public final class Encoder {
 	 */
 	public Encoder() {
 		this.text = new StringBuilder();
-		this.attrUriPool = new ValuePool();
-		this.attrNamePool = new ValuePool();
-		this.attrValuePool = new ValuePool();
-		this.elemUriPool = new ValuePool();
-		this.elemNamePool = new ValuePool();
-		this.elemValuePool = new ValuePool();
+		this.attrUriPool = new TextValuePool();
+		this.attrNamePool = new TextValuePool();
+		this.attrValuePool = new TextValuePool();
+		this.elemUriPool = new TextValuePool();
+		this.elemNamePool = new TextValuePool();
+		this.elemValuePool = new TextValuePool();
 		this.elemGroupPool = new ElemGrpupPool();
 		this.attrGroupPool = new AttrGroupPool();
 	}
@@ -965,13 +967,13 @@ public final class Encoder {
 	}
 
 	/**
-	 * Diese Methode schreibt {@link ValueItem}s in das gegebene {@link DataTarget}.
+	 * Diese Methode schreibt {@link TextValueItem}s in das gegebene {@link DataTarget}.
 	 * 
 	 * @param target {@link DataTarget}.
-	 * @param items {@link ValueItem}s.
+	 * @param items {@link TextValueItem}s.
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
-	void writeValues(final DataTarget target, final List<ValueItem> items) throws IOException {
+	void writeValues(final DataTarget target, final List<TextValueItem> items) throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
 		for(int i = 0; i < size; i++){
@@ -1039,13 +1041,13 @@ public final class Encoder {
 	 * @throws IOException Wenn beim Schreiben ein Fehler auftritt.
 	 */
 	void writeDocument(final DataTarget target) throws IOException {
-		final List<ValueItem> attrUriList = this.attrUriPool.items();
-		final List<ValueItem> attrNameList = this.attrNamePool.items();
-		final List<ValueItem> attrValueList = this.attrValuePool.items();
+		final List<TextValueItem> attrUriList = this.attrUriPool.items();
+		final List<TextValueItem> attrNameList = this.attrNamePool.items();
+		final List<TextValueItem> attrValueList = this.attrValuePool.items();
 		final List<GroupItem> attrGroupList = this.attrGroupPool.items();
-		final List<ValueItem> elemUriList = this.elemUriPool.items();
-		final List<ValueItem> elemNameList = this.elemNamePool.items();
-		final List<ValueItem> elemValueList = this.elemValuePool.items();
+		final List<TextValueItem> elemUriList = this.elemUriPool.items();
+		final List<TextValueItem> elemNameList = this.elemNamePool.items();
+		final List<TextValueItem> elemValueList = this.elemValuePool.items();
 		final List<GroupItem> elemGroupList = this.elemGroupPool.items();
 		this.computeKeys(attrUriList, 1);
 		this.computeKeys(attrNameList, 0);
