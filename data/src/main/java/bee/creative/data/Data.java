@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import bee.creative.array.ByteArraySection;
 import bee.creative.array.CompactByteArray;
 import bee.creative.util.Bytes;
@@ -104,21 +107,13 @@ public interface Data {
 		/**
 		 * Dieses Feld speichert den Lesepuffer.
 		 */
-		private final byte[] array = new byte[8];
+		protected final byte[] array = new byte[8];
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void readFully(final byte[] b) throws IOException {
-			this.readFully(b, 0, b.length);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final int skipBytes(final int n) throws IOException {
+		public int skipBytes(final int n) throws IOException {
 			this.seek(this.index() + n);
 			return n;
 		}
@@ -127,7 +122,15 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean readBoolean() throws IOException {
+		public void readFully(final byte[] b) throws IOException {
+			this.readFully(b, 0, b.length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean readBoolean() throws IOException {
 			return this.readByte() != 0;
 		}
 
@@ -135,7 +138,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final byte readByte() throws IOException {
+		public byte readByte() throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, 1);
 			return array[0];
@@ -145,7 +148,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int readUnsignedByte() throws IOException {
+		public int readUnsignedByte() throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, 1);
 			return Bytes.get1(array, 0);
@@ -155,7 +158,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final short readShort() throws IOException {
+		public short readShort() throws IOException {
 			return (short)this.readChar();
 		}
 
@@ -163,7 +166,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int readUnsignedShort() throws IOException {
+		public int readUnsignedShort() throws IOException {
 			return this.readChar();
 		}
 
@@ -171,7 +174,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final char readChar() throws IOException {
+		public char readChar() throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, 2);
 			return (char)Bytes.get2(array, 0);
@@ -181,7 +184,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int readInt() throws IOException {
+		public int readInt() throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, 4);
 			return Bytes.get4(array, 0);
@@ -191,7 +194,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int readInt(final int size) throws IOException {
+		public int readInt(final int size) throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, size);
 			return Bytes.getInt(array, 0, size);
@@ -201,7 +204,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long readLong() throws IOException {
+		public long readLong() throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, 8);
 			return Bytes.get8(array, 0);
@@ -211,7 +214,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long readLong(final int size) throws IOException {
+		public long readLong(final int size) throws IOException {
 			final byte[] array = this.array;
 			this.readFully(array, 0, size);
 			return Bytes.getLong(array, 0, size);
@@ -221,7 +224,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final float readFloat() throws IOException {
+		public float readFloat() throws IOException {
 			return Float.intBitsToFloat(this.readInt());
 		}
 
@@ -229,7 +232,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final double readDouble() throws IOException {
+		public double readDouble() throws IOException {
 			return Double.longBitsToDouble(this.readLong());
 		}
 
@@ -237,27 +240,24 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final String readLine() throws IOException {
-			final StringBuffer input = new StringBuffer();
-			final byte[] array = this.array;
+		public String readLine() throws IOException {
+			final StringBuffer result = new StringBuffer();
 			try{
 				for(int value; true;){
-					this.readFully(array, 0, 1);
-					switch(value = array[0]){
+					switch(value = this.readUnsignedByte()){
 						case '\r':
 							final long cur = this.index();
-							this.readFully(array, 0, 1);
-							if(array[0] == '\n') return input.toString();
+							if(this.readUnsignedByte() == '\n') return result.toString();
 							this.seek(cur);
 						case '\n':
-							return input.toString();
+							return result.toString();
 						default:
-							input.append((char)value);
+							result.append((char)value);
 					}
 				}
 			}catch(final EOFException e){
-				if(input.length() == 0) return null;
-				return input.toString();
+				if(result.length() == 0) return null;
+				return result.toString();
 			}
 		}
 
@@ -265,7 +265,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final String readUTF() throws IOException {
+		public String readUTF() throws IOException {
 			return DataInputStream.readUTF(this);
 		}
 
@@ -281,13 +281,13 @@ public interface Data {
 		/**
 		 * Dieses Feld speichert den Schreibpuffer.
 		 */
-		private final byte[] array = new byte[8];
+		protected final byte[] array = new byte[8];
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void write(final int b) throws IOException {
+		public void write(final int b) throws IOException {
 			this.writeByte(b);
 		}
 
@@ -295,7 +295,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void write(final byte[] b) throws IOException {
+		public void write(final byte[] b) throws IOException {
 			this.write(b, 0, b.length);
 		}
 
@@ -303,7 +303,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeBoolean(final boolean v) throws IOException {
+		public void writeBoolean(final boolean v) throws IOException {
 			this.write(v ? 1 : 0);
 		}
 
@@ -311,7 +311,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeByte(final int v) throws IOException {
+		public void writeByte(final int v) throws IOException {
 			final byte[] array = this.array;
 			Bytes.set1(array, 0, v);
 			this.write(array, 0, 1);
@@ -321,7 +321,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeShort(final int v) throws IOException {
+		public void writeShort(final int v) throws IOException {
 			final byte[] array = this.array;
 			Bytes.set2(array, 0, v);
 			this.write(array, 0, 2);
@@ -331,7 +331,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeChar(final int v) throws IOException {
+		public void writeChar(final int v) throws IOException {
 			this.writeShort(v);
 		}
 
@@ -339,7 +339,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeInt(final int v) throws IOException {
+		public void writeInt(final int v) throws IOException {
 			final byte[] array = this.array;
 			Bytes.set4(array, 0, v);
 			this.write(array, 0, 4);
@@ -349,7 +349,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeInt(final int v, final int size) throws IOException {
+		public void writeInt(final int v, final int size) throws IOException {
 			final byte[] array = this.array;
 			Bytes.setInt(array, 0, v, size);
 			this.write(array, 0, size);
@@ -359,7 +359,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeLong(final long v) throws IOException {
+		public void writeLong(final long v) throws IOException {
 			final byte[] array = this.array;
 			Bytes.set8(array, 0, v);
 			this.write(array, 0, 8);
@@ -369,7 +369,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeLong(final long v, final int size) throws IOException {
+		public void writeLong(final long v, final int size) throws IOException {
 			final byte[] array = this.array;
 			Bytes.setLong(array, 0, v, size);
 			this.write(array, 0, size);
@@ -379,7 +379,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeFloat(final float v) throws IOException {
+		public void writeFloat(final float v) throws IOException {
 			this.writeInt(Float.floatToIntBits(v));
 		}
 
@@ -387,7 +387,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeDouble(final double v) throws IOException {
+		public void writeDouble(final double v) throws IOException {
 			this.writeLong(Double.doubleToLongBits(v));
 		}
 
@@ -395,7 +395,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeBytes(final String s) throws IOException {
+		public void writeBytes(final String s) throws IOException {
 			final int len = s.length();
 			final byte[] data = new byte[len];
 			for(int i = 0; i < len; i++){
@@ -408,20 +408,17 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeChars(final String s) throws IOException {
-			final int len = s.length();
-			final byte[] data = new byte[len * 2];
-			for(int i = 0; i < len; i++){
-				Bytes.set2(data, i << 1, s.charAt(i));
+		public void writeChars(final String s) throws IOException {
+			for(int i = 0, size = s.length(); i < size; i++){
+				this.writeChar(s.charAt(i));
 			}
-			this.write(data);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void writeUTF(final String s) throws IOException {
+		public void writeUTF(final String s) throws IOException {
 			new DataOutputStream(null) {
 
 				{
@@ -488,7 +485,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final RandomAccessFile data() {
+		public RandomAccessFile data() {
 			return this.data;
 		}
 
@@ -496,7 +493,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void readFully(final byte[] array, final int offset, final int length) throws IOException {
+		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 			this.data.readFully(array, offset, length);
 		}
 
@@ -504,7 +501,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void seek(final long index) throws IOException {
+		public void seek(final long index) throws IOException {
 			this.data.seek(index);
 		}
 
@@ -512,7 +509,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long index() throws IOException {
+		public long index() throws IOException {
 			return this.data.getFilePointer();
 		}
 
@@ -520,7 +517,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long length() throws IOException {
+		public long length() throws IOException {
 			return this.data.length();
 		}
 
@@ -528,14 +525,15 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void close() throws IOException {
+		public void close() throws IOException {
 			this.data.close();
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}.
+	 * Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt via {@link Bytes} und
+	 * damit in {@link ByteOrder#BIG_ENDIAN}.
 	 * 
 	 * @see ByteArraySection
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -577,7 +575,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final ByteArraySection data() {
+		public ByteArraySection data() {
 			return this.data;
 		}
 
@@ -585,7 +583,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void readFully(final byte[] array, final int offset, final int length) throws IOException {
+		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 			final ByteArraySection data = this.data;
 			final int index = this.index, index2 = index + length;
 			if(index2 > data.size()) throw new EOFException();
@@ -597,7 +595,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void seek(final long index) throws IOException {
+		public void seek(final long index) throws IOException {
 			this.index = (int)index;
 		}
 
@@ -605,7 +603,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long index() throws IOException {
+		public long index() throws IOException {
 			return this.index;
 		}
 
@@ -613,7 +611,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long length() throws IOException {
+		public long length() throws IOException {
 			return this.data.size();
 		}
 
@@ -621,7 +619,238 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void close() throws IOException {
+		public void close() throws IOException {
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link ByteBuffer}.
+	 * 
+	 * @see ByteBuffer
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static class DataSourceBuffer extends AbstractDataSource {
+
+		/**
+		 * Dieses Feld speichert die Nutzdaten.
+		 */
+		private final ByteBuffer data;
+
+		/**
+		 * Dieses Feld speichert den {@link ByteBuffer} zu {@link #array}.
+		 */
+		private final ByteBuffer buffer;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
+		 */
+		public DataSourceBuffer(final byte... data) throws NullPointerException {
+			this(ByteBuffer.wrap(data));
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
+		 * @throws IllegalArgumentException Wenn {@link ByteBuffer#order()} nicht {@link ByteOrder#BIG_ENDIAN} ist.
+		 */
+		public DataSourceBuffer(final ByteBuffer data) throws NullPointerException, IllegalArgumentException {
+			if(data.order() != ByteOrder.BIG_ENDIAN) throw new IllegalArgumentException();
+			this.data = data;
+			this.buffer = ByteBuffer.wrap(this.array);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public ByteBuffer data() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
+			try{
+				this.data.get(array, offset, length);
+			}catch(final BufferUnderflowException e){
+				throw new EOFException();
+			}catch(final IndexOutOfBoundsException e){
+				throw new EOFException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean readBoolean() throws IOException {
+			return this.readByte() != 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte readByte() throws IOException {
+			return this.data.get();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int readUnsignedByte() throws IOException {
+			return this.data.get() & 0xFF;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public short readShort() throws IOException {
+			return this.data.getShort();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int readUnsignedShort() throws IOException {
+			return this.data.getShort() & 0xFFFF;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public char readChar() throws IOException {
+			return this.data.getChar();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int readInt() throws IOException {
+			return this.data.getInt();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int readInt(final int size) throws IOException {
+			switch(size){
+				case 0:
+					return 0;
+				case 1:
+					return this.data.get() & 0xFF;
+				case 2:
+					return this.data.getShort() & 0xFFFF;
+				case 3:
+					this.data.get(this.array, 1, 3);
+					return this.buffer.getInt(0) & 0xFFFFFF;
+				case 4:
+					return this.data.getInt();
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long readLong() throws IOException {
+			return this.data.getLong();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long readLong(final int size) throws IOException {
+			switch(size){
+				case 0:
+					return 0;
+				case 1:
+					return this.data.get() & 0xFF;
+				case 2:
+					return this.data.getShort() & 0xFFFF;
+				case 3:
+					this.data.get(this.array, 1, 3);
+					return this.buffer.getInt(0) & 0xFFFFFF;
+				case 4:
+					return this.data.getInt();
+				case 5:
+					this.data.get(this.array, 3, 5);
+					return this.buffer.getLong(0) & 0xFFFFFFFFFFL;
+				case 6:
+					this.data.get(this.array, 2, 6);
+					return this.buffer.getLong(0) & 0xFFFFFFFFFFFFL;
+				case 7:
+					this.data.get(this.array, 1, 7);
+					return this.buffer.getLong(0) & 0xFFFFFFFFFFFFFFL;
+				case 8:
+					return this.data.getLong();
+				default:
+					throw new IllegalArgumentException();
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public float readFloat() throws IOException {
+			return this.data.getFloat();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public double readDouble() throws IOException {
+			return this.data.getDouble();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void seek(final long index) throws IOException {
+			this.data.position((int)index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long index() throws IOException {
+			return this.data.position();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public long length() throws IOException {
+			return this.data.limit();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void close() throws IOException {
 		}
 
 	}
@@ -634,29 +863,29 @@ public interface Data {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class DataSourceCache extends AbstractDataSource {
-	
+
 		/**
 		 * Diese Klasse implementiert einen Datenauszug.
 		 * 
 		 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
 		private static final class Page {
-	
+
 			/**
 			 * Dieses Feld definiert die Bitbreite der Anzahl der Byte in {@link #data}.
 			 */
 			public static final int BITS = 11;
-	
+
 			/**
 			 * Dieses Feld speichert die Nutzdaten als einen Auszug einer {@link DataSource}.
 			 */
 			public final byte[] data;
-	
+
 			/**
 			 * Dieses Feld speichert die Anzahl der Wiederverwendungen.
 			 */
 			public int uses = 1;
-	
+
 			/**
 			 * Dieser Konstruktor initialisiert den Datenauszug.
 			 */
@@ -664,39 +893,39 @@ public interface Data {
 				this.data = new byte[1 << Page.BITS];
 				this.uses = 1;
 			}
-	
+
 		}
-	
+
 		/**
 		 * Dieses Feld speichert die {@link DataSource}.
 		 */
 		private final DataSource source;
-	
+
 		/**
 		 * Dieses Feld speichert die Größe der {@link #source}.
 		 */
 		private final int length;
-	
+
 		/**
 		 * Dieses Feld speichert die Datenauszüge.
 		 */
 		private final Page[] pages;
-	
+
 		/**
 		 * Dieses Feld speichert die maximale Anzahl der gleichzeitig verwalteten {@link Page}s.
 		 */
 		private int limit;
-	
+
 		/**
 		 * Dieses Feld speichert die Anzahl der aktuell verwalteten {@link Page}s. Dies wird in {@link #page(int)} modifiziert.
 		 */
 		private int count;
-	
+
 		/**
 		 * Dieses Feld speichert die Navigationsposition.
 		 */
 		private int index;
-	
+
 		/**
 		 * Dieser Konstruktor initialisiert das die {@link DataSource}. Wenn sich die {@link DataSource#length() Länge} der Nutzdaten in der gegebenen
 		 * {@link DataSource} später ändert, ist das Verhalten des {@link DataSourceCache} undefiniert.
@@ -711,7 +940,7 @@ public interface Data {
 			this.pages = new Page[((this.length + (1 << Page.BITS)) - 1) >> Page.BITS];
 			this.setCacheSize(0x010000);
 		}
-	
+
 		/**
 		 * Diese Methode gibt den {@link Page#data Nutzdatenblock} der {@code index}-ten {@link Page} zurück. Diese wird bei Bedarf aus der {@link #source}
 		 * nachgeladen.
@@ -759,7 +988,7 @@ public interface Data {
 				return page.data;
 			}
 		}
-	
+
 		/**
 		 * Diese Methode gibt die Größe des Pufferspeichers zurück.
 		 * 
@@ -768,7 +997,7 @@ public interface Data {
 		public int getCacheSize() {
 			return this.limit << Page.BITS;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die Größe des Pufferspeichers.
 		 * 
@@ -777,7 +1006,7 @@ public interface Data {
 		public void setCacheSize(final int value) {
 			this.limit = Math.min(Math.max(1, value >> Page.BITS), this.pages.length);
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -785,7 +1014,7 @@ public interface Data {
 		public DataSource data() {
 			return this.source;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -793,7 +1022,7 @@ public interface Data {
 		public void seek(final long index) throws IOException {
 			this.index = (int)index;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -801,7 +1030,7 @@ public interface Data {
 		public long index() throws IOException {
 			return this.index;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -809,7 +1038,7 @@ public interface Data {
 		public long length() throws IOException {
 			return this.length;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -827,7 +1056,7 @@ public interface Data {
 			}
 			this.index = index + length;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -835,7 +1064,7 @@ public interface Data {
 		public void close() throws IOException {
 			this.source.close();
 		}
-	
+
 	}
 
 	/**
@@ -888,7 +1117,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final RandomAccessFile data() {
+		public RandomAccessFile data() {
 			return this.data;
 		}
 
@@ -896,7 +1125,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void write(final byte[] array, final int offset, final int length) throws IOException {
+		public void write(final byte[] array, final int offset, final int length) throws IOException {
 			this.data.write(array, offset, length);
 		}
 
@@ -904,7 +1133,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void seek(final long index) throws IOException {
+		public void seek(final long index) throws IOException {
 			this.data.seek(index);
 		}
 
@@ -912,7 +1141,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long index() throws IOException {
+		public long index() throws IOException {
 			return this.data.getFilePointer();
 		}
 
@@ -920,7 +1149,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long length() throws IOException {
+		public long length() throws IOException {
 			return this.data.length();
 		}
 
@@ -928,7 +1157,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void allocate(final long value) throws IOException {
+		public void allocate(final long value) throws IOException {
 			this.data.setLength(value);
 		}
 
@@ -936,7 +1165,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void close() throws IOException {
+		public void close() throws IOException {
 			this.data.close();
 		}
 
@@ -993,7 +1222,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final CompactByteArray data() {
+		public CompactByteArray data() {
 			return this.data;
 		}
 
@@ -1001,7 +1230,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void write(final byte[] array, final int offset, final int length) throws IOException {
+		public void write(final byte[] array, final int offset, final int length) throws IOException {
 			if((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
 			final CompactByteArray data = this.data;
 			final int size = data.size(), index = this.index, index2 = index + length;
@@ -1014,7 +1243,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void seek(final long index) throws IOException {
+		public void seek(final long index) throws IOException {
 			this.index = (int)index;
 		}
 
@@ -1022,7 +1251,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long index() throws IOException {
+		public long index() throws IOException {
 			return this.index;
 		}
 
@@ -1030,7 +1259,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final long length() throws IOException {
+		public long length() throws IOException {
 			return this.data.size();
 		}
 
@@ -1038,7 +1267,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void allocate(final long value) throws IOException {
+		public void allocate(final long value) throws IOException {
 			final int size = this.data.size();
 			final int count = (int)value - size;
 			if(count < 0){
@@ -1053,7 +1282,7 @@ public interface Data {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final void close() throws IOException {
+		public void close() throws IOException {
 		}
 
 	}

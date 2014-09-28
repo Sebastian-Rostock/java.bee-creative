@@ -242,7 +242,6 @@ public final class Decoder {
 		 * @return Text.
 		 */
 		public String valueItem(final int itemKey) {
-
 			if((itemKey < 0) || (itemKey >= this.itemCount)) return null;
 			final TextValuePage[] pages = this.pages;
 			final int pageIndex = itemKey >> TextValuePage.BITS, dataIndex = itemKey & ((1 << TextValuePage.BITS) - 1);
@@ -259,7 +258,7 @@ public final class Decoder {
 			}
 			final int[] offsets = this.itemOffset;
 			final int offset = offsets[itemKey], length = offsets[itemKey + 1] - offset;
-			final byte[] array = new byte[length-1];
+			final byte[] array = new byte[length - 1];
 			try{
 				final DataSource source = this.source;
 				source.seek(offset + this.offset);
