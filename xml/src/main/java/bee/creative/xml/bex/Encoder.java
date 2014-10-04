@@ -149,9 +149,9 @@ import bee.creative.util.Unique.UniqueSet;
  * <tr>
  * <td>offset</td>
  * <td>INT(length)</td>
- * <td>size</td>
+ * <td>size+1</td>
  * <td>Startpositionen der Zeichenketten im Speicherbereich item. Das erste Byte der i-ten Zeichenkette liegt bei Position offset[i] und das nach dem letzten
- * bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
+ * bei offset[i+1]. Die Startposition offset[0] ist 0.</td>
  * </tr>
  * <tr>
  * <td>item</td>
@@ -210,9 +210,9 @@ import bee.creative.util.Unique.UniqueSet;
  * <tr>
  * <td>offset</td>
  * <td>INT(length)</td>
- * <td>size</td>
+ * <td>size+1</td>
  * <td>Startpositionen der Attributknotenlisten im Speicherbereich item. Der erste Attributknoten der i-ten Attributknotenliste liegt bei Position offset[i] und
- * der nach dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
+ * der nach dem letzten bei offset[i+1]. Die Startposition offset[0] ist 0.</td>
  * </tr>
  * <tr>
  * <td>item</td>
@@ -302,9 +302,9 @@ import bee.creative.util.Unique.UniqueSet;
  * <tr>
  * <td>offset</td>
  * <td>INT(length)</td>
- * <td>size</td>
+ * <td>size+1</td>
  * <td>Startpositionen der Kindknotenlisten im Speicherbereich item. Der erste Kindknoten der i-ten Kindknotenliste liegt bei Position offset[i] und der nach
- * dem letzten bei offset[i+1]. Die Startposition offset[0] ist implizit 0.</td>
+ * dem letzten bei offset[i+1]. Die Startposition offset[0] ist 0.</td>
  * </tr>
  * <tr>
  * <td>item</td>
@@ -961,6 +961,7 @@ public final class Encoder {
 		final int length = Bytes.lengthOf(offset);
 		target.writeInt(size);
 		target.writeByte(length);
+		target.writeInt(0, length);
 		for(int i = 0; i < size; i++){
 			target.writeInt(offsets[i], length);
 		}

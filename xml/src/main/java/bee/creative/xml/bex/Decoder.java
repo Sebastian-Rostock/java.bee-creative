@@ -146,8 +146,7 @@ public final class Decoder {
 			final DataSource fileCache = this.source;
 			final int size = fileCache.readInt() + 1, length = fileCache.readUnsignedByte();
 			final int[] offsets = new int[size];
-			offsets[0] = 0;
-			for(int i = 1; i < size; i++){
+			for(int i = 0; i < size; i++){
 				offsets[i] = fileCache.readInt(length);
 			}
 			this.itemCount = size - 1;
