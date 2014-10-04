@@ -638,11 +638,6 @@ public interface Data {
 		private final ByteBuffer data;
 
 		/**
-		 * Dieses Feld speichert den {@link ByteBuffer} zu {@link #array}.
-		 */
-		private final ByteBuffer buffer;
-
-		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
@@ -662,7 +657,6 @@ public interface Data {
 		public DataSourceBuffer(final ByteBuffer data) throws NullPointerException, IllegalArgumentException {
 			if(data.order() != ByteOrder.BIG_ENDIAN) throw new IllegalArgumentException();
 			this.data = data;
-			this.buffer = ByteBuffer.wrap(this.array);
 		}
 
 		/**
@@ -756,8 +750,8 @@ public interface Data {
 				case 2:
 					return this.data.getShort() & 0xFFFF;
 				case 3:
-					this.data.get(this.array, 1, 3);
-					return this.buffer.getInt(0) & 0xFFFFFF;
+					this.data.get(this.array, 0, 3);
+					return Bytes.get3(this.array, 0);
 				case 4:
 					return this.data.getInt();
 				default:
@@ -786,19 +780,19 @@ public interface Data {
 				case 2:
 					return this.data.getShort() & 0xFFFF;
 				case 3:
-					this.data.get(this.array, 1, 3);
-					return this.buffer.getInt(0) & 0xFFFFFF;
+					this.data.get(this.array, 0, 3);
+					return Bytes.get3(this.array, 0);
 				case 4:
 					return this.data.getInt();
 				case 5:
-					this.data.get(this.array, 3, 5);
-					return this.buffer.getLong(0) & 0xFFFFFFFFFFL;
+					this.data.get(this.array, 0, 5);
+					return Bytes.get5(this.array, 0);
 				case 6:
-					this.data.get(this.array, 2, 6);
-					return this.buffer.getLong(0) & 0xFFFFFFFFFFFFL;
+					this.data.get(this.array, 0, 6);
+					return Bytes.get6(this.array, 0);
 				case 7:
-					this.data.get(this.array, 1, 7);
-					return this.buffer.getLong(0) & 0xFFFFFFFFFFFFFFL;
+					this.data.get(this.array, 0, 7);
+					return Bytes.get7(this.array, 0);
 				case 8:
 					return this.data.getLong();
 				default:
