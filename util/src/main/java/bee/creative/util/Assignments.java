@@ -2,6 +2,8 @@ package bee.creative.util;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,7 +23,7 @@ public class Assignments {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GSource> Typ des Quellobjekt.
 	 */
-	public static final class ChildAssignment<GSource> implements Assignment<GSource> {
+	public static class ChildAssignment<GSource> implements Assignment<GSource> {
 
 		/**
 		 * Dieses Feld speichert das {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
@@ -58,7 +60,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> GValue get(final GValue source) {
+		public <GObject> GObject get(final GObject source) {
 			return this.parent.get(source);
 		}
 
@@ -66,7 +68,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> void set(final GValue source, final GValue target) {
+		public <GObject> void set(final GObject source, final GObject target) {
 			this.parent.set(source, target);
 		}
 
@@ -74,8 +76,17 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GSource2> void assign(final GSource2 source, final Assignable<? super GSource2> target) throws NullPointerException, IllegalArgumentException {
+		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
 			this.parent.assign(source, target);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
+			IllegalArgumentException {
+			this.parent.assign(source, target, commit);
 		}
 
 		/**
@@ -85,6 +96,23 @@ public class Assignments {
 		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
 			this.parent.assign(source, target, assigner);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner, final boolean commit)
+			throws NullPointerException, IllegalArgumentException {
+			this.parent.assign(source, target, assigner, commit);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void commit() throws IllegalArgumentException {
+			this.parent.commit();
 		}
 
 		/**
@@ -111,30 +139,49 @@ public class Assignments {
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ParentAssignment implements Assignment<Object> {
+	public static class ParentAssignment implements Assignment<Object> {
+
+		@SuppressWarnings ("javadoc")
+		static interface Entry {
+
+			public abstract void assign(Assignment<Object> scope);
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		static <GObject> Entry newEntry(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
+			return new Entry() {
+
+				@Override
+				public void assign(final Assignment<Object> scope) {
+					assigner.assign(target, scope.assignment(source));
+				}
+
+			};
+		}
+
+		@SuppressWarnings ("javadoc")
+		static <GObject> Entry newEntry(final GObject source, final Assignable<? super GObject> target) {
+			return new Entry() {
+
+				@Override
+				public void assign(final Assignment<Object> scope) {
+					target.assign(scope.assignment(source));
+				}
+
+			};
+		}
 
 		/**
 		 * Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte.
 		 */
-		final Map<Object, Object> map;
+		final Map<Object, Object> map = new HashMap<Object, Object>();
 
 		/**
-		 * Dieser Konstruktor initialisiert das {@link Assignment} mit einer {@link HashMap}.
+		 * Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
+		 * {@link Entry}s.
 		 */
-		public ParentAssignment() {
-			this(new HashMap<Object, Object>());
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Map}. Diese muss keine {@code null} Schlüssel unterstützen.
-		 * 
-		 * @param map {@link Map}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public ParentAssignment(final Map<Object, Object> map) throws NullPointerException {
-			if(map == null) throw new NullPointerException();
-			this.map = map;
-		}
+		final List<Entry> entries = new LinkedList<Entry>();
 
 		/**
 		 * Diese Methode gibt {@code null} zurück.
@@ -148,10 +195,10 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> GValue get(final GValue source) {
+		public <GObject> GObject get(final GObject source) {
 			if(source == null) return null;
 			@SuppressWarnings ("unchecked")
-			final GValue target = (GValue)this.map.get(source);
+			final GObject target = (GObject)this.map.get(source);
 			return target == null ? source : target;
 		}
 
@@ -159,9 +206,13 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> void set(final GValue source, final GValue target) throws NullPointerException {
+		public <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
 			if(source == null) throw new NullPointerException();
-			this.map.put(source, target);
+			if(target == null){
+				this.map.remove(source);
+			}else{
+				this.map.put(source, target);
+			}
 		}
 
 		/**
@@ -169,8 +220,22 @@ public class Assignments {
 		 */
 		@Override
 		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
+			this.assign(source, target, true);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
+			IllegalArgumentException {
+			if((source == null) || (target == null)) throw new NullPointerException();
 			this.set(source, target);
-			target.assign(this.assignment(source));
+			if(commit){
+				target.assign(this.assignment(source));
+			}else{
+				this.entries.add(ParentAssignment.newEntry(source, target));
+			}
 		}
 
 		/**
@@ -181,6 +246,32 @@ public class Assignments {
 			throws NullPointerException, IllegalArgumentException {
 			this.set(source, target);
 			assigner.assign(target, this.assignment(source));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner, final boolean commit)
+			throws NullPointerException, IllegalArgumentException {
+			if((source == null) || (target == null) || (assigner == null)) throw new NullPointerException();
+			this.set(source, target);
+			if(commit){
+				assigner.assign(target, this.assignment(source));
+			}else{
+				this.entries.add(ParentAssignment.newEntry(source, target, assigner));
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void commit() throws IllegalArgumentException {
+			final List<Entry> entries = this.entries;
+			while(!entries.isEmpty()){
+				entries.remove(0).assign(this);
+			}
 		}
 
 		/**
