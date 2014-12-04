@@ -13,10 +13,10 @@ public interface Assignable<GSource> {
 	 * Diese Methode überträgt die Informationen des gegebenen {@link Assignment#value() Quellobjekts} auf dieses Objekt.
 	 * 
 	 * @see Assignment#value()
-	 * @param source {@link Assignment} mit dem {@link Assignment#value() Quellobjekt}.
+	 * @param assignment {@link Assignment} mit dem {@link Assignment#value() Quellobjekt}.
 	 * @throws NullPointerException Wenn das {@link Assignment} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das {@link Assignment#value() Quellobjekt} ungültig ist.
 	 */
-	public void assign(Assignment<? extends GSource> source) throws NullPointerException, IllegalArgumentException;
+	public void assign(Assignment<? extends GSource> assignment) throws NullPointerException, IllegalArgumentException;
 
 }

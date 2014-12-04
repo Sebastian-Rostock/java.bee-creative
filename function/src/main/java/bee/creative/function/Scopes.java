@@ -385,6 +385,15 @@ public final class Scopes {
 		}
 
 		/**
+		 * Diese Methode gibt eine Kopie der berechneten Parameterwerte zurück.
+		 * 
+		 * @return Parameterwerte.
+		 */
+		public Value[] values() {
+			return this.values.clone();
+		}
+
+		/**
 		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
 		 * 
 		 * @return Kopie der Parameterfunktionen.

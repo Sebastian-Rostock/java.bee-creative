@@ -156,7 +156,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		int index = this.startIndex();
 		final int delta = data.startIndex() - index;
 		final int finalIndex = this.finalIndex();
-		if((finalIndex - index) != (((data.finalIndex() + index) - delta))) return false;
+		if((finalIndex - index) != (((data.finalIndex() - index) - delta))) return false;
 		final GArray array1 = this.array(), array2 = data.array();
 		for(; index < finalIndex; index++){
 			if(!this.equals(array1, array2, index, index + delta)) return false;

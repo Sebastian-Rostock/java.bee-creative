@@ -16,10 +16,10 @@ public interface Assigner<GTarget, GSource> {
 	 * 
 	 * @see Assignment#value()
 	 * @param target Zielobjekt.
-	 * @param source {@link Assignment} mit dem {@link Assignment#value() Quellobjekt}.
+	 * @param assignment {@link Assignment} mit dem {@link Assignment#value() Quellobjekt}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das {@link Assignment#value() Quellobjekt} ungültig ist.
 	 */
-	public void assign(GTarget target, Assignment<? extends GSource> source) throws NullPointerException, IllegalArgumentException;
+	public void assign(GTarget target, Assignment<? extends GSource> assignment) throws NullPointerException, IllegalArgumentException;
 
 }
