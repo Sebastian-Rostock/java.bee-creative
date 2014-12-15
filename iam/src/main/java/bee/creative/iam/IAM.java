@@ -12,6 +12,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.util.Objects;
@@ -31,7 +32,7 @@ public final class IAM {
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten {@link Iterator}, der beginnend bei Index {@code 0} über eine gegebene Anzahl von Elementen iteriert. Die
-	 * {@link #next()}-Methode solldas Element zu dem von {@link #nextIndex()} gelieferten Index liefern.
+	 * {@link #next()}-Methode soll das Element zu dem von {@link #nextIndex()} gelieferten Index liefern.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
@@ -482,8 +483,9 @@ public final class IAM {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Nummerierung einzigartiger {@code int}-Arrays.
+	 * Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Nummerierung (einzigartiger) {@code int}-Arrays.
 	 * 
+	 * @see #put(boolean,int...)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class AbstractUniqueList extends UniqueMap<int[], Integer> {
@@ -491,7 +493,7 @@ public final class IAM {
 		/**
 		 * Dieses Feld speichert die bisher gesammelten Elemente in der Reihenfolge ihrer Erfassung.
 		 */
-		final List<int[]> entryList = new ArrayList<int[]>();
+		final List<int[]> entries = new ArrayList<int[]>();
 
 		/**
 		 * {@inheritDoc}
@@ -506,19 +508,35 @@ public final class IAM {
 		 */
 		@Override
 		protected Integer compile(final int[] input) {
-			final List<int[]> entryList = this.entryList;
+			return Integer.valueOf(this.put(false, input));
+		}
+
+		/**
+		 * Diese Methode gibt den Index zurück, unter dem in {@link #entries()} ein zum gegebenen Array äquivalentes Array verwaltet wird.<br>
+		 * Sollte die Wiederverwendung deaktiviert oder in {@link #entries()} kein wiederverwendbares Array enthalten sein, wird das gegebene Array an
+		 * {@link #entries()} angefügt.
+		 * 
+		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert und das gegebene Array wiederverwendbar sind.
+		 * @param array Array.
+		 * @return Index, unter dem ein äquivalentes Array verwaltet wird.
+		 * @throws NullPointerException Wenn das Array {@code null} ist.
+		 */
+		public int put(final boolean reuse, final int... array) throws NullPointerException {
+			if(reuse) return this.get(array).intValue();
+			final List<int[]> entryList = this.entries;
 			final int result = entryList.size();
-			entryList.add(result, input);
+			entryList.add(result, array.clone());
 			return result;
 		}
 
 		/**
 		 * Diese Methode gibt die bisher gesammelten Elemente in der Reihenfolge ihrer Erfassung zurück.
 		 * 
+		 * @see Collections#unmodifiableList(List)
 		 * @return bisher gesammelte Elemente.
 		 */
 		public List<int[]> entries() {
-			return this.entryList;
+			return Collections.unmodifiableList(this.entries);
 		}
 
 		/**
@@ -527,7 +545,7 @@ public final class IAM {
 		@Override
 		public int hashCode() {
 			int hash = 0x811C9DC5;
-			for(final int[] item: this.entryList){
+			for(final int[] item: this.entries){
 				hash = (hash * 0x01000193) ^ Arrays.hashCode(item);
 			}
 			return hash;
@@ -541,7 +559,7 @@ public final class IAM {
 			if(object == this) return true;
 			if(!(object instanceof AbstractUniqueList)) return false;
 			final AbstractUniqueList data = (AbstractUniqueList)object;
-			final List<int[]> list1 = this.entryList, list2 = data.entryList;
+			final List<int[]> list1 = this.entries, list2 = data.entries;
 			final int size = list1.size();
 			if(size != list2.size()) return false;
 			for(int i = 0; i < size; i++){

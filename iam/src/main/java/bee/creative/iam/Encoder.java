@@ -80,7 +80,7 @@ public final class Encoder extends AbstractIndexView {
 		@Override
 		public int key(final int entryIndex, final int index) throws IndexOutOfBoundsException {
 			if((index < 0) || (index >= this.keySize)) throw new IndexOutOfBoundsException();
-			return this.entryList.entries().get(entryIndex)[index];
+			return this.entryList.entries.get(entryIndex)[index];
 		}
 
 		/**
@@ -97,7 +97,7 @@ public final class Encoder extends AbstractIndexView {
 		@Override
 		public int value(final int entryIndex, final int index) throws IndexOutOfBoundsException {
 			if((index < 0) || (index >= this.valueSize)) throw new IndexOutOfBoundsException();
-			return this.entryList.entries().get(entryIndex)[index + this.keySize];
+			return this.entryList.entries.get(entryIndex)[index + this.keySize];
 		}
 
 		/**
@@ -113,7 +113,7 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		@Override
 		public int entryCount() {
-			return this.entryList.entries().size();
+			return this.entryList.entries.size();
 		}
 
 		/**
@@ -124,6 +124,19 @@ public final class Encoder extends AbstractIndexView {
 			if(key.length != this.keySize) return -1;
 			final Integer result = this.entryList.entryMap().get(key);
 			return result == null ? -1 : result.intValue();
+		}
+
+		/**
+		 * Diese Methode gibt das modifizierbare {@code int}-Array des {@code entryIndex}-ten Eintrags zurück. In diesem Array sollten nur die für den Wert
+		 * stehenden {@code int}s verändert werden.
+		 * 
+		 * @see #entryCount()
+		 * @param entryIndex Index des Eintrags.
+		 * @return {@code int}-Array des {@code entryIndex}-ten Eintrags.
+		 * @throws IndexOutOfBoundsException Wenn eine der Eingaben ungültig ist.
+		 */
+		public int[] get(final int entryIndex) {
+			return this.entryList.entries.get(entryIndex);
 		}
 
 		/**
@@ -139,7 +152,7 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		public int put(final int... entry) throws NullPointerException, IllegalArgumentException {
 			if(entry.length != this.entrySize) throw new IllegalArgumentException();
-			return this.entryList.get(entry).intValue();
+			return this.entryList.put(true, entry);
 		}
 
 		/**
@@ -175,7 +188,7 @@ public final class Encoder extends AbstractIndexView {
 			{
 				keySize = this.keySize;
 				valueSize = this.valueSize;
-				entryList = this.entryList.entries();
+				entryList = this.entryList.entries;
 				entryCount = entryList.size();
 			}
 			final int rangeMask, rangeCount;
@@ -288,7 +301,7 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		@Override
 		public int item(final int itemIndex, final int index) throws IndexOutOfBoundsException {
-			return this.itemList.entries().get(itemIndex)[index];
+			return this.itemList.entries.get(itemIndex)[index];
 		}
 
 		/**
@@ -296,7 +309,7 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		@Override
 		public int itemSize(final int itemIndex) {
-			return this.itemList.entries().get(itemIndex).length;
+			return this.itemList.entries.get(itemIndex).length;
 		}
 
 		/**
@@ -304,7 +317,21 @@ public final class Encoder extends AbstractIndexView {
 		 */
 		@Override
 		public int itemCount() {
-			return this.itemList.entries().size();
+			return this.itemList.entries.size();
+		}
+
+		/**
+		 * Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Element zurück. Dieses Array sollte nur dann verändert werden, wenn es
+		 * über {@link #put(boolean, int...)} ohne Wiederverwendung hunzugefügt wurde.
+		 * 
+		 * @see #put(boolean, int...)
+		 * @see #itemCount()
+		 * @param itemIndex Index des Elements.
+		 * @return {@code int}-Array des {@code itemIndex}-ten Elements.
+		 * @throws IndexOutOfBoundsException Wenn eine der Eingaben ungültig ist.
+		 */
+		public int[] get(final int itemIndex) throws IndexOutOfBoundsException {
+			return this.itemList.entries.get(itemIndex);
 		}
 
 		/**
@@ -313,12 +340,29 @@ public final class Encoder extends AbstractIndexView {
 		 * <p>
 		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link ListDecoder} verwerden wird.
 		 * 
+		 * @see #put(boolean, int...)
 		 * @param value Element.
 		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public int put(final int... value) throws NullPointerException {
-			return this.itemList.get(value).intValue();
+			return this.itemList.put(true, value);
+		}
+
+		/**
+		 * Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn die Wiederverwendung aktiviert ist
+		 * und bereits ein Element mit dem gleichen Daten existiert, wird dessen Index zurück gegeben.
+		 * <p>
+		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link ListDecoder} verwerden wird.
+		 * 
+		 * @see AbstractUniqueList#put(boolean, int...)
+		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert ist.
+		 * @param value Element.
+		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public int put(final boolean reuse, final int... value) throws NullPointerException {
+			return this.itemList.put(reuse, value);
 		}
 
 		/**
@@ -331,7 +375,7 @@ public final class Encoder extends AbstractIndexView {
 			final List<int[]> itemList;
 			final int itemCount;
 			{
-				itemList = this.itemList.entries();
+				itemList = this.itemList.entries;
 				itemCount = itemList.size();
 			}
 			int rangeValue;
