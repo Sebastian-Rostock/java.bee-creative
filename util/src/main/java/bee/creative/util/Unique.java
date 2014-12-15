@@ -70,6 +70,130 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
+	 * Diese Klasse implementiert das {@link Set} zu {@link Unique#data}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> {
+
+		/**
+		 * Dieses Feld speichert den Besitzer.
+		 */
+		final Unique<GInput, GOutput> owner;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 */
+		public EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
+			if(owner == null) throw new NullPointerException();
+			this.owner = owner;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.owner.data.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<Entry<GInput, GOutput>> iterator() {
+			return this.owner.data.iterator();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die {@link Map}-Sicht auf die Einträge von {@link Unique#data}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	static final class EntryMap<GInput, GOutput> extends AbstractMap<GInput, GOutput> {
+
+		/**
+		 * Dieses Feld speichert den Besitzer.
+		 */
+		final Unique<GInput, GOutput> owner;
+
+		/**
+		 * Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}.
+		 */
+		final EntrySet<GInput, GOutput> entrySet;
+
+		/**
+		 * Dieser Konstruktor initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 */
+		public EntryMap(final Unique<GInput, GOutput> owner) throws NullPointerException {
+			if(owner == null) throw new NullPointerException();
+			this.owner = owner;
+			this.entrySet = new EntrySet<GInput, GOutput>(owner);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int size() {
+			return this.owner.data.size();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Set<Entry<GInput, GOutput>> entrySet() {
+			return this.entrySet;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		public GOutput get(final Object key) {
+			if(!this.owner.check(key)) return null;
+			return this.owner.data.get((GInput)key);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		public GOutput remove(final Object key) {
+			if(!this.owner.check(key)) return null;
+			final GOutput value = this.owner.data.get((GInput)key);
+			if(value == null) return null;
+			this.owner.data.set((GInput)key, null);
+			return value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		public boolean containsKey(final Object key) {
+			return this.owner.check(key) && (this.owner.data.get((GInput)key) != null);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique}s in {@link List}s mit Zugriff über eine binäre Suche.
 	 * 
 	 * @see Unique#compare(Object, Object)
@@ -118,25 +242,20 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>)-1)</code>.
 		 */
 		protected int index(final GInput input) {
-			return Comparables.binarySearch(this.inputs, new Comparable<GInput>() {
-
-				@Override
-				public int compareTo(final GInput value) {
-					return ListData.this.owner.compare(input, value);
-				}
-
-			});
+			return Comparables.binarySearch(this.inputs, Comparables.entryComparable(input, this.owner));
 		}
 
 		/**
-		 * Diese Methode fügt {@code null} an der gegebenen Position in {@link #inputs} und {@link #outputs} ein.
+		 * Diese Methode fügt die gegebene Ein- und Ausgabe an der gegebenen Position in {@link #inputs} bzw. {@link #outputs} ein.
 		 * 
 		 * @param index Position.
+		 * @param key Eingabe.
+		 * @param value Ausgebe.
 		 */
-		protected abstract void insert(final int index);
+		protected abstract void insert(final int index, final GInput key, final GOutput value);
 
 		/**
-		 * Diese Methode entfernt den Wert an der gegebenen Position aus {@link #inputs} und {@link #outputs}.
+		 * Diese Methode entfernt den Eintrag an der gegebenen Position aus {@link #inputs} und {@link #outputs}.
 		 * 
 		 * @param index Position.
 		 */
@@ -160,9 +279,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			if(index < 0){
 				if(value == null) return;
 				index = -index - 1;
-				this.insert(index);
-				this.inputs.set(index, key);
-				this.outputs.set(index, value);
+				this.insert(index, key, value);
 			}else if(value == null){
 				this.remove(index);
 			}else{
@@ -245,8 +362,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void insert(final int index) {
-			this.inputs.add(index, null);
+		protected void insert(final int index, final GValue key, final GValue value) {
+			this.inputs.add(index, key);
 		}
 
 		/**
@@ -287,9 +404,9 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void insert(final int index) {
-			this.inputs.add(index, null);
-			this.outputs.add(index, null);
+		protected void insert(final int index, final GInput key, final GOutput value) {
+			this.inputs.add(index, key);
+			this.outputs.add(index, value);
 		}
 
 		/**
@@ -598,130 +715,6 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			entry.input = key;
 			entry.output = value;
 			return entry;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert das {@link Set} zu {@link Unique#data}.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> {
-
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
-		final Unique<GInput, GOutput> owner;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
-		 * 
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
-		public EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
-			this.owner = owner;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.owner.data.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return this.owner.data.iterator();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert die {@link Map}-Sicht auf die Einträge von {@link Unique#data}.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	static final class EntryMap<GInput, GOutput> extends AbstractMap<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
-		final Unique<GInput, GOutput> owner;
-
-		/**
-		 * Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}.
-		 */
-		final EntrySet<GInput, GOutput> entrySet;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
-		 * 
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
-		public EntryMap(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
-			this.owner = owner;
-			this.entrySet = new EntrySet<GInput, GOutput>(owner);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.owner.data.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Set<Entry<GInput, GOutput>> entrySet() {
-			return this.entrySet;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput get(final Object key) {
-			if(!this.owner.check(key)) return null;
-			return this.owner.data.get((GInput)key);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput remove(final Object key) {
-			if(!this.owner.check(key)) return null;
-			final GOutput value = this.owner.data.get((GInput)key);
-			if(value == null) return null;
-			this.owner.data.set((GInput)key, null);
-			return value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public boolean containsKey(final Object key) {
-			return this.owner.check(key) && (this.owner.data.get((GInput)key) != null);
 		}
 
 	}
