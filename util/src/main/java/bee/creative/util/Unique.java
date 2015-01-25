@@ -546,6 +546,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			 */
 			GValue value;
 
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return this.value.toString();
+			}
+
 		}
 
 		/**
@@ -651,6 +659,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			 * Dieses Feld speichert die Ausgabe.
 			 */
 			GOutput output;
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return this.input + "=" + this.output;
+			}
 
 		}
 
