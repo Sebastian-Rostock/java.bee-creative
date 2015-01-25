@@ -1,129 +1,59 @@
 package bee.creative.iam;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
-import bee.creative.util.Unique.UniqueMap;
 
 /**
- * Diese Klasse implementiert Klassen und Metoden zur Bereitstellung und Verarbeitung von Informationen eines {@code IAM} ({@code Integer Array Model}). Die
- * grundlegende Schnittstelle zum Zugriff auf ein {@code IAM} wird im {@link IndexView} definiert.
+ * Diese Klasse implementiert grundlegende Klassen und Methoden zur Umsetzung des {@code IAM - Integer Array Model}.
+ * <p>
  * 
- * @see IndexView
- * @see MapView
- * @see ListView
- * @see ArrayView
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class IAM {
+public class IAM {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Iterator}, der beginnend bei Index {@code 0} über eine gegebene Anzahl von Elementen iteriert. Die
-	 * {@link #next()}-Methode soll das Element zu dem von {@link #nextIndex()} gelieferten Index liefern.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static abstract class AbstractIterator<GItem> implements Iterator<GItem> {
-
-		/**
-		 * Dieses Feld speichert das Index des nächsten Elements.
-		 */
-		int index = 0;
-
-		/**
-		 * Dieses Feld speichert die Anzahl der Elemente.
-		 */
-		int count;
-
-		/**
-		 * Dieser Konstruktor initialisiert dei Anzahl der Elemente.
-		 * 
-		 * @param count Anzahl der Elemente.
-		 */
-		public AbstractIterator(final int count) {
-			this.count = count;
-		}
-
-		/**
-		 * Diese Methode gibt den Index für das nächste Element in {@link #next()} zurück und erhöht diesen für den nächsten Aufruf.
-		 * 
-		 * @return Index für das nächste Element.
-		 */
-		public int nextIndex() {
-			return this.index++;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return this.index < this.count;
-		}
-
-	};
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten {@link ListView}, dessen {@link #item(int)}-Methode einen {@link ArrayView} liefert, der an
-	 * {@link #item(int, int)} sowie {@link #itemSize(int)} delegeirt.
+	 * Diese Klasse implementiert eine abstrakte {@link IAMList}. Die von {@link #items()} gelieferte {@link List} delegiert an {@link #item(int)} und
+	 * {@link #itemCount()}. Die Methoden {@link #item(int, int)} und {@link #itemLength(int)} delegieren an {@link IAMList#item(int)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractListView implements ListView {
+	public static abstract class IAMBaseList implements IAMList {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ArrayView item(final int itemIndex) throws IndexOutOfBoundsException {
-			if((itemIndex < 0) || (itemIndex >= this.itemCount())) throw new IndexOutOfBoundsException();
-			return new AbstractArrayView() {
-
-				@Override
-				public int get(final int index) throws IndexOutOfBoundsException {
-					return AbstractListView.this.item(itemIndex, index);
-				}
-
-				@Override
-				public int length() {
-					return AbstractListView.this.itemSize(itemIndex);
-				}
-
-			};
+		public int item(final int itemIndex, final int index) {
+			return this.item(index).get(index);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<ArrayView> iterator() {
-			return new AbstractIterator<ArrayView>(this.itemCount()) {
+		public int itemLength(final int itemIndex) {
+			return this.item(itemIndex).length();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public List<IAMArray> items() {
+			return new AbstractList<IAMArray>() {
 
 				@Override
-				public ArrayView next() {
-					return AbstractListView.this.item(this.nextIndex());
+				public IAMArray get(final int index) {
+					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
+					return IAMBaseList.this.item(index);
+				}
+
+				@Override
+				public int size() {
+					return IAMBaseList.this.itemCount();
 				}
 
 			};
@@ -134,154 +64,77 @@ public final class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this);
+			return Objects.toStringCall(this, this.items());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link MapView}, dessen {@link #key(int)}- und {@link #value(int)}-Methoden je einen {@link ArrayView} liefern,
-	 * der an {@link #key(int, int)} sowie {@link #keySize()} bzw. {@link #value(int, int)} sowie {@link #valueSize()} delegeirt. Der von #en gelieferte
-	 * {@link EntryView} delegiert dazu an alle zuvor genannten Methoden. Die {@code find}-Methoden mit {@code 1} bis {@code 5} {@code int}-Parametern delegieren
-	 * an die mit dem {@code int[]}-Parameter.
+	 * Diese Klasse implementiert eine abstrakte {@link IAMMap}. Die Methode {@link #entry(int)} liefert einen {@link IAMValueEntry} mit den von {@link #key(int)}
+	 * und {@link #value(int)} gelieferten Zahlenfolgen. Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und
+	 * {@link #entryCount()}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractMapView implements MapView {
+	public static abstract class IAMBaseMap implements IAMMap {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ArrayView key(final int entryIndex) throws IndexOutOfBoundsException {
-			if((entryIndex < 0) || (entryIndex >= this.entryCount())) throw new IndexOutOfBoundsException();
-			return new AbstractArrayView() {
-
-				@Override
-				public int get(final int index) throws IndexOutOfBoundsException {
-					return AbstractMapView.this.key(entryIndex, index);
-				}
-
-				@Override
-				public int length() {
-					return AbstractMapView.this.keySize();
-				}
-
-			};
+		public int key(final int entryIndex, final int index) {
+			return this.key(entryIndex).get(index);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ArrayView value(final int entryIndex) throws IndexOutOfBoundsException {
-			if((entryIndex < 0) || (entryIndex >= this.entryCount())) throw new IndexOutOfBoundsException();
-			return new AbstractArrayView() {
-
-				@Override
-				public int get(final int index) throws IndexOutOfBoundsException {
-					return AbstractMapView.this.value(entryIndex, index);
-				}
-
-				@Override
-				public int length() {
-					return AbstractMapView.this.valueSize();
-				}
-
-			};
+		public int keyLength(final int entryIndex) {
+			return this.key(entryIndex).length();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public EntryView entry(final int entryIndex) throws IndexOutOfBoundsException {
-			if((entryIndex < 0) || (entryIndex >= this.entryCount())) throw new IndexOutOfBoundsException();
-			return new AbstractEntryView() {
-
-				@Override
-				public ArrayView key() {
-					return AbstractMapView.this.key(entryIndex);
-				}
-
-				@Override
-				public int key(final int index) throws IndexOutOfBoundsException {
-					return AbstractMapView.this.key(entryIndex, index);
-				}
-
-				@Override
-				public int keySize() {
-					return AbstractMapView.this.keySize();
-				}
-
-				@Override
-				public ArrayView value() {
-					return AbstractMapView.this.value(entryIndex);
-				}
-
-				@Override
-				public int value(final int index) throws IndexOutOfBoundsException {
-					return AbstractMapView.this.value(entryIndex, index);
-				}
-
-				@Override
-				public int valueSize() {
-					return AbstractMapView.this.valueSize();
-				}
-
-			};
+		public int value(final int entryIndex, final int index) {
+			return this.value(entryIndex).get(index);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int key) {
-			return this.find(new int[]{key});
+		public int valueLength(final int entryIndex) {
+			return this.value(entryIndex).length();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int key1, final int key2) {
-			return this.find(new int[]{key1, key2});
+		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAMEmptyEntry.INSTANCE;
+			return new IAMValueEntry(this.key(entryIndex), this.value(entryIndex));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int key1, final int key2, final int key3) {
-			return this.find(new int[]{key1, key2, key3});
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int find(final int key1, final int key2, final int key3, final int key4) {
-			return this.find(new int[]{key1, key2, key3, key4});
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int find(final int key1, final int key2, final int key3, final int key4, final int key5) {
-			return this.find(new int[]{key1, key2, key3, key4, key5});
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<EntryView> iterator() {
-			return new AbstractIterator<EntryView>(this.entryCount()) {
+		public List<IAMEntry> entries() {
+			return new AbstractList<IAMEntry>() {
 
 				@Override
-				public EntryView next() {
-					return AbstractMapView.this.entry(this.nextIndex());
+				public IAMEntry get(final int index) {
+					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
+					return IAMBaseMap.this.entry(index);
+				}
+
+				@Override
+				public int size() {
+					return IAMBaseMap.this.entryCount();
 				}
 
 			};
@@ -292,18 +145,49 @@ public final class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this);
+			return Objects.toStringCall(this, this.entries());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link EntryView}, dessen {@link #hashCode()}-, {@link #equals(Object)}- und {@link #toString()}-Methoden an
-	 * {@link #key()} und {@link #value()} delegieren.
+	 * Diese Klasse implementiert ein abstraktes {@link IAMEntry}.
 	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractEntryView implements EntryView {
+	public static abstract class IAMBaseEntry implements IAMEntry {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int key(final int index) {
+			return this.key().get(index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int keyLength() {
+			return this.key().length();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int value(final int index) {
+			return this.value().get(index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int valueLength() {
+			return this.value().length();
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -318,9 +202,9 @@ public final class IAM {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof EntryView)) return false;
-			final EntryView data = (EntryView)object;
+			if (object == this) return true;
+			if (!(object instanceof IAMEntry)) return false;
+			final IAMEntry data = (IAMEntry)object;
 			return this.key().equals(data.key()) && this.value().equals(data.value());
 		}
 
@@ -335,29 +219,97 @@ public final class IAM {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link ArrayView}, dessen {@link #iterator()}-, {@link #hashCode()}-, {@link #equals(Object)}- und
-	 * {@link #toArray()}-Methoden an {@link #get(int)} und {@link #length()} delegieren. Die Methoden {@link #section(int)} und {@link #section(int, int)}
-	 * erzeugen je einen {@link ArrayView}.
+	 * Diese Klasse implementiert ein abstraktes {@link IAMArray} ohne {@link #get(int)}- und {@link #length()}-Methoden.
 	 * 
-	 * @see IAM#array(ArrayView, int, int)
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractArrayView implements ArrayView {
+	public static abstract class IAMBaseArray implements IAMArray {
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode implementiert die Erzeugung des Abschnitts in {@link #section(int, int)}. die Parameter sind bereits geprüft.
+		 * 
+		 * @param offset Beginn des Abschnitts.
+		 * @param length Länge des Abschnitts.
+		 * @return Abschnitt.
 		 */
-		@Override
-		public ArrayView section(final int offset) throws IndexOutOfBoundsException {
-			return IAM.array(this, offset, this.length() - offset);
+		protected IAMArray newSection(final int offset, final int length) {
+			if (length == 0) return IAMEmptyArray.INSTANCE;
+			return new IAMBaseArray() {
+
+				@Override
+				public int get(final int index) {
+					if ((index < 0) || (index >= length)) return 0;
+					return IAMBaseArray.this.get(offset + index);
+				}
+
+				@Override
+				public int length() {
+					return length;
+				}
+
+				@Override
+				public IAMArray section(final int offset2, final int length2) {
+					return IAMBaseArray.this.section(offset + offset2, length2);
+				}
+
+			};
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ArrayView section(final int offset, final int length) throws IndexOutOfBoundsException {
-			return IAM.array(this, offset, length);
+		public int hash() {
+			int hash = 0x811C9DC5;
+			for (int i = 0, size = this.length(); i < size; i++) {
+				hash = (hash * 0x01000193) ^ this.get(i);
+			}
+			return hash;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final IAMArray value) {
+			final int length = this.length();
+			if (length != value.length()) return false;
+			for (int i = 0; i < length; i++)
+				if (this.get(i) != value.get(i)) return false;
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(final IAMArray value) {
+			final int length1 = this.length(), length2 = value.length();
+			for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
+				if ((result = Comparators.compare(this.get(i), value.get(i))) != 0) return result;
+			return length1 - length2;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray section(final int offset, final int length) {
+			if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return this.newSection(0, 0);
+			return this.newSection(offset, length);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int[] toArray() {
+			final int length = this.length();
+			final int[] result = new int[length];
+			for (int i = 0; i < length; i++) {
+				result[i] = this.get(i);
+			}
+			return result;
 		}
 
 		/**
@@ -365,11 +317,23 @@ public final class IAM {
 		 */
 		@Override
 		public Iterator<Integer> iterator() {
-			return new AbstractIterator<Integer>(this.length()) {
+			return new Iterator<Integer>() {
+
+				int index = 0;
+
+				@Override
+				public boolean hasNext() {
+					return this.index < IAMBaseArray.this.length();
+				}
 
 				@Override
 				public Integer next() {
-					return AbstractArrayView.this.get(this.nextIndex());
+					return Integer.valueOf(IAMBaseArray.this.get(this.index++));
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
 				}
 
 			};
@@ -380,11 +344,15 @@ public final class IAM {
 		 */
 		@Override
 		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for(int i = 0, size = this.length(); i < size; i++){
-				hash = (hash * 0x01000193) ^ this.get(i);
-			}
-			return hash;
+			return this.hash();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compareTo(final IAMArray value) {
+			return this.compare(value);
 		}
 
 		/**
@@ -392,27 +360,9 @@ public final class IAM {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ArrayView)) return false;
-			final ArrayView data = (ArrayView)object;
-			final int length = this.length();
-			if(length != data.length()) return false;
-			for(int i = 0; i < length; i++)
-				if(this.get(i) != data.get(i)) return false;
-			return true;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int[] toArray() {
-			final int size = this.length();
-			final int[] array = new int[size];
-			for(int i = 0; i < size; i++){
-				array[i] = this.get(i);
-			}
-			return array;
+			if (object == this) return true;
+			if (!(object instanceof IAMArray)) return false;
+			return this.equals((IAMArray)object);
 		}
 
 		/**
@@ -420,34 +370,35 @@ public final class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toString(this);
+			return this.length() > 100 ? Objects.toString(this.section(0, 100)) + "..." : Objects.toString(this);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link IndexView}, dessen {@link #maps()}- und {@link #lists()}-Methoden je eine {@link List} liefern, die an
+	 * Diese Klasse implementiert einen abstrakten {@link IAMIndex}, dessen {@link #maps()}- und {@link #lists()}-Methoden je eine {@link List} liefern, die an
 	 * {@link #map(int)} sowie {@link #mapCount()} bzw. {@link #list(int)} sowie {@link #listCount()} delegeirt.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractIndexView implements IndexView {
+	public static abstract class IAMBaseIndex implements IAMIndex {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public List<MapView> maps() {
-			return new AbstractList<MapView>() {
+		public List<IAMMap> maps() {
+			return new AbstractList<IAMMap>() {
 
 				@Override
-				public MapView get(final int index) {
-					return AbstractIndexView.this.map(index);
+				public IAMMap get(final int index) {
+					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
+					return IAMBaseIndex.this.map(index);
 				}
 
 				@Override
 				public int size() {
-					return AbstractIndexView.this.mapCount();
+					return IAMBaseIndex.this.mapCount();
 				}
 
 			};
@@ -457,18 +408,20 @@ public final class IAM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public List<ListView> lists() {
-			return new AbstractList<ListView>() {
+		public List<IAMList> lists() {
+			return new AbstractList<IAMList>() {
 
 				@Override
-				public ListView get(final int index) {
-					return AbstractIndexView.this.list(index);
+				public IAMList get(final int index) {
+					if ((index < 0) || (index >= this.size())) throw new IndexOutOfBoundsException();
+					return IAMBaseIndex.this.list(index);
 				}
 
 				@Override
 				public int size() {
-					return AbstractIndexView.this.listCount();
+					return IAMBaseIndex.this.listCount();
 				}
+
 			};
 		}
 
@@ -482,334 +435,314 @@ public final class IAM {
 
 	}
 
+	{}
+
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Nummerierung (einzigartiger) {@code int}-Arrays.
+	 * Diese Klasse implementiert ein {@link IAMEntry} mit gegebenem Schlüssel und Wert.
 	 * 
-	 * @see #put(boolean,int...)
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractUniqueList extends UniqueMap<int[], Integer> {
+	public static final class IAMValueEntry extends IAMBaseEntry {
 
 		/**
-		 * Dieses Feld speichert die bisher gesammelten Elemente in der Reihenfolge ihrer Erfassung.
+		 * Dieses Feld speichert den Schlüssel.
 		 */
-		final List<int[]> entries = new ArrayList<int[]>();
+		protected final IAMArray key;
 
 		/**
-		 * {@inheritDoc}
+		 * Dieses Feld speichert den Wert.
 		 */
-		@Override
-		protected boolean check(final Object input) {
-			return input instanceof int[];
-		}
+		protected final IAMArray value;
 
 		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected Integer compile(final int[] input) {
-			return Integer.valueOf(this.put(false, input));
-		}
-
-		/**
-		 * Diese Methode gibt den Index zurück, unter dem in {@link #entries()} ein zum gegebenen Array äquivalentes Array verwaltet wird.<br>
-		 * Sollte die Wiederverwendung deaktiviert oder in {@link #entries()} kein wiederverwendbares Array enthalten sein, wird das gegebene Array an
-		 * {@link #entries()} angefügt.
+		 * Dieser Konstruktor initialisiert Schlüssel und Wert.
 		 * 
-		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert und das gegebene Array wiederverwendbar sind.
-		 * @param array Array.
-		 * @return Index, unter dem ein äquivalentes Array verwaltet wird.
-		 * @throws NullPointerException Wenn das Array {@code null} ist.
+		 * @param key Schlüssel.
+		 * @param value Wert.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public int put(final boolean reuse, final int... array) throws NullPointerException {
-			if(reuse) return this.get(array).intValue();
-			final List<int[]> entryList = this.entries;
-			final int result = entryList.size();
-			entryList.add(result, array.clone());
-			return result;
+		public IAMValueEntry(final IAMArray key, final IAMArray value) throws NullPointerException {
+			if ((key == null) || (value == null)) throw new NullPointerException();
+			this.key = key;
+			this.value = value;
 		}
 
 		/**
-		 * Diese Methode gibt die bisher gesammelten Elemente in der Reihenfolge ihrer Erfassung zurück.
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray key() {
+			return this.key;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray value() {
+			return this.value;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@code int[]} gegeben sind.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class IAMValueArray extends IAMBaseArray {
+
+		/**
+		 * Dieses Feld speichert das array.
+		 */
+		protected final int[] array;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Zahlen.
 		 * 
-		 * @see Collections#unmodifiableList(List)
-		 * @return bisher gesammelte Elemente.
+		 * @param array Zahlen.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public List<int[]> entries() {
-			return Collections.unmodifiableList(this.entries);
+		public IAMValueArray(final int[] array) throws NullPointerException {
+			if (array == null) throw new NullPointerException();
+			this.array = array;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hashCode() {
-			int hash = 0x811C9DC5;
-			for(final int[] item: this.entries){
-				hash = (hash * 0x01000193) ^ Arrays.hashCode(item);
-			}
-			return hash;
+		public int get(final int index) {
+			if ((index < 0) || (index >= this.array.length)) return 0;
+			return this.array[index];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof AbstractUniqueList)) return false;
-			final AbstractUniqueList data = (AbstractUniqueList)object;
-			final List<int[]> list1 = this.entries, list2 = data.entries;
-			final int size = list1.size();
-			if(size != list2.size()) return false;
-			for(int i = 0; i < size; i++){
-				if(!Arrays.equals(list1.get(i), list2.get(i))) return false;
-			}
-			return true;
+		public int length() {
+			return this.array.length;
 		}
 
-	};
+	}
+
+	{}
 
 	/**
-	 * Dieses Feld speichert die Kennzeichnung von Datenstruktur und Bytereihenfolge. <br>
-	 * {@value #MAGIC} = GOODFOOD.
-	 */
-	public static final int MAGIC = 0x600DF00D;
-
-	/**
-	 * Diese Methode gibt einen {@link ArrayView} zurück, dessen Daten durch einen zu einer Datei erzeugten {@link MappedByteBuffer} bereitgestellt werden.
+	 * Diese Klasse implementiert die leere {@link IAMMap}.
 	 * 
-	 * @see RandomAccessFile#getChannel()
-	 * @see FileChannel#map(MapMode, long, long)
-	 * @see ByteOrder#nativeOrder()
-	 * @see ByteBuffer#order(ByteOrder)
-	 * @see ByteBuffer#asIntBuffer()
-	 * @see #array(IntBuffer)
-	 * @param file Datei.
-	 * @return {@link ArrayView}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 * @throws IOException Wenn ein I/O-Fehler eintritt.
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static ArrayView array(final File file) throws NullPointerException, IOException {
-		return IAM.array(new RandomAccessFile(file, "r").getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(ByteOrder.nativeOrder()).asIntBuffer());
+	public static final class IAMEmptyMap extends IAMBaseMap {
+
+		/**
+		 * Dieses Feld speichert die {@link IAMEmptyMap}.
+		 */
+		public static final IAMEmptyMap INSTANCE = new IAMEmptyMap();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray key(final int entryIndex) {
+			return IAMEmptyArray.INSTANCE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray value(final int entryIndex) {
+			return IAMEmptyArray.INSTANCE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
+			return IAMEmptyEntry.INSTANCE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int entryCount() {
+			return 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int find(final int[] key) {
+			return -1;
+		}
+
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link ArrayView} zurück, dessen Daten durch einen primitives {@code int}-Array bereitgestellt werden.
+	 * Diese Klasse implementiert die leere {@link IAMList}.
 	 * 
-	 * @see IntBuffer#wrap(int[])
-	 * @see #array(IntBuffer)
-	 * @param array {@code int}-Array.
-	 * @return {@link ArrayView}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static ArrayView array(final int... array) throws NullPointerException {
-		return IAM.array(IntBuffer.wrap(array));
+	public static final class IAMEmptyList extends IAMBaseList {
+
+		/**
+		 * Dieses Feld speichert die {@link IAMEmptyList}.
+		 */
+		public static final IAMEmptyList INSTANCE = new IAMEmptyList();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray item(final int itemIndex) {
+			return IAMEmptyArray.INSTANCE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int itemCount() {
+			return 0;
+		}
+
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link ArrayView} zurück, dessen Daten durch einen {@link IntBuffer} bereitgestellt werden.
+	 * Diese Klasse implementiert den leeren {@link IAMEntry}.
 	 * 
-	 * @param buffer {@link IntBuffer}.
-	 * @return {@link ArrayView}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static ArrayView array(final IntBuffer buffer) throws NullPointerException {
-		if(buffer == null) throw new NullPointerException();
-		return new AbstractArrayView() {
+	public static final class IAMEmptyEntry extends IAMBaseEntry {
 
-			@Override
-			public int get(final int index) throws IndexOutOfBoundsException {
-				return buffer.get(index);
-			}
+		/**
+		 * Dieses Feld speichert den {@link IAMEmptyEntry}.
+		 */
+		public static final IAMEmptyEntry INSTANCE = new IAMEmptyEntry();
 
-			@Override
-			public int length() {
-				return buffer.limit();
-			}
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray key() {
+			return IAMEmptyArray.INSTANCE;
+		}
 
-			@Override
-			public ArrayView section(final int offset) throws IndexOutOfBoundsException {
-				final IntBuffer buffer2 = buffer;
-				buffer2.position(offset);
-				return IAM.array(buffer2.slice());
-			}
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMArray value() {
+			return IAMEmptyArray.INSTANCE;
+		}
 
-			@Override
-			public ArrayView section(final int offset, final int length) throws IndexOutOfBoundsException {
-				IntBuffer buffer2 = buffer;
-				buffer2.position(offset);
-				buffer2 = buffer2.slice();
-				if(length > buffer2.limit()) throw new IndexOutOfBoundsException();
-				buffer2.limit(length);
-				return IAM.array(buffer2);
-			}
-
-		};
 	}
 
 	/**
-	 * Diese Methode gibt einen Abschnitt eines {@link ArrayView}s zurück.
+	 * Diese Klasse implementiert ein leeres {@link IAMArray}. Die Methoden {@link #get(int)} und {@link #section(int, int)} können in Nachfahren überschieben
+	 * werden.
 	 * 
-	 * @see AbstractArrayView#section(int)
-	 * @see AbstractArrayView#section(int, int)
-	 * @param array {@link ArrayView}, dessen Abschnitt erzeugt werden soll.
-	 * @param offset Position, bei der der Abschnitt beginnt.
-	 * @param length Länge des Abschnitts.
-	 * @return Abschnitt.
-	 * @throws NullPointerException Wenn der gegebene {@link ArrayView} {@code null} ist.
-	 * @throws IndexOutOfBoundsException Wenn die Position bzw. Länge ungültig ist.
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static ArrayView array(final ArrayView array, final int offset, final int length) throws NullPointerException, IndexOutOfBoundsException {
-		if((offset < 0) || (length < 0) || ((offset + length) > array.length())) throw new IndexOutOfBoundsException();
-		return new AbstractArrayView() {
+	public static final class IAMEmptyArray extends IAMBaseArray {
 
-			@Override
-			public int get(final int index) throws IndexOutOfBoundsException {
-				if((index < 0) || (index >= length)) throw new IndexOutOfBoundsException();
-				return array.get(offset + index);
-			}
+		/**
+		 * Dieses Feld speichert das {@link IAMEmptyArray}.
+		 */
+		public static final IAMEmptyArray INSTANCE = new IAMEmptyArray();
 
-			@Override
-			public int length() {
-				return length;
-			}
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int get(final int index) {
+			return 0;
+		}
 
-			@Override
-			public ArrayView section(final int offset2) throws IndexOutOfBoundsException {
-				return array.section(offset + offset2, length - offset2);
-			}
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int length() {
+			return 0;
+		}
 
-			@Override
-			public ArrayView section(final int offset2, final int length2) throws IndexOutOfBoundsException {
-				if((offset2 + length2) > length) throw new IndexOutOfBoundsException();
-				return array.section(offset + offset2, length2);
-			}
-
-		};
 	}
 
-	/**
-	 * Diese Methode erzeugt einen neuen {@link Encoder} und gibt diesen zurück.
-	 * 
-	 * @return neuer {@link Encoder}.
-	 */
-	public static Encoder encoder() {
-		return new Encoder();
-	}
+	{}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link Decoder} und gibt diesen zurück.
+	 * Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück.
 	 * 
-	 * @return neuer {@link Decoder}.
-	 */
-	public static Decoder decoder() {
-		return new Decoder();
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Schlüssels zurück.
-	 * 
-	 * @param key Schlüssel.
+	 * @see IAMArray#hash()
+	 * @param array Zahlenfolge.
 	 * @return Streuwert.
 	 */
-	public static int hash(final int key) {
-		return ((0x811C9DC5 * 0x01000193) ^ key);
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Schlüssels zurück.
-	 * 
-	 * @param key1 erster Wert des Schlüssels.
-	 * @param key2 zweiter Wert des Schlüssels.
-	 * @return Streuwert.
-	 */
-	public static int hash(final int key1, final int key2) {
-		return ((((0x811C9DC5 * 0x01000193) ^ key1) * 0x01000193) ^ key2);
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Schlüssels zurück.
-	 * 
-	 * @param key1 erster Wert des Schlüssels.
-	 * @param key2 zweiter Wert des Schlüssels.
-	 * @param key3 dritter Wert des Schlüssels.
-	 * @return Streuwert.
-	 */
-	public static int hash(final int key1, final int key2, final int key3) {
-		return ((((((0x811C9DC5 * 0x01000193) ^ key1) * 0x01000193) ^ key2) * 0x01000193) ^ key3);
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Schlüssels zurück.
-	 * 
-	 * @param key1 erster Wert des Schlüssels.
-	 * @param key2 zweiter Wert des Schlüssels.
-	 * @param key3 dritter Wert des Schlüssels.
-	 * @param key4 vierter Wert des Schlüssels.
-	 * @return Streuwert.
-	 */
-	public static int hash(final int key1, final int key2, final int key3, final int key4) {
-		return ((((((((0x811C9DC5 * 0x01000193) ^ key1) * 0x01000193) ^ key2) * 0x01000193) ^ key3) * 0x01000193) ^ key4);
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Schlüssels zurück.
-	 * 
-	 * @param key1 erster Wert des Schlüssels.
-	 * @param key2 zweiter Wert des Schlüssels.
-	 * @param key3 dritter Wert des Schlüssels.
-	 * @param key4 vierter Wert des Schlüssels.
-	 * @param key5 fünfter Wert des Schlüssels.
-	 * @return Streuwert.
-	 */
-	public static int hash(final int key1, final int key2, final int key3, final int key4, final int key5) {
-		return ((((((((((0x811C9DC5 * 0x01000193) ^ key1) * 0x01000193) ^ key2) * 0x01000193) ^ key3) * 0x01000193) ^ key4) * 0x01000193) ^ key5);
-	}
-
-	/**
-	 * Diese Methode gibt den Streuwert des gegebenen Eintrags zurück.
-	 * 
-	 * @param array Array, dass mit dem Schlüssel beginnt.
-	 * @param length Länge des Schlüssels.
-	 * @return Streuwert.
-	 */
-	public static int hash(final int[] array, final int length) {
+	public static int hash(final int[] array) {
 		int hash = 0x811C9DC5;
-		for(int i = 0, size = length; i < size; i++){
+		for (int i = 0, size = array.length; i < size; i++) {
 			hash = (hash * 0x01000193) ^ array[i];
 		}
 		return hash;
 	}
 
 	/**
-	 * Diese Methode gibt die Bitmaske zur Umrechnung von Streuwerten zurück.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zahlenfolgen gleich sind.
 	 * 
-	 * @param entryCount Anzahl der Einträge der Abbildung.
-	 * @return Bitmaske.
+	 * @see IAMArray#equals(IAMArray)
+	 * @param array1 erste Zahlenfolge.
+	 * @param array2 zweite Zahlenfolge.
+	 * @return {@code true}, wenn die Zahlenfolgen gleich sind.
 	 */
-	public static int mask(final int entryCount) {
-		if(entryCount <= 0) return 0;
-		int result = 1;
-		while(result < entryCount){
-			result <<= 1;
-		}
-		return result - 1;
+	public static boolean equals(final int[] array1, final int[] array2) {
+		final int length1 = array1.length, length2 = array2.length;
+		if (length1 != length2) return false;
+		for (int i = 0; i < length1; i++)
+			if (array1[i] != array2[i]) return false;
+		return true;
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn die ersten {@code length} Werte der gegebenen Arrays gleich sind.
+	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw.
+	 * größer als die der zweiten Zahlenfolge ist.
 	 * 
-	 * @param array1 erstes Array.
-	 * @param array2 zweites Array.
-	 * @param length Anzahl der zu vergleichenden Werte.
-	 * @return {@code true}, wenn Arrays gleich beginnen.
+	 * @see IAMArray#compare(IAMArray)
+	 * @param array1 erste Zahlenfolge.
+	 * @param array2 zweite Zahlenfolge.
+	 * @return Vergleichswert der Ordnungen.
 	 */
-	public static boolean equals(final int[] array1, final int[] array2, final int length) {
-		for(int i = 0, size = length; i < size; i++){
-			if(array1[i] != array2[i]) return false;
-		}
-		return true;
+	public static int compare(final int[] array1, final int[] array2) {
+		final int length1 = array1.length, length2 = array2.length;
+		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
+			if ((result = Comparators.compare(array1[i], array2[i])) != 0) return result;
+		return length1 - length2;
+	}
+
+	{}
+
+	/**
+	 * Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
+	 * 
+	 * @param type Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
+	 * @return Byteanzahl ({@code 1}, {@code 2} oder {@code 4}).
+	 */
+	public static int byteCount(final int type) {
+		return (1 << type) >> 1;
+	}
+
+	/**
+	 * Diese Methode gibt die kleinste Länge eines {@code INT32} Arrays zurück, in dessen Speicherbereich ein {@code INT8} Array mit der gegebenen Länge passen.
+	 * 
+	 * @param _byteCount Länge eines {@code INT8} Arrays.
+	 * @return Länge des {@code INT32} Arrays.
+	 */
+	public static int byteAlign(final int _byteCount) {
+		return (_byteCount + 3) >> 2;
 	}
 
 }
