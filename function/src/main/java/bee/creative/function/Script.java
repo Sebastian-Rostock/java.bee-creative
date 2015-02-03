@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.function.Values.ScriptRangeCompiler;
+import bee.creative.function.Scripts.ScriptCompilerHelper;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
@@ -15,8 +15,8 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * 
  * @see Values#parseScript(String)
- * @see Values#compileToValue(Script, ScriptRangeCompiler, String...)
- * @see Values#compileToFunction(Script, ScriptRangeCompiler, String...)
+ * @see Values#compileToValue(Script, ScriptCompilerHelper, String...)
+ * @see Values#compileToFunction(Script, ScriptCompilerHelper, String...)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
@@ -31,7 +31,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	public static final class Range implements Comparable<Range> {
 
 		/**
-		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle 0 sind.
+		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind.
 		 */
 		public static final Range NULL = new Range((char)0, 0, 0);
 
@@ -127,7 +127,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind.
 		 */
 		public Range(final char type, final int start, final int length) throws IllegalArgumentException {
-			if((start < 0) || (length < 0)) throw new IllegalArgumentException();
+			if ((start < 0) || (length < 0)) throw new IllegalArgumentException();
 			this.type = type;
 			this.start = start;
 			this.length = length;
@@ -203,8 +203,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Range)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Range)) return false;
 			final Range data = (Range)object;
 			return (this.start == data.start) && (this.length == data.length) && (this.type == data.type);
 		}
@@ -241,12 +241,12 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	public Script(final String source, final Range[] ranges) throws NullPointerException, IllegalArgumentException {
 		int offset = 0;
 		final int length = source.length();
-		for(final Range range: ranges){
+		for (final Range range: ranges) {
 			final int start = range.start;
-			if(start < offset) throw new IllegalArgumentException();
+			if (start < offset) throw new IllegalArgumentException();
 			offset = start + range.length;
 		}
-		if(offset > length) throw new IllegalArgumentException();
+		if (offset > length) throw new IllegalArgumentException();
 		this.source = source;
 		this.ranges = ranges.clone();
 	}
@@ -292,7 +292,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		final Range[] ranges = this.ranges;
 		final int length = ranges.length;
 		final char[] types = new char[length];
-		for(int i = 0; i < length; i++){
+		for (int i = 0; i < length; i++) {
 			types[i] = ranges[i].type;
 		}
 		return types;
@@ -341,7 +341,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		final StringBuilder normalSource = new StringBuilder();
 		final String source = this.source;
 		int start = 0;
-		for(final Range range: this.ranges){
+		for (final Range range: this.ranges) {
 			final int length = range.length;
 			normalSource.append(range.extract(source));
 			normalRanges.add(new Range(range.type, start, length));
@@ -363,8 +363,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof Script)) return false;
+		if (object == this) return true;
+		if (!(object instanceof Script)) return false;
 		final Script data = (Script)object;
 		return Objects.equals(this.source, data.source) && Objects.equals(this.ranges, data.ranges);
 	}
