@@ -64,7 +64,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.items());
+			return Objects.toStringCall(this, this.itemCount());
 		}
 
 	}
@@ -145,7 +145,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.entries());
+			return Objects.toStringCall(this, this.entryCount());
 		}
 
 	}

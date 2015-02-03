@@ -423,6 +423,8 @@ public class IAMDecoder {
 			offset++;
 			if ((header & 0xFFFFFC00) != 0xF00D1000) throw new IAMException(IAMException.INVALID_HEADER);
 
+			// System.out.println("M: " + Integer.toBinaryString(header & 0x3FF| 1073741824));
+
 			final int keyDataType = (header >> 8) & 3;
 			final int keySizeType = (header >> 6) & 3;
 			final int rangeSizeType = (header >> 4) & 3;
@@ -653,6 +655,8 @@ public class IAMDecoder {
 			final int header = array.get(offset);
 			offset++;
 			if ((header & 0xFFFFFFF0) != 0xF00D2000) throw new IAMException(IAMException.INVALID_HEADER);
+
+			// System.out.println("L: " + Integer.toBinaryString(header & 0xF| 1073741824));
 
 			final int itemDataType = (header >> 2) & 3;
 			final int itemSizeType = (header >> 0) & 3;

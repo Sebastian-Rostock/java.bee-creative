@@ -6,7 +6,7 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>1.2.3</version>
+	<version>1.4.5</version>
 	<artifactId>bee-creative.iam</artifactId>
 	<dependencies>
 		<dependency>

@@ -15,6 +15,7 @@ import bee.creative.iam.IAM.IAMEmptyArray;
 import bee.creative.iam.IAM.IAMEmptyList;
 import bee.creative.iam.IAM.IAMEmptyMap;
 import bee.creative.iam.IAM.IAMValueArray;
+import bee.creative.iam.IAMDecoder.IAMBufferINT32Array;
 import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
 import bee.creative.iam.IAMDecoder.IAMListDecoder;
 import bee.creative.iam.IAMDecoder.IAMMapDecoder;
@@ -349,15 +350,122 @@ public class IAMEncoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface IAMEncoding {
+	public static interface IAMBaseEncoder {
 
 		/**
 		 * Diese Methode kompiliert die gesammelten Daten in eine optimierte Datenstruktur und gibt diese zurück.
 		 * 
 		 * @param order Bytereihenfolge.
 		 * @return optimierte Datenstruktur.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Datenstruktur nicht in der gegebenen Bytereihenfolge kodiert werden konnte.
 		 */
-		public byte[] encode(final ByteOrder order);
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException;
+
+	}
+
+	/**
+	 * Diese Schnittstelle erweitert einen {@link IAMBaseEncoder} zur Kodierung und Bereitstellung einer {@link IAMMap}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface IAMBaseMapEncoder extends IAMBaseEncoder {
+
+		/**
+		 * Diese Methode gibt die durch dieses Objekt bereitgestellte {@link IAMMap} zurück.
+		 * 
+		 * @return bereitgestellte {@link IAMMap}.
+		 */
+		public IAMMap toMap();
+
+	}
+
+	/**
+	 * Diese Schnittstelle erweitert einen {@link IAMBaseEncoder} zur Kodierung und Bereitstellung einer {@link IAMList}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface IAMBaseListEncoder extends IAMBaseEncoder {
+
+		/**
+		 * Diese Methode gibt die durch dieses Objekt bereitgestellte {@link IAMList} zurück.
+		 * 
+		 * @return bereitgestellte {@link IAMList}.
+		 */
+		public IAMList toList();
+
+	}
+
+	{}
+
+	/**
+	 * Diese Klasse implementiert einen {@link IAMBaseMapEncoder}, dessen {@link IAMMap} aus einer gegebenen Zahlenfolge dekodiert wird.
+	 * 
+	 * @see IAMMapDecoder
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class IAMMapData implements IAMBaseMapEncoder {
+
+		/**
+		 * Dieses Feld speichert die {@link IAMMap}.
+		 */
+		protected final IAMMap data;
+
+		/**
+		 * Dieses Feld speichert die kodierte Zahlenfeolge.
+		 */
+		protected final byte[] array;
+
+		/**
+		 * Dieses Feld speichert die Bytereihenfolge.
+		 */
+		protected final ByteOrder order;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Zahlenfeolge mit den kodierten Daten eines {@link IAMMapDecoder}.
+		 * 
+		 * @param bytes Zahlenfeolge.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IAMException Wenn beim dekodieren der Zahlenfeolge ein Fehler erkannt wird.
+		 */
+		public IAMMapData(final byte[] bytes) throws NullPointerException, IAMException {
+			int length = bytes.length;
+			if (length == 0 || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
+			this.array = bytes.clone();
+			final ByteBuffer buffer = ByteBuffer.wrap(this.array).order(ByteOrder.BIG_ENDIAN);
+			if ((buffer.getInt(0) & 0xFFFFFC00) == 0xF00D1000) {
+				this.order = ByteOrder.BIG_ENDIAN;
+			} else {
+				this.order = ByteOrder.LITTLE_ENDIAN;
+				buffer.order(ByteOrder.LITTLE_ENDIAN);
+			}
+			this.data = new IAMMapDecoder(new IAMBufferINT32Array(buffer));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
+			if (!order.equals(this.order)) throw new IllegalArgumentException();
+			return this.array.clone();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMMap toMap() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return this.data.toString();
+		}
 
 	}
 
@@ -366,7 +474,7 @@ public class IAMEncoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMMapEncoder extends IAMBaseMap implements IAMEncoding {
+	public static final class IAMMapEncoder extends IAMBaseMap implements IAMBaseMapEncoder {
 
 		/**
 		 * Dieses Feld speichert den Mods, unter dem über {@link #encode(ByteOrder)} eine Abbildung kodiert wird, deren Einträge über den Streuwert ihrer Schlüssel
@@ -479,7 +587,7 @@ public class IAMEncoder {
 		 * @see #put(int[], int[])
 		 */
 		@Override
-		public byte[] encode(final ByteOrder order) {
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			final List<IAMEntry> datas = this.entries.datas;
 			final int count = datas.size();
 			final IAMEntry[] entries = datas.toArray(new IAMEntry[count]);
@@ -575,6 +683,85 @@ public class IAMEncoder {
 			return result;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMMap toMap() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link IAMBaseListEncoder}, dessen {@link IAMList} aus einer gegebenen Zahlenfolge dekodiert wird.
+	 * 
+	 * @see IAMListDecoder
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class IAMListData implements IAMBaseListEncoder {
+
+		/**
+		 * Dieses Feld speichert die {@link IAMList}.
+		 */
+		protected final IAMList data;
+
+		/**
+		 * Dieses Feld speichert die kodierte Zahlenfeolge.
+		 */
+		protected final byte[] array;
+
+		/**
+		 * Dieses Feld speichert die Bytereihenfolge.
+		 */
+		protected final ByteOrder order;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Zahlenfeolge mit den kodierten Daten eines {@link IAMListDecoder}.
+		 * 
+		 * @param bytes Zahlenfeolge.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IAMException Wenn beim dekodieren der Zahlenfeolge ein Fehler erkannt wird.
+		 */
+		public IAMListData(final byte[] bytes) throws NullPointerException, IAMException {
+			int length = bytes.length;
+			if (length == 0 || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
+			this.array = bytes.clone();
+			final ByteBuffer buffer = ByteBuffer.wrap(this.array).order(ByteOrder.BIG_ENDIAN);
+			if ((buffer.getInt(0) & 0xFFFFFFF0) == 0xF00D2000) {
+				this.order = ByteOrder.BIG_ENDIAN;
+			} else {
+				this.order = ByteOrder.LITTLE_ENDIAN;
+				buffer.order(ByteOrder.LITTLE_ENDIAN);
+			}
+			this.data = new IAMListDecoder(new IAMBufferINT32Array(buffer));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
+			if (!order.equals(this.order)) throw new IllegalArgumentException();
+			return this.array.clone();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMList toList() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return this.data.toString();
+		}
+
 	}
 
 	/**
@@ -582,7 +769,7 @@ public class IAMEncoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMListEncoder extends IAMBaseList implements IAMEncoding {
+	public static final class IAMListEncoder extends IAMBaseList implements IAMBaseListEncoder {
 
 		/**
 		 * Dieses Feld speichert die bisher gesammelten Elemente.
@@ -660,7 +847,7 @@ public class IAMEncoder {
 		 * @see #put(boolean, int[])
 		 */
 		@Override
-		public byte[] encode(final ByteOrder order) {
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			final List<IAMItem> datas = this.items.datas;
 			final int count = datas.size();
 			final IAMData itemData = new IAMData(new AbstractList<int[]>() {
@@ -687,6 +874,14 @@ public class IAMEncoder {
 			return result;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IAMList toList() {
+			return this;
+		}
+
 	}
 
 	/**
@@ -694,17 +889,17 @@ public class IAMEncoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMIndexEncoder extends IAMBaseIndex implements IAMEncoding {
+	public static final class IAMIndexEncoder extends IAMBaseIndex implements IAMBaseEncoder {
 
 		/**
 		 * Dieses Feld speichert die {@link IAMMapEncoder}.
 		 */
-		protected final List<IAMMapEncoder> maps = new ArrayList<IAMMapEncoder>();
+		protected final List<IAMBaseMapEncoder> maps = new ArrayList<IAMBaseMapEncoder>();
 
 		/**
 		 * Dieses Feld speichert die {@link IAMListEncoder}.
 		 */
-		protected final List<IAMListEncoder> lists = new ArrayList<IAMListEncoder>();
+		protected final List<IAMBaseListEncoder> lists = new ArrayList<IAMBaseListEncoder>();
 
 		/**
 		 * Dieser Konstruktor initialisiert die internen Datenstrukturen zum Sammeln der Einträge von {@link IAMMap}s und Elementen der {@link ListView}s.
@@ -718,7 +913,7 @@ public class IAMEncoder {
 		@Override
 		public IAMMap map(final int index) {
 			if ((index < 0) || (index >= this.mapCount())) return IAMEmptyMap.INSTANCE;
-			return this.maps.get(index);
+			return this.maps.get(index).toMap();
 		}
 
 		/**
@@ -735,7 +930,7 @@ public class IAMEncoder {
 		@Override
 		public IAMList list(final int index) {
 			if ((index < 0) || (index >= this.listCount())) return IAMEmptyList.INSTANCE;
-			return this.lists.get(index);
+			return this.lists.get(index).toList();
 		}
 
 		/**
@@ -747,13 +942,15 @@ public class IAMEncoder {
 		}
 
 		/**
-		 * Diese Methode fügt den gegebene {@link IAMMapEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
+		 * Diese Methode fügt den gegebene {@link IAMBaseMapEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
 		 * 
-		 * @param map {@link IAMMapEncoder}.
-		 * @return Index des {@link IAMMapEncoder}s.
+		 * @see IAMMapData
+		 * @see IAMMapEncoder
+		 * @param map {@link IAMBaseMapEncoder}.
+		 * @return Index des {@link IAMBaseMapEncoder}s.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public int put(final IAMMapEncoder map) throws NullPointerException {
+		public int put(final IAMBaseMapEncoder map) throws NullPointerException {
 			if (map == null) throw new NullPointerException();
 			final int result = this.maps.size();
 			this.maps.add(result, map);
@@ -761,13 +958,15 @@ public class IAMEncoder {
 		}
 
 		/**
-		 * Diese Methode fügt den gegebene {@link IAMListEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
+		 * Diese Methode fügt den gegebene {@link IAMBaseListEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
 		 * 
-		 * @param list {@link IAMListEncoder}.
-		 * @return Index des {@link IAMListEncoder}s.
+		 * @see IAMListData
+		 * @see IAMListEncoder
+		 * @param list {@link IAMBaseListEncoder}.
+		 * @return Index des {@link IAMBaseListEncoder}s.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public int put(final IAMListEncoder list) throws NullPointerException {
+		public int put(final IAMBaseListEncoder list) throws NullPointerException {
 			if (list == null) throw new NullPointerException();
 			final int result = this.lists.size();
 			this.lists.add(result, list);
@@ -777,11 +976,11 @@ public class IAMEncoder {
 		/**
 		 * {@inheritDoc}
 		 * 
-		 * @see #put(IAMMapEncoder)
-		 * @see #put(IAMListEncoder)
+		 * @see #put(IAMBaseMapEncoder)
+		 * @see #put(IAMBaseListEncoder)
 		 */
 		@Override
-		public byte[] encode(final ByteOrder order) {
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			final byte[][] maps = IAMEncoder.encodeBytes(this.maps, order);
 			final byte[][] lists = IAMEncoder.encodeBytes(this.lists, order);
 			int length = 12;
@@ -892,14 +1091,14 @@ public class IAMEncoder {
 	}
 
 	/**
-	 * Diese Methode kodiert die gegebenen {@link IAMEncoding} in Zahlenfolgen.
+	 * Diese Methode kodiert die gegebenen {@link IAMBaseEncoder} in Zahlenfolgen.
 	 * 
-	 * @see IAMEncoding#encode(ByteOrder)
+	 * @see IAMBaseEncoder#encode(ByteOrder)
 	 * @param source Quelldaten.
 	 * @param order Bytereihenfolge
 	 * @return Zahlenfolgen.
 	 */
-	protected static byte[][] encodeBytes(final List<? extends IAMEncoding> source, final ByteOrder order) {
+	protected static byte[][] encodeBytes(final List<? extends IAMBaseEncoder> source, final ByteOrder order) {
 		final int count = source.size();
 		final byte[][] result = new byte[count][];
 		for (int i = 0; i < count; i++) {
