@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.text.html.ListView;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
@@ -429,8 +428,8 @@ public class IAMEncoder {
 		 * @throws IAMException Wenn beim dekodieren der Zahlenfeolge ein Fehler erkannt wird.
 		 */
 		public IAMMapData(final byte[] bytes) throws NullPointerException, IAMException {
-			int length = bytes.length;
-			if (length == 0 || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
+			final int length = bytes.length;
+			if ((length == 0) || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
 			this.array = bytes.clone();
 			final ByteBuffer buffer = ByteBuffer.wrap(this.array).order(ByteOrder.BIG_ENDIAN);
 			if ((buffer.getInt(0) & 0xFFFFFC00) == 0xF00D1000) {
@@ -449,6 +448,16 @@ public class IAMEncoder {
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			if (!order.equals(this.order)) throw new IllegalArgumentException();
 			return this.array.clone();
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zurück, in der die kodierten Daten vorliegen.
+		 * 
+		 * @see #encode(ByteOrder)
+		 * @return Bytereihenfolge.
+		 */
+		public ByteOrder order() {
+			return this.order;
 		}
 
 		/**
@@ -724,8 +733,8 @@ public class IAMEncoder {
 		 * @throws IAMException Wenn beim dekodieren der Zahlenfeolge ein Fehler erkannt wird.
 		 */
 		public IAMListData(final byte[] bytes) throws NullPointerException, IAMException {
-			int length = bytes.length;
-			if (length == 0 || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
+			final int length = bytes.length;
+			if ((length == 0) || ((length & 3) != 0)) throw new IAMException(IAMException.INVALID_LENGTH);
 			this.array = bytes.clone();
 			final ByteBuffer buffer = ByteBuffer.wrap(this.array).order(ByteOrder.BIG_ENDIAN);
 			if ((buffer.getInt(0) & 0xFFFFFFF0) == 0xF00D2000) {
@@ -744,6 +753,16 @@ public class IAMEncoder {
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			if (!order.equals(this.order)) throw new IllegalArgumentException();
 			return this.array.clone();
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zurück, in der die kodierten Daten vorliegen.
+		 * 
+		 * @see #encode(ByteOrder)
+		 * @return Bytereihenfolge.
+		 */
+		public ByteOrder order() {
+			return this.order;
 		}
 
 		/**
@@ -902,10 +921,11 @@ public class IAMEncoder {
 		protected final List<IAMBaseListEncoder> lists = new ArrayList<IAMBaseListEncoder>();
 
 		/**
-		 * Dieser Konstruktor initialisiert die internen Datenstrukturen zum Sammeln der Einträge von {@link IAMMap}s und Elementen der {@link ListView}s.
+		 * Dieses Feld speichert die Bytereihenfolge oder {@code null}.
+		 * 
+		 * @see #setOrder(ByteOrder)
 		 */
-		public IAMIndexEncoder() {
-		}
+		protected ByteOrder order = null;
 
 		/**
 		 * {@inheritDoc}
@@ -942,6 +962,29 @@ public class IAMEncoder {
 		}
 
 		/**
+		 * Diese Methode setzt die Bytereihenfolge.
+		 * 
+		 * @param value Bytereihenfolge.
+		 * @throws IllegalArgumentException Wenn die Bytereihenfolge ungültig ist.
+		 */
+		protected void setOrder(final ByteOrder value) throws IllegalArgumentException {
+			this.checkOrder(value);
+			this.order = value;
+		}
+
+		/**
+		 * Diese Methode prüft, ob die gegebene Bytereihenfolge kompatibel zur aktuellen ist.
+		 * 
+		 * @param value Bytereihenfolge.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Bytereihenfolge ungültig ist.
+		 */
+		protected void checkOrder(final ByteOrder value) throws NullPointerException, IllegalArgumentException {
+			final ByteOrder order = this.order;
+			if ((order != null) && !value.equals(order)) throw new IllegalArgumentException();
+		}
+
+		/**
 		 * Diese Methode fügt den gegebene {@link IAMBaseMapEncoder} hinzu und gibt den Index zurück, unter dem er verwaltet wird.
 		 * 
 		 * @see IAMMapData
@@ -950,7 +993,7 @@ public class IAMEncoder {
 		 * @return Index des {@link IAMBaseMapEncoder}s.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public int put(final IAMBaseMapEncoder map) throws NullPointerException {
+		protected int put(final IAMBaseMapEncoder map) throws NullPointerException {
 			if (map == null) throw new NullPointerException();
 			final int result = this.maps.size();
 			this.maps.add(result, map);
@@ -974,13 +1017,71 @@ public class IAMEncoder {
 		}
 
 		/**
+		 * Diese Methode fügt die gegebene {@link IAMMapData} hinzu und gibt den Index zurück, unter dem die dadurch beschriebene {@link IAMMap} verwaltet wird.
+		 * 
+		 * @param value {@link IAMMapData}.
+		 * @return Index der {@link IAMMap}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Bytereihenfolge der gegbenen {@link IAMMapData} inkompatibel zu der bereits hinzugefügter {@link IAMMapData}
+		 *         oder {@link IAMListData} ist.
+		 */
+		public int putMap(final IAMMapData value) throws NullPointerException, IllegalArgumentException {
+			this.setOrder(value.order());
+			return this.put(value);
+		}
+
+		/**
+		 * Diese Methode fügt den gegebene {@link IAMMapEncoder} hinzu und gibt den Index zurück, unter dem die dadurch beschriebene {@link IAMMap} verwaltet wird.
+		 * 
+		 * @param value {@link IAMMapEncoder}.
+		 * @return Index der {@link IAMMap}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public int putMap(final IAMMapEncoder value) throws NullPointerException {
+			value.toMap();
+			return this.put(value);
+		}
+
+		/**
+		 * Diese Methode fügt die gegebene {@link IAMListData} hinzu und gibt den Index zurück, unter dem die dadurch beschriebene {@link IAMList} verwaltet wird.
+		 * 
+		 * @param value {@link IAMListData}.
+		 * @return Index der {@link IAMList}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Bytereihenfolge der gegbenen {@link IAMMapData} inkompatibel zu der bereits hinzugefügter {@link IAMMapData}
+		 *         oder {@link IAMListData} ist.
+		 */
+		public int putList(final IAMListData value) throws NullPointerException, IllegalArgumentException {
+			this.setOrder(value.order());
+			return this.put(value);
+		}
+
+		/**
+		 * Diese Methode fügt den gegebenen {@link IAMListEncoder} hinzu und gibt den Index zurück, unter dem die dadurch beschriebene {@link IAMList} verwaltet
+		 * wird.
+		 * 
+		 * @see IAMListData
+		 * @see IAMListEncoder
+		 * @param value {@link IAMListEncoder}.
+		 * @return Index der {@link IAMList}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public int putList(final IAMListEncoder value) throws NullPointerException {
+			value.toList();
+			return this.put(value);
+		}
+
+		/**
 		 * {@inheritDoc}
 		 * 
-		 * @see #put(IAMBaseMapEncoder)
-		 * @see #put(IAMBaseListEncoder)
+		 * @see #putMap(IAMMapData)
+		 * @see #putMap(IAMMapEncoder)
+		 * @see #putList(IAMListData)
+		 * @see #putList(IAMListEncoder)
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
+			this.checkOrder(order);
 			final byte[][] maps = IAMEncoder.encodeBytes(this.maps, order);
 			final byte[][] lists = IAMEncoder.encodeBytes(this.lists, order);
 			int length = 12;
