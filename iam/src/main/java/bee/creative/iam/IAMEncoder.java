@@ -23,6 +23,11 @@ import bee.creative.util.Unique.UniqueMap;
 /**
  * Diese Klasse implementiert die Klassen und Methoden zur Kodierung der {@link IAM} Datenstrukturen.
  * 
+ * @see IAMMapData
+ * @see IAMMapEncoder
+ * @see IAMListData
+ * @see IAMListEncoder
+ * @see IAMIndexEncoder
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class IAMEncoder {
@@ -1078,6 +1083,7 @@ public class IAMEncoder {
 		 * @see #putMap(IAMMapEncoder)
 		 * @see #putList(IAMListData)
 		 * @see #putList(IAMListEncoder)
+		 * @throws IllegalArgumentException Wenn die Bytereihenfolge inkompatibel zu der bereits hinzugefügter {@link IAMMapData} oder {@link IAMListData} ist.
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {

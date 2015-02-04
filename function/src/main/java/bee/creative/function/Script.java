@@ -14,9 +14,9 @@ import bee.creative.util.Objects;
 /**
  * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * 
- * @see Values#parseScript(String)
- * @see Values#compileToValue(Script, ScriptCompilerHelper, String...)
- * @see Values#compileToFunction(Script, ScriptCompilerHelper, String...)
+ * @see Scripts#parseScript(String)
+ * @see Scripts#compileToValue(Script, ScriptCompilerHelper, String...)
+ * @see Scripts#compileToFunction(Script, ScriptCompilerHelper, String...)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Script implements Get<Script.Range>, Iterable<Script.Range> {

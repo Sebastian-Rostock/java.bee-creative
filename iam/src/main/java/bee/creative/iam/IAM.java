@@ -8,8 +8,9 @@ import bee.creative.util.Objects;
 
 /**
  * Diese Klasse implementiert grundlegende Klassen und Methoden zur Umsetzung des {@code IAM - Integer Array Model}.
- * <p>
  * 
+ * @see IAMEncoder
+ * @see IAMDecoder
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class IAM {

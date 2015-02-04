@@ -1,10 +1,12 @@
 package bee.creative.function;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.xml.sax.InputSource;
 import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Functions.ArrayFunction;
 import bee.creative.function.Functions.ClosureFunction;
@@ -21,8 +23,10 @@ import bee.creative.util.Parser;
 public class Scripts {
 
 	/**
-	 * Diese Klasse implementiert den Parser für {@link Values#parseScript(String)}.
+	 * Diese Klasse implementiert den Parser, der eine Zeichenkette in einen aufbereiteten Quelltext überführt. Ein solcher Quelltext kann anschließend mit einem
+	 * {@link ScriptCompiler} in Werte und Funktionen überführt werden.
 	 * 
+	 * @see #parse()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ScriptParser extends Parser {
@@ -140,8 +144,8 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode parst die Eingabe und gibt die Liste der ermittelten Bereiche zurück. Die Erzeugung von {@link Range Bereichen} erfolgt gemäß dieser
-		 * Regeln:
+		 * Diese Methode parst die {@link #source() Eingabe} und gibt die Liste der ermittelten Bereiche zurück. Die Erzeugung von {@link Range Bereiche} erfolgt
+		 * gemäß dieser Regeln:
 		 * <ul>
 		 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
 		 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet
@@ -204,12 +208,33 @@ public class Scripts {
 
 	}
 
+	/**
+	 * Diese Klasse implementiert einen Formatter, der Werten und Funktionen in eine Zeichenkette überführen kann. Dieser realisiert damit die entgegen gesetzte
+	 * Operation zur Kombination von {@link ScriptParser} und {@link ScriptCompiler}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static class ScriptFormatter {
 
+		/**
+		 * Diese Klasse implementiert eine Markierung, mit welcher die Tiefe und Aktivierung der Einrückung definiert werden kann.
+		 * 
+		 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+		 */
 		private static class Mark {
 
+			/**
+			 * Dieses Feld speichert die Eigenschaften dieser Markierung.
+			 */
 			private int data;
 
+			/**
+			 * Dieser Konstruktor initialisiert die Markierung.
+			 * 
+			 * @param level Einrücktiefe.
+			 * @param last Endmarkierung.
+			 * @param enabled Aktivierung.
+			 */
 			public Mark(final int level, final boolean last, final boolean enabled) {
 				this.data = (level << 2) | (last ? 1 : 0) | (enabled ? 2 : 0);
 			}
@@ -250,12 +275,24 @@ public class Scripts {
 
 		}
 
-		private static final Object TAG = new Mark(0, false, false);
+		/**
+		 * Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird.
+		 */
+		private static final Object MARK = new Mark(0, false, false);
 
+		/**
+		 * Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}.
+		 */
 		private final String indent;
 
+		/**
+		 * Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen.
+		 */
 		private final List<Object> items;
 
+		/**
+		 * Dieses Feld speichert den Stack der Hierarchieebenen.
+		 */
 		private final LinkedList<Boolean> indents;
 
 		private final ScriptFormatterHelper helper;
@@ -274,16 +311,16 @@ public class Scripts {
 			this.indents.addLast(Boolean.FALSE);
 		}
 
-		{}
-
-		// markiert die aktuelle hierarchieebene als einzurücken, die nächst tiefere kann ggf bleiben
 		/**
-		 * Diese Methode markiert die aktuelle Hierarchieebene als einzurücken und gibt {@code this} zurück. Behinn und Ende einer Hierarchieebene werden über
+		 * Diese Methode markiert die aktuelle Hierarchieebene als einzurücken und gibt {@code this} zurück. Beginn und Ende einer Hierarchieebene werden über
 		 * {@link #putSpaceInc()} und {@link #putSpaceDec()} markiert.
 		 * 
-		 * @return
+		 * @see #putSpace()
+		 * @see #putSpaceInc()
+		 * @see #putSpaceDec()
+		 * @return {@code this}.
 		 */
-		public ScriptFormatter setIndent() { // OKAY
+		public ScriptFormatter setIndent() {
 			final LinkedList<Boolean> indents = this.indents;
 			if (this.indents.getLast().booleanValue()) return this;
 			final int value = indents.size();
@@ -291,7 +328,7 @@ public class Scripts {
 			final List<Object> items = this.items;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
-				if (item == ScriptFormatter.TAG) {
+				if (item == ScriptFormatter.MARK) {
 					final Mark token = (Mark)items.get(i + 1);
 					if (token.level() == value) {
 						if (token.isEnabled()) return this;
@@ -304,51 +341,80 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode fügt das gegebene Objekt an und gibt {@code this} zurück. Zur Umwandlung des Objekts in eine Zeichenkette wird die Methode
-		 * {@link Object#toString()} verwendet.
+		 * Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück. Zur Umwandlung des Objekts in eine Zeichenkette wird die
+		 * Methode {@link Object#toString()} verwendet.
 		 * 
 		 * @param object Objekt.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ScriptFormatter put(final Object object) throws NullPointerException {
-			if (object == null) throw new NullPointerException();
-			this.items.add(object);
+			this.items.add(object.toString());
 			return this;
 		}
 
-		public ScriptFormatter putSpace() { // FEIN
+		/**
+		 * Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #setIndent()} die Einrückung für die aktuelle
+		 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
+		 * 
+		 * @see #setIndent()
+		 * @see #putSpaceInc()
+		 * @see #putSpaceDec()
+		 * @return {@code this}.
+		 */
+		public ScriptFormatter putSpace() {
 			final LinkedList<Boolean> indents = this.indents;
-			return this.put(ScriptFormatter.TAG).put(new Mark(indents.size(), false, indents.getLast().booleanValue()));
+			return this.put(ScriptFormatter.MARK).put(new Mark(indents.size(), false, indents.getLast().booleanValue()));
 		}
 
 		/**
-		 * Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück.<br>
-		 * Hierbei fügt sie gleich einen {@link #putSpace() bedingten Umbruch} ein.
+		 * Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück. Hierbei fügt sie
+		 * gleich einen {@link #putSpace() bedingtes Leerzeichen} ein.
 		 * 
+		 * @see #setIndent()
+		 * @see #putSpace()
+		 * @see #putSpaceDec()
 		 * @return {@code this}.
 		 */
-		public ScriptFormatter putSpaceInc() { // FEIN
+		public ScriptFormatter putSpaceInc() {
 			final LinkedList<Boolean> indents = this.indents;
 			indents.addLast(Boolean.FALSE);
-			return this.put(ScriptFormatter.TAG).put(new Mark(indents.size(), false, false));
+			return this.put(ScriptFormatter.MARK).put(new Mark(indents.size(), false, false));
 		}
 
 		/**
 		 * Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Hierbei fügt sie
-		 * gleich einen {@link #putSpace() bedingten Umbruch} ein.
+		 * gleich einen {@link #putSpace() bedingtes Leerzeichen} ein.
 		 * 
+		 * @see #setIndent()
+		 * @see #putSpace()
+		 * @see #putSpaceInc()
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde.
 		 */
-		public ScriptFormatter putSpaceDec() throws IllegalStateException { // FEIN
+		public ScriptFormatter putSpaceDec() throws IllegalStateException {
 			final LinkedList<Boolean> indents = this.indents;
 			final int value = indents.size();
 			if (value <= 1) throw new IllegalStateException();
-			return this.put(ScriptFormatter.TAG).put(new Mark(value, true, indents.removeLast().booleanValue()));
+			return this.put(ScriptFormatter.MARK).put(new Mark(value, true, indents.removeLast().booleanValue()));
 		}
 
-		public ScriptFormatter putArray(final Array array) throws IllegalArgumentException { // OKAY
+		/**
+		 * Diese Methode fügt die Werte der gegebenen Liste an und gibt {@code this} zurück.
+		 * <p>
+		 * Wenn die Liste leer ist, wird {@code "[ ]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
+		 * separiert über {@link #putValue(Value)} angefügt. Nach der öffnenden Klammer {@link #putSpaceInc() beginnt} dabei eine neue Hierarchieebene, die vor der
+		 * schließenden Klammer {@link #putSpaceDec() endet}. Nach jedem Trennzeichen wird ein {@link #putSpace() bedingtes Leerzeichen} eingefügt.
+		 * 
+		 * @see #putValue(Value)
+		 * @see #putSpace()
+		 * @see #putSpaceInc()
+		 * @see #putSpaceDec()
+		 * @param array Liste von Werten.
+		 * @return this.
+		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
+		 */
+		public ScriptFormatter putArray(final Array array) throws IllegalArgumentException {
 			final int length = array.length();
 			if (length == 0) return this.put("[ ]");
 			(length == 1 ? this : this.setIndent()).put("[").putSpaceInc().putValue(array.get(0));
@@ -364,6 +430,8 @@ public class Scripts {
 		 * Wenn der Wert ein {@link ArrayValue} oder ein {@link FunctionValue} ist, wird er über {@link #putArray(Array)} bzw. über {@link #putFunction(Function)}
 		 * angefügt. Andernfalls wird der Wert über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, Value)} formatiert.
 		 * 
+		 * @see #putArray(Array)
+		 * @see #putFunction(Function)
 		 * @param value Wert.
 		 * @return {@code this}.
 		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
@@ -399,8 +467,12 @@ public class Scripts {
 			return this;
 		}
 
-		{}
-
+		/**
+		 * Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
+		 * 
+		 * @see #put(Object)
+		 * @return Quelltext.
+		 */
 		public String format() {
 			final StringBuilder result = new StringBuilder();
 			final String indent = this.indent;
@@ -408,7 +480,7 @@ public class Scripts {
 			final int size = items.size();
 			for (int i = 0; i < size;) {
 				final Object item = items.get(i++);
-				if (item == ScriptFormatter.TAG) {
+				if (item == ScriptFormatter.MARK) {
 					final Mark token = (Mark)items.get(i++);
 					if (token.isEnabled()) {
 						result.append('\n');
@@ -456,8 +528,8 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Kompiler für {@link Values#compileToValue(Script, ScriptCompilerHelper, String...)} bzw.
-	 * {@link Values#compileToFunction(Script, ScriptCompilerHelper, String...)}.
+	 * Diese Klasse implementiert den Kompiler für {@link Scripts#compileToValue(Script, ScriptCompilerHelper, String...)} bzw.
+	 * {@link Scripts#compileToFunction(Script, ScriptCompilerHelper, String...)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1013,6 +1085,58 @@ public class Scripts {
 			this.range = range;
 		}
 
+	}
+
+	/**
+	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück.
+	 * 
+	 * @see Script
+	 * @see ScriptParser#parse()
+	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
+	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
+	 * @param source Zeichenkette.
+	 * @return aufbereiteter Quelltext.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public static Script parseScript(final String source) throws NullPointerException {
+		return new Script(source, new ScriptParser(source).parse());
+	}
+
+	/**
+	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
+	 * 
+	 * @see #parseScript(String)
+	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
+	 * @see ScriptCompiler#compileToValue()
+	 * @param script Quelltext.
+	 * @param compiler Kompilationsmethoden.
+	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
+	 * @return kompilierter Wert.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
+	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
+	 */
+	public static Value compileToValue(final Script script, final ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
+		ScriptException {
+		return new ScriptCompiler(script, compiler, params).compileToValue();
+	}
+
+	/**
+	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
+	 * zurück.
+	 * 
+	 * @see #parseScript(String)
+	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
+	 * @see ScriptCompiler#compileToFunction()
+	 * @param script Quelltext.
+	 * @param compiler Kompilationsmethoden.
+	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
+	 * @return kompilierte Funktion.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
+	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
+	 */
+	public static Function compileToFunction(final Script script, final ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
+		ScriptException {
+		return new ScriptCompiler(script, compiler, params).compileToFunction();
 	}
 
 }

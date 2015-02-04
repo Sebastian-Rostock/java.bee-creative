@@ -1,10 +1,6 @@
 package bee.creative.function;
 
 import bee.creative.function.Scopes.CompositeScope;
-import bee.creative.function.Scripts.ScriptCompiler;
-import bee.creative.function.Scripts.ScriptCompilerHelper;
-import bee.creative.function.Scripts.ScriptException;
-import bee.creative.function.Scripts.ScriptParser;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
 import bee.creative.function.Types.FunctionType;
@@ -640,58 +636,6 @@ public final class Values {
 		final Array array = Array.from(data);
 		if (array != null) return ArrayValue.valueOf(array);
 		return ObjectValue.valueOf(data);
-	}
-
-	/**
-	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück.
-	 * 
-	 * @see Script
-	 * @see ScriptParser#parse()
-	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
-	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
-	 * @param source Zeichenkette.
-	 * @return aufbereiteter Quelltext.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
-	public static Script parseScript(final String source) throws NullPointerException {
-		return new Script(source, new ScriptParser(source).parse());
-	}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
-	 * 
-	 * @see #parseScript(String)
-	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileToValue()
-	 * @param script Quelltext.
-	 * @param compiler Kompilationsmethoden.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierter Wert.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Value compileToValue(final Script script, final Scripts.ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
-		ScriptException {
-		return new ScriptCompiler(script, compiler, params).compileToValue();
-	}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
-	 * zurück.
-	 * 
-	 * @see #parseScript(String)
-	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileToFunction()
-	 * @param script Quelltext.
-	 * @param compiler Kompilationsmethoden.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierte Funktion.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Function compileToFunction(final Script script, final Scripts.ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
-		ScriptException {
-		return new ScriptCompiler(script, compiler, params).compileToFunction();
 	}
 
 	/**
