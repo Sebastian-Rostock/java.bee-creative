@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.xml.sax.InputSource;
+import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
 import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Functions.ArrayFunction;
 import bee.creative.function.Functions.ClosureFunction;
@@ -16,6 +17,7 @@ import bee.creative.function.Functions.ParamFunction;
 import bee.creative.function.Functions.TraceFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Script.Range;
+import bee.creative.function.Scripts.ScriptFormatterHelper;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.util.Parser;
@@ -528,8 +530,8 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Kompiler für {@link Scripts#compileToValue(Script, ScriptCompilerHelper, String...)} bzw.
-	 * {@link Scripts#compileToFunction(Script, ScriptCompilerHelper, String...)}.
+	 * Diese Klasse implementiert den Kompiler für {@link Scripts#compileValue(Script, ScriptCompilerHelper, String...)} bzw.
+	 * {@link Scripts#compileFunction(Script, ScriptCompilerHelper, String...)}.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -627,7 +629,7 @@ public class Scripts {
 		 * @param string Zeichenkette.
 		 * @return Zahl.
 		 */
-		protected int compileIndex(final String string) {
+		protected int doCompileIndex(final String string) {
 			final char symbol = string.charAt(0);
 			if ((symbol < '0') || (symbol > '9')) return -1;
 			try {
@@ -643,7 +645,7 @@ public class Scripts {
 		 * @return Wertliste.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Object compileArray() throws ScriptException {
+		protected Object doCompileArray() throws ScriptException {
 			if (!this.arrayEnabled) throw new ScriptException(this.script, this.range);
 			this.skip();
 			if (this.skipSpace().type == ']') {
@@ -652,7 +654,7 @@ public class Scripts {
 			}
 			boolean value = true;
 			for (final LinkedList<Function> array = new LinkedList<Function>(); true;) {
-				final Function item = this.compileFunction();
+				final Function item = this.doCompileFunction();
 				array.add(item);
 				value = value && (item instanceof ValueFunction);
 				switch (this.skipSpace().type) {
@@ -682,7 +684,7 @@ public class Scripts {
 		 * @return Wert.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Value compileValue() throws ScriptException {
+		protected Value doCompileValue() throws ScriptException {
 			final Value value;
 			switch (this.skipSpace().type) {
 				case 0:
@@ -695,10 +697,10 @@ public class Scripts {
 				case '}':
 					throw new ScriptException(this.script, this.range);
 				case '[':
-					return this.compileValueArray();
+					return this.doCompileValueArray();
 				case '{':
 					if (this.closureEnabled) throw new ScriptException(this.script, this.range);
-					return new FunctionValue(this.compileScope());
+					return new FunctionValue(this.doCompileScope());
 				default:
 					try {
 						value = this.helper.compileValue(this.script, this.range);
@@ -719,8 +721,8 @@ public class Scripts {
 		 * @return Wertliste als {@link Value}.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Value compileValueArray() throws ScriptException {
-			final Object array = this.compileArray();
+		protected Value doCompileValueArray() throws ScriptException {
+			final Object array = this.doCompileArray();
 			if (array instanceof Value) return (Value)array;
 			throw new ScriptException(this.script, this.range);
 		}
@@ -731,7 +733,7 @@ public class Scripts {
 		 * @return Parametername oder {@code null}.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected String compileParam() throws ScriptException {
+		protected String doCompileParam() throws ScriptException {
 			switch (this.skipSpace().type) {
 				case 0:
 				case '$':
@@ -765,14 +767,14 @@ public class Scripts {
 		 * @return Funktion als {@link FunctionValue}.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Function compileScope() throws ScriptException {
+		protected Function doCompileScope() throws ScriptException {
 			this.skip();
 			int count = 0;
 			while (true) {
 				if (this.skipSpace().type == 0) throw new ScriptException(this.script, this.range);
-				final String name = this.compileParam();
+				final String name = this.doCompileParam();
 				if (name != null) {
-					if (this.compileIndex(name) >= 0) throw new ScriptException(this.script, this.range);
+					if (this.doCompileIndex(name) >= 0) throw new ScriptException(this.script, this.range);
 					this.params.add(count++, name);
 				}
 				switch (this.skipSpace().type) {
@@ -782,7 +784,7 @@ public class Scripts {
 						break;
 					case ':': {
 						this.skip();
-						final Function function = this.compileFunction();
+						final Function function = this.doCompileFunction();
 						if (this.skipSpace().type != '}') throw new ScriptException(this.script, this.range);
 						this.skip();
 						this.params.subList(0, count).clear();
@@ -800,30 +802,30 @@ public class Scripts {
 		 * @return Funktion.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Function compileFunction() throws ScriptException {
+		protected Function doCompileFunction() throws ScriptException {
 			Function function;
 			boolean chained = false;
 			switch (this.skipSpace().type) {
 				case '$': {
 					this.skip();
-					final String name = this.compileParam();
+					final String name = this.doCompileParam();
 					if (name == null) return ArrayFunction.VIEW;
-					final int index = this.compileIndex(name);
+					final int index = this.doCompileIndex(name);
 					final int index2 = (index < 0) ? this.params.indexOf(name) : (index - 1);
 					if (index2 < 0) throw new ScriptException(this.script, this.range);
 					return ParamFunction.valueOf(index2);
 				}
 				case '{': {
-					function = this.compileScope();
+					function = this.doCompileScope();
 					if (this.skipSpace().type != '(') return this.closureEnabled ? new ClosureFunction(function) : new ValueFunction(new FunctionValue(function));
 					if (!this.chainingEnabled) throw new ScriptException(this.script, this.range);
 					break;
 				}
 				case '[': {
-					return this.compileFunctionArray();
+					return this.doCompileFunctionArray();
 				}
 				default: {
-					final Value value = this.compileValue();
+					final Value value = this.doCompileValue();
 					if (!(value instanceof FunctionValue)) return new ValueFunction(value);
 					if (this.skipSpace().type != '(') {
 						if (this.handlerEnabled) return new ValueFunction(value);
@@ -842,7 +844,7 @@ public class Scripts {
 						function = CompositeFunction.valueOf(function, chained, functions.toArray(new Function[functions.size()]));
 						break;
 					}
-					functions.add(this.compileFunction());
+					functions.add(this.doCompileFunction());
 					switch (this.skipSpace().type) {
 						default:
 							throw new ScriptException(this.script, this.range);
@@ -862,8 +864,8 @@ public class Scripts {
 		 * @return Wertliste als {@link Function}.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		protected Function compileFunctionArray() throws ScriptException {
-			final Object array = this.compileArray();
+		protected Function doCompileFunctionArray() throws ScriptException {
+			final Object array = this.doCompileArray();
 			if (array instanceof Value) return new ValueFunction((Value)array);
 			return (Function)array;
 		}
@@ -871,12 +873,12 @@ public class Scripts {
 		/**
 		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
 		 * 
-		 * @see #compileToFunction()
+		 * @see #compileFunction()
 		 * @return Wert.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		public Value compileToValue() throws ScriptException {
-			final Value value = this.compileValue();
+		public Value compileValue() throws ScriptException {
+			final Value value = this.doCompileValue();
 			if (this.skipSpace().type == 0) return value;
 			throw new ScriptException(this.script, this.range);
 		}
@@ -904,8 +906,8 @@ public class Scripts {
 		 * @return Funktion.
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
-		public Function compileToFunction() throws ScriptException {
-			final Function function = this.compileFunction();
+		public Function compileFunction() throws ScriptException {
+			final Function function = this.doCompileFunction();
 			if (this.skipSpace().type == 0) return function;
 			throw new ScriptException(this.script, this.range);
 		}
@@ -913,7 +915,7 @@ public class Scripts {
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn Wertlisten zulässig sind (z.B. {@code [1;2]}).
 		 * 
-		 * @see #compileToFunction()
+		 * @see #compileFunction()
 		 * @return Zulässigkeit von Wertlisten.
 		 */
 		public boolean isArrayEnabled() {
@@ -936,7 +938,7 @@ public class Scripts {
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(Script, Range)} als {@link FunctionValue}
 		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
 		 * 
-		 * @see #compileToFunction()
+		 * @see #compileFunction()
 		 * @return Zulässigkeit von Funktionszeigern.
 		 */
 		public boolean isHandlerEnabled() {
@@ -958,7 +960,7 @@ public class Scripts {
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link ClosureFunction}s kompiliert werden.
 		 * 
-		 * @see #compileToFunction()
+		 * @see #compileFunction()
 		 * @return Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
 		public boolean isClosureEnabled() {
@@ -981,7 +983,7 @@ public class Scripts {
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die Verkettung von Funktionen zulässig ist, d.h. ob die Funktion, die von einem Funktionsaufruf
 		 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
 		 * 
-		 * @see #compileToFunction()
+		 * @see #compileFunction()
 		 * @see CompositeFunction#chained()
 		 * @see CompositeFunction#execute(Scope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
@@ -1005,8 +1007,8 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link ScriptCompiler#compileToValue()} und
-	 * {@link ScriptCompiler#compileToFunction()} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
+	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link ScriptCompiler#compileValue()} und
+	 * {@link ScriptCompiler#compileFunction()} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1092,51 +1094,59 @@ public class Scripts {
 	 * 
 	 * @see Script
 	 * @see ScriptParser#parse()
-	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
-	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
+	 * @see #compileValue(Script, ScriptCompilerHelper, String...)
+	 * @see #compileFunction(Script, ScriptCompilerHelper, String...)
 	 * @param source Zeichenkette.
 	 * @return aufbereiteter Quelltext.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public static Script parseScript(final String source) throws NullPointerException {
+	public static Script parse(final String source) throws NullPointerException {
 		return new Script(source, new ScriptParser(source).parse());
+	}
+
+	public static String formatValue(Value value, ScriptFormatterHelper helper) {
+		return new ScriptFormatter(helper).putValue(value).format();
+	}
+
+	public static String formatFunction(Function function, ScriptFormatterHelper helper) {
+		return new ScriptFormatter(helper).putFunction(function).format();
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
 	 * 
-	 * @see #parseScript(String)
-	 * @see #compileToFunction(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileToValue()
+	 * @see #parse(String)
+	 * @see #compileFunction(Script, ScriptCompilerHelper, String...)
+	 * @see ScriptCompiler#compileValue()
 	 * @param script Quelltext.
-	 * @param compiler Kompilationsmethoden.
+	 * @param helper Kompilationsmethoden.
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierter Wert.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
 	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
 	 */
-	public static Value compileToValue(final Script script, final ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
+	public static Value compileValue(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException,
 		ScriptException {
-		return new ScriptCompiler(script, compiler, params).compileToValue();
+		return new ScriptCompiler(script, helper, params).compileValue();
 	}
 
 	/**
 	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
 	 * zurück.
 	 * 
-	 * @see #parseScript(String)
-	 * @see #compileToValue(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileToFunction()
+	 * @see #parse(String)
+	 * @see #compileValue(Script, ScriptCompilerHelper, String...)
+	 * @see ScriptCompiler#compileFunction()
 	 * @param script Quelltext.
-	 * @param compiler Kompilationsmethoden.
+	 * @param helper Kompilationsmethoden.
 	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
 	 * @return kompilierte Funktion.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
 	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
 	 */
-	public static Function compileToFunction(final Script script, final ScriptCompilerHelper compiler, final String... params) throws NullPointerException,
+	public static Function compileFunction(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException,
 		ScriptException {
-		return new ScriptCompiler(script, compiler, params).compileToFunction();
+		return new ScriptCompiler(script, helper, params).compileFunction();
 	}
 
 }

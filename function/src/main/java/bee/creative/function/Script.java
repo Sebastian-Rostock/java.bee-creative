@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.function.Scripts.ScriptCompilerHelper;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Get;
 import bee.creative.util.Comparators;
@@ -14,9 +13,6 @@ import bee.creative.util.Objects;
 /**
  * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * 
- * @see Scripts#parseScript(String)
- * @see Scripts#compileToValue(Script, ScriptCompilerHelper, String...)
- * @see Scripts#compileToFunction(Script, ScriptCompilerHelper, String...)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
