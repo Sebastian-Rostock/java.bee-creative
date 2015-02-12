@@ -1,13 +1,10 @@
 package bee.creative.function;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.xml.sax.InputSource;
-import com.sun.org.apache.xml.internal.security.utils.HelperNodeList;
 import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Functions.ArrayFunction;
 import bee.creative.function.Functions.ClosureFunction;
@@ -17,7 +14,6 @@ import bee.creative.function.Functions.ParamFunction;
 import bee.creative.function.Functions.TraceFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Script.Range;
-import bee.creative.function.Scripts.ScriptFormatterHelper;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.util.Parser;
@@ -1007,8 +1003,8 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link ScriptCompiler#compileValue()} und
-	 * {@link ScriptCompiler#compileFunction()} zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
+	 * Diese Schnittstelle definiert Kompilationsmethoden, die in den Methoden {@link ScriptCompiler#compileValue()} und {@link ScriptCompiler#compileFunction()}
+	 * zur Übersetzung von Quelltexten in Werte, Funktionen bzw. Parameternamen genutzt werden.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1125,8 +1121,7 @@ public class Scripts {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
 	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
 	 */
-	public static Value compileValue(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException,
-		ScriptException {
+	public static Value compileValue(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException, ScriptException {
 		return new ScriptCompiler(script, helper, params).compileValue();
 	}
 
