@@ -286,7 +286,7 @@ public final class Functions {
 		 */
 		@Override
 		public ArrayValue execute(final Scope scope) {
-			if(this.mode()) return new ArrayValue(new ValueArray(Array.valueOf(scope).toArray()));
+			if(this.mode()) return new ArrayValue(new ValueArray(Array.valueOf(scope).value()));
 			return new ArrayValue(Array.valueOf(scope));
 		}
 

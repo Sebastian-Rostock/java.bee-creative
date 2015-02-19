@@ -351,6 +351,20 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	}
 
 	/**
+	 * Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
+	 * 
+	 * @return Array mit den Werten dieser Wertliste.
+	 */
+	public Value[] value() {
+		final int length = this.length();
+		final Value[] array = new Value[length];
+		for(int i = 0; i < length; i++){
+			array[i] = this.get(i);
+		}
+		return array;
+	}
+
+	/**
 	 * Diese Methode gibt den {@code index}-ten Wert zurück.
 	 */
 	@Override
@@ -429,20 +443,6 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		for(int i = 0; i < length; i++)
 			if(!Objects.equals(this.get(i), data.get(i))) return false;
 		return true;
-	}
-
-	/**
-	 * Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
-	 * 
-	 * @return Array mit den Werten dieser Wertliste.
-	 */
-	public Value[] toArray() {
-		final int length = this.length();
-		final Value[] array = new Value[length];
-		for(int i = 0; i < length; i++){
-			array[i] = this.get(i);
-		}
-		return array;
 	}
 
 	/**
