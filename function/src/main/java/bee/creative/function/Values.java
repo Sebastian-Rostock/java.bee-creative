@@ -30,12 +30,12 @@ public final class Values {
 		/**
 		 * Dieses Feld speichert die Nutzdaten.
 		 */
-		final GData data;
+		protected GData data;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten nit {@code null}.
+		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
 		 */
-		AbstractValue() {
+		public AbstractValue() {
 			this.data = null;
 		}
 
@@ -54,7 +54,7 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GData data() {
+		public final GData data() {
 			return this.data;
 		}
 
