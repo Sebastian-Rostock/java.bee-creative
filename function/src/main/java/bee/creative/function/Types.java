@@ -61,6 +61,8 @@ public class Types {
 			return this.valueOf(input).data();
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * 
@@ -78,8 +80,8 @@ public class Types {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Type<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Type<?>)) return false;
 			final Type<?> data = (Type<?>)object;
 			return this.id() == data.id();
 		}
@@ -109,6 +111,8 @@ public class Types {
 		 */
 		public static final int ID = 0;
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -133,6 +137,8 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 1;
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -159,6 +165,8 @@ public class Types {
 		 */
 		public static final int ID = 2;
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -183,6 +191,8 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 3;
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -209,6 +219,8 @@ public class Types {
 		 */
 		public static final int ID = 4;
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -234,6 +246,8 @@ public class Types {
 		 */
 		public static final int ID = 5;
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -258,6 +272,8 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 6;
+
+		{}
 
 		/**
 		 * {@inheritDoc}

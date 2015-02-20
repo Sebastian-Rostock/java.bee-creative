@@ -21,9 +21,9 @@ import bee.creative.util.Objects;
 import bee.creative.util.Strings;
 
 /**
- * Diese Klasse implementiert die Verwaltung des {@link #getDefault() default}-{@link Context}s.
+ * Diese Klasse implementiert die Verwaltung des {@link #getDefaultContext() default}-{@link Context}s.
  * 
- * @see #getDefault()
+ * @see #getDefaultContext()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Contexts {
@@ -41,6 +41,42 @@ public class Contexts {
 		 */
 		public static final DefaultContext INSTANCE = new DefaultContext();
 
+		{}
+
+		/**
+		 * {@inheritDoc} Hierfür wird auf dem {@link Type#id() Identifikator} des gegebenen Datentyps eine Fallunterscheidung durchgeführt und eine der
+		 * spezialisierten Konvertierunsmethoden aufgerufen. Bei einem unbekannten Datentyp wird eine {@link IllegalArgumentException} ausgelöst.
+		 * 
+		 * @see #castToNullValue(Value)
+		 * @see #castToArrayValue(Value)
+		 * @see #castToObjectValue(Value)
+		 * @see #castToFunctionValue(Value)
+		 * @see #castToStringValue(Value)
+		 * @see #castToNumberValue(Value)
+		 * @see #castToBooleanValue(Value)
+		 */
+		@SuppressWarnings ("unchecked")
+		@Override
+		public <GValue> GValue cast(final Value value, final Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			switch (type.id()) {
+				case NullType.ID:
+					return (GValue)this.castToNullValue(value);
+				case ArrayType.ID:
+					return (GValue)this.castToArrayValue(value);
+				case ObjectType.ID:
+					return (GValue)this.castToObjectValue(value);
+				case FunctionType.ID:
+					return (GValue)this.castToFunctionValue(value);
+				case StringType.ID:
+					return (GValue)this.castToStringValue(value);
+				case NumberType.ID:
+					return (GValue)this.castToNumberValue(value);
+				case BooleanType.ID:
+					return (GValue)this.castToBooleanValue(value);
+			}
+			throw new IllegalArgumentException();
+		}
+
 		/**
 		 * Diese Methode gibt {@link NullValue#INSTANCE} zurück.
 		 * 
@@ -49,7 +85,7 @@ public class Contexts {
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
 		protected NullValue castToNullValue(final Value value) throws NullPointerException {
-			if(value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException();
 			return NullValue.INSTANCE;
 		}
 
@@ -66,9 +102,9 @@ public class Contexts {
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
 		protected ArrayValue castToArrayValue(final Value value) throws NullPointerException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case NullType.ID:
-					return ArrayValue.valueOf(Array.EMPTY_ARRAY);
+					return ArrayValue.valueOf(Array.EMPTY);
 				case ArrayType.ID:
 					return (ArrayValue)value;
 				default:
@@ -89,7 +125,7 @@ public class Contexts {
 		 * @throws NullPointerException Wenn der gegebene Wert oder dessen Nutzdaten {@code null} sind.
 		 */
 		protected ObjectValue castToObjectValue(final Value value) throws NullPointerException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case ObjectType.ID:
 					return (ObjectValue)value;
 				default:
@@ -112,7 +148,7 @@ public class Contexts {
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
 		protected FunctionValue castToFunctionValue(final Value value) throws NullPointerException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case FunctionType.ID:
 					return (FunctionValue)value;
 				default:
@@ -137,7 +173,7 @@ public class Contexts {
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
 		protected StringValue castToStringValue(final Value value) throws NullPointerException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case NullType.ID:
 					return StringValue.valueOf("");
 				case StringType.ID:
@@ -167,7 +203,7 @@ public class Contexts {
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
 		protected NumberValue castToNumberValue(final Value value) throws NullPointerException, IllegalArgumentException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case NullType.ID:
 					return NumberValue.valueOf(Double.NaN);
 				case StringType.ID:
@@ -202,7 +238,7 @@ public class Contexts {
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
 		protected BooleanValue castToBooleanValue(final Value value) throws NullPointerException, IllegalArgumentException {
-			switch(value.type().id()){
+			switch (value.type().id()) {
 				case NullType.ID:
 					return BooleanValue.FALSE;
 				case ArrayType.ID:
@@ -221,39 +257,7 @@ public class Contexts {
 			}
 		}
 
-		/**
-		 * {@inheritDoc} Hierfür wird auf dem {@link Type#id() Identifikator} des gegebenen Datentyps eine Fallunterscheidung durchgeführt und eine der
-		 * spezialisierten Konvertierunsmethoden aufgerufen. Bei einem unbekannten Datentyp wird eine {@link IllegalArgumentException} ausgelöst.
-		 * 
-		 * @see #castToNullValue(Value)
-		 * @see #castToArrayValue(Value)
-		 * @see #castToObjectValue(Value)
-		 * @see #castToFunctionValue(Value)
-		 * @see #castToStringValue(Value)
-		 * @see #castToNumberValue(Value)
-		 * @see #castToBooleanValue(Value)
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public <GValue> GValue cast(final Value value, final Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
-			switch(type.id()){
-				case NullType.ID:
-					return (GValue)this.castToNullValue(value);
-				case ArrayType.ID:
-					return (GValue)this.castToArrayValue(value);
-				case ObjectType.ID:
-					return (GValue)this.castToObjectValue(value);
-				case FunctionType.ID:
-					return (GValue)this.castToFunctionValue(value);
-				case StringType.ID:
-					return (GValue)this.castToStringValue(value);
-				case NumberType.ID:
-					return (GValue)this.castToNumberValue(value);
-				case BooleanType.ID:
-					return (GValue)this.castToBooleanValue(value);
-			}
-			throw new IllegalArgumentException();
-		}
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -264,6 +268,8 @@ public class Contexts {
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieses Feld speichert den {@code default}-{@link Context}.
@@ -276,19 +282,19 @@ public class Contexts {
 	 * 
 	 * @return {@code default}-{@link Context}.
 	 */
-	public static Context getDefault() {
+	public static Context getDefaultContext() {
 		return Contexts.defaultContext;
 	}
 
 	/**
 	 * Diese Methode setzt den {@code default}-{@link Context}.
 	 * 
-	 * @see #getDefault()
+	 * @see #getDefaultContext()
 	 * @param value neuer {@code default}-{@link Context}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public static void setDefault(final Context value) throws NullPointerException {
-		if(value == null) throw new NullPointerException();
+	public static void setDefaultContext(final Context value) throws NullPointerException {
+		if (value == null) throw new NullPointerException();
 		Contexts.defaultContext = value;
 	}
 

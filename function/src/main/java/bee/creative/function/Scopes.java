@@ -31,6 +31,8 @@ public final class Scopes {
 			return new GetIterator<Value>(this, this.size());
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -44,8 +46,8 @@ public final class Scopes {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Scope)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Scope)) return false;
 			final Scope data = (Scope)object;
 			return Array.valueOf(this).equals(Array.valueOf(data));
 		}
@@ -62,7 +64,7 @@ public final class Scopes {
 
 	/**
 	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Parameterwerte. Als Kontextobjekt wird
-	 * {@link Contexts#getDefault()} verwendet.
+	 * {@link Contexts#getDefaultContext()} verwendet.
 	 * 
 	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -70,16 +72,20 @@ public final class Scopes {
 	public static final class VoidScope extends AbstractScope {
 
 		/**
-		 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefault()}
+		 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefaultContext()}
 		 * verwendet.
 		 */
 		public static final VoidScope INSTANCE = new VoidScope();
+
+		{}
 
 		/**
 		 * Dieser Konstruktor ist versteckt.
 		 */
 		VoidScope() {
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc} Die {@link IndexOutOfBoundsException} wird immer ausgelöst.
@@ -102,7 +108,7 @@ public final class Scopes {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der Rückgabewert ist {@link Contexts#getDefault()}.
+		 * Der Rückgabewert ist {@link Contexts#getDefaultContext()}.
 		 */
 		@Override
 		public Context context() {
@@ -170,6 +176,8 @@ public final class Scopes {
 			this.offset = (replace ? scope.size() : 0) - this.length;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc} Diese entsprechen hierbei entweder allen oder nur den zusätzlichen Parameterwerten des übergeordneten Ausführungskontexts, welche über
 		 * {@code this.scope().get(index - this.size())} bzw. {@code this.scope().get(index - this.size() + this.scope().size())} ermittelt werden.
@@ -216,6 +224,8 @@ public final class Scopes {
 			return this.values;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -252,10 +262,12 @@ public final class Scopes {
 		 * @throws NullPointerException Wenn der gegebene Ausführungskontext {@code null} ist.
 		 */
 		public ContextScope(final Scope scope, final Context context) throws NullPointerException {
-			if(scope == null) throw new NullPointerException();
+			if (scope == null) throw new NullPointerException();
 			this.scope = scope;
 			this.context = context;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -289,6 +301,8 @@ public final class Scopes {
 		public Context context() {
 			return this.context;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -334,11 +348,13 @@ public final class Scopes {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
-			if((scope == null) || (functions == null)) throw new NullPointerException();
+			if ((scope == null) || (functions == null)) throw new NullPointerException();
 			this.scope = scope;
 			this.values = new Value[functions.length];
 			this.functions = functions;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc} Diese entsprechen hierbei den Parameterwerten des übergeordneten Ausführungskontext, die über {@code this.scope().get(index - this.size())}
@@ -351,11 +367,11 @@ public final class Scopes {
 		public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 			final Value[] values = this.values;
 			final int length = values.length;
-			if(index >= length) return this.scope.get(index - length);
+			if (index >= length) return this.scope.get(index - length);
 			Value value = values[index];
-			if(value != null) return value;
+			if (value != null) return value;
 			value = this.functions[index].execute(this.scope);
-			if(value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException();
 			return values[index] = value;
 		}
 
@@ -401,6 +417,8 @@ public final class Scopes {
 		public Function[] functions() {
 			return this.functions.clone();
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}

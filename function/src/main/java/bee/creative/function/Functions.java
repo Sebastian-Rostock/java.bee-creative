@@ -1,6 +1,5 @@
 package bee.creative.function;
 
-import bee.creative.function.Array.ValueArray;
 import bee.creative.function.Scopes.CompositeScope;
 import bee.creative.function.Scopes.ValueScope;
 import bee.creative.function.Values.ArrayValue;
@@ -50,11 +49,13 @@ public final class Functions {
 		 */
 		public static CompositeFunction applyTo(final CompositeFunction function) throws NullPointerException {
 			final Function[] functions = function.functions.clone();
-			for(int i = 0, size = functions.length; i < size; i++){
+			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = LazyFunction.valueOf(functions[i]);
 			}
-			return new CompositeFunction(function.function, function.chained, functions);
+			return CompositeFunction.valueOf(function.function, function.chained, functions);
 		}
+
+		{}
 
 		/**
 		 * Dieses Feld speichert die auszuwertende Funktion.
@@ -68,9 +69,11 @@ public final class Functions {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public LazyFunction(final Function function) throws NullPointerException {
-			if(function == null) throw new NullPointerException();
+			if (function == null) throw new NullPointerException();
 			this.function = function;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt die auszuwertende Funktion zurück.
@@ -94,6 +97,8 @@ public final class Functions {
 			return LazyValue.valueOf(scope, this.function);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -107,8 +112,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof LazyFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof LazyFunction)) return false;
 			final LazyFunction data = (LazyFunction)object;
 			return Objects.equals(this.function, data.function);
 		}
@@ -136,11 +141,15 @@ public final class Functions {
 		 */
 		public static final CallFunction INSTANCE = new CallFunction();
 
+		{}
+
 		/**
 		 * Dieser Konstruktor ist versteckt.
 		 */
 		CallFunction() {
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -150,10 +159,12 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			if(scope.size() != 2) throw new IllegalArgumentException();
+			if (scope.size() != 2) throw new IllegalArgumentException();
 			final Context context = scope.context();
 			return context.cast(scope.get(0), FunctionValue.TYPE).data().execute(new ValueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data()));
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -178,6 +189,8 @@ public final class Functions {
 		 */
 		public static final ApplyFunction INSTANCE = new ApplyFunction();
 
+		{}
+
 		/**
 		 * Dieser Konstruktor ist versteckt.
 		 */
@@ -199,6 +212,8 @@ public final class Functions {
 			final Context context = scope.context();
 			return context.cast(scope.get(index), FunctionValue.TYPE).data().execute(new ValueScope(scope, Array.valueOf(scope).section(0, index)));
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -246,6 +261,8 @@ public final class Functions {
 
 		};
 
+		{}
+
 		/**
 		 * Diese Methode gibt eine {@link ArrayFunction} zurück, die entwerder eine {@link Array#valueOf(Scope) Sicht} auf oder eine {@link Array#valueOf(Value...)
 		 * Kopie} der Parameterwerte des ihr übergebenen Ausführungskontexts liefert.
@@ -259,11 +276,15 @@ public final class Functions {
 			return mode ? ArrayFunction.COPY : ArrayFunction.VIEW;
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor ist versteckt.
 		 */
 		ArrayFunction() {
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den Modus.
@@ -286,9 +307,11 @@ public final class Functions {
 		 */
 		@Override
 		public ArrayValue execute(final Scope scope) {
-			if(this.mode()) return new ArrayValue(new ValueArray(Array.valueOf(scope).value()));
-			return new ArrayValue(Array.valueOf(scope));
+			if (this.mode()) return ArrayValue.valueOf(Array.valueOf(Array.valueOf(scope).value()));
+			return ArrayValue.valueOf(Array.valueOf(scope));
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -394,6 +417,8 @@ public final class Functions {
 
 		}
 
+		{}
+
 		/**
 		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link TraceHandler} oder unverändert zurück. Sie sollte zur
 		 * rekursiven Weiterverfolgung in {@link TraceHandler#onExecute(TraceEvent)} aufgerufen und zur Modifikation von {@link TraceEvent#function} verwendet
@@ -410,26 +435,28 @@ public final class Functions {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public static Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
-			if((handler == null) || (function == null)) throw new NullPointerException();
+			if ((handler == null) || (function == null)) throw new NullPointerException();
 			final Object clazz = function.getClass();
-			if(clazz == CompositeFunction.class){
+			if (clazz == CompositeFunction.class) {
 				final CompositeFunction function2 = (CompositeFunction)function;
 				final Function[] functions2 = function2.functions();
-				for(int i = 0, size = functions2.length; i < size; i++){
+				for (int i = 0, size = functions2.length; i < size; i++) {
 					functions2[i] = new TraceFunction(handler, functions2[i]);
 				}
-				return new CompositeFunction(new TraceFunction(handler, function2.function), function2.chained, functions2);
-			}else if(clazz == ValueFunction.class){
+				return CompositeFunction.valueOf(new TraceFunction(handler, function2.function), function2.chained, functions2);
+			} else if (clazz == ValueFunction.class) {
 				final ValueFunction function2 = (ValueFunction)function;
 				final Value value = function2.value;
-				if(value.getClass() == FunctionValue.class) return new ValueFunction(new FunctionValue(new TraceFunction(handler, (Function)value.data())));
-			}else if(clazz == ClosureFunction.class){
+				if (value.getClass() == FunctionValue.class) return ValueFunction.valueOf(FunctionValue.valueOf(new TraceFunction(handler, (Function)value.data())));
+			} else if (clazz == ClosureFunction.class) {
 				final ClosureFunction function2 = (ClosureFunction)function;
-				if(function2.scope == null) return new ClosureFunction(new TraceFunction(handler, function2.function));
+				if (function2.scope == null) return ClosureFunction.valueOf(new TraceFunction(handler, function2.function));
 				return new ClosureFunction(function2.scope, new TraceFunction(handler, function2.function));
 			}
 			return function;
 		}
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den {@link TraceHandler}.
@@ -449,10 +476,12 @@ public final class Functions {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public TraceFunction(final TraceHandler handler, final Function function) throws NullPointerException {
-			if((handler == null) || (function == null)) throw new NullPointerException();
+			if ((handler == null) || (function == null)) throw new NullPointerException();
 			this.handler = handler;
 			this.function = function;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den {@link TraceHandler} zurück.
@@ -489,18 +518,20 @@ public final class Functions {
 			event.scope = scope;
 			event.function = this.function;
 			handler.onExecute(event);
-			try{
+			try {
 				event.result = event.function.execute(event.scope);
 				event.exception = null;
 				handler.onReturn(event);
 				return event.result;
-			}catch(final RuntimeException exception){
+			} catch (final RuntimeException exception) {
 				event.result = null;
 				event.exception = exception;
 				handler.onThrow(event);
 				throw event.exception;
 			}
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -515,8 +546,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof TraceFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof TraceFunction)) return false;
 			final TraceFunction data = (TraceFunction)object;
 			return Objects.equals(this.handler, data.handler) && Objects.equals(this.function, data.function);
 		}
@@ -542,7 +573,9 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert die {@link ValueFunction}, die immer {@link NullValue#INSTANCE} liefert.
 		 */
-		public static final ValueFunction NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
+		public static final ValueFunction NULL_FUNCTION = ValueFunction.valueOf(NullValue.INSTANCE);
+
+		{}
 
 		/**
 		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
@@ -552,7 +585,7 @@ public final class Functions {
 		 * @return {@link ValueFunction}.
 		 */
 		public static ValueFunction valueOf(final Object data) {
-			if(data == null) return ValueFunction.NULL_FUNCTION;
+			if (data == null) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(Values.valueOf(data));
 		}
 
@@ -563,9 +596,11 @@ public final class Functions {
 		 * @return {@link ValueFunction}.
 		 */
 		public static ValueFunction valueOf(final Value value) {
-			if((value == null) || (value == NullValue.INSTANCE)) return ValueFunction.NULL_FUNCTION;
+			if ((value == null) || (value == NullValue.INSTANCE)) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(value);
 		}
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
@@ -579,9 +614,11 @@ public final class Functions {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ValueFunction(final Value value) throws NullPointerException {
-			if(value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException();
 			this.value = value;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den Ergebniswert zurück.
@@ -604,6 +641,8 @@ public final class Functions {
 			return this.value;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -617,8 +656,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ValueFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ValueFunction)) return false;
 			final ValueFunction data = (ValueFunction)object;
 			return Objects.equals(this.value, data.value);
 		}
@@ -647,6 +686,8 @@ public final class Functions {
 		static final ParamFunction[] INSTANCES = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
 			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
 
+		{}
+
 		/**
 		 * Diese Methode erzeugt eine eine projizierende Funktion, deren Ergebniswert dem {@code index}-ten Parameterwert des Ausführungskontexts entspricht, und
 		 * gibt diese zurück.
@@ -656,9 +697,11 @@ public final class Functions {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
 		public static ParamFunction valueOf(final int index) throws IndexOutOfBoundsException {
-			if(index < ParamFunction.INSTANCES.length) return ParamFunction.INSTANCES[index];
+			if (index < ParamFunction.INSTANCES.length) return ParamFunction.INSTANCES[index];
 			return new ParamFunction(index);
 		}
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Index des Parameterwerts.
@@ -672,9 +715,11 @@ public final class Functions {
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
 		 */
 		public ParamFunction(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
+			if (index < 0) throw new IndexOutOfBoundsException();
 			this.index = index;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den Index des Parameterwerts zurück.
@@ -698,6 +743,8 @@ public final class Functions {
 			return scope.get(this.index);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -711,8 +758,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ParamFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ParamFunction)) return false;
 			final ParamFunction data = (ParamFunction)object;
 			return this.index == data.index;
 		}
@@ -749,6 +796,8 @@ public final class Functions {
 			return new ClosureFunction(function);
 		}
 
+		{}
+
 		/**
 		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
 		 */
@@ -768,7 +817,7 @@ public final class Functions {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ClosureFunction(final Function function) throws NullPointerException {
-			if(function == null) throw new NullPointerException();
+			if (function == null) throw new NullPointerException();
 			this.scope = null;
 			this.function = function;
 		}
@@ -784,10 +833,12 @@ public final class Functions {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
-			if((scope == null) || (function == null)) throw new NullPointerException();
+			if ((scope == null) || (function == null)) throw new NullPointerException();
 			this.scope = scope;
 			this.function = function;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den gebundene Ausführungskontext oder {@code null} zurück. Der Ausführungskontext ist {@code null}, wenn diese {@link ClosureFunction}
@@ -821,9 +872,11 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			final Scope scope2 = this.scope;
-			if(scope2 == null) return new FunctionValue(new ClosureFunction(scope, this.function));
+			if (scope2 == null) return FunctionValue.valueOf(new ClosureFunction(scope, this.function));
 			return this.function.execute(new ValueScope(scope2, Array.valueOf(scope), false));
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -838,8 +891,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ClosureFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ClosureFunction)) return false;
 			final ClosureFunction data = (ClosureFunction)object;
 			return Objects.equals(this.scope, data.scope) && Objects.equals(this.function, data.function);
 		}
@@ -849,7 +902,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			if(this.scope == null) return Objects.toStringCall(this, this.function);
+			if (this.scope == null) return Objects.toStringCall(this, this.function);
 			return Objects.toStringCall(this, this.scope, this.function);
 		}
 
@@ -891,6 +944,8 @@ public final class Functions {
 			return new CompositeFunction(function, chained, functions);
 		}
 
+		{}
+
 		/**
 		 * Dieses Feld speichert die Verkettung.
 		 */
@@ -926,11 +981,13 @@ public final class Functions {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
-			if((function == null) || (functions == null)) throw new NullPointerException();
+			if ((function == null) || (functions == null)) throw new NullPointerException();
 			this.chained = chained;
 			this.function = function;
 			this.functions = functions;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt die Verkettung zurück.
@@ -984,6 +1041,8 @@ public final class Functions {
 				this.functions));
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -997,8 +1056,8 @@ public final class Functions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof CompositeFunction)) return false;
+			if (object == this) return true;
+			if (!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;
 			return Objects.equals(this.function, data.function) && Objects.equals(this.functions, data.functions);
 		}

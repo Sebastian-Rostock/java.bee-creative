@@ -39,6 +39,8 @@ public final class Values {
 			this.data = null;
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -74,6 +76,8 @@ public final class Values {
 			IllegalArgumentException {
 			return context.cast(this, type);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -131,6 +135,8 @@ public final class Values {
 			return new LazyValue(scope, function);
 		}
 
+		{}
+
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
 		 * 
@@ -164,6 +170,8 @@ public final class Values {
 			this.scope = scope;
 			this.function = function;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -233,6 +241,8 @@ public final class Values {
 			return this.function;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -280,6 +290,8 @@ public final class Values {
 		 */
 		public static final NullValue INSTANCE = new NullValue();
 
+		{}
+
 		/**
 		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück
 		 * gegeben.
@@ -291,6 +303,8 @@ public final class Values {
 			if (value == null) return NullValue.INSTANCE;
 			return value;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -315,6 +329,8 @@ public final class Values {
 		 */
 		public static final ArrayType TYPE = new ArrayType();
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück.
 		 * 
@@ -326,6 +342,8 @@ public final class Values {
 			return new ArrayValue(data);
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
@@ -335,6 +353,8 @@ public final class Values {
 		public ArrayValue(final Array data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -359,6 +379,8 @@ public final class Values {
 		 */
 		public static final ObjectType TYPE = new ObjectType();
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert das gegebene Object in einen {@link ObjectValue} und gibt diesen zurück.
 		 * 
@@ -370,6 +392,8 @@ public final class Values {
 			return new ObjectValue(data);
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -379,6 +403,8 @@ public final class Values {
 		public ObjectValue(final Object data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -403,6 +429,8 @@ public final class Values {
 		 */
 		public static final FunctionType TYPE = new FunctionType();
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert die gegebene Funktion in einen {@link FunctionValue} und gibt diesen zurück.
 		 * 
@@ -414,6 +442,8 @@ public final class Values {
 			return new FunctionValue(data);
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -423,6 +453,8 @@ public final class Values {
 		public FunctionValue(final Function data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -447,6 +479,8 @@ public final class Values {
 		 */
 		public static final StringType TYPE = new StringType();
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert den gegebenen Test in einen {@link StringValue} und gibt diesen zurück.
 		 * 
@@ -458,6 +492,8 @@ public final class Values {
 			return new StringValue(data);
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -467,6 +503,8 @@ public final class Values {
 		public StringValue(final String data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -491,6 +529,8 @@ public final class Values {
 		 */
 		public static final NumberType TYPE = new NumberType();
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
 		 * 
@@ -502,6 +542,8 @@ public final class Values {
 			return new NumberValue(data);
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -511,6 +553,8 @@ public final class Values {
 		public NumberValue(final Number data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -545,6 +589,8 @@ public final class Values {
 		 */
 		public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
 
+		{}
+
 		/**
 		 * Diese Methode konvertiert den gegebenen Wahrheitswert in einen {@link BooleanValue} und gibt diesen zurück.
 		 * 
@@ -566,6 +612,8 @@ public final class Values {
 			return BooleanValue.valueOf(data.booleanValue());
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
@@ -575,6 +623,8 @@ public final class Values {
 		public BooleanValue(final Boolean data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -586,10 +636,32 @@ public final class Values {
 
 	}
 
+	{}
+
 	/**
-	 * Dieses Feld speichert den {@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
+	 * Dieses Feld speichert den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
 	 */
-	static Converter<? super Object, ? extends Value> converter;
+	static Converter<? super Object, ? extends Value> defaultConverter;
+
+	/**
+	 * Diese Methode gibt den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)} zurück.
+	 * 
+	 * @return {@code default}-{@link Converter} oder {@code null}.
+	 */
+	public static Converter<? super Object, ? extends Value> getDefaultConverter() {
+		return Values.defaultConverter;
+	}
+
+	/**
+	 * Diese Methode setzt den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
+	 * 
+	 * @param value {@code default}-{@link Converter} oder {@code null}.
+	 */
+	public static void setDefaultConverter(final Converter<? super Object, ? extends Value> value) {
+		Values.defaultConverter = value;
+	}
+
+	{}
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Objekts kann hierfür
@@ -598,7 +670,7 @@ public final class Values {
 	 * <ul>
 	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
-	 * <li>Wenn der via {@link #setConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
+	 * <li>Wenn der via {@link #setDefaultConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
 	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} zurück gegeben.</li>
@@ -623,7 +695,7 @@ public final class Values {
 	public static Value valueOf(final Object data) {
 		if (data == null) return NullValue.INSTANCE;
 		if (data instanceof Value) return (Value)data;
-		final Converter<? super Object, ? extends Value> converter = Values.converter;
+		final Converter<? super Object, ? extends Value> converter = Values.defaultConverter;
 		if (converter != null) {
 			final Value value = converter.convert(data);
 			if (value != null) return value;
@@ -636,24 +708,6 @@ public final class Values {
 		final Array array = Array.from(data);
 		if (array != null) return ArrayValue.valueOf(array);
 		return ObjectValue.valueOf(data);
-	}
-
-	/**
-	 * Diese Methode gibt den {@link Converter} zur Anpassung von {@link Values#valueOf(Object)} zurück.
-	 * 
-	 * @return {@link Converter} oder {@code null}.
-	 */
-	public static Converter<? super Object, ? extends Value> getConverter() {
-		return Values.converter;
-	}
-
-	/**
-	 * Diese Methode setzt den {@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
-	 * 
-	 * @param handler {@link Converter} oder {@code null}.
-	 */
-	public static void setConverter(final Converter<? super Object, ? extends Value> handler) {
-		Values.converter = handler;
 	}
 
 }

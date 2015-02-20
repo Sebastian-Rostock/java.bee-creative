@@ -34,7 +34,7 @@ public interface Type<GValue> {
 	 * 
 	 * @see Type#id()
 	 * @see Value#type()
-	 * @see Contexts#getDefault()
+	 * @see Contexts#getDefaultContext()
 	 * @see #valueOf(Value, Context)
 	 * @param value gegebener Wert.
 	 * @return konvertierter Wert.
