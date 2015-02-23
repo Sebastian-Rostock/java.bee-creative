@@ -6,7 +6,7 @@
 		<artifactId>bee-creative</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-	<version>3.2.31</version>
+	<version>3.2.32</version>
 	<artifactId>bee-creative.function</artifactId>
 	<dependencies>
 		<dependency>

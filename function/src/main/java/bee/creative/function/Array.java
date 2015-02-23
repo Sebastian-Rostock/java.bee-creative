@@ -19,6 +19,24 @@ import bee.creative.util.Objects;
 public abstract class Array implements Get<Value>, Iterable<Value> {
 
 	/**
+	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Elementen einer Wertliste in der Methode {@link Array#collect(Collector, int, int)}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	protected static interface Collector {
+
+		/**
+		 * Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an.
+		 * 
+		 * @param value Wert.
+		 */
+		public void push(Value value);
+
+	}
+
+	{}
+
+	/**
 	 * Dieses Feld speichert eine leere Wertliste.
 	 */
 	public static final Array EMPTY = new Array() {
@@ -346,17 +364,38 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	{}
 
 	/**
+	 * Diese Methode fügt alle Werte im gegebenen Abschnitt geordnet an den gegebenen {@link Collector} an.
+	 * 
+	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 */
+	protected void collect(final Collector target, int offset, int length) {
+		for (length += offset; offset < length; offset++) {
+			target.push(this.get(offset));
+		}
+	}
+
+	/**
 	 * Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
 	 * 
 	 * @return Array mit den Werten dieser Wertliste.
 	 */
 	public Value[] value() {
 		final int length = this.length();
-		final Value[] value = new Value[length];
-		for (int i = 0; i < length; i++) {
-			value[i] = this.get(i);
-		}
-		return value;
+		final Value[] values = new Value[length];
+		final Collector collector = new Collector() {
+
+			int index = 0;
+
+			@Override
+			public void push(final Value value) {
+				values[this.index++] = value;
+			}
+
+		};
+		this.collect(collector, 0, length);
+		return values;
 	}
 
 	/**
@@ -385,6 +424,19 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		return new Array() {
 
 			@Override
+			protected void collect(final Collector target, final int offset, final int length) {
+				final int offset2 = offset - Array.this.length(), length2=offset2 + length;
+				if (offset2 >= 0) {
+					array.collect(target, offset2, length);
+				} else if (length2 <= 0) {
+					Array.this.collect(target, offset, length);
+				} else {
+					Array.this.collect(target, offset, -offset2);
+					array.collect(target, 0, length2);
+				}
+			}
+
+			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
 				final int index2 = index - Array.this.length();
 				return index2 < 0 ? Array.this.get(index) : array.get(index2);
@@ -392,11 +444,10 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Array section(final int offset, final int length) throws IllegalArgumentException {
-				final int offset2 = offset - Array.this.length();
+				final int offset2 = offset - Array.this.length(), length2=offset2 + length;
 				if (offset2 >= 0) return array.section(offset2, length);
-				final int length2 = offset2 + length; //
 				if (length2 <= 0) return super.section(offset, length);
-				return super.section(offset, -offset2).concat(array.section(0, offset2));
+				return super.section(offset, -offset2).concat(array.section(0, length2));
 			}
 
 			@Override
@@ -420,6 +471,11 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		if ((offset < 0) || (length < 0) || ((offset + length) > this.length())) throw new IllegalArgumentException();
 		if (length == 0) return Array.EMPTY;
 		return new Array() {
+
+			@Override
+			protected void collect(final Collector target, final int offset2, final int length2) {
+				Array.this.collect(target, offset + offset2, length2);
+			}
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
