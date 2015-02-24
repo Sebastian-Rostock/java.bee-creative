@@ -23,7 +23,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	protected static interface Collector {
+	public static interface Collector {
 
 		/**
 		 * Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an.
@@ -361,6 +361,22 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		return Array.valueOf(data.toArray(new Value[data.size()]));
 	}
 
+	/**
+	 * Diese Methode fügt alle Werte im gegebenen Abschnitt der gegebenen Wertliste geordnet an den gegebenen {@link Collector} an.
+	 * 
+	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
+	 * @param source Wertliste.
+	 * @param offset Position, an welcher der Abschnitt beginnt.
+	 * @param length Anzahl der Werte im Abschnitt.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
+	 */
+	public static void collect(final Collector target, Array source, int offset, int length) throws NullPointerException, IllegalArgumentException {
+		if (target == null || source == null) throw new NullPointerException();
+		if (offset < 0 || length < 0 || offset + length > source.length()) throw new IllegalArgumentException();
+		source.collect(target, offset, length);
+	}
+
 	{}
 
 	/**
@@ -415,7 +431,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
 	 * 
 	 * @param array Wertliste.
-	 * @return {@link Array}-Sicht auf die Verkettung dieser mit der gegebenen Wertliste.
+	 * @return {@link Array}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public Array concat(final Array array) throws NullPointerException {
@@ -425,7 +441,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			protected void collect(final Collector target, final int offset, final int length) {
-				final int offset2 = offset - Array.this.length(), length2=offset2 + length;
+				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
 				if (offset2 >= 0) {
 					array.collect(target, offset2, length);
 				} else if (length2 <= 0) {
@@ -444,7 +460,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Array section(final int offset, final int length) throws IllegalArgumentException {
-				final int offset2 = offset - Array.this.length(), length2=offset2 + length;
+				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
 				if (offset2 >= 0) return array.section(offset2, length);
 				if (length2 <= 0) return super.section(offset, length);
 				return super.section(offset, -offset2).concat(array.section(0, length2));
@@ -463,8 +479,8 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @return {@link Array}-Sicht auf einen Abschnitt dieses Arrays.
-	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieses Arrays liegt oder eine negative Länge hätte.
+	 * @return {@link Array}-Sicht auf einen Abschnitt dieser Wertliste.
+	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
 	 */
 	public Array section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this.length())) return this;
