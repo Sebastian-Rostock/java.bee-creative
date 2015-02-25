@@ -82,7 +82,7 @@ public final class Decoder {
 		 * @throws NullPointerException Wenn die {@link DataSource} {@code null} ist.
 		 */
 		public AbstractPool(final DataSource source, final int pageLimit) throws IOException, NullPointerException {
-			if(source == null) throw new NullPointerException();
+			if (source == null) throw new NullPointerException();
 			this.source = source;
 			this.pageLimit = Math.max(pageLimit, 1);
 			this.pageCount = 0;
@@ -98,22 +98,22 @@ public final class Decoder {
 		 */
 		protected final void set(final AbstractPage[] pages, final int index, final AbstractPage page) {
 			int pageCount = this.pageCount, pageLimit = this.pageLimit;
-			if(pageCount >= pageLimit){
+			if (pageCount >= pageLimit) {
 				pageLimit = pageLimit < 0 ? 1 : (pageLimit + 1) / 2;
 				final int size = pages.length;
-				while(pageCount > pageLimit){
+				while (pageCount > pageLimit) {
 					int uses = 0;
 					final int maxUses = Integer.MAX_VALUE / pageCount;
-					for(int i = 0; i < size; i++){
+					for (int i = 0; i < size; i++) {
 						final AbstractPage item = pages[i];
-						if(item != null){
+						if (item != null) {
 							uses += (item.uses = Math.min(item.uses, maxUses - i));
 						}
 					}
 					final int minUses = uses / pageCount;
-					for(int i = 0; i < size; i++){
+					for (int i = 0; i < size; i++) {
 						final AbstractPage item = pages[i];
-						if((item != null) && ((item.uses -= minUses) <= 0)){
+						if ((item != null) && ((item.uses -= minUses) <= 0)) {
 							pages[i] = null;
 							pageCount--;
 						}
@@ -146,7 +146,7 @@ public final class Decoder {
 			final DataSource fileCache = this.source;
 			final int size = fileCache.readInt() + 1, length = fileCache.readUnsignedByte();
 			final int[] offsets = new int[size];
-			for(int i = 0; i < size; i++){
+			for (int i = 0; i < size; i++) {
 				offsets[i] = fileCache.readInt(length);
 			}
 			this.itemCount = size - 1;
@@ -160,7 +160,7 @@ public final class Decoder {
 		 * @return Größe des Datensatzes.
 		 */
 		public int size(final int itemKey) {
-			if(itemKey < 0) return 0;
+			if (itemKey < 0) return 0;
 			final int[] offsets = this.itemOffset;
 			return offsets[itemKey + 1] - offsets[itemKey];
 		}
@@ -241,28 +241,28 @@ public final class Decoder {
 		 * @return Text.
 		 */
 		public String valueItem(final int itemKey) {
-			if((itemKey < 0) || (itemKey >= this.itemCount)) return null;
+			if ((itemKey < 0) || (itemKey >= this.itemCount)) return null;
 			final TextValuePage[] pages = this.pages;
 			final int pageIndex = itemKey >> TextValuePage.BITS, dataIndex = itemKey & ((1 << TextValuePage.BITS) - 1);
 			TextValuePage page = pages[pageIndex];
-			if(page != null){
+			if (page != null) {
 				final String value = page.data[dataIndex];
-				if(value != null){
+				if (value != null) {
 					page.uses++;
 					return value;
 				}
-			}else{
+			} else {
 				page = new TextValuePage();
 				this.set(pages, pageIndex, page);
 			}
 			final int[] offsets = this.itemOffset;
 			final int offset = offsets[itemKey], length = offsets[itemKey + 1] - offset;
 			final byte[] array = new byte[length - 1];
-			try{
+			try {
 				final DataSource source = this.source;
 				source.seek(offset + this.offset);
 				source.readFully(array);
-			}catch(final IOException e){
+			} catch (final IOException e) {
 				throw new IllegalArgumentException(e);
 			}
 			final String value = new String(array, Encoder.CHARSET);
@@ -315,17 +315,17 @@ public final class Decoder {
 		 * @return Attributknoten oder {@code null}.
 		 */
 		public BEXAttrNodeView item(final BEXElemNodeView parent, final int groupKey, final int nodeIndex) {
-			if((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
+			if ((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
 			final int[] offsets = this.itemOffset;
 			final int itemKey = offsets[groupKey] + nodeIndex;
-			if(itemKey >= offsets[groupKey + 1]) return null;
+			if (itemKey >= offsets[groupKey + 1]) return null;
 			final byte[] array = this.array;
 			final int lengths = this.lengths;
 			int length = lengths & 31, offset;
-			try{
+			try {
 				this.source.seek((itemKey * length) + this.offset);
 				this.source.readFully(array, 0, length);
-			}catch(final IOException e){
+			} catch (final IOException e) {
 				throw new IllegalArgumentException(e);
 			}
 			final int uriRef = Bytes.getInt(array, 0, offset = (lengths >> 15) & 31) + 1;
@@ -388,18 +388,18 @@ public final class Decoder {
 		 * @return Attributknoten oder {@code null}.
 		 */
 		public BEXNodeView item(final BEXNodeView parent, final int groupKey, final int nodeIndex) {
-			if((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
+			if ((groupKey < 0) || (groupKey >= this.itemCount) || (nodeIndex < 0)) return null;
 			final int[] offsets = this.itemOffset;
 			final int itemKey = offsets[groupKey] + nodeIndex;
-			if(itemKey >= offsets[groupKey + 1]) return null;
+			if (itemKey >= offsets[groupKey + 1]) return null;
 			final byte[] array = this.array;
 			final int lengths = this.lengths;
 			int length = lengths & 31, offset;
-			try{
+			try {
 				final DataSource source = this.source;
 				source.seek((itemKey * length) + this.offset);
 				source.readFully(array, 0, length);
-			}catch(final IOException e){
+			} catch (final IOException e) {
 				throw new IllegalArgumentException(e);
 			}
 			final int uriRef = Bytes.getInt(array, 0, offset = (lengths >> 20) & 31) - 1;
@@ -407,9 +407,9 @@ public final class Decoder {
 			final int contentRef = Bytes.getInt(array, offset = offset + length, length = (lengths >> 10) & 31) - 1;
 			final int childrenRef = contentRef - this.contentRef;
 			final int attributesRef = Bytes.getInt(array, offset + length, (lengths >> 5) & 31) - 1;
-			if(nameRef < 0) return new BEXTextNodeView(parent, nodeIndex, contentRef);
-			if(contentRef < 0) return new BEXElemNodeView(parent, nodeIndex, uriRef, nameRef, -1, attributesRef);
-			if(childrenRef < 0) return new BEXElemTextNodeView(parent, nodeIndex, uriRef, nameRef, contentRef, attributesRef);
+			if (nameRef < 0) return new BEXTextNodeView(parent, nodeIndex, contentRef);
+			if (contentRef < 0) return new BEXElemNodeView(parent, nodeIndex, uriRef, nameRef, -1, attributesRef);
+			if (childrenRef < 0) return new BEXElemTextNodeView(parent, nodeIndex, uriRef, nameRef, contentRef, attributesRef);
 			return new BEXElemNodeView(parent, nodeIndex, uriRef, nameRef, childrenRef, attributesRef);
 		}
 
@@ -756,7 +756,7 @@ public final class Decoder {
 		 */
 		@Override
 		public BEXNodeView get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
+			if (index < 0) throw new IndexOutOfBoundsException();
 			return this.owner.document().elemGroupItem(this.owner, this.childrenRef, index);
 		}
 
@@ -765,9 +765,9 @@ public final class Decoder {
 		 */
 		@Override
 		public NodeView get(final String uri, final String name, final int index) throws NullPointerException {
-			for(int i = index, size = this.size(); index < size; i++){
+			for (int i = index, size = this.size(); index < size; i++) {
 				final BEXNodeView item = this.get(i);
-				if((item.type() == NodeView.TYPE_ELEMENT) && Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
+				if ((item.type() == NodeView.TYPE_ELEMENT) && Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
 			}
 			return null;
 		}
@@ -852,8 +852,8 @@ public final class Decoder {
 		 */
 		@Override
 		public BEXTextNodeView get(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException();
-			if(index > 0) return null;
+			if (index < 0) throw new IndexOutOfBoundsException();
+			if (index > 0) return null;
 			return new BEXTextNodeView(this.owner, 0, this.childrenRef);
 		}
 
@@ -1037,9 +1037,9 @@ public final class Decoder {
 		 */
 		@Override
 		public BEXAttrNodeView get(final String uri, final String name, final int index) throws NullPointerException {
-			for(int i = index, size = this.size(); i < size; i++){
+			for (int i = index, size = this.size(); i < size; i++) {
 				final BEXAttrNodeView item = this.get(i);
-				if(Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
+				if (Objects.equals(name, item.name()) && Objects.equals(uri, item.uri())) return item;
 			}
 			return null;
 		}

@@ -35,8 +35,8 @@ public class Conversions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Conversion<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Conversion<?, ?>)) return false;
 			final Conversion<?, ?> data = (Conversion<?, ?>)object;
 			return Objects.equals(this.output(), data.output());
 		}
@@ -134,8 +134,8 @@ public class Conversions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof StaticConversionConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof StaticConversionConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 
@@ -163,7 +163,7 @@ public class Conversions {
 		 * @throws NullPointerException Wenn die gegebene {@link Conversion} {@code null} ist.
 		 */
 		public InverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) throws NullPointerException {
-			if(conversion == null) throw new NullPointerException();
+			if (conversion == null) throw new NullPointerException();
 			this.conversion = conversion;
 		}
 
@@ -254,7 +254,7 @@ public class Conversions {
 		 * @throws NullPointerException Wenn der gegebenen {@link Converter} {@code null} ist.
 		 */
 		public DynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.input = input;
 			this.converter = converter;
 		}
@@ -319,8 +319,8 @@ public class Conversions {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DynamicConversionConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof DynamicConversionConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 

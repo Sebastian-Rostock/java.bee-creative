@@ -131,7 +131,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactIntegerArraySection(final CompactIntegerArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -189,7 +189,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactIntegerSubArraySection(final CompactIntegerSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -291,7 +291,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	protected int[] newArray(final int length) {
-		if(length == 0) return CompactIntegerArray.VOID;
+		if (length == 0) return CompactIntegerArray.VOID;
 		return new int[length];
 	}
 

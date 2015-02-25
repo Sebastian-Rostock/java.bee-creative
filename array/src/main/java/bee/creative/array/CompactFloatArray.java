@@ -131,7 +131,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -189,7 +189,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -291,7 +291,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	protected float[] newArray(final int length) {
-		if(length == 0) return CompactFloatArray.VOID;
+		if (length == 0) return CompactFloatArray.VOID;
 		return new float[length];
 	}
 

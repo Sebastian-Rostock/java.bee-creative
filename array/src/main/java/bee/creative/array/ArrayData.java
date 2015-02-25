@@ -7,8 +7,8 @@ package bee.creative.array;
  * sondern auch dessen Position.
  * <p>
  * Beim Entfernen von Elementen, werden die wenigen Elemente vor bzw. nach dem zu entfernenden Bereich verschoben. Dadurch vergrößert sich entweder die Größe
- * des Leerraums vor oder  die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht
- * aus, werden alle Elemente verschoben und im internen Array neu ausgerichtet.
+ * des Leerraums vor oder die Größe des Leerraums nach dem Nutzdatenbereich. Reicht der verfügbare Leerraum zum Verschieben dieser wenigen Elemente nicht aus,
+ * werden alle Elemente verschoben und im internen Array neu ausgerichtet.
  * <p>
  * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des internen Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am
  * Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des internen Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
@@ -75,9 +75,9 @@ public abstract class ArrayData<GArray> {
 	 */
 	protected int defaultLength(final int count) {
 		final int oldLength = this.getArrayLength();
-		if(oldLength >= count) return oldLength;
+		if (oldLength >= count) return oldLength;
 		final int newLength = oldLength + (oldLength >> 1);
-		if(newLength >= count) return newLength;
+		if (newLength >= count) return newLength;
 		return count;
 	}
 
@@ -92,9 +92,9 @@ public abstract class ArrayData<GArray> {
 	 */
 	protected void defaultResize(final int length) throws IllegalArgumentException {
 		final int size = this.size;
-		if(size > length) throw new IllegalArgumentException("size > length");
+		if (size > length) throw new IllegalArgumentException("size > length");
 		final int from2 = this.defaultAlignment(length - size);
-		if(length != this.getArrayLength()){
+		if (length != this.getArrayLength()) {
 			final GArray array = this.getArray();
 			final GArray array2 = this.newArray(length);
 			System.arraycopy(array, this.from, array2, from2, size);
@@ -119,17 +119,17 @@ public abstract class ArrayData<GArray> {
 	protected void defaultInsert(final int index, final int count) throws IllegalArgumentException {
 		final int from = this.from;
 		final int index2 = index - from;
-		if(index2 < 0) throw new IllegalArgumentException("index < from");
+		if (index2 < 0) throw new IllegalArgumentException("index < from");
 		final int size = this.size;
-		if(index2 > size) throw new IllegalArgumentException("index > from + size");
-		if(count == 0) return;
-		if(count < 0) throw new IllegalArgumentException("count < 0");
+		if (index2 > size) throw new IllegalArgumentException("index > from + size");
+		if (count == 0) return;
+		if (count < 0) throw new IllegalArgumentException("count < 0");
 		final int size2 = size + count;
 		final GArray array = this.getArray();
 		final int arrayLength = this.getArrayLength();
 		final int array2Length = this.defaultLength(size2);
 		this.size = size2;
-		if(arrayLength != array2Length){
+		if (arrayLength != array2Length) {
 			final int from2 = this.defaultAlignment(array2Length - size2);
 			final GArray array2 = this.newArray(array2Length);
 			System.arraycopy(array, from, array2, from2, index2);
@@ -138,13 +138,13 @@ public abstract class ArrayData<GArray> {
 			this.setArray(array2);
 			return;
 		}
-		if(index2 > (size / 2)){
-			if((from + size2) <= array2Length){
+		if (index2 > (size / 2)) {
+			if ((from + size2) <= array2Length) {
 				System.arraycopy(array, index, array, index + count, size - index2);
 				return;
 			}
-		}else{
-			if(from >= count){
+		} else {
+			if (from >= count) {
 				final int from2 = from - count;
 				this.from = from2;
 				System.arraycopy(array, from, array, from2, index2);
@@ -153,17 +153,17 @@ public abstract class ArrayData<GArray> {
 		}
 		final int from2 = this.defaultAlignment(array2Length - size2);
 		this.from = from2;
-		if(from2 < from){
+		if (from2 < from) {
 			System.arraycopy(array, from, array, from2, index2);
 			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
 			final int last = from + size, last2 = from2 + size2;
-			if(last2 < last){
+			if (last2 < last) {
 				this.clearArray(last2, last);
 			}
-		}else{
+		} else {
 			System.arraycopy(array, index, array, from2 + index2 + count, size - index2);
 			System.arraycopy(array, from, array, from2, index2);
-			if(from2 > from){
+			if (from2 > from) {
 				this.clearArray(from, from2);
 			}
 		}
@@ -181,22 +181,22 @@ public abstract class ArrayData<GArray> {
 	protected void defaultRemove(final int index, final int count) throws IllegalArgumentException {
 		final int from = this.from;
 		final int index2 = index - from;
-		if(index2 < 0) throw new IllegalArgumentException("index < from");
+		if (index2 < 0) throw new IllegalArgumentException("index < from");
 		final int size = this.size;
-		if(index2 > size) throw new IllegalArgumentException("index > from + size");
-		if(count == 0) return;
-		if(count < 0) throw new IllegalArgumentException("count < 0");
+		if (index2 > size) throw new IllegalArgumentException("index > from + size");
+		if (count == 0) return;
+		if (count < 0) throw new IllegalArgumentException("count < 0");
 		final int size2 = size - count;
-		if(size2 < 0) throw new IllegalArgumentException("count > size");
+		if (size2 < 0) throw new IllegalArgumentException("count > size");
 		final GArray array = this.getArray();
 		this.size = size2;
-		if(size2 == 0){
+		if (size2 == 0) {
 			this.from = this.defaultAlignment(this.getArrayLength());
 			this.clearArray(from, from + size);
-		}else if(index2 > (size2 / 2)){
+		} else if (index2 > (size2 / 2)) {
 			System.arraycopy(array, index + count, array, index, size2 - index2);
 			this.clearArray(from + size2, from + size);
-		}else{
+		} else {
 			final int from2 = from + count;
 			this.from = from2;
 			System.arraycopy(array, from, array, from2, index2);
@@ -236,7 +236,7 @@ public abstract class ArrayData<GArray> {
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
 	public final void allocate(final int capacity) throws IllegalArgumentException {
-		if(capacity < 0) throw new IllegalArgumentException("capacity < 0");
+		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
 		this.defaultResize(this.defaultLength(capacity));
 	}
 

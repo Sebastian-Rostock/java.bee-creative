@@ -24,8 +24,8 @@ public final class ElementCollector implements NodeList {
 	 * @param children {@link NodeListView}.
 	 */
 	final void collectElements(final NodeListView children) {
-		for(final NodeView nodeView: children){
-			if(nodeView.type() == NodeView.TYPE_ELEMENT){
+		for (final NodeView nodeView: children) {
+			if (nodeView.type() == NodeView.TYPE_ELEMENT) {
 				this.list.add(nodeView);
 				this.collectElements(nodeView.children());
 			}
@@ -38,9 +38,9 @@ public final class ElementCollector implements NodeList {
 	 * @param children {@link NodeListView}.
 	 */
 	final void collectElementsByUri(final NodeListView children) {
-		for(final NodeView nodeView: children){
-			if(nodeView.type() == NodeView.TYPE_ELEMENT){
-				if(this.uri.equals(nodeView.uri())){
+		for (final NodeView nodeView: children) {
+			if (nodeView.type() == NodeView.TYPE_ELEMENT) {
+				if (this.uri.equals(nodeView.uri())) {
 					this.list.add(nodeView);
 				}
 				this.collectElementsByUri(nodeView.children());
@@ -54,9 +54,9 @@ public final class ElementCollector implements NodeList {
 	 * @param children {@link NodeListView}.
 	 */
 	final void collectElementsByName(final NodeListView children) {
-		for(final NodeView nodeView: children){
-			if(nodeView.type() == NodeView.TYPE_ELEMENT){
-				if(this.name.equals(nodeView.name())){
+		for (final NodeView nodeView: children) {
+			if (nodeView.type() == NodeView.TYPE_ELEMENT) {
+				if (this.name.equals(nodeView.name())) {
 					this.list.add(nodeView);
 				}
 				this.collectElementsByName(nodeView.children());
@@ -70,9 +70,9 @@ public final class ElementCollector implements NodeList {
 	 * @param children {@link NodeListView}.
 	 */
 	final void collectElementsByLabel(final NodeListView children) {
-		for(final NodeView nodeView: children){
-			if(nodeView.type() == NodeView.TYPE_ELEMENT){
-				if(this.name.equals(nodeView.name()) && this.uri.equals(nodeView.uri())){
+		for (final NodeView nodeView: children) {
+			if (nodeView.type() == NodeView.TYPE_ELEMENT) {
+				if (this.name.equals(nodeView.name()) && this.uri.equals(nodeView.uri())) {
 					this.list.add(nodeView);
 				}
 				this.collectElementsByLabel(nodeView.children());
@@ -109,20 +109,20 @@ public final class ElementCollector implements NodeList {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public ElementCollector(final NodeListView children, final String uri, final String name) throws NullPointerException {
-		if((children == null) || (uri == null) || (name == null)) throw new NullPointerException();
+		if ((children == null) || (uri == null) || (name == null)) throw new NullPointerException();
 		this.uri = uri;
 		this.name = name;
 		this.list = new ArrayList<NodeView>();
-		if("*".equals(uri)){
-			if("*".equals(name)){
+		if ("*".equals(uri)) {
+			if ("*".equals(name)) {
 				this.collectElements(children);
-			}else{
+			} else {
 				this.collectElementsByName(children);
 			}
-		}else{
-			if("*".equals(name)){
+		} else {
+			if ("*".equals(name)) {
 				this.collectElementsByUri(children);
-			}else{
+			} else {
 				this.collectElementsByLabel(children);
 			}
 		}
@@ -134,7 +134,7 @@ public final class ElementCollector implements NodeList {
 	 */
 	@Override
 	public Node item(final int index) {
-		if(index < this.size) return new ElementAdapter(this.list.get(index));
+		if (index < this.size) return new ElementAdapter(this.list.get(index));
 		return null;
 	}
 

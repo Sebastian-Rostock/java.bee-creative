@@ -89,7 +89,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
-		if(value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException();
 		this.items.set(index, value);
 		this.setKey(key, value);
 	}
@@ -108,7 +108,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		if(value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException();
 		return super.put(key, value);
 	}
 
@@ -117,7 +117,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@Override
 	public boolean containsValue(final Object value) {
-		if(value == null) return false;
+		if (value == null) return false;
 		return this.items.values().contains(value);
 	}
 

@@ -27,11 +27,11 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 */
 	public static <GSection extends ArraySection<?>> GSection validate(final GSection section) throws NullPointerException, IndexOutOfBoundsException,
 		IllegalArgumentException {
-		if(section == null) throw new NullPointerException("section is null");
-		if(section.array() == null) throw new NullPointerException("array is null");
-		if(section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
-		if(section.finalIndex() < section.startIndex()) throw new IllegalArgumentException("finalIndex < startIndex");
-		if(section.finalIndex() > section.arrayLength()) throw new IndexOutOfBoundsException("finalIndex > arrayLength");
+		if (section == null) throw new NullPointerException("section is null");
+		if (section.array() == null) throw new NullPointerException("array is null");
+		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
+		if (section.finalIndex() < section.startIndex()) throw new IllegalArgumentException("finalIndex < startIndex");
+		if (section.finalIndex() > section.arrayLength()) throw new IndexOutOfBoundsException("finalIndex > arrayLength");
 		return section;
 	}
 
@@ -140,7 +140,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	public int hashCode() {
 		int hash = 1;
 		final GArray array = this.array();
-		for(int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++){
+		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
 			hash = (31 * hash) + this.hashCode(array, index);
 		}
 		return hash;
@@ -156,10 +156,10 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		int index = this.startIndex();
 		final int delta = data.startIndex() - index;
 		final int finalIndex = this.finalIndex();
-		if((finalIndex - index) != (((data.finalIndex() - index) - delta))) return false;
+		if ((finalIndex - index) != (((data.finalIndex() - index) - delta))) return false;
 		final GArray array1 = this.array(), array2 = data.array();
-		for(; index < finalIndex; index++){
-			if(!this.equals(array1, array2, index, index + delta)) return false;
+		for (; index < finalIndex; index++) {
+			if (!this.equals(array1, array2, index, index + delta)) return false;
 		}
 		return true;
 	}
@@ -176,18 +176,18 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		final int finalIndex2 = section.finalIndex();
 		final int size1 = this.finalIndex() - startIndex1;
 		final int size2 = section.finalIndex() - startIndex2;
-		if(size1 < size2){
-			for(final int delta = startIndex2 - startIndex1; startIndex1 < finalIndex1; startIndex1++){
+		if (size1 < size2) {
+			for (final int delta = startIndex2 - startIndex1; startIndex1 < finalIndex1; startIndex1++) {
 				final int comp = this.compareTo(array1, array2, startIndex1, startIndex1 + delta);
-				if(comp != 0) return comp;
+				if (comp != 0) return comp;
 			}
 			return -1;
-		}else{
-			for(final int delta = startIndex1 - startIndex2; startIndex2 < finalIndex2; startIndex2++){
+		} else {
+			for (final int delta = startIndex1 - startIndex2; startIndex2 < finalIndex2; startIndex2++) {
 				final int comp = this.compareTo(array1, array2, startIndex2 + delta, startIndex2);
-				if(comp != 0) return comp;
+				if (comp != 0) return comp;
 			}
-			if(size1 == size2) return 0;
+			if (size1 == size2) return 0;
 			return 1;
 		}
 	}
@@ -199,12 +199,12 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	public String toString() {
 		int index = this.startIndex();
 		final int finalIndex = this.finalIndex();
-		if(index == finalIndex) return "[]";
+		if (index == finalIndex) return "[]";
 		final StringBuilder builder = new StringBuilder();
 		builder.append('[');
 		final GArray array = this.array();
 		this.toString(array, index++, builder);
-		for(; index < finalIndex; index++){
+		for (; index < finalIndex; index++) {
 			this.toString(array, index, builder.append(", "));
 		}
 		return builder.append(']').toString();

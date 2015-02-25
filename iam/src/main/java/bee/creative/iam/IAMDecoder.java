@@ -557,7 +557,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMBufferArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
 			final IAMArray keyOffset = this.keyOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
@@ -575,7 +575,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMBufferArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
 			final IAMArray keyOffset = this.valueOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
@@ -833,7 +833,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMMapDecoder map(final int index) {
-			if ((index < 0) || (index >= this.maps.length)) return EMPTY_MAP;
+			if ((index < 0) || (index >= this.maps.length)) return IAMDecoder.EMPTY_MAP;
 			return this.maps[index];
 		}
 
@@ -850,7 +850,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMListDecoder list(final int index) {
-			if ((index < 0) || (index >= this.lists.length)) return EMPTY_LIST;
+			if ((index < 0) || (index >= this.lists.length)) return IAMDecoder.EMPTY_LIST;
 			return this.lists[index];
 		}
 

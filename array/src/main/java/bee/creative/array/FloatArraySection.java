@@ -116,8 +116,8 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof FloatArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof FloatArraySection)) return false;
 		return super.equals(object);
 	}
 

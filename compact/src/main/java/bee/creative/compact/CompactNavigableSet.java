@@ -106,7 +106,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public boolean add(final GItem item) {
-			if(!this.isInRange(item)) throw new IllegalArgumentException("entry out of range");
+			if (!this.isInRange(item)) throw new IllegalArgumentException("entry out of range");
 			return this.data.add(item);
 		}
 
@@ -131,7 +131,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public boolean remove(final Object item) {
-			if(!this.isInRange(item)) return false;
+			if (!this.isInRange(item)) return false;
 			return this.data.remove(item);
 		}
 
@@ -188,8 +188,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Set<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Set<?>)) return false;
 			return new CompactSetItems<GItem>(this).equals(object);
 		}
 
@@ -327,8 +327,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
-			if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
-			if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, fromInclusive, toElement, toInclusive);
 		}
 
@@ -337,7 +337,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
-			if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
 			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, toElement, inclusive);
 		}
 
@@ -346,7 +346,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-			if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 			return new CompactNavigableSet.CompactAscendingSubSet<GItem>(this.data, fromElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
@@ -476,8 +476,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> subSet(final GItem fromElement, final boolean fromInclusive, final GItem toElement, final boolean toInclusive) {
-			if(!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
-			if(!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(fromElement, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(toElement, toInclusive)) throw new IllegalArgumentException("toElement out of range");
 			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, toInclusive, fromElement, fromInclusive);
 		}
 
@@ -486,7 +486,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> headSet(final GItem toElement, final boolean inclusive) {
-			if(!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(toElement, inclusive)) throw new IllegalArgumentException("toElement out of range");
 			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, toElement, inclusive, this.lastItem, this.lastInclusive);
 		}
 
@@ -495,7 +495,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public NavigableSet<GItem> tailSet(final GItem fromElement, final boolean inclusive) {
-			if(!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(fromElement, inclusive)) throw new IllegalArgumentException("fromElement out of range");
 			return new CompactNavigableSet.CompactDescendingSubSet<GItem>(this.data, this.fromItem, this.fromInclusive, fromElement, inclusive);
 		}
 
@@ -514,7 +514,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 		super();
-		if(comparator == null) throw new NullPointerException("comparator is null");
+		if (comparator == null) throw new NullPointerException("comparator is null");
 		this.comparator = comparator;
 	}
 
@@ -541,7 +541,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator) throws NullPointerException {
 		this(comparator);
-		if(collection == null) throw new NullPointerException("collection is null");
+		if (collection == null) throw new NullPointerException("collection is null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}
@@ -553,7 +553,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @return {@code index}-te Element oder {@code null}.
 	 */
 	protected final GItem poll(final int index) {
-		if((index < 0) || (index >= this.size())) return null;
+		if ((index < 0) || (index >= this.size())) return null;
 		final GItem item = this.getItem(index);
 		this.customRemove(index, 1);
 		return item;
@@ -566,7 +566,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @return {@code index}-tes Element oder {@code null}.
 	 */
 	protected final GItem getItemOrNull(final int index) {
-		if((index < 0) || (index >= this.size())) return null;
+		if ((index < 0) || (index >= this.size())) return null;
 		return this.getItem(index);
 	}
 
@@ -578,7 +578,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
 	 */
 	protected final GItem getItemOrException(final int index) throws NoSuchElementException {
-		if((index < 0) || (index >= this.size())) throw new NoSuchElementException();
+		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getItem(index);
 	}
 

@@ -48,7 +48,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	 */
 	@Override
 	protected int customItemIndex(final Object key) {
-		if(key == null) return this.defaultEqualsIndex(null, 0);
+		if (key == null) return this.defaultEqualsIndex(null, 0);
 		return this.defaultEqualsIndex(key, key.hashCode());
 	}
 
@@ -58,7 +58,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
-		if(key == null) return this.getKey((GValue)item) == null;
+		if (key == null) return this.getKey((GValue)item) == null;
 		return key.equals(this.getKey((GValue)item));
 	}
 
@@ -69,7 +69,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	@Override
 	protected int customItemCompare(final Object key, final int hash, final Object item) {
 		final Object value = this.getKey((GValue)item);
-		if(value == null) return hash;
+		if (value == null) return hash;
 		return Comparators.compare(hash, value.hashCode());
 	}
 

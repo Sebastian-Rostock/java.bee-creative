@@ -68,7 +68,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
 		public AbstractDelegatingField(final Field<? super GInput2, GValue2> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -358,7 +358,7 @@ public final class Fields {
 		 * @param set {@link Set}.
 		 * @return Bearbeitungskopie.
 		 */
-		protected Set<GEntry> copy(Set<GEntry> set) {
+		protected Set<GEntry> copy(final Set<GEntry> set) {
 			return new HashSet<GEntry>(set);
 		}
 
@@ -367,7 +367,7 @@ public final class Fields {
 		 */
 		@Override
 		public void clear(final GInput input) {
-			if(this.get(input).isEmpty()) return;
+			if (this.get(input).isEmpty()) return;
 			this.set(input, Collections.<GEntry>emptySet());
 		}
 
@@ -377,8 +377,8 @@ public final class Fields {
 		@Override
 		public void append(final GInput input, final GEntry entry) {
 			Set<GEntry> set = this.get(input);
-			if(set.contains(entry)) return;
-			set = copy(this.get(input));
+			if (set.contains(entry)) return;
+			set = this.copy(this.get(input));
 			set.add(entry);
 			this.set(input, set);
 		}
@@ -388,8 +388,8 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GEntry> entries) {
-			final Set<GEntry> set = copy(this.get(input));
-			if(!Iterables.appendAll(set, entries)) return;
+			final Set<GEntry> set = this.copy(this.get(input));
+			if (!Iterables.appendAll(set, entries)) return;
 			this.set(input, set);
 		}
 
@@ -399,8 +399,8 @@ public final class Fields {
 		@Override
 		public void remove(final GInput input, final Object entry) {
 			Set<GEntry> set = this.get(input);
-			if(!set.contains(entry)) return;
-			set = copy(this.get(input));
+			if (!set.contains(entry)) return;
+			set = this.copy(this.get(input));
 			set.remove(entry);
 			this.set(input, set);
 		}
@@ -410,8 +410,8 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> entries) {
-			final Set<GEntry> set = copy(this.get(input));
-			if(!Iterables.removeAll(set, entries)) return;
+			final Set<GEntry> set = this.copy(this.get(input));
+			if (!Iterables.removeAll(set, entries)) return;
 			this.set(input, set);
 		}
 
@@ -432,7 +432,7 @@ public final class Fields {
 		 * @param list {@link List}.
 		 * @return Bearbeitungskopie.
 		 */
-		protected List<GEntry> copy(List<GEntry> list) {
+		protected List<GEntry> copy(final List<GEntry> list) {
 			return new ArrayList<GEntry>(list);
 		}
 
@@ -441,7 +441,7 @@ public final class Fields {
 		 */
 		@Override
 		public void clear(final GInput input) {
-			if(this.get(input).isEmpty()) return;
+			if (this.get(input).isEmpty()) return;
 			this.set(input, Collections.<GEntry>emptyList());
 		}
 
@@ -450,7 +450,7 @@ public final class Fields {
 		 */
 		@Override
 		public void append(final GInput input, final GEntry entry) {
-			final List<GEntry> list = copy(this.get(input));
+			final List<GEntry> list = this.copy(this.get(input));
 			list.add(entry);
 			this.set(input, list);
 		}
@@ -460,8 +460,8 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends GEntry> entries) {
-			final List<GEntry> list = copy(this.get(input));
-			if(!Iterables.appendAll(list, entries)) return;
+			final List<GEntry> list = this.copy(this.get(input));
+			if (!Iterables.appendAll(list, entries)) return;
 			this.set(input, list);
 		}
 
@@ -470,7 +470,7 @@ public final class Fields {
 		 */
 		@Override
 		public void append(final GInput input, final int index, final GEntry entry) {
-			final List<GEntry> list = copy(this.get(input));
+			final List<GEntry> list = this.copy(this.get(input));
 			list.add(index, entry);
 			this.set(input, list);
 		}
@@ -480,8 +480,8 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final int index, final Iterable<? extends GEntry> entries) {
-			final List<GEntry> list = copy(this.get(input));
-			if(!Iterables.appendAll(list.subList(index, index), entries)) return;
+			final List<GEntry> list = this.copy(this.get(input));
+			if (!Iterables.appendAll(list.subList(index, index), entries)) return;
 			this.set(input, list);
 		}
 
@@ -490,7 +490,7 @@ public final class Fields {
 		 */
 		@Override
 		public void remove(final GInput input, final int index) {
-			final List<GEntry> list = copy(this.get(input));
+			final List<GEntry> list = this.copy(this.get(input));
 			list.remove(index);
 			this.set(input, list);
 		}
@@ -502,7 +502,7 @@ public final class Fields {
 		public void remove(final GInput input, final Object entry) {
 			final List<GEntry> list = this.get(input);
 			final int index = list.indexOf(entry);
-			if(index < 0) return;
+			if (index < 0) return;
 			this.remove(input, index);
 		}
 
@@ -511,8 +511,8 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> entries) {
-			final List<GEntry> list = copy(this.get(input));
-			if(!Iterables.removeAll(list, entries)) return;
+			final List<GEntry> list = this.copy(this.get(input));
+			if (!Iterables.removeAll(list, entries)) return;
 			this.set(input, list);
 		}
 
@@ -535,7 +535,7 @@ public final class Fields {
 		 * @param map {@link Map}.
 		 * @return Bearbeitungskopie.
 		 */
-		protected Map<GKey, GValue> copy(Map<GKey, GValue> map) {
+		protected Map<GKey, GValue> copy(final Map<GKey, GValue> map) {
 			return new HashMap<GKey, GValue>(map);
 		}
 
@@ -544,7 +544,7 @@ public final class Fields {
 		 */
 		@Override
 		public void clear(final GInput input) {
-			if(this.get(input).isEmpty()) return;
+			if (this.get(input).isEmpty()) return;
 			this.set(input, Collections.<GKey, GValue>emptyMap());
 		}
 
@@ -554,8 +554,8 @@ public final class Fields {
 		@Override
 		public void append(final GInput input, final GKey key, final GValue value) {
 			Map<GKey, GValue> map = this.get(input);
-			if(Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
-			map = copy(this.get(input));
+			if (Objects.equals(map.get(key), value) && ((value != null) || map.containsKey(key))) return;
+			map = this.copy(this.get(input));
 			map.put(key, value);
 			this.set(input, map);
 		}
@@ -565,12 +565,12 @@ public final class Fields {
 		 */
 		@Override
 		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			final Map<GKey, GValue> map = copy(this.get(input));
+			final Map<GKey, GValue> map = this.copy(this.get(input));
 			boolean modified = false;
-			for(final Entry<? extends GKey, ? extends GValue> entry: entries){
+			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
 				modified = !Objects.equals(map.put(entry.getKey(), entry.getValue()), entry.getValue()) || modified;
 			}
-			if(!modified) return;
+			if (!modified) return;
 			this.set(input, map);
 		}
 
@@ -580,8 +580,8 @@ public final class Fields {
 		@Override
 		public void remove(final GInput input, final Object key) {
 			Map<GKey, GValue> map = this.get(input);
-			if(!map.containsKey(key)) return;
-			map = copy(map);
+			if (!map.containsKey(key)) return;
+			map = this.copy(map);
 			map.remove(key);
 			this.set(input, map);
 		}
@@ -591,8 +591,8 @@ public final class Fields {
 		 */
 		@Override
 		public void removeAll(final GInput input, final Iterable<?> keys) {
-			final Map<GKey, GValue> map = copy(this.get(input));
-			if(!Iterables.removeAll(map.keySet(), keys)) return;
+			final Map<GKey, GValue> map = this.copy(this.get(input));
+			if (!Iterables.removeAll(map.keySet(), keys)) return;
 			this.set(input, map);
 		}
 
@@ -619,7 +619,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingSetField(final Field<? super GInput, Set<GEntry>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -652,8 +652,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DelegatingSetField<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof DelegatingSetField<?, ?>)) return false;
 			final DelegatingSetField<?, ?> data = (DelegatingSetField<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
@@ -689,7 +689,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingListField(final Field<? super GInput, List<GEntry>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -722,8 +722,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DelegatingListField<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof DelegatingListField<?, ?>)) return false;
 			final DelegatingListField<?, ?> data = (DelegatingListField<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
@@ -760,7 +760,7 @@ public final class Fields {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} null ist.
 		 */
 		public DelegatingMapField(final Field<? super GInput, Map<GKey, GValue>> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -793,8 +793,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DelegatingMapField<?, ?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof DelegatingMapField<?, ?, ?>)) return false;
 			final DelegatingMapField<?, ?, ?> data = (DelegatingMapField<?, ?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
@@ -897,8 +897,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ValueField<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ValueField<?>)) return false;
 			final ValueField<?> data = (ValueField<?>)object;
 			return Objects.equals(this.value, data.value);
 		}
@@ -987,16 +987,16 @@ public final class Fields {
 		@Override
 		public GValue get(final Iterable<? extends GInput> input) {
 			final Converter<? super GValue2, ? extends GValue> formatter = this.formatter;
-			if(formatter == null) return null;
+			if (formatter == null) return null;
 			final Field<? super GInput, GValue2> field = this.field;
 			GValue2 next = null;
 			Object last = IterableField.SKIP;
-			for(final GInput input2: input){
+			for (final GInput input2: input) {
 				next = field.get(input2);
-				if((last != IterableField.SKIP) && !Objects.equals(last, next)) return this.mixedValue;
+				if ((last != IterableField.SKIP) && !Objects.equals(last, next)) return this.mixedValue;
 				last = next;
 			}
-			if(last == IterableField.SKIP) return this.emptyValue;
+			if (last == IterableField.SKIP) return this.emptyValue;
 			return formatter.convert(next);
 		}
 
@@ -1006,10 +1006,10 @@ public final class Fields {
 		@Override
 		public void set(final Iterable<? extends GInput> input, final GValue value) {
 			final Converter<? super GValue, ? extends GValue2> parser = this.parser;
-			if(parser == null) return;
+			if (parser == null) return;
 			final Field<? super GInput, GValue2> field = this.field;
 			final GValue2 value2 = parser.convert(value);
-			for(final GInput entry: input){
+			for (final GInput entry: input) {
 				field.set(entry, value2);
 			}
 		}
@@ -1027,8 +1027,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof IterableField<?, ?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof IterableField<?, ?, ?>)) return false;
 			final IterableField<?, ?, ?> data = (IterableField<?, ?, ?>)object;
 			return Objects.equals(this.field, data.field) && Objects.equals(this.parser, data.parser) && Objects.equals(this.formatter, data.formatter)
 				&& Objects.equals(this.emptyValue, data.emptyValue) && Objects.equals(this.mixedValue, data.mixedValue);
@@ -1069,7 +1069,7 @@ public final class Fields {
 		 */
 		public ConvertedField(final Converter<? super GInput, ? extends GOutput> converter, final Field<? super GOutput, GValue> field) throws NullPointerException {
 			super(field);
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -1102,8 +1102,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConvertedField<?, ?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConvertedField<?, ?, ?>)) return false;
 			final ConvertedField<?, ?, ?> data = (ConvertedField<?, ?, ?>)object;
 			return Objects.equals(this.field, data.field) && Objects.equals(this.converter, data.converter);
 		}
@@ -1165,7 +1165,7 @@ public final class Fields {
 		@Override
 		public GValue get(final GInput input) {
 			final Converter<? super GValue2, ? extends GValue> formatter = this.formatter;
-			if(formatter == null) return null;
+			if (formatter == null) return null;
 			return formatter.convert(this.field.get(input));
 		}
 
@@ -1175,7 +1175,7 @@ public final class Fields {
 		@Override
 		public void set(final GInput input, final GValue value) {
 			final Converter<? super GValue, ? extends GValue2> parser = this.parser;
-			if(parser == null) return;
+			if (parser == null) return;
 			this.field.set(input, parser.convert(value));
 		}
 
@@ -1192,8 +1192,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof TranscodedField<?, ?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof TranscodedField<?, ?, ?>)) return false;
 			final TranscodedField<?, ?, ?> data = (TranscodedField<?, ?, ?>)object;
 			return Objects.equals(this.field, data.field) && Objects.equals(this.parser, data.parser) && Objects.equals(this.formatter, data.formatter);
 		}
@@ -1244,7 +1244,7 @@ public final class Fields {
 		 */
 		public ConditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject)
 			throws NullPointerException {
-			if((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
+			if ((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
 			this.condition = condition;
 			this.accept = accept;
 			this.reject = reject;
@@ -1255,7 +1255,7 @@ public final class Fields {
 		 */
 		@Override
 		public GValue get(final GInput input) {
-			if(this.condition.accept(input)) return this.accept.get(input);
+			if (this.condition.accept(input)) return this.accept.get(input);
 			return this.reject.get(input);
 		}
 
@@ -1264,9 +1264,9 @@ public final class Fields {
 		 */
 		@Override
 		public void set(final GInput input, final GValue value) {
-			if(this.condition.accept(input)){
+			if (this.condition.accept(input)) {
 				this.accept.set(input, value);
-			}else{
+			} else {
 				this.reject.set(input, value);
 			}
 		}
@@ -1284,8 +1284,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConditionalField<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConditionalField<?, ?>)) return false;
 			final ConditionalField<?, ?> data = (ConditionalField<?, ?>)object;
 			return Objects.equals(this.condition, data.condition) && Objects.equals(this.accept, data.accept) && Objects.equals(this.reject, data.reject);
 		}
@@ -1324,7 +1324,7 @@ public final class Fields {
 		 */
 		@Override
 		public GValue get(final GInput input) {
-			synchronized(this){
+			synchronized (this) {
 				return this.field.get(input);
 			}
 		}
@@ -1334,7 +1334,7 @@ public final class Fields {
 		 */
 		@Override
 		public void set(final GInput input, final GValue value) {
-			synchronized(this){
+			synchronized (this) {
 				this.field.set(input, value);
 			}
 		}
@@ -1344,8 +1344,8 @@ public final class Fields {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof SynchronizedField<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof SynchronizedField<?, ?>)) return false;
 			final SynchronizedField<?, ?> data = (SynchronizedField<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}

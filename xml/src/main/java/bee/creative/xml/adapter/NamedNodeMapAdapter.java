@@ -27,7 +27,7 @@ public final class NamedNodeMapAdapter implements NamedNodeMap {
 	 * @throws NullPointerException Wenn der {@link NodeListView} {@code null} ist.
 	 */
 	public NamedNodeMapAdapter(final NodeListView attributesView) throws NullPointerException {
-		if(attributesView == null) throw new NullPointerException();
+		if (attributesView == null) throw new NullPointerException();
 		this.listView = attributesView;
 	}
 
@@ -37,7 +37,7 @@ public final class NamedNodeMapAdapter implements NamedNodeMap {
 	@Override
 	public Node item(final int index) {
 		final NodeView attributeView = this.listView.get(index);
-		if(attributeView == null) return null;
+		if (attributeView == null) return null;
 		return new AttrAdapter(attributeView);
 	}
 
@@ -71,7 +71,7 @@ public final class NamedNodeMapAdapter implements NamedNodeMap {
 	@Override
 	public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
 		final NodeView nodeView = this.listView.get(namespaceURI, localName, 0);
-		if(nodeView == null) return null;
+		if (nodeView == null) return null;
 		return new AttrAdapter(nodeView);
 	}
 
@@ -105,7 +105,7 @@ public final class NamedNodeMapAdapter implements NamedNodeMap {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		for(int i = 0, size = this.getLength(); i < size; i++){
+		for (int i = 0, size = this.getLength(); i < size; i++) {
 			builder.append(' ').append(this.item(i));
 		}
 		return builder.toString();

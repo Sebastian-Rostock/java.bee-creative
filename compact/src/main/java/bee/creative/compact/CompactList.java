@@ -43,7 +43,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -226,11 +226,11 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 */
 	@Override
 	public final boolean addAll(final int index, final Collection<? extends GItem> collection) {
-		if(collection == null) throw new NullPointerException();
-		if(collection.isEmpty()) return false;
+		if (collection == null) throw new NullPointerException();
+		if (collection.isEmpty()) return false;
 		final Object[] items = collection.toArray();
 		final int count = items.length;
-		if(count == 0) return false;
+		if (count == 0) return false;
 		this.customInsert(index, count);
 		this.setItems(index, items);
 		return true;

@@ -137,7 +137,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -204,7 +204,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 

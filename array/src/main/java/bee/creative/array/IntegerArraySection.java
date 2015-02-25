@@ -101,8 +101,8 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 	@Override
 	protected int compareTo(final int[] array1, final int[] array2, final int index1, final int index2) {
 		final int value1 = array1[index1], value2 = array2[index2];
-		if(value1 == value2) return 0;
-		if(value1 < value2) return -1;
+		if (value1 == value2) return 0;
+		if (value1 < value2) return -1;
 		return 1;
 	}
 
@@ -119,8 +119,8 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof IntegerArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof IntegerArraySection)) return false;
 		return super.equals(object);
 	}
 

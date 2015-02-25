@@ -98,7 +98,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	public CompactCollection(final Collection<? extends GItem> collection) {
 		super();
-		if(collection == null) throw new NullPointerException("collection is null");
+		if (collection == null) throw new NullPointerException("collection is null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}
@@ -172,7 +172,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	@Override
 	public final boolean remove(final Object item) {
 		final int index = this.customItemIndex(item);
-		if(index < 0) return false;
+		if (index < 0) return false;
 		this.customRemove(index, 1);
 		return true;
 	}
@@ -190,7 +190,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final boolean retainAll(final Collection<?> collection) {
-		if(this.isEmpty()) return false;
+		if (this.isEmpty()) return false;
 		return Iterables.retainAll((Iterable<?>)this, collection);
 	}
 
@@ -199,7 +199,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final boolean removeAll(final Collection<?> collection) {
-		if(this.isEmpty()) return false;
+		if (this.isEmpty()) return false;
 		return Iterables.removeAll((Iterable<?>)this, collection);
 	}
 

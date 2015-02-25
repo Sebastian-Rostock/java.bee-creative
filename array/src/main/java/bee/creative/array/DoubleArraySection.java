@@ -117,8 +117,8 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof DoubleArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof DoubleArraySection)) return false;
 		return super.equals(object);
 	}
 

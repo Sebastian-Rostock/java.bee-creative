@@ -56,7 +56,7 @@ public final class AttrAdapter extends AbstractNodeAdapter implements Attr {
 	public String getNodeName() {
 		final String xmlnsName = this.lookupPrefix(this.nodeView.uri());
 		final String attributeName = this.nodeView.name();
-		if(xmlnsName == null) return attributeName;
+		if (xmlnsName == null) return attributeName;
 		return xmlnsName + ":" + attributeName;
 	}
 
@@ -177,8 +177,8 @@ public final class AttrAdapter extends AbstractNodeAdapter implements Attr {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof AttrAdapter)) return false;
+		if (object == this) return true;
+		if (!(object instanceof AttrAdapter)) return false;
 		final AttrAdapter data = (AttrAdapter)object;
 		return Objects.equals(this.nodeView, data.nodeView);
 	}

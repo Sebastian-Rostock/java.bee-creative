@@ -94,7 +94,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		public AbstractNamedConverter(final String name) throws NullPointerException {
-			if(name == null) throw new NullPointerException();
+			if (name == null) throw new NullPointerException();
 			this.name = name;
 		}
 
@@ -148,7 +148,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 		 */
 		public AbstractDelegatingConverter(final Converter<? super GInput2, ? extends GOutput2> converter) throws NullPointerException {
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -225,7 +225,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn das gegebene {@link bee.creative.util.Field} null ist.
 		 */
 		public FieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -250,8 +250,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FieldConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FieldConverter<?, ?>)) return false;
 			final FieldConverter<?, ?> data = (FieldConverter<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
@@ -288,7 +288,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
 		 */
 		public FixedFieldConverter(final Field field) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			this.field = field;
 		}
 
@@ -298,9 +298,9 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			try{
+			try {
 				return (GOutput)this.field.get(input);
-			}catch(final IllegalAccessException e){
+			} catch (final IllegalAccessException e) {
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -318,8 +318,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FixedFieldConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FixedFieldConverter<?, ?>)) return false;
 			final FixedFieldConverter<?, ?> data = (FixedFieldConverter<?, ?>)object;
 			return Objects.equals(this.field, data.field);
 		}
@@ -356,7 +356,7 @@ public class Converters {
 		 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
 		 */
 		public FixedMethodConverter(final Method method) throws NullPointerException {
-			if(method == null) throw new NullPointerException();
+			if (method == null) throw new NullPointerException();
 			this.method = method;
 		}
 
@@ -366,11 +366,11 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			try{
+			try {
 				return (GOutput)this.method.invoke(input);
-			}catch(final InvocationTargetException e){
+			} catch (final InvocationTargetException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final IllegalAccessException e){
+			} catch (final IllegalAccessException e) {
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -388,8 +388,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FixedMethodConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FixedMethodConverter<?, ?>)) return false;
 			final FixedMethodConverter<?, ?> data = (FixedMethodConverter<?, ?>)object;
 			return Objects.equals(this.method, data.method);
 		}
@@ -431,14 +431,14 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException();
-			try{
+			if (input == null) throw new NullPointerException();
+			try {
 				return (GOutput)input.getClass().getField(this.name).get(input);
-			}catch(final IllegalAccessException e){
+			} catch (final IllegalAccessException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final NoSuchFieldException e){
+			} catch (final NoSuchFieldException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final SecurityException e){
+			} catch (final SecurityException e) {
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -448,8 +448,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof NamedFieldConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof NamedFieldConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 
@@ -482,16 +482,16 @@ public class Converters {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public GOutput convert(final GInput input) {
-			if(input == null) throw new NullPointerException();
-			try{
+			if (input == null) throw new NullPointerException();
+			try {
 				return (GOutput)input.getClass().getMethod(this.name).invoke(input);
-			}catch(final InvocationTargetException e){
+			} catch (final InvocationTargetException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final IllegalAccessException e){
+			} catch (final IllegalAccessException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final NoSuchMethodException e){
+			} catch (final NoSuchMethodException e) {
 				throw new IllegalArgumentException(e);
-			}catch(final SecurityException e){
+			} catch (final SecurityException e) {
 				throw new IllegalArgumentException(e);
 			}
 		}
@@ -501,8 +501,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof NamedMethodConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof NamedMethodConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 
@@ -551,8 +551,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ValueConverter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ValueConverter<?>)) return false;
 			final ValueConverter<?> data = (ValueConverter<?>)object;
 			return Objects.equals(this.value, data.value);
 		}
@@ -634,7 +634,7 @@ public class Converters {
 		 * Diese Methode leert den Cache.
 		 */
 		public void clear() {
-			if(this.capacity == 0) return;
+			if (this.capacity == 0) return;
 			this.map = new LinkedHashMap<Pointer<GInput>, Pointer<GOutput>>(0, 0.75f, true);
 			this.capacity = 0;
 		}
@@ -646,21 +646,21 @@ public class Converters {
 		public GOutput convert(final GInput input) {
 			final Map<Pointer<GInput>, Pointer<GOutput>> map = this.map;
 			final Pointer<GOutput> pointer = map.get(Pointers.hardPointer(input));
-			if(pointer != null){
+			if (pointer != null) {
 				final GOutput output = pointer.data();
-				if(output != null) return output;
-				if(Pointers.isValid(pointer)) return null;
+				if (output != null) return output;
+				if (Pointers.isValid(pointer)) return null;
 				int valid = this.limit - 1;
-				for(final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = map.entrySet().iterator(); iterator.hasNext();){
+				for (final Iterator<Entry<Pointer<GInput>, Pointer<GOutput>>> iterator = map.entrySet().iterator(); iterator.hasNext();) {
 					final Entry<Pointer<GInput>, Pointer<GOutput>> entry = iterator.next();
 					final Pointer<?> key = entry.getKey(), value = entry.getValue();
-					if(valid != 0){
-						if(!Pointers.isValid(key) || !Pointers.isValid(value)){
+					if (valid != 0) {
+						if (!Pointers.isValid(key) || !Pointers.isValid(value)) {
 							iterator.remove();
-						}else{
+						} else {
 							valid--;
 						}
-					}else{
+					} else {
 						iterator.remove();
 					}
 				}
@@ -668,9 +668,9 @@ public class Converters {
 			final GOutput output = this.converter.convert(input);
 			map.put(Pointers.pointer(this.inputMode, input), Pointers.pointer(this.outputMode, output));
 			final int size = map.size(), capacity = this.capacity;
-			if(size >= capacity){
+			if (size >= capacity) {
 				this.capacity = size;
-			}else if((size << 2) <= capacity){
+			} else if ((size << 2) <= capacity) {
 				(this.map = new LinkedHashMap<Pointer<GInput>, Pointer<GOutput>>(0, 0.75f, true)).putAll(map);
 				this.capacity = size;
 			}
@@ -682,8 +682,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof CachedConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof CachedConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 
@@ -727,7 +727,7 @@ public class Converters {
 		 */
 		public ChainedConverter(final Converter<? super GInput, ? extends GValue> converter1, final Converter<? super GValue, ? extends GOutput> converter2)
 			throws NullPointerException {
-			if((converter1 == null) || (converter2 == null)) throw new NullPointerException();
+			if ((converter1 == null) || (converter2 == null)) throw new NullPointerException();
 			this.converter1 = converter1;
 			this.converter2 = converter2;
 		}
@@ -753,8 +753,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ChainedConverter<?, ?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ChainedConverter<?, ?, ?>)) return false;
 			final ChainedConverter<?, ?, ?> data = (ChainedConverter<?, ?, ?>)object;
 			return Objects.equals(this.converter1, data.converter1) && Objects.equals(this.converter2, data.converter2);
 		}
@@ -805,7 +805,7 @@ public class Converters {
 		 */
 		public ConditionalConverter(final Filter<? super GInput> condition, final Converter<? super GInput, ? extends GOutput> accept,
 			final Converter<? super GInput, ? extends GOutput> reject) throws NullPointerException {
-			if((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
+			if ((condition == null) || (accept == null) || (reject == null)) throw new NullPointerException();
 			this.condition = condition;
 			this.accept = accept;
 			this.reject = reject;
@@ -816,7 +816,7 @@ public class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			if(this.condition.accept(input)) return this.accept.convert(input);
+			if (this.condition.accept(input)) return this.accept.convert(input);
 			return this.reject.convert(input);
 		}
 
@@ -833,8 +833,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConditionalConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConditionalConverter<?, ?>)) return false;
 			final ConditionalConverter<?, ?> data = (ConditionalConverter<?, ?>)object;
 			return Objects.equals(this.condition, data.condition) && Objects.equals(this.accept, data.accept) && Objects.equals(this.reject, data.reject);
 		}
@@ -874,7 +874,7 @@ public class Converters {
 		 */
 		@Override
 		public GOutput convert(final GInput input) {
-			synchronized(this){
+			synchronized (this) {
 				return this.converter.convert(input);
 			}
 		}
@@ -884,8 +884,8 @@ public class Converters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof SynchronizedConverter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof SynchronizedConverter<?, ?>)) return false;
 			return super.equals(object);
 		}
 

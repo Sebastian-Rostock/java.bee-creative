@@ -83,8 +83,8 @@ public interface Item extends Part, Assignable<Item> {
 	public int state();
 
 	/**
-	 * Diese Methode gibt eine Auflistung der Assoziationen zurück, in denen dieses {@link Item} verwenden wird. Über {@link Iterator#remove()} kann
-	 * die Assoziation zu diesem {@link Item} aufgelöst werden.
+	 * Diese Methode gibt eine Auflistung der Assoziationen zurück, in denen dieses {@link Item} verwenden wird. Über {@link Iterator#remove()} kann die
+	 * Assoziation zu diesem {@link Item} aufgelöst werden.
 	 * 
 	 * @return Assoziationen, die dieses {@link Item} verwenden.
 	 */

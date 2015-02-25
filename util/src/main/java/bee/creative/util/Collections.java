@@ -152,7 +152,7 @@ public class Collections {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public AbstractReverseList(final List<GValue> list) throws NullPointerException {
-			if(list == null) throw new NullPointerException();
+			if (list == null) throw new NullPointerException();
 			this.list = list;
 		}
 
@@ -339,10 +339,10 @@ public class Collections {
 			public ChainedIterator(final AbstractChainedList<GValue> list, final int index) {
 				this.size = list.list1.size();
 				this.list = list;
-				if(index < this.size){
+				if (index < this.size) {
 					this.iterator1 = this.iterator = list.list1.listIterator(index);
 					this.iterator2 = list.list2.listIterator(0);
-				}else{
+				} else {
 					this.iterator1 = list.list1.listIterator(this.size);
 					this.iterator2 = this.iterator = list.list2.listIterator(index - this.size);
 				}
@@ -377,11 +377,11 @@ public class Collections {
 			 */
 			@Override
 			public void add(final GValue e) {
-				if((this.iterator2.nextIndex() != 0) || (this.iterator1.nextIndex() != this.size)){
+				if ((this.iterator2.nextIndex() != 0) || (this.iterator1.nextIndex() != this.size)) {
 					this.iterator.add(e);
-				}else if(this.list.extendMode){
+				} else if (this.list.extendMode) {
 					this.iterator1.add(e);
-				}else{
+				} else {
 					this.iterator2.add(e);
 				}
 				this.size = this.list.list1.size();
@@ -425,7 +425,7 @@ public class Collections {
 			@Override
 			public void remove() {
 				this.iterator.remove();
-				if(this.iterator == this.iterator2) return;
+				if (this.iterator == this.iterator2) return;
 				this.size = this.list.list1.size();
 			}
 
@@ -457,7 +457,7 @@ public class Collections {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public AbstractChainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
-			if((values1 == null) || (values2 == null)) throw new NullPointerException();
+			if ((values1 == null) || (values2 == null)) throw new NullPointerException();
 			this.extendMode = extendMode;
 			this.list1 = values1;
 			this.list2 = values2;
@@ -487,9 +487,9 @@ public class Collections {
 		@Override
 		public void add(final int index, final GValue element) {
 			final int size = this.list1.size();
-			if((index < size) || ((index == size) && this.extendMode)){
+			if ((index < size) || ((index == size) && this.extendMode)) {
 				this.list1.add(index, element);
-			}else{
+			} else {
 				this.list2.add(index - size, element);
 			}
 		}
@@ -500,7 +500,7 @@ public class Collections {
 		@Override
 		public boolean addAll(final int index, final Collection<? extends GValue> c) {
 			final int size = this.list1.size();
-			if((index < size) || ((index == size) && this.extendMode)) return this.list1.addAll(index, c);
+			if ((index < size) || ((index == size) && this.extendMode)) return this.list1.addAll(index, c);
 			return this.list2.addAll(index - size, c);
 		}
 
@@ -509,7 +509,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean retainAll(final Collection<?> c) {
-			if(!this.list1.retainAll(c)) return this.list2.retainAll(c);
+			if (!this.list1.retainAll(c)) return this.list2.retainAll(c);
 			this.list2.retainAll(c);
 			return true;
 		}
@@ -536,7 +536,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean removeAll(final Collection<?> c) {
-			if(!this.list1.removeAll(c)) return this.list2.removeAll(c);
+			if (!this.list1.removeAll(c)) return this.list2.removeAll(c);
 			this.list2.removeAll(c);
 			return true;
 		}
@@ -572,7 +572,7 @@ public class Collections {
 		@Override
 		public int indexOf(final Object o) {
 			int index = this.list1.indexOf(o);
-			if(index >= 0) return index;
+			if (index >= 0) return index;
 			index = this.list2.indexOf(o);
 			return index < 0 ? -1 : index + this.list1.size();
 		}
@@ -583,7 +583,7 @@ public class Collections {
 		@Override
 		public int lastIndexOf(final Object o) {
 			final int index = this.list2.lastIndexOf(o);
-			if(index >= 0) return index + this.list1.size();
+			if (index >= 0) return index + this.list1.size();
 			return this.list1.lastIndexOf(o);
 		}
 
@@ -651,7 +651,7 @@ public class Collections {
 		 */
 		public AbstractTranscodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
 			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			if ((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
 			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
@@ -688,7 +688,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean add(final GEntry entry) {
-			if(!this.parser.accept(entry)) throw new IllegalArgumentException();
+			if (!this.parser.accept(entry)) throw new IllegalArgumentException();
 			return this.data.add(this.parser.convert(entry));
 		}
 
@@ -697,7 +697,7 @@ public class Collections {
 		 */
 		@Override
 		public void add(final int index, final GEntry entry) {
-			if(!this.parser.accept(entry)) throw new IllegalArgumentException();
+			if (!this.parser.accept(entry)) throw new IllegalArgumentException();
 			this.data.add(index, this.parser.convert(entry));
 		}
 
@@ -725,7 +725,7 @@ public class Collections {
 		@Override
 		public GEntry remove(final int index) {
 			final GEntry2 entry2 = this.data.remove(index);
-			if(!this.formatter.accept(entry2)) throw new IllegalArgumentException();
+			if (!this.formatter.accept(entry2)) throw new IllegalArgumentException();
 			return this.formatter.convert(entry2);
 		}
 
@@ -735,7 +735,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean remove(final Object entry) {
-			if(!this.parser.accept(entry)) return false;
+			if (!this.parser.accept(entry)) return false;
 			return this.data.remove(((Converter)this.parser).convert(entry));
 		}
 
@@ -787,7 +787,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean contains(final Object enrty) {
-			if(!this.parser.accept(enrty)) return false;
+			if (!this.parser.accept(enrty)) return false;
 			return this.data.contains(((Converter)this.parser).convert(enrty));
 		}
 
@@ -805,7 +805,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public int indexOf(final Object entry) {
-			if(!this.parser.accept(entry)) return -1;
+			if (!this.parser.accept(entry)) return -1;
 			return this.data.indexOf(((Converter)this.parser).convert(entry));
 		}
 
@@ -815,7 +815,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public int lastIndexOf(final Object entry) {
-			if(!this.parser.accept(entry)) return -1;
+			if (!this.parser.accept(entry)) return -1;
 			return this.data.lastIndexOf(((Converter)this.parser).convert(entry));
 		}
 
@@ -972,7 +972,7 @@ public class Collections {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ChainedCollection(final Collection<GValue> values1, final Collection<GValue> values2, final boolean extendMode) throws NullPointerException {
-			if((values1 == null) || (values2 == null)) throw new NullPointerException();
+			if ((values1 == null) || (values2 == null)) throw new NullPointerException();
 			this.extendMode = extendMode;
 			this.values1 = values1;
 			this.values2 = values2;
@@ -999,7 +999,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean retainAll(final Collection<?> c) {
-			if(!this.values1.retainAll(c)) return this.values2.retainAll(c);
+			if (!this.values1.retainAll(c)) return this.values2.retainAll(c);
 			this.values2.retainAll(c);
 			return true;
 		}
@@ -1017,7 +1017,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean removeAll(final Collection<?> c) {
-			if(!this.values1.removeAll(c)) return this.values2.removeAll(c);
+			if (!this.values1.removeAll(c)) return this.values2.removeAll(c);
 			this.values2.removeAll(c);
 			return true;
 		}
@@ -1087,7 +1087,7 @@ public class Collections {
 
 				@Override
 				public boolean accept(final Object input) {
-					if(!(input instanceof Entry)) return false;
+					if (!(input instanceof Entry)) return false;
 					final Entry<?, ?> entry = (Entry<?, ?>)input;
 					return keyParser.accept(entry.getKey()) && valueParser.accept(entry.getValue());
 				}
@@ -1099,22 +1099,22 @@ public class Collections {
 						@Override
 						public GKey2 getKey() {
 							final GKey key = input.getKey();
-							if(!keyParser.accept(key)) throw new IllegalArgumentException();
+							if (!keyParser.accept(key)) throw new IllegalArgumentException();
 							return keyParser.convert(key);
 						}
 
 						@Override
 						public GValue2 getValue() {
 							final GValue value = input.getValue();
-							if(!valueParser.accept(value)) throw new IllegalArgumentException();
+							if (!valueParser.accept(value)) throw new IllegalArgumentException();
 							return valueParser.convert(value);
 						}
 
 						@Override
 						public GValue2 setValue(final GValue2 value2) {
-							if(!valueFormatter.accept(value2)) throw new IllegalArgumentException();
+							if (!valueFormatter.accept(value2)) throw new IllegalArgumentException();
 							final GValue value = input.setValue(valueFormatter.convert(value2));
-							if(!valueParser.accept(value)) throw new IllegalArgumentException();
+							if (!valueParser.accept(value)) throw new IllegalArgumentException();
 							return valueParser.convert(value);
 						}
 
@@ -1125,7 +1125,7 @@ public class Collections {
 
 						@Override
 						public boolean equals(final Object object) {
-							if(!(object instanceof Entry<?, ?>)) return false;
+							if (!(object instanceof Entry<?, ?>)) return false;
 							final Entry<?, ?> data = (Entry<?, ?>)object;
 							return Objects.equals(this.getKey(), data.getKey()) && Objects.equals(this.getValue(), data.getValue());
 						}
@@ -1187,7 +1187,8 @@ public class Collections {
 		public TranscodedMap(final Map<GKey2, GValue2> map, final FilterConverter<? super GKey, ? extends GKey2> keyParser,
 			final FilterConverter<? super GKey2, ? extends GKey> keyFormatter, final FilterConverter<? super GValue, ? extends GValue2> valueParser,
 			final FilterConverter<? super GValue2, ? extends GValue> valueFormatter) throws NullPointerException {
-			if((map == null) || (keyParser == null) || (keyFormatter == null) || (valueParser == null) || (valueFormatter == null)) throw new NullPointerException();
+			if ((map == null) || (keyParser == null) || (keyFormatter == null) || (valueParser == null) || (valueFormatter == null))
+				throw new NullPointerException();
 			this.data = map;
 			this.keyParser = keyParser;
 			this.keyFormatter = keyFormatter;
@@ -1209,7 +1210,7 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public boolean containsKey(final Object key) {
-			if(!this.keyParser.accept(key)) return false;
+			if (!this.keyParser.accept(key)) return false;
 			return this.data.containsKey(((Converter)this.keyParser).convert(key));
 		}
 
@@ -1219,7 +1220,7 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public boolean containsValue(final Object value) {
-			if(!this.valueParser.accept(value)) return false;
+			if (!this.valueParser.accept(value)) return false;
 			return this.data.containsValue(((Converter)this.valueParser).convert(value));
 		}
 
@@ -1229,9 +1230,9 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public GValue get(final Object key) {
-			if(!this.keyParser.accept(key)) return null;
+			if (!this.keyParser.accept(key)) return null;
 			final GValue2 value2 = this.data.get(((Converter)this.keyParser).convert(key));
-			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			if (!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
 			return this.valueFormatter.convert(value2);
 		}
 
@@ -1256,9 +1257,9 @@ public class Collections {
 		 */
 		@Override
 		public GValue put(final GKey key, final GValue value) {
-			if(!this.keyParser.accept(key) || !this.valueParser.accept(value)) throw new IllegalArgumentException();
+			if (!this.keyParser.accept(key) || !this.valueParser.accept(value)) throw new IllegalArgumentException();
 			final GValue2 value2 = this.data.put(this.keyParser.convert(key), this.valueParser.convert(value));
-			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			if (!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
 			return this.valueFormatter.convert(value2);
 		}
 
@@ -1277,9 +1278,9 @@ public class Collections {
 		@SuppressWarnings ({"rawtypes", "unchecked"})
 		@Override
 		public GValue remove(final Object key) {
-			if(!this.keyParser.accept(key)) return null;
+			if (!this.keyParser.accept(key)) return null;
 			final GValue2 value2 = this.data.remove(((Converter)this.keyParser).convert(key));
-			if(!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
+			if (!this.valueFormatter.accept(value2)) throw new IllegalArgumentException();
 			return this.valueFormatter.convert(value2);
 		}
 
@@ -1348,7 +1349,7 @@ public class Collections {
 		 */
 		public TranscodedSet(final Set<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
 			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			if ((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
 			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
@@ -1359,7 +1360,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean add(final GEntry e) {
-			if(!this.parser.accept(e)) throw new IllegalArgumentException();
+			if (!this.parser.accept(e)) throw new IllegalArgumentException();
 			return this.data.add(this.parser.convert(e));
 		}
 
@@ -1378,7 +1379,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean remove(final Object o) {
-			if(!this.parser.accept(o)) return false;
+			if (!this.parser.accept(o)) return false;
 			return this.data.remove(((Converter)this.parser).convert(o));
 		}
 
@@ -1430,7 +1431,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean contains(final Object o) {
-			if(!this.parser.accept(o)) return false;
+			if (!this.parser.accept(o)) return false;
 			return this.data.contains(((Converter)this.parser).convert(o));
 		}
 
@@ -1536,7 +1537,7 @@ public class Collections {
 		 */
 		public TranscodedCollection(final Collection<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
 			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
-			if((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
+			if ((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
 			this.data = data;
 			this.parser = parser;
 			this.formatter = formatter;
@@ -1547,7 +1548,7 @@ public class Collections {
 		 */
 		@Override
 		public boolean add(final GEntry e) {
-			if(!this.parser.accept(e)) throw new IllegalArgumentException();
+			if (!this.parser.accept(e)) throw new IllegalArgumentException();
 			return this.data.add(this.parser.convert(e));
 		}
 
@@ -1566,7 +1567,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean remove(final Object o) {
-			if(!this.parser.accept(o)) return false;
+			if (!this.parser.accept(o)) return false;
 			return this.data.remove(((Converter)this.parser).convert(o));
 		}
 
@@ -1618,7 +1619,7 @@ public class Collections {
 		@SuppressWarnings ({"unchecked", "rawtypes"})
 		@Override
 		public boolean contains(final Object o) {
-			if(!this.parser.accept(o)) return false;
+			if (!this.parser.accept(o)) return false;
 			return this.data.contains(((Converter)this.parser).convert(o));
 		}
 
@@ -1658,7 +1659,7 @@ public class Collections {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public UnionSet(final Set<? extends GEntry> set1, final Set<? extends GEntry> set2) throws NullPointerException {
-			if((set1 == null) || (set2 == null)) throw new NullPointerException();
+			if ((set1 == null) || (set2 == null)) throw new NullPointerException();
 			this.set1 = set1;
 			this.set2 = set2;
 		}
@@ -1676,7 +1677,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			if(this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.chainedIterator(Iterators.filteredIterator( //
+			if (this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.chainedIterator(Iterators.filteredIterator( //
 				Filters.negationFilter(Filters.containsFilter(this.set2)), this.set1.iterator()), this.set2.iterator()));
 			return Iterators.unmodifiableIterator(Iterators.chainedIterator(Iterators.filteredIterator( //
 				Filters.negationFilter(Filters.containsFilter(this.set1)), this.set2.iterator()), this.set1.iterator()));
@@ -1718,7 +1719,7 @@ public class Collections {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public IntersectionSet(final Set<? extends GEntry> set1, final Set<? extends GEntry> set2) throws NullPointerException {
-			if((set1 == null) || (set2 == null)) throw new NullPointerException();
+			if ((set1 == null) || (set2 == null)) throw new NullPointerException();
 			this.set1 = set1;
 			this.set2 = set2;
 		}
@@ -1736,7 +1737,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GEntry> iterator() {
-			if(this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.filteredIterator( //
+			if (this.set1.size() < this.set2.size()) return Iterators.unmodifiableIterator(Iterators.filteredIterator( //
 				Filters.containsFilter(this.set2), this.set1.iterator()));
 			return Iterators.unmodifiableIterator(Iterators.filteredIterator( //
 				Filters.containsFilter(this.set1), this.set2.iterator()));

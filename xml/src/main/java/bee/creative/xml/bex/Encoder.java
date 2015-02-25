@@ -518,13 +518,13 @@ public final class Encoder {
 		public String toString() {
 			final int count = this.entryMap.size();
 			int minSize = Integer.MAX_VALUE, maxSize = Integer.MIN_VALUE, avgSize = 0;
-			for(final Item item: this.entryMap.values()){
+			for (final Item item: this.entryMap.values()) {
 				final int size = item.size;
 				minSize = Math.min(minSize, size);
 				maxSize = Math.max(maxSize, size);
 				avgSize += size;
 			}
-			if(count == 0) return Objects.toStringCallFormat(false, true, this, "items", count, "minSize", Float.NaN, "maxSize", Float.NaN, "avgSize", Float.NaN);
+			if (count == 0) return Objects.toStringCallFormat(false, true, this, "items", count, "minSize", Float.NaN, "maxSize", Float.NaN, "avgSize", Float.NaN);
 			return Objects.toStringCallFormat(false, true, this, "items", count, "minSize", minSize, "maxSize", maxSize, "avgSize", avgSize / (float)count);
 		}
 
@@ -585,9 +585,9 @@ public final class Encoder {
 		public boolean equals(final GroupItem input1, final GroupItem input2) throws NullPointerException {
 			final Item[] data1 = input1.group, data2 = input2.group;
 			final int length = data1.length;
-			if(length != data2.length) return false;
-			for(int i = 0; i < length; i++)
-				if(data1[i] != data2[i]) return false;
+			if (length != data2.length) return false;
+			for (int i = 0; i < length; i++)
+				if (data1[i] != data2[i]) return false;
 			return true;
 		}
 
@@ -830,7 +830,7 @@ public final class Encoder {
 		 */
 		@Override
 		public void startDocument() {
-			if(this.stack != null) throw new IllegalStateException("document already built");
+			if (this.stack != null) throw new IllegalStateException("document already built");
 			this.stack = new Stack();
 		}
 
@@ -954,7 +954,7 @@ public final class Encoder {
 		final int size = items.size();
 		final int[] offsets = new int[size];
 		int offset = 0;
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			offset += items.get(i).size;
 			offsets[i] = offset;
 		}
@@ -962,7 +962,7 @@ public final class Encoder {
 		target.writeInt(size);
 		target.writeByte(length);
 		target.writeInt(0, length);
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			target.writeInt(offsets[i], length);
 		}
 	}
@@ -977,7 +977,7 @@ public final class Encoder {
 	void writeValues(final DataTarget target, final List<TextValueItem> items) throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			final byte[] data = items.get(i).data;
 			target.write(data, 0, data.length);
 		}
@@ -998,10 +998,10 @@ public final class Encoder {
 		final int attributesLength) throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			final Item[] data = items.get(i).group;
 			final int count = data.length;
-			for(int j = 0; j < count;){
+			for (int j = 0; j < count;) {
 				target.writeInt(data[j++].key, uriLength);
 				target.writeInt(data[j++].key, nameLength);
 				target.writeInt(data[j++].key, contentLength);
@@ -1024,10 +1024,10 @@ public final class Encoder {
 		throws IOException {
 		this.writeOffset(target, items);
 		final int size = items.size();
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			final Item[] data = items.get(i).group;
 			final int count = data.length;
-			for(int j = 0; j < count;){
+			for (int j = 0; j < count;) {
 				target.writeInt(data[j++].key, uriLength);
 				target.writeInt(data[j++].key, nameLength);
 				target.writeInt(data[j++].key, valueLength);
@@ -1085,7 +1085,7 @@ public final class Encoder {
 	 */
 	void encodeText(final List<Item> items) {
 		final StringBuilder text = this.text;
-		if(text.length() == 0) return;
+		if (text.length() == 0) return;
 		items.addAll(Arrays.asList(Item.VOID, Item.VOID, this.elemValuePool.unique(text.toString()), Item.VOID));
 		text.setLength(0);
 	}
@@ -1105,18 +1105,18 @@ public final class Encoder {
 		final Item nameRef = this.elemNamePool.unique(element.getNodeName());
 		final Item contentRef;
 		final Item attributesRef;
-		if(children.length > 0){
-			if((children.length == 4) && (children[1] == Item.VOID)){
+		if (children.length > 0) {
+			if ((children.length == 4) && (children[1] == Item.VOID)) {
 				contentRef = children[2];
-			}else{
+			} else {
 				contentRef = this.elemGroupPool.unique(children);
 			}
-		}else{
+		} else {
 			contentRef = Item.VOID;
 		}
-		if(attributes.length > 1){
+		if (attributes.length > 1) {
 			attributesRef = this.attrGroupPool.unique(attributes);
-		}else{
+		} else {
 			attributesRef = Item.VOID;
 		}
 		items.addAll(Arrays.asList(uriRef, nameRef, contentRef, attributesRef));
@@ -1131,9 +1131,9 @@ public final class Encoder {
 	Item[] encodeChildren(final NodeList nodes) {
 		final int length = nodes.getLength();
 		final List<Item> items = new ArrayList<Item>(length * 4);
-		for(int i = 0; i < length; i++){
+		for (int i = 0; i < length; i++) {
 			final Node node = nodes.item(i);
-			switch(node.getNodeType()){
+			switch (node.getNodeType()) {
 				case Node.TEXT_NODE:
 				case Node.CDATA_SECTION_NODE:
 					this.text.append(node.getNodeValue());
@@ -1174,14 +1174,14 @@ public final class Encoder {
 			@Override
 			public int compare(final Item[] o1, final Item[] o2) {
 				final int comp = Comparators.compare(o1[0].toString(), o2[0].toString());
-				if(comp != 0) return comp;
+				if (comp != 0) return comp;
 				return Comparators.compare(o1[1].toString(), o2[1].toString());
 			}
 
 		});
 		final int size = items.length;
 		final Item[] data = new Item[size * 3];
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			System.arraycopy(items[i], 0, data, i * 3, 3);
 		}
 		return data;
@@ -1196,7 +1196,7 @@ public final class Encoder {
 	Item[] encodeAttributes(final Attributes nodes) {
 		final int size = nodes.getLength();
 		final Item[][] items = new Item[size][3];
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			final Item[] item = items[i];
 			item[0] = this.attrUriPool.unique(nodes.getURI(i));
 			item[1] = this.attrNamePool.unique(nodes.getLocalName(i));
@@ -1214,7 +1214,7 @@ public final class Encoder {
 	Item[] encodeAttributes(final NamedNodeMap nodes) {
 		final int size = nodes.getLength();
 		final Item[][] items = new Item[size][3];
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			final Node node = nodes.item(i);
 			final Item[] item = items[i];
 			item[0] = this.attrUriPool.unique(node.getNamespaceURI());
@@ -1233,7 +1233,7 @@ public final class Encoder {
 	 * @param offset Schlüssel des ersten {@link Item}s.
 	 */
 	void computeKeys(final List<? extends Item> items, int offset) {
-		for(final Item item: items){
+		for (final Item item: items) {
 			item.key = offset++;
 		}
 	}
@@ -1270,7 +1270,7 @@ public final class Encoder {
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
 	public void encode(final File source, final File target) throws IOException, SAXException, NullPointerException {
-		if((source == null) || (target == null)) throw new NullPointerException();
+		if ((source == null) || (target == null)) throw new NullPointerException();
 		this.encode(XMLReaderFactory.createXMLReader(), new InputSource(new FileReader(source)), new DataTargetFile(target));
 	}
 
@@ -1284,7 +1284,7 @@ public final class Encoder {
 	public void encode(final Document source, final DataTarget target) throws IOException {
 		this.clear();
 		final Item[] children = this.encodeChildren(source.getChildNodes());
-		if((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
+		if ((children.length != 4) || (children[1] == Item.VOID)) throw new IllegalArgumentException("Document must have one child element.");
 		this.documentChildren = this.elemGroupPool.unique(children);
 		this.writeDocument(target);
 	}
@@ -1301,7 +1301,7 @@ public final class Encoder {
 	 * @throws NullPointerException Wenn eine der eingaben {@code null} ist.
 	 */
 	public void encode(final XMLReader reader, final InputSource source, final DataTarget target) throws IOException, SAXException, NullPointerException {
-		if((reader == null) || (source == null) || (target == null)) throw new NullPointerException();
+		if ((reader == null) || (source == null) || (target == null)) throw new NullPointerException();
 		this.clear();
 		reader.setContentHandler(new Handler(this));
 		reader.setFeature("http://xml.org/sax/features/external-general-entities", true);

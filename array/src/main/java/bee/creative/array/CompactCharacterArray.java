@@ -131,7 +131,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactCharacterArraySection(final CompactCharacterArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -189,7 +189,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactCharacterSubArraySection(final CompactCharacterSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -291,7 +291,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	 */
 	@Override
 	protected char[] newArray(final int length) {
-		if(length == 0) return CompactCharacterArray.VOID;
+		if (length == 0) return CompactCharacterArray.VOID;
 		return new char[length];
 	}
 

@@ -50,7 +50,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public GValue set(final int index, final GValue value) {
-			if(value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException();
 			final CompactArray<?, GValue> owner = this.owner;
 			final GValue entry = owner.getValue(index);
 			owner.setValue(index, value);
@@ -62,7 +62,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public void add(final int index, final GValue value) {
-			if(value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException();
 			final CompactArray<?, GValue> owner = this.owner;
 			owner.insert(index, 1);
 			owner.setValue(index, value);
@@ -105,7 +105,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public UnmodifiableValues(final CompactArray<GArray, GValue> owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -122,13 +122,13 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public int indexOf(final Object item) {
-			if(item == null){
-				for(int index = 0, count = this.size(); index < count; index++){
-					if(this.get(index) == null) return index;
+			if (item == null) {
+				for (int index = 0, count = this.size(); index < count; index++) {
+					if (this.get(index) == null) return index;
 				}
-			}else{
-				for(int index = 0, count = this.size(); index < count; index++){
-					if(item.equals(this.get(index))) return index;
+			} else {
+				for (int index = 0, count = this.size(); index < count; index++) {
+					if (item.equals(this.get(index))) return index;
 				}
 			}
 			return -1;
@@ -139,13 +139,13 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public int lastIndexOf(final Object item) {
-			if(item == null){
-				for(int index = this.size() - 1; 0 <= index; index--){
-					if(this.get(index) == null) return index;
+			if (item == null) {
+				for (int index = this.size() - 1; 0 <= index; index--) {
+					if (this.get(index) == null) return index;
 				}
-			}else{
-				for(int index = this.size() - 1; 0 <= index; index--){
-					if(item.equals(this.get(index))) return index;
+			} else {
+				for (int index = this.size() - 1; 0 <= index; index--) {
+					if (item.equals(this.get(index))) return index;
 				}
 			}
 			return -1;
@@ -209,8 +209,8 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 *         {@code startIndex > finalIndex}).
 		 */
 		public CompactSubArray(final GOwner owner, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException {
-			if(owner == null) throw new NullPointerException("owner is null");
-			if(startIndex > finalIndex) throw new IndexOutOfBoundsException("startIndex > finalIndex");
+			if (owner == null) throw new NullPointerException("owner is null");
+			if (startIndex > finalIndex) throw new IndexOutOfBoundsException("startIndex > finalIndex");
 			this.startIndex = owner.exclusiveIndex(startIndex);
 			this.finalIndex = owner.exclusiveIndex(finalIndex);
 			this.owner = owner;
@@ -224,9 +224,9 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 * @throws IndexOutOfBoundsException Wenn der gegebene Index ungültig ist ({@code index < 0} oder {@code index > size()}).
 		 */
 		protected final int ownerIndex(final int index) throws IndexOutOfBoundsException {
-			if(index < 0) throw new IndexOutOfBoundsException("index < 0");
+			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 			final int delta = this.startIndex;
-			if(index > (this.finalIndex - delta)) throw new IndexOutOfBoundsException("index > size");
+			if (index > (this.finalIndex - delta)) throw new IndexOutOfBoundsException("index > size");
 			return index + delta;
 		}
 
@@ -241,11 +241,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 *         {@code startIndex > finalIndex}).
 		 */
 		protected final Array<GArray, GValue> ownerSubArray(final int startIndex, final int finalIndex) {
-			if(startIndex < 0) throw new IndexOutOfBoundsException();
-			if(startIndex > finalIndex) throw new IllegalArgumentException();
+			if (startIndex < 0) throw new IndexOutOfBoundsException();
+			if (startIndex > finalIndex) throw new IllegalArgumentException();
 			final int delta = this.startIndex;
 			final int ownerFinalIndex = delta + finalIndex;
-			if(ownerFinalIndex > this.finalIndex) throw new IndexOutOfBoundsException();
+			if (ownerFinalIndex > this.finalIndex) throw new IndexOutOfBoundsException();
 			return this.owner.subArray(delta + startIndex, ownerFinalIndex);
 		}
 
@@ -326,7 +326,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public void add(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-			if(values == null) throw new NullPointerException("values is null");
+			if (values == null) throw new NullPointerException("values is null");
 			this.add(index, values.section());
 		}
 
@@ -335,7 +335,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-			if(values == null) throw new NullPointerException("values is null");
+			if (values == null) throw new NullPointerException("values is null");
 			this.insert(index, values.size());
 			this.set(index, values);
 		}
@@ -345,11 +345,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public void insert(final int index, final int count) {
-			if(index < 0) throw new IndexOutOfBoundsException();
+			if (index < 0) throw new IndexOutOfBoundsException();
 			final int startIndex = this.startIndex;
 			final int finalIndex = this.finalIndex;
 			final int ownerIndex = startIndex + index;
-			if(ownerIndex > finalIndex) throw new IndexOutOfBoundsException();
+			if (ownerIndex > finalIndex) throw new IndexOutOfBoundsException();
 			final GOwner owner = this.owner;
 			int offset = -owner.from;
 			owner.insert(ownerIndex, count);
@@ -363,11 +363,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public void remove(final int index, final int count) {
-			if(index < 0) throw new IndexOutOfBoundsException();
+			if (index < 0) throw new IndexOutOfBoundsException();
 			final int startIndex = this.startIndex;
 			final int finalIndex = this.finalIndex;
 			final int ownerIndex = startIndex + index;
-			if((ownerIndex + count) > finalIndex) throw new IndexOutOfBoundsException();
+			if ((ownerIndex + count) > finalIndex) throw new IndexOutOfBoundsException();
 			final GOwner owner = this.owner;
 			int offset = -owner.from;
 			owner.insert(ownerIndex, count);
@@ -410,8 +410,8 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof Array<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof Array<?, ?>)) return false;
 			final Array<?, ?> data = (Array<?, ?>)object;
 			return this.section().equals(data.section());
 		}
@@ -446,7 +446,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
 	public CompactArray(final int capacity) throws IllegalArgumentException {
-		if(capacity < 0) throw new IllegalArgumentException("capacity < 0");
+		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
 		this.setArray(this.newArray(capacity));
 		this.allocate(capacity);
 	}
@@ -504,7 +504,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size}).
 	 */
 	protected final int inclusiveIndex(final int index) throws IndexOutOfBoundsException {
-		if((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException();
+		if ((index < 0) || (index >= this.size)) throw new IndexOutOfBoundsException();
 		return this.from + index;
 	}
 
@@ -517,8 +517,8 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size}).
 	 */
 	protected final int exclusiveIndex(final int index) throws IndexOutOfBoundsException {
-		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
-		if(index > this.size) throw new IndexOutOfBoundsException("index > size");
+		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
+		if (index > this.size) throw new IndexOutOfBoundsException("index > size");
 		return this.from + index;
 	}
 
@@ -527,7 +527,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void get(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values is null");
+		if (values == null) throw new NullPointerException("values is null");
 		this.get(index, values.section());
 	}
 
@@ -536,11 +536,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void get(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values is null");
-		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
+		if (values == null) throw new NullPointerException("values is null");
+		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
-		if((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
-		if(valuesSize == 0) return;
+		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
+		if (valuesSize == 0) return;
 		System.arraycopy(this.getArray(), index + this.from, values.array(), values.startIndex(), valuesSize);
 	}
 
@@ -549,7 +549,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void set(final int index, final Array<GArray, GValue> values) throws NullPointerException, IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values is null");
+		if (values == null) throw new NullPointerException("values is null");
 		this.set(index, values.section());
 	}
 
@@ -558,11 +558,11 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void set(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values is null");
-		if(index < 0) throw new IndexOutOfBoundsException("index < 0");
+		if (values == null) throw new NullPointerException("values is null");
+		if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 		final int valuesSize = values.size();
-		if((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
-		if(valuesSize == 0) return;
+		if ((index + valuesSize) > this.size) throw new IndexOutOfBoundsException("index + values.size() > size");
+		if (valuesSize == 0) return;
 		System.arraycopy(values.array(), values.startIndex(), this.getArray(), index + this.from, valuesSize);
 	}
 
@@ -587,7 +587,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void add(final int index, final Array<GArray, GValue> values) {
-		if(values == null) throw new NullPointerException("values is null");
+		if (values == null) throw new NullPointerException("values is null");
 		this.add(index, values.section());
 	}
 
@@ -596,9 +596,9 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public void add(final int index, final ArraySection<GArray> values) throws NullPointerException, IndexOutOfBoundsException {
-		if(values == null) throw new NullPointerException("values is null");
+		if (values == null) throw new NullPointerException("values is null");
 		final int valuesSize = values.size();
-		if(valuesSize == 0) return;
+		if (valuesSize == 0) return;
 		this.insert(index, valuesSize);
 		System.arraycopy(values.array(), values.startIndex(), this.getArray(), this.from + index, valuesSize);
 	}
@@ -625,7 +625,7 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 * @throws IllegalArgumentException Wenn die gegebene relative Ausrichtungsposition kleiner {@code 0}, größer {@code 1} ist oder {@link Float#NaN}.
 	 */
 	public void setAlignment(final float alignment) throws IllegalArgumentException {
-		if(!((alignment >= 0f) && (alignment <= 1f))) throw new IllegalArgumentException();
+		if (!((alignment >= 0f) && (alignment <= 1f))) throw new IllegalArgumentException();
 		this.alignment = alignment;
 	}
 
@@ -729,8 +729,8 @@ public abstract class CompactArray<GArray, GValue> extends ArrayData<GArray> imp
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof Array<?, ?>)) return false;
+		if (object == this) return true;
+		if (!(object instanceof Array<?, ?>)) return false;
 		final Array<?, ?> data = (Array<?, ?>)object;
 		return this.section().equals(data.section());
 	}

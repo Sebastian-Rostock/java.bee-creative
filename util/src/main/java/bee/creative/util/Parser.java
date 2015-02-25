@@ -59,8 +59,8 @@ public class Parser {
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
 	 */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
-		if(index < 0) throw new IndexOutOfBoundsException();
-		if(index < this.length) return this.symbol = this.chars[this.index = index];
+		if (index < 0) throw new IndexOutOfBoundsException();
+		if (index < this.length) return this.symbol = this.chars[this.index = index];
 		this.index = this.length;
 		return this.symbol = -1;
 	}
@@ -105,7 +105,7 @@ public class Parser {
 	 * @param symbol Zeichen.
 	 */
 	public final void take(final int symbol) {
-		if(symbol < 0) return;
+		if (symbol < 0) return;
 		this.target.append((char)symbol);
 	}
 

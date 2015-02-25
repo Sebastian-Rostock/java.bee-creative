@@ -65,7 +65,7 @@ public class Filters {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public AbstractJunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if((filter1 == null) || (filter2 == null)) throw new NullPointerException();
+			if ((filter1 == null) || (filter2 == null)) throw new NullPointerException();
 			this.filter1 = filter1;
 			this.filter2 = filter2;
 		}
@@ -83,8 +83,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof AbstractJunctionFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof AbstractJunctionFilter<?>)) return false;
 			final AbstractJunctionFilter<?> data = (AbstractJunctionFilter<?>)object;
 			return Objects.equals(this.filter1, data.filter1) && Objects.equals(this.filter2, data.filter2);
 		}
@@ -120,7 +120,7 @@ public class Filters {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public AbstractDelegatingFilter(final Filter<? super GInput2> filter) throws NullPointerException {
-			if(filter == null) throw new NullPointerException();
+			if (filter == null) throw new NullPointerException();
 			this.filter = filter;
 		}
 
@@ -137,8 +137,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof AbstractDelegatingFilter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof AbstractDelegatingFilter<?, ?>)) return false;
 			final AbstractDelegatingFilter<?, ?> data = (AbstractDelegatingFilter<?, ?>)object;
 			return Objects.equals(this.filter, data.filter);
 		}
@@ -207,7 +207,7 @@ public class Filters {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ClassFilter(final Class<?> clazz) throws NullPointerException {
-			if(clazz == null) throw new NullPointerException();
+			if (clazz == null) throw new NullPointerException();
 			this.clazz = clazz;
 		}
 
@@ -232,8 +232,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ClassFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ClassFilter<?>)) return false;
 			final ClassFilter<?> data = (ClassFilter<?>)object;
 			return Objects.equals(this.clazz, data.clazz);
 		}
@@ -335,8 +335,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof NegationFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof NegationFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -365,7 +365,7 @@ public class Filters {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public ContainsFilter(final Collection<?> collection) {
-			if(collection == null) throw new NullPointerException();
+			if (collection == null) throw new NullPointerException();
 			this.collection = collection;
 		}
 
@@ -390,8 +390,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ContainsFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ContainsFilter<?>)) return false;
 			final ContainsFilter<?> data = (ContainsFilter<?>)object;
 			return Objects.equals(this.collection, data.collection);
 		}
@@ -435,7 +435,7 @@ public class Filters {
 		 */
 		public ConvertedFilter(final Converter<? super GInput, ? extends GOutput> converter, final Filter<? super GOutput> filter) {
 			super(filter);
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -460,8 +460,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConvertedFilter<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConvertedFilter<?, ?>)) return false;
 			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
 			return Objects.equals(this.converter, data.converter) && Objects.equals(this.filter, data.filter);
 		}
@@ -513,8 +513,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof DisjunctionFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof DisjunctionFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -557,8 +557,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConjunctionFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConjunctionFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -601,8 +601,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof EquivalenceFilter<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof EquivalenceFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -632,7 +632,7 @@ public class Filters {
 		 */
 		@Override
 		public boolean accept(final GInput input) {
-			synchronized(this){
+			synchronized (this) {
 				return this.filter.accept(input);
 			}
 		}
@@ -642,8 +642,8 @@ public class Filters {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if((object == this) || Objects.equals(object, this.filter)) return true;
-			if(!(object instanceof SynchronizedFilter<?>)) return false;
+			if ((object == this) || Objects.equals(object, this.filter)) return true;
+			if (!(object instanceof SynchronizedFilter<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -718,10 +718,10 @@ public class Filters {
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if(filter == null) throw new NullPointerException();
-		if(filter == AcceptFilter.INSTANCE) return Filters.rejectFilter();
-		if(filter == RejectFilter.INSTANCE) return Filters.acceptFilter();
-		if(filter instanceof NegationFilter<?>) return (Filter<GInput>)((NegationFilter<?>)filter).filter;
+		if (filter == null) throw new NullPointerException();
+		if (filter == AcceptFilter.INSTANCE) return Filters.rejectFilter();
+		if (filter == RejectFilter.INSTANCE) return Filters.acceptFilter();
+		if (filter instanceof NegationFilter<?>) return (Filter<GInput>)((NegationFilter<?>)filter).filter;
 		return new NegationFilter<GInput>(filter);
 	}
 
@@ -735,8 +735,8 @@ public class Filters {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public static <GInput> Filter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
-		if(inputs.length == 0) return Filters.<GInput>rejectFilter();
-		if(inputs.length == 1) return Filters.containsFilter(Collections.singleton(inputs[0]));
+		if (inputs.length == 0) return Filters.<GInput>rejectFilter();
+		if (inputs.length == 1) return Filters.containsFilter(Collections.singleton(inputs[0]));
 		return Filters.containsFilter(new HashSet<Object>(Arrays.asList(inputs)));
 	}
 
@@ -794,7 +794,7 @@ public class Filters {
 	 */
 	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
+		if ((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
 			return Filters.negationFilter(Filters.conjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
 		return new DisjunctionFilter<GInput>(filter1, filter2);
 	}
@@ -816,7 +816,7 @@ public class Filters {
 	 */
 	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
+		if ((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
 			return Filters.negationFilter(Filters.disjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
 		return new ConjunctionFilter<GInput>(filter1, filter2);
 	}

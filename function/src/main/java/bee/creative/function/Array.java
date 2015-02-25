@@ -371,9 +371,10 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
 	 */
-	public static void collect(final Collector target, Array source, int offset, int length) throws NullPointerException, IllegalArgumentException {
-		if (target == null || source == null) throw new NullPointerException();
-		if (offset < 0 || length < 0 || offset + length > source.length()) throw new IllegalArgumentException();
+	public static void collect(final Collector target, final Array source, final int offset, final int length) throws NullPointerException,
+		IllegalArgumentException {
+		if ((target == null) || (source == null)) throw new NullPointerException();
+		if ((offset < 0) || (length < 0) || ((offset + length) > source.length())) throw new IllegalArgumentException();
 		source.collect(target, offset, length);
 	}
 

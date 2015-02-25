@@ -101,8 +101,8 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	@Override
 	protected int compareTo(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		final boolean value1 = array1[index1], value2 = array2[index2];
-		if(value1 == value2) return 0;
-		if(value2) return -1;
+		if (value1 == value2) return 0;
+		if (value2) return -1;
 		return 1;
 	}
 
@@ -119,8 +119,8 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof BooleanArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof BooleanArraySection)) return false;
 		return super.equals(object);
 	}
 

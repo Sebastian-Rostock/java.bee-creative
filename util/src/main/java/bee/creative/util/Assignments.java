@@ -43,7 +43,7 @@ public class Assignments {
 		 * @throws NullPointerException Wenn das gegebene {@link Assignment} {@code null} ist.
 		 */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
-			if(parent == null) throw new NullPointerException();
+			if (parent == null) throw new NullPointerException();
 			this.parent = parent;
 			this.source = source;
 		}
@@ -196,7 +196,7 @@ public class Assignments {
 		 */
 		@Override
 		public <GObject> GObject get(final GObject source) {
-			if(source == null) return null;
+			if (source == null) return null;
 			@SuppressWarnings ("unchecked")
 			final GObject target = (GObject)this.map.get(source);
 			return target == null ? source : target;
@@ -207,10 +207,10 @@ public class Assignments {
 		 */
 		@Override
 		public <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
-			if(source == null) throw new NullPointerException();
-			if(target == null){
+			if (source == null) throw new NullPointerException();
+			if (target == null) {
 				this.map.remove(source);
-			}else{
+			} else {
 				this.map.put(source, target);
 			}
 		}
@@ -229,11 +229,11 @@ public class Assignments {
 		@Override
 		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
-			if((source == null) || (target == null)) throw new NullPointerException();
+			if ((source == null) || (target == null)) throw new NullPointerException();
 			this.set(source, target);
-			if(commit){
+			if (commit) {
 				target.assign(this.assignment(source));
-			}else{
+			} else {
 				this.entries.add(ParentAssignment.newEntry(source, target));
 			}
 		}
@@ -254,11 +254,11 @@ public class Assignments {
 		@Override
 		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner, final boolean commit)
 			throws NullPointerException, IllegalArgumentException {
-			if((source == null) || (target == null) || (assigner == null)) throw new NullPointerException();
+			if ((source == null) || (target == null) || (assigner == null)) throw new NullPointerException();
 			this.set(source, target);
-			if(commit){
+			if (commit) {
 				assigner.assign(target, this.assignment(source));
-			}else{
+			} else {
 				this.entries.add(ParentAssignment.newEntry(source, target, assigner));
 			}
 		}
@@ -269,7 +269,7 @@ public class Assignments {
 		@Override
 		public void commit() throws IllegalArgumentException {
 			final List<Entry> entries = this.entries;
-			while(!entries.isEmpty()){
+			while (!entries.isEmpty()) {
 				entries.remove(0).assign(this);
 			}
 		}
@@ -329,9 +329,9 @@ public class Assignments {
 	 */
 	public static <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
 		throws NullPointerException {
-		if(assignment == null) throw new NullPointerException();
+		if (assignment == null) throw new NullPointerException();
 		target.clear();
-		for(final Entry<GKey, GValue> entry: source.entrySet()){
+		for (final Entry<GKey, GValue> entry: source.entrySet()) {
 			target.put(assignment.get(entry.getKey()), assignment.get(entry.getValue()));
 		}
 	}
@@ -355,9 +355,9 @@ public class Assignments {
 	 */
 	public static <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
 		throws NullPointerException {
-		if(assignment == null) throw new NullPointerException();
+		if (assignment == null) throw new NullPointerException();
 		target.clear();
-		for(final GValue value: source){
+		for (final GValue value: source) {
 			target.add(assignment.get(value));
 		}
 	}

@@ -131,7 +131,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactShortArraySection(final CompactShortArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -189,7 +189,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactShortSubArraySection(final CompactShortSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -291,7 +291,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	 */
 	@Override
 	protected short[] newArray(final int length) {
-		if(length == 0) return CompactShortArray.VOID;
+		if (length == 0) return CompactShortArray.VOID;
 		return new short[length];
 	}
 

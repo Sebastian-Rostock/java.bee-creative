@@ -9,8 +9,7 @@ package bee.creative.data.codec;
 public interface CodecData<GContext> {
 
 	/**
-	 * Diese Methode gibt das Objekt zurück, in dessen Kontext ein Wert aus einer {@link CodecSource} gelesen bzw. in ein {@link CodecTarget} geschrieben
-	 * wird.
+	 * Diese Methode gibt das Objekt zurück, in dessen Kontext ein Wert aus einer {@link CodecSource} gelesen bzw. in ein {@link CodecTarget} geschrieben wird.
 	 * 
 	 * @return Kontextobjekt.
 	 */

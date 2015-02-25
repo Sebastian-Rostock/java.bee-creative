@@ -92,9 +92,9 @@ public final class TextAdapter extends AbstractChildNodeAdapter implements Text 
 	 */
 	@Override
 	public String substringData(final int offset, final int count) throws DOMException {
-		try{
+		try {
 			return this.getNodeValue().substring(offset, offset + count);
-		}catch(final IndexOutOfBoundsException e){
+		} catch (final IndexOutOfBoundsException e) {
 			throw new DOMException(DOMException.INDEX_SIZE_ERR, e.getMessage());
 		}
 	}
@@ -169,10 +169,10 @@ public final class TextAdapter extends AbstractChildNodeAdapter implements Text 
 	@Override
 	public boolean isElementContentWhitespace() {
 		final String nodeValue = this.getNodeValue();
-		for(int i = 0, size = nodeValue.length(); i < size; i++){
+		for (int i = 0, size = nodeValue.length(); i < size; i++) {
 			final char value = nodeValue.charAt(i);
-			if((value > 0x20) || (value < 0x09)) return false;
-			if((value != 0x0A) && (value != 0x0D)) return false;
+			if ((value > 0x20) || (value < 0x09)) return false;
+			if ((value != 0x0A) && (value != 0x0D)) return false;
 		}
 		return true;
 	}
@@ -190,8 +190,8 @@ public final class TextAdapter extends AbstractChildNodeAdapter implements Text 
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof TextAdapter)) return false;
+		if (object == this) return true;
+		if (!(object instanceof TextAdapter)) return false;
 		final TextAdapter data = (TextAdapter)object;
 		return Objects.equals(this.nodeView, data.nodeView);
 	}

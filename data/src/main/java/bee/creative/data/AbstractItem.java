@@ -83,10 +83,10 @@ public abstract class AbstractItem implements Item {
 	 */
 	@Override
 	public void assign(final Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException {
-		if(assignment == null) throw new NullPointerException();
+		if (assignment == null) throw new NullPointerException();
 		final Item value = assignment.value();
-		if(value == null) throw new IllegalArgumentException();
-		for(final Assigner<? super Item, ? super Item> assigner: this.assigners(assignment)){
+		if (value == null) throw new IllegalArgumentException();
+		for (final Assigner<? super Item, ? super Item> assigner: this.assigners(assignment)) {
 			assigner.assign(this, assignment);
 		}
 	}
@@ -149,8 +149,8 @@ public abstract class AbstractItem implements Item {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof Item)) return false;
+		if (object == this) return true;
+		if (!(object instanceof Item)) return false;
 		final Item data = (Item)object;
 		return (this.key() == data.key()) && Objects.equals(this.pool(), data.pool());
 	}

@@ -131,7 +131,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactDoubleArraySection(final CompactDoubleArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -189,7 +189,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactDoubleSubArraySection(final CompactDoubleSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -291,7 +291,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	 */
 	@Override
 	protected double[] newArray(final int length) {
-		if(length == 0) return CompactDoubleArray.VOID;
+		if (length == 0) return CompactDoubleArray.VOID;
 		return new double[length];
 	}
 

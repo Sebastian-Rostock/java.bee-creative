@@ -38,7 +38,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public FilteredSelection(final Iterable<? extends GItem> iterable) throws NullPointerException {
-			if(iterable == null) throw new NullPointerException();
+			if (iterable == null) throw new NullPointerException();
 			this.iterable = iterable;
 		}
 
@@ -50,7 +50,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 		 */
 		@Override
 		public <GValue> GItem find(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-			for(final GItem item: this.findAll(field, value))
+			for (final GItem item: this.findAll(field, value))
 				return item;
 			return null;
 		}
@@ -60,7 +60,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 		 */
 		@Override
 		public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-			if(field == null) throw new NullPointerException();
+			if (field == null) throw new NullPointerException();
 			return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.convertedFilter(Converters.fieldConverter(field), Filters.containsFilter(value)),
 				this.iterable));
 		}
@@ -86,11 +86,11 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final void delete(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
-		switch(item.state()){
+		switch (item.state()) {
 			case Item.APPEND_STATE:
 			case Item.UPDATE_STATE:
 			case Item.REMOVE_STATE:
-				if(!this.equals(item.pool())) throw new IllegalArgumentException();
+				if (!this.equals(item.pool())) throw new IllegalArgumentException();
 				this.doDelete((GItem)item);
 			case Item.CREATE_STATE:
 				return;
@@ -108,11 +108,11 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final void append(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
-		switch(item.state()){
+		switch (item.state()) {
 			case Item.CREATE_STATE:
 			case Item.REMOVE_STATE:
 			case Item.UPDATE_STATE:
-				if(!this.equals(item.pool())) throw new IllegalArgumentException();
+				if (!this.equals(item.pool())) throw new IllegalArgumentException();
 				this.doAppend((GItem)item);
 			case Item.APPEND_STATE:
 				return;
@@ -131,10 +131,10 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final void remove(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		switch(item.state()){
+		switch (item.state()) {
 			case Item.APPEND_STATE:
 			case Item.UPDATE_STATE:
-				if(!this.equals(item.pool())) throw new IllegalArgumentException();
+				if (!this.equals(item.pool())) throw new IllegalArgumentException();
 				this.doRemove((GItem)item);
 			case Item.REMOVE_STATE:
 				return;
@@ -155,10 +155,10 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final void update(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		switch(item.state()){
+		switch (item.state()) {
 			case Item.REMOVE_STATE:
 			case Item.CREATE_STATE:
-				if(!this.equals(item.pool())) throw new IllegalArgumentException();
+				if (!this.equals(item.pool())) throw new IllegalArgumentException();
 				this.doUpdate((GItem)item);
 			case Item.UPDATE_STATE:
 				return;
@@ -302,8 +302,8 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof Pool<?>)) return false;
+		if (object == this) return true;
+		if (!(object instanceof Pool<?>)) return false;
 		final Pool<?> data = (Pool<?>)object;
 		return Objects.equals(this.type(), data.type()) && Objects.equals(this.field(), data.field()) && Objects.equals(this.owner(), data.owner());
 	}

@@ -89,8 +89,8 @@ public class Objects {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof NormalObject)) return false;
+			if (object == this) return true;
+			if (!(object instanceof NormalObject)) return false;
 			return super.equals(object);
 		}
 
@@ -126,8 +126,8 @@ public class Objects {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FormatObject)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FormatObject)) return false;
 			return super.equals(object);
 		}
 
@@ -157,11 +157,11 @@ public class Objects {
 	 * @return Zeichenkette mit erhöhtem Einzug.
 	 */
 	static String indent(final String value) {
-		if(value == null) return "null";
+		if (value == null) return "null";
 		final StringBuilder output = new StringBuilder();
 		int last = -1, next = 0;
 		final int size = value.length();
-		while((next = value.indexOf('\n', next)) >= 0){
+		while ((next = value.indexOf('\n', next)) >= 0) {
 			output.append(value.substring(last + 1, last = next)).append("\n  ");
 			next++;
 		}
@@ -180,19 +180,19 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String toString(final boolean format, final boolean indent, final Object object) {
-		if(object == null) return "null";
+		if (object == null) return "null";
 		final String output;
-		if(object.getClass().isArray()){
+		if (object.getClass().isArray()) {
 			output = Objects.arrayToString(format, object);
-		}else if(object instanceof String){
+		} else if (object instanceof String) {
 			output = Objects.stringToString(format, (String)object);
-		}else if(object instanceof UseToString){
+		} else if (object instanceof UseToString) {
 			output = String.valueOf(object);
-		}else if(object instanceof Map<?, ?>){
+		} else if (object instanceof Map<?, ?>) {
 			output = Objects.mapToString(format, (Map<?, ?>)object);
-		}else if(object instanceof Iterable<?>){
+		} else if (object instanceof Iterable<?>) {
 			output = Objects.iterableToString(format, (Iterable<?>)object);
-		}else{
+		} else {
 			output = String.valueOf(object);
 		}
 		return (indent ? Objects.indent(output) : output);
@@ -207,12 +207,12 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String mapToString(final boolean format, final Map<?, ?> object) {
-		if(object == null) return "null";
-		if(object.isEmpty()) return "{}";
+		if (object == null) return "null";
+		if (object.isEmpty()) return "{}";
 		String space = (format ? "{\n  " : "{ ");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
-		for(final Entry<?, ?> entry: object.entrySet()){
+		for (final Entry<?, ?> entry: object.entrySet()) {
 			output.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
 		}
@@ -229,13 +229,13 @@ public class Objects {
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist.
 	 */
 	static String arrayToString(final boolean format, final Object object) throws IllegalArgumentException {
-		if(object == null) return "null";
+		if (object == null) return "null";
 		final int size = Array.getLength(object);
-		if(size == 0) return "[]";
+		if (size == 0) return "[]";
 		String space = (format ? "[\n  " : "[ ");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
-		for(int i = 0; i < size; i++){
+		for (int i = 0; i < size; i++) {
 			output.append(space).append(Objects.toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
@@ -251,13 +251,13 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String stringToString(final boolean format, final String object) {
-		if(object == null) return "null";
+		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
 		final StringBuilder output = new StringBuilder("\"");
 		int last = -1, next = 0;
 		final int size = object.length();
-		while(next < size){
-			switch(object.charAt(next)){
+		while (next < size) {
+			switch (object.charAt(next)) {
 				case '\"':
 					output.append(object.substring(last + 1, last = next)).append("\\\"");
 					break;
@@ -285,16 +285,16 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	static String iterableToString(final boolean format, final Iterable<?> object) {
-		if(object == null) return "null";
+		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
-		if(!iter.hasNext()) return "[]";
+		if (!iter.hasNext()) return "[]";
 		String space = (format ? "[\n  " : "[ ");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
-		do{
+		do {
 			output.append(space).append(Objects.toString(format, format, iter.next()));
 			space = comma;
-		}while(iter.hasNext());
+		} while (iter.hasNext());
 		return output.append((format ? "\n]" : " ]")).toString();
 	}
 
@@ -316,9 +316,9 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hash(final Object... objects) {
-		if(objects == null) return 0;
+		if (objects == null) return 0;
 		int hash = 0x811C9DC5;
-		for(final Object object: objects){
+		for (final Object object: objects) {
 			hash = (hash * 0x01000193) ^ Objects.hash(object);
 		}
 		return hash;
@@ -368,17 +368,17 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hashEx(final Object object) {
-		if(object == null) return 0;
+		if (object == null) return 0;
 		final Class<?> clazz = object.getClass();
-		if(!clazz.isArray()) return object.hashCode();
-		if(clazz == int[].class) return Arrays.hashCode((int[])object);
-		if(clazz == long[].class) return Arrays.hashCode((long[])object);
-		if(clazz == byte[].class) return Arrays.hashCode((byte[])object);
-		if(clazz == char[].class) return Arrays.hashCode((char[])object);
-		if(clazz == short[].class) return Arrays.hashCode((short[])object);
-		if(clazz == float[].class) return Arrays.hashCode((float[])object);
-		if(clazz == double[].class) return Arrays.hashCode((double[])object);
-		if(clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
+		if (!clazz.isArray()) return object.hashCode();
+		if (clazz == int[].class) return Arrays.hashCode((int[])object);
+		if (clazz == long[].class) return Arrays.hashCode((long[])object);
+		if (clazz == byte[].class) return Arrays.hashCode((byte[])object);
+		if (clazz == char[].class) return Arrays.hashCode((char[])object);
+		if (clazz == short[].class) return Arrays.hashCode((short[])object);
+		if (clazz == float[].class) return Arrays.hashCode((float[])object);
+		if (clazz == double[].class) return Arrays.hashCode((double[])object);
+		if (clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
 		return Objects.hashEx((Object[])object);
 	}
 
@@ -391,9 +391,9 @@ public class Objects {
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
 	public static int hashEx(final Object... objects) {
-		if(objects == null) return 0;
+		if (objects == null) return 0;
 		int hash = 0x811C9DC5;
-		for(final Object object: objects){
+		for (final Object object: objects) {
 			hash = (hash * 0x01000193) ^ Objects.hashEx(object);
 		}
 		return hash;
@@ -438,9 +438,9 @@ public class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equals(final Object... objects) {
-		if(objects == null) return true;
-		for(int i = 0, size = objects.length; i < size; i += 2){
-			if(!Objects.equals(objects[i], objects[i + 1])) return false;
+		if (objects == null) return true;
+		for (int i = 0, size = objects.length; i < size; i += 2) {
+			if (!Objects.equals(objects[i], objects[i + 1])) return false;
 		}
 		return true;
 	}
@@ -471,12 +471,12 @@ public class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equals(final Object[] objects1, final Object[] objects2) {
-		if(objects1 == objects2) return true;
-		if((objects1 == null) || (objects2 == null)) return false;
+		if (objects1 == objects2) return true;
+		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
-		if(length != objects2.length) return false;
-		for(int i = 0; i < length; i++){
-			if(!Objects.equals(objects1[i], objects2[i])) return false;
+		if (length != objects2.length) return false;
+		for (int i = 0; i < length; i++) {
+			if (!Objects.equals(objects1[i], objects2[i])) return false;
 		}
 		return true;
 	}
@@ -528,9 +528,9 @@ public class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
 	public static boolean equalsEx(final Object... objects) {
-		if(objects == null) return true;
-		for(int i = 0, size = objects.length; i < size; i += 2){
-			if(!Objects.equalsEx(objects[i], objects[i + 1])) return false;
+		if (objects == null) return true;
+		for (int i = 0, size = objects.length; i < size; i += 2) {
+			if (!Objects.equalsEx(objects[i], objects[i + 1])) return false;
 		}
 		return true;
 	}
@@ -558,20 +558,20 @@ public class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equalsEx(final Object object1, final Object object2) {
-		if(object1 == object2) return true;
-		if((object1 == null) || (object2 == null)) return false;
+		if (object1 == object2) return true;
+		if ((object1 == null) || (object2 == null)) return false;
 		final Class<?> c1 = object1.getClass();
-		if(!c1.isArray()) return !object2.getClass().isArray() && object1.equals(object2);
+		if (!c1.isArray()) return !object2.getClass().isArray() && object1.equals(object2);
 		final Class<?> c2 = object2.getClass();
-		if(!c2.isArray()) return false;
-		if(c1 == int[].class) return (c2 == int[].class) && Arrays.equals((int[])object1, (int[])object2);
-		if(c1 == long[].class) return (c2 == long[].class) && Arrays.equals((long[])object1, (long[])object2);
-		if(c1 == byte[].class) return (c2 == byte[].class) && Arrays.equals((byte[])object1, (byte[])object2);
-		if(c1 == char[].class) return (c2 == char[].class) && Arrays.equals((char[])object1, (char[])object2);
-		if(c1 == short[].class) return (c2 == short[].class) && Arrays.equals((short[])object1, (short[])object2);
-		if(c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
-		if(c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
-		if(c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
+		if (!c2.isArray()) return false;
+		if (c1 == int[].class) return (c2 == int[].class) && Arrays.equals((int[])object1, (int[])object2);
+		if (c1 == long[].class) return (c2 == long[].class) && Arrays.equals((long[])object1, (long[])object2);
+		if (c1 == byte[].class) return (c2 == byte[].class) && Arrays.equals((byte[])object1, (byte[])object2);
+		if (c1 == char[].class) return (c2 == char[].class) && Arrays.equals((char[])object1, (char[])object2);
+		if (c1 == short[].class) return (c2 == short[].class) && Arrays.equals((short[])object1, (short[])object2);
+		if (c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
+		if (c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
+		if (c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
 		return Objects.equalsEx((Object[])object1, (Object[])object2);
 	}
 
@@ -586,12 +586,12 @@ public class Objects {
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
 	public static boolean equalsEx(final Object[] objects1, final Object[] objects2) {
-		if(objects1 == objects2) return true;
-		if((objects1 == null) || (objects2 == null)) return false;
+		if (objects1 == objects2) return true;
+		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
-		if(length != objects2.length) return false;
-		for(int i = 0; i < length; i++){
-			if(!Objects.equalsEx(objects1[i], objects2[i])) return false;
+		if (length != objects2.length) return false;
+		for (int i = 0; i < length; i++) {
+			if (!Objects.equalsEx(objects1[i], objects2[i])) return false;
 		}
 		return true;
 	}
@@ -724,24 +724,24 @@ public class Objects {
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
 	 */
 	public static String toStringCallFormat(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
-		if((name == null) || (args == null)) throw new NullPointerException();
+		if ((name == null) || (args == null)) throw new NullPointerException();
 		final StringBuilder output = new StringBuilder(name);
-		if(args.length != 0){
+		if (args.length != 0) {
 			String join = (format ? "(\n  " : "( ");
 			final String comma = (format ? ",\n  " : ", ");
-			if(label){
-				for(int i = 0, size = args.length - 1; i < size; i += 2){
+			if (label) {
+				for (int i = 0, size = args.length - 1; i < size; i += 2) {
 					output.append(join).append(Objects.toString(format, format, args[i])).append(" = ").append(Objects.toString(format, format, args[i + 1]));
 					join = comma;
 				}
-			}else{
-				for(int i = 0, size = args.length; i < size; i++){
+			} else {
+				for (int i = 0, size = args.length; i < size; i++) {
 					output.append(join).append(Objects.toString(format, format, args[i]));
 					join = comma;
 				}
 			}
 			output.append((format ? "\n)" : " )"));
-		}else{
+		} else {
 			output.append("()");
 		}
 		return output.toString();
@@ -763,7 +763,7 @@ public class Objects {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		if(object == null) throw new NullPointerException();
+		if (object == null) throw new NullPointerException();
 		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
 	}
 

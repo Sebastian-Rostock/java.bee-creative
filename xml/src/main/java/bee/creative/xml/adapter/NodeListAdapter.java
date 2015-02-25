@@ -25,7 +25,7 @@ public final class NodeListAdapter implements NodeList {
 	 * @throws NullPointerException Wenn der {@link NodeListView} {@code null} ist.
 	 */
 	public NodeListAdapter(final NodeListView listView) throws NullPointerException {
-		if(listView == null) throw new NullPointerException();
+		if (listView == null) throw new NullPointerException();
 		this.listView = listView;
 	}
 
@@ -35,8 +35,8 @@ public final class NodeListAdapter implements NodeList {
 	@Override
 	public Node item(final int index) {
 		final NodeView nodeView = this.listView.get(index);
-		if(nodeView == null) return null;
-		if(nodeView.type() == NodeView.TYPE_ELEMENT) return new ElementAdapter(nodeView);
+		if (nodeView == null) return null;
+		if (nodeView.type() == NodeView.TYPE_ELEMENT) return new ElementAdapter(nodeView);
 		return new TextAdapter(nodeView);
 	}
 

@@ -47,13 +47,13 @@ public class Iterables {
 		@SuppressWarnings ("unchecked")
 		public static <GEntry> Iterable<? extends Iterable<? extends GEntry>> valueOf(final Iterable<? extends GEntry> iterable1,
 			final Iterable<? extends GEntry> iterable2) {
-			if(iterable1 instanceof ChainedIterable<?>){
+			if (iterable1 instanceof ChainedIterable<?>) {
 				final Iterable<?> iterableA = ((ChainedIterable<?>)iterable1).iterable;
-				if(iterableA instanceof IterableArray<?>){
+				if (iterableA instanceof IterableArray<?>) {
 					final Iterable<?>[] arrayA = ((IterableArray<?>)iterableA).array;
-					if(iterable2 instanceof ChainedIterable<?>){
+					if (iterable2 instanceof ChainedIterable<?>) {
 						final Iterable<?> iterableB = ((ChainedIterable<?>)iterable1).iterable;
-						if(iterableB instanceof IterableArray){
+						if (iterableB instanceof IterableArray) {
 							final Iterable<?>[] arrayB = ((IterableArray<?>)iterableB).array;
 							final Iterable<?>[] array = new Iterable<?>[arrayA.length + arrayB.length];
 							System.arraycopy(arrayA, 0, array, 0, arrayA.length);
@@ -61,7 +61,7 @@ public class Iterables {
 							return new IterableArray<GEntry>(array);
 						}
 					}
-					if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)){
+					if ((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) {
 						final Iterable<?>[] array = new Iterable<?>[arrayA.length + 1];
 						System.arraycopy(arrayA, 0, array, 0, arrayA.length);
 						array[arrayA.length] = iterable2;
@@ -70,10 +70,10 @@ public class Iterables {
 					return (Iterable<? extends Iterable<? extends GEntry>>)iterableA;
 				}
 			}
-			if(iterable2 instanceof ChainedIterable<?>){
+			if (iterable2 instanceof ChainedIterable<?>) {
 				final Iterable<?> iterableB = ((ChainedIterable<?>)iterable1).iterable;
-				if((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)){
-					if(iterableB instanceof IterableArray){
+				if ((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)) {
+					if (iterableB instanceof IterableArray) {
 						final Iterable<?>[] arrayB = ((IterableArray<?>)iterableB).array;
 						final Iterable<?>[] array = new Iterable<?>[1 + arrayB.length];
 						System.arraycopy(arrayB, 0, array, 1, arrayB.length);
@@ -83,11 +83,11 @@ public class Iterables {
 				}
 				return (Iterable<? extends Iterable<? extends GEntry>>)iterableB;
 			}
-			if((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)){
-				if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable1, iterable2);
+			if ((iterable1 != null) && (iterable1 != VoidIterable.INSTANCE)) {
+				if ((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable1, iterable2);
 				return new IterableArray<GEntry>(iterable1);
 			}
-			if((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable2);
+			if ((iterable2 != null) && (iterable2 != VoidIterable.INSTANCE)) return new IterableArray<GEntry>(iterable2);
 			return new IterableArray<GEntry>();
 		}
 
@@ -103,7 +103,7 @@ public class Iterables {
 		 * @throws NullPointerException Wenn das gegebene {@link Iterable}-Array {@code null} ist.
 		 */
 		public IterableArray(final Iterable<?>... array) throws NullPointerException {
-			if(array == null) throw new NullPointerException();
+			if (array == null) throw new NullPointerException();
 			this.array = array;
 		}
 
@@ -186,7 +186,7 @@ public class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 		 */
 		public AbstractDelegatingIterable(final Iterable<? extends GEntry2> iterable) throws NullPointerException {
-			if(iterable == null) throw new NullPointerException();
+			if (iterable == null) throw new NullPointerException();
 			this.iterable = iterable;
 		}
 
@@ -203,8 +203,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof AbstractDelegatingIterable<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof AbstractDelegatingIterable<?, ?>)) return false;
 			final AbstractDelegatingIterable<?, ?> data = (AbstractDelegatingIterable<?, ?>)object;
 			return Objects.equals(this.iterable, data.iterable);
 		}
@@ -295,8 +295,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof EntryIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof EntryIterable<?>)) return false;
 			final EntryIterable<?> data = (EntryIterable<?>)object;
 			return Objects.equals(this.entry, data.entry);
 		}
@@ -332,7 +332,7 @@ public class Iterables {
 		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
 		 */
 		public BuilderIterable(final Builder<? extends GEntry> builder) throws NullPointerException {
-			if(builder == null) throw new NullPointerException();
+			if (builder == null) throw new NullPointerException();
 			this.builder = builder;
 		}
 
@@ -357,8 +357,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof BuilderIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof BuilderIterable<?>)) return false;
 			final BuilderIterable<?> data = (BuilderIterable<?>)object;
 			return Objects.equals(this.builder, data.builder);
 		}
@@ -393,7 +393,7 @@ public class Iterables {
 		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
 		 */
 		public IntegerIterable(final int count) throws IllegalArgumentException {
-			if(count < 0) throw new IllegalArgumentException();
+			if (count < 0) throw new IllegalArgumentException();
 			this.count = count;
 		}
 
@@ -418,8 +418,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof IntegerIterable)) return false;
+			if (object == this) return true;
+			if (!(object instanceof IntegerIterable)) return false;
 			final IntegerIterable data = (IntegerIterable)object;
 			return this.count == data.count;
 		}
@@ -466,8 +466,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof UniqueIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof UniqueIterable<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -497,7 +497,7 @@ public class Iterables {
 		 */
 		public LimitedIterable(final int count, final Iterable<? extends GEntry> iterable) throws NullPointerException, IllegalArgumentException {
 			super(iterable);
-			if(count < 0) throw new IllegalArgumentException();
+			if (count < 0) throw new IllegalArgumentException();
 			this.count = count;
 		}
 
@@ -522,8 +522,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof LimitedIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof LimitedIterable<?>)) return false;
 			final LimitedIterable<?> data = (LimitedIterable<?>)object;
 			return (this.count == data.count) && Objects.equals(this.iterable, data.iterable);
 		}
@@ -562,7 +562,7 @@ public class Iterables {
 		 */
 		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
 			super(iterable);
-			if(filter == null) throw new NullPointerException();
+			if (filter == null) throw new NullPointerException();
 			this.filter = filter;
 		}
 
@@ -587,8 +587,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FilteredIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FilteredIterable<?>)) return false;
 			final FilteredIterable<?> data = (FilteredIterable<?>)object;
 			return Objects.equals(this.filter, data.filter) && Objects.equals(this.iterable, data.iterable);
 		}
@@ -647,8 +647,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ChainedIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ChainedIterable<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -680,7 +680,7 @@ public class Iterables {
 		public ConvertedIterable(final Converter<? super GInput, ? extends GOutput> converter, final Iterable<? extends GInput> iterable)
 			throws NullPointerException {
 			super(iterable);
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -705,8 +705,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof EntryIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof EntryIterable<?>)) return false;
 			final ConvertedIterable<?, ?> data = (ConvertedIterable<?, ?>)object;
 			return Objects.equals(this.converter, data.converter) && Objects.equals(this.iterable, data.iterable);
 		}
@@ -753,8 +753,8 @@ public class Iterables {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof UnmodifiableIterable<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof UnmodifiableIterable<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -802,7 +802,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
 	public static boolean retainAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
-		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		if ((iterable == null) || (collection == null)) throw new NullPointerException();
 		return Iterators.retainAll(iterable.iterator(), collection);
 	}
 
@@ -817,7 +817,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
 	public static boolean retainAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if((collection == null) || (iterable == null)) throw new NullPointerException();
+		if ((collection == null) || (iterable == null)) throw new NullPointerException();
 		return Iterators.retainAll(collection, iterable.iterator());
 	}
 
@@ -833,7 +833,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static <GEntry> boolean appendAll(final Collection<GEntry> collection, final Iterable<? extends GEntry> iterable) throws NullPointerException {
-		if((collection == null) || (iterable == null)) throw new NullPointerException();
+		if ((collection == null) || (iterable == null)) throw new NullPointerException();
 		return Iterators.appendAll(collection, iterable.iterator());
 	}
 
@@ -846,7 +846,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
 	public static boolean removeAll(final Iterable<?> iterable) throws NullPointerException {
-		if(iterable == null) throw new NullPointerException();
+		if (iterable == null) throw new NullPointerException();
 		return Iterators.removeAll(iterable.iterator());
 	}
 
@@ -861,7 +861,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
 	public static boolean removeAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
-		if((iterable == null) || (collection == null)) throw new NullPointerException();
+		if ((iterable == null) || (collection == null)) throw new NullPointerException();
 		return Iterators.removeAll(iterable.iterator(), collection);
 	}
 
@@ -876,7 +876,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
 	public static boolean removeAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if((collection == null) || (iterable == null)) throw new NullPointerException();
+		if ((collection == null) || (iterable == null)) throw new NullPointerException();
 		return Iterators.removeAll(collection, iterable.iterator());
 	}
 
@@ -890,7 +890,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
 	public static boolean containsAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
-		if((collection == null) || (iterable == null)) throw new NullPointerException();
+		if ((collection == null) || (iterable == null)) throw new NullPointerException();
 		return Iterators.containsAll(collection, iterable.iterator());
 	}
 
@@ -1031,8 +1031,8 @@ public class Iterables {
 	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-Array {@code null} ist.
 	 */
 	public static <GEntry> ChainedIterable<GEntry> chainedIterable(final Iterable<? extends GEntry>... iterables) throws NullPointerException {
-		if(iterables == null) throw new NullPointerException();
-		if(iterables.length == 2) return Iterables.chainedIterable(iterables[0], iterables[1]);
+		if (iterables == null) throw new NullPointerException();
+		if (iterables.length == 2) return Iterables.chainedIterable(iterables[0], iterables[1]);
 		return Iterables.chainedIterable(new IterableArray<GEntry>(iterables.clone()));
 	}
 

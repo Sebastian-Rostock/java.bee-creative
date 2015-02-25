@@ -28,7 +28,7 @@ public abstract class AbstractNodeAdapter implements Node {
 	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
 	 */
 	public AbstractNodeAdapter(final NodeView nodeView) throws NullPointerException {
-		if(nodeView == null) throw new NullPointerException();
+		if (nodeView == null) throw new NullPointerException();
 		this.nodeView = nodeView;
 	}
 

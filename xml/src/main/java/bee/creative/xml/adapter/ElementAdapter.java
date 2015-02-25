@@ -27,10 +27,10 @@ public final class ElementAdapter extends AbstractChildNodeAdapter implements El
 	 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist.
 	 */
 	static final void collectContent(final StringBuffer content, final NodeListView children) throws NullPointerException {
-		for(final NodeView child: children){
-			if(child.type() == NodeView.TYPE_ELEMENT){
+		for (final NodeView child: children) {
+			if (child.type() == NodeView.TYPE_ELEMENT) {
 				ElementAdapter.collectContent(content, child.children());
-			}else{
+			} else {
 				content.append(child.value());
 			}
 		}
@@ -77,7 +77,7 @@ public final class ElementAdapter extends AbstractChildNodeAdapter implements El
 	public String getNodeName() {
 		final String xmlnsName = this.lookupPrefix(this.nodeView.uri());
 		final String elementName = this.nodeView.name();
-		if(xmlnsName == null) return elementName;
+		if (xmlnsName == null) return elementName;
 		return xmlnsName + ":" + elementName;
 	}
 
@@ -185,7 +185,7 @@ public final class ElementAdapter extends AbstractChildNodeAdapter implements El
 	@Override
 	public String getAttributeNS(final String uri, final String name) throws DOMException {
 		final NodeView nodeView = this.nodeView.attributes().get(uri, name, 0);
-		if(nodeView == null) return "";
+		if (nodeView == null) return "";
 		return nodeView.value();
 	}
 
@@ -227,7 +227,7 @@ public final class ElementAdapter extends AbstractChildNodeAdapter implements El
 	@Override
 	public Attr getAttributeNodeNS(final String uri, final String name) throws DOMException {
 		final NodeView nodeView = this.nodeView.attributes().get(uri, name, 0);
-		if(nodeView == null) return null;
+		if (nodeView == null) return null;
 		return new AttrAdapter(nodeView);
 	}
 
@@ -374,8 +374,8 @@ public final class ElementAdapter extends AbstractChildNodeAdapter implements El
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof ElementAdapter)) return false;
+		if (object == this) return true;
+		if (!(object instanceof ElementAdapter)) return false;
 		final ElementAdapter data = (ElementAdapter)object;
 		return Objects.equals(this.nodeView, data.nodeView);
 	}

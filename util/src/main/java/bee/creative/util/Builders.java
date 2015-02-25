@@ -59,7 +59,7 @@ public class Builders {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public AbstractDelegatingBuilder(final Builder<? extends GValue2> builder) throws NullPointerException {
-			if(builder == null) throw new NullPointerException();
+			if (builder == null) throw new NullPointerException();
 			this.builder = builder;
 		}
 
@@ -133,8 +133,8 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ValueBuilder<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ValueBuilder<?>)) return false;
 			final ValueBuilder<?> data = (ValueBuilder<?>)object;
 			return Objects.equals(this.value, data.value);
 		}
@@ -196,10 +196,10 @@ public class Builders {
 		@Override
 		public GValue build() throws IllegalStateException {
 			final Pointer<GValue> pointer = this.pointer;
-			if(pointer != null){
+			if (pointer != null) {
 				final GValue data = pointer.data();
-				if(data != null) return data;
-				if(pointer == NullPointer.INSTANCE) return null;
+				if (data != null) return data;
+				if (pointer == NullPointer.INSTANCE) return null;
 			}
 			final GValue data = this.builder.build();
 			this.pointer = Pointers.pointer(this.mode, data);
@@ -211,8 +211,8 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof CachedBuilder<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof CachedBuilder<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -242,7 +242,7 @@ public class Builders {
 		 */
 		public ConvertedBuilder(final Converter<? super GInput, ? extends GOutput> converter, final Builder<? extends GInput> builder) throws NullPointerException {
 			super(builder);
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -267,8 +267,8 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConvertedBuilder<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConvertedBuilder<?, ?>)) return false;
 			final ConvertedBuilder<?, ?> data = (ConvertedBuilder<?, ?>)object;
 			return Objects.equals(this.builder, data.builder) && Objects.equals(this.builder, data.builder);
 		}
@@ -307,7 +307,7 @@ public class Builders {
 		 */
 		@Override
 		public GValue build() throws IllegalStateException {
-			synchronized(this){
+			synchronized (this) {
 				return this.builder.build();
 			}
 		}
@@ -317,8 +317,8 @@ public class Builders {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof SynchronizedBuilder<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof SynchronizedBuilder<?>)) return false;
 			return super.equals(object);
 		}
 

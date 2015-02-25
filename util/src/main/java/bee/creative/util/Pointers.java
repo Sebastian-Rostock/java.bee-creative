@@ -247,7 +247,7 @@ public class Pointers {
 		 * @throws NullPointerException Wenn der gegebenen {@link Pointer} bzw. der gegebenen {@link Converter} {@code null} ist.
 		 */
 		public ConvertedPointer(final Converter<? super GInput, ? extends GOutput> converter, final Pointer<? extends GInput> pointer) throws NullPointerException {
-			if((pointer == null) || (converter == null)) throw new NullPointerException();
+			if ((pointer == null) || (converter == null)) throw new NullPointerException();
 			this.pointer = pointer;
 			this.converter = converter;
 		}
@@ -334,8 +334,8 @@ public class Pointers {
 	 * @return {@link Object#equals(Object) Äquivalenz}.
 	 */
 	static boolean equals(final Pointer<?> pointer, final Object object) {
-		if(object == pointer) return true;
-		if(!(object instanceof Pointer<?>)) return false;
+		if (object == pointer) return true;
+		if (!(object instanceof Pointer<?>)) return false;
 		final Pointer<?> data = (Pointer<?>)object;
 		return Objects.equals(pointer.data(), data.data());
 	}
@@ -349,7 +349,7 @@ public class Pointers {
 	 * @throws NullPointerException Wenn der gegebenen {@link Pointer} {@code null} ist.
 	 */
 	public static boolean isValid(final Pointer<?> pointer) throws NullPointerException {
-		if(pointer == null) throw new NullPointerException();
+		if (pointer == null) throw new NullPointerException();
 		return (pointer == NullPointer.INSTANCE) || (pointer.data() != null);
 	}
 
@@ -378,7 +378,7 @@ public class Pointers {
 	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist.
 	 */
 	public static <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
-		switch(mode){
+		switch (mode) {
 			case HARD:
 				return Pointers.hardPointer(data);
 			case WEAK:

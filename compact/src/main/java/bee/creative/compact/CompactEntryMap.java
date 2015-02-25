@@ -46,7 +46,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	 */
 	public CompactEntryMap(final Map<? extends GKey, ? extends GValue> map) {
 		this();
-		if(map == null) throw new NullPointerException("map is null");
+		if (map == null) throw new NullPointerException("map is null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}

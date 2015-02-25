@@ -116,8 +116,8 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof CharacterArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof CharacterArraySection)) return false;
 		return super.equals(object);
 	}
 

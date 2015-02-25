@@ -20,7 +20,7 @@ public final class Bytes {
 	 * @return {@code byte}s als {@code int}.
 	 */
 	public static int getInt(final byte[] array, final int index, final int size) {
-		switch(size){
+		switch (size) {
 			case 0:
 				return 0;
 			case 1:
@@ -47,7 +47,7 @@ public final class Bytes {
 	 * @return {@code byte}s als {@code long}.
 	 */
 	public static long getLong(final byte[] array, final int index, final int size) {
-		switch(size){
+		switch (size) {
 			case 0:
 				return 0;
 			case 1:
@@ -95,7 +95,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code int}s.
 	 */
 	static public void get1(final byte[] source, int sourceOffset, final int[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 1) {
 			target[targetOffset] = Bytes.get1(source, sourceOffset);
 		}
 	}
@@ -125,7 +125,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code int}s.
 	 */
 	static public void get2(final byte[] source, int sourceOffset, final int[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 2, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 2, targetOffset += 1) {
 			target[targetOffset] = Bytes.get2(source, sourceOffset);
 		}
 	}
@@ -155,7 +155,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code int}s.
 	 */
 	static public void get3(final byte[] source, int sourceOffset, final int[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 3, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 3, targetOffset += 1) {
 			target[targetOffset] = Bytes.get3(source, sourceOffset);
 		}
 	}
@@ -185,7 +185,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code int}s.
 	 */
 	static public void get4(final byte[] source, int sourceOffset, final int[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 4, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 4, targetOffset += 1) {
 			target[targetOffset] = Bytes.get4(source, sourceOffset);
 		}
 	}
@@ -215,7 +215,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code long}s.
 	 */
 	static public void get5(final byte[] source, int sourceOffset, final long[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 5, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 5, targetOffset += 1) {
 			target[targetOffset] = Bytes.get5(source, sourceOffset);
 		}
 	}
@@ -245,7 +245,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code long}s.
 	 */
 	static public void get6(final byte[] source, int sourceOffset, final long[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 6, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 6, targetOffset += 1) {
 			target[targetOffset] = Bytes.get6(source, sourceOffset);
 		}
 	}
@@ -275,7 +275,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code long}s.
 	 */
 	static public void get7(final byte[] source, int sourceOffset, final long[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 7, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 7, targetOffset += 1) {
 			target[targetOffset] = Bytes.get7(source, sourceOffset);
 		}
 	}
@@ -305,7 +305,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code long}s.
 	 */
 	static public void get8(final byte[] source, int sourceOffset, final long[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 8, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 8, targetOffset += 1) {
 			target[targetOffset] = Bytes.get8(source, sourceOffset);
 		}
 	}
@@ -321,7 +321,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..4).
 	 */
 	public static void setInt(final byte[] array, final int index, final int value, final int size) {
-		switch(size){
+		switch (size) {
 			case 0:
 				return;
 			case 1:
@@ -352,7 +352,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..8).
 	 */
 	public static void setLong(final byte[] array, final int index, final long value, final int size) {
-		switch(size){
+		switch (size) {
 			case 0:
 				return;
 			case 1:
@@ -408,7 +408,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set1(final int[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 1){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 1) {
 			Bytes.set1(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -439,7 +439,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set2(final int[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 2){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 2) {
 			Bytes.set2(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -471,7 +471,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set3(final int[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 3){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 3) {
 			Bytes.set3(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -504,7 +504,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set4(final int[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 4){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 4) {
 			Bytes.set4(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -535,7 +535,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set5(final long[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 5){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 5) {
 			Bytes.set5(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -566,7 +566,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set6(final long[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 6){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 6) {
 			Bytes.set6(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -597,7 +597,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set7(final long[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 7){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 7) {
 			Bytes.set7(target, targetOffset, source[sourceOffset]);
 		}
 	}
@@ -628,7 +628,7 @@ public final class Bytes {
 	 * @param targetCount Anzahl der kopierten {@code byte}s.
 	 */
 	static public void set8(final long[] source, int sourceOffset, final byte[] target, int targetOffset, int targetCount) {
-		for(targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 8){
+		for (targetCount += targetOffset; targetOffset < targetCount; sourceOffset += 1, targetOffset += 8) {
 			Bytes.set8(target, targetOffset, source[sourceOffset]);
 		}
 	}

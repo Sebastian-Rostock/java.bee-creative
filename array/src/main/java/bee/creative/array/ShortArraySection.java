@@ -116,8 +116,8 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof ShortArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof ShortArraySection)) return false;
 		return super.equals(object);
 	}
 

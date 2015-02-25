@@ -50,7 +50,7 @@ public abstract class CompactData {
 		 */
 		@Override
 		protected Object[] newArray(final int length) {
-			if(length == 0) return CompactDataArray.VOID;
+			if (length == 0) return CompactDataArray.VOID;
 			return new Object[length];
 		}
 
@@ -75,7 +75,7 @@ public abstract class CompactData {
 		 * @param data {@link CompactData}.
 		 */
 		public CompactDataOwner(final GData data) {
-			if(data == null) throw new NullPointerException("data is null");
+			if (data == null) throw new NullPointerException("data is null");
 			this.data = data;
 		}
 
@@ -141,7 +141,7 @@ public abstract class CompactData {
 		@Override
 		public void remove() {
 			final int item = this.item;
-			if(item < 0) throw new IllegalStateException();
+			if (item < 0) throw new IllegalStateException();
 			this.data.customRemove(item, 1);
 			this.item = -1;
 		}
@@ -265,13 +265,13 @@ public abstract class CompactData {
 		public CompactSubData(final GData data, final Object fromItem, final boolean fromInclusive, final Object lastItem, final boolean lastInclusive)
 			throws IllegalArgumentException {
 			super(data);
-			if(fromItem != CompactSubData.OPEN){
-				if(lastItem != CompactSubData.OPEN){
-					if(data.customItemCompare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
-				}else{
+			if (fromItem != CompactSubData.OPEN) {
+				if (lastItem != CompactSubData.OPEN) {
+					if (data.customItemCompare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
+				} else {
 					data.customItemCompare(fromItem, 0, fromItem);
 				}
-			}else if(lastItem != CompactSubData.OPEN){
+			} else if (lastItem != CompactSubData.OPEN) {
 				data.customItemCompare(lastItem, 0, lastItem);
 			}
 			this.fromItem = fromItem;
@@ -290,8 +290,8 @@ public abstract class CompactData {
 		 */
 		protected final boolean isTooLow(final int index) {
 			final CompactObjectArray<Object> array = this.data.items;
-			if(index >= array.size()) return true;
-			if(index < 0) return false;
+			if (index >= array.size()) return true;
+			if (index < 0) return false;
 			return this.isTooLow(array.get(index));
 		}
 
@@ -308,7 +308,7 @@ public abstract class CompactData {
 		 */
 		protected final boolean isTooLow(final Object key) {
 			final Object fromItem = this.fromItem;
-			if(fromItem == CompactSubData.OPEN) return false;
+			if (fromItem == CompactSubData.OPEN) return false;
 			final int comp = this.data.customItemCompare(key, 0, fromItem);
 			return ((comp < 0) || ((comp == 0) && !this.fromInclusive));
 		}
@@ -322,8 +322,8 @@ public abstract class CompactData {
 		 */
 		protected final boolean isTooHigh(final int index) {
 			final CompactObjectArray<Object> array = this.data.items;
-			if(index >= array.size()) return true;
-			if(index < 0) return false;
+			if (index >= array.size()) return true;
+			if (index < 0) return false;
 			return this.isTooHigh(array.get(index));
 		}
 
@@ -340,7 +340,7 @@ public abstract class CompactData {
 		 */
 		protected final boolean isTooHigh(final Object key) {
 			final Object lastItem = this.lastItem;
-			if(lastItem == CompactSubData.OPEN) return false;
+			if (lastItem == CompactSubData.OPEN) return false;
 			final int comp = this.data.customItemCompare(key, 0, lastItem);
 			return ((comp > 0) || ((comp == 0) && !this.lastInclusive));
 		}
@@ -394,8 +394,8 @@ public abstract class CompactData {
 		protected final int firstIndex() {
 			final GData data = this.data;
 			final Object fromItem = this.fromItem;
-			if(fromItem == CompactSubData.OPEN) return data.firstIndex();
-			if(this.fromInclusive) return data.ceilingIndex(fromItem);
+			if (fromItem == CompactSubData.OPEN) return data.firstIndex();
+			if (this.fromInclusive) return data.ceilingIndex(fromItem);
 			return data.higherIndex(fromItem);
 		}
 
@@ -407,8 +407,8 @@ public abstract class CompactData {
 		protected final int lastIndex() {
 			final GData data = this.data;
 			final Object lastItem = this.lastItem;
-			if(lastItem == CompactSubData.OPEN) return data.lastIndex();
-			if(this.lastInclusive) return data.floorIndex(lastItem);
+			if (lastItem == CompactSubData.OPEN) return data.lastIndex();
+			if (this.lastInclusive) return data.floorIndex(lastItem);
 			return data.lowerIndex(lastItem);
 		}
 
@@ -420,7 +420,7 @@ public abstract class CompactData {
 		 */
 		protected final int lowestIndex() {
 			final int index = this.firstIndex();
-			if(this.isTooHigh(index)) return -index - 1;
+			if (this.isTooHigh(index)) return -index - 1;
 			return index;
 		}
 
@@ -432,7 +432,7 @@ public abstract class CompactData {
 		 */
 		protected final int highestIndex() {
 			final int index = this.lastIndex();
-			if(this.isTooLow(index)) return -index - 1;
+			if (this.isTooLow(index)) return -index - 1;
 			return index;
 		}
 
@@ -445,9 +445,9 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int lowerIndex(final Object item) {
-			if(this.isTooHigh(item)) return this.highestIndex();
+			if (this.isTooHigh(item)) return this.highestIndex();
 			final int index = this.data.lowerIndex(item);
-			if(this.isTooLow(index)) return -index - 1;
+			if (this.isTooLow(index)) return -index - 1;
 			return index;
 		}
 
@@ -460,9 +460,9 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int floorIndex(final Object item) {
-			if(this.isTooHigh(item)) return this.highestIndex();
+			if (this.isTooHigh(item)) return this.highestIndex();
 			final int index = this.data.floorIndex(item);
-			if(this.isTooLow(index)) return -index - 1;
+			if (this.isTooLow(index)) return -index - 1;
 			return index;
 		}
 
@@ -475,9 +475,9 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int ceilingIndex(final Object item) {
-			if(this.isTooLow(item)) return this.lowestIndex();
+			if (this.isTooLow(item)) return this.lowestIndex();
 			final int index = this.data.ceilingIndex(item);
-			if(this.isTooHigh(index)) return -index - 1;
+			if (this.isTooHigh(index)) return -index - 1;
 			return index;
 		}
 
@@ -490,9 +490,9 @@ public abstract class CompactData {
 		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
 		protected final int higherIndex(final Object item) {
-			if(this.isTooLow(item)) return this.lowestIndex();
+			if (this.isTooLow(item)) return this.lowestIndex();
 			final int index = this.data.higherIndex(item);
-			if(this.isTooHigh(index)) return -index - 1;
+			if (this.isTooHigh(index)) return -index - 1;
 			return index;
 		}
 
@@ -501,7 +501,7 @@ public abstract class CompactData {
 		 */
 		protected final void clearItems() {
 			final int fromIndex = this.firstIndex(), lastIndex = this.lastIndex();
-			if(fromIndex > lastIndex) return;
+			if (fromIndex > lastIndex) return;
 			this.data.customRemove(fromIndex, (lastIndex - fromIndex) + 1);
 		}
 
@@ -544,17 +544,17 @@ public abstract class CompactData {
 	 */
 	protected final int defaultEqualsIndex(final Object key, final int hash) {
 		final int index = this.defaultCompareIndex(key, hash);
-		if(index < 0) return index;
+		if (index < 0) return index;
 		final CompactDataArray data = this.items;
 		final Object[] array = data.array();
 		final int from = data.startIndex();
-		if(this.customItemEquals(key, hash, array[index + from])) return index;
+		if (this.customItemEquals(key, hash, array[index + from])) return index;
 		Object item;
-		for(int next = (index + from) - 1; (from <= next) && (this.customItemCompare(key, hash, item = array[next]) == 0); next--){
-			if(this.customItemEquals(key, hash, item)) return next - from;
+		for (int next = (index + from) - 1; (from <= next) && (this.customItemCompare(key, hash, item = array[next]) == 0); next--) {
+			if (this.customItemEquals(key, hash, item)) return next - from;
 		}
-		for(int next = (index + from) + 1, last = data.finalIndex(); (next < last) && (this.customItemCompare(key, hash, item = array[next]) == 0); next++){
-			if(this.customItemEquals(key, hash, item)) return next - from;
+		for (int next = (index + from) + 1, last = data.finalIndex(); (next < last) && (this.customItemCompare(key, hash, item = array[next]) == 0); next++) {
+			if (this.customItemEquals(key, hash, item)) return next - from;
 		}
 		return -index - 1;
 	}
@@ -573,13 +573,13 @@ public abstract class CompactData {
 		final Object[] array = data.array();
 		final int offset = data.startIndex();
 		int from = offset, last = data.finalIndex();
-		while(from < last){
+		while (from < last) {
 			final int index = (from + last) >>> 1, value = this.customItemCompare(key, hash, array[index]);
-			if(value < 0){
+			if (value < 0) {
 				last = index;
-			}else if(value > 0){
+			} else if (value > 0) {
 				from = index + 1;
-			}else return index - offset;
+			} else return index - offset;
 		}
 		return offset - from - 1;
 	}
@@ -689,7 +689,7 @@ public abstract class CompactData {
 	 */
 	protected final int lowerIndex(final Object item) {
 		final int index = this.customItemIndex(item);
-		if(index < 0) return -index - 2;
+		if (index < 0) return -index - 2;
 		return index - 1;
 	}
 
@@ -703,7 +703,7 @@ public abstract class CompactData {
 	 */
 	protected final int floorIndex(final Object item) {
 		final int index = this.customItemIndex(item);
-		if(index < 0) return -index - 2;
+		if (index < 0) return -index - 2;
 		return index;
 	}
 
@@ -716,7 +716,7 @@ public abstract class CompactData {
 	 */
 	protected final int ceilingIndex(final Object item) {
 		final int index = this.customItemIndex(item);
-		if(index < 0) return -index - 1;
+		if (index < 0) return -index - 1;
 		return index;
 	}
 
@@ -729,7 +729,7 @@ public abstract class CompactData {
 	 */
 	protected final int higherIndex(final Object item) {
 		final int index = this.customItemIndex(item);
-		if(index < 0) return -index - 1;
+		if (index < 0) return -index - 1;
 		return index + 1;
 	}
 

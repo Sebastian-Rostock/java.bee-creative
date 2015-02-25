@@ -89,8 +89,8 @@ public final class DocumentAdapter extends AbstractNodeAdapter implements Docume
 
 		@Override
 		public Object getParameter(final String name) throws DOMException {
-			if(DocumentAdapter.VOID_DOM_PARAMETER_LIST_TRUE.contains(name)) return Boolean.TRUE;
-			if(DocumentAdapter.VOID_DOM_PARAMETER_LIST_FALSE.contains(name)) return Boolean.FALSE;
+			if (DocumentAdapter.VOID_DOM_PARAMETER_LIST_TRUE.contains(name)) return Boolean.TRUE;
+			if (DocumentAdapter.VOID_DOM_PARAMETER_LIST_FALSE.contains(name)) return Boolean.FALSE;
 			throw new DOMException(DOMException.NOT_FOUND_ERR, null);
 		}
 
@@ -138,7 +138,7 @@ public final class DocumentAdapter extends AbstractNodeAdapter implements Docume
 		@Override
 		public String item(final int index) {
 			final int offset = DocumentAdapter.VOID_DOM_PARAMETER_LIST_TRUE.size();
-			if(index < offset) return DocumentAdapter.VOID_DOM_PARAMETER_LIST_TRUE.get(index);
+			if (index < offset) return DocumentAdapter.VOID_DOM_PARAMETER_LIST_TRUE.get(index);
 			return DocumentAdapter.VOID_DOM_PARAMETER_LIST_FALSE.get(index - offset);
 		}
 
@@ -180,7 +180,7 @@ public final class DocumentAdapter extends AbstractNodeAdapter implements Docume
 	public DocumentAdapter(final NodeView nodeView) throws NullPointerException, IllegalArgumentException {
 		super(nodeView);
 		final NodeListView children = nodeView.children();
-		if((children.size() != 1) || (children.get(0).type() != NodeView.TYPE_ELEMENT)) throw new IllegalArgumentException();
+		if ((children.size() != 1) || (children.get(0).type() != NodeView.TYPE_ELEMENT)) throw new IllegalArgumentException();
 	}
 
 	/**
@@ -317,7 +317,7 @@ public final class DocumentAdapter extends AbstractNodeAdapter implements Docume
 	@Override
 	public Element getElementById(final String elementId) {
 		final NodeView nodeView = this.nodeView.element(elementId);
-		if(nodeView == null) return null;
+		if (nodeView == null) return null;
 		return new ElementAdapter(nodeView);
 	}
 
@@ -579,8 +579,8 @@ public final class DocumentAdapter extends AbstractNodeAdapter implements Docume
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof DocumentAdapter)) return false;
+		if (object == this) return true;
+		if (!(object instanceof DocumentAdapter)) return false;
 		final DocumentAdapter data = (DocumentAdapter)object;
 		return Objects.equals(this.nodeView, data.nodeView);
 	}

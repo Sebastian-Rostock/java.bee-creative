@@ -116,8 +116,8 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof ByteArraySection)) return false;
+		if (object == this) return true;
+		if (!(object instanceof ByteArraySection)) return false;
 		return super.equals(object);
 	}
 

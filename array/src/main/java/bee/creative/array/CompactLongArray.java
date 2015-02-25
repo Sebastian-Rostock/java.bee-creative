@@ -130,7 +130,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactLongArraySection(final CompactLongArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -188,7 +188,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactLongSubArraySection(final CompactLongSubArray owner) throws NullPointerException {
-			if(owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException();
 			this.owner = owner;
 		}
 
@@ -290,7 +290,7 @@ public class CompactLongArray extends CompactArray<long[], Long> implements Long
 	 */
 	@Override
 	protected long[] newArray(final int length) {
-		if(length == 0) return CompactLongArray.VOID;
+		if (length == 0) return CompactLongArray.VOID;
 		return new long[length];
 	}
 

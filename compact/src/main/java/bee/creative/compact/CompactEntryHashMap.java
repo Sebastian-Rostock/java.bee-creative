@@ -58,7 +58,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 */
 	@Override
 	protected int customItemIndex(final Object key) {
-		if(key == null) return this.defaultEqualsIndex(null, 0);
+		if (key == null) return this.defaultEqualsIndex(null, 0);
 		return this.defaultEqualsIndex(key, key.hashCode());
 	}
 
@@ -67,7 +67,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 */
 	@Override
 	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
-		if(key == null) return item == null;
+		if (key == null) return item == null;
 		return key.equals(item);
 	}
 
@@ -76,7 +76,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	 */
 	@Override
 	protected int customItemCompare(final Object key, final int hash, final Object item) {
-		if(item == null) return hash;
+		if (item == null) return hash;
 		return Comparators.compare(hash, item.hashCode());
 	}
 

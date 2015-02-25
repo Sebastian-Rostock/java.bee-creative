@@ -60,8 +60,8 @@ public class Strings {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof PatternConverter)) return false;
+			if (object == this) return true;
+			if (!(object instanceof PatternConverter)) return false;
 			final PatternConverter data = (PatternConverter)object;
 			return (this.flags == data.flags);
 		}
@@ -97,8 +97,8 @@ public class Strings {
 	 */
 	static List<String> apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if((regex == null) || (string == null)) throw new NullPointerException();
-		if(index < 0) throw new IllegalArgumentException();
+		if ((regex == null) || (string == null)) throw new NullPointerException();
+		if (index < 0) throw new IllegalArgumentException();
 		return Strings.apply(Strings.PATTERN_CONVERTER.convert(regex), string, index, split, match);
 	}
 
@@ -118,26 +118,26 @@ public class Strings {
 	 */
 	static List<String> apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
-		if((pattern == null) || (string == null)) throw new NullPointerException();
-		if(index < 0) throw new IllegalArgumentException();
+		if ((pattern == null) || (string == null)) throw new NullPointerException();
+		if (index < 0) throw new IllegalArgumentException();
 		final Matcher matcher = pattern.matcher(string);
-		if(index > matcher.groupCount()) throw new IllegalArgumentException();
+		if (index > matcher.groupCount()) throw new IllegalArgumentException();
 		final List<String> stringList = new ArrayList<String>();
 		int cursor = 0;
-		while(matcher.find()){
+		while (matcher.find()) {
 			final int from = matcher.start(index);
-			if(from >= 0){
+			if (from >= 0) {
 				final int last = matcher.end(index);
-				if(split){
+				if (split) {
 					stringList.add(string.subSequence(cursor, from).toString());
 					cursor = last;
 				}
-				if(match){
+				if (match) {
 					stringList.add(string.subSequence(from, last).toString());
 				}
 			}
 		}
-		if(split){
+		if (split) {
 			stringList.add(string.subSequence(cursor, string.length()).toString());
 		}
 		return stringList;
@@ -156,7 +156,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebenen reguläre Ausdruck bzw. die gegebene Zeichenkette {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if((regex == null) || (string == null)) throw new NullPointerException();
+		if ((regex == null) || (string == null)) throw new NullPointerException();
 		return Strings.applyAll(Strings.PATTERN_CONVERTER.convert(regex), string, split, match);
 	}
 
@@ -173,40 +173,40 @@ public class Strings {
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	static List<List<String>> applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
-		if((pattern == null) || (string == null)) throw new NullPointerException();
+		if ((pattern == null) || (string == null)) throw new NullPointerException();
 		final Matcher matcher = pattern.matcher(string);
 		final int count = matcher.groupCount() + 1;
 		final List<List<String>> stringListList = new ArrayList<List<String>>();
 		final int[] cursorList = new int[count];
-		while(matcher.find()){
+		while (matcher.find()) {
 			final List<String> spliList = (split ? new ArrayList<String>() : null);
 			final List<String> matchList = (match ? new ArrayList<String>() : null);
-			for(int i = 0; i < count; i++){
+			for (int i = 0; i < count; i++) {
 				final int from = matcher.start(i);
-				if(from >= 0){
+				if (from >= 0) {
 					final int last = matcher.end(i);
-					if(split){
+					if (split) {
 						spliList.add(string.subSequence(cursorList[i], from).toString());
 						cursorList[i] = last;
 					}
-					if(match){
+					if (match) {
 						matchList.add(string.subSequence(from, last).toString());
 					}
-				}else if(match){
+				} else if (match) {
 					matchList.add(null);
 				}
 			}
-			if(split){
+			if (split) {
 				stringListList.add(spliList);
 			}
-			if(match){
+			if (match) {
 				stringListList.add(matchList);
 			}
 		}
-		if(split){
+		if (split) {
 			final List<String> splitList = new ArrayList<String>();
 			final int last = string.length();
-			for(int i = 0; i < count; i++){
+			for (int i = 0; i < count; i++) {
 				splitList.add(string.subSequence(cursorList[i], last).toString());
 			}
 			stringListList.add(splitList);
@@ -227,7 +227,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn das gegebenen Array {@code null} ist.
 	 */
 	public static String join(final Object... items) throws NullPointerException {
-		if(items == null) throw new NullPointerException();
+		if (items == null) throw new NullPointerException();
 		return Strings.join("", items);
 	}
 
@@ -242,7 +242,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn das gegebenen Array bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Object... items) throws NullPointerException {
-		if((space == null) || (items == null)) throw new NullPointerException();
+		if ((space == null) || (items == null)) throw new NullPointerException();
 		return Strings.join(space, Arrays.asList(items));
 	}
 
@@ -259,7 +259,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
 	public static String join(final Iterable<?> items) {
-		if(items == null) throw new NullPointerException();
+		if (items == null) throw new NullPointerException();
 		return Strings.join("", items);
 	}
 
@@ -273,16 +273,16 @@ public class Strings {
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. das gegebene Trennzeichen {@code null} ist.
 	 */
 	public static String join(final String space, final Iterable<?> items) {
-		if((space == null) || (items == null)) throw new NullPointerException();
+		if ((space == null) || (items == null)) throw new NullPointerException();
 		final StringBuilder builder = new StringBuilder();
-		if(!space.isEmpty()){
+		if (!space.isEmpty()) {
 			String join = "";
-			for(final Object item: items){
+			for (final Object item: items) {
 				builder.append(join).append(item);
 				join = space;
 			}
-		}else{
-			for(final Object item: items){
+		} else {
+			for (final Object item: items) {
 				builder.append(item);
 			}
 		}

@@ -124,12 +124,12 @@ public class XML {
 		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 		 */
 		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final String name, final GValue value) throws NullPointerException {
-			if(name == null) throw new NullPointerException("name is null");
-			if(value == null){
-				if(map == null) return null;
+			if (name == null) throw new NullPointerException("name is null");
+			if (value == null) {
+				if (map == null) return null;
 				map.remove(name);
 				return map;
-			}else{
+			} else {
 				map = this.map(map);
 				map.put(name, value);
 				return map;
@@ -147,10 +147,10 @@ public class XML {
 		 */
 		final <GValue> Map<String, GValue> set(Map<String, GValue> map, final Map<String, GValue> value) throws NullPointerException {
 			final Iterable<Entry<String, GValue>> entries = ((value == null) ? Collections.<Entry<String, GValue>>emptySet() : value.entrySet());
-			if(map != null){
+			if (map != null) {
 				map.clear();
 			}
-			for(final Entry<String, GValue> entry: entries){
+			for (final Entry<String, GValue> entry: entries) {
 				map = this.set(map, entry.getKey(), entry.getValue());
 			}
 			return map;
@@ -268,8 +268,8 @@ public class XML {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FeatureOptions)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FeatureOptions)) return false;
 			final FeatureOptions data = (FeatureOptions)object;
 			return this.equals(this.featureMap, data.featureMap);
 		}
@@ -347,8 +347,8 @@ public class XML {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof AttributeOptions)) return false;
+			if (object == this) return true;
+			if (!(object instanceof AttributeOptions)) return false;
 			final AttributeOptions data = (AttributeOptions)object;
 			return super.equals(object) && this.equals(this.attributeMap, data.attributeMap);
 		}
@@ -413,9 +413,9 @@ public class XML {
 		 */
 		@Override
 		public XPathExpression convert(final String input) {
-			try{
+			try {
 				return this.xpath.compile(input);
-			}catch(final XPathExpressionException e){
+			} catch (final XPathExpressionException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -425,11 +425,11 @@ public class XML {
 		 */
 		@Override
 		public XPathExpression compile(final String expression) throws XPathExpressionException {
-			try{
+			try {
 				return this.converter.convert(expression);
-			}catch(final RuntimeException e){
+			} catch (final RuntimeException e) {
 				final Throwable cause = e.getCause();
-				if(cause instanceof XPathExpressionException) throw (XPathExpressionException)cause;
+				if (cause instanceof XPathExpressionException) throw (XPathExpressionException)cause;
 				throw e;
 			}
 		}
@@ -439,8 +439,8 @@ public class XML {
 		 */
 		@Override
 		public Object evaluate(final String expression, final Object item, final QName returnType) throws XPathExpressionException {
-			if(expression == null) throw new NullPointerException("expression is null");
-			if(returnType == null) throw new NullPointerException("returnType is null");
+			if (expression == null) throw new NullPointerException("expression is null");
+			if (returnType == null) throw new NullPointerException("returnType is null");
 			return this.compile(expression).evaluate(item, returnType);
 		}
 
@@ -449,7 +449,7 @@ public class XML {
 		 */
 		@Override
 		public String evaluate(final String expression, final Object item) throws XPathExpressionException {
-			if(expression == null) throw new NullPointerException("expression is null");
+			if (expression == null) throw new NullPointerException("expression is null");
 			return this.compile(expression).evaluate(item);
 		}
 
@@ -458,9 +458,9 @@ public class XML {
 		 */
 		@Override
 		public Object evaluate(final String expression, final InputSource source, final QName returnType) throws XPathExpressionException {
-			if(expression == null) throw new NullPointerException("expression is null");
-			if(source == null) throw new NullPointerException("source is null");
-			if(returnType == null) throw new NullPointerException("returnType is null");
+			if (expression == null) throw new NullPointerException("expression is null");
+			if (source == null) throw new NullPointerException("source is null");
+			if (returnType == null) throw new NullPointerException("returnType is null");
 			return this.compile(expression).evaluate(source, returnType);
 		}
 
@@ -469,8 +469,8 @@ public class XML {
 		 */
 		@Override
 		public String evaluate(final String expression, final InputSource source) throws XPathExpressionException {
-			if(expression == null) throw new NullPointerException("expression is null");
-			if(source == null) throw new NullPointerException("source is null");
+			if (expression == null) throw new NullPointerException("expression is null");
+			if (source == null) throw new NullPointerException("source is null");
 			return this.compile(expression).evaluate(source);
 		}
 
@@ -578,7 +578,7 @@ public class XML {
 		 * @throws NullPointerException Wenn die gegebenen {@link XPathOptions XPath-Optionen} {@code null} sind.
 		 */
 		public XPathOptions applyTo(final XPathOptions target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			return target.setFeatureMap(this.featureMap).setVariableResolver(this.variableResolver).setFunctionResolver(this.functionResolver)
 				.setNamespaceContext(this.namespaceContext);
 		}
@@ -591,14 +591,14 @@ public class XML {
 		 * @throws NullPointerException Wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 		 */
 		public XPath applyTo(final XPath target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
-			if(this.namespaceContext != null){
+			if (target == null) throw new NullPointerException("target is null");
+			if (this.namespaceContext != null) {
 				target.setNamespaceContext(this.namespaceContext);
 			}
-			if(this.variableResolver != null){
+			if (this.variableResolver != null) {
 				target.setXPathVariableResolver(this.variableResolver);
 			}
-			if(this.functionResolver != null){
+			if (this.functionResolver != null) {
 				target.setXPathFunctionResolver(this.functionResolver);
 			}
 			return target;
@@ -613,15 +613,15 @@ public class XML {
 		 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
 		public XPathFactory applyTo(final XPathFactory target) throws NullPointerException, XPathFactoryConfigurationException {
-			if(target == null) throw new NullPointerException("target is null");
-			if(this.variableResolver != null){
+			if (target == null) throw new NullPointerException("target is null");
+			if (this.variableResolver != null) {
 				target.setXPathVariableResolver(this.variableResolver);
 			}
-			if(this.functionResolver != null){
+			if (this.functionResolver != null) {
 				target.setXPathFunctionResolver(this.functionResolver);
 			}
-			if(this.featureMap != null){
-				for(final Entry<String, Boolean> entry: this.featureMap.entrySet()){
+			if (this.featureMap != null) {
+				for (final Entry<String, Boolean> entry: this.featureMap.entrySet()) {
 					target.setFeature(entry.getKey(), entry.getValue().booleanValue());
 				}
 			}
@@ -771,8 +771,8 @@ public class XML {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof XPathOptions)) return false;
+			if (object == this) return true;
+			if (!(object instanceof XPathOptions)) return false;
 			final XPathOptions data = (XPathOptions)object;
 			return super.equals(object) && Objects.equals(this.variableResolver, data.variableResolver)
 				&& Objects.equals(this.functionResolver, data.functionResolver) && Objects.equals(this.namespaceContext, data.namespaceContext);
@@ -831,7 +831,7 @@ public class XML {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public NodeBuilder(final Document document) throws NullPointerException {
-			if(document == null) throw new NullPointerException();
+			if (document == null) throw new NullPointerException();
 			this.node = document;
 			this.owner = null;
 		}
@@ -866,7 +866,7 @@ public class XML {
 		 * @throws IllegalStateException wenn es keine vorherige Position gibt.
 		 */
 		public NodeBuilder prev() throws IllegalStateException {
-			if(!this.hasPrev()) throw new IllegalStateException();
+			if (!this.hasPrev()) throw new IllegalStateException();
 			this.index--;
 			return this;
 		}
@@ -879,7 +879,7 @@ public class XML {
 		 * @throws IllegalStateException wenn es keine nächste Position gibt.
 		 */
 		public NodeBuilder next() throws IllegalStateException {
-			if(!this.hasNext()) throw new IllegalStateException();
+			if (!this.hasNext()) throw new IllegalStateException();
 			this.index++;
 			return this;
 		}
@@ -896,7 +896,7 @@ public class XML {
 		 */
 		public NodeBuilder seek(final int index) throws IllegalArgumentException {
 			final int length = this.length(), offset = index >= 0 ? index : length + index + 1;
-			if((offset < 0) || (offset > length)) throw new IllegalArgumentException();
+			if ((offset < 0) || (offset > length)) throw new IllegalArgumentException();
 			this.index = offset;
 			return this;
 		}
@@ -956,7 +956,7 @@ public class XML {
 		 */
 		public NodeBuilder open() throws IllegalStateException {
 			final Node node = NodeBuilder.this.node().getChildNodes().item(NodeBuilder.this.index);
-			if(!(node instanceof Element)) throw new IllegalStateException();
+			if (!(node instanceof Element)) throw new IllegalStateException();
 			return new NodeBuilder(node, this);
 		}
 
@@ -970,7 +970,7 @@ public class XML {
 		 * @throws IllegalStateException Wenn es keinen erzeugenden {@link NodeBuilder} gibt.
 		 */
 		public NodeBuilder close() throws IllegalStateException {
-			if(this.owner == null) throw new IllegalStateException();
+			if (this.owner == null) throw new IllegalStateException();
 			return this.owner;
 		}
 
@@ -1002,7 +1002,7 @@ public class XML {
 		 */
 		public NodeBuilder delete() throws DOMException, IllegalStateException {
 			final Node root = this.node(), next = root.getChildNodes().item(this.index);
-			if(next == null) throw new IllegalStateException();
+			if (next == null) throw new IllegalStateException();
 			root.removeChild(next);
 			return this;
 		}
@@ -1075,10 +1075,10 @@ public class XML {
 		 * @throws IllegalStateException Wenn das {@link #node() aktuelle Knoten} kein {@link Element} ist.
 		 */
 		public NodeBuilder attribute(final String name, final String value) throws DOMException, IllegalStateException {
-			if(this.owner == null) throw new IllegalStateException();
-			if(value == null){
+			if (this.owner == null) throw new IllegalStateException();
+			if (value == null) {
 				((Element)this.node).removeAttribute(name);
-			}else{
+			} else {
 				((Element)this.node).setAttribute(name, value);
 			}
 			return this;
@@ -1098,10 +1098,10 @@ public class XML {
 		 * @throws IllegalStateException Wenn das {@link #node() aktuelle Knoten} kein {@link Element} ist.
 		 */
 		public NodeBuilder attribute(final String uri, final String name, final String value) throws DOMException, IllegalStateException {
-			if(this.owner == null) throw new IllegalStateException();
-			if(value == null){
+			if (this.owner == null) throw new IllegalStateException();
+			if (value == null) {
 				((Element)this.node).removeAttributeNS(uri, name);
-			}else{
+			} else {
 				((Element)this.node).setAttributeNS(uri, name, value);
 			}
 			return this;
@@ -1207,7 +1207,7 @@ public class XML {
 		 * @throws NullPointerException Wenn die gegebenen {@link ParseOptions Parse-Optionen} {@code null} sind.
 		 */
 		public ParseOptions applyTo(final ParseOptions target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap).setSchema(this.schema).setValidating(this.validating)
 				.setCoalescing(this.coalescing).setErrorHandler(this.errorHandler).setEntityResolver(this.entityResolver)
 				.setExpandEntityReferences(this.expandEntityReferences).setIgnoringComments(this.ignoringComments)
@@ -1222,7 +1222,7 @@ public class XML {
 		 * @throws NullPointerException Wenn der gegebene {@link DocumentBuilder Document-Builder} {@code null} ist.
 		 */
 		public DocumentBuilder applyTo(final DocumentBuilder target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			target.setErrorHandler(this.errorHandler);
 			target.setEntityResolver(this.entityResolver);
 			return target;
@@ -1237,7 +1237,7 @@ public class XML {
 		 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
 		public DocumentBuilderFactory applyTo(final DocumentBuilderFactory target) throws NullPointerException, ParserConfigurationException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			target.setSchema(this.schema);
 			target.setValidating(this.validating);
 			target.setCoalescing(this.coalescing);
@@ -1246,13 +1246,13 @@ public class XML {
 			target.setIgnoringComments(this.ignoringComments);
 			target.setIgnoringElementContentWhitespace(this.ignoringElementContentWhitespace);
 			target.setExpandEntityReferences(this.expandEntityReferences);
-			if(this.featureMap != null){
-				for(final Entry<String, Boolean> entry: this.featureMap.entrySet()){
+			if (this.featureMap != null) {
+				for (final Entry<String, Boolean> entry: this.featureMap.entrySet()) {
 					target.setFeature(entry.getKey(), entry.getValue().booleanValue());
 				}
 			}
-			if(this.attributeMap != null){
-				for(final Entry<String, String> entry: this.attributeMap.entrySet()){
+			if (this.attributeMap != null) {
+				for (final Entry<String, String> entry: this.attributeMap.entrySet()) {
 					target.setAttribute(entry.getKey(), entry.getValue());
 				}
 			}
@@ -1601,8 +1601,8 @@ public class XML {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ParseOptions)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ParseOptions)) return false;
 			final ParseOptions data = (ParseOptions)object;
 			return super.equals(object) && Objects.equals(this.schema, data.schema) && Objects.equals(this.errorHandler, data.errorHandler)
 				&& Objects.equals(this.entityResolver, data.entityResolver) && (this.validating == data.validating) && (this.coalescing == data.coalescing)
@@ -1680,7 +1680,7 @@ public class XML {
 		 * @throws NullPointerException Wenn die gegebenen {@link FormatOptions Format-Optionen} {@code null} sind.
 		 */
 		public FormatOptions applyTo(final FormatOptions target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			return target.setFeatureMap(this.featureMap).setAttributeMap(this.attributeMap).setParameterMap(this.parameterMap)
 				.setOutputPropertyMap(this.outputPropertyMap).setUriResolver(this.uriResolver).setErrorListener(this.errorListener);
 		}
@@ -1693,14 +1693,14 @@ public class XML {
 		 * @throws NullPointerException Wenn der gegebene {@link Transformer XSL-Transformer} {@code null} ist.
 		 */
 		public Transformer applyTo(final Transformer target) throws NullPointerException {
-			if(target == null) throw new NullPointerException("target is null");
-			if(this.parameterMap != null){
-				for(final Entry<String, Object> entry: this.parameterMap.entrySet()){
+			if (target == null) throw new NullPointerException("target is null");
+			if (this.parameterMap != null) {
+				for (final Entry<String, Object> entry: this.parameterMap.entrySet()) {
 					target.setParameter(entry.getKey(), entry.getValue());
 				}
 			}
-			if(this.outputPropertyMap != null){
-				for(final Entry<String, String> entry: this.outputPropertyMap.entrySet()){
+			if (this.outputPropertyMap != null) {
+				for (final Entry<String, String> entry: this.outputPropertyMap.entrySet()) {
 					target.setOutputProperty(entry.getKey(), entry.getValue());
 				}
 			}
@@ -1716,18 +1716,18 @@ public class XML {
 		 * @throws TransformerConfigurationException Wenn eines der Feature nicht unterstützt wird.
 		 */
 		public TransformerFactory applyTo(final TransformerFactory target) throws NullPointerException, TransformerConfigurationException {
-			if(target == null) throw new NullPointerException("target is null");
+			if (target == null) throw new NullPointerException("target is null");
 			target.setURIResolver(this.uriResolver);
-			if(this.errorListener != null){
+			if (this.errorListener != null) {
 				target.setErrorListener(this.errorListener);
 			}
-			if(this.featureMap != null){
-				for(final Entry<String, Boolean> entry: this.featureMap.entrySet()){
+			if (this.featureMap != null) {
+				for (final Entry<String, Boolean> entry: this.featureMap.entrySet()) {
 					target.setFeature(entry.getKey(), entry.getValue().booleanValue());
 				}
 			}
-			if(this.attributeMap != null){
-				for(final Entry<String, String> entry: this.attributeMap.entrySet()){
+			if (this.attributeMap != null) {
+				for (final Entry<String, String> entry: this.attributeMap.entrySet()) {
 					target.setAttribute(entry.getKey(), entry.getValue());
 				}
 			}
@@ -1998,8 +1998,8 @@ public class XML {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof FormatOptions)) return false;
+			if (object == this) return true;
+			if (!(object instanceof FormatOptions)) return false;
 			final FormatOptions data = (FormatOptions)object;
 			return super.equals(object) && this.equals(this.parameterMap, data.parameterMap) && this.equals(this.outputPropertyMap, data.outputPropertyMap)
 				&& Objects.equals(this.uriResolver, data.uriResolver) && Objects.equals(this.errorListener, data.errorListener);
@@ -2024,9 +2024,9 @@ public class XML {
 
 		@Override
 		public XPath build() {
-			try{
+			try {
 				return XML.cachedXPath();
-			}catch(final XPathFactoryConfigurationException e){
+			} catch (final XPathFactoryConfigurationException e) {
 				throw new IllegalStateException(e);
 			}
 		}
@@ -2065,8 +2065,8 @@ public class XML {
 	 * @throws NullPointerException Wenn der gegebene Attribut-Name {@code null} ist.
 	 */
 	public static String value(final Node node, final String name, final String defaultValue) throws NullPointerException {
-		if(name == null) throw new NullPointerException("name is null");
-		if((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) return defaultValue;
+		if (name == null) throw new NullPointerException("name is null");
+		if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) return defaultValue;
 		return XML.value(((Element)node).getAttributeNode(name), defaultValue);
 	}
 
@@ -2085,9 +2085,9 @@ public class XML {
 	 * @throws NullPointerException Wenn der gegebene Attribut-Name {@code null} ist.
 	 */
 	public static String value(final Node node, final String namespaceURI, final String localName, final String defaultValue) throws NullPointerException {
-		if(namespaceURI == null) throw new NullPointerException("namespaceURI is null");
-		if(localName == null) throw new NullPointerException("localName is null");
-		if((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) return defaultValue;
+		if (namespaceURI == null) throw new NullPointerException("namespaceURI is null");
+		if (localName == null) throw new NullPointerException("localName is null");
+		if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) return defaultValue;
 		return XML.value(((Element)node).getAttributeNodeNS(namespaceURI, localName), defaultValue);
 	}
 
@@ -2152,7 +2152,7 @@ public class XML {
 	 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static XPath createXPath(final XPathOptions options) throws NullPointerException, XPathFactoryConfigurationException {
-		if(options == null) throw new NullPointerException("options is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(XPathFactory.newInstance()).newXPath());
 	}
 
@@ -2180,7 +2180,7 @@ public class XML {
 	 * @throws NullPointerException wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 	 */
 	public static XPath cachedXPath(final XPath xpath) throws NullPointerException {
-		if(xpath == null) throw new NullPointerException("xpath is null");
+		if (xpath == null) throw new NullPointerException("xpath is null");
 		return XML.cachedXPath(-1, Pointers.SOFT, Pointers.SOFT, xpath);
 	}
 
@@ -2195,7 +2195,7 @@ public class XML {
 	 * @throws XPathFactoryConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static XPath cachedXPath(final XPathOptions options) throws NullPointerException, XPathFactoryConfigurationException {
-		if(options == null) throw new NullPointerException("options is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.cachedXPath(XML.createXPath(options));
 	}
 
@@ -2213,7 +2213,7 @@ public class XML {
 	 * @throws NullPointerException wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 	 */
 	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPath xpath) throws NullPointerException {
-		if(xpath == null) throw new NullPointerException("xpath is null");
+		if (xpath == null) throw new NullPointerException("xpath is null");
 		return new CachedXPath(limit, inputMode, outputMode, xpath);
 	}
 
@@ -2232,7 +2232,7 @@ public class XML {
 	 */
 	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPathOptions options) throws NullPointerException,
 		XPathFactoryConfigurationException {
-		if(options == null) throw new NullPointerException("options is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.cachedXPath(limit, inputMode, outputMode, XML.createXPath(options));
 	}
 
@@ -2260,7 +2260,7 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Node evaluateNode(final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(script == null) throw new NullPointerException("script is null");
+		if (script == null) throw new NullPointerException("script is null");
 		return XML.evaluateNode(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
@@ -2278,8 +2278,8 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Node evaluateNode(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		synchronized (source) {
 			return (Node)source.evaluate(input, XPathConstants.NODE);
 		}
 	}
@@ -2299,9 +2299,9 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Node evaluateNode(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (source) {
 			return XML.evaluateNode(source.compile(script), input);
 		}
 	}
@@ -2320,7 +2320,7 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static NodeList evaluateNodeSet(final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(script == null) throw new NullPointerException("script is null");
+		if (script == null) throw new NullPointerException("script is null");
 		return XML.evaluateNodeSet(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
@@ -2338,8 +2338,8 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static NodeList evaluateNodeSet(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		synchronized (source) {
 			return (NodeList)source.evaluate(input, XPathConstants.NODESET);
 		}
 	}
@@ -2359,9 +2359,9 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static NodeList evaluateNodeSet(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (source) {
 			return XML.evaluateNodeSet(source.compile(script), input);
 		}
 	}
@@ -2380,7 +2380,7 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static String evaluateString(final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(script == null) throw new NullPointerException("script is null");
+		if (script == null) throw new NullPointerException("script is null");
 		return XML.evaluateString(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
@@ -2398,8 +2398,8 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static String evaluateString(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		synchronized (source) {
 			return (String)source.evaluate(input, XPathConstants.STRING);
 		}
 	}
@@ -2419,9 +2419,9 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static String evaluateString(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (source) {
 			return XML.evaluateString(source.compile(script), input);
 		}
 	}
@@ -2440,7 +2440,7 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Boolean evaluateBoolean(final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(script == null) throw new NullPointerException("script is null");
+		if (script == null) throw new NullPointerException("script is null");
 		return XML.evaluateBoolean(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
@@ -2458,8 +2458,8 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Boolean evaluateBoolean(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		synchronized (source) {
 			return (Boolean)source.evaluate(input, XPathConstants.BOOLEAN);
 		}
 	}
@@ -2479,9 +2479,9 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Boolean evaluateBoolean(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (source) {
 			return XML.evaluateBoolean(source.compile(script), input);
 		}
 	}
@@ -2500,7 +2500,7 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Number evaluateNumber(final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(script == null) throw new NullPointerException("script is null");
+		if (script == null) throw new NullPointerException("script is null");
 		return XML.evaluateNumber(XML.CACHED_XPATH_BUILDER.build(), script, input);
 	}
 
@@ -2518,8 +2518,8 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Number evaluateNumber(final XPathExpression source, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		synchronized (source) {
 			return (Number)source.evaluate(input, XPathConstants.NUMBER);
 		}
 	}
@@ -2539,9 +2539,9 @@ public class XML {
 	 * @throws XPathExpressionException Wenn der gegebenen {@link XPathExpression XPath-Ausdruck} nicht ausgewertet werden kann.
 	 */
 	public static Number evaluateNumber(final XPath source, final String script, final Node input) throws NullPointerException, XPathExpressionException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(source){
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (source) {
 			return XML.evaluateNumber(source.compile(script), input);
 		}
 	}
@@ -2570,7 +2570,7 @@ public class XML {
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static Document createDocument(final ParseOptions options) throws NullPointerException, ParserConfigurationException {
-		if(options == null) throw new NullPointerException("options is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(DocumentBuilderFactory.newInstance()).newDocumentBuilder()).newDocument();
 	}
 
@@ -2587,7 +2587,7 @@ public class XML {
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static Document createDocument(final String source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
@@ -2605,8 +2605,8 @@ public class XML {
 	 */
 	public static Document createDocument(final String source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
 		ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.createDocument(new StringReader(source), options);
 	}
 
@@ -2623,7 +2623,7 @@ public class XML {
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static Document createDocument(final Reader source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
@@ -2641,8 +2641,8 @@ public class XML {
 	 */
 	public static Document createDocument(final Reader source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
 		ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.createDocument(new InputSource(source), options);
 	}
 
@@ -2659,7 +2659,7 @@ public class XML {
 	 * @throws ParserConfigurationException Wenn eines der Feature nicht unterstützt wird.
 	 */
 	public static Document createDocument(final InputSource source) throws NullPointerException, SAXException, IOException, ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createDocument(source, ParseOptions.DEFAULT);
 	}
 
@@ -2676,8 +2676,8 @@ public class XML {
 	 */
 	public static Document createDocument(final InputSource source, final ParseOptions options) throws NullPointerException, SAXException, IOException,
 		ParserConfigurationException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return options.applyTo(options.applyTo(DocumentBuilderFactory.newInstance()).newDocumentBuilder()).parse(source);
 	}
 
@@ -2694,7 +2694,7 @@ public class XML {
 	 */
 	public static Templates createTemplates(final String source) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
@@ -2712,8 +2712,8 @@ public class XML {
 	 */
 	public static Templates createTemplates(final String source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new StringReader(source), options);
 	}
 
@@ -2730,7 +2730,7 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Node source) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
@@ -2748,8 +2748,8 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Node source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new DOMSource(source), options);
 	}
 
@@ -2766,7 +2766,7 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Reader source) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
@@ -2784,8 +2784,8 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Reader source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return XML.createTemplates(new StreamSource(source), options);
 	}
 
@@ -2802,7 +2802,7 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Source source) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		return XML.createTemplates(source, FormatOptions.DEFAULT);
 	}
 
@@ -2818,8 +2818,8 @@ public class XML {
 	 */
 	public static Templates createTemplates(final Source source, final FormatOptions options) throws NullPointerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		return options.applyTo(TransformerFactory.newInstance()).newTemplates(source);
 	}
 
@@ -2837,7 +2837,7 @@ public class XML {
 	 */
 	public static String transform(final Node source) throws NullPointerException, TransformerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
+		if (source == null) throw new NullPointerException("source is null");
 		final Writer target = new StringWriter();
 		XML.transform(target, source);
 		return target.toString();
@@ -2855,8 +2855,8 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static String transform(final Node source, final Templates script) throws NullPointerException, TransformerException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
 		final Writer target = new StringWriter();
 		XML.transform(target, source, script);
 		return target.toString();
@@ -2875,8 +2875,8 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static String transform(final Node source, final Transformer script) throws NullPointerException, TransformerException {
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
 		final Writer target = new StringWriter();
 		XML.transform(new StreamResult(target), new DOMSource(source), script);
 		return target.toString();
@@ -2900,8 +2900,8 @@ public class XML {
 	 */
 	public static String transform(final Node source, final FormatOptions options) throws NullPointerException, TransformerException,
 		TransformerConfigurationException, TransformerFactoryConfigurationError {
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		final Writer target = new StringWriter();
 		XML.transform(target, source, options);
 		return target.toString();
@@ -2921,8 +2921,8 @@ public class XML {
 	 */
 	public static void transform(final Writer target, final Node source) throws NullPointerException, TransformerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
 		XML.transform(new StreamResult(target), new DOMSource(source));
 	}
 
@@ -2938,9 +2938,9 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static void transform(final Writer target, final Node source, final Templates script) throws NullPointerException, TransformerException {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
 		XML.transform(new StreamResult(target), new DOMSource(source), script);
 	}
 
@@ -2957,9 +2957,9 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static void transform(final Writer target, final Node source, final Transformer script) throws NullPointerException, TransformerException {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
 		XML.transform(new StreamResult(target), new DOMSource(source), script);
 	}
 
@@ -2981,9 +2981,9 @@ public class XML {
 	 */
 	public static void transform(final Writer target, final Node source, final FormatOptions options) throws NullPointerException, TransformerException,
 		TransformerConfigurationException, TransformerFactoryConfigurationError {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		XML.transform(new StreamResult(target), new DOMSource(source), options);
 	}
 
@@ -3003,8 +3003,8 @@ public class XML {
 	 */
 	public static void transform(final Result target, final Source source) throws NullPointerException, TransformerException, TransformerConfigurationException,
 		TransformerFactoryConfigurationError {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
 		XML.transform(target, source, FormatOptions.DEFAULT);
 	}
 
@@ -3020,9 +3020,9 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static void transform(final Result target, final Source source, final Templates script) throws NullPointerException, TransformerException {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
 		XML.transform(target, source, script.newTransformer());
 	}
 
@@ -3038,10 +3038,10 @@ public class XML {
 	 * @throws TransformerException Wenn bei der Transformation ein Fehler eintritt.
 	 */
 	public static void transform(final Result target, final Source source, final Transformer script) throws NullPointerException, TransformerException {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(script == null) throw new NullPointerException("script is null");
-		synchronized(script){
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (script == null) throw new NullPointerException("script is null");
+		synchronized (script) {
 			script.transform(source, target);
 		}
 	}
@@ -3063,9 +3063,9 @@ public class XML {
 	 */
 	public static void transform(final Result target, final Source source, final FormatOptions options) throws NullPointerException, TransformerException,
 		TransformerConfigurationException, TransformerFactoryConfigurationError {
-		if(target == null) throw new NullPointerException("target is null");
-		if(source == null) throw new NullPointerException("source is null");
-		if(options == null) throw new NullPointerException("options is null");
+		if (target == null) throw new NullPointerException("target is null");
+		if (source == null) throw new NullPointerException("source is null");
+		if (options == null) throw new NullPointerException("options is null");
 		XML.transform(target, source, options.applyTo(options.applyTo(TransformerFactory.newInstance()).newTransformer()));
 	}
 

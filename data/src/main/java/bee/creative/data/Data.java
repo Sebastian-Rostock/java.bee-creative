@@ -242,12 +242,12 @@ public interface Data {
 		@Override
 		public String readLine() throws IOException {
 			final StringBuffer result = new StringBuffer();
-			try{
-				for(int value; true;){
-					switch(value = this.readUnsignedByte()){
+			try {
+				for (int value; true;) {
+					switch (value = this.readUnsignedByte()) {
 						case '\r':
 							final long cur = this.index();
-							if(this.readUnsignedByte() == '\n') return result.toString();
+							if (this.readUnsignedByte() == '\n') return result.toString();
 							this.seek(cur);
 						case '\n':
 							return result.toString();
@@ -255,8 +255,8 @@ public interface Data {
 							result.append((char)value);
 					}
 				}
-			}catch(final EOFException e){
-				if(result.length() == 0) return null;
+			} catch (final EOFException e) {
+				if (result.length() == 0) return null;
 				return result.toString();
 			}
 		}
@@ -398,7 +398,7 @@ public interface Data {
 		public void writeBytes(final String s) throws IOException {
 			final int len = s.length();
 			final byte[] data = new byte[len];
-			for(int i = 0; i < len; i++){
+			for (int i = 0; i < len; i++) {
 				Bytes.set1(data, i, s.charAt(i));
 			}
 			this.write(data);
@@ -409,7 +409,7 @@ public interface Data {
 		 */
 		@Override
 		public void writeChars(final String s) throws IOException {
-			for(int i = 0, size = s.length(); i < size; i++){
+			for (int i = 0, size = s.length(); i < size; i++) {
 				this.writeChar(s.charAt(i));
 			}
 		}
@@ -477,7 +477,7 @@ public interface Data {
 		 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist.
 		 */
 		public DataSourceFile(final RandomAccessFile file) throws NullPointerException {
-			if(file == null) throw new NullPointerException();
+			if (file == null) throw new NullPointerException();
 			this.data = file;
 		}
 
@@ -567,7 +567,7 @@ public interface Data {
 		 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
 		 */
 		public DataSourceArray(final ByteArraySection data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException();
 			this.data = data;
 		}
 
@@ -586,7 +586,7 @@ public interface Data {
 		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 			final ByteArraySection data = this.data;
 			final int index = this.index, index2 = index + length;
-			if(index2 > data.size()) throw new EOFException();
+			if (index2 > data.size()) throw new EOFException();
 			System.arraycopy(data.array(), data.startIndex() + index, array, offset, length);
 			this.index = index2;
 		}
@@ -655,7 +655,7 @@ public interface Data {
 		 * @throws IllegalArgumentException Wenn {@link ByteBuffer#order()} nicht {@link ByteOrder#BIG_ENDIAN} ist.
 		 */
 		public DataSourceBuffer(final ByteBuffer data) throws NullPointerException, IllegalArgumentException {
-			if(data.order() != ByteOrder.BIG_ENDIAN) throw new IllegalArgumentException();
+			if (data.order() != ByteOrder.BIG_ENDIAN) throw new IllegalArgumentException();
 			this.data = data;
 		}
 
@@ -672,11 +672,11 @@ public interface Data {
 		 */
 		@Override
 		public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-			try{
+			try {
 				this.data.get(array, offset, length);
-			}catch(final BufferUnderflowException e){
+			} catch (final BufferUnderflowException e) {
 				throw new EOFException();
-			}catch(final IndexOutOfBoundsException e){
+			} catch (final IndexOutOfBoundsException e) {
 				throw new EOFException();
 			}
 		}
@@ -742,7 +742,7 @@ public interface Data {
 		 */
 		@Override
 		public int readInt(final int size) throws IOException {
-			switch(size){
+			switch (size) {
 				case 0:
 					return 0;
 				case 1:
@@ -772,7 +772,7 @@ public interface Data {
 		 */
 		@Override
 		public long readLong(final int size) throws IOException {
-			switch(size){
+			switch (size) {
 				case 0:
 					return 0;
 				case 1:
@@ -946,7 +946,7 @@ public interface Data {
 		private byte[] page(final int index) throws IOException {
 			final Page[] pages = this.pages;
 			Page page = pages[index];
-			if(page == null){
+			if (page == null) {
 				page = new Page();
 				final byte[] data = page.data;
 				final int offset = index << Page.BITS;
@@ -954,21 +954,21 @@ public interface Data {
 				source.seek(offset);
 				source.readFully(data, 0, Math.min(1 << Page.BITS, this.length - offset));
 				int pageCount = this.count, pageLimit = this.limit;
-				if(pageCount < pageLimit) return data;
+				if (pageCount < pageLimit) return data;
 				pageLimit = pageLimit < 0 ? 1 : (pageLimit + 1) / 2;
-				for(final int size = pages.length; pageCount > pageLimit;){
+				for (final int size = pages.length; pageCount > pageLimit;) {
 					int uses = 0;
 					final int maxUses = Integer.MAX_VALUE / pageCount;
-					for(int i = 0; i < size; i++){
+					for (int i = 0; i < size; i++) {
 						final Page item = pages[i];
-						if(item != null){
+						if (item != null) {
 							uses += (item.uses = Math.min(item.uses, maxUses - i));
 						}
 					}
 					final int minUses = uses / pageCount;
-					for(int i = 0; i < size; i++){
+					for (int i = 0; i < size; i++) {
 						final Page item = pages[i];
-						if((item != null) && ((item.uses -= minUses) <= 0)){
+						if ((item != null) && ((item.uses -= minUses) <= 0)) {
 							pages[i] = null;
 							pageCount--;
 						}
@@ -977,7 +977,7 @@ public interface Data {
 				this.count = pageCount + 1;
 				pages[index] = page;
 				return data;
-			}else{
+			} else {
 				page.uses++;
 				return page.data;
 			}
@@ -1042,7 +1042,7 @@ public interface Data {
 			int page = index >> Page.BITS;
 			int srcPos = index & ((1 << Page.BITS) - 1);
 			final int destLength = offset + length;
-			for(int destPos = offset; destPos < destLength; page++){
+			for (int destPos = offset; destPos < destLength; page++) {
 				final int count = Math.min(destLength - destPos, (1 << Page.BITS) - srcPos);
 				System.arraycopy(this.page(page), srcPos, array, destPos, count);
 				destPos += count;
@@ -1103,7 +1103,7 @@ public interface Data {
 		 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist.
 		 */
 		public DataTargetFile(final RandomAccessFile file) throws NullPointerException {
-			if(file == null) throw new NullPointerException();
+			if (file == null) throw new NullPointerException();
 			this.data = file;
 		}
 
@@ -1208,7 +1208,7 @@ public interface Data {
 		 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind.
 		 */
 		public DataTargetArray(final CompactByteArray data) throws NullPointerException {
-			if(data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException();
 			this.data = data;
 		}
 
@@ -1225,7 +1225,7 @@ public interface Data {
 		 */
 		@Override
 		public void write(final byte[] array, final int offset, final int length) throws IOException {
-			if((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
+			if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
 			final CompactByteArray data = this.data;
 			final int size = data.size(), index = this.index, index2 = index + length;
 			data.insert(size, Math.max(index2 - size, 0));
@@ -1264,10 +1264,10 @@ public interface Data {
 		public void allocate(final long value) throws IOException {
 			final int size = this.data.size();
 			final int count = (int)value - size;
-			if(count < 0){
+			if (count < 0) {
 				this.data.remove(size - count, count);
 				this.index = Math.min(this.index, size - count);
-			}else if(count > 0){
+			} else if (count > 0) {
 				this.data.insert(size, count);
 			}
 		}

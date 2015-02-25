@@ -17,7 +17,7 @@ public abstract class AbstractChildNodeAdapter extends AbstractNodeAdapter {
 	 * @param nodeView {@link NodeView}.
 	 * @throws NullPointerException Wenn der {@link NodeView} {@code null} ist.
 	 */
-	public AbstractChildNodeAdapter(NodeView nodeView) throws NullPointerException {
+	public AbstractChildNodeAdapter(final NodeView nodeView) throws NullPointerException {
 		super(nodeView);
 	}
 
@@ -27,8 +27,8 @@ public abstract class AbstractChildNodeAdapter extends AbstractNodeAdapter {
 	@Override
 	public Node getParentNode() {
 		final NodeView nodeView = this.nodeView.parent();
-		if(nodeView == null) return null;
-		if(nodeView.type() == NodeView.TYPE_ELEMENT) return new ElementAdapter(nodeView);
+		if (nodeView == null) return null;
+		if (nodeView.type() == NodeView.TYPE_ELEMENT) return new ElementAdapter(nodeView);
 		return new DocumentAdapter(nodeView);
 	}
 
@@ -38,7 +38,7 @@ public abstract class AbstractChildNodeAdapter extends AbstractNodeAdapter {
 	@Override
 	public Node getPreviousSibling() {
 		final Node parent = this.getParentNode();
-		if(parent == null) return null;
+		if (parent == null) return null;
 		return parent.getChildNodes().item(this.nodeView.index() - 1);
 	}
 
@@ -48,7 +48,7 @@ public abstract class AbstractChildNodeAdapter extends AbstractNodeAdapter {
 	@Override
 	public Node getNextSibling() {
 		final Node parent = this.getParentNode();
-		if(parent == null) return null;
+		if (parent == null) return null;
 		return parent.getChildNodes().item(this.nodeView.index() + 1);
 	}
 

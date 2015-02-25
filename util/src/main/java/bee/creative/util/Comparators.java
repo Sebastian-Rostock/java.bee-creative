@@ -58,7 +58,7 @@ public class Comparators {
 		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 		 */
 		public AbstractDelegatingComparator(final Comparator<? super GEntry2> comparator) throws NullPointerException {
-			if(comparator == null) throw new NullPointerException();
+			if (comparator == null) throw new NullPointerException();
 			this.comparator = comparator;
 		}
 
@@ -125,8 +125,8 @@ public class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof NullComparator<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof NullComparator<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -163,8 +163,8 @@ public class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ReverseComparator<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ReverseComparator<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -202,8 +202,8 @@ public class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof IterableComparator<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof IterableComparator<?>)) return false;
 			return super.equals(object);
 		}
 
@@ -236,7 +236,7 @@ public class Comparators {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public ChainedComparator(final Comparator<? super GEntry> comparator1, final Comparator<? super GEntry> comparator2) throws NullPointerException {
-			if((comparator1 == null) || (comparator2 == null)) throw new NullPointerException();
+			if ((comparator1 == null) || (comparator2 == null)) throw new NullPointerException();
 			this.comparator1 = comparator1;
 			this.comparator2 = comparator2;
 		}
@@ -263,8 +263,8 @@ public class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ChainedComparator<?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ChainedComparator<?>)) return false;
 			final ChainedComparator<?> data = (ChainedComparator<?>)object;
 			return Objects.equals(this.comparator1, data.comparator1) && Objects.equals(this.comparator2, data.comparator2);
 		}
@@ -304,7 +304,7 @@ public class Comparators {
 		public ConvertedComparator(final Comparator<? super GOutput> comparator, final Converter<? super GInput, ? extends GOutput> converter)
 			throws NullPointerException {
 			super(comparator);
-			if(converter == null) throw new NullPointerException();
+			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
 
@@ -329,8 +329,8 @@ public class Comparators {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			if(object == this) return true;
-			if(!(object instanceof ConvertedComparator<?, ?>)) return false;
+			if (object == this) return true;
+			if (!(object instanceof ConvertedComparator<?, ?>)) return false;
 			final ConvertedComparator<?, ?> data = (ConvertedComparator<?, ?>)object;
 			return Objects.equals(this.converter, data.converter) && Objects.equals(this.comparator, data.comparator);
 		}
@@ -520,20 +520,20 @@ public class Comparators {
 			final int s1 = value1.length(), s2 = value2.length();
 			int a1 = 0, a2 = 0;
 			{ // '0' überspringen
-				while((a1 < s1) && (value1.charAt(a1) == '0')){
+				while ((a1 < s1) && (value1.charAt(a1) == '0')) {
 					a1++;
 				}
-				while((a2 < s2) && (value2.charAt(a2) == '0')){
+				while ((a2 < s2) && (value2.charAt(a2) == '0')) {
 					a2++;
 				}
 			}
 			{ // War eine der Eingaben Leer oder "0"
-				if(a1 == s1) return ((a2 == s2) ? 0 : -1);
-				if(a2 == s2) return 1;
+				if (a1 == s1) return ((a2 == s2) ? 0 : -1);
+				if (a2 == s2) return 1;
 			}
 			{ // Zahlen vergleichen
 				final int comp = (s1 - a1) - (s2 - a2);
-				if(comp != 0) return comp;
+				if (comp != 0) return comp;
 				return value1.substring(a1, s1).compareTo(value2.substring(a2, s2));
 			}
 		}
@@ -598,64 +598,64 @@ public class Comparators {
 		public int compare(final String value1, final String value2) {
 			final int s1 = value1.length(), s2 = value2.length();
 			int a1 = 0, a2 = 0, e1, e2;
-			while((a1 < s1) && (a2 < s2)){
+			while ((a1 < s1) && (a2 < s2)) {
 				{ // Buchstaben überspringen = Halt, wenn Ziffer gefunden
-					for(e1 = a1; e1 < s1; e1++){
+					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = value1.charAt(e1);
-						if(('0' <= c1) && (c1 <= '9')){
+						if (('0' <= c1) && (c1 <= '9')) {
 							break;
 						}
 					}
-					for(e2 = a2; e2 < s2; e2++){
+					for (e2 = a2; e2 < s2; e2++) {
 						final char c2 = value2.charAt(e2);
-						if(('0' <= c2) && (c2 <= '9')){
+						if (('0' <= c2) && (c2 <= '9')) {
 							break;
 						}
 					}
 				}
 				{ // Buchstaben vergleichen
-					if(a1 == e1){
-						if(a2 != e2) return -1;
-					}else if(a2 != e2){
+					if (a1 == e1) {
+						if (a2 != e2) return -1;
+					} else if (a2 != e2) {
 						final int comp = value1.substring(a1, e1).compareToIgnoreCase(value2.substring(a2, e2));
-						if(comp != 0) return comp;
-					}else return 1;
+						if (comp != 0) return comp;
+					} else return 1;
 				}
 				{ // '0' überspringen = Halt, wenn nicht '0' gefunden
-					for(a1 = e1; a1 < s1; a1++){
-						if(value1.charAt(a1) != '0'){
+					for (a1 = e1; a1 < s1; a1++) {
+						if (value1.charAt(a1) != '0') {
 							break;
 						}
 					}
-					for(a2 = e2; a2 < s2; a2++){
-						if(value2.charAt(a2) != '0'){
+					for (a2 = e2; a2 < s2; a2++) {
+						if (value2.charAt(a2) != '0') {
 							break;
 						}
 					}
 				}
 				{ // Ziffern überspringen = Halt, wenn nicht Ziffer gefunden
-					for(e1 = a1; e1 < s1; e1++){
+					for (e1 = a1; e1 < s1; e1++) {
 						final char c1 = value1.charAt(e1);
-						if(('0' > c1) || (c1 > '9')){
+						if (('0' > c1) || (c1 > '9')) {
 							break;
 						}
 					}
-					for(e2 = a2; e2 < s2; e2++){
+					for (e2 = a2; e2 < s2; e2++) {
 						final char c2 = value2.charAt(e2);
-						if(('0' > c2) || (c2 > '9')){
+						if (('0' > c2) || (c2 > '9')) {
 							break;
 						}
 					}
 				}
 				{ // Ziffern vergleichen
-					if(a1 == e1){
-						if(a2 != e2) return -1;
-					}else if(a2 != e2){
+					if (a1 == e1) {
+						if (a2 != e2) return -1;
+					} else if (a2 != e2) {
 						int comp = (e1 - a1) - (e2 - a2);
-						if(comp != 0) return comp;
+						if (comp != 0) return comp;
 						comp = value1.substring(a1, e1).compareTo(value2.substring(a2, e2));
-						if(comp != 0) return comp;
-					}else return 1;
+						if (comp != 0) return comp;
+					} else return 1;
 				}
 				a1 = e1;
 				a2 = e2;
@@ -783,12 +783,12 @@ public class Comparators {
 	public static <GEntry> int compare(final Iterable<? extends GEntry> value1, final Iterable<? extends GEntry> value2,
 		final Comparator<? super GEntry> comparator) throws NullPointerException {
 		final Iterator<? extends GEntry> i1 = value1.iterator(), i2 = value2.iterator();
-		while(true){
+		while (true) {
 			final boolean h1 = i1.hasNext(), h2 = i2.hasNext();
-			if(!h1) return (h2 ? -1 : 0);
-			if(!h2) return 1;
+			if (!h1) return (h2 ? -1 : 0);
+			if (!h2) return 1;
 			final int comp = comparator.compare(i1.next(), i2.next());
-			if(comp != 0) return comp;
+			if (comp != 0) return comp;
 		}
 	}
 

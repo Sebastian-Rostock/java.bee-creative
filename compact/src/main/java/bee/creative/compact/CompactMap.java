@@ -273,7 +273,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			final GKey key = this.getKey();
 			final GValue result = super.setValue(value);
 			final int index = this.data.customItemIndex(this.getKey());
-			if(index < 0) throw new IllegalStateException();
+			if (index < 0) throw new IllegalStateException();
 			this.data.setEntry(index, key, value);
 			return result;
 		}
@@ -388,7 +388,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	public CompactMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
 		this();
-		if(map == null) throw new NullPointerException("map is null");
+		if (map == null) throw new NullPointerException("map is null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}
@@ -502,7 +502,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	@Override
 	public final GValue get(final Object key) {
 		final int index = this.customItemIndex(key);
-		if(index < 0) return null;
+		if (index < 0) return null;
 		return this.getValue(index);
 	}
 
@@ -512,7 +512,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	@Override
 	public GValue put(final GKey key, final GValue value) {
 		final int index = this.customItemIndex(key);
-		if(index >= 0){
+		if (index >= 0) {
 			final GValue item = this.getValue(index);
 			this.setEntry(index, this.getKey(index), value);
 			return item;
@@ -528,7 +528,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public void putAll(final Map<? extends GKey, ? extends GValue> map) {
-		for(final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()){
+		for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
 			this.put(entry.getKey(), entry.getValue());
 		}
 	}
@@ -539,7 +539,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	@Override
 	public GValue remove(final Object key) {
 		final int index = this.customItemIndex(key);
-		if(index < 0) return null;
+		if (index < 0) return null;
 		final GValue item = this.getValue(index);
 		this.customRemove(index, 1);
 		return item;
@@ -558,8 +558,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public boolean equals(final Object object) {
-		if(object == this) return true;
-		if(!(object instanceof Map<?, ?>)) return false;
+		if (object == this) return true;
+		if (!(object instanceof Map<?, ?>)) return false;
 		return new CompactMapItems<GKey, GValue>(this).equals(object);
 	}
 

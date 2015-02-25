@@ -69,7 +69,7 @@ public class Tester {
 		 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner oder gleich {@code 0} ist.
 		 */
 		public Updater(final int millis) throws IllegalArgumentException {
-			if(millis <= 0) throw new IllegalArgumentException();
+			if (millis <= 0) throw new IllegalArgumentException();
 			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
@@ -82,19 +82,19 @@ public class Tester {
 			final Runtime runtime = Runtime.getRuntime();
 			long enterTime = 0;
 			long leaveTime = 0;
-			do{
+			do {
 				final long enterTime2 = System.nanoTime();
 				this.usedTime += leaveTime - enterTime;
 				runtime.gc();
 				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
 				enterTime = enterTime2;
 				leaveTime = System.nanoTime();
-				try{
+				try {
 					Thread.sleep(this.millis);
-				}catch(final InterruptedException e){
+				} catch (final InterruptedException e) {
 					break;
 				}
-			}while(this.millis != 0);
+			} while (this.millis != 0);
 			this.usedTime += leaveTime - enterTime;
 		}
 
@@ -114,9 +114,9 @@ public class Tester {
 		 */
 		public void deactivate() {
 			this.millis = 0;
-			try{
+			try {
 				this.join();
-			}catch(final InterruptedException e){}
+			} catch (final InterruptedException e) {}
 		}
 
 	}
@@ -192,20 +192,20 @@ public class Tester {
 	 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner als {@code 0} ist.
 	 */
 	public Tester(final int millis, final Test method) throws NullPointerException, IllegalArgumentException {
-		if(millis < 0) throw new IllegalArgumentException();
-		if(method == null) throw new NullPointerException();
+		if (millis < 0) throw new IllegalArgumentException();
+		if (method == null) throw new NullPointerException();
 		final Runtime runtime = Runtime.getRuntime();
 		Throwable throwable = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;
-		if(millis > 0){
+		if (millis > 0) {
 			final Updater updater = new Updater(millis);
 			runtime.gc();
 			updater.activate();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
-			try{
+			try {
 				method.run();
-			}catch(final Throwable e){
+			} catch (final Throwable e) {
 				throwable = e;
 			}
 			leaveTime = System.nanoTime();
@@ -214,13 +214,13 @@ public class Tester {
 			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
 			this.usedTime = leaveTime - enterTime - updater.usedTime;
 			this.usedMemory = Math.max(updater.usedMemory, leaveMemory) - enterMemory;
-		}else{
+		} else {
 			runtime.gc();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
-			try{
+			try {
 				method.run();
-			}catch(final Throwable e){
+			} catch (final Throwable e) {
 				throwable = e;
 			}
 			leaveTime = System.nanoTime();
