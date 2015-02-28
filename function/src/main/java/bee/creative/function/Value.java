@@ -27,7 +27,7 @@ public interface Value {
 
 	/**
 	 * Diese Methode konvertiert diesen Wert kontextfrei in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
-	 * Der Rückgabewert entspricht {@code type.cast(this)}, d.h. {@code Contexts.getDefault().cast(this, type)}.
+	 * Der Rückgabewert entspricht {@code type.cast(this)}, d.h. {@code Contexts.getDefaultContext().cast(this, type)}.
 	 * 
 	 * @see Type#valueOf(Value)
 	 * @see Context#cast(Value, Type)

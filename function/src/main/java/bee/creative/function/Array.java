@@ -19,8 +19,9 @@ import bee.creative.util.Objects;
 public abstract class Array implements Get<Value>, Iterable<Value> {
 
 	/**
-	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Elementen einer Wertliste in der Methode {@link Array#collect(Collector, int, int)}.
+	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.
 	 * 
+	 * @see Array#collect(Collector, Array, int, int)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface Collector {
@@ -57,7 +58,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese oder {@code null} zurück. Wenn das gegebene Objekt {@link Class#isArray()
-	 * kein } oder ein unpassendes Array ist, wird {@code null} zurück gegeben.
+	 * kein} oder ein unpassendes Array ist, wird {@code null} zurück gegeben.
 	 * 
 	 * @see Array#valueOf(int[])
 	 * @see Array#valueOf(long[])
@@ -369,7 +370,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
+	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb der Wertliste liegt oder eine negative Länge hätte.
 	 */
 	public static void collect(final Collector target, final Array source, final int offset, final int length) throws NullPointerException,
 		IllegalArgumentException {

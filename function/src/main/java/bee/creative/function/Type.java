@@ -30,7 +30,7 @@ public interface Type<GValue> {
 
 	/**
 	 * Diese Methode konvertiert den gegebenen Wert kontextfrei in einen Wert dieses Datentyps und gibt ihn zurück.<br>
-	 * Der Rückgabewert entspricht {@code Contexts.getDefault().cast(value, this)}.
+	 * Der Rückgabewert entspricht {@code Contexts.getDefaultContext().cast(value, this)}.
 	 * 
 	 * @see Type#id()
 	 * @see Value#type()
