@@ -287,7 +287,7 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird.
 		 */
-		protected static final Object MARK = new Mark(0, false, false);
+		protected static final Mark MARK = new Mark(0, false, false);
 
 		{}
 
@@ -386,6 +386,17 @@ public class Scripts {
 		}
 
 		/**
+		 * Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
+		 * 
+		 * @param object Markierung.
+		 * @return {@code this}.
+		 */
+		protected ScriptFormatter putMark(final Mark object) {
+			this.items.add(object);
+			return this;
+		}
+
+		/**
 		 * Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #setIndent()} die Einrückung für die aktuelle
 		 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
 		 * 
@@ -396,7 +407,7 @@ public class Scripts {
 		 */
 		public ScriptFormatter putSpace() {
 			final LinkedList<Boolean> indents = this.indents;
-			return this.put(ScriptFormatter.MARK).put(new Mark(indents.size(), false, indents.getLast().booleanValue()));
+			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(indents.size(), false, indents.getLast().booleanValue()));
 		}
 
 		/**
@@ -411,7 +422,7 @@ public class Scripts {
 		public ScriptFormatter putSpaceInc() {
 			final LinkedList<Boolean> indents = this.indents;
 			indents.addLast(Boolean.FALSE);
-			return this.put(ScriptFormatter.MARK).put(new Mark(indents.size(), false, false));
+			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(indents.size(), false, false));
 		}
 
 		/**
@@ -428,7 +439,7 @@ public class Scripts {
 			final LinkedList<Boolean> indents = this.indents;
 			final int value = indents.size();
 			if (value <= 1) throw new IllegalStateException();
-			return this.put(ScriptFormatter.MARK).put(new Mark(value, true, indents.removeLast().booleanValue()));
+			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(value, true, indents.removeLast().booleanValue()));
 		}
 
 		/**
