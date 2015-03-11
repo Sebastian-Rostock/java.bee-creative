@@ -1014,7 +1014,7 @@ public class IAMEncoder {
 		 * @return Index des {@link IAMBaseListEncoder}s.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public int put(final IAMBaseListEncoder list) throws NullPointerException {
+		protected int put(final IAMBaseListEncoder list) throws NullPointerException {
 			if (list == null) throw new NullPointerException();
 			final int result = this.lists.size();
 			this.lists.add(result, list);
@@ -1249,12 +1249,11 @@ public class IAMEncoder {
 	 * @return Bitmaske.
 	 */
 	protected static int computeRangeMask(final int entryCount) {
-		if (entryCount <= 0) return 0;
 		int result = 2;
 		while (result < entryCount) {
 			result <<= 1;
 		}
-		return result - 1;
+		return (result - 1) & 536870911;
 	}
 
 }
