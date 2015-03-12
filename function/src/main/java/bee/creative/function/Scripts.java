@@ -344,8 +344,8 @@ public class Scripts {
 		{}
 
 		/**
-		 * Diese Methode markiert die aktuelle Hierarchieebene als einzurücken und gibt {@code this} zurück. Beginn und Ende einer Hierarchieebene werden über
-		 * {@link #putSpaceInc()} und {@link #putSpaceDec()} markiert.
+		 * Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
+		 * Hierarchieebene werden über {@link #putSpaceInc()} und {@link #putSpaceDec()} markiert.
 		 * 
 		 * @see #putSpace()
 		 * @see #putSpaceInc()
@@ -356,7 +356,9 @@ public class Scripts {
 			final LinkedList<Boolean> indents = this.indents;
 			if (this.indents.getLast().booleanValue()) return this;
 			final int value = indents.size();
-			indents.set(value - 1, Boolean.TRUE);
+			for (int i = 0; i <= value; i++) {
+				indents.set(i, Boolean.TRUE);
+			}
 			final List<Object> items = this.items;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
@@ -552,7 +554,7 @@ public class Scripts {
 						result.append(' ');
 					}
 				} else {
-					result.append(item.toString());
+					result.append(item);
 				}
 			}
 			return result.toString();
