@@ -825,14 +825,14 @@ public class XML {
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert das {@link Document}, das über diesen {@link NodeBuilder} befüllt werden soll.
+		 * Dieser Konstruktor initialisiert den {@link Node}, das über diesen {@link NodeBuilder} befüllt werden soll.
 		 * 
-		 * @param document {@link Document}.
+		 * @param node {@link Node}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public NodeBuilder(final Document document) throws NullPointerException {
-			if (document == null) throw new NullPointerException();
-			this.node = document;
+		public NodeBuilder(final Node node) throws NullPointerException {
+			if (node == null) throw new NullPointerException();
+			this.node = node;
 			this.owner = null;
 		}
 
@@ -855,7 +855,9 @@ public class XML {
 		 * @return {@link Document} des {@link #node() aktuellen Knoten}.
 		 */
 		public Document document() {
-			return this.node().getOwnerDocument();
+			Node node = this.node.getOwnerDocument();
+			if (node.getNodeType() == Node.DOCUMENT_NODE) return (Document)node;
+			return node.getOwnerDocument();
 		}
 
 		/**
