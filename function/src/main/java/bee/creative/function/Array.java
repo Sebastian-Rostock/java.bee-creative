@@ -27,11 +27,12 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	public static interface Collector {
 
 		/**
-		 * Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an.
+		 * Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
 		 * 
 		 * @param value Wert.
+		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll.
 		 */
-		public void push(Value value);
+		public boolean push(Value value);
 
 	}
 
@@ -369,35 +370,40 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	}
 
 	/**
-	 * Diese Methode fügt alle Werte im gegebenen Abschnitt der gegebenen Wertliste geordnet an den gegebenen {@link Collector} an.
+	 * Diese Methode fügt alle Werte im gegebenen Abschnitt der gegebenen Wertliste geordnet an den gegebenen {@link Collector} an.<br>
+	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(Value)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param source Wertliste.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb der Wertliste liegt oder eine negative Länge hätte.
 	 */
-	public static void collect(final Collector target, final Array source, final int offset, final int length) throws NullPointerException,
+	public static boolean collect(final Collector target, final Array source, final int offset, final int length) throws NullPointerException,
 		IllegalArgumentException {
 		if ((target == null) || (source == null)) throw new NullPointerException();
 		if ((offset < 0) || (length < 0) || ((offset + length) > source.length())) throw new IllegalArgumentException();
-		source.collect(target, offset, length);
+		return source.collect(target, offset, length);
 	}
 
 	{}
 
 	/**
-	 * Diese Methode fügt alle Werte im gegebenen Abschnitt geordnet an den gegebenen {@link Collector} an.
+	 * Diese Methode fügt alle Werte im gegebenen Abschnitt geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig abgebrochen, wenn
+	 * {@link Collector#push(Value)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 */
-	protected void collect(final Collector target, int offset, int length) {
+	protected boolean collect(final Collector target, int offset, int length) {
 		for (length += offset; offset < length; offset++) {
-			target.push(this.get(offset));
+			if (!target.push(this.get(offset))) return false;
 		}
+		return true;
 	}
 
 	/**
@@ -413,8 +419,9 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 			int index = 0;
 
 			@Override
-			public void push(final Value value) {
+			public boolean push(final Value value) {
 				values[this.index++] = value;
+				return true;
 			}
 
 		};
@@ -448,15 +455,15 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		return new Array() {
 
 			@Override
-			protected void collect(final Collector target, final int offset, final int length) {
+			protected boolean collect(final Collector target, final int offset, final int length) {
 				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
 				if (offset2 >= 0) {
-					array.collect(target, offset2, length);
+					return array.collect(target, offset2, length);
 				} else if (length2 <= 0) {
-					Array.this.collect(target, offset, length);
+					return Array.this.collect(target, offset, length);
 				} else {
-					Array.this.collect(target, offset, -offset2);
-					array.collect(target, 0, length2);
+					if (!Array.this.collect(target, offset, -offset2)) return false;
+					return array.collect(target, 0, length2);
 				}
 			}
 
@@ -497,8 +504,8 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		return new Array() {
 
 			@Override
-			protected void collect(final Collector target, final int offset2, final int length2) {
-				Array.this.collect(target, offset + offset2, length2);
+			protected boolean collect(final Collector target, final int offset2, final int length2) {
+				return Array.this.collect(target, offset + offset2, length2);
 			}
 
 			@Override
