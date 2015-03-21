@@ -666,12 +666,12 @@ public final class Values {
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Objekts kann hierfür
 	 * automatisch ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue}
-	 * verwendet.
+	 * verwendet werden.
 	 * <ul>
-	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
 	 * <li>Wenn der via {@link #setDefaultConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
 	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
+	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.</li>
+	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} zurück gegeben.</li>
 	 * <li>Wenn das Objekt eine {@link Number} ist, wird dieser als {@link NumberValue} zurück gegeben.</li>
@@ -693,13 +693,13 @@ public final class Values {
 	 * @return {@link Value}.
 	 */
 	public static Value valueOf(final Object data) {
-		if (data == null) return NullValue.INSTANCE;
-		if (data instanceof Value) return (Value)data;
 		final Converter<? super Object, ? extends Value> converter = Values.defaultConverter;
 		if (converter != null) {
 			final Value value = converter.convert(data);
 			if (value != null) return value;
 		}
+		if (data == null) return NullValue.INSTANCE;
+		if (data instanceof Value) return (Value)data;
 		if (data instanceof Array) return ArrayValue.valueOf((Array)data);
 		if (data instanceof String) return StringValue.valueOf((String)data);
 		if (data instanceof Number) return NumberValue.valueOf((Number)data);
