@@ -1,6 +1,5 @@
 package bee.creative.function;
 
-import java.math.BigDecimal;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
@@ -16,6 +15,7 @@ import bee.creative.function.Values.NullValue;
 import bee.creative.function.Values.NumberValue;
 import bee.creative.function.Values.ObjectValue;
 import bee.creative.function.Values.StringValue;
+import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Strings;
@@ -44,217 +44,200 @@ public class Contexts {
 		{}
 
 		/**
-		 * {@inheritDoc} Hierfür wird auf dem {@link Type#id() Identifikator} des gegebenen Datentyps eine Fallunterscheidung durchgeführt und eine der
-		 * spezialisierten Konvertierunsmethoden aufgerufen. Bei einem unbekannten Datentyp wird eine {@link IllegalArgumentException} ausgelöst.
+		 * Dieses Feld speichert den {@link Converter} zu {@link #castToString(Value)}.
+		 */
+		protected final Converter<Value, String> castToString = new Converter<Value, String>() {
+
+			@Override
+			public String convert(final Value input) {
+				return DefaultContext.this.castToString(input);
+			}
+
+		};
+
+		/**
+		 * {@inheritDoc}
+		 * <ul>
+		 * <li>Wenn der {@link Value#type() Datentyp} des gegebenen Werts gleich dem gegebenen Datentyp ist, wird der Wert unverändert geliefert.</li>
+		 * <li>Andernfalls wird auf dem {@link Type#id() Identifikator} des gegebenen Datentyps eine Fallunterscheidung durchgeführt und eine der spezialisierten
+		 * Konvertierunsmethoden aufgerufen.<br>
+		 * Bei einem unbekannten Datentyp wird eine {@link IllegalArgumentException} ausgelöst.</li>
+		 * </ul>
 		 * 
-		 * @see #castToNullValue(Value)
-		 * @see #castToArrayValue(Value)
-		 * @see #castToObjectValue(Value)
-		 * @see #castToFunctionValue(Value)
-		 * @see #castToStringValue(Value)
-		 * @see #castToNumberValue(Value)
-		 * @see #castToBooleanValue(Value)
+		 * @see #castToArray(Value)
+		 * @see #castToObject(Value)
+		 * @see #castToFunction(Value)
+		 * @see #castToString(Value)
+		 * @see #castToNumber(Value)
+		 * @see #castToBoolean(Value)
 		 */
 		@SuppressWarnings ("unchecked")
 		@Override
 		public <GValue> GValue cast(final Value value, final Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			if (type == value.type()) return (GValue)value;
 			switch (type.id()) {
-				case NullType.ID:
-					return (GValue)this.castToNullValue(value);
 				case ArrayType.ID:
-					return (GValue)this.castToArrayValue(value);
+					return (GValue)ArrayValue.valueOf(this.castToArray(value));
 				case ObjectType.ID:
-					return (GValue)this.castToObjectValue(value);
+					return (GValue)ObjectValue.valueOf(this.castToObject(value));
 				case FunctionType.ID:
-					return (GValue)this.castToFunctionValue(value);
+					return (GValue)FunctionValue.valueOf(this.castToFunction(value));
 				case StringType.ID:
-					return (GValue)this.castToStringValue(value);
+					return (GValue)StringValue.valueOf(this.castToString(value));
 				case NumberType.ID:
-					return (GValue)this.castToNumberValue(value);
+					return (GValue)NumberValue.valueOf(this.castToNumber(value));
 				case BooleanType.ID:
-					return (GValue)this.castToBooleanValue(value);
+					return (GValue)BooleanValue.valueOf(this.castToBoolean(value));
 			}
 			throw new IllegalArgumentException();
 		}
 
 		/**
-		 * Diese Methode gibt {@link NullValue#INSTANCE} zurück.
-		 * 
-		 * @param value Wert.
-		 * @return {@link NullValue#INSTANCE}.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
-		 */
-		protected NullValue castToNullValue(final Value value) throws NullPointerException {
-			if (value == null) throw new NullPointerException();
-			return NullValue.INSTANCE;
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link ArrayValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert in eine Wertliste und gibt diese zurück.
 		 * <ul>
-		 * <li>Wenn der Wert ein {@link NullValue} ist, wird ein leeres Array zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link ArrayValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>In allen anderen Fällen wird ein {@link ArrayValue} zurück gegeben, das den gegebenen Wert als einziges Element enthält.</li>
+		 * <li>Wenn der Wert ein {@link NullValue} ist, wird die leere Wertliste geliefert.</li>
+		 * <li>Wenn der Wert ein {@link ArrayValue} ist, wird dessen Wertliste unverändert geliefert.</li>
+		 * <li>In allen anderen Fällen wird eine Wertliste geliefert, die den gegebenen Wert als einziges Element enthält.</li>
 		 * </ul>
 		 * 
 		 * @param value Wert.
-		 * @return {@link ArrayValue}.
+		 * @return Wertliste.
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
-		protected ArrayValue castToArrayValue(final Value value) throws NullPointerException {
+		protected Array castToArray(final Value value) throws NullPointerException {
 			switch (value.type().id()) {
 				case NullType.ID:
-					return ArrayValue.valueOf(Array.EMPTY);
+					return Array.EMPTY;
 				case ArrayType.ID:
-					return (ArrayValue)value;
-				default:
-					return ArrayValue.valueOf(Array.valueOf(value));
+					return (Array)value.data();
 			}
+			return Array.valueOf(value);
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link ObjectValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert ein Objekt und gibt diesen zurück.
 		 * <ul>
-		 * <li>Wenn die Nutzdaten des Werts {@code null} sind, wird ein {@link NullPointerException} ausgelöst.</li>
-		 * <li>Wenn der Wert ein {@link ObjectValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>In allen anderen Fällen wird ein neuer {@link ObjectValue} mit den Nutzdaten des gegebenen Werts zurück gegeben.</li>
+		 * <li>Es werden immer die Nutzdaten des des gegebenen Werts unverändert geliefert.</li>
 		 * </ul>
 		 * 
 		 * @param value Wert.
-		 * @return {@link ObjectValue}.
+		 * @return Objekt.
 		 * @throws NullPointerException Wenn der gegebene Wert oder dessen Nutzdaten {@code null} sind.
 		 */
-		protected ObjectValue castToObjectValue(final Value value) throws NullPointerException {
-			switch (value.type().id()) {
-				case ObjectType.ID:
-					return (ObjectValue)value;
-				default:
-					return ObjectValue.valueOf(value.data());
-			}
+		protected Object castToObject(final Value value) throws NullPointerException {
+			return value.data();
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link FunctionValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert in eine Funktion und gibt diese zurück.
 		 * <ul>
-		 * <li>Wenn der Wert ein {@link FunctionValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>In allen anderen Fällen wird der Wert via {@link ValueFunction#valueOf(Value)} und {@link FunctionValue#valueOf(Function)} umgewandelt und zurück
-		 * gegeben.</li>
+		 * <li>Wenn der Wert ein {@link FunctionValue} ist, wird deren Funktion unverändert geliefert.</li>
+		 * <li>Andernfalls wird die via {@link ValueFunction#valueOf(Value)} aus dem Wert erzeugte Funktion geliefert.</li>
 		 * </ul>
 		 * 
 		 * @see ValueFunction#valueOf(Value)
-		 * @see FunctionValue#valueOf(Function)
 		 * @param value Wert.
-		 * @return {@link FunctionValue}.
+		 * @return Funktion.
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
-		protected FunctionValue castToFunctionValue(final Value value) throws NullPointerException {
-			switch (value.type().id()) {
-				case FunctionType.ID:
-					return (FunctionValue)value;
-				default:
-					return FunctionValue.valueOf(ValueFunction.valueOf(value));
-			}
+		protected Function castToFunction(final Value value) throws NullPointerException {
+			if (value.type().id() == FunctionType.ID) return (Function)value.data();
+			return ValueFunction.valueOf(value);
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link StringValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert in eine Zeichenkette und gibt diese zurück.
 		 * <ul>
-		 * <li>Wenn der Wert ein {@link NullValue} ist, wird {@code "null"} als {@link StringValue} zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link StringValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link ArrayValue} ist, werden die mit dieser Methode in {@link String Zeichenketten} umgewandelten Elemente des {@link Array}s mit
-		 * dem Trennzeichen {@code ", "} verkettet und als {@link StringValue} zurück gegeben.</li>
-		 * <li>In allen anderen Fällen derden die Nutzdaten des Werts via {@link String#valueOf(Object)} in eine Zeichenkette umgewandelt und als
-		 * {@link StringValue} zurück gegeben.</li>
+		 * <li>Wenn der Wert ein {@link NullValue} ist, wird eine leere Zeichenkette geliefert.</li>
+		 * <li>Wenn der Wert ein {@link StringValue} ist, wird dessen Zeichenkette unverändert geliefert.</li>
+		 * <li>Wenn der Wert ein {@link ArrayValue} ist, wird eine Zeichenkette geliefert, die aus der das Trennzeichen {@code ", "} verwendenden Verkettung der mit
+		 * dieser Methode umgewandelten Werte der Wertliste ersteht.</li>
+		 * <li>In allen anderen Fällen wird eine Zeichenkette geliefert, die aus den Nutzdaten des Werts via {@link String#valueOf(Object)} entsteht.</li>
 		 * </ul>
 		 * 
 		 * @see String#valueOf(Object)
 		 * @param value Wert.
-		 * @return {@link StringValue}.
+		 * @return Zeichenkette.
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 */
-		protected StringValue castToStringValue(final Value value) throws NullPointerException {
+		protected String castToString(final Value value) throws NullPointerException {
 			switch (value.type().id()) {
 				case NullType.ID:
-					return StringValue.valueOf("");
+					return "";
 				case StringType.ID:
-					return (StringValue)value;
+					return (String)value.data();
 				case ArrayType.ID:
-					return StringValue.valueOf(Strings.join(", ", Iterables.convertedIterable(StringValue.TYPE, ((ArrayValue)value).data)));
-				default:
-					return StringValue.valueOf(String.valueOf(value.data()));
+					return Strings.join(", ", Iterables.convertedIterable(this.castToString, (Array)value.data()));
 			}
+			return String.valueOf(value.data());
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link NumberValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert in einen Zahlenwert und gibt diesen zurück.
 		 * <ul>
-		 * <li>Wenn der Wert ein {@link NullValue} ist, wird {@code NaN} als {@link NumberValue} zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link NumberValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link StringValue} ist, werden seine Nutzdaten via {@link BigDecimal#BigDecimal(String)} interpretiert und als {@link NumberValue}
-		 * zurück gegeben. Hierbei kann eine {@link IllegalArgumentException} ausgelöst werden.</li>
-		 * <li>Wenn der Wert ein {@link BooleanValue} ist, wird bei {@code false} eine {@code 0} bzw. bei {@code true} eine {@code 1} als {@link NumberValue} zurück
-		 * gegeben.</li>
+		 * <li>Wenn der Wert ein {@link NullValue} ist, wird {@link Double#NaN} geliefert.</li>
+		 * <li>Wenn der Wert ein {@link NumberValue} ist, wird dessen Zahlenwert unverändert geliefert.</li>
+		 * <li>Wenn der Wert ein {@link StringValue} ist, wird ein Zahlenwert geliefert, der via {@link Double#valueOf(String)} interpretiert wird.<br>
+		 * Hierbei kann eine {@link IllegalArgumentException} ausgelöst werden.</li>
+		 * <li>Wenn der Wert ein {@link BooleanValue} ist, wird bei {@code false} eine {@code 0} bzw. bei {@code true} eine {@code 1} als {@link Integer} geliefert.
+		 * </li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 * 
 		 * @param value Wert.
-		 * @return {@link NumberValue}.
+		 * @return Zahlenwert.
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
-		protected NumberValue castToNumberValue(final Value value) throws NullPointerException, IllegalArgumentException {
+		protected Number castToNumber(final Value value) throws NullPointerException, IllegalArgumentException {
 			switch (value.type().id()) {
 				case NullType.ID:
-					return NumberValue.valueOf(Double.NaN);
+					return Double.valueOf(Double.NaN);
 				case StringType.ID:
-					return NumberValue.valueOf(new BigDecimal(((StringValue)value).data));
+					return Double.valueOf((String)value.data());
 				case NumberType.ID:
-					return (NumberValue)value;
+					return (Number)value.data();
 				case BooleanType.ID:
-					return NumberValue.valueOf(((BooleanValue)value).data.booleanValue() ? 1 : 0);
-				default:
-					throw new IllegalArgumentException();
+					return ((Boolean)value.data()).booleanValue() ? Integer.valueOf(1) : Integer.valueOf(0);
 			}
+			throw new IllegalArgumentException();
 		}
 
 		/**
-		 * Diese Methode konvertiert den gegebenen Wert in einen {@link BooleanValue} und gibt diesen zurück.
+		 * Diese Methode konvertiert den gegebenen Wert in einen Wahrheitswert und gibt diesen zurück.
 		 * <ul>
-		 * <li>Wenn der Wert ein {@link NullValue} ist, wird {@link BooleanValue#FALSE} zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link BooleanValue} ist, wird er unverändert zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link ArrayValue} ist, wird {@link BooleanValue#FALSE} nur bei einem leeren {@link Array} als Nutzdaten zurück gegeben;
-		 * Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
-		 * <li>Wenn der Wert ein {@link ObjectValue} oder {@link FunctionValue} ist, wird {@link BooleanValue#TRUE} zurück gegeben.</li>
-		 * <li>Wenn der Wert ein {@link StringValue} ist, wird {@link BooleanValue#FALSE} nur bei einem leeren {@link String} als Nutzdaten zurück gegeben;
-		 * Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
-		 * <li>Wenn der Wert ein {@link NumberValue} ist, wird {@link BooleanValue#FALSE} nur bei {@code 0} bzw. {@code NaN} als Nutzdaten zurück gegeben;
-		 * Anderenfalls ist der Rückgabewert {@link BooleanValue#TRUE}.</li>
+		 * <li>Wenn der Wert ein {@link NullValue} ist, wird {@link Boolean#FALSE} geliefert.</li>
+		 * <li>Wenn der Wert ein {@link BooleanValue} ist, wird dessen Wahrheitswert unverändert geliefert.</li>
+		 * <li>Wenn der Wert ein {@link ArrayValue} oder ein {@link StringValue} ist, wird {@link Boolean#FALSE} nur bei einer leeren Wertliste bzw. Zeichenkette
+		 * geliefert. Anderenfalls wird {@link Boolean#TRUE} geliefert.</li>
+		 * <li>Wenn der Wert ein {@link ObjectValue} oder ein {@link FunctionValue} ist, wird {@link Boolean#TRUE} geliefert.</li>
+		 * <li>Wenn der Wert ein {@link NumberValue} ist, wird {@link Boolean#FALSE} nur bei {@code 0} bzw. {@code NaN} geliefert. Anderenfalls wird
+		 * {@link Boolean#TRUE} geliefert.</li>
 		 * <li>In allen anderen Fällen wird eine {@link IllegalArgumentException} ausgelöst.</li>
 		 * </ul>
 		 * 
 		 * @param value Wert.
-		 * @return {@link BooleanValue}.
+		 * @return Wahrheitswert.
 		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
-		protected BooleanValue castToBooleanValue(final Value value) throws NullPointerException, IllegalArgumentException {
+		protected Boolean castToBoolean(final Value value) throws NullPointerException, IllegalArgumentException {
 			switch (value.type().id()) {
 				case NullType.ID:
-					return BooleanValue.FALSE;
+					return Boolean.FALSE;
 				case ArrayType.ID:
-					return BooleanValue.valueOf(((ArrayValue)value).data.length() != 0);
+					return Boolean.valueOf(((Array)value.data()).length() != 0);
 				case ObjectType.ID:
 				case FunctionType.ID:
-					return BooleanValue.TRUE;
+					return Boolean.TRUE;
 				case StringType.ID:
-					return BooleanValue.valueOf(((StringValue)value).data.length() != 0);
+					return Boolean.valueOf(((String)value.data()).length() != 0);
 				case NumberType.ID:
-					return BooleanValue.valueOf(((NumberValue)value).data.intValue() != 0);
+					return Boolean.valueOf(((Number)value.data()).intValue() != 0);
 				case BooleanType.ID:
-					return (BooleanValue)value;
-				default:
-					throw new IllegalArgumentException();
+					return (Boolean)value.data();
 			}
+			throw new IllegalArgumentException();
 		}
 
 		{}

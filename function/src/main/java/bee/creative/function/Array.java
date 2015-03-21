@@ -91,6 +91,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Byte#valueOf(byte)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -103,7 +104,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Byte(values[index]));
+				return NumberValue.valueOf(Byte.valueOf(values[index]));
 			}
 
 			@Override
@@ -117,6 +118,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Short#valueOf(short)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -129,7 +131,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Short(values[index]));
+				return NumberValue.valueOf(Short.valueOf(values[index]));
 			}
 
 			@Override
@@ -143,6 +145,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Integer#valueOf(int)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -155,7 +158,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Integer(values[index]));
+				return NumberValue.valueOf(Integer.valueOf(values[index]));
 			}
 
 			@Override
@@ -169,6 +172,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Long#valueOf(long)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -181,7 +185,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Long(values[index]));
+				return NumberValue.valueOf(Long.valueOf(values[index]));
 			}
 
 			@Override
@@ -195,6 +199,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Float#valueOf(float)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -207,7 +212,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Float(values[index]));
+				return NumberValue.valueOf(Float.valueOf(values[index]));
 			}
 
 			@Override
@@ -221,6 +226,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Double#valueOf(double)
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
@@ -233,7 +239,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(new Double(values[index]));
+				return NumberValue.valueOf(Double.valueOf(values[index]));
 			}
 
 			@Override

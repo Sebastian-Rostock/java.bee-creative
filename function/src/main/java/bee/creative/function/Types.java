@@ -21,7 +21,8 @@ public class Types {
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten Datentyp, dem zur Vollständigkeit nur noch die Methode {@link #id()} fehlt. {@link Object#hashCode() Streuwert}
-	 * und {@link Object#equals(Object) Äquivalenz} beruhen auf dem {@link Type#id() Identifikator}.
+	 * und {@link Object#equals(Object) Äquivalenz} beruhen auf dem {@link Type#id() Identifikator}. Des Weiteren ist Der Datentyp kann als {@link Converter}
+	 * verwendet werden, welcher einen beliebigen Wert zuerst in einen {@code GValue} umwandelt und anschließend dessen Nutzdaten als {@code GData} liefert.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Nutzdaten des Werts.
@@ -54,7 +55,7 @@ public class Types {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode konvertiert den gegebenen Wert über {@link #valueOf(Value)} in den Wert dieses Datentyps und gibt dessen Nutzdaten zurück.
 		 */
 		@Override
 		public GData convert(final Value input) {
