@@ -693,6 +693,7 @@ public class Scripts {
 		 * @return Zahl.
 		 */
 		protected int doCompileIndex(final String string) {
+			if ((string == null) || string.isEmpty()) return -1;
 			final char symbol = string.charAt(0);
 			if ((symbol < '0') || (symbol > '9')) return -1;
 			try {
@@ -709,7 +710,7 @@ public class Scripts {
 		 * @throws ScriptException Wenn {@link #script} ungültig ist.
 		 */
 		protected Object doCompileArray() throws ScriptException {
-			if (!this.arrayEnabled) throw new ScriptException(this.script, this.range);
+			if (!this.arrayEnabled) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
 			if (this.skipSpace().type == ']') {
 				this.skip();
@@ -736,7 +737,7 @@ public class Scripts {
 						return ArrayValue.valueOf(Array.valueOf(values));
 					}
 					default:
-						throw new ScriptException(this.script, this.range);
+						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «]» erwartet.");
 				}
 			}
 		}
@@ -758,11 +759,11 @@ public class Scripts {
 				case ')':
 				case ']':
 				case '}':
-					throw new ScriptException(this.script, this.range);
+					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wert erwartet.");
 				case '[':
 					return this.doCompileValueArray();
 				case '{':
-					if (this.closureEnabled) throw new ScriptException(this.script, this.range);
+					if (this.closureEnabled) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Ungebundene Funktion unzulässig.");
 					return FunctionValue.valueOf(this.doCompileScope());
 				default:
 					try {
@@ -770,9 +771,9 @@ public class Scripts {
 					} catch (final ScriptException e) {
 						throw e;
 					} catch (final RuntimeException e) {
-						throw new ScriptException(this.script, this.range, e);
+						throw new ScriptException(e).setRange(this.range).setScript(this.script);
 					}
-					if (value == null) throw new ScriptException(this.script, this.range);
+					if (value == null) throw new ScriptException().setRange(this.range).setScript(this.script);
 					this.skip();
 					return value;
 			}
@@ -787,7 +788,7 @@ public class Scripts {
 		protected Value doCompileValueArray() throws ScriptException {
 			final Object array = this.doCompileArray();
 			if (array instanceof Value) return (Value)array;
-			throw new ScriptException(this.script, this.range);
+			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wertliste erwartet.");
 		}
 
 		/**
@@ -803,7 +804,7 @@ public class Scripts {
 				case '(':
 				case '[':
 				case '{':
-					throw new ScriptException(this.script, this.range);
+					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername oder Parameterindex erwartet.");
 				case ':':
 				case ';':
 				case ')':
@@ -818,7 +819,7 @@ public class Scripts {
 			} catch (final ScriptException e) {
 				throw e;
 			} catch (final RuntimeException e) {
-				throw new ScriptException(this.script, this.range, e);
+				throw new ScriptException(e).setRange(this.range).setScript(this.script).setHint(" Parametername oder Parameterindex erwartet.");
 			}
 			this.skip();
 			return name;
@@ -834,27 +835,27 @@ public class Scripts {
 			this.skip();
 			int count = 0;
 			while (true) {
-				if (this.skipSpace().type == 0) throw new ScriptException(this.script, this.range);
+				if (this.skipSpace().type == 0) throw new ScriptException().setRange(this.range).setScript(this.script);
 				final String name = this.doCompileParam();
 				if (name != null) {
-					if (this.doCompileIndex(name) >= 0) throw new ScriptException(this.script, this.range);
+					if (this.doCompileIndex(name) >= 0) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername erwartet.");
 					this.params.add(count++, name);
 				}
 				switch (this.skipSpace().type) {
 					case ';':
-						if (name == null) throw new ScriptException(this.script, this.range);
+						if (name == null) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername oder Zeichen «:» erwartet.");
 						this.skip();
 						break;
 					case ':': {
 						this.skip();
 						final Function function = this.doCompileFunction();
-						if (this.skipSpace().type != '}') throw new ScriptException(this.script, this.range);
+						if (this.skipSpace().type != '}') throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «}» erwartet.");
 						this.skip();
 						this.params.subList(0, count).clear();
 						return function;
 					}
 					default:
-						throw new ScriptException(this.script, this.range);
+						throw new ScriptException().setRange(this.range).setScript(this.script);
 				}
 			}
 		}
@@ -873,16 +874,22 @@ public class Scripts {
 					this.skip();
 					final String name = this.doCompileParam();
 					if (name == null) return ArrayFunction.VIEW;
-					final int index = this.doCompileIndex(name);
-					final int index2 = (index < 0) ? this.params.indexOf(name) : (index - 1);
-					if (index2 < 0) throw new ScriptException(this.script, this.range);
-					return ParamFunction.valueOf(index2);
+					int index = this.doCompileIndex(name);
+					if (index < 0) {
+						index = this.params.indexOf(name);
+						if (index < 0) throw new ScriptException().setRange(this.range).setScript(this.script) //
+							.setHint(String.format(" Parametername «%s» ist unbekannt.", name));
+					} else if (index > 0) {
+						index--;
+					} else throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parameterindex «0» ist unzulässig.");
+					return ParamFunction.valueOf(index);
 				}
 				case '{': {
 					function = this.doCompileScope();
 					if (this.skipSpace().type != '(') return this.closureEnabled ? //
 						ClosureFunction.valueOf(function) : ValueFunction.valueOf(FunctionValue.valueOf(function));
-					if (!this.chainingEnabled) throw new ScriptException(this.script, this.range);
+					if (!this.chainingEnabled)
+						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
 				}
 				case '[': {
@@ -893,13 +900,14 @@ public class Scripts {
 					if (!(value instanceof FunctionValue)) return ValueFunction.valueOf(value);
 					if (this.skipSpace().type != '(') {
 						if (this.handlerEnabled) return ValueFunction.valueOf(value);
-						throw new ScriptException(this.script, this.range);
+						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverweise sind nicht zulässig.");
 					}
 					function = ((FunctionValue)value).data();
 				}
 			}
 			do {
-				if (chained && !this.chainingEnabled) throw new ScriptException(this.script, this.range);
+				if (chained && !this.chainingEnabled)
+					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				this.skipSpace();
 				for (final LinkedList<Function> functions = new LinkedList<Function>(); true;) {
@@ -911,7 +919,7 @@ public class Scripts {
 					functions.add(this.doCompileFunction());
 					switch (this.skipSpace().type) {
 						default:
-							throw new ScriptException(this.script, this.range);
+							throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «)» erwartet.");
 						case ';':
 							this.skip();
 						case ')':
@@ -946,7 +954,7 @@ public class Scripts {
 		public Value compileValue() throws ScriptException {
 			final Value value = this.doCompileValue();
 			if (this.skipSpace().type == 0) return value;
-			throw new ScriptException(this.script, this.range);
+			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
 		}
 
 		/**
@@ -975,7 +983,7 @@ public class Scripts {
 		public Function compileFunction() throws ScriptException {
 			final Function function = this.doCompileFunction();
 			if (this.skipSpace().type == 0) return function;
-			throw new ScriptException(this.script, this.range);
+			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
 		}
 
 		/**
@@ -1114,45 +1122,116 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert die Serial-Version-UID.
 		 */
-		private static final long serialVersionUID = -2729122475649970656L;
+		private static final long serialVersionUID = -918623847189389909L;
 
 		{}
 
 		/**
+		 * Dieses Feld speichert den Hinweis zum erwarteten Inhalt des Bereichs.
+		 */
+		String hint;
+
+		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		public final Script script;
+		Script script;
 
 		/**
 		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
 		 */
-		public final Range range;
+		Range range;
 
 		/**
-		 * Dieser Konstruktor initialisiert den Quelltext und den Bereich mit dem Syntaxfehler.
-		 * 
-		 * @param script Quelltext.
-		 * @param range Bereich mit dem Syntaxfehler.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * Dieser Konstruktor initialisiert die {@link ScriptException} ohne Ursache.
 		 */
-		public ScriptException(final Script script, final Range range) throws NullPointerException {
-			this(script, range, null);
+		public ScriptException() {
+			super();
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert den Quelltext und den Bereich mit dem Syntaxfehler.
+		 * Dieser Konstruktor initialisiert die {@link ScriptException} mit Ursache.
 		 * 
-		 * @param script Quelltext.
-		 * @param range Bereich mit dem Syntaxfehler.
-		 * @param cause Verursachende Ausnahme.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @param cause Urssache.
 		 */
-		public ScriptException(final Script script, final Range range, final Throwable cause) throws NullPointerException {
-			super(range == Range.NULL ? //
-				"Unerwartetes Ende der Zeichenkette." : //
-				"Unerwartete Zeichenkette '" + range.extract(script.source) + "' an Position " + range.start + ".", cause);
-			this.script = script;
-			this.range = range;
+		public ScriptException(final Throwable cause) {
+			super(cause);
+		}
+
+		/**
+		 * Diese Methode gibt den Hinweis zum erwarteten Inhalt des Bereichs zurück.
+		 * 
+		 * @see #getRange()
+		 * @return Hinweis oder {@code null}.
+		 */
+		public String getHint() {
+			return this.hint;
+		}
+
+		/**
+		 * Diese Methode setzt den Hinweis und gibt {@code this} zurück.
+		 * 
+		 * @see #getHint()
+		 * @param value Hinweis.
+		 * @return {@code this}.
+		 */
+		public ScriptException setHint(final String value) {
+			this.hint = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode gibt den Bereich zurück, in dem der Syntaxfehler auftrat.
+		 * 
+		 * @return Bereich.
+		 */
+		public Range getRange() {
+			return this.range;
+		}
+
+		/**
+		 * Diese Methode setzt den Bereich und gibt {@code this} zurück.
+		 * 
+		 * @see #getRange()
+		 * @param value Bereich.
+		 * @return {@code this}.
+		 */
+		public ScriptException setRange(final Range value) {
+			this.range = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode gibt Quelltext zurück, in dem der Syntaxfehler auftrat.
+		 * 
+		 * @return Quelltext.
+		 */
+		public Script getScript() {
+			return this.script;
+		}
+
+		/**
+		 * Diese Methode setzt den Quelltext und gibt {@code this} zurück.
+		 * 
+		 * @see #getScript()
+		 * @param value Quelltext.
+		 * @return {@code this}.
+		 */
+		public ScriptException setScript(final Script value) {
+			this.script = value;
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String getMessage() {
+			return (this.range == Range.NULL //
+				? "Unerwartetes Ende der Zeichenkette." //
+				: "Unerwartete Zeichenkette «" + this.range.extract(this.script.source) + "» an Position «" + this.range.start + "».") //
+				+ (this.hint != null //
+					? this.hint //
+					: "");
 		}
 
 	}
