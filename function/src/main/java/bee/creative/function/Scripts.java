@@ -1228,10 +1228,8 @@ public class Scripts {
 		public String getMessage() {
 			return (this.range == Range.NULL //
 				? "Unerwartetes Ende der Zeichenkette." //
-				: "Unerwartete Zeichenkette «" + this.range.extract(this.script.source) + "» an Position «" + this.range.start + "».") //
-				+ (this.hint != null //
-					? this.hint //
-					: "");
+				: "Unerwartete Zeichenkette «" + this.range.extract(this.script.source) + "» an Position " + this.range.start + ".") //
+				+ (this.hint != null ? this.hint : "");
 		}
 
 	}
