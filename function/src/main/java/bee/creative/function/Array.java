@@ -21,7 +21,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.
 	 * 
-	 * @see Array#collect(Collector, Array, int, int)
+	 * @see Array#collect(Collector)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface Collector {
@@ -369,25 +369,6 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 		return Array.valueOf(data.toArray(new Value[data.size()]));
 	}
 
-	/**
-	 * Diese Methode fügt alle Werte im gegebenen Abschnitt der gegebenen Wertliste geordnet an den gegebenen {@link Collector} an.<br>
-	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(Value)} {@code false} liefert.
-	 * 
-	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
-	 * @param source Wertliste.
-	 * @param offset Position, an welcher der Abschnitt beginnt.
-	 * @param length Anzahl der Werte im Abschnitt.
-	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb der Wertliste liegt oder eine negative Länge hätte.
-	 */
-	public static boolean collect(final Collector target, final Array source, final int offset, final int length) throws NullPointerException,
-		IllegalArgumentException {
-		if ((target == null) || (source == null)) throw new NullPointerException();
-		if ((offset < 0) || (length < 0) || ((offset + length) > source.length())) throw new IllegalArgumentException();
-		return source.collect(target, offset, length);
-	}
-
 	{}
 
 	/**
@@ -441,6 +422,19 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @return Länge.
 	 */
 	public abstract int length();
+
+	/**
+	 * Diese Methode fügt alle Werte der Wertliste geordnet an den gegebenen {@link Collector} an.<br>
+	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(Value)} {@code false} liefert.
+	 * 
+	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 */
+	public boolean collect(final Collector target) throws NullPointerException {
+		if (target == null) throw new NullPointerException();
+		return collect(target, 0, length());
+	}
 
 	/**
 	 * Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
