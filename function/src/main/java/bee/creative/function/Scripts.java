@@ -388,7 +388,7 @@ public class Scripts {
 		/**
 		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #stopFormatting()} verwendet werden.
 		 * 
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		protected final synchronized void startFormatting() throws IllegalStateException {
 			this.checkIdling();
@@ -407,7 +407,7 @@ public class Scripts {
 		/**
 		 * Diese Methode prüft den Parsestatus.
 		 * 
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		protected final void checkIdling() throws IllegalStateException {
 			if (this.indents.size() != 0) throw new IllegalStateException();
@@ -416,7 +416,7 @@ public class Scripts {
 		/**
 		 * Diese Methode prüft den Parsestatus.
 		 * 
-		 * @throws IllegalStateException Wenn aktuell nicht geparst wird.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		protected final void checkFormatting() throws IllegalStateException {
 			if (this.indents.size() == 0) throw new IllegalStateException();
@@ -577,10 +577,11 @@ public class Scripts {
 		 * @see #putFunction(Function)
 		 * @param value Wert.
 		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putValue(final Value value) throws IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putValue(final Value value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value instanceof ArrayValue) return this.putArray((Array)value.data());
 			if (value instanceof FunctionValue) return this.putScope((Function)value.data());
 			this.helper.formatValue(this, value);
@@ -603,66 +604,110 @@ public class Scripts {
 		}
 
 		/**
+		 * Diese Methode fügt den Quelltext der gegebenen Parameterfunktionen an und gibt {@code this} zurück.
+		 * <p>
+		 * Wenn die Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die Parameterfunktionen in {@code "("} und {@code ")"} eingeschlossen sowie mit
+		 * {@code ";"} separiert über {@link #putFunction(Function)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue
+		 * Hierarchieebene, die vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes
+		 * Leerzeichen} eingefügt.<br>
+		 * Die aktuelle Hierarchieebene wird als einzurücken markiert, wenn die Funktionsliste mehr als ein Element enthält.
+		 * 
+		 * @param value Funktionsliste.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
+		 */
+		public ScriptFormatter putParams(final Function... value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			final int length = value.length;
+			if (length == 0) return this.put("()");
+			(length > 1 ? this.putIndent() : this).put("(").putBreakInc().putFunction(value[0]);
+			for (int i = 1; i < length; i++) {
+				this.put(";").putBreakSpace().putFunction(value[i]);
+			}
+			this.putBreakDec().put(")");
+			return this;
+		}
+
+		/**
 		 * Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.
 		 * <p>
 		 * Wenn die Funktion eine {@link ArrayFunction} ist, wird {@code "$"} angefügt. Wenn die Funktion eine {@link ParamFunction} ist, wird {@code "$i"}
 		 * angefügt, wobei {@code i} der um eins vergrößerte Parameterindex ist. Wenn die Funktion eine {@link ValueFunction} ist, wird ihr Wert via
 		 * {@link #putValue(Value)} angefügt. Wenn die Funktion eine {@link ClosureFunction} ist, wird ihre Funktion über {@link #putScope(Function)} angefügt. Wenn
 		 * die Funktion eine {@link LazyFunction} oder eine {@link TraceFunction} ist, wird ihre Funktion über {@link #putFunction(Function)} angefügt. Wenn die
-		 * Funktion eine {@link CompositeFunction} ist, werden ihre aufzurufende Funktion gefolgt von den in {@code "("} und {@code ")"} eingeschlossenen und mit
-		 * {@code ";"} separierten Parameterfunktionen angefügt, wobei jede diese Funktionen selbst über {@link #putFunction(Function)} angefügt wird. Andernfalls
-		 * wird die Funktion über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)} formatiert.
+		 * Funktion eine {@link CompositeFunction} ist, werden ihre aufzurufende Funktion über {@link #putFunction(Function)} und ihre Parameterfunktionen über
+		 * {@link #putParams(Function...)} angefügt. Andernfalls wird die Funktion über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)}
+		 * formatiert.
 		 * 
-		 * @param function Funktion.
+		 * @param value Funktion.
 		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putFunction(final Function function) throws IllegalStateException, IllegalArgumentException {
-			if (function instanceof ArrayFunction) return this.put("$");
-			if (function instanceof ParamFunction) return this.put("$").put(String.valueOf(((ParamFunction)function).index() + 1));
-			if (function instanceof ValueFunction) return this.putValue(((ValueFunction)function).value());
-			if (function instanceof LazyFunction) return this.putFunction(((LazyFunction)function).function());
-			if (function instanceof TraceFunction) return this.putFunction(((TraceFunction)function).function());
-			if (function instanceof ClosureFunction) return this.putScope(((ClosureFunction)function).function());
-			if (function instanceof CompositeFunction) {
-				final CompositeFunction compositeFunction = (CompositeFunction)function;
-				this.putFunction(compositeFunction.function());
-				final Function[] functions = compositeFunction.functions();
-				final int length = functions.length;
-				if (length == 0) return this.put("()");
-				(length > 1 ? this.putIndent() : this).put("(").putBreakInc().putFunction(functions[0]);
-				for (int i = 1; i < length; i++) {
-					this.put(";").putBreakSpace().putFunction(functions[i]);
-				}
-				this.putBreakDec().put(")");
-				return this;
+		public ScriptFormatter putFunction(final Function value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value instanceof ArrayFunction) return this.put("$");
+			if (value instanceof ParamFunction) return this.put("$").put(String.valueOf(((ParamFunction)value).index() + 1));
+			if (value instanceof ValueFunction) return this.putValue(((ValueFunction)value).value());
+			if (value instanceof LazyFunction) return this.putFunction(((LazyFunction)value).function());
+			if (value instanceof TraceFunction) return this.putFunction(((TraceFunction)value).function());
+			if (value instanceof ClosureFunction) return this.putScope(((ClosureFunction)value).function());
+			if (value instanceof CompositeFunction) {
+				final CompositeFunction compositeFunction = (CompositeFunction)value;
+				return this.putFunction(compositeFunction.function()).putParams(compositeFunction.params());
 			}
-			this.helper.formatFunction(this, function);
+			this.helper.formatFunction(this, value);
 			return this;
 		}
 
 		{}
 
+		/**
+		 * Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück.
+		 * 
+		 * @return Zeichenkette zur Einrückung .
+		 */
 		public String getIndent() {
 			return this.indent;
 		}
 
+		/**
+		 * Diese Methode gibt die genutzten Formatierungsmethoden zurück.
+		 * 
+		 * @return Formatierungsmethoden.
+		 */
 		public ScriptFormatterHelper getHelper() {
 			return this.helper;
 		}
 
-		public ScriptFormatter setIndent(final String indent) throws NullPointerException, IllegalStateException {
-			indent.length();
+		/**
+		 * Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.
+		 * 
+		 * @param value Zeichenkette zur Einrückung (z.B. {@code "\t"} oder {@code "    "}).
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 */
+		public ScriptFormatter setIndent(final String value) throws NullPointerException, IllegalStateException {
+			value.length();
 			this.checkIdling();
-			this.indent = indent;
+			this.indent = value;
 			return this;
 		}
 
-		public ScriptFormatter setHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
-			if (helper == null) throw new NullPointerException();
+		/**
+		 * Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt {@code this} zurück.
+		 * 
+		 * @param value Formatierungsmethoden.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 */
+		public ScriptFormatter setHelper(final ScriptFormatterHelper value) throws NullPointerException, IllegalStateException {
+			if (value == null) throw new NullPointerException();
 			this.checkIdling();
-			this.helper = helper;
+			this.helper = value;
 			return this;
 		}
 
@@ -698,20 +743,50 @@ public class Scripts {
 			return string.toString();
 		}
 
-		public String formatValue(final Value value) throws IllegalStateException {
+		/**
+		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
+		 * Die Werte werden mit {@code ';'} separiert.
+		 * 
+		 * @param value Wert.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
+		 */
+		public String formatValue(final Value... value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			this.startFormatting();
 			try {
-				this.putValue(value);
+				final int length = value.length;
+				if (length == 0) return "";
+				(length == 1 ? this : this.putIndent()).putValue(value[0]);
+				for (int i = 1; i < length; i++) {
+					this.put(";").putBreakSpace().putValue(value[i]);
+				}
 				return this.format();
 			} finally {
 				this.stopFormatting();
 			}
 		}
 
-		public String formatFunction(final Function value) throws IllegalStateException {
+		/**
+		 * Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
+		 * Die Funktionen werden mit {@code ';'} separiert.
+		 * 
+		 * @param value Funktionen.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
+		 */
+		public String formatFunction(final Function... value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			this.startFormatting();
 			try {
-				this.putFunction(value);
+				final int length = value.length;
+				if (length == 0) return "";
+				(length == 1 ? this : this.putIndent()).putFunction(value[0]);
+				for (int i = 1; i < length; i++) {
+					this.put(";").putBreakSpace().putFunction(value[i]);
+				}
 				return this.format();
 			} finally {
 				this.stopFormatting();

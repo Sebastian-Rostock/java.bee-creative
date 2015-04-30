@@ -48,7 +48,7 @@ public final class Functions {
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
 		public static CompositeFunction applyTo(final CompositeFunction function) throws NullPointerException {
-			final Function[] functions = function.functions.clone();
+			final Function[] functions = function.params.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = LazyFunction.valueOf(functions[i]);
 			}
@@ -439,7 +439,7 @@ public final class Functions {
 			final Object clazz = function.getClass();
 			if (clazz == CompositeFunction.class) {
 				final CompositeFunction function2 = (CompositeFunction)function;
-				final Function[] functions2 = function2.functions();
+				final Function[] functions2 = function2.params();
 				for (int i = 0, size = functions2.length; i < size; i++) {
 					functions2[i] = new TraceFunction(handler, functions2[i]);
 				}
@@ -959,7 +959,7 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden sollen.
 		 */
-		final Function[] functions;
+		final Function[] params;
 
 		/**
 		 * Dieser Konstruktor initialisiert die aufzurufende Funktion und die Parameterfunktionen.
@@ -984,7 +984,7 @@ public final class Functions {
 			if ((function == null) || (functions == null)) throw new NullPointerException();
 			this.chained = chained;
 			this.function = function;
-			this.functions = functions;
+			this.params = functions;
 		}
 
 		{}
@@ -1015,15 +1015,15 @@ public final class Functions {
 		 * @return Kopie der Parameterfunktionen.
 		 * @see #execute(Scope)
 		 */
-		public Function[] functions() {
-			return this.functions.clone();
+		public Function[] params() {
+			return this.params.clone();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 * <p>
 		 * Wenn die {@link #chained() Verkettung} deaktiviert ist, ergibt sich dieser Ergebniswert aus dem Aufruf der {@link #function() aufzurufende Funktion} mit
-		 * den Parameterwerten, die sich aus der Auswertung der {@link #functions() Parameterfunktionen} mit dem gegebenen Ausführungskontext ergeben. Ist die
+		 * den Parameterwerten, die sich aus der Auswertung der {@link #params() Parameterfunktionen} mit dem gegebenen Ausführungskontext ergeben. Ist die
 		 * {@link #chained() Verkettung} dagegen aktiviert, wird statt der {@link #function() aufzurufende Funktion} die Funktion verwendet, die bei der Auswertung
 		 * der {@link #function() aufzurufenden Funktion} mit dem gegebenen Ausführungskontext ermittelt wurde.<br>
 		 * <p>
@@ -1032,13 +1032,13 @@ public final class Functions {
 		 * 
 		 * @see #chained()
 		 * @see #function()
-		 * @see #functions()
+		 * @see #params()
 		 * @see CompositeScope
 		 */
 		@Override
 		public Value execute(final Scope scope) {
 			return (this.chained ? scope.context().cast(this.function.execute(scope), FunctionValue.TYPE).data() : this.function).execute(new CompositeScope(scope,
-				this.functions));
+				this.params));
 		}
 
 		{}
@@ -1048,7 +1048,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return Objects.hashEx(this.function, this.functions);
+			return Objects.hashEx(this.function, this.params);
 		}
 
 		/**
@@ -1059,7 +1059,7 @@ public final class Functions {
 			if (object == this) return true;
 			if (!(object instanceof CompositeFunction)) return false;
 			final CompositeFunction data = (CompositeFunction)object;
-			return Objects.equals(this.function, data.function) && Objects.equals(this.functions, data.functions);
+			return Objects.equals(this.function, data.function) && Objects.equals(this.params, data.params);
 		}
 
 		/**
@@ -1067,7 +1067,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCallFormat(true, true, this, new Object[]{"function", this.function, "functions", this.functions});
+			return Objects.toStringCallFormat(true, true, this, new Object[]{"function", this.function, "functions", this.params});
 		}
 
 	}
