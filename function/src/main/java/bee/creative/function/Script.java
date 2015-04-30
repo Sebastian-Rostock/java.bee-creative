@@ -29,7 +29,32 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		/**
 		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind.
 		 */
-		public static final Range NULL = new Range((char)0, 0, 0);
+		@SuppressWarnings ("hiding")
+		public static final Range EMPTY = new Range((char)0, 0, 0);
+
+		/**
+		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
+		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
+		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
+		 * 
+		 * @see Range#end()
+		 * @see Range#start()
+		 * @see Comparables
+		 * @see Comparators#compare(int, int)
+		 * @param index Position.
+		 * @return {@link Comparable} für Startposition von Bereichen.
+		 */
+		public static final Comparable<Range> contains(final int index) {
+			return new Comparable<Script.Range>() {
+
+				@Override
+				public int compareTo(final Range value) {
+					final int start = value.start;
+					return index < start ? -1 : index > (value.length + start) ? +1 : 0;
+				}
+
+			};
+		}
 
 		/**
 		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht. Der
@@ -75,29 +100,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 			};
 		}
 
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
-		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
-		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
-		 * 
-		 * @see Range#end()
-		 * @see Range#start()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
-		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen.
-		 */
-		public static final Comparable<Range> contains(final int index) {
-			return new Comparable<Script.Range>() {
-
-				@Override
-				public int compareTo(final Range value) {
-					final int start = value.start;
-					return index < start ? -1 : index > (value.length + start) ? +1 : 0;
-				}
-
-			};
-		}
+		{}
 
 		/**
 		 * Dieses Feld speichert den Typ des Bereichs.
@@ -128,6 +131,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 			this.start = start;
 			this.length = length;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den Typ des Bereichs zurück.
@@ -178,6 +183,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 			return source.substring(start, start + this.length);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -210,10 +217,17 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		 */
 		@Override
 		public String toString() {
-			return "('" + this.type + "':" + this.start + "/" + this.length + ")";
+			return "'" + this.type + "'@" + this.start + "/" + this.length;
 		}
 
 	}
+
+	/**
+	 * Dieses Feld speichert den leeren Quelltext ohne Bereiche.
+	 */
+	public static final Script EMPTY = new Script("", new Range[0]);
+
+	{}
 
 	/**
 	 * Dieses Feld speichert die Zeichenkette.
@@ -259,6 +273,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	public Script(final String source, final Collection<? extends Range> ranges) throws NullPointerException, IllegalArgumentException {
 		this(source, ranges.toArray(new Range[ranges.size()]));
 	}
+
+	{}
 
 	/**
 	 * Diese Methode gibt den {@code index}-ten Bereich zurück.
@@ -319,14 +335,6 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Iterator<Range> iterator() {
-		return new GetIterator<Range>(this, this.length());
-	}
-
-	/**
 	 * Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
 	 * einem der {@link #ranges() Bereiche} enthalten ist.
 	 * 
@@ -344,6 +352,16 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 			start += length;
 		}
 		return new Script(normalSource.toString(), normalRanges);
+	}
+
+	{}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterator<Range> iterator() {
+		return new GetIterator<Range>(this, this.length());
 	}
 
 	/**

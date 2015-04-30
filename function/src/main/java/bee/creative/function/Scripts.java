@@ -2,6 +2,7 @@ package bee.creative.function;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,97 +29,64 @@ public class Scripts {
 	/**
 	 * Diese Klasse implementiert den Parser, der eine Zeichenkette in einen aufbereiteten Quelltext überführt. Ein solcher Quelltext kann anschließend mit einem
 	 * {@link ScriptCompiler} in Werte und Funktionen überführt werden.
+	 * <p>
+	 * Die Erzeugung von {@link Range Bereichen} erfolgt gemäß dieser Regeln:
+	 * <ul>
+	 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
+	 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
+	 * Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
+	 * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und letzten
+	 * jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp
+	 * {@code '?'}. Andernfalls hat er den Bereichstyp {@code '!'}.</li>
+	 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
+	 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
+	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
+	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
+	 * </ul>
 	 * 
-	 * @see #parse()
+	 * @see #parseRanges()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ScriptParser extends Parser {
+	public static class ScriptParser extends Parser {
 
 		/**
 		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
 		 */
-		protected int value;
+		private int value = Integer.MIN_VALUE;
 
 		/**
 		 * Dieses Feld speichert die bisher ermittelten Bereiche.
 		 */
-		protected final List<Range> ranges;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Eingabe.
-		 * 
-		 * @param source Eingabe.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public ScriptParser(final String source) throws NullPointerException {
-			super(source);
-			this.value = -1;
-			this.ranges = new ArrayList<Range>((this.length() / 10) + 5);
-		}
+		private final List<Range> ranges = new ArrayList<Range>();
 
 		{}
 
 		/**
-		 * Diese Methode parst die {@link #source() Eingabe} und gibt die Liste der ermittelten Bereiche zurück. Die Erzeugung von {@link Range Bereiche} erfolgt
-		 * gemäß dieser Regeln:
-		 * <ul>
-		 * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
-		 * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet
-		 * der Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
-		 * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und
-		 * letzten jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp
-		 * {@code '?'}. Andernfalls hat er den Bereichstyp {@code '!'}.</li>
-		 * <li>Jedes der Zeichen {@code '$'}, {@code ';'}, {@code ':'}, {@code '('}, {@code ')'}, <code>'{'</code> und <code>'}'</code> erzeugt eine eigene Bereich,
-		 * der das entsprechende Zeichen als Bereichstyp verwendet.</li>
-		 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
-		 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
-		 * </ul>
+		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #stopParsing()} verwendet werden.
 		 * 
-		 * @return Bereiche.
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
 		 */
-		public List<Range> parse() {
-			for (int symbol; true;) {
-				switch (symbol = this.symbol()) {
-					case -1: {
-						this.closeValue();
-						return this.ranges;
-					}
-					case '\'':
-					case '\"':
-					case '/': {
-						this.closeValue();
-						this.parseMask(symbol);
-						break;
-					}
-					case '<': {
-						this.closeValue();
-						this.parseName();
-						break;
-					}
-					case '$':
-					case ':':
-					case ';':
-					case '(':
-					case ')':
-					case '[':
-					case ']':
-					case '{':
-					case '}': {
-						this.closeValue();
-						this.parseSymbol(symbol);
-						break;
-					}
-					default: {
-						if (symbol <= ' ') {
-							this.closeValue();
-							this.parseSpace();
-						} else {
-							this.parseValue();
-							this.skip();
-						}
-					}
-				}
-			}
+		protected final synchronized void startParsing() throws IllegalStateException {
+			this.checkIdling();
+			this.value = -1;
+			this.ranges.clear();
+		}
+
+		/**
+		 * Diese Methode beendet das Parsen und sollte nur in Verbindung mit {@link #startParsing()} verwendet werden.
+		 */
+		protected final synchronized void stopParsing() {
+			this.value = Integer.MIN_VALUE;
+			this.reset();
+		}
+
+		/**
+		 * Diese Methode prüft den Parsestatus.
+		 * 
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 */
+		protected final void checkIdling() throws IllegalStateException {
+			if (this.value != Integer.MIN_VALUE) throw new IllegalStateException();
 		}
 
 		{}
@@ -129,7 +97,7 @@ public class Scripts {
 		 * @param type Typ.
 		 * @param start Startposition.
 		 */
-		protected void range(final int type, final int start) {
+		protected final void range(final int type, final int start) {
 			this.ranges.add(new Range((char)type, start, this.index() - start));
 		}
 
@@ -213,6 +181,93 @@ public class Scripts {
 			this.range(type, start);
 		}
 
+		{}
+
+		/**
+		 * Diese Methode setzt die Eingabe, ruft {@link #reset()} auf und gibt {@code this} zurück.
+		 * 
+		 * @param value Eingabe.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 */
+		public ScriptParser setSource(final String value) throws NullPointerException, IllegalStateException {
+			this.checkIdling();
+			super.source(value);
+			return this;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode parst die {@link #source() Eingabe} in einen aufbereiteten Quelltext und gibt diesen zurück.
+		 * 
+		 * @see Script
+		 * @see #parseRanges()
+		 * @return aufbereiteter Quelltext.
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 */
+		public Script parseScript() throws IllegalStateException {
+			return new Script(this.source(), this.parseRanges());
+		}
+
+		/**
+		 * Diese Methode parst die {@link #source() Eingabe} und gibt die Liste der ermittelten Bereiche zurück.
+		 * 
+		 * @see Range
+		 * @return Bereiche.
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 */
+		public Range[] parseRanges() throws IllegalStateException {
+			this.startParsing();
+			try {
+				for (int symbol; true;) {
+					switch (symbol = this.symbol()) {
+						case -1: {
+							this.closeValue();
+							return this.ranges.toArray(new Range[this.ranges.size()]);
+						}
+						case '\'':
+						case '\"':
+						case '/': {
+							this.closeValue();
+							this.parseMask(symbol);
+							break;
+						}
+						case '<': {
+							this.closeValue();
+							this.parseName();
+							break;
+						}
+						case '$':
+						case ':':
+						case ';':
+						case '(':
+						case ')':
+						case '[':
+						case ']':
+						case '{':
+						case '}': {
+							this.closeValue();
+							this.parseSymbol(symbol);
+							break;
+						}
+						default: {
+							if (symbol <= ' ') {
+								this.closeValue();
+								this.parseSpace();
+							} else {
+								this.parseValue();
+								this.skip();
+							}
+						}
+					}
+				}
+			} finally {
+				this.stopParsing();
+			}
+		}
+
 	}
 
 	/**
@@ -228,7 +283,14 @@ public class Scripts {
 		 * 
 		 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		protected static final class Mark {
+		private static final class Mark {
+
+			/**
+			 * Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird.
+			 */
+			public static final Mark DEFAULT = new ScriptFormatter.Mark(0, false, false, false);
+
+			{}
 
 			/**
 			 * Dieses Feld speichert die Eigenschaften dieser Markierung.
@@ -238,13 +300,16 @@ public class Scripts {
 			/**
 			 * Dieser Konstruktor initialisiert die Markierung.
 			 * 
-			 * @param level Einrücktiefe.
-			 * @param last Endmarkierung.
-			 * @param enabled Aktivierung.
+			 * @param level Einrücktiefe ({@link #level()}).
+			 * @param last Endmarkierung ({@link #isLast()}).
+			 * @param space Leerzeichen ({@link #isSpace()}).
+			 * @param enabled Aktivierung ({@link #isEnabled()}).
 			 */
-			Mark(final int level, final boolean last, final boolean enabled) {
-				this.data = (level << 2) | (last ? 1 : 0) | (enabled ? 2 : 0);
+			public Mark(final int level, final boolean last, final boolean space, final boolean enabled) {
+				this.data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
 			}
+
+			{}
 
 			/**
 			 * Diese Methode gibt die Tiefe der Einrückung zurück.
@@ -252,7 +317,7 @@ public class Scripts {
 			 * @return Tiefe der Einrückung.
 			 */
 			public int level() {
-				return this.data >> 2;
+				return this.data >> 3;
 			}
 
 			/**
@@ -272,6 +337,15 @@ public class Scripts {
 			}
 
 			/**
+			 * Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt ein bedingtes Leerzeichen markiert.
+			 * 
+			 * @return {@code true} bei einem bedingten Leerzeichen.
+			 */
+			public boolean isSpace() {
+				return (this.data & 4) != 0;
+			}
+
+			/**
 			 * Diese Methode gibt nur dann {@code true} zurück, wenn die Einrückung aktiviert ist.
 			 * 
 			 * @return Aktivierung.
@@ -285,84 +359,157 @@ public class Scripts {
 		{}
 
 		/**
-		 * Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird.
-		 */
-		protected static final Mark MARK = new Mark(0, false, false);
-
-		{}
-
-		/**
-		 * Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}.
-		 */
-		protected final String indent;
-
-		/**
 		 * Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen.
 		 */
-		protected final List<Object> items;
+		private final List<Object> items = new ArrayList<Object>();
+
+		/**
+		 * Dieses Feld speichert den Puffer für {@link #format()}.
+		 */
+		private final StringBuilder string = new StringBuilder();
 
 		/**
 		 * Dieses Feld speichert den Stack der Hierarchieebenen.
 		 */
-		protected final LinkedList<Boolean> indents;
+		private final LinkedList<Boolean> indents = new LinkedList<Boolean>();
+
+		/**
+		 * Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}.
+		 */
+		private String indent = "\t";
 
 		/**
 		 * Dieses Feld speichert die Formatierungsmethoden.
 		 */
-		protected final ScriptFormatterHelper helper;
+		private ScriptFormatterHelper helper = ScriptFormatterHelper.DEFAULT;
+
+		{}
 
 		/**
-		 * Dieser Konstruktor initialisiert die Formatierungsmethoden.<br>
-		 * Der Einzug erfolgt mit {@code "\t"}.
+		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #stopFormatting()} verwendet werden.
 		 * 
-		 * @param helper Formatierungsmethoden.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
 		 */
-		public ScriptFormatter(final ScriptFormatterHelper helper) throws NullPointerException {
-			this(helper, "\t");
+		protected final synchronized void startFormatting() throws IllegalStateException {
+			this.checkIdling();
+			this.indents.addLast(Boolean.FALSE);
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert Formatierungsmethoden und Einzug.<br>
-		 * Der Einzug ist eine Zeichenkette, die zum Einrücken der Hierarchieebene eingesetzt wird.
-		 * 
-		 * @param helper Formatierungsmethoden.
-		 * @param indent Einzug.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 * @throws IllegalArgumentException Wenn der Einzug leer ist.
+		 * Diese Methode beendet das Parsen und sollte nur in Verbindung mit {@link #startFormatting()} verwendet werden.
 		 */
-		public ScriptFormatter(final ScriptFormatterHelper helper, final String indent) throws NullPointerException, IllegalArgumentException {
-			if (helper == null) throw new NullPointerException();
-			if (indent.isEmpty()) throw new IllegalArgumentException();
-			this.helper = helper;
-			this.indent = indent;
-			this.items = new ArrayList<Object>();
-			this.indents = new LinkedList<Boolean>();
-			this.indents.addLast(Boolean.FALSE);
+		protected final synchronized void stopFormatting() {
+			this.items.clear();
+			this.string.setLength(0);
+			this.indents.clear();
+		}
+
+		/**
+		 * Diese Methode prüft den Parsestatus.
+		 * 
+		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 */
+		protected final void checkIdling() throws IllegalStateException {
+			if (this.indents.size() != 0) throw new IllegalStateException();
+		}
+
+		/**
+		 * Diese Methode prüft den Parsestatus.
+		 * 
+		 * @throws IllegalStateException Wenn aktuell nicht geparst wird.
+		 */
+		protected final void checkFormatting() throws IllegalStateException {
+			if (this.indents.size() == 0) throw new IllegalStateException();
 		}
 
 		{}
 
 		/**
-		 * Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
-		 * Hierarchieebene werden über {@link #putSpaceInc()} und {@link #putSpaceDec()} markiert.
+		 * Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
 		 * 
-		 * @see #putSpace()
-		 * @see #putSpaceInc()
-		 * @see #putSpaceDec()
+		 * @param object Markierung.
 		 * @return {@code this}.
 		 */
-		public ScriptFormatter setIndent() {
+		private ScriptFormatter putMark(final Mark object) {
+			this.items.add(object);
+			return this;
+		}
+
+		/**
+		 * Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
+		 * {@link #putIndent()} die Einrückung für diese Hierarchieebene aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung
+		 * angefügt.
+		 * 
+		 * @see #putBreakDec()
+		 * @see #putBreakSpace()
+		 * @see #putIndent()
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 */
+		public ScriptFormatter putBreakInc() throws IllegalStateException {
+			this.checkFormatting();
+			final LinkedList<Boolean> indents = this.indents;
+			indents.addLast(Boolean.FALSE);
+			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, false, false));
+		}
+
+		/**
+		 * Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
+		 * {@link #putIndent()} die Einrückung für eine der tieferen Hierarchieebenen aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur aktuellen Ebene
+		 * passenden Einrückung angefügt.
+		 * 
+		 * @see #putBreakInc()
+		 * @see #putBreakSpace()
+		 * @see #putIndent()
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde oder aktuell nicht formatiert wird.
+		 */
+		public ScriptFormatter putBreakDec() throws IllegalStateException {
+			this.checkFormatting();
+			final LinkedList<Boolean> indents = this.indents;
+			final int value = indents.size();
+			if (value <= 1) throw new IllegalStateException();
+			return this.putMark(Mark.DEFAULT).putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
+		}
+
+		/**
+		 * Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #putIndent()} die Einrückung für die aktuelle
+		 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
+		 * 
+		 * @see #putBreakInc()
+		 * @see #putBreakDec()
+		 * @see #putIndent()
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 */
+		public ScriptFormatter putBreakSpace() throws IllegalStateException {
+			this.checkFormatting();
+			final LinkedList<Boolean> indents = this.indents;
+			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
+		}
+
+		/**
+		 * Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
+		 * Hierarchieebene werden über {@link #putBreakInc()} und {@link #putBreakDec()} markiert.
+		 * 
+		 * @see #putBreakSpace()
+		 * @see #putBreakInc()
+		 * @see #putBreakDec()
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 */
+		public ScriptFormatter putIndent() throws IllegalStateException {
+			this.checkFormatting();
 			final LinkedList<Boolean> indents = this.indents;
 			if (this.indents.getLast().booleanValue()) return this;
 			final int value = indents.size();
-			for (int i = 0; i <= value; i++) {
+			for (int i = 0; i < value; i++) {
 				indents.set(i, Boolean.TRUE);
 			}
 			final List<Object> items = this.items;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
-				if (item == ScriptFormatter.MARK) {
+				if (item == Mark.DEFAULT) {
 					final Mark token = (Mark)items.get(i + 1);
 					if (token.level() == value) {
 						if (token.isEnabled()) return this;
@@ -374,6 +521,8 @@ public class Scripts {
 			return this;
 		}
 
+		{}
+
 		/**
 		 * Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück. Zur Umwandlung des Objekts in eine Zeichenkette wird die
 		 * Methode {@link Object#toString()} verwendet.
@@ -381,113 +530,76 @@ public class Scripts {
 		 * @param object Objekt.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
-		public ScriptFormatter put(final Object object) throws NullPointerException {
+		public ScriptFormatter put(final Object object) throws NullPointerException, IllegalStateException {
+			this.checkFormatting();
 			this.items.add(object.toString());
 			return this;
 		}
 
 		/**
-		 * Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
-		 * 
-		 * @param object Markierung.
-		 * @return {@code this}.
-		 */
-		protected ScriptFormatter putMark(final Mark object) {
-			this.items.add(object);
-			return this;
-		}
-
-		/**
-		 * Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #setIndent()} die Einrückung für die aktuelle
-		 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
-		 * 
-		 * @see #setIndent()
-		 * @see #putSpaceInc()
-		 * @see #putSpaceDec()
-		 * @return {@code this}.
-		 */
-		public ScriptFormatter putSpace() {
-			final LinkedList<Boolean> indents = this.indents;
-			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(indents.size(), false, indents.getLast().booleanValue()));
-		}
-
-		/**
-		 * Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück. Hierbei fügt sie
-		 * gleich einen {@link #putSpace() bedingtes Leerzeichen} ein.
-		 * 
-		 * @see #setIndent()
-		 * @see #putSpace()
-		 * @see #putSpaceDec()
-		 * @return {@code this}.
-		 */
-		public ScriptFormatter putSpaceInc() {
-			final LinkedList<Boolean> indents = this.indents;
-			indents.addLast(Boolean.FALSE);
-			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(indents.size(), false, false));
-		}
-
-		/**
-		 * Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Hierbei fügt sie
-		 * gleich einen {@link #putSpace() bedingtes Leerzeichen} ein.
-		 * 
-		 * @see #setIndent()
-		 * @see #putSpace()
-		 * @see #putSpaceInc()
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde.
-		 */
-		public ScriptFormatter putSpaceDec() throws IllegalStateException {
-			final LinkedList<Boolean> indents = this.indents;
-			final int value = indents.size();
-			if (value <= 1) throw new IllegalStateException();
-			return this.putMark(ScriptFormatter.MARK).putMark(new Mark(value, true, indents.removeLast().booleanValue()));
-		}
-
-		/**
-		 * Diese Methode fügt die Werte der gegebenen Liste an und gibt {@code this} zurück.
+		 * Diese Methode fügt die gegebenen Wertliste an und gibt {@code this} zurück.
 		 * <p>
-		 * Wenn die Liste leer ist, wird {@code "[ ]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
-		 * separiert über {@link #putValue(Value)} angefügt. Nach der öffnenden Klammer {@link #putSpaceInc() beginnt} dabei eine neue Hierarchieebene, die vor der
-		 * schließenden Klammer {@link #putSpaceDec() endet}. Nach jedem Trennzeichen wird ein {@link #putSpace() bedingtes Leerzeichen} eingefügt. <br>
+		 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
+		 * separiert über {@link #putValue(Value)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der
+		 * schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 		 * Die aktuelle Hierarchieebene wird als einzurücken markiert, wenn die Wertliste mehr als ein Element enthält.
 		 * 
 		 * @see #putValue(Value)
-		 * @see #putSpace()
-		 * @see #putSpaceInc()
-		 * @see #putSpaceDec()
-		 * @param array Liste von Werten.
+		 * @see #putBreakSpace()
+		 * @see #putBreakInc()
+		 * @see #putBreakDec()
+		 * @param value Wertliste.
 		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putArray(final Array array) throws IllegalArgumentException {
-			final int length = array.length();
-			if (length == 0) return this.put("[ ]");
-			(length == 1 ? this : this.setIndent()).put("[").putSpaceInc().putValue(array.get(0));
+		public ScriptFormatter putArray(final Array value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			this.checkFormatting();
+			final int length = value.length();
+			if (length == 0) return this.put("[]");
+			(length == 1 ? this : this.putIndent()).put("[").putBreakInc().putValue(value.get(0));
 			for (int i = 1; i < length; i++) {
-				this.put(";").putSpace().putValue(array.get(i));
+				this.put(";").putBreakSpace().putValue(value.get(i));
 			}
-			return this.putSpaceDec().put("]");
+			return this.putBreakDec().put("]");
 		}
 
 		/**
 		 * Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.
 		 * <p>
-		 * Wenn der Wert ein {@link ArrayValue} oder ein {@link FunctionValue} ist, wird er über {@link #putArray(Array)} bzw. über {@link #putFunction(Function)}
-		 * angefügt. Eine {@link FunctionValue} wird dabei in <code>"{ : "</code> und <code>" }"</code> eingeschlossen. Andernfalls wird der Wert über
-		 * {@link ScriptFormatterHelper#formatValue(ScriptFormatter, Value)} formatiert.
+		 * Wenn der Wert ein {@link ArrayValue} oder ein {@link FunctionValue} ist, wird er über {@link #putArray(Array)} bzw. {@link #putScope(Function)} angefügt.
+		 * Andernfalls wird er über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, Value)} formatiert.
 		 * 
 		 * @see #putArray(Array)
 		 * @see #putFunction(Function)
 		 * @param value Wert.
 		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putValue(final Value value) throws IllegalArgumentException {
+		public ScriptFormatter putValue(final Value value) throws IllegalStateException, IllegalArgumentException {
 			if (value instanceof ArrayValue) return this.putArray((Array)value.data());
-			if (value instanceof FunctionValue) return this.put("{ : ").putFunction((Function)value.data()).put(" }");
+			if (value instanceof FunctionValue) return this.putScope((Function)value.data());
 			this.helper.formatValue(this, value);
 			return this;
+		}
+
+		/**
+		 * Diese Methode fügt die gegebenen, parametrisierte Funktion an und gibt {@code this} zurück.
+		 * <p>
+		 * Die parametrisierte Funktion wird dabei in <code>"{: "</code> und <code>"}"</code> eingeschlossen und über {@link #putFunction(Function)} angefügt.
+		 * 
+		 * @param value parametrisierte Funktion.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
+		 */
+		public ScriptFormatter putScope(final Function value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.put("{: ").putFunction(value).put("}");
 		}
 
 		/**
@@ -495,40 +607,66 @@ public class Scripts {
 		 * <p>
 		 * Wenn die Funktion eine {@link ArrayFunction} ist, wird {@code "$"} angefügt. Wenn die Funktion eine {@link ParamFunction} ist, wird {@code "$i"}
 		 * angefügt, wobei {@code i} der um eins vergrößerte Parameterindex ist. Wenn die Funktion eine {@link ValueFunction} ist, wird ihr Wert via
-		 * {@link #putValue(Value)} angefügt. Wenn die Funktion eine {@link ClosureFunction} ist, wird ihre Funktion als {@link FunctionValue} über
-		 * {@link #putValue(Value)} angefügt. Wenn die Funktion eine {@link LazyFunction} bzw. eine {@link TraceFunction} ist, wird ihre Funktion über
-		 * {@link #putFunction(Function)} angefügt. Wenn die Funktion eine {@link CompositeFunction} ist, werden ihre aufzurufende Funktion gefolgt von den in
-		 * {@code "("} und {@code ")"} eingeschlossenen und mit {@code ";"} separierten Parameterfunktionen angefügt, wobei jede diese Funktionen selbst über
-		 * {@link #putFunction(Function)} angefügt wird. Andernfalls wird die Funktion über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)}
-		 * formatiert.
+		 * {@link #putValue(Value)} angefügt. Wenn die Funktion eine {@link ClosureFunction} ist, wird ihre Funktion über {@link #putScope(Function)} angefügt. Wenn
+		 * die Funktion eine {@link LazyFunction} oder eine {@link TraceFunction} ist, wird ihre Funktion über {@link #putFunction(Function)} angefügt. Wenn die
+		 * Funktion eine {@link CompositeFunction} ist, werden ihre aufzurufende Funktion gefolgt von den in {@code "("} und {@code ")"} eingeschlossenen und mit
+		 * {@code ";"} separierten Parameterfunktionen angefügt, wobei jede diese Funktionen selbst über {@link #putFunction(Function)} angefügt wird. Andernfalls
+		 * wird die Funktion über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)} formatiert.
 		 * 
 		 * @param function Funktion.
 		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putFunction(final Function function) throws IllegalArgumentException {
+		public ScriptFormatter putFunction(final Function function) throws IllegalStateException, IllegalArgumentException {
 			if (function instanceof ArrayFunction) return this.put("$");
-			if (function instanceof ParamFunction) return this.put("$").put(Integer.valueOf(((ParamFunction)function).index() + 1));
+			if (function instanceof ParamFunction) return this.put("$").put(String.valueOf(((ParamFunction)function).index() + 1));
 			if (function instanceof ValueFunction) return this.putValue(((ValueFunction)function).value());
-			if (function instanceof ClosureFunction) return this.putValue(FunctionValue.valueOf(((ClosureFunction)function).function()));
 			if (function instanceof LazyFunction) return this.putFunction(((LazyFunction)function).function());
 			if (function instanceof TraceFunction) return this.putFunction(((TraceFunction)function).function());
+			if (function instanceof ClosureFunction) return this.putScope(((ClosureFunction)function).function());
 			if (function instanceof CompositeFunction) {
 				final CompositeFunction compositeFunction = (CompositeFunction)function;
 				this.putFunction(compositeFunction.function());
 				final Function[] functions = compositeFunction.functions();
 				final int length = functions.length;
-				if (length == 0) return this.put("( )");
-				(length > 1 ? this.setIndent() : this).put("(").putSpaceInc().putFunction(functions[0]);
+				if (length == 0) return this.put("()");
+				(length > 1 ? this.putIndent() : this).put("(").putBreakInc().putFunction(functions[0]);
 				for (int i = 1; i < length; i++) {
-					this.put(";").putSpace().putFunction(functions[i]);
+					this.put(";").putBreakSpace().putFunction(functions[i]);
 				}
-				this.putSpaceDec().put(")");
+				this.putBreakDec().put(")");
 				return this;
 			}
 			this.helper.formatFunction(this, function);
 			return this;
 		}
+
+		{}
+
+		public String getIndent() {
+			return this.indent;
+		}
+
+		public ScriptFormatterHelper getHelper() {
+			return this.helper;
+		}
+
+		public ScriptFormatter setIndent(final String indent) throws NullPointerException, IllegalStateException {
+			indent.length();
+			this.checkIdling();
+			this.indent = indent;
+			return this;
+		}
+
+		public ScriptFormatter setHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
+			if (helper == null) throw new NullPointerException();
+			this.checkIdling();
+			this.helper = helper;
+			return this;
+		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
@@ -536,28 +674,48 @@ public class Scripts {
 		 * @see #put(Object)
 		 * @return Quelltext.
 		 */
-		public String format() {
-			final StringBuilder result = new StringBuilder();
+		private String format() {
 			final String indent = this.indent;
 			final List<Object> items = this.items;
+			final StringBuilder string = this.string;
 			final int size = items.size();
 			for (int i = 0; i < size;) {
 				final Object item = items.get(i++);
-				if (item == ScriptFormatter.MARK) {
+				if (item == Mark.DEFAULT) {
 					final Mark token = (Mark)items.get(i++);
 					if (token.isEnabled()) {
-						result.append('\n');
+						string.append('\n');
 						for (int count = token.level() - (token.isLast() ? 2 : 1); count > 0; count--) {
-							result.append(indent);
+							string.append(indent);
 						}
-					} else {
-						result.append(' ');
+					} else if (token.isSpace()) {
+						string.append(' ');
 					}
 				} else {
-					result.append(item);
+					string.append(item);
 				}
 			}
-			return result.toString();
+			return string.toString();
+		}
+
+		public String formatValue(final Value value) throws IllegalStateException {
+			this.startFormatting();
+			try {
+				this.putValue(value);
+				return this.format();
+			} finally {
+				this.stopFormatting();
+			}
+		}
+
+		public String formatFunction(final Function value) throws IllegalStateException {
+			this.startFormatting();
+			try {
+				this.putFunction(value);
+				return this.format();
+			} finally {
+				this.stopFormatting();
+			}
 		}
 
 	}
@@ -571,7 +729,24 @@ public class Scripts {
 	public interface ScriptFormatterHelper {
 
 		/**
-		 * Diese Methode formatiert den gegebenen Wert in einen Quelltext unf fügt diesen an den gegebenen {@link ScriptFormatter} anfügen.
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden den Wert bzw. die Funktion über {@link Object#toString()} formatieren.
+		 */
+		static ScriptFormatterHelper DEFAULT = new ScriptFormatterHelper() {
+
+			@Override
+			public void formatValue(final Scripts.ScriptFormatter target, final Value value) throws IllegalArgumentException {
+				target.put(value.toString());
+			}
+
+			@Override
+			public void formatFunction(final Scripts.ScriptFormatter target, final Function function) throws IllegalArgumentException {
+				target.put(function.toString());
+			}
+
+		};
+
+		/**
+		 * Diese Methode formatiert den gegebenen Wert in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
 		 * 
 		 * @param target {@link ScriptFormatter}.
 		 * @param value Wert.
@@ -580,7 +755,7 @@ public class Scripts {
 		public void formatValue(ScriptFormatter target, Value value) throws IllegalArgumentException;
 
 		/**
-		 * Diese Methode formatiert die gegebene Funktion in einen Quelltext unf fügt diesen an den gegebenen {@link ScriptFormatter} anfügen.
+		 * Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
 		 * 
 		 * @param target {@link ScriptFormatter}.
 		 * @param function Funktion.
@@ -591,95 +766,135 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Kompiler für {@link Scripts#compileValue(Script, ScriptCompilerHelper, String...)} bzw.
-	 * {@link Scripts#compileFunction(Script, ScriptCompilerHelper, String...)}.
+	 * Diese Klasse implementiert einen Kompiler für {@link Value Werte} und {@link Function Funktionen}.
+	 * <p>
+	 * Die Bereichestypen eines Quelltexts haben folgende Bedeutung:
+	 * <ul>
+	 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) dürfen an jeder Position vorkommen und werden ignoriert.</li>
+	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
+	 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente nur dann zulässig, wenn das {@link Array} als Funktion bzw. Parameterwert
+	 * kompiliert wird.</li>
+	 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
+	 * Bereichen vom Typ {@code ';'} separiert werden müssen und als Funktionen kompiliert werden.</li>
+	 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
+	 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
+	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompilerHelper#compileParam(Script, Range)}
+	 * aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu
+	 * genau einer Funktion kompiliert werden.</li>
+	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
+	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link ArrayFunction#VIEW}.</li>
+	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(Script, Range)} in Werte überführt. Funktionen werden hierbei als
+	 * {@link FunctionValue}s angegeben.</li>
+	 * </ul>
 	 * 
+	 * @see #compileValue()
+	 * @see #compileFunction()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class ScriptCompiler {
 
 		/**
-		 * Dieses Feld speichert den Quelltext.
-		 */
-		protected final Script script;
-
-		/**
-		 * Dieses Feld speichert die Parameternamen.
-		 */
-		protected final LinkedList<String> params;
-
-		/**
-		 * Dieses Feld speichert den {@link Iterator} über die Bereiche von {@link #script}.
-		 */
-		protected final Iterator<Range> iterator;
-
-		/**
 		 * Dieses Feld speichert den aktuellen Bereich.
 		 */
-		protected Range range;
+		private Range range = Range.EMPTY;
 
 		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
 		 */
-		protected final ScriptCompilerHelper helper;
+		private ScriptCompilerHelper helper = ScriptCompilerHelper.DEFAULT;
+
+		/**
+		 * Dieses Feld speichert den {@link Iterator} über die Bereiche von {@link #getScript()}.
+		 */
+		private Iterator<Range> iterator;
+
+		/**
+		 * Dieses Feld speichert den Quelltext.
+		 */
+		private Script script = Script.EMPTY;
+
+		/**
+		 * Dieses Feld speichert die Parameternamen.
+		 */
+		private LinkedList<String> params = new LinkedList<String>();
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
 		 */
-		protected boolean arrayEnabled = true;
+		private boolean arrayEnabled = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Funktionszeigern.
 		 */
-		protected boolean handlerEnabled = true;
+		private boolean handlerEnabled = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
-		protected boolean closureEnabled = true;
+		private boolean closureEnabled = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen.
 		 */
-		protected boolean chainingEnabled = true;
+		private boolean chainingEnabled = true;
+
+		{}
 
 		/**
-		 * Dieser Konstruktor initialisiert Quelltext, Kompilationsmethoden und Parameternamen.
+		 * Diese Methode beginnt die Kompilation und sollte nur in Verbindung mit {@link #stopCompiling()} verwendet werden.
 		 * 
-		 * @param script Quelltext.
-		 * @param helper Kompilationsmethoden.
-		 * @param params Parameternamen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException {
-			this.script = script;
-			this.iterator = script.iterator();
-			if (helper == null) throw new NullPointerException();
-			this.helper = helper;
-			this.params = new LinkedList<String>(Arrays.asList(params));
-			if (this.params.contains(null)) throw new NullPointerException();
+		protected final synchronized void startCompiling() throws IllegalStateException {
+			this.checkIdling();
+			this.iterator = this.script.iterator();
 			this.skip();
+		}
+
+		/**
+		 * Diese Methode beendet die Kompilation und sollte nur in Verbindung mit {@link #startCompiling()} verwendet werden.
+		 */
+		protected final synchronized void stopCompiling() {
+			this.iterator = null;
+		}
+
+		/**
+		 * Diese Methode prüft den Kompilationsstatus.
+		 * 
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		protected final void checkIdling() throws IllegalStateException {
+			if (this.iterator != null) throw new IllegalStateException();
 		}
 
 		{}
 
 		/**
-		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#NULL} zurück. Der {@link #range aktuelle Bereich} wird durch
-		 * diese Methode verändert.
+		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#EMPTY} zurück.<br>
+		 * Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
 		 * 
-		 * @return aktueller Bereich oder {@link Range#NULL}.
+		 * @return aktueller Bereich oder {@link Range#EMPTY}.
 		 */
-		protected Range skip() {
-			if (!this.iterator.hasNext()) return this.range = Range.NULL;
+		protected final Range skip() {
+			if (!this.iterator.hasNext()) return this.range = Range.EMPTY;
 			return this.range = this.iterator.next();
 		}
 
 		/**
-		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den ersten bedeutsamen Bereich oder {@link Range#NULL}
-		 * zurück. Der {@link #range aktuelle Bereich} wird durch diese Methode verändert.
+		 * Diese Methode gibt den aktuellen Bereich, der zuletzt von {@link #skip()} geliefert wurde.
+		 * 
+		 * @return aktueller Bereich.
+		 */
+		protected final Range range() {
+			return this.range;
+		}
+
+		/**
+		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den ersten bedeutsamen Bereich oder {@link Range#EMPTY}
+		 * zurück. Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
 		 * 
 		 * @see #skip()
-		 * @return aktueller Bereich oder {@link Range#NULL}.
+		 * @return aktueller Bereich oder {@link Range#EMPTY}.
 		 */
 		protected Range skipSpace() {
 			for (int type = this.range.type; (type == '_') || (type == '/'); type = this.skip().type) {}
@@ -707,7 +922,7 @@ public class Scripts {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} oder eine {@link Function} und gibt diesen zurück.
 		 * 
 		 * @return Wertliste.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Object doCompileArray() throws ScriptException {
 			if (!this.arrayEnabled) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wertlisten sind nicht zulässig.");
@@ -746,7 +961,7 @@ public class Scripts {
 		 * Diese Methode kompiliert den beim aktuellen Bereich beginnende Wert und gibt diesen zurück.
 		 * 
 		 * @return Wert.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Value doCompileValue() throws ScriptException {
 			final Value value;
@@ -783,7 +998,7 @@ public class Scripts {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} und gibt diesen zurück.
 		 * 
 		 * @return Wertliste als {@link Value}.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Value doCompileValueArray() throws ScriptException {
 			final Object array = this.doCompileArray();
@@ -795,7 +1010,7 @@ public class Scripts {
 		 * Diese Methode kompiliert den aktuellen Bereich zu einen Parameternamen und gibt diesen oder {@code null} zurück.
 		 * 
 		 * @return Parametername oder {@code null}.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected String doCompileParam() throws ScriptException {
 			switch (this.skipSpace().type) {
@@ -829,7 +1044,7 @@ public class Scripts {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
 		 * 
 		 * @return Funktion als {@link FunctionValue}.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Function doCompileScope() throws ScriptException {
 			this.skip();
@@ -864,7 +1079,7 @@ public class Scripts {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diesen zurück.
 		 * 
 		 * @return Funktion.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Function doCompileFunction() throws ScriptException {
 			Function function;
@@ -934,7 +1149,7 @@ public class Scripts {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
 		 * 
 		 * @return Wertliste als {@link Function}.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Function doCompileFunctionArray() throws ScriptException {
 			final Object array = this.doCompileArray();
@@ -945,45 +1160,30 @@ public class Scripts {
 		{}
 
 		/**
-		 * Diese Methode kompiliert den Quelltext zu einem Wert und gibt diesen zurück.
+		 * Diese Methode gibt den zu kompilierenden Quelltext zurück.
 		 * 
-		 * @see #compileFunction()
-		 * @return Wert.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @return Quelltext.
 		 */
-		public Value compileValue() throws ScriptException {
-			final Value value = this.doCompileValue();
-			if (this.skipSpace().type == 0) return value;
-			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
+		public final Script getScript() {
+			return this.script;
 		}
 
 		/**
-		 * Diese Methode kompiliert den Quelltext im Kontext der Kompilationsmethoden sowie der Funktionsparameter in eine Funktion und gibt diese Funktion zurück.
-		 * Die Bereichestypen des Quelltexts haben folgende Bedeutung:
-		 * <ul>
-		 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) dürfen an jeder Position vorkommen und werden ignoriert.</li>
-		 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
-		 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente unzulässig .</li>
-		 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
-		 * Bereichen vom Typ {@code ';'} separiert werden müssen.</li>
-		 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
-		 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ
-		 * {@code ':'} abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über
-		 * {@link ScriptCompilerHelper#compileParam(Script, Range)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu
-		 * Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einem {@link FunctionValue} kompilieren müssen.</li>
-		 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-		 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link ArrayFunction#VIEW}.</li>
-		 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(Script, Range)} in Werte überführt. Funktionen werden hierbei zu
-		 * {@link FunctionValue}s.</li>
-		 * </ul>
+		 * Diese Methode gibt die genutzten Kompilationsmethoden zurück.
 		 * 
-		 * @return Funktion.
-		 * @throws ScriptException Wenn {@link #script} ungültig ist.
+		 * @return Kompilationsmethoden.
 		 */
-		public Function compileFunction() throws ScriptException {
-			final Function function = this.doCompileFunction();
-			if (this.skipSpace().type == 0) return function;
-			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
+		public final ScriptCompilerHelper getHelper() {
+			return this.helper;
+		}
+
+		/**
+		 * Diese Methode gibt die Liste der aktellen Parameternamen zurück.
+		 * 
+		 * @return Parameternamen.
+		 */
+		public final List<String> getParams() {
+			return Collections.unmodifiableList(this.params);
 		}
 
 		/**
@@ -992,20 +1192,8 @@ public class Scripts {
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Wertlisten.
 		 */
-		public boolean isArrayEnabled() {
+		public final boolean isArrayEnabled() {
 			return this.arrayEnabled;
-		}
-
-		/**
-		 * Diese Methode setzt die Zulässigkeit von Wertlisten.
-		 * 
-		 * @see #isArrayEnabled()
-		 * @param value Zulässigkeit von Wertlisten.
-		 * @return {@code this}.
-		 */
-		public ScriptCompiler setArrayEnabled(final boolean value) {
-			this.arrayEnabled = value;
-			return this;
 		}
 
 		/**
@@ -1015,20 +1203,8 @@ public class Scripts {
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Funktionszeigern.
 		 */
-		public boolean isHandlerEnabled() {
+		public final boolean isHandlerEnabled() {
 			return this.handlerEnabled;
-		}
-
-		/**
-		 * Diese Methode setzt die Zulässigkeit von Funktionszeigern.
-		 * 
-		 * @see #isHandlerEnabled()
-		 * @param value Zulässigkeit von Funktionszeigern.
-		 * @return {@code this}.
-		 */
-		public ScriptCompiler setHandlerEnabled(final boolean value) {
-			this.handlerEnabled = value;
-			return this;
 		}
 
 		/**
@@ -1037,20 +1213,8 @@ public class Scripts {
 		 * @see #compileFunction()
 		 * @return Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
-		public boolean isClosureEnabled() {
+		public final boolean isClosureEnabled() {
 			return this.closureEnabled;
-		}
-
-		/**
-		 * Diese Methode setzt die Zulässigkeit der Bindung des Ausführungskontexts.
-		 * 
-		 * @see #isClosureEnabled()
-		 * @param value Zulässigkeit der Bindung des Ausführungskontexts.
-		 * @return {@code this}.
-		 */
-		public ScriptCompiler setClosureEnabled(final boolean value) {
-			this.closureEnabled = value;
-			return this;
 		}
 
 		/**
@@ -1062,8 +1226,107 @@ public class Scripts {
 		 * @see CompositeFunction#execute(Scope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
-		public boolean isChainingEnabled() {
+		public final boolean isChainingEnabled() {
 			return this.chainingEnabled;
+		}
+
+		/**
+		 * Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
+		 * 
+		 * @param value Quelltext.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setScript(final Script value) throws NullPointerException, IllegalStateException {
+			value.length();
+			this.checkIdling();
+			this.script = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die zu nutzenden Kompilationsmethoden und gibt {@code this} zurück.
+		 * 
+		 * @param value Kompilationsmethoden.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
+			if (value == null) throw new NullPointerException();
+			this.checkIdling();
+			this.helper = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
+		 * 
+		 * @param value Parameternamen.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setParams(final String... value) throws NullPointerException, IllegalStateException {
+			return this.setParams(Arrays.asList(value.clone()));
+		}
+
+		/**
+		 * Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
+		 * 
+		 * @param value Parameternamen.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setParams(final List<String> value) throws NullPointerException, IllegalStateException {
+			if (value.contains(null)) throw new NullPointerException();
+			this.checkIdling();
+			this.params = new LinkedList<String>(value);
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit von Wertlisten.
+		 * 
+		 * @see #isArrayEnabled()
+		 * @param value Zulässigkeit von Wertlisten.
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setArrayEnabled(final boolean value) throws IllegalStateException {
+			this.checkIdling();
+			this.arrayEnabled = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit von Funktionszeigern.
+		 * 
+		 * @see #isHandlerEnabled()
+		 * @param value Zulässigkeit von Funktionszeigern.
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setHandlerEnabled(final boolean value) throws IllegalStateException {
+			this.checkIdling();
+			this.handlerEnabled = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die Zulässigkeit der Bindung des Ausführungskontexts.
+		 * 
+		 * @see #isClosureEnabled()
+		 * @param value Zulässigkeit der Bindung des Ausführungskontexts.
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public ScriptCompiler setClosureEnabled(final boolean value) throws IllegalStateException {
+			this.checkIdling();
+			this.closureEnabled = value;
+			return this;
 		}
 
 		/**
@@ -1072,10 +1335,102 @@ public class Scripts {
 		 * @see #isChainingEnabled()
 		 * @param value Zulässigkeit der Verkettung von Funktionen.
 		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setChainingEnabled(final boolean value) {
+		public ScriptCompiler setChainingEnabled(final boolean value) throws IllegalStateException {
+			this.checkIdling();
 			this.chainingEnabled = value;
 			return this;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext in einen Wert und gibt diesen zurück.
+		 * 
+		 * @return Wert.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public Value compileValue() throws ScriptException, IllegalStateException {
+			this.startCompiling();
+			try {
+				final Value result = this.doCompileValue();
+				if (this.skipSpace().type == 0) return result;
+				throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
+			} finally {
+				this.stopCompiling();
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext in eine Liste von Werten und gibt diese zurück. Die Werte müssen durch Bereiche vom Typ {@code ';'} separiert
+		 * sein.
+		 * 
+		 * @return Werte.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public Value[] compileValues() throws ScriptException, IllegalStateException {
+			this.startCompiling();
+			try {
+				final List<Value> result = new ArrayList<Value>();
+				while (true) {
+					result.add(this.doCompileValue());
+					switch (this.skipSpace().type) {
+						case 0:
+							return result.toArray(new Value[result.size()]);
+						case ';':
+							this.skip();
+					}
+				}
+			} finally {
+				this.stopCompiling();
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext in eine Funktion und gibt diese zurück.
+		 * 
+		 * @return Funktion.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public Function compileFunction() throws ScriptException, IllegalStateException {
+			this.startCompiling();
+			try {
+				final Function result = this.doCompileFunction();
+				if (this.skipSpace().type == 0) return result;
+				throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Keine weiteren Definitionen erwartet.");
+			} finally {
+				this.stopCompiling();
+			}
+		}
+
+		/**
+		 * Diese Methode kompiliert den Quelltext in eine Liste von Funktionen und gibt diese zurück. Die Funktionen müssen durch Bereiche vom Typ {@code ';'}
+		 * separiert sein.
+		 * 
+		 * @return Funktionen.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
+		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 */
+		public Function[] compileFunctions() throws ScriptException, IllegalStateException {
+			this.startCompiling();
+			try {
+				final List<Function> result = new ArrayList<Function>();
+				while (true) {
+					result.add(this.doCompileFunction());
+					switch (this.skipSpace().type) {
+						case 0:
+							return result.toArray(new Function[result.size()]);
+						case ';':
+							this.skip();
+					}
+				}
+			} finally {
+				this.stopCompiling();
+			}
 		}
 
 	}
@@ -1087,6 +1442,23 @@ public class Scripts {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface ScriptCompilerHelper {
+
+		/**
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden immer {@code null} liefern.
+		 */
+		static Scripts.ScriptCompilerHelper DEFAULT = new Scripts.ScriptCompilerHelper() {
+
+			@Override
+			public Value compileValue(final Script script, final Range range) throws Scripts.ScriptException {
+				return null;
+			}
+
+			@Override
+			public String compileParam(final Script script, final Range range) throws Scripts.ScriptException {
+				return null;
+			}
+
+		};
 
 		/**
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue} geliefert
@@ -1129,17 +1501,17 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert den Hinweis zum erwarteten Inhalt des Bereichs.
 		 */
-		String hint;
+		String hint = "";
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		Script script;
+		Script script = Script.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
 		 */
-		Range range;
+		Range range = Range.EMPTY;
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link ScriptException} ohne Ursache.
@@ -1157,6 +1529,8 @@ public class Scripts {
 			super(cause);
 		}
 
+		{}
+
 		/**
 		 * Diese Methode gibt den Hinweis zum erwarteten Inhalt des Bereichs zurück.
 		 * 
@@ -1165,18 +1539,6 @@ public class Scripts {
 		 */
 		public String getHint() {
 			return this.hint;
-		}
-
-		/**
-		 * Diese Methode setzt den Hinweis und gibt {@code this} zurück.
-		 * 
-		 * @see #getHint()
-		 * @param value Hinweis.
-		 * @return {@code this}.
-		 */
-		public ScriptException setHint(final String value) {
-			this.hint = value;
-			return this;
 		}
 
 		/**
@@ -1189,18 +1551,6 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode setzt den Bereich und gibt {@code this} zurück.
-		 * 
-		 * @see #getRange()
-		 * @param value Bereich.
-		 * @return {@code this}.
-		 */
-		public ScriptException setRange(final Range value) {
-			this.range = value;
-			return this;
-		}
-
-		/**
 		 * Diese Methode gibt Quelltext zurück, in dem der Syntaxfehler auftrat.
 		 * 
 		 * @return Quelltext.
@@ -1210,249 +1560,91 @@ public class Scripts {
 		}
 
 		/**
+		 * Diese Methode setzt den Hinweis und gibt {@code this} zurück.
+		 * 
+		 * @see #getHint()
+		 * @param value Hinweis.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ScriptException setHint(final String value) throws NullPointerException {
+			value.length();
+			this.hint = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt den Bereich und gibt {@code this} zurück.
+		 * 
+		 * @see #getRange()
+		 * @param value Bereich.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 */
+		public ScriptException setRange(final Range value) throws NullPointerException {
+			value.type();
+			this.range = value;
+			return this;
+		}
+
+		/**
 		 * Diese Methode setzt den Quelltext und gibt {@code this} zurück.
 		 * 
 		 * @see #getScript()
 		 * @param value Quelltext.
 		 * @return {@code this}.
+		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public ScriptException setScript(final Script value) {
+		public ScriptException setScript(final Script value) throws NullPointerException {
+			value.length();
 			this.script = value;
 			return this;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public String getMessage() {
-			return (this.range == Range.NULL //
+			return (this.range == Range.EMPTY //
 				? "Unerwartetes Ende der Zeichenkette." //
 				: "Unerwartete Zeichenkette «" + this.range.extract(this.script.source) + "» an Position " + this.range.start + ".") //
-				+ (this.hint != null ? this.hint : "");
+				+ this.hint;
 		}
-
 	}
 
 	{}
 
 	/**
-	 * Dieses Feld speichert den {@code default}-{@link ScriptFormatterHelper}.
-	 */
-	static ScriptFormatterHelper defaultFormatterHelper = new ScriptFormatterHelper() {
-
-		@Override
-		public void formatValue(final ScriptFormatter target, final Value value) throws IllegalArgumentException {
-			target.put(value.toString());
-		}
-
-		@Override
-		public void formatFunction(final ScriptFormatter target, final Function function) throws IllegalArgumentException {
-			target.put(function.toString());
-		}
-
-	};
-
-	/**
-	 * Diese Methode gibt den {@code default}-{@link ScriptFormatterHelper} zurück, der in den Methoden {@link #formatValue(Value)} und
-	 * {@link #formatFunction(Function)} verwendet wird.
+	 * Diese Methode erzeugt einen neuen {@link ScriptParser} und gibt diesen zurück.
 	 * 
-	 * @return {@code default}-{@link ScriptFormatterHelper}.
+	 * @see ScriptParser
+	 * @return {@link ScriptParser}.
 	 */
-	public static ScriptFormatterHelper getDefaultFormatterHelper() {
-		return Scripts.defaultFormatterHelper;
+	public static ScriptParser scriptParser() {
+		return new ScriptParser();
 	}
 
 	/**
-	 * Diese Methode setzt den {@code default}-{@link ScriptFormatterHelper}.
+	 * Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.
 	 * 
-	 * @see #getDefaultFormatterHelper()
-	 * @param value neuer {@code default}-{@link ScriptFormatterHelper}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @see ScriptFormatter
+	 * @return {@link ScriptFormatter}.
 	 */
-	public static void setDefaultFormatterHelper(final ScriptFormatterHelper value) {
-		if (value == null) throw new NullPointerException();
-		Scripts.defaultFormatterHelper = value;
-	}
-
-	{}
-
-	/**
-	 * Dieses Feld speichert den {@code default}-{@link ScriptFormatterHelper}.
-	 */
-	static ScriptCompilerHelper defaultCompilerHelper = new ScriptCompilerHelper() {
-
-		@Override
-		public Value compileValue(final Script script, final Range range) throws ScriptException {
-			return null;
-		}
-
-		@Override
-		public String compileParam(final Script script, final Range range) throws ScriptException {
-			return null;
-		}
-
-	};
-
-	/**
-	 * Diese Methode gibt den {@code default}-{@link ScriptCompilerHelper} zurück, der in den Methoden {@link #compileValue(Script, String...)} und
-	 * {@link #compileFunction(Script, String...)} verwendet wird.
-	 * 
-	 * @return {@code default}-{@link ScriptCompilerHelper}.
-	 */
-	public static ScriptCompilerHelper getDefaultCompilerHelper() {
-		return Scripts.defaultCompilerHelper;
+	public static ScriptFormatter scriptFormatter() {
+		return new ScriptFormatter();
 	}
 
 	/**
-	 * Diese Methode setzt den {@code default}-{@link ScriptCompilerHelper}.
+	 * Diese Methode erzeugt einen neuen {@link ScriptCompiler} und gibt diesen zurück.
 	 * 
-	 * @see #getDefaultCompilerHelper()
-	 * @param value neuer {@code default}-{@link ScriptCompilerHelper}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @see ScriptCompiler
+	 * @return {@link ScriptCompiler}.
 	 */
-	public static void setDefaultCompilerHelper(final ScriptCompilerHelper value) {
-		if (value == null) throw new NullPointerException();
-		Scripts.defaultCompilerHelper = value;
-	}
-
-	{}
-
-	/**
-	 * Diese Methode parst die gegebene Zeichenkette in einen aufbereiteten Quelltext und gibt diesen zurück.
-	 * 
-	 * @see Script
-	 * @see ScriptParser#parse()
-	 * @see #compileValue(Script, ScriptCompilerHelper, String...)
-	 * @see #compileFunction(Script, ScriptCompilerHelper, String...)
-	 * @param source Zeichenkette.
-	 * @return aufbereiteter Quelltext.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
-	public static Script parse(final String source) throws NullPointerException {
-		return new Script(source, new ScriptParser(source).parse());
-	}
-
-	{}
-
-	/**
-	 * Diese Methode formatiert den gegebenen Wert in eine Zeichenkette und gibt diese zurück.
-	 * 
-	 * @see #getDefaultFormatterHelper()
-	 * @see #formatValue(Value, ScriptFormatterHelper)
-	 * @param value Wert.
-	 * @return Zeichenkette.
-	 */
-	public static String formatValue(final Value value) {
-		return Scripts.formatValue(value, Scripts.getDefaultFormatterHelper());
-	}
-
-	/**
-	 * Diese Methode formatiert den gegebenen Wert im Kontext der gegebenen Formatierungsmethoden in eine Zeichenkette und gibt diese zurück.
-	 * 
-	 * @see ScriptFormatter#putValue(Value)
-	 * @param value Wert.
-	 * @param helper Formatierungsmethoden.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn die Formatierungsmethoden {@code null} sind.
-	 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
-	 */
-	public static String formatValue(final Value value, final ScriptFormatterHelper helper) throws NullPointerException, IllegalArgumentException {
-		return new ScriptFormatter(helper).putValue(value).format();
-	}
-
-	/**
-	 * Diese Methode formatiert die gegebene Funktion in eine Zeichenkette und gibt diese zurück.
-	 * 
-	 * @see #getDefaultFormatterHelper()
-	 * @see #formatFunction(Function, ScriptFormatterHelper)
-	 * @param function Funktion.
-	 * @return Zeichenkette.
-	 */
-	public static String formatFunction(final Function function) {
-		return Scripts.formatFunction(function, Scripts.getDefaultFormatterHelper());
-	}
-
-	/**
-	 * Diese Methode formatiert die gegebene Funktion im Kontext der gegebenen Formatierungsmethoden in eine Zeichenkette und gibt diese zurück.
-	 * 
-	 * @see ScriptFormatter#putFunction(Function)
-	 * @param function Funktion.
-	 * @param helper Formatierungsmethoden.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn die Formatierungsmethoden {@code null} sind.
-	 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
-	 */
-	public static String formatFunction(final Function function, final ScriptFormatterHelper helper) {
-		return new ScriptFormatter(helper).putFunction(function).format();
-	}
-
-	{}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Funktionsparameter in einen Wert und gibt diesen zurück.
-	 * 
-	 * @see #getDefaultCompilerHelper()
-	 * @see #compileValue(Script, ScriptCompilerHelper, String...)
-	 * @param script Quelltext.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierter Wert.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Value compileValue(final Script script, final String... params) throws NullPointerException, ScriptException {
-		return Scripts.compileValue(script, Scripts.getDefaultCompilerHelper(), params);
-	}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in einen Wert und gibt diesen zurück.
-	 * 
-	 * @see #parse(String)
-	 * @see #compileFunction(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileValue()
-	 * @param script Quelltext.
-	 * @param helper Kompilationsmethoden.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierter Wert.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Value compileValue(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException, ScriptException {
-		return new ScriptCompiler(script, helper, params).compileValue();
-	}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Funktionsparameter in eine Funktion und gibt diese zurück.
-	 * 
-	 * @see #getDefaultCompilerHelper()
-	 * @see #compileFunction(Script, ScriptCompilerHelper, String...)
-	 * @param script Quelltext.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierte Funktion.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Function compileFunction(final Script script, final String... params) throws NullPointerException, ScriptException {
-		return Scripts.compileFunction(script, Scripts.getDefaultCompilerHelper(), params);
-	}
-
-	/**
-	 * Diese Methode kompiliert den gegebenen Quelltext im Kontext der gegebenen Kompilationsmethoden und Funktionsparameter in eine Funktion und gibt diese
-	 * zurück.
-	 * 
-	 * @see #parse(String)
-	 * @see #compileValue(Script, ScriptCompilerHelper, String...)
-	 * @see ScriptCompiler#compileFunction()
-	 * @param script Quelltext.
-	 * @param helper Kompilationsmethoden.
-	 * @param params Namen der Parameter, in deren Kontext eine Funktion kompiliert werden soll.
-	 * @return kompilierte Funktion.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist, enthält oder liefert.
-	 * @throws ScriptException Wenn eine der Eingaben ungültig ist.
-	 */
-	public static Function compileFunction(final Script script, final ScriptCompilerHelper helper, final String... params) throws NullPointerException,
-		ScriptException {
-		return new ScriptCompiler(script, helper, params).compileFunction();
+	public static ScriptCompiler scriptCompiler() {
+		return new ScriptCompiler();
 	}
 
 }

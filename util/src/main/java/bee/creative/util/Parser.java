@@ -15,12 +15,12 @@ public class Parser {
 	/**
 	 * Dieses Feld speichert die Zeichen der Eingabe.
 	 */
-	private final char[] chars;
+	private char[] chars;
 
 	/**
 	 * Dieses Feld speichert die Ausgabe.
 	 */
-	private final StringBuffer target;
+	private final StringBuffer target = new StringBuffer();
 
 	/**
 	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
@@ -30,12 +30,19 @@ public class Parser {
 	/**
 	 * Dieses Feld speichert die Eingabe.
 	 */
-	private final String source;
+	private String source;
 
 	/**
 	 * Dieses Feld speichert die Anzahl der Zeichen in der Eingabe.
 	 */
-	private final int length;
+	private int length;
+
+	/**
+	 * Dieser Konstruktor initialisiert die leere Eingabe.
+	 */
+	public Parser() {
+		this.source("");
+	}
 
 	/**
 	 * Dieser Konstruktor initialisiert die Eingabe.
@@ -44,10 +51,10 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public Parser(final String source) throws NullPointerException {
-		this.length = (this.chars = (this.source = source).toCharArray()).length;
-		this.target = new StringBuffer();
-		this.reset();
+		this.source(source);
 	}
+
+	{}
 
 	/**
 	 * Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
@@ -80,6 +87,69 @@ public class Parser {
 		this.symbol = symbol;
 		return symbol;
 	}
+
+	/**
+	 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
+	 * 
+	 * @see #seek(int)
+	 */
+	public final void reset() {
+		this.seek(0);
+	}
+
+	/**
+	 * Diese Methode gibt die aktuelle Position zurück.
+	 * 
+	 * @see #skip()
+	 * @see #take()
+	 * @see #symbol()
+	 * @return aktuelle Position.
+	 */
+	public final int index() {
+		return this.index;
+	}
+
+	/**
+	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
+	 * {@link #source() Eingabe} erreicht wurde.
+	 * 
+	 * @see #skip()
+	 * @see #take()
+	 * @see #index()
+	 * @return aktuelles Zeichen oder {@code -1}.
+	 */
+	public final int symbol() {
+		return this.symbol;
+	}
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
+	 * Eingabe} ist.
+	 * 
+	 * @see #seek(int)
+	 * @see #reset()
+	 * @see #index()
+	 * @return {@code true}, wenn die aktuelle Position minimal ist.
+	 */
+	public final boolean isReset() {
+		return this.index == 0;
+	}
+
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
+	 * Position} am Ende der {@link #source() Eingabe} ist.
+	 * 
+	 * @see #seek(int)
+	 * @see #index()
+	 * @see #length()
+	 * @see #symbol()
+	 * @return {@code true}, wenn die aktuelle Position maximal ist.
+	 */
+	public final boolean isParsed() {
+		return this.symbol < 0;
+	}
+
+	{}
 
 	/**
 	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
@@ -134,27 +204,6 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
-	 * 
-	 * @see #seek(int)
-	 */
-	public final void reset() {
-		this.seek(0);
-	}
-
-	/**
-	 * Diese Methode gibt die aktuelle Position zurück.
-	 * 
-	 * @see #skip()
-	 * @see #take()
-	 * @see #symbol()
-	 * @return aktuelle Position.
-	 */
-	public final int index() {
-		return this.index;
-	}
-
-	/**
 	 * Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
 	 * 
 	 * @see #skip()
@@ -170,6 +219,20 @@ public class Parser {
 	}
 
 	/**
+	 * Diese Methode setzt die Ausgabe.
+	 * 
+	 * @param value Ausgabe.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	protected void string(final String value) throws NullPointerException {
+		value.length();
+		this.target.setLength(0);
+		this.target.append(value);
+	}
+
+	{}
+
+	/**
 	 * Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
 	 * 
 	 * @see #seek(int)
@@ -182,19 +245,6 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
-	 * {@link #source() Eingabe} erreicht wurde.
-	 * 
-	 * @see #skip()
-	 * @see #take()
-	 * @see #index()
-	 * @return aktuelles Zeichen oder {@code -1}.
-	 */
-	public final int symbol() {
-		return this.symbol;
-	}
-
-	/**
 	 * Diese Methode gibt die Eingabe zurück.
 	 * 
 	 * @return Eingabe.
@@ -204,31 +254,18 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
-	 * Eingabe} ist.
+	 * Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
 	 * 
-	 * @see #seek(int)
-	 * @see #reset()
-	 * @see #index()
-	 * @return {@code true}, wenn die aktuelle Position minimal ist.
+	 * @param value Eingabe.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	public final boolean isReset() {
-		return this.index == 0;
+	protected void source(final String value) throws NullPointerException {
+		value.length();
+		this.length = (this.chars = (this.source = value).toCharArray()).length;
+		this.reset();
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
-	 * Position} am Ende der {@link #source() Eingabe} ist.
-	 * 
-	 * @see #seek(int)
-	 * @see #index()
-	 * @see #length()
-	 * @see #symbol()
-	 * @return {@code true}, wenn die aktuelle Position maximal ist.
-	 */
-	public final boolean isParsed() {
-		return this.symbol < 0;
-	}
+	{}
 
 	/**
 	 * {@inheritDoc}

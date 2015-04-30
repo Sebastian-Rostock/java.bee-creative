@@ -429,7 +429,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public boolean collect(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException();
