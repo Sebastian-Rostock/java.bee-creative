@@ -45,7 +45,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public AbstractValue(final GData data) throws NullPointerException {
 			if (data == null) throw new NullPointerException();
@@ -129,7 +129,7 @@ public final class Values {
 		 * @param scope Ausführungskontext.
 		 * @param function auszuwertende Funktion.
 		 * @return {@link LazyValue}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public static LazyValue valueOf(final Scope scope, final Function function) throws NullPointerException {
 			return new LazyValue(scope, function);
@@ -163,7 +163,7 @@ public final class Values {
 		 * 
 		 * @param scope Ausführungskontext.
 		 * @param function Funktion.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
 			if ((scope == null) || (function == null)) throw new NullPointerException();
@@ -336,7 +336,7 @@ public final class Values {
 		 * 
 		 * @param data Wertliste.
 		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static ArrayValue valueOf(final Array data) throws NullPointerException {
 			return new ArrayValue(data);
@@ -348,7 +348,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert den Datensatz.
 		 * 
 		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn der Datensatz {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public ArrayValue(final Array data) throws NullPointerException {
 			super(data);
@@ -386,7 +386,7 @@ public final class Values {
 		 * 
 		 * @param data Object.
 		 * @return {@link ObjectValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static ObjectValue valueOf(final Object data) throws NullPointerException {
 			return new ObjectValue(data);
@@ -398,7 +398,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public ObjectValue(final Object data) throws NullPointerException {
 			super(data);
@@ -436,7 +436,7 @@ public final class Values {
 		 * 
 		 * @param data Funktion.
 		 * @return {@link FunctionValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static FunctionValue valueOf(final Function data) throws NullPointerException {
 			return new FunctionValue(data);
@@ -448,7 +448,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public FunctionValue(final Function data) throws NullPointerException {
 			super(data);
@@ -486,7 +486,7 @@ public final class Values {
 		 * 
 		 * @param data Text.
 		 * @return {@link StringValue}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static StringValue valueOf(final String data) throws NullPointerException {
 			return new StringValue(data);
@@ -498,7 +498,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public StringValue(final String data) throws NullPointerException {
 			super(data);
@@ -536,7 +536,7 @@ public final class Values {
 		 * 
 		 * @param data Zahlenwert.
 		 * @return {@link NumberValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static NumberValue valueOf(final Number data) throws NullPointerException {
 			return new NumberValue(data);
@@ -548,7 +548,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public NumberValue(final Number data) throws NullPointerException {
 			super(data);
@@ -606,7 +606,7 @@ public final class Values {
 		 * 
 		 * @param data Wahrheitswert.
 		 * @return {@link BooleanValue}.
-		 * @throws NullPointerException wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public static BooleanValue valueOf(final Boolean data) throws NullPointerException {
 			return BooleanValue.valueOf(data.booleanValue());
@@ -618,7 +618,7 @@ public final class Values {
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
 		 * 
 		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public BooleanValue(final Boolean data) throws NullPointerException {
 			super(data);

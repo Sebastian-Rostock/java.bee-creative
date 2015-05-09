@@ -3,7 +3,7 @@ package bee.creative.mmf;
 import java.nio.ByteBuffer;
 
 /**
- * Diese Klasse implementiert ein {@link MMFArray}, welches eine Datei bzw. einen gegebenen Speicherbereich als Folge von {@code UINT8} Zahlen interpretiert.
+ * Diese Klasse implementiert ein {@link MMFArray}, welches einen gegebenen Speicherbereich als Folge von {@code UINT8} Zahlen interpretiert.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */

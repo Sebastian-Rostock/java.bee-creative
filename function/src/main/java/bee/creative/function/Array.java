@@ -72,7 +72,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see Array#valueOf(Object[])
 	 * @param data Objekt.
 	 * @return Wertliste oder {@code null}.
-	 * @throws NullPointerException Wenn das Objekt {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array from(final Object data) throws NullPointerException {
 		final Class<?> clazz = data.getClass();
@@ -96,7 +96,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(byte[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -123,7 +123,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(short[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -150,7 +150,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(int[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -177,7 +177,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(long[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -204,7 +204,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(float[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -231,7 +231,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see NumberValue#valueOf(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(double[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -257,7 +257,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see BooleanValue#valueOf(boolean)
 	 * @param data Wahrheitswertliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(boolean[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -284,7 +284,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see Values#valueOf(Object)
 	 * @param data Objektliste.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(Object[] data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -311,7 +311,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see Scope#size()
 	 * @param scope Ausführungskontext.
 	 * @return Wertliste der Parameterwerte.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(final Scope scope) throws NullPointerException {
 		if (scope.size() == 0) return Array.EMPTY;
@@ -336,7 +336,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @param data Werte.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(Value... data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
@@ -362,7 +362,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @see #valueOf(Value...)
 	 * @param data Werte.
 	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static Array valueOf(final Collection<? extends Value> data) throws NullPointerException {
 		if (data.size() == 0) return Array.EMPTY;
@@ -429,7 +429,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 	 */
 	public boolean collect(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException();
@@ -441,7 +441,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * 
 	 * @param array Wertliste.
 	 * @return {@link Array}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
 	public Array concat(final Array array) throws NullPointerException {
 		if (array.length() == 0) return this;

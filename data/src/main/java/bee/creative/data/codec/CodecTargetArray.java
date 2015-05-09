@@ -30,7 +30,7 @@ public class CodecTargetArray<GContext> extends DataTargetArray implements Codec
 	 * 
 	 * @param context Kontextobjekt.
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public CodecTargetArray(final GContext context, final CompactByteArray data) throws NullPointerException {
 		super(data);

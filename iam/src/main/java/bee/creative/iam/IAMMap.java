@@ -19,7 +19,7 @@ public interface IAMMap {
 	public IAMArray key(final int entryIndex);
 
 	/**
-	 * Diese Methode gibt die {@code index}-te Zahl des Schlüssels des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} bzw.
+	 * Diese Methode gibt die {@code index}-te Zahl des Schlüssels des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} oder
 	 * {@code entryIndex} wird {@code 0} geliefert.
 	 * 
 	 * @see #keyLength(int)
@@ -49,7 +49,7 @@ public interface IAMMap {
 	public IAMArray value(final int entryIndex);
 
 	/**
-	 * Diese Methode gibt die {@code index}-te Zahl des Werts des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} bzw.
+	 * Diese Methode gibt die {@code index}-te Zahl des Werts des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} oder
 	 * {@code entryIndex} wird {@code 0} geliefert.
 	 * 
 	 * @see #valueLength(int)
@@ -102,6 +102,6 @@ public interface IAMMap {
 	 * @return Index des Entrags.
 	 * @throws NullPointerException Wenn {@code key} {@code null} ist.
 	 */
-	public int find(final int[] key) throws NullPointerException;
+	public int find(final int... key) throws NullPointerException;
 
 }

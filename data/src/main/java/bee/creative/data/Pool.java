@@ -60,7 +60,7 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	 * @param value Wert.
 	 * @param states Status-Bitmaske ({@link Item#APPEND_STATE}, {@link Item#REMOVE_STATE}, {@link Item#UPDATE_STATE}).
 	 * @return {@link Item} oder {@code null}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
 	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value, int states) throws NullPointerException;
 
@@ -80,7 +80,7 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	 * @param value Wert.
 	 * @param states Status-Bitmaske ({@link Item#APPEND_STATE}, {@link Item#REMOVE_STATE}, {@link Item#UPDATE_STATE}).
 	 * @return {@link Selection}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
 	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value, int states) throws NullPointerException;
 

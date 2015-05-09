@@ -34,7 +34,7 @@ public interface Value {
 	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
 	 * @param type Datentyp.
 	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn der gegebene {@link Type} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
 	 */
@@ -50,7 +50,7 @@ public interface Value {
 	 * @param type Datentyp.
 	 * @param context Kontext.
 	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
 	 */

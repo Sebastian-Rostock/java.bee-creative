@@ -176,7 +176,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		 * 
 		 * @param source Zeichenkette.
 		 * @return Abschnitt.
-		 * @throws NullPointerException Wenn die eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 		 */
 		public String extract(final String source) throws NullPointerException {
 			final int start = this.start;
@@ -245,7 +245,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist oder enthält.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen.
 	 */
 	public Script(final String source, final Range[] ranges) throws NullPointerException, IllegalArgumentException {
@@ -267,7 +267,7 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist oder enthält.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen.
 	 */
 	public Script(final String source, final Collection<? extends Range> ranges) throws NullPointerException, IllegalArgumentException {

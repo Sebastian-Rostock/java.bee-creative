@@ -19,7 +19,7 @@ public interface Selection<GItem> extends Iterable<GItem> {
 	 * @param field {@link Field} der Eigenschaft.
 	 * @param value Wert.
 	 * @return {@link Item} oder {@code null}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
 	public <GValue> GItem find(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 
@@ -30,7 +30,7 @@ public interface Selection<GItem> extends Iterable<GItem> {
 	 * @param field {@link Field} der Eigenschaft.
 	 * @param value Wert.
 	 * @return {@link Selection}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
 	public <GValue> Selection<GItem> findAll(Field<? super GItem, ? extends GValue> field, GValue value) throws NullPointerException;
 

@@ -11,7 +11,7 @@ public class IAMException extends RuntimeException {
 	private static final long serialVersionUID = -5004886777612828963L;
 
 	/**
-	 * Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer ungültigen Anzahl bzw. eines ungültigen Werts.
+	 * Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer ungültigen Anzahl oder eines ungültigen Werts.
 	 */
 	public static final int INVALID_VALUE = 1;
 

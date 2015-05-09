@@ -11,7 +11,7 @@ import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAMArray;
 
 /**
- * Diese Klasse implementiert ein abstraktes {@link IAMArray}, dessen Zahlen durch ein {@link File} bzw. einen {@link ByteBuffer} gegeben sind.<br>
+ * Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@link File} oder einen {@link ByteBuffer} gegeben sind.<br>
  * Die Methoden {@link #get(int)}, {@link #length()} und {@link #section(int, int)} liefern in dieser Basisklasse immer {@code 0} bzw. {@code this}.<br>
  * Zur Interpretation des Speicherbereichs muss eine entsprechende, über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()} oder
  * {@link #toINT32()} erzeugte Sicht verwendet werden.

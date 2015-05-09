@@ -67,15 +67,15 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.itemCount());
+			return Objects.toStringCall("IAMList", this.itemCount());
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert eine abstrakte {@link IAMMap}. Die Methode {@link #entry(int)} liefert einen {@link IAMValueEntry} mit den von {@link #key(int)}
-	 * und {@link #value(int)} gelieferten Zahlenfolgen. Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und
-	 * {@link #entryCount()}.
+	 * Diese Klasse implementiert eine abstrakte {@link IAMMap}. Die Methode {@link #entry(int)} liefert einen {@link IAMEntry} mit den von {@link #key(int)} und
+	 * {@link #value(int)} gelieferten Zahlenfolgen, welcher über {@link IAM#toEntry(IAMArray, IAMArray)} erzeugt wird. Die von {@link #entries()} gelieferte
+	 * {@link List} delegiert an {@link #entry(int)} und {@link #entryCount()} .
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -118,8 +118,8 @@ public class IAM {
 		 */
 		@Override
 		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAMEmptyEntry.INSTANCE;
-			return new IAMValueEntry(this.key(entryIndex), this.value(entryIndex));
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAM.EMPTY_ENTRY;
+			return IAM.toEntry(this.key(entryIndex), this.value(entryIndex));
 		}
 
 		/**
@@ -150,7 +150,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.entryCount());
+			return Objects.toStringCall("IAMMap", this.entryCount());
 		}
 
 	}
@@ -240,7 +240,7 @@ public class IAM {
 		 * @return Abschnitt.
 		 */
 		protected IAMArray newSection(final int offset, final int length) {
-			if (length == 0) return IAMEmptyArray.INSTANCE;
+			if (length == 0) return IAM.EMPTY_ARRAY;
 			return new IAMBaseArray() {
 
 				@Override
@@ -388,7 +388,7 @@ public class IAM {
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten {@link IAMIndex}, dessen {@link #maps()}- und {@link #lists()}-Methoden je eine {@link List} liefern, die an
-	 * {@link #map(int)} sowie {@link #mapCount()} bzw. {@link #list(int)} sowie {@link #listCount()} delegeirt.
+	 * {@link #map(int)} und {@link #mapCount()} bzw. {@link #list(int)} und {@link #listCount()} delegeirt.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -443,7 +443,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.maps(), this.lists());
+			return Objects.toStringCall("IAMIndex", this.maps(), this.lists());
 		}
 
 	}
@@ -451,257 +451,192 @@ public class IAM {
 	{}
 
 	/**
-	 * Diese Klasse implementiert ein {@link IAMEntry} mit gegebenem Schlüssel und Wert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * Dieses Feld speichert die leere {@link IAMMap}.
 	 */
-	public static final class IAMValueEntry extends IAMBaseEntry {
+	public static final IAMMap EMPTY_MAP = new IAMBaseMap() {
 
-		/**
-		 * Dieses Feld speichert den Schlüssel.
-		 */
-		protected final IAMArray key;
-
-		/**
-		 * Dieses Feld speichert den Wert.
-		 */
-		protected final IAMArray value;
-
-		/**
-		 * Dieser Konstruktor initialisiert Schlüssel und Wert.
-		 * 
-		 * @param key Schlüssel.
-		 * @param value Wert.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public IAMValueEntry(final IAMArray key, final IAMArray value) throws NullPointerException {
-			if ((key == null) || (value == null)) throw new NullPointerException();
-			this.key = key;
-			this.value = value;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IAMArray key() {
-			return this.key;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IAMArray value() {
-			return this.value;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@code int[]} gegeben sind.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class IAMValueArray extends IAMBaseArray {
-
-		/**
-		 * Dieses Feld speichert das array.
-		 */
-		protected final int[] array;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Zahlen.
-		 * 
-		 * @param array Zahlen.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-		 */
-		public IAMValueArray(final int[] array) throws NullPointerException {
-			this.array = array.clone();
-		}
-
-		@SuppressWarnings ("javadoc")
-		IAMValueArray(final int[] array, final boolean IGNORE) throws NullPointerException {
-			this.array = array;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(final int index) {
-			if ((index < 0) || (index >= this.array.length)) return 0;
-			return this.array[index];
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int length() {
-			return this.array.length;
-		}
-
-	}
-
-	{}
-
-	/**
-	 * Diese Klasse implementiert die leere {@link IAMMap}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class IAMEmptyMap extends IAMBaseMap {
-
-		/**
-		 * Dieses Feld speichert die {@link IAMEmptyMap}.
-		 */
-		public static final IAMEmptyMap INSTANCE = new IAMEmptyMap();
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public IAMArray key(final int entryIndex) {
-			return IAMEmptyArray.INSTANCE;
+			return IAM.EMPTY_ARRAY;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public IAMArray value(final int entryIndex) {
-			return IAMEmptyArray.INSTANCE;
+			return IAM.EMPTY_ARRAY;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
-			return IAMEmptyEntry.INSTANCE;
+			return IAM.EMPTY_ENTRY;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public int entryCount() {
 			return 0;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public int find(final int[] key) throws NullPointerException {
+		public int find(final int... key) throws NullPointerException {
 			if (key == null) throw new NullPointerException();
 			return -1;
 		}
 
-	}
+	};
 
 	/**
-	 * Diese Klasse implementiert die leere {@link IAMList}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * Dieses Feld speichert die leere {@link IAMList}.
 	 */
-	public static final class IAMEmptyList extends IAMBaseList {
+	public static final IAMList EMPTY_LIST = new IAMBaseList() {
 
-		/**
-		 * Dieses Feld speichert die {@link IAMEmptyList}.
-		 */
-		public static final IAMEmptyList INSTANCE = new IAMEmptyList();
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public IAMArray item(final int itemIndex) {
-			return IAMEmptyArray.INSTANCE;
+			return IAM.EMPTY_ARRAY;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public int itemCount() {
 			return 0;
 		}
 
-	}
+	};
 
 	/**
-	 * Diese Klasse implementiert den leeren {@link IAMEntry}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * Dieses Feld speichert ein leeres {@link IAMArray}.
 	 */
-	public static final class IAMEmptyEntry extends IAMBaseEntry {
+	public static final IAMArray EMPTY_ARRAY = new IAMBaseArray() {
 
-		/**
-		 * Dieses Feld speichert den {@link IAMEmptyEntry}.
-		 */
-		public static final IAMEmptyEntry INSTANCE = new IAMEmptyEntry();
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IAMArray key() {
-			return IAMEmptyArray.INSTANCE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IAMArray value() {
-			return IAMEmptyArray.INSTANCE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein leeres {@link IAMArray}. Die Methoden {@link #get(int)} und {@link #section(int, int)} können in Nachfahren überschieben
-	 * werden.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class IAMEmptyArray extends IAMBaseArray {
-
-		/**
-		 * Dieses Feld speichert das {@link IAMEmptyArray}.
-		 */
-		public static final IAMEmptyArray INSTANCE = new IAMEmptyArray();
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public int get(final int index) {
 			return 0;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public int length() {
 			return 0;
 		}
 
+	};
+
+	/**
+	 * Dieses Feld speichert den leeren {@link IAMEntry}.
+	 */
+	public static final IAMEntry EMPTY_ENTRY = new IAMBaseEntry() {
+
+		@Override
+		public IAMArray value() {
+			return IAM.EMPTY_ARRAY;
+		}
+
+		@Override
+		public IAMArray key() {
+			return IAM.EMPTY_ARRAY;
+		}
+
+	};
+
+	{}
+
+	/**
+	 * Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlen.
+	 * @return {@link IAMArray}-Sicht auf {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 */
+	public static IAMArray toArray(final byte[] array) {
+		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		return new IAMBaseArray() {
+
+			@Override
+			public int get(final int index) {
+				if ((index < 0) || (index >= array.length)) return 0;
+				return array[index];
+			}
+
+			@Override
+			public int length() {
+				return array.length;
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlen.
+	 * @return {@link IAMArray}-Sicht auf {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 */
+	public static IAMArray toArray(final short[] array) {
+		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		return new IAMBaseArray() {
+
+			@Override
+			public int get(final int index) {
+				if ((index < 0) || (index >= array.length)) return 0;
+				return array[index];
+			}
+
+			@Override
+			public int length() {
+				return array.length;
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlen.
+	 * @return {@link IAMArray}-Sicht auf {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 */
+	public static IAMArray toArray(final int... array) {
+		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		return new IAMBaseArray() {
+
+			@Override
+			public int get(final int index) {
+				if ((index < 0) || (index >= array.length)) return 0;
+				return array[index];
+			}
+
+			@Override
+			public int length() {
+				return array.length;
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode ein neues {@link IAMEntry} als Sicht auf den gegebenen Schlüssel sowie dem gegebenen Wert zurück.
+	 * 
+	 * @param key Schlüssel.
+	 * @param value Wert.
+	 * @return {@link IAMEntry}-Sicht auf {@code key} und {@code value}.
+	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist.
+	 */
+	public static IAMEntry toEntry(final IAMArray key, final IAMArray value) throws NullPointerException {
+		if ((key.length() == 0) && (value.length() == 0)) return IAM.EMPTY_ENTRY;
+		return new IAMBaseEntry() {
+
+			@Override
+			public IAMArray key() {
+				return key;
+			}
+
+			@Override
+			public IAMArray value() {
+				return value;
+			}
+
+		};
 	}
 
 	{}

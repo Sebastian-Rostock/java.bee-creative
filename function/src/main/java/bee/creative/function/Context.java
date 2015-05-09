@@ -18,7 +18,7 @@ public interface Context {
 	 * @param value gegebener Wert.
 	 * @param type gegebener Datentyp.
 	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 	 */

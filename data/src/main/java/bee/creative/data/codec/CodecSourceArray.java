@@ -21,7 +21,7 @@ public class CodecSourceArray<GContext> extends DataSourceArray implements Codec
 	 * 
 	 * @param context Kontextobjekt.
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public CodecSourceArray(final GContext context, final byte... data) throws NullPointerException {
 		super(data);
@@ -33,7 +33,7 @@ public class CodecSourceArray<GContext> extends DataSourceArray implements Codec
 	 * 
 	 * @param context Kontextobjekt.
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public CodecSourceArray(final GContext context, final ByteArraySection data) throws NullPointerException {
 		super(data);

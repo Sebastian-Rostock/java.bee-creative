@@ -102,7 +102,7 @@ public class Contexts {
 		 * 
 		 * @param value Wert.
 		 * @return Wertliste.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		protected Array castToArray(final Value value) throws NullPointerException {
 			switch (value.type().id()) {
@@ -122,10 +122,12 @@ public class Contexts {
 		 * 
 		 * @param value Wert.
 		 * @return Objekt.
-		 * @throws NullPointerException Wenn der gegebene Wert oder dessen Nutzdaten {@code null} sind.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 */
 		protected Object castToObject(final Value value) throws NullPointerException {
-			return value.data();
+			Object data = value.data();
+			if (data == null) throw new NullPointerException();
+			return data;
 		}
 
 		/**
@@ -138,7 +140,7 @@ public class Contexts {
 		 * @see ValueFunction#valueOf(Value)
 		 * @param value Wert.
 		 * @return Funktion.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		protected Function castToFunction(final Value value) throws NullPointerException {
 			if (value.type().id() == FunctionType.ID) return (Function)value.data();
@@ -158,7 +160,7 @@ public class Contexts {
 		 * @see String#valueOf(Object)
 		 * @param value Wert.
 		 * @return Zeichenkette.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		protected String castToString(final Value value) throws NullPointerException {
 			switch (value.type().id()) {
@@ -186,7 +188,7 @@ public class Contexts {
 		 * 
 		 * @param value Wert.
 		 * @return Zahlenwert.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
 		protected Number castToNumber(final Value value) throws NullPointerException, IllegalArgumentException {
@@ -218,7 +220,7 @@ public class Contexts {
 		 * 
 		 * @param value Wert.
 		 * @return Wahrheitswert.
-		 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 		 */
 		protected Boolean castToBoolean(final Value value) throws NullPointerException, IllegalArgumentException {
@@ -274,7 +276,7 @@ public class Contexts {
 	 * 
 	 * @see #getDefaultContext()
 	 * @param value neuer {@code default}-{@link Context}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static void setDefaultContext(final Context value) throws NullPointerException {
 		if (value == null) throw new NullPointerException();

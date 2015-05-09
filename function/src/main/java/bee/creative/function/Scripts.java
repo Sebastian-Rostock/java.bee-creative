@@ -188,7 +188,7 @@ public class Scripts {
 		 * 
 		 * @param value Eingabe.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell geparst wird.
 		 */
 		public ScriptParser setSource(final String value) throws NullPointerException, IllegalStateException {
@@ -529,7 +529,7 @@ public class Scripts {
 		 * 
 		 * @param object Objekt.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code object} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		public ScriptFormatter put(final Object object) throws NullPointerException, IllegalStateException {
@@ -552,7 +552,7 @@ public class Scripts {
 		 * @see #putBreakDec()
 		 * @param value Wertliste.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
 		 */
@@ -577,7 +577,7 @@ public class Scripts {
 		 * @see #putFunction(Function)
 		 * @param value Wert.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
 		 */
@@ -595,7 +595,7 @@ public class Scripts {
 		 * 
 		 * @param value parametrisierte Funktion.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
 		 */
@@ -614,7 +614,7 @@ public class Scripts {
 		 * 
 		 * @param value Funktionsliste.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
 		 */
@@ -642,7 +642,7 @@ public class Scripts {
 		 * 
 		 * @param value Funktion.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
 		 */
@@ -684,9 +684,9 @@ public class Scripts {
 		/**
 		 * Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.
 		 * 
-		 * @param value Zeichenkette zur Einrückung (z.B. {@code "\t"} oder {@code "    "}).
+		 * @param value Zeichenkette zur Einrückung (z.B. {@code "\t"} oder {@code "  "}).
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		public ScriptFormatter setIndent(final String value) throws NullPointerException, IllegalStateException {
@@ -701,7 +701,7 @@ public class Scripts {
 		 * 
 		 * @param value Formatierungsmethoden.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		public ScriptFormatter setHelper(final ScriptFormatterHelper value) throws NullPointerException, IllegalStateException {
@@ -749,7 +749,7 @@ public class Scripts {
 		 * 
 		 * @param value Wert.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
@@ -774,7 +774,7 @@ public class Scripts {
 		 * 
 		 * @param value Funktionen.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
@@ -1310,7 +1310,7 @@ public class Scripts {
 		 * 
 		 * @param value Quelltext.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public ScriptCompiler setScript(final Script value) throws NullPointerException, IllegalStateException {
@@ -1325,7 +1325,7 @@ public class Scripts {
 		 * 
 		 * @param value Kompilationsmethoden.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public ScriptCompiler setHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
@@ -1340,7 +1340,7 @@ public class Scripts {
 		 * 
 		 * @param value Parameternamen.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public ScriptCompiler setParams(final String... value) throws NullPointerException, IllegalStateException {
@@ -1352,7 +1352,7 @@ public class Scripts {
 		 * 
 		 * @param value Parameternamen.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public ScriptCompiler setParams(final List<String> value) throws NullPointerException, IllegalStateException {
@@ -1640,7 +1640,7 @@ public class Scripts {
 		 * @see #getHint()
 		 * @param value Hinweis.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public ScriptException setHint(final String value) throws NullPointerException {
 			value.length();
@@ -1654,7 +1654,7 @@ public class Scripts {
 		 * @see #getRange()
 		 * @param value Bereich.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public ScriptException setRange(final Range value) throws NullPointerException {
 			value.type();
@@ -1668,7 +1668,7 @@ public class Scripts {
 		 * @see #getScript()
 		 * @param value Quelltext.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public ScriptException setScript(final Script value) throws NullPointerException {
 			value.length();
@@ -1703,16 +1703,6 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.
-	 * 
-	 * @see ScriptFormatter
-	 * @return {@link ScriptFormatter}.
-	 */
-	public static ScriptFormatter scriptFormatter() {
-		return new ScriptFormatter();
-	}
-
-	/**
 	 * Diese Methode erzeugt einen neuen {@link ScriptCompiler} und gibt diesen zurück.
 	 * 
 	 * @see ScriptCompiler
@@ -1720,6 +1710,16 @@ public class Scripts {
 	 */
 	public static ScriptCompiler scriptCompiler() {
 		return new ScriptCompiler();
+	}
+
+	/**
+	 * Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.
+	 * 
+	 * @see ScriptFormatter
+	 * @return {@link ScriptFormatter}.
+	 */
+	public static ScriptFormatter scriptFormatter() {
+		return new ScriptFormatter();
 	}
 
 }

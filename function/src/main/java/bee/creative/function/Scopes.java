@@ -153,7 +153,7 @@ public final class Scopes {
 		 * 
 		 * @param scope übergeordneter Ausführungskontext, dessen zusätzlichen Parameterwerte genutzt werden.
 		 * @param values Parameterwerte.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 		 */
 		public ValueScope(final Scope scope, final Array values) throws NullPointerException {
 			this(scope, values, true);
@@ -167,7 +167,7 @@ public final class Scopes {
 		 * @param values Parameterwerte.
 		 * @param replace {@code true}, wenn statt aller nur die zusätzlichen Parameterwerte des gegebenen Ausführungskontexts als zusätzliche Parameterwerte
 		 *        genutzt werden sollen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 		 */
 		public ValueScope(final Scope scope, final Array values, final boolean replace) throws NullPointerException {
 			this.scope = scope;
@@ -259,7 +259,7 @@ public final class Scopes {
 		 * 
 		 * @param scope Ausführungskontext.
 		 * @param context Kontextobjekt.
-		 * @throws NullPointerException Wenn der gegebene Ausführungskontext {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} {@code null} ist.
 		 */
 		public ContextScope(final Scope scope, final Context context) throws NullPointerException {
 			if (scope == null) throw new NullPointerException();
@@ -345,7 +345,7 @@ public final class Scopes {
 		 * 
 		 * @param scope übergeordneter Ausführungskontext.
 		 * @param functions Parameterfunktionen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code functions} {@code null} ist.
 		 */
 		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
 			if ((scope == null) || (functions == null)) throw new NullPointerException();

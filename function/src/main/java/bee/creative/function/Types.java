@@ -26,7 +26,7 @@ public class Types {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Nutzdaten des Werts.
-	 * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} bzw. {@link #valueOf(Value, Context)} konvertiert werden kann.
+	 * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} oder {@link #valueOf(Value, Context)} konvertiert werden kann.
 	 */
 	public static abstract class AbstractType<GData, GValue extends AbstractValue<GData>> implements Type<GValue>, Converter<Value, GData> {
 

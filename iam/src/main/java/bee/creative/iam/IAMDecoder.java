@@ -3,8 +3,6 @@ package bee.creative.iam;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
-import bee.creative.iam.IAM.IAMEmptyArray;
-import bee.creative.iam.IAM.IAMValueArray;
 import bee.creative.mmf.MMFArray;
 
 /**
@@ -262,8 +260,8 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int[] key) throws NullPointerException {
-			final IAMArray array = key.length == 0 ? IAMEmptyArray.INSTANCE : new IAMValueArray(key, false);
+		public int find(final int... key) throws NullPointerException {
+			final IAMArray array = key.length == 0 ? IAM.EMPTY_ARRAY : IAM.toArray(key);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final IAMArray range = this.rangeOffset;

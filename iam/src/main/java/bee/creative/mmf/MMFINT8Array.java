@@ -1,10 +1,9 @@
 package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
-import bee.creative.iam.IAMArray;
 
 /**
- * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT8/byte} Zahlen interpretiert.
+ * Diese Klasse implementiert ein {@link MMFArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT8} Zahlen interpretiert.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */

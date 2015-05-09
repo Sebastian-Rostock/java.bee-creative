@@ -10,10 +10,6 @@ import java.util.List;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
-import bee.creative.iam.IAM.IAMEmptyArray;
-import bee.creative.iam.IAM.IAMEmptyList;
-import bee.creative.iam.IAM.IAMEmptyMap;
-import bee.creative.iam.IAM.IAMValueArray;
 import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
 import bee.creative.iam.IAMDecoder.IAMListDecoder;
 import bee.creative.iam.IAMDecoder.IAMMapDecoder;
@@ -101,7 +97,7 @@ public class IAMEncoder {
 		}
 
 		/**
-		 * Diese Methode schreibt die {@link #dataLength} bzw. {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
+		 * Diese Methode schreibt die {@link #dataLength} bzw. das {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
 		 * 
 		 * @param buffer Puffer.
 		 */
@@ -190,7 +186,7 @@ public class IAMEncoder {
 	{}
 
 	/**
-	 * Diese Klasse implementiert ein Element einer {@link IAMUniqueItemMap} bzw. eines {@link IAMListEncoder}.
+	 * Diese Klasse implementiert ein Element einer {@link IAMUniqueItemMap} eines {@link IAMListEncoder}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -209,7 +205,7 @@ public class IAMEncoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein Element einer {@link IAMUniqueEntryMap} bzw. eines {@link IAMMapEncoder}.
+	 * Diese Klasse implementiert ein Element einer {@link IAMUniqueEntryMap} eines {@link IAMMapEncoder}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -587,8 +583,8 @@ public class IAMEncoder {
 		@Override
 		public IAMArray key(final int entryIndex) {
 			final List<IAMEntry> datas = this.entries.datas;
-			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMEmptyArray.INSTANCE;
-			return new IAMValueArray(datas.get(entryIndex).key, false);
+			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			return IAM.toArray(datas.get(entryIndex).key);
 		}
 
 		/**
@@ -597,8 +593,8 @@ public class IAMEncoder {
 		@Override
 		public IAMArray value(final int entryIndex) {
 			final List<IAMEntry> datas = this.entries.datas;
-			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMEmptyArray.INSTANCE;
-			return new IAMValueArray(datas.get(entryIndex).value, false);
+			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			return IAM.toArray(datas.get(entryIndex).value);
 		}
 
 		/**
@@ -613,7 +609,8 @@ public class IAMEncoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int[] key) {
+		public int find(final int... key) throws NullPointerException {
+			if (key == null) throw new NullPointerException();
 			final IAMEntry result = this.entries.entryMap().get(key);
 			return result == null ? -1 : result.index;
 		}
@@ -762,7 +759,7 @@ public class IAMEncoder {
 		 * Dieser Konstruktor initialisiert die Zahlenfeolge mit den kodierten Daten eines {@link IAMListDecoder}.
 		 * 
 		 * @param bytes Zahlenfeolge.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
 		 * @throws IAMException Wenn beim dekodieren der Zahlenfeolge ein Fehler erkannt wird.
 		 */
 		public IAMListData(final byte[] bytes) throws NullPointerException, IAMException {
@@ -886,8 +883,8 @@ public class IAMEncoder {
 		@Override
 		public IAMArray item(final int itemIndex) {
 			final List<IAMItem> datas = this.items.datas;
-			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAMEmptyArray.INSTANCE;
-			return new IAMValueArray(datas.get(itemIndex).item, false);
+			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			return IAM.toArray(datas.get(itemIndex).item);
 		}
 
 		/**
@@ -986,7 +983,7 @@ public class IAMEncoder {
 		 * Diese Methode prüft, ob die gegebene Bytereihenfolge kompatibel zur aktuellen ist.
 		 * 
 		 * @param value Bytereihenfolge.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Bytereihenfolge ungültig ist.
 		 */
 		protected void checkOrder(final ByteOrder value) throws NullPointerException, IllegalArgumentException {
@@ -999,14 +996,14 @@ public class IAMEncoder {
 		 * 
 		 * @see IAMMapData
 		 * @see IAMMapEncoder
-		 * @param map {@link IAMBaseMapEncoder}.
+		 * @param value {@link IAMBaseMapEncoder}.
 		 * @return Index des {@link IAMBaseMapEncoder}s.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		protected int put(final IAMBaseMapEncoder map) throws NullPointerException {
-			if (map == null) throw new NullPointerException();
+		protected int put(final IAMBaseMapEncoder value) throws NullPointerException {
+			if (value == null) throw new NullPointerException();
 			final int result = this.maps.size();
-			this.maps.add(result, map);
+			this.maps.add(result, value);
 			return result;
 		}
 
@@ -1015,14 +1012,14 @@ public class IAMEncoder {
 		 * 
 		 * @see IAMListData
 		 * @see IAMListEncoder
-		 * @param list {@link IAMBaseListEncoder}.
+		 * @param value {@link IAMBaseListEncoder}.
 		 * @return Index des {@link IAMBaseListEncoder}s.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		protected int put(final IAMBaseListEncoder list) throws NullPointerException {
-			if (list == null) throw new NullPointerException();
+		protected int put(final IAMBaseListEncoder value) throws NullPointerException {
+			if (value == null) throw new NullPointerException();
 			final int result = this.lists.size();
-			this.lists.add(result, list);
+			this.lists.add(result, value);
 			return result;
 		}
 
@@ -1031,7 +1028,7 @@ public class IAMEncoder {
 		 * 
 		 * @param value {@link IAMMapData}.
 		 * @return Index der {@link IAMMap}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Bytereihenfolge der gegbenen {@link IAMMapData} inkompatibel zu der bereits hinzugefügter {@link IAMMapData}
 		 *         oder {@link IAMListData} ist.
 		 */
@@ -1045,7 +1042,7 @@ public class IAMEncoder {
 		 * 
 		 * @param value {@link IAMMapEncoder}.
 		 * @return Index der {@link IAMMap}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public int putMap(final IAMMapEncoder value) throws NullPointerException {
 			value.toMap();
@@ -1057,7 +1054,7 @@ public class IAMEncoder {
 		 * 
 		 * @param value {@link IAMListData}.
 		 * @return Index der {@link IAMList}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Bytereihenfolge der gegbenen {@link IAMMapData} inkompatibel zu der bereits hinzugefügter {@link IAMMapData}
 		 *         oder {@link IAMListData} ist.
 		 */
@@ -1074,7 +1071,7 @@ public class IAMEncoder {
 		 * @see IAMListEncoder
 		 * @param value {@link IAMListEncoder}.
 		 * @return Index der {@link IAMList}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public int putList(final IAMListEncoder value) throws NullPointerException {
 			value.toList();
@@ -1088,7 +1085,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public IAMMap map(final int index) {
-			if ((index < 0) || (index >= this.mapCount())) return IAMEmptyMap.INSTANCE;
+			if ((index < 0) || (index >= this.mapCount())) return IAM.EMPTY_MAP;
 			return this.maps.get(index).toMap();
 		}
 
@@ -1105,7 +1102,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public IAMList list(final int index) {
-			if ((index < 0) || (index >= this.listCount())) return IAMEmptyList.INSTANCE;
+			if ((index < 0) || (index >= this.listCount())) return IAM.EMPTY_LIST;
 			return this.lists.get(index).toList();
 		}
 

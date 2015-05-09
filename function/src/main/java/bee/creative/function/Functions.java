@@ -33,7 +33,7 @@ public final class Functions {
 		 * 
 		 * @param value auszuwertende Funktion.
 		 * @return {@link LazyFunction}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public static LazyFunction valueOf(final Function value) throws NullPointerException {
 			return new LazyFunction(value);
@@ -45,7 +45,7 @@ public final class Functions {
 		 * 
 		 * @param function komponierte Funktion.
 		 * @return neue komponierte Funktion mit {@link LazyFunction}s als Parameterfunktionen.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public static CompositeFunction applyTo(final CompositeFunction function) throws NullPointerException {
 			final Function[] functions = function.params.clone();
@@ -66,7 +66,7 @@ public final class Functions {
 		 * Dieser Konstruktor initialisiert die auszuwertende Funktion.
 		 * 
 		 * @param function auszuwertende Funktion.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public LazyFunction(final Function function) throws NullPointerException {
 			if (function == null) throw new NullPointerException();
@@ -432,7 +432,7 @@ public final class Functions {
 		 * @param handler {@link TraceHandler}.
 		 * @param function Funktion.
 		 * @return Funktion.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
 		public static Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
 			if ((handler == null) || (function == null)) throw new NullPointerException();
@@ -473,7 +473,7 @@ public final class Functions {
 		 * 
 		 * @param handler {@link TraceHandler}.
 		 * @param function Funktion.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
 		public TraceFunction(final TraceHandler handler, final Function function) throws NullPointerException {
 			if ((handler == null) || (function == null)) throw new NullPointerException();
@@ -611,7 +611,7 @@ public final class Functions {
 		 * Dieser Konstruktor initialisiert den Ergebniswert.
 		 * 
 		 * @param value Ergebniswert.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public ValueFunction(final Value value) throws NullPointerException {
 			if (value == null) throw new NullPointerException();
@@ -790,7 +790,7 @@ public final class Functions {
 		 * @see ClosureFunction#ClosureFunction(Function)
 		 * @param function auszuwertende Funktion.
 		 * @return {@link ClosureFunction}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public static ClosureFunction valueOf(final Function function) throws NullPointerException {
 			return new ClosureFunction(function);
@@ -814,7 +814,7 @@ public final class Functions {
 		 * 
 		 * @see #execute(Scope)
 		 * @param function auszuwertende Funktion.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Function function) throws NullPointerException {
 			if (function == null) throw new NullPointerException();
@@ -830,7 +830,7 @@ public final class Functions {
 		 * @see #execute(Scope)
 		 * @param scope gebundener Ausführungskontext.
 		 * @param function auszuwertende Funktion.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
 			if ((scope == null) || (function == null)) throw new NullPointerException();
@@ -924,7 +924,7 @@ public final class Functions {
 		 * @param function aufzurufende Funktion.
 		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @return {@link CompositeFunction}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
 		public static CompositeFunction valueOf(final Function function, final Function... functions) throws NullPointerException {
 			return new CompositeFunction(function, functions);
@@ -938,7 +938,7 @@ public final class Functions {
 		 * @param chained Verketung.
 		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @return {@link CompositeFunction}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
 		public static CompositeFunction valueOf(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
 			return new CompositeFunction(function, chained, functions);
@@ -966,7 +966,7 @@ public final class Functions {
 		 * 
 		 * @param function aufzurufende Funktion.
 		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
 			this(function, false, functions);
@@ -978,7 +978,7 @@ public final class Functions {
 		 * @param function aufzurufende Funktion.
 		 * @param chained Verketung.
 		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
 		public CompositeFunction(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
 			if ((function == null) || (functions == null)) throw new NullPointerException();

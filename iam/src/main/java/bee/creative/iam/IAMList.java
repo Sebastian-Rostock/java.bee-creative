@@ -21,7 +21,7 @@ public interface IAMList {
 	public IAMArray item(final int itemIndex);
 
 	/**
-	 * Diese Methode gibt die {@code index}-te Zahl des {@code itemIndex}-ten Elements zurück. Bei einem ungültigen {@code index} bzw. {@code itemIndex} wird
+	 * Diese Methode gibt die {@code index}-te Zahl des {@code itemIndex}-ten Elements zurück. Bei einem ungültigen {@code index} oder {@code itemIndex} wird
 	 * {@code 0} geliefert.
 	 * 
 	 * @see #itemLength(int)

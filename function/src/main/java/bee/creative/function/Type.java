@@ -6,7 +6,7 @@ package bee.creative.function;
  * 
  * @see Value
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} bzw. {@link #valueOf(Value, Context)} konvertiert werden kann.
+ * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} oder {@link #valueOf(Value, Context)} konvertiert werden kann.
  */
 public interface Type<GValue> {
 
@@ -38,7 +38,7 @@ public interface Type<GValue> {
 	 * @see #valueOf(Value, Context)
 	 * @param value gegebener Wert.
 	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn der gegebene Wert {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 	 */
@@ -54,7 +54,7 @@ public interface Type<GValue> {
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
 	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
 	 */
