@@ -129,6 +129,26 @@ public class MMFArray extends IAMBaseArray {
 	{}
 
 	/**
+	 * Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
+	 * 
+	 * @return Kopie des Speicherbereichs.
+	 */
+	public final byte[] toBytes() {
+		final int length = this.byteLength;
+		final byte[] result = new byte[length];
+		if (length == 0) return result;
+		final ByteBuffer buffer = this.byteBuffer;
+		final int position = buffer.position();
+		try {
+			buffer.position(position + this.byteOffset);
+			buffer.get(result);
+		} finally {
+			buffer.position(position);
+		}
+		return result;
+	}
+
+	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
 	 * 
 	 * @return {@link MMFINT8Array}

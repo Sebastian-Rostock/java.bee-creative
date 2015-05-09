@@ -8,7 +8,7 @@ import bee.creative.util.Comparables.Get;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface BEXList extends Get<BEXNode> {
+public interface BEXList extends Get<BEXNode>, Iterable<BEXNode> {
 
 	/**
 	 * Dieses Feld speichert das VOID_LIST.
