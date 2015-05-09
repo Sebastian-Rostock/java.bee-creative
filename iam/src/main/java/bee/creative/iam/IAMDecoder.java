@@ -1,17 +1,11 @@
 package bee.creative.iam;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel.MapMode;
-import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
+import bee.creative.iam.IAM.IAMEmptyArray;
 import bee.creative.iam.IAM.IAMValueArray;
+import bee.creative.mmf.MMFArray;
 
 /**
  * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link IAM} Datenstrukturen.
@@ -21,342 +15,7 @@ import bee.creative.iam.IAM.IAMValueArray;
 public class IAMDecoder {
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes {@link IAMArray}, dessen Zahlen durch einen {@link ByteBuffer} gegeben sind.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static abstract class IAMBufferArray extends IAMBaseArray {
-
-		/**
-		 * Dieses Feld speichert den Speicherbereich.
-		 */
-		protected final ByteBuffer byteBuffer;
-
-		/**
-		 * Dieses Feld speichert die Länge.
-		 */
-		protected final int byteLength;
-
-		/**
-		 * Dieses Feld speichert die Startposition.
-		 */
-		protected final int byteOffset;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferArray(final ByteBuffer buffer) throws NullPointerException {
-			this(buffer, 0, Math.min(buffer.limit(), 1073741823));
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferArray(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
-			this.byteBuffer = byteBuffer;
-			this.byteOffset = byteOffset;
-			this.byteLength = byteLength;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected abstract IAMBufferArray newSection(int offset, int length);
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public IAMBufferArray section(final int offset, final int length) {
-			return (IAMBufferArray)super.section(offset, length);
-		}
-
-		/**
-		 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen interpretiert zurück.
-		 * 
-		 * @return {@link IAMBufferINT8Array}
-		 */
-		public final IAMBufferINT8Array toINT8() {
-			return new IAMBufferINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
-		}
-
-		/**
-		 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen interpretiert zurück.
-		 * 
-		 * @return {@link IAMBufferINT16Array}
-		 */
-		public final IAMBufferINT16Array toINT16() {
-			return new IAMBufferINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
-		}
-
-		/**
-		 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen interpretiert zurück.
-		 * 
-		 * @return {@link IAMBufferINT32Array}
-		 */
-		public final IAMBufferINT32Array toINT32() {
-			return new IAMBufferINT32Array(this.byteBuffer, this.byteOffset, this.byteLength);
-		}
-
-		/**
-		 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen interpretiert zurück.
-		 * 
-		 * @return {@link IAMBufferUINT8Array}
-		 */
-		public final IAMBufferUINT8Array toUINT8() {
-			return new IAMBufferUINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
-		}
-
-		/**
-		 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen interpretiert zurück.
-		 * 
-		 * @return {@link IAMBufferUINT16Array}
-		 */
-		public final IAMBufferUINT16Array toUINT16() {
-			return new IAMBufferUINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT8/byte} Zahlen interpretiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class IAMBufferINT8Array extends IAMBufferArray {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferINT8Array(final ByteBuffer buffer) throws NullPointerException {
-			super(buffer);
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferINT8Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
-			super(byteBuffer, byteOffset, byteLength);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected IAMBufferArray newSection(final int offset, final int length) {
-			return new IAMBufferINT8Array(this.byteBuffer, this.byteOffset + offset, length);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(final int index) {
-			if ((index < 0) || (index >= this.byteLength)) return 0;
-			return this.byteBuffer.get(this.byteOffset + index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int length() {
-			return this.byteLength;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT16/short} Zahlen interpretiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class IAMBufferINT16Array extends IAMBufferArray {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferINT16Array(final ByteBuffer buffer) {
-			super(buffer);
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferINT16Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
-			IllegalArgumentException {
-			super(byteBuffer, byteOffset, byteLength);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected IAMBufferArray newSection(final int offset, final int length) {
-			return new IAMBufferINT16Array(this.byteBuffer, this.byteOffset + (offset << 1), length << 1);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(int index) {
-			index <<= 1;
-			if ((index < 0) || (index >= this.byteLength)) return 0;
-			return this.byteBuffer.getShort(this.byteOffset + index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int length() {
-			return this.byteLength >> 1;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT32/int} Zahlen interpretiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class IAMBufferINT32Array extends IAMBufferArray {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferINT32Array(final ByteBuffer buffer) throws NullPointerException {
-			super(buffer);
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferINT32Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
-			IllegalArgumentException {
-			super(byteBuffer, byteOffset, byteLength);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected IAMBufferArray newSection(final int offset, final int length) {
-			return new IAMBufferINT32Array(this.byteBuffer, this.byteOffset + (offset << 2), length << 2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(int index) {
-			index <<= 2;
-			if ((index < 0) || (index >= this.byteLength)) return 0;
-			return this.byteBuffer.getInt(this.byteOffset + index);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int length() {
-			return this.byteLength >> 2;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code UINT8} Zahlen interpretiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class IAMBufferUINT8Array extends IAMBufferINT8Array {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferUINT8Array(final ByteBuffer buffer) throws NullPointerException {
-			super(buffer);
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferUINT8Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
-			IllegalArgumentException {
-			super(byteBuffer, byteOffset, byteLength);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected IAMBufferArray newSection(final int offset, final int length) {
-			return new IAMBufferUINT8Array(this.byteBuffer, this.byteOffset + offset, length);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(final int index) {
-			return super.get(index) & 255;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT16/short} Zahlen interpretiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static class IAMBufferUINT16Array extends IAMBufferINT16Array {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Speicherbereich.
-		 * 
-		 * @param buffer Speicherbereich.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public IAMBufferUINT16Array(final ByteBuffer buffer) {
-			super(buffer);
-		}
-
-		@SuppressWarnings ("javadoc")
-		protected IAMBufferUINT16Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
-			IllegalArgumentException {
-			super(byteBuffer, byteOffset, byteLength);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected IAMBufferArray newSection(final int offset, final int length) {
-			return new IAMBufferUINT16Array(this.byteBuffer, this.byteOffset + (offset << 1), length << 1);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int get(final int index) {
-			return super.get(index) & 65535;
-		}
-
-	}
-
-	{}
-
-	/**
-	 * Diese Klasse implementiert eine {@link IAMMap}, die ihre Daten aus einem {@link IAMBufferINT32Array} dekodiert.
+	 * Diese Klasse implementiert eine {@link IAMMap}, die ihre Daten aus einem {@link IAMArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -365,12 +24,12 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Schlüssel.
 		 */
-		protected final IAMBufferArray keyData;
+		protected final MMFArray keyData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüssel.
 		 */
-		protected final IAMBufferArray keyOffset;
+		protected final MMFArray keyOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Schlüssel.
@@ -380,12 +39,12 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Werte.
 		 */
-		protected final IAMBufferArray valueData;
+		protected final MMFArray valueData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Werte.
 		 */
-		protected final IAMBufferArray valueOffset;
+		protected final MMFArray valueOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Werte.
@@ -400,7 +59,7 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüsselbereiche.
 		 */
-		protected final IAMBufferArray rangeOffset;
+		protected final MMFArray rangeOffset;
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Einträge.
@@ -427,9 +86,10 @@ public class IAMDecoder {
 		 * 
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMMapDecoder(final IAMBufferINT32Array array) throws IAMException {
-			if ((array == null) || (array.length() < 4)) throw new IAMException(IAMException.INVALID_LENGTH);
+		public IAMMapDecoder(final MMFArray array) throws IAMException, NullPointerException {
+			if (array.length() < 4) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
 			final int header = array.get(offset);
@@ -449,7 +109,7 @@ public class IAMDecoder {
 
 			int rangeValue;
 			final int rangeMask;
-			final IAMBufferArray rangeOffset;
+			final MMFArray rangeOffset;
 			if (rangeSizeType != 0) {
 
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
@@ -478,7 +138,7 @@ public class IAMDecoder {
 
 			int keyValue;
 			final int keyLength;
-			final IAMBufferArray keyOffset;
+			final MMFArray keyOffset;
 			if (keySizeType != 0) {
 
 				keyValue = IAM.byteAlign((entryCount + 1) * IAM.byteCount(keySizeType));
@@ -504,13 +164,13 @@ public class IAMDecoder {
 			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
 			keyValue = IAM.byteAlign(keyValue * IAM.byteCount(keyDataType));
-			final IAMBufferArray keyData = IAMDecoder.dataArray(array.section(offset, keyValue), keyDataType);
+			final MMFArray keyData = IAMDecoder.dataArray(array.section(offset, keyValue), keyDataType);
 			offset += keyValue;
 			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int valueValue;
 			final int valueLength;
-			final IAMBufferArray valueOffset;
+			final MMFArray valueOffset;
 			if (valueSizeType != 0) {
 
 				valueValue = IAM.byteAlign((entryCount + 1) * IAM.byteCount(valueSizeType));
@@ -536,7 +196,7 @@ public class IAMDecoder {
 			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
 			valueValue = IAM.byteAlign(valueValue * IAM.byteCount(valueDataType));
-			final IAMBufferArray valueData = IAMDecoder.dataArray(array.section(offset, valueValue), valueDataType);
+			final MMFArray valueData = IAMDecoder.dataArray(array.section(offset, valueValue), valueDataType);
 			offset += valueValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -552,11 +212,13 @@ public class IAMDecoder {
 
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IAMBufferArray key(final int entryIndex) {
+		public MMFArray key(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
 			final IAMArray keyOffset = this.keyOffset;
 			if (keyOffset != null) {
@@ -574,7 +236,7 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IAMBufferArray value(final int entryIndex) {
+		public MMFArray value(final int entryIndex) {
 			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
 			final IAMArray keyOffset = this.valueOffset;
 			if (keyOffset != null) {
@@ -600,8 +262,8 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int[] key) {
-			final IAMArray array = new IAMValueArray(key);
+		public int find(final int[] key) throws NullPointerException {
+			final IAMArray array = key.length == 0 ? IAMEmptyArray.INSTANCE : new IAMValueArray(key, false);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final IAMArray range = this.rangeOffset;
@@ -627,7 +289,7 @@ public class IAMDecoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link IAMList}, die ihre Daten aus einem {@link IAMBufferINT32Array} dekodiert.
+	 * Diese Klasse implementiert eine {@link IAMList}, die ihre Daten aus einem {@link IAMArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -636,12 +298,12 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Elemente.
 		 */
-		protected final IAMBufferArray itemData;
+		protected final MMFArray itemData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Elemente.
 		 */
-		protected final IAMBufferArray itemOffset;
+		protected final MMFArray itemOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Elemente.
@@ -668,9 +330,10 @@ public class IAMDecoder {
 		 * 
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMListDecoder(final IAMBufferINT32Array array) throws IAMException {
-			if ((array == null) || (array.length() < 3)) throw new IAMException(IAMException.INVALID_LENGTH);
+		public IAMListDecoder(final MMFArray array) throws IAMException, NullPointerException {
+			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
 			final int header = array.get(offset);
@@ -687,7 +350,7 @@ public class IAMDecoder {
 
 			int itemValue;
 			final int itemLength;
-			final IAMBufferArray itemOffset;
+			final MMFArray itemOffset;
 			if (itemSizeType != 0) {
 
 				itemValue = IAM.byteAlign((itemCount + 1) * IAM.byteCount(itemSizeType));
@@ -712,7 +375,7 @@ public class IAMDecoder {
 			}
 
 			itemValue = IAM.byteAlign(itemValue * IAM.byteCount(itemDataType));
-			final IAMBufferArray itemData = IAMDecoder.dataArray(array.section(offset, itemValue), itemDataType);
+			final MMFArray itemData = IAMDecoder.dataArray(array.section(offset, itemValue), itemDataType);
 			offset += itemValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -723,11 +386,13 @@ public class IAMDecoder {
 
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IAMBufferArray item(final int itemIndex) {
+		public MMFArray item(final int itemIndex) {
 			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return IAMDecoder.EMPTY_ARRAY;
 			final IAMArray itemOffset = this.itemOffset;
 			if (itemOffset != null) {
@@ -752,7 +417,7 @@ public class IAMDecoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link IAMBufferINT32Array} dekodiert.
+	 * Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link IAMArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -773,9 +438,10 @@ public class IAMDecoder {
 		 * 
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMIndexDecoder(final IAMBufferINT32Array array) throws IAMException {
-			if ((array == null) || (array.length() < 5)) throw new IAMException(IAMException.INVALID_LENGTH);
+		public IAMIndexDecoder(final MMFArray array) throws IAMException, NullPointerException {
+			if (array.length() < 5) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
 			final int header = array.get(offset);
@@ -804,11 +470,11 @@ public class IAMDecoder {
 			final int listDataLength = listOffset.get(listCount);
 			if ((listDataLength < 0) || (listDataLength > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMBufferINT32Array mapData = array.section(offset, mapDataLength).toINT32();
+			final MMFArray mapData = array.section(offset, mapDataLength).toINT32();
 			offset += mapDataLength;
 			if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			final IAMBufferINT32Array listData = array.section(offset, listDataLength).toINT32();
+			final MMFArray listData = array.section(offset, listDataLength).toINT32();
 			offset += listDataLength;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -827,6 +493,8 @@ public class IAMDecoder {
 			}
 
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -881,24 +549,23 @@ public class IAMDecoder {
 	/**
 	 * Dieses Feld speichert das leere IAMBufferArray.
 	 */
-	public static final IAMBufferArray EMPTY_ARRAY = //
-		new IAMBufferINT8Array(ByteBuffer.wrap(new byte[0]));
+	public static final MMFArray EMPTY_ARRAY = //
+		new MMFArray(new byte[0], null);
 
 	{}
 
 	/**
-	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link IAMBufferUINT8Array}, {@link IAMBufferUINT16Array} bzw.
-	 * {@link IAMBufferINT32Array} zurück.
+	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
 	 * 
-	 * @see IAMBufferArray#toUINT8()
-	 * @see IAMBufferArray#toUINT16()
-	 * @see IAMBufferArray#toINT32()
+	 * @see MMFArray#toUINT8()
+	 * @see MMFArray#toUINT16()
+	 * @see MMFArray#toINT32()
 	 * @param array Zahlenfolge.
 	 * @param sizeType Größentyp ({@code 1..3}).
 	 * @return Folge von {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Größentyp ungültig ist.
 	 */
-	protected static IAMBufferArray sizeArray(final IAMBufferArray array, final int sizeType) throws IllegalArgumentException {
+	static MMFArray sizeArray(final MMFArray array, final int sizeType) throws IllegalArgumentException {
 		switch (sizeType) {
 			case 1:
 				return array.toUINT8();
@@ -911,18 +578,17 @@ public class IAMDecoder {
 	}
 
 	/**
-	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link IAMBufferINT8Array}, {@link IAMBufferINT16Array} bzw.
-	 * {@link IAMBufferINT32Array} zurück.
+	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen zurück.
 	 * 
-	 * @see IAMBufferArray#toINT8()
-	 * @see IAMBufferArray#toINT16()
-	 * @see IAMBufferArray#toINT32()
+	 * @see MMFArray#toINT8()
+	 * @see MMFArray#toINT16()
+	 * @see MMFArray#toINT32()
 	 * @param array Zahlenfolge.
 	 * @param dataType Datentyp ({@code 1..3}).
 	 * @return Folge von {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Datentyp ungültig ist.
 	 */
-	protected static IAMBufferArray dataArray(final IAMBufferArray array, final int dataType) throws IllegalArgumentException {
+	static MMFArray dataArray(final MMFArray array, final int dataType) throws IllegalArgumentException {
 		switch (dataType) {
 			case 1:
 				return array.toINT8();
@@ -940,7 +606,7 @@ public class IAMDecoder {
 	 * @param array Zahlenfolge.
 	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen.
 	 */
-	protected static void checkArray(final IAMArray array) throws IAMException {
+	static void checkArray(final IAMArray array) throws IAMException {
 		int value = array.get(0);
 		if (value != 0) throw new IAMException(IAMException.INVALID_OFFSET);
 		for (int i = 0, length = array.length(); i < length; i++) {
@@ -948,50 +614,6 @@ public class IAMDecoder {
 			if (value > value2) throw new IAMException(IAMException.INVALID_OFFSET);
 			value = value2;
 		}
-	}
-
-	{}
-
-	/**
-	 * Diese Methode öffnet die gegebene Datei als {@link MappedByteBuffer} in der nativen Bytereihenfolge und gibt das dazu erzeugte {@link IAMBufferINT8Array}
-	 * zurück.
-	 * 
-	 * @see #arrayOf(File, ByteOrder)
-	 * @param file Datei.
-	 * @return {@link IAMBufferINT8Array}.
-	 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
-	 */
-	public static IAMBufferINT8Array arrayOf(final File file) throws IOException {
-		return IAMDecoder.arrayOf(file, ByteOrder.nativeOrder());
-	}
-
-	/**
-	 * Diese Methode öffnet die gegebene Datei als {@link MappedByteBuffer} in der gegebenen Bytereihenfolge und gibt das dazu erzeugte {@link IAMBufferINT8Array}
-	 * zurück.
-	 * 
-	 * @see #arrayOf(ByteBuffer)
-	 * @param file Datei.
-	 * @param order Bytereihenfolge.
-	 * @return {@link IAMBufferINT8Array}.
-	 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
-	 */
-	public static IAMBufferINT8Array arrayOf(final File file, final ByteOrder order) throws IOException {
-		final RandomAccessFile data = new RandomAccessFile(file, "r");
-		try {
-			return IAMDecoder.arrayOf(data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(ByteOrder.nativeOrder()));
-		} finally {
-			data.close();
-		}
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Speicherbereich als {@link IAMBufferINT8Array} zurück.
-	 * 
-	 * @param buffer Speicherbereich.
-	 * @return {@link IAMBufferINT8Array}.
-	 */
-	public static IAMBufferINT8Array arrayOf(final ByteBuffer buffer) {
-		return new IAMBufferINT8Array(buffer);
 	}
 
 }

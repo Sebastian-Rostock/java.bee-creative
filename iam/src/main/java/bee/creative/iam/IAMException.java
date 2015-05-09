@@ -30,24 +30,32 @@ public class IAMException extends RuntimeException {
 	 */
 	public static final int INVALID_HEADER = 8;
 
+	{}
+
 	/**
-	 * Dieses Feld speichert die Fehlerursache.
+	 * Dieses Feld speichert die Kennungen der Fehlerursache.
 	 */
 	protected final int code;
 
 	/**
-	 * Dieser Konstrukteur initialisiert die Fehlerursache.
+	 * Dieser Konstrukteur initialisiert die Kennungen der Fehlerursachen.
 	 * 
-	 * @param code Fehlerursache.
+	 * @see #INVALID_VALUE
+	 * @see #INVALID_OFFSET
+	 * @see #INVALID_LENGTH
+	 * @see #INVALID_HEADER
+	 * @param code Kennungen der Fehlerursachen ({@code |}-verknüpft).
 	 */
 	public IAMException(final int code) {
 		this.code = code;
 	}
 
+	{}
+
 	/**
-	 * Diese Methode gibt die Fehlerursache zurück.
+	 * Diese Methode gibt die Kennungen der Fehlerursachen zurück.
 	 * 
-	 * @return Fehlerursache.
+	 * @return Kennungen der Fehlerursachen.
 	 */
 	public int code() {
 		return this.code;

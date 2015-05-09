@@ -51,8 +51,9 @@ public interface IAMArray extends Iterable<Integer>, Comparable<IAMArray> {
 	 * 
 	 * @param value Zahlenfolge.
 	 * @return Vergleichswert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public boolean equals(IAMArray value);
+	public boolean equals(IAMArray value) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
@@ -66,8 +67,9 @@ public interface IAMArray extends Iterable<Integer>, Comparable<IAMArray> {
 	 * 
 	 * @param value Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public int compare(IAMArray value);
+	public int compare(IAMArray value) throws NullPointerException;
 
 	/**
 	 * Diese Methode gibt einen Abschnitt dieser Zahlenfolge ab der gegebenen Position und mit der gegebenen Länge zurück. Wenn der Abschnitt nicht innerhalb der

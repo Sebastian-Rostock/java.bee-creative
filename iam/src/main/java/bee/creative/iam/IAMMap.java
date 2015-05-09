@@ -100,7 +100,8 @@ public interface IAMMap {
 	 * 
 	 * @param key Schlüssel.
 	 * @return Index des Entrags.
+	 * @throws NullPointerException Wenn {@code key} {@code null} ist.
 	 */
-	public int find(final int[] key);
+	public int find(final int[] key) throws NullPointerException;
 
 }

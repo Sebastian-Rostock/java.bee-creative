@@ -60,6 +60,8 @@ public class IAM {
 			};
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -141,6 +143,8 @@ public class IAM {
 			};
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -189,6 +193,8 @@ public class IAM {
 		public int valueLength() {
 			return this.value().length();
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -256,6 +262,8 @@ public class IAM {
 			};
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -272,7 +280,7 @@ public class IAM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean equals(final IAMArray value) {
+		public boolean equals(final IAMArray value) throws NullPointerException {
 			final int length = this.length();
 			if (length != value.length()) return false;
 			for (int i = 0; i < length; i++)
@@ -284,7 +292,7 @@ public class IAM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int compare(final IAMArray value) {
+		public int compare(final IAMArray value) throws NullPointerException {
 			final int length1 = this.length(), length2 = value.length();
 			for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
 				if ((result = Comparators.compare(this.get(i), value.get(i))) != 0) return result;
@@ -312,6 +320,8 @@ public class IAM {
 			}
 			return result;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -371,7 +381,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return this.length() > 100 ? Objects.toString(this.section(0, 100)) + "..." : Objects.toString(this);
+			return this.length() > 50 ? Objects.toString(this.section(0, 50)) + "..." : Objects.toString(this);
 		}
 
 	}
@@ -426,6 +436,8 @@ public class IAM {
 			};
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -468,6 +480,8 @@ public class IAM {
 			this.value = value;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -502,12 +516,18 @@ public class IAM {
 		 * Dieser Konstruktor initialisiert die Zahlen.
 		 * 
 		 * @param array Zahlen.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
 		public IAMValueArray(final int[] array) throws NullPointerException {
-			if (array == null) throw new NullPointerException();
+			this.array = array.clone();
+		}
+
+		@SuppressWarnings ("javadoc")
+		IAMValueArray(final int[] array, final boolean IGNORE) throws NullPointerException {
 			this.array = array;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -541,6 +561,8 @@ public class IAM {
 		 * Dieses Feld speichert die {@link IAMEmptyMap}.
 		 */
 		public static final IAMEmptyMap INSTANCE = new IAMEmptyMap();
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -578,7 +600,8 @@ public class IAM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int[] key) {
+		public int find(final int[] key) throws NullPointerException {
+			if (key == null) throw new NullPointerException();
 			return -1;
 		}
 
@@ -595,6 +618,8 @@ public class IAM {
 		 * Dieses Feld speichert die {@link IAMEmptyList}.
 		 */
 		public static final IAMEmptyList INSTANCE = new IAMEmptyList();
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -625,6 +650,8 @@ public class IAM {
 		 * Dieses Feld speichert den {@link IAMEmptyEntry}.
 		 */
 		public static final IAMEmptyEntry INSTANCE = new IAMEmptyEntry();
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -657,6 +684,8 @@ public class IAM {
 		 */
 		public static final IAMEmptyArray INSTANCE = new IAMEmptyArray();
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -683,8 +712,9 @@ public class IAM {
 	 * @see IAMArray#hash()
 	 * @param array Zahlenfolge.
 	 * @return Streuwert.
+	 * @throws NullPointerException wenn {@code array} {@code null} ist.
 	 */
-	public static int hash(final int[] array) {
+	public static int hash(final int[] array) throws NullPointerException {
 		int hash = 0x811C9DC5;
 		for (int i = 0, size = array.length; i < size; i++) {
 			hash = (hash * 0x01000193) ^ array[i];
@@ -699,8 +729,9 @@ public class IAM {
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.
 	 * @return {@code true}, wenn die Zahlenfolgen gleich sind.
+	 * @throws NullPointerException wenn {@code array1} bzw. {@code array2} {@code null} ist.
 	 */
-	public static boolean equals(final int[] array1, final int[] array2) {
+	public static boolean equals(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
 		if (length1 != length2) return false;
 		for (int i = 0; i < length1; i++)
@@ -716,8 +747,9 @@ public class IAM {
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
+	 * @throws NullPointerException wenn {@code array1} bzw. {@code array2} {@code null} ist.
 	 */
-	public static int compare(final int[] array1, final int[] array2) {
+	public static int compare(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
 		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
 			if ((result = Comparators.compare(array1[i], array2[i])) != 0) return result;
@@ -729,21 +761,21 @@ public class IAM {
 	/**
 	 * Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
 	 * 
-	 * @param type Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
+	 * @param dataType Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
 	 * @return Byteanzahl ({@code 1}, {@code 2} oder {@code 4}).
 	 */
-	public static int byteCount(final int type) {
-		return (1 << type) >> 1;
+	public static int byteCount(final int dataType) {
+		return (1 << dataType) >> 1;
 	}
 
 	/**
 	 * Diese Methode gibt die kleinste Länge eines {@code INT32} Arrays zurück, in dessen Speicherbereich ein {@code INT8} Array mit der gegebenen Länge passen.
 	 * 
-	 * @param _byteCount Länge eines {@code INT8} Arrays.
+	 * @param byteCount Länge eines {@code INT8} Arrays.
 	 * @return Länge des {@code INT32} Arrays.
 	 */
-	public static int byteAlign(final int _byteCount) {
-		return (_byteCount + 3) >> 2;
+	public static int byteAlign(final int byteCount) {
+		return (byteCount + 3) >> 2;
 	}
 
 }
