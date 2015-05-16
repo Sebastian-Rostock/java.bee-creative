@@ -1,8 +1,8 @@
 package bee.creative.bex;
 
 /**
- * Die Schnittstelle {@link BEXFile} definiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem
- * Dokument (vgl. {@code XML} Datei) enthalten sind.
+ * Diese Schnittstelle definiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem Dokument (vgl.
+ * {@code XML} Datei) enthalten sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */

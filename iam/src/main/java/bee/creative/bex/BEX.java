@@ -84,6 +84,26 @@ public class BEX {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public int find(final String uri, final String name, final int start) throws NullPointerException {
+			if (start < 0) return -1;
+			final boolean useUri = uri.length() != 0, useName = name.length() != 0;
+			for (int i = start, length = this.length(); i < length; i++) {
+				final BEXNode node = this.get(i);
+				if (useUri && !node.uri().equals(uri)) {
+					continue;
+				}
+				if (useName && !node.name().equals(name)) {
+					continue;
+				}
+				return i;
+			}
+			return -1;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public Iterator<BEXNode> iterator() {
 			return new GetIterator<>(this, this.length());
 		}
@@ -116,6 +136,32 @@ public class BEX {
 		}
 
 	}
+
+	{}
+
+	// Typkennung für den undefinierten Knoten bzw. die undefinierte Knotenliste.
+	static final int BEX_VOID_TYPE = 0;
+
+	// Typkennung für einen Attributknoten.
+	static final int BEX_ATTR_NODE = 1;
+
+	// Typkennung für einen Elementknoten.
+	static final int BEX_ELEM_NODE = 2;
+
+	// Typkennung für einen Textknoten.
+	static final int BEX_TEXT_NODE = 3;
+
+	// Typkennung für den Textknoten eines Elementknoten.
+	static final int BEX_TEXTELEM_NODE = 4;
+
+	// Typkennung für eine Attributknotenliste.
+	static final int BEX_ATTR_LIST = 5;
+
+	// Typkennung für eine Kindknotenliste.
+	static final int BEX_CHLD_LIST = 6;
+
+	// Typkennung für die Kindknotenliste dem Textknoten eines Elementknoten.
+	static final int BEX_CHLDTEXT_LIST = 7;
 
 	{}
 
@@ -174,6 +220,18 @@ public class BEX {
 	 */
 	public static String toString(final MMFArray value) {
 		return BEX.toString(value.toBytes());
+	}
+
+	final static int key(final int type, final int index) {
+		return (index << 3) | (type << 0);
+	}
+
+	final static int type(final int key) {
+		return (key >> 0) & 7;
+	}
+
+	final static int index(final int key) {
+		return (key >> 3) & 0x1FFFFFFF;
 	}
 
 }
