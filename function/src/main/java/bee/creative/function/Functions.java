@@ -573,7 +573,7 @@ public final class Functions {
 		/**
 		 * Dieses Feld speichert die {@link ValueFunction}, die immer {@link NullValue#INSTANCE} liefert.
 		 */
-		public static final ValueFunction NULL_FUNCTION = ValueFunction.valueOf(NullValue.INSTANCE);
+		public static final ValueFunction NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
 
 		{}
 
