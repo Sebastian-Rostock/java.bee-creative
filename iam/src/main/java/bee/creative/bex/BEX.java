@@ -172,18 +172,18 @@ public class BEX {
 
 	{}
 
-	/**
-	 * Diese Methode wandelt die gegebene Zeichenkette via {@link #toBytes(String)} und {@link IAM#toArray(byte[])} eine Zahlenfolge um und gibt diese zurück.
-	 * 
-	 * @see #toBytes(String)
-	 * @see IAM#toArray(byte[])
-	 * @param value Zeichenkette.
-	 * @return Zahlenfolge.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	static IAMArray toArray(final String value) {
-		return IAM.toArray(BEX.toBytes(value));
-	}
+//	/**
+//	 * Diese Methode wandelt die gegebene Zeichenkette via {@link #toBytes(String)} und {@link IAM#toArray(byte[])} eine Zahlenfolge um und gibt diese zurück.
+//	 * 
+//	 * @see #toBytes(String)
+//	 * @see IAM#toArray(byte[])
+//	 * @param value Zeichenkette.
+//	 * @return Zahlenfolge.
+//	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+//	 */
+//	static IAMArray toArray(final String value) {
+//		return IAM.toArray(BEX.toBytes(value));
+//	}
 
 	/**
 	 * Diese Methode kodiert die gegebene Zeichenkette mit dem {@link #CHARSET} in eine Bytefolge und gibt diese zurück.
