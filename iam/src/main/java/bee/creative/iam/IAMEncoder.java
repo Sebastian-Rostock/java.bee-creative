@@ -1,5 +1,8 @@
 package bee.creative.iam;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
@@ -60,8 +63,6 @@ public class IAMEncoder {
 		 */
 		public final int[] dataOffset;
 
-		{}
-
 		/**
 		 * Dieser Konstruktor analysiert die gegebene Zahlenliste und initialisiert die Felder.
 		 * 
@@ -95,6 +96,8 @@ public class IAMEncoder {
 			}
 
 		}
+
+		{}
 
 		/**
 		 * Diese Methode schreibt die {@link #dataLength} bzw. das {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
@@ -246,14 +249,6 @@ public class IAMEncoder {
 		{}
 
 		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected boolean check(final Object input) {
-			return input instanceof int[];
-		}
-
-		/**
 		 * Diese Methode erzeugt einen neuen Nutzdatensatz und gibt diesen zurück.
 		 * 
 		 * @param index Index, unter dem der Nutzdatensatz in {@link #datas} verwaltet wird.
@@ -261,6 +256,41 @@ public class IAMEncoder {
 		 * @return Nutzdatensatz.
 		 */
 		protected abstract GData create(int index, int[] array);
+
+		/**
+		 * Diese Methode nimmt einen neuen Nutzdatensatz mit der gegebenen Zahlenliste in die Verwaltung auf und gibt den Index zurück, unter dem diese in
+		 * {@link #datas} verwaltet werden.
+		 * 
+		 * @param array Zahlenliste.
+		 * @return Nutzdatensatz.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+		 */
+		public GData put(final int[] array) throws NullPointerException {
+			final GData data = this.create(this.datas.size(), array.clone());
+			this.datas.add(data);
+			return data;
+		}
+
+		/**
+		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
+		 * 
+		 * @see #datas
+		 * @see #entryMap
+		 */
+		public void clear() {
+			this.datas.clear();
+			this.entryMap.clear();
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected boolean check(final Object input) {
+			return input instanceof int[];
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -292,22 +322,6 @@ public class IAMEncoder {
 		@Override
 		public int compare(final int[] array1, final int[] array2) throws NullPointerException {
 			return IAM.compare(array1, array2);
-		}
-
-		{}
-
-		/**
-		 * Diese Methode nimmt einen neuen Nutzdatensatz mit der gegebenen Zahlenliste in die Verwaltung auf und gibt den Index zurück, unter dem diese in
-		 * {@link #datas} verwaltet werden.
-		 * 
-		 * @param array Zahlenliste.
-		 * @return Nutzdatensatz.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-		 */
-		public GData put(final int[] array) throws NullPointerException {
-			final GData data = this.create(this.datas.size(), array.clone());
-			this.datas.add(data);
-			return data;
 		}
 
 	}
@@ -482,8 +496,6 @@ public class IAMEncoder {
 			return this.data;
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -575,6 +587,13 @@ public class IAMEncoder {
 			this.mode = mode;
 		}
 
+		/**
+		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
+		 */
+		public void clear() {
+			this.entries.clear();
+		}
+
 		{}
 
 		/**
@@ -614,8 +633,6 @@ public class IAMEncoder {
 			final IAMEntry result = this.entries.entryMap().get(key);
 			return result == null ? -1 : result.index;
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -806,8 +823,6 @@ public class IAMEncoder {
 			return this.data;
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -878,6 +893,15 @@ public class IAMEncoder {
 		}
 
 		/**
+		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
+		 */
+		public void clear() {
+			this.items.clear();
+		}
+
+		{}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -894,8 +918,6 @@ public class IAMEncoder {
 		public int itemCount() {
 			return this.items.datas.size();
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -1078,6 +1100,15 @@ public class IAMEncoder {
 			return this.put(value);
 		}
 
+		/**
+		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
+		 */
+		public void clear() {
+			this.maps.clear();
+			this.lists.clear();
+			this.order = null;
+		}
+
 		{}
 
 		/**
@@ -1114,8 +1145,6 @@ public class IAMEncoder {
 			return this.lists.size();
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 * 
@@ -1132,8 +1161,8 @@ public class IAMEncoder {
 			final byte[][] lists = IAMEncoder.encodeBytes(this.lists, order);
 			int length = 12;
 			length += (maps.length + lists.length + 2) << 2;
-			length += IAMEncoder.countBytes(maps);
-			length += IAMEncoder.countBytes(lists);
+			length += IAMEncoder.length(maps);
+			length += IAMEncoder.length(lists);
 			final byte[] result = new byte[length];
 			final ByteBuffer buffer = ByteBuffer.wrap(result).order(order);
 			buffer.putInt(0xF00DBA5E);
@@ -1174,9 +1203,7 @@ public class IAMEncoder {
 	 * @param source Zahlenfolgen.
 	 */
 	protected static void putData(final ByteBuffer buffer, final byte[][] source) {
-		for (final byte[] data: source) {
-			buffer.put(data);
-		}
+		IAMEncoder.write(source, buffer);
 	}
 
 	/**
@@ -1222,20 +1249,6 @@ public class IAMEncoder {
 	}
 
 	{}
-
-	/**
-	 * Diese Methode gibt die Summe der Anzahl der Bytes in den gegebenen Zahlenfolgen zurück.
-	 * 
-	 * @param source Zahlenfolgen.
-	 * @return Anzahl der Bytes.
-	 */
-	protected static int countBytes(final byte[][] source) {
-		int length = 0;
-		for (final byte[] bytes: source) {
-			length += bytes.length;
-		}
-		return length;
-	}
 
 	/**
 	 * Diese Methode kodiert die gegebenen {@link IAMBaseEncoder} in Zahlenfolgen.
@@ -1294,6 +1307,83 @@ public class IAMEncoder {
 			result <<= 1;
 		}
 		return (result - 1) & 536870911;
+	}
+
+	{}
+
+	/**
+	 * Diese Methode speichert die gegebenen Bytefolgen in die gegebene Datei.
+	 * 
+	 * @see #write(byte[][], RandomAccessFile)
+	 * @param source Bytefolgen.
+	 * @param target Datei.
+	 * @throws IOException Wenn ein E/A-Fehler eintritt.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist.
+	 */
+	public static void write(final byte[][] source, final File target) throws IOException, NullPointerException {
+		try (RandomAccessFile file = new RandomAccessFile(target, "rw")) {
+			IAMEncoder.write(source, file);
+		}
+	}
+
+	/**
+	 * Diese Methode fügt die gegebenen Bytefolgen an den gegebenen {@link ByteBuffer} an.
+	 * 
+	 * @see ByteBuffer#put(byte[])
+	 * @param source Bytefolgen.
+	 * @param target {@link ByteBuffer}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Bytefolge aus {@code source} nicht in {@code target} passen.
+	 */
+	public static void write(final byte[][] source, final ByteBuffer target) throws NullPointerException, IllegalArgumentException {
+		if (target.remaining() < IAMEncoder.length(source)) throw new IllegalArgumentException();
+		for (final byte[] data: source) {
+			target.put(data);
+		}
+	}
+
+	/**
+	 * Diese Methode speichert die gegebenen Bytefolgen in die gegebene Datei.
+	 * 
+	 * @see RandomAccessFile#write(byte[])
+	 * @param source Bytefolgen.
+	 * @param target Datei.
+	 * @throws IOException Wenn ein E/A-Fehler eintritt.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist.
+	 */
+	public static void write(final byte[][] source, final RandomAccessFile target) throws IOException, NullPointerException {
+		for (final byte[] data: source) {
+			target.write(data);
+		}
+	}
+
+	/**
+	 * Diese Methode gibt die Summe der Anzahl der Bytes in den gegebenen Bytefolgen zurück.
+	 * 
+	 * @param source Bytefolgen.
+	 * @return Anzahl der Bytes.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält.
+	 */
+	public static int length(final byte[][] source) throws NullPointerException {
+		int length = 0;
+		for (final byte[] bytes: source) {
+			length += bytes.length;
+		}
+		return length;
+	}
+
+	/**
+	 * Diese Methode gibt die Summe der Anzahl der Bytes in den gegebenen Bytefolgen zurück.
+	 * 
+	 * @see #write(byte[][], ByteBuffer)
+	 * @param source Bytefolgen.
+	 * @return Anzahl der Bytes.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält.
+	 */
+	public static byte[] compact(final byte[][] source) throws NullPointerException {
+		final byte[] target = new byte[IAMEncoder.length(source)];
+		IAMEncoder.write(source, ByteBuffer.wrap(target));
+		return target;
 	}
 
 }

@@ -105,7 +105,7 @@ public class MMFArray extends IAMBaseArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MMFArray section(final int offset, final int length) {
+	public final MMFArray section(final int offset, final int length) {
 		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return this.newSection(0, 0);
 		return this.newSection(offset, length);
 	}
