@@ -22,8 +22,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import bee.creative.bex.BEXEncoder.BEXItem;
 import bee.creative.iam.IAMEncoder;
+import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.iam.IAMEncoder.IAMListEncoder;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
@@ -43,10 +43,11 @@ public class BEXEncoder {
 		final DocumentBuilder db = dbf.newDocumentBuilder();
 		final Document doc = db.parse(new File("bex.xml"));
 		final BEXFileEncoder encoder = new BEXFileEncoder();
-		encoder.setAttrParentEnabled(true);
+		// encoder.setAttrParentEnabled(true);
 		encoder.putNode(doc);
 		System.out.println(encoder);
-		System.out.println(encoder.encode(ByteOrder.nativeOrder()));
+		final byte[] x = encoder.encode(ByteOrder.nativeOrder());
+		IAMEncoder.write(new byte[][]{x}, new File("bex.bin"));
 		System.out.println(encoder);
 
 	}
@@ -250,25 +251,6 @@ public class BEXEncoder {
 		@Override
 		public int key() {
 			return this.group.offset + this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return this.index;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof BEXParentItem)) return false;
-			final BEXParentItem data = (BEXParentItem)object;
-			return (this.index == data.index) && (this.group == data.group);
 		}
 
 	}
@@ -568,7 +550,7 @@ public class BEXEncoder {
 			pool.length = offset;
 		}
 
-		byte[] encodePART(final BEXGroupPool pool, final ByteOrder order) {
+		IAMListEncoder encodePART(final BEXGroupPool pool) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = groups.size();
 			final int[] value = new int[length + 1];
@@ -578,10 +560,10 @@ public class BEXEncoder {
 			value[length] = pool.length;
 			final IAMListEncoder encoder = new IAMListEncoder();
 			encoder.put(value, false);
-			return encoder.encode(order);
+			return encoder;
 		}
 
-		byte[] encodePROP(final BEXGroupPool pool, final ByteOrder order, final int prop) {
+		IAMListEncoder encodePROP(final BEXGroupPool pool, final int prop) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = pool.length;
 			final int[] value = new int[length];
@@ -598,7 +580,7 @@ public class BEXEncoder {
 			for (int i = (prop == 0) || (prop == 4) ? 0 : length; (i < length) && (empty = value[i] == 0); i++) {}
 			final IAMListEncoder encoder = new IAMListEncoder();
 			encoder.put(empty ? new int[0] : value, false);
-			return encoder.encode(order);
+			return encoder;
 		}
 
 		/**
@@ -619,20 +601,14 @@ public class BEXEncoder {
 			return result;
 		}
 
-		byte[] encodeTEXT(final BEXTextPool pool, final ByteOrder order) {
+		IAMListEncoder encodeTEXT(final BEXTextPool pool) {
 			final List<BEXTextItem> texts = pool.items;
 			Collections.sort(texts, BEXTextItem.ORDER);
 			final IAMListEncoder encoder = new IAMListEncoder();
 			for (final BEXTextItem text: texts) {
 				text.key = encoder.put(this.encodeTEXT(text.text), false);
 			}
-			return encoder.encode(order);
-		}
-
-		byte[] encodeHEAD(final int header, final ByteOrder order) {
-			final byte[] result = new byte[4];
-			ByteBuffer.wrap(result).order(order).putInt(header);
-			return result;
+			return encoder;
 		}
 
 		/**
@@ -712,7 +688,7 @@ public class BEXEncoder {
 			this.putText(stack);
 			final BEXStack parent = stack.parent;
 			final List<BEXItem> chldItems = stack.children.items;
-			List<BEXItem> attrItems = stack.attributes.items;
+			final List<BEXItem> attrItems = stack.attributes.items;
 			final BEXItem uri = this.chldUriText.get(this.chldUriEnabled ? stack.uri : null);
 			final BEXItem name = this.chldNameText.get(stack.name);
 			final BEXItem content = ((chldItems.size() == 5) && (chldItems.get(1) == null)) ? //
@@ -1034,55 +1010,28 @@ public class BEXEncoder {
 			if (stack.type != BEXStack.ROOT) throw new IllegalStateException();
 			this.updatePART(this.attrTablePart, +1);
 			this.updatePART(this.chldTablePart, -1);
-
-			final byte[] fileHeader = this.encodeHEAD(0xBE10BA5E, order);
-			final byte[] rootRef = this.encodeHEAD(stack.children.offset, order);
-
-			final byte[] textHeader = this.encodeHEAD(0xBE101000, order);
-			final byte[] attrUriText = this.encodeTEXT(this.attrUriText, order);
-			final byte[] attrNameText = this.encodeTEXT(this.attrNameText, order);
-			final byte[] attrValueText = this.encodeTEXT(this.attrValueText, order);
-			final byte[] chldUriText = this.encodeTEXT(this.chldUriText, order);
-			final byte[] chldNameText = this.encodeTEXT(this.chldNameText, order);
-			final byte[] chldValueText = this.encodeTEXT(this.chldValueText, order);
-
-			final byte[] propHeader = this.encodeHEAD(0xBE102000, order);
-			final byte[] attrUriRef = this.encodePROP(this.attrTablePart, order, 0);
-			final byte[] attrNameRef = this.encodePROP(this.attrTablePart, order, 1);
-			final byte[] attrValueRef = this.encodePROP(this.attrTablePart, order, 2);
-			final byte[] attrParentRef = this.encodePROP(this.attrTablePart, order, 4);
-			final byte[] chldUriRef = this.encodePROP(this.chldTablePart, order, 0);
-			final byte[] chldNameRef = this.encodePROP(this.chldTablePart, order, 1);
-			final byte[] chldContentRef = this.encodePROP(this.chldTablePart, order, 2);
-			final byte[] chldAttributesRef = this.encodePROP(this.chldTablePart, order, 3);
-			final byte[] chldParentRef = this.encodePROP(this.chldTablePart, order, 4);
-
-			final byte[] partHeader = this.encodeHEAD(0xBE103000, order);
-			final byte[] attrTablePart = this.encodePART(this.attrTablePart, order);
-			final byte[] chldTablePart = this.encodePART(this.chldTablePart, order);
-
-			final byte[][] target = new byte[][]{fileHeader, //
-				rootRef, //
-				textHeader, attrUriText, //
-				textHeader, attrNameText, //
-				textHeader, attrValueText, //
-				textHeader, chldUriText, //
-				textHeader, chldNameText, //
-				textHeader, chldValueText, //
-				propHeader, attrUriRef, //
-				propHeader, attrNameRef, //
-				propHeader, attrValueRef, //
-				propHeader, attrParentRef, //
-				propHeader, chldUriRef, //
-				propHeader, chldNameRef, //
-				propHeader, chldContentRef, //
-				propHeader, chldAttributesRef, //
-				propHeader, chldParentRef, //
-				partHeader, attrTablePart, //
-				partHeader, chldTablePart //
-				};
-
-			return IAMEncoder.compact(target);
+			final byte[] dataA = new byte[8];
+			ByteBuffer.wrap(dataA).order(order).putInt(0xBE10BA5E).putInt(stack.children.offset);
+			final IAMIndexEncoder encoder = new IAMIndexEncoder();
+			encoder.putList(this.encodeTEXT(this.attrUriText));
+			encoder.putList(this.encodeTEXT(this.attrNameText));
+			encoder.putList(this.encodeTEXT(this.attrValueText));
+			encoder.putList(this.encodeTEXT(this.chldUriText));
+			encoder.putList(this.encodeTEXT(this.chldNameText));
+			encoder.putList(this.encodeTEXT(this.chldValueText));
+			encoder.putList(this.encodePROP(this.attrTablePart, 0));
+			encoder.putList(this.encodePROP(this.attrTablePart, 1));
+			encoder.putList(this.encodePROP(this.attrTablePart, 2));
+			encoder.putList(this.encodePROP(this.attrTablePart, 4));
+			encoder.putList(this.encodePROP(this.chldTablePart, 0));
+			encoder.putList(this.encodePROP(this.chldTablePart, 1));
+			encoder.putList(this.encodePROP(this.chldTablePart, 2));
+			encoder.putList(this.encodePROP(this.chldTablePart, 3));
+			encoder.putList(this.encodePROP(this.chldTablePart, 4));
+			encoder.putList(this.encodePART(this.attrTablePart));
+			encoder.putList(this.encodePART(this.chldTablePart));
+			final byte[] dataB = encoder.encode(order);
+			return IAMEncoder.compact(new byte[][]{dataA, dataB});
 		}
 
 		{}
