@@ -5,13 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -22,35 +19,22 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+import bee.creative.bex.BEXDecoder.BEXFileDecoder;
 import bee.creative.iam.IAMEncoder;
+import bee.creative.iam.IAMEncoder.IAMBaseEncoder;
 import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.iam.IAMEncoder.IAMListEncoder;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
+/**
+ * Diese Klasse implementiert die Klassen und Methoden zur Kodierung der {@link BEX} Datenstrukturen.
+ * 
+ * @see BEXFileEncoder
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ */
 public class BEXEncoder {
-
-	public static void main(final String[] args) throws Exception {
-
-		System.out.println(BEX.toString(new byte[]{64, 32, 66, 0}));
-
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		dbf.setCoalescing(true);
-		dbf.setIgnoringComments(true);
-		dbf.setXIncludeAware(true);
-		final DocumentBuilder db = dbf.newDocumentBuilder();
-		final Document doc = db.parse(new File("bex.xml"));
-		final BEXFileEncoder encoder = new BEXFileEncoder();
-		// encoder.setAttrParentEnabled(true);
-		encoder.putNode(doc);
-		System.out.println(encoder);
-		final byte[] x = encoder.encode(ByteOrder.nativeOrder());
-		IAMEncoder.write(new byte[][]{x}, new File("bex.bin"));
-		System.out.println(encoder);
-
-	}
 
 	/**
 	 * Diese Klasse implementiert einen Datensatz, dem ein identifizierender {@link #key()} zugeordnet werden kann.
@@ -408,39 +392,83 @@ public class BEXEncoder {
 	 */
 	static class BEXStack {
 
+		/**
+		 * Dieses Feld speichert den Datentyp des Dokumentknoten ohne Wurzelelement.
+		 */
 		public static final int VOID = 0;
 
+		/**
+		 * Dieses Feld speichert den Datentyp eines Elementknoten.
+		 */
 		public static final int ELEM = 1;
 
+		/**
+		 * Dieses Feld speichert den Datentyp eines Attributknoten.
+		 */
 		public static final int ATTR = 2;
 
+		/**
+		 * Dieses Feld speichert den Datentyp eines Textknoten.
+		 */
 		public static final int TEXT = 3;
 
+		/**
+		 * Dieses Feld speichert den Datentyp des Dokumentknoten mit Wurzelelement.
+		 */
 		public static final int ROOT = 4;
 
 		{}
 
+		/**
+		 * Dieses Feld speichert die Zustandsdaten des Elternknoten.
+		 */
 		public BEXStack parent;
 
+		/**
+		 * Dieses Feld speichert den Typ der Zustandsdaten.
+		 */
 		public int type;
 
+		/**
+		 * Dieses Feld speichert den URI des Knoten.
+		 */
 		public String uri;
 
+		/**
+		 * Dieses Feld speichert den Namen des Knoten.
+		 */
 		public String name;
 
+		/**
+		 * Dieses Feld speichert den Wert des Knoten.
+		 */
 		public String value;
 
+		/**
+		 * Dieses Feld speichert das {@link BEXItem} dieses Knoten.
+		 */
 		public BEXItem item;
 
+		/**
+		 * Dieses Feld speichert die Kindknotenliste.
+		 */
 		public BEXGroupItem children;
 
+		/**
+		 * Dieses Feld speichert die Attributknotenliste.
+		 */
 		public BEXGroupItem attributes;
 
 	}
 
 	{}
 
-	public static final class BEXFileEncoder {
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileDecoder}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class BEXFileEncoder implements IAMBaseEncoder {
 
 		/**
 		 * Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten.
@@ -512,6 +540,9 @@ public class BEXEncoder {
 		 */
 		protected boolean chldParentEnabled = false;
 
+		/**
+		 * Dieser Konstruktor initialisiert einen leeren {@link BEXFileEncoder}.
+		 */
 		public BEXFileEncoder() {
 			this.clear();
 		}
@@ -535,6 +566,7 @@ public class BEXEncoder {
 		 * Diese Methode aktualisiert die Ordnung der zusammengestellten Datensätze, die Anzahl der Zeilen der durch diese Datensätze beschriebenen Tabelle sowie
 		 * die Schlüssel und Startpositionen der Datensätze.
 		 * 
+		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param step Inkrement für den Zähler der Schlüssel (-1=Kindknoten, +1=Attributknoten).
 		 */
 		void updatePART(final BEXGroupPool pool, final int step) {
@@ -544,12 +576,18 @@ public class BEXEncoder {
 			for (final BEXGroupItem group: groups) {
 				group.key = key;
 				group.offset = offset;
-				key -= step;
+				key += step;
 				offset += group.items.size() / 5;
 			}
 			pool.length = offset;
 		}
 
+		/**
+		 * Diese Methode kodiert die Längen der gegebenen Tabellenabschnitte in eine Zahlenfolge und gibt diese in einer Liste zurück.
+		 * 
+		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
+		 * @return Auflistung mit einer Zahlenfolge.
+		 */
 		IAMListEncoder encodePART(final BEXGroupPool pool) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = groups.size();
@@ -563,6 +601,13 @@ public class BEXEncoder {
 			return encoder;
 		}
 
+		/**
+		 * Diese Methode kodiert eine Spalte der gegebenen Tabellenabschnitte in eine Zahlenfolge und gibt diese in einer Liste zurück.
+		 * 
+		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
+		 * @param prop Spaltenindex (0..4).
+		 * @return Auflistung mit einer Zahlenfolge.
+		 */
 		IAMListEncoder encodePROP(final BEXGroupPool pool, final int prop) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = pool.length;
@@ -584,29 +629,18 @@ public class BEXEncoder {
 		}
 
 		/**
-		 * Diese Methode kodiert die gegebene Zeichenkette via {@link String#getBytes(Charset)} in eine Bytefolge, wandelt diese in eine nullterminierte Zahlenfolge
-		 * um gibt diese zurück.
+		 * Diese Methode kodiert die gegebenen Zeichenketten in eine Liste von Zahlenfolgen und gibt diese zurück.
 		 * 
-		 * @param source Zeichenkette.
-		 * @return Zahlenfolge.
+		 * @see BEX#toItem(String)
+		 * @param pool Auflistung von Zeichenketten.
+		 * @return Auflistung von Zahlenfolgen.
 		 */
-		int[] encodeTEXT(final String source) {
-			final byte[] bytes = source.getBytes(BEX.CHARSET);
-			final int length = bytes.length;
-			final int[] result = new int[length + 1];
-			for (int i = 0; i < length; i++) {
-				result[i] = bytes[i];
-			}
-			result[length] = 0;
-			return result;
-		}
-
 		IAMListEncoder encodeTEXT(final BEXTextPool pool) {
 			final List<BEXTextItem> texts = pool.items;
 			Collections.sort(texts, BEXTextItem.ORDER);
 			final IAMListEncoder encoder = new IAMListEncoder();
 			for (final BEXTextItem text: texts) {
-				text.key = encoder.put(this.encodeTEXT(text.text), false);
+				text.key = encoder.put(BEX.toItem(text.text), false);
 			}
 			return encoder;
 		}
@@ -682,7 +716,14 @@ public class BEXEncoder {
 			return this;
 		}
 
-		public BEXFileEncoder putElem() {
+		/**
+		 * Diese Methode beendet die Bestückung des aktuellen Elementknoten und gibt {@code this} zurück.<br>
+		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
+		 * 
+		 * @return {@code this}.
+		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird.
+		 */
+		public BEXFileEncoder putElem() throws IllegalStateException {
 			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.ELEM) throw new IllegalStateException();
 			this.putText(stack);
@@ -695,15 +736,14 @@ public class BEXEncoder {
 				chldItems.get(2) : //
 				(stack.children = this.chldParentEnabled && !chldItems.isEmpty() ? this.chldTablePart.put(stack.children) : this.chldTablePart.get(chldItems));
 			final BEXItem attributes = //
-				(stack.attributes = this.attrParentEnabled && !attrItems.isEmpty() ? this.chldTablePart.put(stack.attributes) : this.chldTablePart.get(attrItems));
-			this.stack = parent;
+				(stack.attributes = this.attrParentEnabled && !attrItems.isEmpty() ? this.attrTablePart.put(stack.attributes) : this.attrTablePart.get(attrItems));
 			if (parent == null) return this;
+			this.stack = parent;
 			parent.children.put(uri).put(name).put(content).put(attributes).put(this.chldParentEnabled ? parent.item : null);
 			if (parent.type != BEXStack.VOID) return this;
 			parent.type = BEXStack.ELEM;
 			this.putElem();
 			parent.type = BEXStack.ROOT;
-			this.stack = parent;
 			return this;
 		}
 
@@ -730,7 +770,18 @@ public class BEXEncoder {
 			return this;
 		}
 
-		public BEXFileEncoder putNode(final File file) throws IOException, SAXException, IllegalStateException {
+		/**
+		 * Diese Methode ließt die gegebene {@code XML} Datei ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
+		 * 
+		 * @see #putNode(InputSource, XMLReader)
+		 * @param file Datei.
+		 * @return {@code this}.
+		 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
+		 * @throws SAXException Wenn die Datei nicht geparst werden kann.
+		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird.
+		 */
+		public BEXFileEncoder putNode(final File file) throws IOException, SAXException, NullPointerException, IllegalStateException {
 			try (FileInputStream stream = new FileInputStream(file)) {
 				return this.putNode(new InputSource(stream), XMLReaderFactory.createXMLReader());
 			}
@@ -788,6 +839,17 @@ public class BEXEncoder {
 			return this;
 		}
 
+		/**
+		 * Diese Methode ließt die gegebene Datenquelle mit dem gegebenen Parser ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
+		 * 
+		 * @param source Datenquelle.
+		 * @param reader Parser.
+		 * @return {@code this}.
+		 * @throws IOException Wenn die Datenquelle nicht geöffnet werden kann.
+		 * @throws SAXException Wenn die Datenquelle nicht geparst werden kann.
+		 * @throws NullPointerException Wenn {@code source} bzw. {@code reader} {@code null} ist.
+		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird.
+		 */
 		public BEXFileEncoder putNode(final InputSource source, final XMLReader reader) throws IOException, SAXException, NullPointerException,
 			IllegalStateException {
 			reader.setContentHandler(new DefaultHandler() {
@@ -986,7 +1048,10 @@ public class BEXEncoder {
 			return this;
 		}
 
-		public BEXFileEncoder clear() {
+		/**
+		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
+		 */
+		public void clear() {
 			this.text.setLength(0);
 			this.stack = new BEXStack();
 			this.stack.type = BEXStack.VOID;
@@ -1001,10 +1066,19 @@ public class BEXEncoder {
 			this.chldNameText.clear();
 			this.chldValueText.clear();
 			this.chldTablePart.clear();
-			return this;
 		}
 
-		public byte[] encode(final ByteOrder order) throws IllegalStateException {
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see #putNode(File)
+		 * @see #putNode(Node)
+		 * @see #putNode(InputSource, XMLReader)
+		 */
+		@Override
+		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
 			if (order == null) throw new NullPointerException();
 			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.ROOT) throw new IllegalStateException();
@@ -1034,15 +1108,14 @@ public class BEXEncoder {
 			return IAMEncoder.compact(new byte[][]{dataA, dataB});
 		}
 
-		{}
-
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String toString() {
-			return super.toString();
+			return Objects.toStringCall(this, this.attrTablePart.items.size(), this.chldTablePart.items.size());
 		}
 
 	}
-
-	{}
 
 }

@@ -13,11 +13,19 @@ import bee.creative.mmf.MMFArray;
 public class IAMDecoder {
 
 	/**
-	 * Diese Klasse implementiert eine {@link IAMMap}, die ihre Daten aus einem {@link IAMArray} dekodiert.
+	 * Diese Klasse implementiert eine {@link IAMMap}, die ihre Daten aus einem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class IAMMapDecoder extends IAMBaseMap {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link IAMMapDecoder}.
+		 */
+		public static final IAMMapDecoder EMPTY = //
+			new IAMMapDecoder();
+
+		{}
 
 		/**
 		 * Dieses Feld speichert die Zahlen der Schlüssel.
@@ -86,7 +94,8 @@ public class IAMDecoder {
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMMapDecoder(final MMFArray array) throws IAMException, NullPointerException {
+		public IAMMapDecoder(MMFArray array) throws IAMException, NullPointerException {
+			array = array.toINT32();
 			if (array.length() < 4) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -217,7 +226,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public MMFArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
 			final IAMArray keyOffset = this.keyOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
@@ -235,7 +244,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public MMFArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return IAMDecoder.EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
 			final IAMArray keyOffset = this.valueOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
@@ -287,11 +296,19 @@ public class IAMDecoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine {@link IAMList}, die ihre Daten aus einem {@link IAMArray} dekodiert.
+	 * Diese Klasse implementiert eine {@link IAMList}, die ihre Daten aus einem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class IAMListDecoder extends IAMBaseList {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link IAMListDecoder}.
+		 */
+		public static final IAMListDecoder EMPTY = //
+			new IAMListDecoder();
+
+		{}
 
 		/**
 		 * Dieses Feld speichert die Zahlen der Elemente.
@@ -330,7 +347,8 @@ public class IAMDecoder {
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMListDecoder(final MMFArray array) throws IAMException, NullPointerException {
+		public IAMListDecoder(MMFArray array) throws IAMException, NullPointerException {
+			array = array.toINT32();
 			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -391,7 +409,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public MMFArray item(final int itemIndex) {
-			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return IAMDecoder.EMPTY_ARRAY;
+			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return MMFArray.EMPTY;
 			final IAMArray itemOffset = this.itemOffset;
 			if (itemOffset != null) {
 				final int offset = itemOffset.get(itemIndex);
@@ -415,11 +433,19 @@ public class IAMDecoder {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link IAMArray} dekodiert.
+	 * Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class IAMIndexDecoder extends IAMBaseIndex {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link IAMIndexDecoder}.
+		 */
+		public static final IAMIndexDecoder EMPTY = //
+			new IAMIndexDecoder();
+
+		{}
 
 		/**
 		 * Dieses Feld speichert die Abbildungen.
@@ -432,13 +458,22 @@ public class IAMDecoder {
 		protected final IAMListDecoder[] lists;
 
 		/**
+		 * Dieser Konstruktor initialisiert das leere Inhaltsverzeichnis.
+		 */
+		protected IAMIndexDecoder() {
+			this.maps = new IAMMapDecoder[0];
+			this.lists = new IAMListDecoder[0];
+		}
+
+		/**
 		 * Dieser Kontrukteur initialisiert diesen {@link IAMIndex} als Sicht auf den gegebenen Speicherbereich.
 		 * 
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
-		public IAMIndexDecoder(final MMFArray array) throws IAMException, NullPointerException {
+		public IAMIndexDecoder(MMFArray array) throws IAMException, NullPointerException {
+			array = array.toINT32();
 			if (array.length() < 5) throw new IAMException(IAMException.INVALID_LENGTH);
 
 			int offset = 0;
@@ -499,7 +534,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMMapDecoder map(final int index) {
-			if ((index < 0) || (index >= this.maps.length)) return IAMDecoder.EMPTY_MAP;
+			if ((index < 0) || (index >= this.maps.length)) return IAMMapDecoder.EMPTY;
 			return this.maps[index];
 		}
 
@@ -516,7 +551,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public IAMListDecoder list(final int index) {
-			if ((index < 0) || (index >= this.lists.length)) return IAMDecoder.EMPTY_LIST;
+			if ((index < 0) || (index >= this.lists.length)) return IAMListDecoder.EMPTY;
 			return this.lists[index];
 		}
 
@@ -529,26 +564,6 @@ public class IAMDecoder {
 		}
 
 	}
-
-	{}
-
-	/**
-	 * Dieses Feld speichert den leeren {@link IAMMapDecoder}.
-	 */
-	public static final IAMMapDecoder EMPTY_MAP = //
-		new IAMMapDecoder();
-
-	/**
-	 * Dieses Feld speichert den leeren {@link IAMListDecoder}.
-	 */
-	public static final IAMListDecoder EMPTY_LIST = //
-		new IAMListDecoder();
-
-	/**
-	 * Dieses Feld speichert das leere IAMBufferArray.
-	 */
-	public static final MMFArray EMPTY_ARRAY = //
-		new MMFArray(new byte[0], null);
 
 	{}
 

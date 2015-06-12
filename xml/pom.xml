@@ -15,11 +15,5 @@
 			<artifactId>bee-creative.util</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<version>[1.3.6,)</version>
-			<groupId>bee-creative</groupId>
-			<artifactId>bee-creative.data</artifactId>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 </project>

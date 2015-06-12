@@ -20,6 +20,13 @@ import bee.creative.iam.IAMArray;
  */
 public class MMFArray extends IAMBaseArray {
 
+	/**
+	 * Dieses Feld speichert das leere {@link MMFArray}.
+	 */
+	public static final MMFArray EMPTY = new MMFArray(null, 0, 0);
+
+	{}
+
 	@SuppressWarnings ("javadoc")
 	static ByteOrder order(final ByteOrder order) {
 		return order != null ? order : ByteOrder.nativeOrder();
@@ -40,14 +47,14 @@ public class MMFArray extends IAMBaseArray {
 	protected final ByteBuffer byteBuffer;
 
 	/**
-	 * Dieses Feld speichert die Länge.
-	 */
-	protected final int byteLength;
-
-	/**
 	 * Dieses Feld speichert die Startposition.
 	 */
 	protected final int byteOffset;
+
+	/**
+	 * Dieses Feld speichert die Länge.
+	 */
+	protected final int byteLength;
 
 	/**
 	 * Dieser Konstruktor initialisiert den Speicherbereich.

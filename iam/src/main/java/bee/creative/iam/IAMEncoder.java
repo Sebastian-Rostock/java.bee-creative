@@ -988,6 +988,12 @@ public class IAMEncoder {
 		 */
 		protected ByteOrder order = null;
 
+		/**
+		 * Dieser Konstruktor initialisiert einen leeren {@link IAMIndexEncoder}.
+		 */
+		public IAMIndexEncoder() {
+		}
+
 		{}
 
 		/**

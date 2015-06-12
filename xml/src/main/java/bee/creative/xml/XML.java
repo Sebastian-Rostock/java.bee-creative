@@ -865,7 +865,7 @@ public class XML {
 		 * 
 		 * @see #hasPrev()
 		 * @return {@code this}.
-		 * @throws IllegalStateException wenn es keine vorherige Position gibt.
+		 * @throws IllegalStateException Wenn es keine vorherige Position gibt.
 		 */
 		public NodeBuilder prev() throws IllegalStateException {
 			if (!this.hasPrev()) throw new IllegalStateException();
@@ -878,7 +878,7 @@ public class XML {
 		 * 
 		 * @see #hasNext()
 		 * @return {@code this}.
-		 * @throws IllegalStateException wenn es keine nächste Position gibt.
+		 * @throws IllegalStateException Wenn es keine nächste Position gibt.
 		 */
 		public NodeBuilder next() throws IllegalStateException {
 			if (!this.hasNext()) throw new IllegalStateException();
@@ -2179,7 +2179,7 @@ public class XML {
 	 * @see XML#cachedXPath(int, int, int, XPath)
 	 * @param xpath {@link XPath XPath-Auswertungsumgebung}.
 	 * @return {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
-	 * @throws NullPointerException wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 	 */
 	public static XPath cachedXPath(final XPath xpath) throws NullPointerException {
 		if (xpath == null) throw new NullPointerException("xpath is null");
@@ -2212,7 +2212,7 @@ public class XML {
 	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map} erzeugt werden.
 	 * @param xpath {@link XPath XPath-Auswertungsumgebung}.
 	 * @return {@link CachedXPath Cached-XPath-Auswertungsumgebung}.
-	 * @throws NullPointerException wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
+	 * @throws NullPointerException Wenn die gegebene {@link XPath XPath-Auswertungsumgebung} {@code null} ist.
 	 */
 	public static XPath cachedXPath(final int limit, final int inputMode, final int outputMode, final XPath xpath) throws NullPointerException {
 		if (xpath == null) throw new NullPointerException("xpath is null");

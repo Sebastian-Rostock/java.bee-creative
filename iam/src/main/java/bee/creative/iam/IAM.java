@@ -3,6 +3,9 @@ package bee.creative.iam;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
+import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
+import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
@@ -647,7 +650,7 @@ public class IAM {
 	 * @see IAMArray#hash()
 	 * @param array Zahlenfolge.
 	 * @return Streuwert.
-	 * @throws NullPointerException wenn {@code array} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
 	public static int hash(final int[] array) throws NullPointerException {
 		int hash = 0x811C9DC5;
@@ -664,7 +667,7 @@ public class IAM {
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.
 	 * @return {@code true}, wenn die Zahlenfolgen gleich sind.
-	 * @throws NullPointerException wenn {@code array1} bzw. {@code array2} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code array1} bzw. {@code array2} {@code null} ist.
 	 */
 	public static boolean equals(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
@@ -682,7 +685,7 @@ public class IAM {
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
-	 * @throws NullPointerException wenn {@code array1} bzw. {@code array2} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code array1} bzw. {@code array2} {@code null} ist.
 	 */
 	public static int compare(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
@@ -694,6 +697,16 @@ public class IAM {
 	{}
 
 	/**
+	 * Diese Methode gibt die kleinste Länge eines {@code INT32} Arrays zurück, in dessen Speicherbereich ein {@code INT8} Array mit der gegebenen Länge passen.
+	 * 
+	 * @param byteCount Länge eines {@code INT8} Arrays.
+	 * @return Länge des {@code INT32} Arrays.
+	 */
+	public static int byteAlign(final int byteCount) {
+		return (byteCount + 3) >> 2;
+	}
+
+	/**
 	 * Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
 	 * 
 	 * @param dataType Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
@@ -703,14 +716,28 @@ public class IAM {
 		return (1 << dataType) >> 1;
 	}
 
+	{}
+
 	/**
-	 * Diese Methode gibt die kleinste Länge eines {@code INT32} Arrays zurück, in dessen Speicherbereich ein {@code INT8} Array mit der gegebenen Länge passen.
+	 * Diese Methode gibt einen neuen {@link IAMIndexEncoder} zurück.
 	 * 
-	 * @param byteCount Länge eines {@code INT8} Arrays.
-	 * @return Länge des {@code INT32} Arrays.
+	 * @see IAMIndexEncoder#IAMIndexEncoder()
+	 * @return neuer {@link IAMIndexEncoder}.
 	 */
-	public static int byteAlign(final int byteCount) {
-		return (byteCount + 3) >> 2;
+	public static IAMIndexEncoder encoder() {
+		return new IAMIndexEncoder();
+	}
+
+	/**
+	 * Diese Methode gibt einen neuen {@link IAMIndexDecoder} zurück.
+	 * 
+	 * @param array Speicherbereich mit {@code INT32} Zahlen.
+	 * @return neuer {@link IAMIndexDecoder}.
+	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 */
+	public static IAMIndexDecoder decoder(final MMFArray array) throws IAMException, NullPointerException {
+		return new IAMIndexDecoder(array);
 	}
 
 }
