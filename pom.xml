@@ -3,11 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
-	<version>2.0.0</version>
-	<packaging>pom</packaging>
-	<name>bee-creative</name>
-	<description>Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, 
-Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.</description>
+	<version>3.0.123</version>
+	<name>bee-creative</name> 
+	<description>Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.</description>
 	<licenses>
 		<license>
 			<url>http://creativecommons.org/licenses/by/3.0/de/</url>
@@ -43,14 +41,4 @@ anzusehen, gehen Sie bitte zu:  [ http://creativecommons.org/licenses/by/3.0/de/
 			</plugin>
 		</plugins>
 	</build>
-	<modules>
-		<module>compact</module>
-		<module>util</module>
-		<module>array</module>
-		<module>function</module>
-		<module>xml</module>
-		<module>data</module>
-		<module>virtual</module>
-		<module>iam</module>
-  </modules>
 </project>
