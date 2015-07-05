@@ -48,6 +48,8 @@ public class Assignments {
 			this.source = source;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -148,6 +150,8 @@ public class Assignments {
 
 		}
 
+		{}
+
 		@SuppressWarnings ("javadoc")
 		static <GObject> Entry newEntry(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
 			return new Entry() {
@@ -172,6 +176,8 @@ public class Assignments {
 			};
 		}
 
+		{}
+
 		/**
 		 * Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte.
 		 */
@@ -182,6 +188,8 @@ public class Assignments {
 		 * {@link Entry}s.
 		 */
 		final List<Entry> entries = new LinkedList<Entry>();
+
+		{}
 
 		/**
 		 * Diese Methode gibt {@code null} zurück.
@@ -292,6 +300,8 @@ public class Assignments {
 
 	}
 
+	{}
+
 	/**
 	 * Diese Methode gibt ein neues {@link Assignment} ohne Quellobjekt zurück.
 	 * 
@@ -300,12 +310,6 @@ public class Assignments {
 	 */
 	public static ParentAssignment assignment() {
 		return new ParentAssignment();
-	}
-
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Assignments() {
 	}
 
 	/**

@@ -399,10 +399,4 @@ public class Builders {
 		return new SynchronizedBuilder<GValue>(builder);
 	}
 
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Builders() {
-	}
-
 }
