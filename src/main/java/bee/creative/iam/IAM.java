@@ -63,8 +63,6 @@ public class IAM {
 			};
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -146,8 +144,6 @@ public class IAM {
 			};
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -196,8 +192,6 @@ public class IAM {
 		public int valueLength() {
 			return this.value().length();
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -324,8 +318,6 @@ public class IAM {
 			return result;
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -438,8 +430,6 @@ public class IAM {
 
 			};
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}

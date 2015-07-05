@@ -126,7 +126,7 @@ public class Contexts {
 		 */
 		protected Object castToObject(final Value value) throws NullPointerException {
 			final Object data = value.data();
-			if (data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException("data = null");
 			return data;
 		}
 

@@ -484,7 +484,8 @@ public class IAMEncoder {
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (!order.equals(this.order)) throw new IllegalArgumentException();
+			if (order == null) throw new IllegalArgumentException("order = null");
+			if (!order.equals(this.order)) throw new IllegalArgumentException("order invalid");
 			return this.array.clone();
 		}
 
@@ -561,7 +562,8 @@ public class IAMEncoder {
 		 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist.
 		 */
 		public void put(final int[] key, final int[] value) throws NullPointerException {
-			if ((key == null) || (value == null)) throw new NullPointerException();
+			if (key == null) throw new NullPointerException("key = null");
+			if (value == null) throw new NullPointerException("value = null");
 			this.entries.get(key).value = value;
 		}
 
@@ -629,7 +631,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public int find(final int... key) throws NullPointerException {
-			if (key == null) throw new NullPointerException();
+			if (key == null) throw new NullPointerException("key = null");
 			final IAMEntry result = this.entries.entryMap().get(key);
 			return result == null ? -1 : result.index;
 		}
@@ -643,7 +645,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (order == null) throw new NullPointerException();
+			if (order == null) throw new NullPointerException("owder = null");
 			final List<IAMEntry> datas = this.entries.datas;
 			final int count = datas.size();
 			final IAMEntry[] entries = datas.toArray(new IAMEntry[count]);
@@ -811,7 +813,8 @@ public class IAMEncoder {
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (!order.equals(this.order)) throw new IllegalArgumentException();
+			if (order == null) throw new NullPointerException("owder = null");
+			if (!order.equals(this.order)) throw new IllegalArgumentException("order invalid");
 			return this.array.clone();
 		}
 
@@ -927,7 +930,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (order == null) throw new NullPointerException();
+			if (order == null) throw new NullPointerException("order = null");
 			final List<IAMItem> datas = this.items.datas;
 			final int count = datas.size();
 			final IAMData itemData = new IAMData(new AbstractList<int[]>() {
@@ -1016,7 +1019,7 @@ public class IAMEncoder {
 		 */
 		protected void checkOrder(final ByteOrder value) throws NullPointerException, IllegalArgumentException {
 			final ByteOrder order = this.order;
-			if ((order != null) && !value.equals(order)) throw new IllegalArgumentException();
+			if ((order != null) && !value.equals(order)) throw new IllegalArgumentException("order invalid");
 		}
 
 		/**
@@ -1024,14 +1027,14 @@ public class IAMEncoder {
 		 * 
 		 * @see IAMMapData
 		 * @see IAMMapEncoder
-		 * @param value {@link IAMBaseMapEncoder}.
+		 * @param map {@link IAMBaseMapEncoder}.
 		 * @return Index des {@link IAMBaseMapEncoder}s.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code map} {@code null} ist.
 		 */
-		protected int put(final IAMBaseMapEncoder value) throws NullPointerException {
-			if (value == null) throw new NullPointerException();
+		protected int put(final IAMBaseMapEncoder map) throws NullPointerException {
+			if (map == null) throw new NullPointerException("map = null");
 			final int result = this.maps.size();
-			this.maps.add(result, value);
+			this.maps.add(result, map);
 			return result;
 		}
 
@@ -1040,14 +1043,14 @@ public class IAMEncoder {
 		 * 
 		 * @see IAMListData
 		 * @see IAMListEncoder
-		 * @param value {@link IAMBaseListEncoder}.
+		 * @param list {@link IAMBaseListEncoder}.
 		 * @return Index des {@link IAMBaseListEncoder}s.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code list} {@code null} ist.
 		 */
-		protected int put(final IAMBaseListEncoder value) throws NullPointerException {
-			if (value == null) throw new NullPointerException();
+		protected int put(final IAMBaseListEncoder list) throws NullPointerException {
+			if (list == null) throw new NullPointerException("list = null");
 			final int result = this.lists.size();
-			this.lists.add(result, value);
+			this.lists.add(result, list);
 			return result;
 		}
 
@@ -1080,15 +1083,15 @@ public class IAMEncoder {
 		/**
 		 * Diese Methode fügt die gegebene {@link IAMListData} hinzu und gibt den Index zurück, unter dem die dadurch beschriebene {@link IAMList} verwaltet wird.
 		 * 
-		 * @param value {@link IAMListData}.
+		 * @param list {@link IAMListData}.
 		 * @return Index der {@link IAMList}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code list} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn die Bytereihenfolge der gegbenen {@link IAMMapData} inkompatibel zu der bereits hinzugefügter {@link IAMMapData}
 		 *         oder {@link IAMListData} ist.
 		 */
-		public int putList(final IAMListData value) throws NullPointerException, IllegalArgumentException {
-			this.setOrder(value.order());
-			return this.put(value);
+		public int putList(final IAMListData list) throws NullPointerException, IllegalArgumentException {
+			this.setOrder(list.order());
+			return this.put(list);
 		}
 
 		/**
@@ -1097,13 +1100,13 @@ public class IAMEncoder {
 		 * 
 		 * @see IAMListData
 		 * @see IAMListEncoder
-		 * @param value {@link IAMListEncoder}.
+		 * @param list {@link IAMListEncoder}.
 		 * @return Index der {@link IAMList}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code list} {@code null} ist.
 		 */
-		public int putList(final IAMListEncoder value) throws NullPointerException {
-			value.toList();
-			return this.put(value);
+		public int putList(final IAMListEncoder list) throws NullPointerException {
+			list.toList();
+			return this.put(list);
 		}
 
 		/**

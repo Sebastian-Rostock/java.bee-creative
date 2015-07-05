@@ -260,7 +260,7 @@ public final class Scopes {
 		 * @throws NullPointerException Wenn {@code scope} {@code null} ist.
 		 */
 		public ContextScope(final Scope scope, final Context context) throws NullPointerException {
-			if (scope == null) throw new NullPointerException();
+			if (scope == null) throw new NullPointerException("scope = null");
 			this.scope = scope;
 			this.context = context;
 		}
@@ -342,14 +342,15 @@ public final class Scopes {
 		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterfunktionen.
 		 * 
 		 * @param scope übergeordneter Ausführungskontext.
-		 * @param functions Parameterfunktionen.
+		 * @param params Parameterfunktionen.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code functions} {@code null} ist.
 		 */
-		public CompositeScope(final Scope scope, final Function... functions) throws NullPointerException {
-			if ((scope == null) || (functions == null)) throw new NullPointerException();
+		public CompositeScope(final Scope scope, final Function... params) throws NullPointerException {
+			if (scope == null) throw new NullPointerException("scope = null");
+			if (params == null) throw new NullPointerException("params = null");
 			this.scope = scope;
-			this.values = new Value[functions.length];
-			this.params = functions;
+			this.values = new Value[params.length];
+			this.params = params;
 		}
 
 		{}
@@ -395,11 +396,11 @@ public final class Scopes {
 			final Value[] values = this.values;
 			final int length = values.length;
 			if (index >= length) return this.scope.get(index - length);
-			Value value = values[index];
-			if (value != null) return value;
-			value = this.params[index].execute(this.scope);
-			if (value == null) throw new NullPointerException();
-			return values[index] = value;
+			Value result = values[index];
+			if (result != null) return result;
+			result = this.params[index].execute(this.scope);
+			if (result == null) throw new NullPointerException("this.params()[index].execute(this.scope()) = null");
+			return values[index] = result;
 		}
 
 		/**

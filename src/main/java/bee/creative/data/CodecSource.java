@@ -1,6 +1,5 @@
 package bee.creative.data;
 
-
 /**
  * Diese Schnittstelle definiert die Eingabedaten eines {@link Decoder}s.
  * 

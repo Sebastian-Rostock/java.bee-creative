@@ -426,7 +426,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 	 */
 	public boolean collect(final Collector target) throws NullPointerException {
-		if (target == null) throw new NullPointerException();
+		if (target == null) throw new NullPointerException("target = null");
 		return this.collect(target, 0, this.length());
 	}
 

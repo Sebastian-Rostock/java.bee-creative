@@ -46,7 +46,7 @@ public final class Values {
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public BaseValue(final GData data) throws NullPointerException {
-			if (data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
 		}
 
@@ -164,7 +164,8 @@ public final class Values {
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
-			if ((scope == null) || (function == null)) throw new NullPointerException();
+			if (scope == null) throw new NullPointerException("scope = null");
+			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
 			this.function = function;
 		}
@@ -179,14 +180,14 @@ public final class Values {
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
 		public Value value() throws NullPointerException {
-			Value value = this.value;
-			if (value != null) return value;
-			value = this.function.execute(this.scope);
-			if (value == null) throw new NullPointerException();
-			this.value = value;
+			Value result = this.value;
+			if (result != null) return result;
+			result = this.function.execute(this.scope);
+			if (result == null) throw new NullPointerException("this.function().execute(this.scope()) = null");
+			this.value = result;
 			this.scope = null;
 			this.function = null;
-			return value;
+			return result;
 		}
 
 		/**

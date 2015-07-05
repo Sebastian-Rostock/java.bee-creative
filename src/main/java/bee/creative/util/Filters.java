@@ -757,9 +757,8 @@ public class Filters {
 		return new ContainsFilter<GInput>(collection);
 	}
 
-	
-	public static <GInput, GOutput> Filter<GInput> fieldFilter(final Field<? super GInput, ? extends GOutput> field,
-		final Filter<? super GOutput> filter) throws NullPointerException {
+	public static <GInput, GOutput> Filter<GInput> fieldFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
+		throws NullPointerException {
 		if (filter == null) throw new NullPointerException();
 		if (field == null) throw new NullPointerException();
 		return new Filter<GInput>() {
@@ -771,7 +770,7 @@ public class Filters {
 
 		};
 	}
-	
+
 	/**
 	 * Diese Methode erzeugt einen {@link Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter} bewertet wird, und gibt diesen zurück. Der erzeugte
 	 * {@link Filter} konvertiert seine Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen {@link Filter}s. Der erzeugte {@link Filter}

@@ -69,7 +69,7 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public LazyFunction(final Function function) throws NullPointerException {
-			if (function == null) throw new NullPointerException();
+			if (function == null) throw new NullPointerException("function = null");
 			this.function = function;
 		}
 
@@ -159,7 +159,7 @@ public final class Functions {
 		 */
 		@Override
 		public Value execute(final Scope scope) {
-			if (scope.size() != 2) throw new IllegalArgumentException();
+			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() !=2");
 			final Context context = scope.context();
 			return context.cast(scope.get(0), FunctionValue.TYPE).data().execute(new ValueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data()));
 		}
@@ -435,7 +435,8 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
 		public static Function trace(final TraceHandler handler, final Function function) throws NullPointerException {
-			if ((handler == null) || (function == null)) throw new NullPointerException();
+			if (handler == null) throw new NullPointerException("handler = null");
+			if (function == null) throw new NullPointerException("function = null");
 			final Object clazz = function.getClass();
 			if (clazz == CompositeFunction.class) {
 				final CompositeFunction function2 = (CompositeFunction)function;
@@ -476,7 +477,8 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
 		public TraceFunction(final TraceHandler handler, final Function function) throws NullPointerException {
-			if ((handler == null) || (function == null)) throw new NullPointerException();
+			if (handler == null) throw new NullPointerException("handler = null");
+			if (function == null) throw new NullPointerException("function = null");
 			this.handler = handler;
 			this.function = function;
 		}
@@ -674,7 +676,7 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public ValueFunction(final Value value) throws NullPointerException {
-			if (value == null) throw new NullPointerException();
+			if (value == null) throw new NullPointerException("value = null");
 			this.value = value;
 		}
 
@@ -877,7 +879,7 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Function function) throws NullPointerException {
-			if (function == null) throw new NullPointerException();
+			if (function == null) throw new NullPointerException("function = null");
 			this.scope = null;
 			this.function = function;
 		}
@@ -893,7 +895,8 @@ public final class Functions {
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
-			if ((scope == null) || (function == null)) throw new NullPointerException();
+			if (scope == null) throw new NullPointerException("scope = null");
+			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
 			this.function = function;
 		}
@@ -1025,11 +1028,11 @@ public final class Functions {
 		 * Dieser Konstruktor initialisiert die aufzurufende Funktion und die Parameterfunktionen.
 		 * 
 		 * @param function aufzurufende Funktion.
-		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
+		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
-		public CompositeFunction(final Function function, final Function... functions) throws NullPointerException {
-			this(function, false, functions);
+		public CompositeFunction(final Function function, final Function... params) throws NullPointerException {
+			this(function, false, params);
 		}
 
 		/**
@@ -1037,14 +1040,15 @@ public final class Functions {
 		 * 
 		 * @param function aufzurufende Funktion.
 		 * @param chained Verketung.
-		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
+		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
 		 */
-		public CompositeFunction(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
-			if ((function == null) || (functions == null)) throw new NullPointerException();
+		public CompositeFunction(final Function function, final boolean chained, final Function... params) throws NullPointerException {
+			if (function == null) throw new NullPointerException("function = null");
+			if (params == null) throw new NullPointerException("params = null");
 			this.chained = chained;
 			this.function = function;
-			this.params = functions;
+			this.params = params;
 		}
 
 		{}

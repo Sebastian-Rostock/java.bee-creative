@@ -1,7 +1,7 @@
 package bee.creative.function;
 
-import bee.creative.function.Values.BaseValue;
 import bee.creative.function.Values.ArrayValue;
+import bee.creative.function.Values.BaseValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.function.Values.NullValue;

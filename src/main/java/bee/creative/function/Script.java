@@ -128,7 +128,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind.
 		 */
 		public Range(final char type, final int start, final int length) throws IllegalArgumentException {
-			if ((start < 0) || (length < 0)) throw new IllegalArgumentException();
+			if (start < 0) throw new IllegalArgumentException("start < 0");
+			if (length < 0) throw new IllegalArgumentException("length < 0");
 			this.type = type;
 			this.start = start;
 			this.length = length;
@@ -257,10 +258,10 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		final int length = source.length();
 		for (final Range range: ranges) {
 			final int start = range.start;
-			if (start < offset) throw new IllegalArgumentException();
+			if (start < offset) throw new IllegalArgumentException("ranges overlapping");
 			offset = start + range.length;
 		}
-		if (offset > length) throw new IllegalArgumentException();
+		if (offset > length) throw new IllegalArgumentException("ranges exceeding");
 		this.source = source;
 		this.ranges = ranges.clone();
 	}

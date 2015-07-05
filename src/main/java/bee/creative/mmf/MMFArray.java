@@ -101,41 +101,6 @@ public class MMFArray extends IAMBaseArray {
 	{}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected MMFArray newSection(final int offset, final int length) {
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final MMFArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return this.newSection(0, 0);
-		return this.newSection(offset, length);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int get(final int index) {
-		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int length() {
-		return 0;
-	}
-
-	{}
-
-	/**
 	 * Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
 	 * 
 	 * @return Kopie des Speicherbereichs.
@@ -198,6 +163,41 @@ public class MMFArray extends IAMBaseArray {
 	 */
 	public final MMFArray toUINT16() {
 		return new MMFUINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
+	}
+
+	{}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected MMFArray newSection(final int offset, final int length) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final MMFArray section(final int offset, final int length) {
+		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return this.newSection(0, 0);
+		return this.newSection(offset, length);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int get(final int index) {
+		return 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int length() {
+		return 0;
 	}
 
 }
