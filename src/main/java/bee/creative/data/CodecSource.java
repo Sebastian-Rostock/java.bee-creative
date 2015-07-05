@@ -1,6 +1,5 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
-import bee.creative.data.Data.DataSource;
 
 /**
  * Diese Schnittstelle definiert die Eingabedaten eines {@link Decoder}s.

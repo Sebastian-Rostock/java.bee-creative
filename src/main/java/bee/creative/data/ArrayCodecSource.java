@@ -1,20 +1,19 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
 import bee.creative.array.ByteArraySection;
-import bee.creative.data.Data.DataSourceArray;
 
 /**
- * Diese Klasse implementiert ein {@link CodecSource} als {@link DataSourceArray}.
+ * Diese Klasse implementiert ein {@link CodecSource} als {@link ArrayDataSource}.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  */
-public class CodecSourceArray<GContext> extends DataSourceArray implements CodecSource<GContext> {
+public class ArrayCodecSource<GContext> extends ArrayDataSource implements CodecSource<GContext> {
 
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	private final GContext context;
+	final GContext context;
 
 	/**
 	 * Dieser Konstruktor initialisiert Kontextobjekt und Nutzdaten.
@@ -23,7 +22,7 @@ public class CodecSourceArray<GContext> extends DataSourceArray implements Codec
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public CodecSourceArray(final GContext context, final byte... data) throws NullPointerException {
+	public ArrayCodecSource(final GContext context, final byte... data) throws NullPointerException {
 		super(data);
 		this.context = context;
 	}
@@ -35,10 +34,12 @@ public class CodecSourceArray<GContext> extends DataSourceArray implements Codec
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public CodecSourceArray(final GContext context, final ByteArraySection data) throws NullPointerException {
+	public ArrayCodecSource(final GContext context, final ByteArraySection data) throws NullPointerException {
 		super(data);
 		this.context = context;
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

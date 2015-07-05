@@ -411,12 +411,6 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	}
 
 	/**
-	 * Diese Methode gibt den {@code index}-ten Wert zurück.
-	 */
-	@Override
-	public abstract Value get(final int index) throws IndexOutOfBoundsException;
-
-	/**
 	 * Diese Methode gibt die Länge dieser Wertliste zurück.
 	 * 
 	 * @return Länge.
@@ -528,6 +522,12 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	}
 
 	{}
+
+	/**
+	 * Diese Methode gibt den {@code index}-ten Wert zurück.
+	 */
+	@Override
+	public abstract Value get(final int index) throws IndexOutOfBoundsException;
 
 	/**
 	 * {@inheritDoc}

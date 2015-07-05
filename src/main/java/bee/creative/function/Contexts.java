@@ -134,10 +134,10 @@ public class Contexts {
 		 * Diese Methode konvertiert den gegebenen Wert in eine Funktion und gibt diese zurück.
 		 * <ul>
 		 * <li>Wenn der Wert ein {@link FunctionValue} ist, wird deren Funktion unverändert geliefert.</li>
-		 * <li>Andernfalls wird die via {@link ValueFunction#valueOf(Value)} aus dem Wert erzeugte Funktion geliefert.</li>
+		 * <li>Andernfalls wird die via {@link ValueFunction#valueOf(Object)} aus dem Wert erzeugte Funktion geliefert.</li>
 		 * </ul>
 		 * 
-		 * @see ValueFunction#valueOf(Value)
+		 * @see ValueFunction#valueOf(Object)
 		 * @param value Wert.
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.

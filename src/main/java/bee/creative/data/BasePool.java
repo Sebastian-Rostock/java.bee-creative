@@ -2,90 +2,28 @@ package bee.creative.data;
 
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.util.Converters;
 import bee.creative.util.Field;
-import bee.creative.util.Filters;
-import bee.creative.util.Iterables;
-import bee.creative.util.Iterables.FilteredIterable;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen {@link Pool}. Die Datensätze müssen Nachfahren von {@link AbstractItem} sein.
+ * Diese Klasse implementiert einen {@link Pool}. Die Datensätze müssen Nachfahren von {@link BaseItem} sein.
  * 
  * @author Sebastian Rostock 2011.
  * @param <GItem> Typ der Datensätze.
  */
-public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
+public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 
 	/**
-	 * Diese Klasse implementiert eine {@link Selection}, die ein {@link FilteredIterable} verwendet.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Datensätze.
-	 */
-	public static final class FilteredSelection<GItem> implements Selection<GItem> {
-
-		/**
-		 * Dieses Feld speichert das {@link Iterable}.
-		 */
-		private final Iterable<? extends GItem> iterable;
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Iterable}.
-		 * 
-		 * @param iterable {@link Iterable} der {@link Item}s.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public FilteredSelection(final Iterable<? extends GItem> iterable) throws NullPointerException {
-			if (iterable == null) throw new NullPointerException();
-			this.iterable = iterable;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Diese Implementation gibt das erste {@link Item} der {@link Selection} zurück, die von {@link #findAll(Field, Object)} für die gegebenen Parameter
-		 * geliefert wird.
-		 */
-		@Override
-		public <GValue> GItem find(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-			for (final GItem item: this.findAll(field, value))
-				return item;
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
-			if (field == null) throw new NullPointerException();
-			return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.convertedFilter(Converters.fieldConverter(field), Filters.containsFilter(value)),
-				this.iterable));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public Iterator<GItem> iterator() {
-			return (Iterator<GItem>)this.iterable.iterator();
-		}
-
-	}
-
-	/**
-	 * Diese Methode implementiert {@link AbstractItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
+	 * Diese Methode implementiert {@link BaseItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
 	 * {@link #items(int)}) zum Entfernen eines {@link Item}s verwendet werden.
 	 * 
-	 * @param item {@link AbstractItem}.
+	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
+	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	protected final void delete(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
+	protected final void delete(final BaseItem item) throws NullPointerException, IllegalArgumentException {
 		switch (item.state()) {
 			case Item.APPEND_STATE:
 			case Item.UPDATE_STATE:
@@ -100,14 +38,14 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/**
-	 * Diese Methode implementiert {@link AbstractItem#append()}.
+	 * Diese Methode implementiert {@link BaseItem#append()}.
 	 * 
-	 * @param item {@link AbstractItem}.
+	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
+	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	protected final void append(final AbstractItem item) throws NullPointerException, IllegalArgumentException {
+	protected final void append(final BaseItem item) throws NullPointerException, IllegalArgumentException {
 		switch (item.state()) {
 			case Item.CREATE_STATE:
 			case Item.REMOVE_STATE:
@@ -122,15 +60,15 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/**
-	 * Diese Methode implementiert {@link AbstractItem#remove()}.
+	 * Diese Methode implementiert {@link BaseItem#remove()}.
 	 * 
-	 * @param item {@link AbstractItem}.
+	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link Item#CREATE_STATE} befindet.
-	 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
+	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	protected final void remove(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	protected final void remove(final BaseItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		switch (item.state()) {
 			case Item.APPEND_STATE:
 			case Item.UPDATE_STATE:
@@ -146,15 +84,15 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/**
-	 * Diese Methode implementiert {@link AbstractItem#remove()}.
+	 * Diese Methode implementiert {@link BaseItem#remove()}.
 	 * 
-	 * @param item {@link AbstractItem}.
+	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link Item#APPEND_STATE} befindet.
-	 * @throws IllegalArgumentException Wenn das {@link AbstractItem} nicht zu diesem {@link AbstractPool} gehört oder {@link Item#state()} unbekannt ist.
+	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	protected final void update(final AbstractItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	protected final void update(final BaseItem item) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 		switch (item.state()) {
 			case Item.REMOVE_STATE:
 			case Item.CREATE_STATE:
@@ -179,7 +117,7 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	protected abstract GItem doCreate();
 
 	/**
-	 * Diese Methode wird bei {@link #delete(AbstractItem)} zur Überführung des Zustands zu {@link Item#CREATE_STATE} aufgerufen.
+	 * Diese Methode wird bei {@link #delete(BaseItem)} zur Überführung des Zustands zu {@link Item#CREATE_STATE} aufgerufen.
 	 * 
 	 * @param item {@link Item}.
 	 */
@@ -205,6 +143,8 @@ public abstract class AbstractPool<GItem extends Item> implements Pool<GItem> {
 	 * @param item {@link Item}.
 	 */
 	protected abstract void doUpdate(final GItem item);
+
+	{}
 
 	/**
 	 * {@inheritDoc}

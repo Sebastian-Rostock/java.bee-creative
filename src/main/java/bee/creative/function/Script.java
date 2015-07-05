@@ -32,6 +32,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		@SuppressWarnings ("hiding")
 		public static final Range EMPTY = new Range((char)0, 0, 0);
 
+		{}
+
 		/**
 		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
 		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
@@ -221,6 +223,8 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieses Feld speichert den leeren Quelltext ohne Bereiche.

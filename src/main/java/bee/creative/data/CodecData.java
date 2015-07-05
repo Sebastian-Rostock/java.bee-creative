@@ -1,4 +1,4 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
 /**
  * Diese Schnittstelle definiert die Basis einer {@link CodecSource} bzw. eines {@link CodecTarget}s als Objekt, dass ein Kontextobjekt bereit stellt.

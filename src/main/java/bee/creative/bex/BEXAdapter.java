@@ -1715,7 +1715,7 @@ public class BEXAdapter {
 		 */
 		public BEXAttrListAdapter(final BEXList list, final Element parent) throws NullPointerException {
 			if (list == null) throw new NullPointerException("list = null");
-			if (parent== null) throw new NullPointerException("parent = null");
+			if (parent == null) throw new NullPointerException("parent = null");
 			this.list = list;
 			this.parent = parent;
 		}
@@ -1832,7 +1832,7 @@ public class BEXAdapter {
 		 */
 		public BEXChldListAdapter(final BEXList list, final Node parent) throws NullPointerException {
 			if (list == null) throw new NullPointerException("list = null");
-			if (parent== null) throw new NullPointerException("parent = null");
+			if (parent == null) throw new NullPointerException("parent = null");
 			this.list = list;
 			this.parent = parent;
 		}
@@ -1988,8 +1988,8 @@ public class BEXAdapter {
 		 */
 		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
 			if (node == null) throw new NullPointerException("node = null");
-			if (uri== null) throw new NullPointerException("uri = null");
-			if (name== null) throw new NullPointerException("name = null");
+			if (uri == null) throw new NullPointerException("uri = null");
+			if (name == null) throw new NullPointerException("name = null");
 			this.uri = uri;
 			this.name = name;
 			this.list = new ArrayList<Node>();

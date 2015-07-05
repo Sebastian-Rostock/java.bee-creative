@@ -1,6 +1,5 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
-import bee.creative.data.Data.DataTarget;
 
 /**
  * Diese Schnittstelle definiert die Ausgabedaten eines {@link Encoder}s.

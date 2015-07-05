@@ -9,19 +9,19 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link AbstractPool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert. <br>
- * Die Methoden {@link #append()}, {@link #remove()} und {@link #update()} delegieren an {@link AbstractPool#append(AbstractItem)},
- * {@link AbstractPool#remove(AbstractItem)} bzw. {@link AbstractPool#update(AbstractItem)}. <br>
+ * Diese Klasse implementiert ein abstraktes {@link Item}, dass seinen {@link BasePool} kennt und einen Teil seiner Schnittstelle an diesen Delegiert. <br>
+ * Die Methoden {@link #append()}, {@link #remove()} und {@link #update()} delegieren an {@link BasePool#append(BaseItem)}, {@link BasePool#remove(BaseItem)}
+ * bzw. {@link BasePool#update(BaseItem)}. <br>
  * Der {@link #hashCode() Streuwert} basiert auf dem {@link #key() Schlüssel}, die {@link #equals(Object) Äquivalenz} basiert auf der von {@link #key()
  * Schlüssel} und {@link #pool() Pool}.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class AbstractItem implements Item {
+public abstract class BaseItem implements Item {
 
 	/**
 	 * Dieses Feld speichert den {@link Converter} für {@link #assigners(Assignment)}, welcher seine Eingabe ({@link Field}) als {@link Assigner} zurück gibt,
-	 * sofern diese ein solcher ist ({@code instanceof}). Andernfalls wird {@code null} zurück gegeben.
+	 * sofern diese ein solcher ist ({@code instanceof}). Andernfalls wird {@code null} geliefert.
 	 */
 	protected static final Converter<Field<?, ?>, Assigner<? super Item, ? super Item>> FIELD_ASSIGNER_CONVERTER =
 		new Converter<Field<?, ?>, Assigner<? super Item, ? super Item>>() {
@@ -34,12 +34,14 @@ public abstract class AbstractItem implements Item {
 
 		};
 
+	{}
+
 	/**
 	 * Diese Methode gibt die {@link Assigner} zurück, die in {@link #assign(Assignment)} zur Übertragung der Informatioenen des gegebenen {@link Item}s auf
 	 * dieses {@link Item} verwendet werden.
 	 * <p>
-	 * Die Implementation in {@link AbstractItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item}s definierten {@link Field}s, die
-	 * die {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
+	 * Die Implementation in {@link BaseItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item}s definierten {@link Field}s, die die
+	 * {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
 	 * {@code this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.voidIterable())}.
 	 * 
 	 * @see #FIELD_ASSIGNER_CONVERTER
@@ -48,15 +50,17 @@ public abstract class AbstractItem implements Item {
 	 */
 	protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Assignment<? extends Item> assignment) {
 		final Type<?> thisType = this.type(), thatType = assignment.value().type();
-		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(AbstractItem.FIELD_ASSIGNER_CONVERTER, //
+		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(BaseItem.FIELD_ASSIGNER_CONVERTER, //
 			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>voidIterable()));
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public abstract AbstractPool<? extends Item> pool();
+	public abstract BasePool<? extends Item> pool();
 
 	/**
 	 * {@inheritDoc}
@@ -83,9 +87,9 @@ public abstract class AbstractItem implements Item {
 	 */
 	@Override
 	public void assign(final Assignment<? extends Item> assignment) throws NullPointerException, IllegalArgumentException {
-		if (assignment == null) throw new NullPointerException();
+		if (assignment == null) throw new NullPointerException("assignment = null");
 		final Item value = assignment.value();
-		if (value == null) throw new IllegalArgumentException();
+		if (value == null) throw new IllegalArgumentException("value = null");
 		for (final Assigner<? super Item, ? super Item> assigner: this.assigners(assignment)) {
 			assigner.assign(this, assignment);
 		}
@@ -94,8 +98,8 @@ public abstract class AbstractItem implements Item {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see AbstractPool#delete(AbstractItem)
-	 * @see AbstractPool#doDelete(Item)
+	 * @see BasePool#delete(BaseItem)
+	 * @see BasePool#doDelete(Item)
 	 */
 	@Override
 	public void delete() {
@@ -105,8 +109,8 @@ public abstract class AbstractItem implements Item {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see AbstractPool#append(AbstractItem)
-	 * @see AbstractPool#doAppend(Item)
+	 * @see BasePool#append(BaseItem)
+	 * @see BasePool#doAppend(Item)
 	 */
 	@Override
 	public void append() {
@@ -116,8 +120,8 @@ public abstract class AbstractItem implements Item {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see AbstractPool#remove(AbstractItem)
-	 * @see AbstractPool#doRemove(Item)
+	 * @see BasePool#remove(BaseItem)
+	 * @see BasePool#doRemove(Item)
 	 */
 	@Override
 	public void remove() throws IllegalStateException {
@@ -127,8 +131,8 @@ public abstract class AbstractItem implements Item {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see AbstractPool#update(AbstractItem)
-	 * @see AbstractPool#doUpdate(Item)
+	 * @see BasePool#update(BaseItem)
+	 * @see BasePool#doUpdate(Item)
 	 */
 	@Override
 	public void update() throws IllegalStateException {

@@ -1,27 +1,26 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
 import bee.creative.array.CompactByteArray;
-import bee.creative.data.Data.DataTargetArray;
 
 /**
- * Diese Klasse implementiert ein {@link CodecTarget} als {@link DataTargetArray}.
+ * Diese Klasse implementiert ein {@link CodecTarget} als {@link ArrayDataTarget}.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.
  */
-public class CodecTargetArray<GContext> extends DataTargetArray implements CodecTarget<GContext> {
+public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements CodecTarget<GContext> {
 
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	private final GContext context;
+	final GContext context;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Kontextobjekt sowie die Nutzdaten mit 128 Byte Größe.
 	 * 
 	 * @param context Kontextobjekt.
 	 */
-	public CodecTargetArray(final GContext context) {
+	public ArrayCodecTarget(final GContext context) {
 		this.context = context;
 	}
 
@@ -32,7 +31,7 @@ public class CodecTargetArray<GContext> extends DataTargetArray implements Codec
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public CodecTargetArray(final GContext context, final CompactByteArray data) throws NullPointerException {
+	public ArrayCodecTarget(final GContext context, final CompactByteArray data) throws NullPointerException {
 		super(data);
 		this.context = context;
 	}
@@ -44,10 +43,12 @@ public class CodecTargetArray<GContext> extends DataTargetArray implements Codec
 	 * @param context Kontextobjekt.
 	 * @param size Größe.
 	 */
-	public CodecTargetArray(final GContext context, final int size) {
+	public ArrayCodecTarget(final GContext context, final int size) {
 		super(size);
 		this.context = context;
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

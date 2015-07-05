@@ -1,6 +1,6 @@
 package bee.creative.function;
 
-import bee.creative.function.Values.AbstractValue;
+import bee.creative.function.Values.BaseValue;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.FunctionValue;
@@ -28,7 +28,7 @@ public class Types {
 	 * @param <GData> Typ der Nutzdaten des Werts.
 	 * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} oder {@link #valueOf(Value, Context)} konvertiert werden kann.
 	 */
-	public static abstract class AbstractType<GData, GValue extends AbstractValue<GData>> implements Type<GValue>, Converter<Value, GData> {
+	public static abstract class BaseType<GData, GValue extends BaseValue<GData>> implements Type<GValue>, Converter<Value, GData> {
 
 		/**
 		 * {@inheritDoc}
@@ -61,8 +61,6 @@ public class Types {
 		public GData convert(final Value input) {
 			return this.valueOf(input).data();
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -103,7 +101,7 @@ public class Types {
 	 * @see NullValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NullType extends AbstractType<Object, NullValue> {
+	public static final class NullType extends BaseType<Object, NullValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -130,7 +128,7 @@ public class Types {
 	 * @see ArrayValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayType extends AbstractType<Array, ArrayValue> {
+	public static final class ArrayType extends BaseType<Array, ArrayValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -157,7 +155,7 @@ public class Types {
 	 * @see ObjectValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectType extends AbstractType<Object, ObjectValue> {
+	public static final class ObjectType extends BaseType<Object, ObjectValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -184,7 +182,7 @@ public class Types {
 	 * @see FunctionValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionType extends AbstractType<Function, FunctionValue> {
+	public static final class FunctionType extends BaseType<Function, FunctionValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -211,7 +209,7 @@ public class Types {
 	 * @see StringValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringType extends AbstractType<String, StringValue> {
+	public static final class StringType extends BaseType<String, StringValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -238,7 +236,7 @@ public class Types {
 	 * @see NumberValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NumberType extends AbstractType<Number, NumberValue> {
+	public static final class NumberType extends BaseType<Number, NumberValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.
@@ -265,7 +263,7 @@ public class Types {
 	 * @see BooleanValue
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BooleanType extends AbstractType<Boolean, BooleanValue> {
+	public static final class BooleanType extends BaseType<Boolean, BooleanValue> {
 
 		/**
 		 * Dieses Feld speichert den Identifikator.

@@ -1,4 +1,4 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
 import java.io.IOException;
 

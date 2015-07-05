@@ -1,4 +1,4 @@
-package bee.creative.data.codec;
+package bee.creative.data;
 
 /**
  * Diese Schnittstelle definiert die Kombination eines {@link Encoder}s und eines {@link Decoder}s als ein Objekt, dass einen gegebenen Wert in ein

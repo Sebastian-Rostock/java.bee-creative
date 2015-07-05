@@ -3,14 +3,17 @@ package bee.creative.function;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import bee.creative.function.Functions.ArrayFunction;
 import bee.creative.function.Functions.ClosureFunction;
 import bee.creative.function.Functions.CompositeFunction;
 import bee.creative.function.Functions.LazyFunction;
 import bee.creative.function.Functions.ParamFunction;
+import bee.creative.function.Functions.ProxyFunction;
 import bee.creative.function.Functions.TraceFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Script.Range;
@@ -88,8 +91,6 @@ public class Scripts {
 		protected final void checkIdling() throws IllegalStateException {
 			if (this.value != Integer.MIN_VALUE) throw new IllegalStateException();
 		}
-
-		{}
 
 		/**
 		 * Diese Methode fügt eine neue {@link Range} mit den gegebenen Parametern hinzu, die bei {@link #index()} endet.
@@ -181,8 +182,6 @@ public class Scripts {
 			this.range(type, start);
 		}
 
-		{}
-
 		/**
 		 * Diese Methode setzt die Eingabe, ruft {@link #reset()} auf und gibt {@code this} zurück.
 		 * 
@@ -191,13 +190,11 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell geparst wird.
 		 */
-		public ScriptParser setSource(final String value) throws NullPointerException, IllegalStateException {
+		public ScriptParser useSource(final String value) throws NullPointerException, IllegalStateException {
 			this.checkIdling();
 			super.source(value);
 			return this;
 		}
-
-		{}
 
 		/**
 		 * Diese Methode parst die {@link #source() Eingabe} in einen aufbereiteten Quelltext und gibt diesen zurück.
@@ -422,8 +419,6 @@ public class Scripts {
 			if (this.indents.size() == 0) throw new IllegalStateException();
 		}
 
-		{}
-
 		/**
 		 * Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
 		 * 
@@ -520,8 +515,6 @@ public class Scripts {
 			}
 			return this;
 		}
-
-		{}
 
 		/**
 		 * Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück. Zur Umwandlung des Objekts in eine Zeichenkette wird die
@@ -661,8 +654,6 @@ public class Scripts {
 			return this;
 		}
 
-		{}
-
 		/**
 		 * Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück.
 		 * 
@@ -689,7 +680,7 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		public ScriptFormatter setIndent(final String value) throws NullPointerException, IllegalStateException {
+		public ScriptFormatter useIndent(final String value) throws NullPointerException, IllegalStateException {
 			value.length();
 			this.checkIdling();
 			this.indent = value;
@@ -704,14 +695,12 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		public ScriptFormatter setHelper(final ScriptFormatterHelper value) throws NullPointerException, IllegalStateException {
+		public ScriptFormatter useHelper(final ScriptFormatterHelper value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException();
 			this.checkIdling();
 			this.helper = value;
 			return this;
 		}
-
-		{}
 
 		/**
 		 * Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
@@ -853,12 +842,12 @@ public class Scripts {
 	 * Bereichen vom Typ {@code ';'} separiert werden müssen und als Funktionen kompiliert werden.</li>
 	 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
 	 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
-	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompilerHelper#compileParam(Script, Range)}
-	 * aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu
-	 * genau einer Funktion kompiliert werden.</li>
+	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über
+	 * {@link ScriptCompilerHelper#compileParam(ScriptCompiler, Range)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog
+	 * zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einer Funktion kompiliert werden.</li>
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
 	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link ArrayFunction#VIEW}.</li>
-	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(Script, Range)} in Werte überführt. Funktionen werden hierbei als
+	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(ScriptCompiler, Range)} in Werte überführt. Funktionen werden hierbei als
 	 * {@link FunctionValue}s angegeben.</li>
 	 * </ul>
 	 * 
@@ -888,6 +877,8 @@ public class Scripts {
 		 */
 		private Script script = Script.EMPTY;
 
+		private Map<String, ProxyFunction> proxies = new HashMap<>();
+
 		/**
 		 * Dieses Feld speichert die Parameternamen.
 		 */
@@ -896,22 +887,22 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
 		 */
-		private boolean arrayEnabled = true;
+		private boolean arrayCompiling = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Funktionszeigern.
 		 */
-		private boolean handlerEnabled = true;
+		private boolean handlerCompiling = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
-		private boolean closureEnabled = true;
+		private boolean closureCompiling = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen.
 		 */
-		private boolean chainingEnabled = true;
+		private boolean chainingCompiling = true;
 
 		{}
 
@@ -922,6 +913,7 @@ public class Scripts {
 		 */
 		protected final synchronized void startCompiling() throws IllegalStateException {
 			this.checkIdling();
+			this.proxies.clear();
 			this.iterator = this.script.iterator();
 			this.skip();
 		}
@@ -941,8 +933,6 @@ public class Scripts {
 		protected final void checkIdling() throws IllegalStateException {
 			if (this.iterator != null) throw new IllegalStateException();
 		}
-
-		{}
 
 		/**
 		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#EMPTY} zurück.<br>
@@ -1000,7 +990,8 @@ public class Scripts {
 		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
 		protected Object doCompileArray() throws ScriptException {
-			if (!this.arrayEnabled) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wertlisten sind nicht zulässig.");
+			if (!this.arrayCompiling) throw new ScriptException() //
+				.setRange(this.range).setScript(this.script).setHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
 			if (this.skipSpace().type == ']') {
 				this.skip();
@@ -1027,9 +1018,35 @@ public class Scripts {
 						return ArrayValue.valueOf(Array.valueOf(values));
 					}
 					default:
-						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «]» erwartet.");
+						throw new ScriptException() //
+							.setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «]» erwartet.");
 				}
 			}
+		}
+
+		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} und gibt diesen zurück.
+		 * 
+		 * @return Wertliste als {@link Value}.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
+		 */
+		protected Value doCompileArrayAsValue() throws ScriptException {
+			final Object array = this.doCompileArray();
+			if (array instanceof Value) return (Value)array;
+			throw new ScriptException() //
+				.setRange(this.range).setScript(this.script).setHint(" Wertliste erwartet.");
+		}
+
+		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
+		 * 
+		 * @return Wertliste als {@link Function}.
+		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
+		 */
+		protected Function doCompileArrayAsFunction() throws ScriptException {
+			final Object array = this.doCompileArray();
+			if (array instanceof Value) return ValueFunction.valueOf(array);
+			return (Function)array;
 		}
 
 		/**
@@ -1049,52 +1066,45 @@ public class Scripts {
 				case ')':
 				case ']':
 				case '}':
-					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wert erwartet.");
+					throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Wert erwartet.");
 				case '[':
-					return this.doCompileValueArray();
+					return this.doCompileArrayAsValue();
 				case '{':
-					if (this.closureEnabled) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Ungebundene Funktion unzulässig.");
+					if (this.closureCompiling) throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Ungebundene Funktion unzulässig.");
 					return FunctionValue.valueOf(this.doCompileScope());
 				default:
 					try {
-						value = this.helper.compileValue(this.script, this.range);
-					} catch (final ScriptException e) {
-						throw e;
-					} catch (final RuntimeException e) {
-						throw new ScriptException(e).setRange(this.range).setScript(this.script);
+						value = this.helper.compileValue(this, this.range);
+						if (value == null) throw new ScriptException() //
+							.setRange(this.range).setScript(this.script);
+					} catch (final ScriptException cause) {
+						throw cause;
+					} catch (final RuntimeException cause) {
+						throw new ScriptException(cause) //
+							.setRange(this.range).setScript(this.script);
 					}
-					if (value == null) throw new ScriptException().setRange(this.range).setScript(this.script);
 					this.skip();
 					return value;
 			}
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} und gibt diesen zurück.
+		 * Diese Methode kompiliert den aktuellen Bereich zu einen Funktions- oder Parameternamen und gibt diesen oder {@code null} zurück.
 		 * 
-		 * @return Wertliste als {@link Value}.
+		 * @return Funktions- oder Parametername oder {@code null}.
 		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
 		 */
-		protected Value doCompileValueArray() throws ScriptException {
-			final Object array = this.doCompileArray();
-			if (array instanceof Value) return (Value)array;
-			throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Wertliste erwartet.");
-		}
-
-		/**
-		 * Diese Methode kompiliert den aktuellen Bereich zu einen Parameternamen und gibt diesen oder {@code null} zurück.
-		 * 
-		 * @return Parametername oder {@code null}.
-		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
-		 */
-		protected String doCompileParam() throws ScriptException {
+		protected String doCompileName() throws ScriptException {
 			switch (this.skipSpace().type) {
 				case 0:
 				case '$':
 				case '(':
 				case '[':
 				case '{':
-					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername oder Parameterindex erwartet.");
+					throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Funktionsname, Parametername oder Parameterindex erwartet.");
 				case ':':
 				case ';':
 				case ')':
@@ -1104,15 +1114,29 @@ public class Scripts {
 			}
 			final String name;
 			try {
-				name = this.helper.compileParam(this.script, this.range);
+				name = this.helper.compileParam(this, this.range);
 				if (name.isEmpty()) throw new IllegalArgumentException();
 			} catch (final ScriptException e) {
 				throw e;
 			} catch (final RuntimeException e) {
-				throw new ScriptException(e).setRange(this.range).setScript(this.script).setHint(" Parametername oder Parameterindex erwartet.");
+				throw new ScriptException(e) //
+					.setRange(this.range).setScript(this.script).setHint(" Funktionsname, Parametername oder Parameterindex erwartet.");
 			}
 			this.skip();
 			return name;
+		}
+
+		protected ProxyFunction doCompileProxy() throws ScriptException {
+			final String name = this.doCompileName();
+			if (name == null) throw new ScriptException() //
+				.setRange(this.range).setScript(this.script).setHint(" Funktionsname erwartet.");
+			final ProxyFunction result = this.getProxy(name);
+			if (this.skipSpace().type != '{') throw new ScriptException() //
+				.setRange(this.range).setScript(this.script).setHint(" Parametrisierter Funktionsaufruf erwartet.");
+			this.skip();
+			final Function function = this.doCompileScope();
+			result.set(function);
+			return result;
 		}
 
 		/**
@@ -1125,27 +1149,32 @@ public class Scripts {
 			this.skip();
 			int count = 0;
 			while (true) {
-				if (this.skipSpace().type == 0) throw new ScriptException().setRange(this.range).setScript(this.script);
-				final String name = this.doCompileParam();
+				if (this.skipSpace().type == 0) throw new ScriptException() //
+					.setRange(this.range).setScript(this.script);
+				final String name = this.doCompileName();
 				if (name != null) {
-					if (this.doCompileIndex(name) >= 0) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername erwartet.");
+					if (this.doCompileIndex(name) >= 0) throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Parametername erwartet.");
 					this.params.add(count++, name);
 				}
 				switch (this.skipSpace().type) {
 					case ';':
-						if (name == null) throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parametername oder Zeichen «:» erwartet.");
+						if (name == null) throw new ScriptException() //
+							.setRange(this.range).setScript(this.script).setHint(" Parametername oder Zeichen «:» erwartet.");
 						this.skip();
 						break;
 					case ':': {
 						this.skip();
 						final Function function = this.doCompileFunction();
-						if (this.skipSpace().type != '}') throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «}» erwartet.");
+						if (this.skipSpace().type != '}') throw new ScriptException() //
+							.setRange(this.range).setScript(this.script).setHint(" Zeichen «}» erwartet.");
 						this.skip();
 						this.params.subList(0, count).clear();
 						return function;
 					}
 					default:
-						throw new ScriptException().setRange(this.range).setScript(this.script);
+						throw new ScriptException() //
+							.setRange(this.range).setScript(this.script);
 				}
 			}
 		}
@@ -1162,42 +1191,45 @@ public class Scripts {
 			switch (this.skipSpace().type) {
 				case '$': {
 					this.skip();
-					final String name = this.doCompileParam();
+					final String name = this.doCompileName();
 					if (name == null) return ArrayFunction.VIEW;
 					int index = this.doCompileIndex(name);
 					if (index < 0) {
 						index = this.params.indexOf(name);
-						if (index < 0) throw new ScriptException().setRange(this.range).setScript(this.script) //
+						if (index < 0) throw new ScriptException() //
+							.setRange(this.range).setScript(this.script) //
 							.setHint(String.format(" Parametername «%s» ist unbekannt.", name));
 					} else if (index > 0) {
 						index--;
-					} else throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Parameterindex «0» ist unzulässig.");
+					} else throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Parameterindex «0» ist unzulässig.");
 					return ParamFunction.valueOf(index);
 				}
 				case '{': {
 					function = this.doCompileScope();
-					if (this.skipSpace().type != '(') return this.closureEnabled ? //
+					if (this.skipSpace().type != '(') return this.closureCompiling ? //
 						ClosureFunction.valueOf(function) : ValueFunction.valueOf(FunctionValue.valueOf(function));
-					if (!this.chainingEnabled)
-						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
+					if (!this.chainingCompiling) throw new ScriptException() //
+						.setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
 				}
 				case '[': {
-					return this.doCompileFunctionArray();
+					return this.doCompileArrayAsFunction();
 				}
 				default: {
 					final Value value = this.doCompileValue();
 					if (!(value instanceof FunctionValue)) return ValueFunction.valueOf(value);
 					if (this.skipSpace().type != '(') {
-						if (this.handlerEnabled) return ValueFunction.valueOf(value);
-						throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverweise sind nicht zulässig.");
+						if (this.handlerCompiling) return ValueFunction.valueOf(value);
+						throw new ScriptException() //
+							.setRange(this.range).setScript(this.script).setHint(" Funktionsverweise sind nicht zulässig.");
 					}
 					function = ((FunctionValue)value).data();
 				}
 			}
 			do {
-				if (chained && !this.chainingEnabled)
-					throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
+				if (chained && !this.chainingCompiling) throw new ScriptException() //
+					.setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				this.skipSpace();
 				for (final LinkedList<Function> functions = new LinkedList<Function>(); true;) {
@@ -1209,7 +1241,8 @@ public class Scripts {
 					functions.add(this.doCompileFunction());
 					switch (this.skipSpace().type) {
 						default:
-							throw new ScriptException().setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «)» erwartet.");
+							throw new ScriptException() //
+								.setRange(this.range).setScript(this.script).setHint(" Zeichen «;» oder «)» erwartet.");
 						case ';':
 							this.skip();
 						case ')':
@@ -1220,19 +1253,13 @@ public class Scripts {
 			return function;
 		}
 
-		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
-		 * 
-		 * @return Wertliste als {@link Function}.
-		 * @throws ScriptException Wenn {@link #getScript()} ungültig ist.
-		 */
-		protected Function doCompileFunctionArray() throws ScriptException {
-			final Object array = this.doCompileArray();
-			if (array instanceof Value) return ValueFunction.valueOf((Value)array);
-			return (Function)array;
+		public synchronized final ProxyFunction getProxy(final String name) throws NullPointerException, IllegalStateException {
+			if (this.iterator == null) throw new IllegalStateException();
+			ProxyFunction result = this.proxies.get(name);
+			if (result != null) return result;
+			this.proxies.put(name, result = new ProxyFunction(name));
+			return result;
 		}
-
-		{}
 
 		/**
 		 * Diese Methode gibt den zu kompilierenden Quelltext zurück.
@@ -1267,19 +1294,19 @@ public class Scripts {
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Wertlisten.
 		 */
-		public final boolean isArrayEnabled() {
-			return this.arrayEnabled;
+		public final boolean isArrayCompiling() {
+			return this.arrayCompiling;
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(Script, Range)} als {@link FunctionValue}
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(ScriptCompiler, Range)} als {@link FunctionValue}
 		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
 		 * 
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Funktionszeigern.
 		 */
-		public final boolean isHandlerEnabled() {
-			return this.handlerEnabled;
+		public final boolean isHandlerCompiling() {
+			return this.handlerCompiling;
 		}
 
 		/**
@@ -1288,8 +1315,8 @@ public class Scripts {
 		 * @see #compileFunction()
 		 * @return Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
-		public final boolean isClosureEnabled() {
-			return this.closureEnabled;
+		public final boolean isClosureCompiling() {
+			return this.closureCompiling;
 		}
 
 		/**
@@ -1301,8 +1328,8 @@ public class Scripts {
 		 * @see CompositeFunction#execute(Scope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
-		public final boolean isChainingEnabled() {
-			return this.chainingEnabled;
+		public final boolean isChainingCompiling() {
+			return this.chainingCompiling;
 		}
 
 		/**
@@ -1313,7 +1340,7 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setScript(final Script value) throws NullPointerException, IllegalStateException {
+		public ScriptCompiler useScript(final Script value) throws NullPointerException, IllegalStateException {
 			value.length();
 			this.checkIdling();
 			this.script = value;
@@ -1328,7 +1355,7 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
+		public ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException();
 			this.checkIdling();
 			this.helper = value;
@@ -1343,8 +1370,8 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setParams(final String... value) throws NullPointerException, IllegalStateException {
-			return this.setParams(Arrays.asList(value.clone()));
+		public ScriptCompiler useParams(final String... value) throws NullPointerException, IllegalStateException {
+			return this.useParams(Arrays.asList(value.clone()));
 		}
 
 		/**
@@ -1355,7 +1382,7 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setParams(final List<String> value) throws NullPointerException, IllegalStateException {
+		public ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
 			if (value.contains(null)) throw new NullPointerException();
 			this.checkIdling();
 			this.params = new LinkedList<String>(value);
@@ -1365,60 +1392,58 @@ public class Scripts {
 		/**
 		 * Diese Methode setzt die Zulässigkeit von Wertlisten.
 		 * 
-		 * @see #isArrayEnabled()
+		 * @see #isArrayCompiling()
 		 * @param value Zulässigkeit von Wertlisten.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setArrayEnabled(final boolean value) throws IllegalStateException {
+		public ScriptCompiler useArrayCompiling(final boolean value) throws IllegalStateException {
 			this.checkIdling();
-			this.arrayEnabled = value;
+			this.arrayCompiling = value;
 			return this;
 		}
 
 		/**
 		 * Diese Methode setzt die Zulässigkeit von Funktionszeigern.
 		 * 
-		 * @see #isHandlerEnabled()
+		 * @see #isHandlerCompiling()
 		 * @param value Zulässigkeit von Funktionszeigern.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setHandlerEnabled(final boolean value) throws IllegalStateException {
+		public ScriptCompiler useHandlerCompiling(final boolean value) throws IllegalStateException {
 			this.checkIdling();
-			this.handlerEnabled = value;
+			this.handlerCompiling = value;
 			return this;
 		}
 
 		/**
 		 * Diese Methode setzt die Zulässigkeit der Bindung des Ausführungskontexts.
 		 * 
-		 * @see #isClosureEnabled()
+		 * @see #isClosureCompiling()
 		 * @param value Zulässigkeit der Bindung des Ausführungskontexts.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setClosureEnabled(final boolean value) throws IllegalStateException {
+		public ScriptCompiler useClosureCompiling(final boolean value) throws IllegalStateException {
 			this.checkIdling();
-			this.closureEnabled = value;
+			this.closureCompiling = value;
 			return this;
 		}
 
 		/**
 		 * Diese Methode setzt die Zulässigkeit der Verkettung von Funktionen.
 		 * 
-		 * @see #isChainingEnabled()
+		 * @see #isChainingCompiling()
 		 * @param value Zulässigkeit der Verkettung von Funktionen.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler setChainingEnabled(final boolean value) throws IllegalStateException {
+		public ScriptCompiler useChainingCompiling(final boolean value) throws IllegalStateException {
 			this.checkIdling();
-			this.chainingEnabled = value;
+			this.chainingCompiling = value;
 			return this;
 		}
-
-		{}
 
 		/**
 		 * Diese Methode kompiliert den Quelltext in einen Wert und gibt diesen zurück.
@@ -1455,6 +1480,24 @@ public class Scripts {
 					switch (this.skipSpace().type) {
 						case 0:
 							return result.toArray(new Value[result.size()]);
+						case ';':
+							this.skip();
+					}
+				}
+			} finally {
+				this.stopCompiling();
+			}
+		}
+
+		public ProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
+			this.startCompiling();
+			try {
+				final List<ProxyFunction> result = new ArrayList<ProxyFunction>();
+				while (true) {
+					result.add(this.doCompileProxy());
+					switch (this.skipSpace().type) {
+						case 0:
+							return result.toArray(new ProxyFunction[result.size()]);
 						case ';':
 							this.skip();
 					}
@@ -1521,15 +1564,15 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden immer {@code null} liefern.
 		 */
-		static Scripts.ScriptCompilerHelper DEFAULT = new Scripts.ScriptCompilerHelper() {
+		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
 
 			@Override
-			public Value compileValue(final Script script, final Range range) throws Scripts.ScriptException {
+			public Value compileValue(final ScriptCompiler compiler, final Range range) throws ScriptException {
 				return null;
 			}
 
 			@Override
-			public String compileParam(final Script script, final Range range) throws Scripts.ScriptException {
+			public String compileParam(final ScriptCompiler compiler, final Range range) throws ScriptException {
 				return null;
 			}
 
@@ -1539,22 +1582,22 @@ public class Scripts {
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue} geliefert
 		 * werden.
 		 * 
-		 * @param script Quelltext.
+		 * @param compiler {@link ScriptCompiler} mit dem Quelltext.
 		 * @param range Bereich.
 		 * @return Wert als {@link Value} oder Funktionen als {@link FunctionValue}.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
-		public Value compileValue(Script script, final Range range) throws ScriptException;
+		public Value compileValue(ScriptCompiler compiler, final Range range) throws ScriptException;
 
 		/**
 		 * Diese Methode gibt den im gegebenen Bereich des gegebenen Quelltexts angegebenen Parameternamen zurück.
 		 * 
-		 * @param script Quelltext.
+		 * @param compiler {@link ScriptCompiler} mit dem Quelltext.
 		 * @param range Bereich.
 		 * @return Parametername.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Parameternamen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
-		public String compileParam(Script script, final Range range) throws ScriptException;
+		public String compileParam(ScriptCompiler compiler, final Range range) throws ScriptException;
 
 	}
 

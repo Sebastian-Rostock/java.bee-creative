@@ -21,7 +21,7 @@ public final class Scopes {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class AbstractScope implements Scope, UseToString {
+	public static abstract class BaseScope implements Scope, UseToString {
 
 		/**
 		 * {@inheritDoc}
@@ -30,8 +30,6 @@ public final class Scopes {
 		public Iterator<Value> iterator() {
 			return new GetIterator<Value>(this, this.size());
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -69,7 +67,7 @@ public final class Scopes {
 	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class VoidScope extends AbstractScope {
+	public static final class VoidScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefaultContext()}
@@ -125,7 +123,7 @@ public final class Scopes {
 	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ValueScope extends AbstractScope {
+	public static final class ValueScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den übergeordneten Ausführungskontext, dessen zusätzlichen Parameterwerte genutzt werden.
@@ -179,6 +177,26 @@ public final class Scopes {
 		{}
 
 		/**
+		 * Diese Methode gibt den übergeordneten Ausführungskontext zurück, dessen Parameterwerte als zusätzliche übernommen werden.
+		 * 
+		 * @return übergeordneter Ausführungskontext.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		/**
+		 * Diese Methode gibt die Parameterwerte zurück.
+		 * 
+		 * @return Parameterwerte.
+		 */
+		public Array values() {
+			return this.values;
+		}
+
+		{}
+
+		/**
 		 * {@inheritDoc} Diese entsprechen hierbei entweder allen oder nur den zusätzlichen Parameterwerten des übergeordneten Ausführungskontexts, welche über
 		 * {@code this.scope().get(index - this.size())} bzw. {@code this.scope().get(index - this.size() + this.scope().size())} ermittelt werden.
 		 * 
@@ -199,32 +217,12 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den übergeordneten Ausführungskontext zurück, dessen Parameterwerte als zusätzliche übernommen werden.
-		 * 
-		 * @return übergeordneter Ausführungskontext.
-		 */
-		public Scope scope() {
-			return this.scope;
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Context context() {
 			return this.scope.context();
 		}
-
-		/**
-		 * Diese Methode gibt die Parameterwerte zurück.
-		 * 
-		 * @return Parameterwerte.
-		 */
-		public Array values() {
-			return this.values;
-		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -242,7 +240,7 @@ public final class Scopes {
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ContextScope extends AbstractScope {
+	public static final class ContextScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den Ausführungskontext.
@@ -270,6 +268,17 @@ public final class Scopes {
 		{}
 
 		/**
+		 * Diese Methode gibt den Ausführungskontext zurück, dessen Parameterwerte übernommen werden.
+		 * 
+		 * @return Ausführungskontext.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		{}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -286,23 +295,12 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den Ausführungskontext zurück, dessen Parameterwerte übernommen werden.
-		 * 
-		 * @return Ausführungskontext.
-		 */
-		public Scope scope() {
-			return this.scope;
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Context context() {
 			return this.context;
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -323,7 +321,7 @@ public final class Scopes {
 	 * @see CompositeFunction
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class CompositeScope extends AbstractScope {
+	public static final class CompositeScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den übergeordneten Ausführungskontext, der für die Parameterfunktionen genutzt wird.
@@ -338,7 +336,7 @@ public final class Scopes {
 		/**
 		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden.
 		 */
-		final Function[] functions;
+		final Function[] params;
 
 		/**
 		 * Dieser Konstruktor initialisiert den übergeordneten Ausführungskontext und die Parameterfunktionen.
@@ -351,7 +349,36 @@ public final class Scopes {
 			if ((scope == null) || (functions == null)) throw new NullPointerException();
 			this.scope = scope;
 			this.values = new Value[functions.length];
-			this.functions = functions;
+			this.params = functions;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt den Ausführungskontext der Parameterfunktionen zurück.
+		 * 
+		 * @return Ausführungskontext der Parameterfunktionen.
+		 */
+		public Scope scope() {
+			return this.scope;
+		}
+
+		/**
+		 * Diese Methode gibt eine Kopie der berechneten Parameterwerte zurück.
+		 * 
+		 * @return Parameterwerte.
+		 */
+		public Value[] values() {
+			return this.values.clone();
+		}
+
+		/**
+		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
+		 * 
+		 * @return Kopie der Parameterfunktionen.
+		 */
+		public Function[] params() {
+			return this.params.clone();
 		}
 
 		{}
@@ -370,7 +397,7 @@ public final class Scopes {
 			if (index >= length) return this.scope.get(index - length);
 			Value value = values[index];
 			if (value != null) return value;
-			value = this.functions[index].execute(this.scope);
+			value = this.params[index].execute(this.scope);
 			if (value == null) throw new NullPointerException();
 			return values[index] = value;
 		}
@@ -384,15 +411,6 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt den Ausführungskontext der Parameterfunktionen zurück.
-		 * 
-		 * @return Ausführungskontext der Parameterfunktionen.
-		 */
-		public Scope scope() {
-			return this.scope;
-		}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -401,31 +419,11 @@ public final class Scopes {
 		}
 
 		/**
-		 * Diese Methode gibt eine Kopie der berechneten Parameterwerte zurück.
-		 * 
-		 * @return Parameterwerte.
-		 */
-		public Value[] values() {
-			return this.values.clone();
-		}
-
-		/**
-		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
-		 * 
-		 * @return Kopie der Parameterfunktionen.
-		 */
-		public Function[] functions() {
-			return this.functions.clone();
-		}
-
-		{}
-
-		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "values", this.values, "functions", this.functions});
+			return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "values", this.values, "functions", this.params});
 		}
 
 	}

@@ -84,6 +84,8 @@ public final class Functions {
 			return this.function;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -96,8 +98,6 @@ public final class Functions {
 		public LazyValue execute(final Scope scope) {
 			return LazyValue.valueOf(scope, this.function);
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -164,8 +164,6 @@ public final class Functions {
 			return context.cast(scope.get(0), FunctionValue.TYPE).data().execute(new ValueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data()));
 		}
 
-		{}
-
 		/**
 		 * {@inheritDoc}
 		 */
@@ -197,6 +195,8 @@ public final class Functions {
 		ApplyFunction() {
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -212,8 +212,6 @@ public final class Functions {
 			final Context context = scope.context();
 			return context.cast(scope.get(index), FunctionValue.TYPE).data().execute(new ValueScope(scope, Array.valueOf(scope).section(0, index)));
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -294,6 +292,8 @@ public final class Functions {
 		 */
 		public abstract boolean mode();
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -310,8 +310,6 @@ public final class Functions {
 			if (this.mode()) return ArrayValue.valueOf(Array.valueOf(Array.valueOf(scope).value()));
 			return ArrayValue.valueOf(Array.valueOf(scope));
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -366,6 +364,8 @@ public final class Functions {
 			 * {@link TraceHandler#onThrow(TraceEvent)} angepasst werden.
 			 */
 			public RuntimeException exception;
+
+			{}
 
 			/**
 			 * {@inheritDoc}
@@ -501,6 +501,8 @@ public final class Functions {
 			return this.function;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -530,8 +532,6 @@ public final class Functions {
 				throw event.exception;
 			}
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -563,6 +563,85 @@ public final class Functions {
 	}
 
 	/**
+	 * Diese Klasse implementiert einen benannten Platzhalter einer Funktione, dessen {@link #execute(Scope)}-Methoden an eine gegebene Funktion delegiert.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class ProxyFunction implements Function {
+
+		/**
+		 * Dieses Feld speichert den Namen.
+		 */
+		final String name;
+
+		/**
+		 * Dieses Feld speichert die Funktion.
+		 */
+		Function function = ValueFunction.valueOf(NullValue.INSTANCE);
+
+		/**
+		 * Dieser Konstruktor initialisiert den Namen.
+		 * 
+		 * @param name Name.
+		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
+		 */
+		public ProxyFunction(final String name) throws NullPointerException {
+			if (name == null) throw new NullPointerException("name = null");
+			this.name = name;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode setzt die in {@link #execute(Scope)} aufzurufende Funktion.
+		 * 
+		 * @param function Funktion.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public void set(final Function function) throws NullPointerException {
+			if (function == null) throw new NullPointerException("function = null");
+			this.function = function;
+		}
+
+		/**
+		 * Diese Methode gibt den Namen.
+		 * 
+		 * @return Name.
+		 */
+		public String name() {
+			return this.name;
+		}
+
+		/**
+		 * Diese Methode gibt die Funktion zurück, die in {@link #execute(Scope)} aufgerufen wird.
+		 * 
+		 * @return Funktion.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Value execute(final Scope scope) {
+			return this.function.execute(scope);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return this.name;
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert eine Funktion mit konstantem Ergebniswert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -571,33 +650,14 @@ public final class Functions {
 	public static final class ValueFunction implements Function {
 
 		/**
-		 * Dieses Feld speichert die {@link ValueFunction}, die immer {@link NullValue#INSTANCE} liefert.
-		 */
-		public static final ValueFunction NULL_FUNCTION = new ValueFunction(NullValue.INSTANCE);
-
-		{}
-
-		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
+		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
 		 * 
 		 * @see Values#valueOf(Object)
 		 * @param data Nutzdaten des Ergebniswerts oder {@code null}.
 		 * @return {@link ValueFunction}.
 		 */
 		public static ValueFunction valueOf(final Object data) {
-			if (data == null) return ValueFunction.NULL_FUNCTION;
 			return new ValueFunction(Values.valueOf(data));
-		}
-
-		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück. Die Eingabe {@code null} wird hierbei zu {@link #NULL_FUNCTION}.
-		 * 
-		 * @param value Ergebniswert oder {@code null}.
-		 * @return {@link ValueFunction}.
-		 */
-		public static ValueFunction valueOf(final Value value) {
-			if ((value == null) || (value == NullValue.INSTANCE)) return ValueFunction.NULL_FUNCTION;
-			return new ValueFunction(value);
 		}
 
 		{}
@@ -629,6 +689,8 @@ public final class Functions {
 			return this.value;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -640,8 +702,6 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			return this.value;
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -731,6 +791,8 @@ public final class Functions {
 			return this.index;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -742,8 +804,6 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			return scope.get(this.index);
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -862,6 +922,8 @@ public final class Functions {
 			return this.function;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 * <p>
@@ -875,8 +937,6 @@ public final class Functions {
 			if (scope2 == null) return FunctionValue.valueOf(new ClosureFunction(scope, this.function));
 			return this.function.execute(new ValueScope(scope2, Array.valueOf(scope), false));
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -1000,6 +1060,16 @@ public final class Functions {
 		}
 
 		/**
+		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
+		 * 
+		 * @return Kopie der Parameterfunktionen.
+		 * @see #execute(Scope)
+		 */
+		public Function[] params() {
+			return this.params.clone();
+		}
+
+		/**
 		 * Diese Methode gibt die aufzurufende Funktion zurück.
 		 * 
 		 * @return aufzurufende Funktion.
@@ -1009,15 +1079,7 @@ public final class Functions {
 			return this.function;
 		}
 
-		/**
-		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
-		 * 
-		 * @return Kopie der Parameterfunktionen.
-		 * @see #execute(Scope)
-		 */
-		public Function[] params() {
-			return this.params.clone();
-		}
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -1040,8 +1102,6 @@ public final class Functions {
 			return (this.chained ? scope.context().cast(this.function.execute(scope), FunctionValue.TYPE).data() : this.function).execute(new CompositeScope(scope,
 				this.params));
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}

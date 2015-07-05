@@ -25,7 +25,7 @@ public final class Values {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Nutzdaten.
 	 */
-	public static abstract class AbstractValue<GData> implements Value {
+	public static abstract class BaseValue<GData> implements Value {
 
 		/**
 		 * Dieses Feld speichert die Nutzdaten.
@@ -35,11 +35,9 @@ public final class Values {
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
 		 */
-		public AbstractValue() {
+		public BaseValue() {
 			this.data = null;
 		}
-
-		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -47,10 +45,12 @@ public final class Values {
 		 * @param data Nutzdaten.
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
-		public AbstractValue(final GData data) throws NullPointerException {
+		public BaseValue(final GData data) throws NullPointerException {
 			if (data == null) throw new NullPointerException();
 			this.data = data;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -76,8 +76,6 @@ public final class Values {
 			IllegalArgumentException {
 			return context.cast(this, type);
 		}
-
-		{}
 
 		/**
 		 * {@inheritDoc}
@@ -174,22 +172,6 @@ public final class Values {
 		{}
 
 		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return this.value().type();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object data() {
-			return this.value().data();
-		}
-
-		/**
 		 * Diese Methode gibt den Ergebniswert der Ausführung der Funktion mit dem Ausführungskontext zurück.
 		 * 
 		 * @see Function#execute(Scope)
@@ -205,22 +187,6 @@ public final class Values {
 			this.scope = null;
 			this.function = null;
 			return value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return this.value().valueTo(type);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
-			return this.value().valueTo(type, context);
 		}
 
 		/**
@@ -242,6 +208,38 @@ public final class Values {
 		}
 
 		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Type<?> type() {
+			return this.value().type();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object data() {
+			return this.value().data();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
+			return this.value().valueTo(type);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			return this.value().valueTo(type, context);
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -278,7 +276,7 @@ public final class Values {
 	 * @see NullType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NullValue extends AbstractValue<Object> {
+	public static final class NullValue extends BaseValue<Object> {
 
 		/**
 		 * Dieses Feld speichert den {@link NullType}.
@@ -322,7 +320,7 @@ public final class Values {
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends AbstractValue<Array> {
+	public static final class ArrayValue extends BaseValue<Array> {
 
 		/**
 		 * Dieses Feld speichert den {@link ArrayType}.
@@ -372,7 +370,7 @@ public final class Values {
 	 * @see ObjectType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectValue extends AbstractValue<Object> {
+	public static final class ObjectValue extends BaseValue<Object> {
 
 		/**
 		 * Dieses Feld speichert den {@link ObjectType}.
@@ -422,7 +420,7 @@ public final class Values {
 	 * @see FunctionType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionValue extends AbstractValue<Function> {
+	public static final class FunctionValue extends BaseValue<Function> {
 
 		/**
 		 * Dieses Feld speichert den {@link FunctionType}.
@@ -472,7 +470,7 @@ public final class Values {
 	 * @see StringType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringValue extends AbstractValue<String> {
+	public static final class StringValue extends BaseValue<String> {
 
 		/**
 		 * Dieses Feld speichert den {@link StringType}.
@@ -522,7 +520,7 @@ public final class Values {
 	 * @see NumberType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NumberValue extends AbstractValue<Number> {
+	public static final class NumberValue extends BaseValue<Number> {
 
 		/**
 		 * Dieses Feld speichert den {@link NumberType}.
@@ -572,7 +570,7 @@ public final class Values {
 	 * @see BooleanType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BooleanValue extends AbstractValue<Boolean> {
+	public static final class BooleanValue extends BaseValue<Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanType}.
@@ -660,8 +658,6 @@ public final class Values {
 	public static void setDefaultConverter(final Converter<? super Object, ? extends Value> value) {
 		Values.defaultConverter = value;
 	}
-
-	{}
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Objekts kann hierfür

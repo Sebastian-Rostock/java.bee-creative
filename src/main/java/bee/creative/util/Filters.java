@@ -435,6 +435,7 @@ public class Filters {
 		 */
 		public ConvertedFilter(final Converter<? super GInput, ? extends GOutput> converter, final Filter<? super GOutput> filter) {
 			super(filter);
+			if (filter == null) throw new NullPointerException();
 			if (converter == null) throw new NullPointerException();
 			this.converter = converter;
 		}
@@ -756,6 +757,21 @@ public class Filters {
 		return new ContainsFilter<GInput>(collection);
 	}
 
+	
+	public static <GInput, GOutput> Filter<GInput> fieldFilter(final Field<? super GInput, ? extends GOutput> field,
+		final Filter<? super GOutput> filter) throws NullPointerException {
+		if (filter == null) throw new NullPointerException();
+		if (field == null) throw new NullPointerException();
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return filter.accept(field.get(input));
+			}
+
+		};
+	}
+	
 	/**
 	 * Diese Methode erzeugt einen {@link Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter} bewertet wird, und gibt diesen zurück. Der erzeugte
 	 * {@link Filter} konvertiert seine Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen {@link Filter}s. Der erzeugte {@link Filter}
@@ -773,9 +789,18 @@ public class Filters {
 	 * @return {@link ConvertedFilter}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GOutput> ConvertedFilter<GInput, GOutput> convertedFilter(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Converter<? super GInput, ? extends GOutput> converter,
 		final Filter<? super GOutput> filter) throws NullPointerException {
-		return new ConvertedFilter<GInput, GOutput>(converter, filter);
+		if (filter == null) throw new NullPointerException();
+		if (converter == null) throw new NullPointerException();
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return filter.accept(converter.convert(input));
+			}
+
+		};
 	}
 
 	/**
