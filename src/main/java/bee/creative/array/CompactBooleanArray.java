@@ -29,6 +29,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactBooleanArraySection(final CompactBooleanArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactBooleanSubArraySection(final CompactBooleanSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code boolean}-Array.
-	 */
-	protected static final boolean[] VOID = new boolean[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code boolean}-Array.
@@ -270,6 +273,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	protected boolean[] newArray(final int length) {
-		if (length == 0) return CompactBooleanArray.VOID;
 		return new boolean[length];
 	}
 

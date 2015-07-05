@@ -125,7 +125,7 @@ public class Contexts {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 */
 		protected Object castToObject(final Value value) throws NullPointerException {
-			Object data = value.data();
+			final Object data = value.data();
 			if (data == null) throw new NullPointerException();
 			return data;
 		}
@@ -276,7 +276,7 @@ public class Contexts {
 	 * 
 	 * @see #getDefaultContext()
 	 * @param value neuer {@code default}-{@link Context}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static void setDefaultContext(final Context value) throws NullPointerException {
 		if (value == null) throw new NullPointerException();

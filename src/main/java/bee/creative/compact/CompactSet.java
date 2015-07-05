@@ -34,9 +34,11 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist.
 		 */
 		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
-			if (set == null) throw new NullPointerException("set is null");
+			if (set == null) throw new NullPointerException("set = null");
 			this.set = set;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -55,6 +57,8 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link Set}.
@@ -81,21 +85,23 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
 	 */
 	public CompactSet(final Collection<? extends GItem> collection) {
-		if (collection == null) throw new NullPointerException("collection is null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public final boolean add(final GItem item) {
-		final int index = this.customItemIndex(item);
+		int index = this.customItemIndex(item);
 		if (index >= 0) return false;
-		final int index2 = -index - 1;
-		this.customInsert(index2, 1);
-		this.setItem(index2, item);
+		index = -index - 1;
+		this.customInsert(index, 1);
+		this.setItem(index, item);
 		return true;
 	}
 

@@ -855,7 +855,7 @@ public class XML {
 		 * @return {@link Document} des {@link #node() aktuellen Knoten}.
 		 */
 		public Document document() {
-			Node node = this.node.getOwnerDocument();
+			final Node node = this.node.getOwnerDocument();
 			if (node.getNodeType() == Node.DOCUMENT_NODE) return (Document)node;
 			return node.getOwnerDocument();
 		}

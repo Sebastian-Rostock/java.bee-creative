@@ -41,6 +41,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			this.data = data;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -86,6 +88,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			super(map, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -114,6 +118,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		public CompactMapKeyDescendingIterator(final CompactMap<GKey, ?> map, final int from, final int last) {
 			super(map, from, last);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -148,6 +154,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			this.map = data;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -179,6 +187,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		public CompactMapValues(final CompactMap<?, GValue> data) {
 			this.data = data;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -225,6 +235,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			super(map, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -249,6 +261,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		 */
 		private static final long serialVersionUID = -543360027933297926L;
 
+		{}
+
 		/**
 		 * Dieses Feld speichert die {@link CompactMap}.
 		 */
@@ -264,6 +278,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			super(data.getKey(index), data.getValue(index));
 			this.data = data;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -302,6 +318,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		public CompactMapEntries(final CompactMap<GKey, GValue> data) {
 			this.data = data;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -349,6 +367,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 			super(map, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -358,6 +378,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieser Konstruktor initialisiert die {@link Map}.
@@ -388,10 +410,12 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	public CompactMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
 		this();
-		if (map == null) throw new NullPointerException("map is null");
+		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}
+
+	{}
 
 	/**
 	 * Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
@@ -427,6 +451,8 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 * @param value Wert.
 	 */
 	protected abstract void setEntry(int index, GKey key, GValue value);
+
+	{}
 
 	/**
 	 * Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder
@@ -511,15 +537,15 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	 */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		final int index = this.customItemIndex(key);
+		int index = this.customItemIndex(key);
 		if (index >= 0) {
 			final GValue item = this.getValue(index);
 			this.setEntry(index, this.getKey(index), value);
 			return item;
 		}
-		final int index2 = -index - 1;
-		this.customInsert(index2, 1);
-		this.setEntry(index2, key, value);
+		index = -index - 1;
+		this.customInsert(index, 1);
+		this.setEntry(index, key, value);
 		return null;
 	}
 

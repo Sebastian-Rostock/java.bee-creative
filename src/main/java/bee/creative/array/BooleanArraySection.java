@@ -71,6 +71,8 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -37,6 +37,8 @@ public abstract class CompactData {
 		 */
 		protected static final Object[] VOID = new Object[0];
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -75,7 +77,7 @@ public abstract class CompactData {
 		 * @param data {@link CompactData}.
 		 */
 		public CompactDataOwner(final GData data) {
-			if (data == null) throw new NullPointerException("data is null");
+			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
 		}
 
@@ -118,6 +120,8 @@ public abstract class CompactData {
 			this.item = -1;
 			this.last = last;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt das {@code index}-te Element zurück.
@@ -168,6 +172,8 @@ public abstract class CompactData {
 			super(data, from - 1, last - 1);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -208,6 +214,8 @@ public abstract class CompactData {
 			super(array, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -231,6 +239,8 @@ public abstract class CompactData {
 		 * Dieses Feld speichert das Objekt zur offenen Begrenzung von Teilmengen.
 		 */
 		protected static final Object OPEN = new Object();
+
+		{}
 
 		/**
 		 * Dieses Feld speichert das erste Element oder {@link CompactSubData#OPEN}.
@@ -279,6 +289,8 @@ public abstract class CompactData {
 			this.lastItem = lastItem;
 			this.lastInclusive = lastInclusive;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu klein
@@ -516,6 +528,8 @@ public abstract class CompactData {
 
 	}
 
+	{}
+
 	/**
 	 * Dieses Feld speichert das {@link Array} der Elemente.
 	 */
@@ -527,6 +541,8 @@ public abstract class CompactData {
 	public CompactData() {
 		this.items = new CompactDataArray();
 	}
+
+	{}
 
 	/**
 	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses

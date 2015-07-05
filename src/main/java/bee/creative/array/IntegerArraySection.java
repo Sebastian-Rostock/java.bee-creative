@@ -71,6 +71,8 @@ public abstract class IntegerArraySection extends ArraySection<int[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -64,10 +64,12 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 */
 	public CompactNavigableEntryMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
-		if (map == null) throw new NullPointerException("map is null");
+		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

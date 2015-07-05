@@ -71,6 +71,8 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

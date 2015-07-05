@@ -239,8 +239,6 @@ public class BEXEncoder {
 
 	}
 
-	{}
-
 	/**
 	 * Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Verwaltung einzigartiger Datensätze.
 	 * 
@@ -383,8 +381,6 @@ public class BEXEncoder {
 
 	}
 
-	{}
-
 	/**
 	 * Diese Klasse implementiert die allgemeinen Zustandsdaten, die während der Bestückung von Knoten eingesetzt werden.
 	 * 
@@ -460,8 +456,6 @@ public class BEXEncoder {
 		public BEXGroupItem attributes;
 
 	}
-
-	{}
 
 	/**
 	 * Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileDecoder}.
@@ -909,12 +903,14 @@ public class BEXEncoder {
 		 * @param name Name.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Element- noch ein Attributknoten ist.
-		 * @throws IllegalArgumentException Wenn {@code name} {@code null} oder leer ist.
+		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn {@code name} leer ist.
 		 */
-		public BEXFileEncoder useName(final String name) throws IllegalStateException, IllegalArgumentException {
+		public BEXFileEncoder useName(final String name) throws IllegalStateException, NullPointerException, IllegalArgumentException {
 			final BEXStack stack = this.stack;
 			if ((stack.type != BEXStack.ATTR) && (stack.type != BEXStack.ELEM)) throw new IllegalStateException();
-			if ((name == null) || name.isEmpty()) throw new IllegalArgumentException();
+			if (name == null) throw new IllegalArgumentException("name = null");
+			if (name.isEmpty()) throw new IllegalArgumentException();
 			stack.name = name;
 			return this;
 		}
@@ -1079,7 +1075,7 @@ public class BEXEncoder {
 		 */
 		@Override
 		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (order == null) throw new NullPointerException();
+			if (order == null) throw new NullPointerException("order = null");
 			final BEXStack stack = this.stack;
 			if (stack.type != BEXStack.ROOT) throw new IllegalStateException();
 			this.updatePART(this.attrTablePart, +1);

@@ -311,8 +311,8 @@ public class BEXAdapter {
 		public String substringData(final int offset, final int count) throws DOMException {
 			try {
 				return this.getNodeValue().substring(offset, offset + count);
-			} catch (final IndexOutOfBoundsException e) {
-				throw new DOMException(DOMException.INDEX_SIZE_ERR, e.getMessage());
+			} catch (final IndexOutOfBoundsException cause) {
+				throw new DOMException(DOMException.INDEX_SIZE_ERR, cause.getMessage());
 			}
 		}
 
@@ -1381,7 +1381,7 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist.
 		 */
 		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
-			if (node == null) throw new NullPointerException();
+			if (node == null) throw new NullPointerException("node = null");
 			this.node = node;
 		}
 
@@ -1714,7 +1714,8 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist.
 		 */
 		public BEXAttrListAdapter(final BEXList list, final Element parent) throws NullPointerException {
-			if ((list == null) || (parent == null)) throw new NullPointerException();
+			if (list == null) throw new NullPointerException("list = null");
+			if (parent== null) throw new NullPointerException("parent = null");
 			this.list = list;
 			this.parent = parent;
 		}
@@ -1830,7 +1831,8 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist.
 		 */
 		public BEXChldListAdapter(final BEXList list, final Node parent) throws NullPointerException {
-			if ((list == null) || (parent == null)) throw new NullPointerException();
+			if (list == null) throw new NullPointerException("list = null");
+			if (parent== null) throw new NullPointerException("parent = null");
 			this.list = list;
 			this.parent = parent;
 		}
@@ -1985,7 +1987,9 @@ public class BEXAdapter {
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
 		public BEXElemCollector(final BEXNodeAdapter node, final String uri, final String name, final boolean self) throws NullPointerException {
-			if ((node == null) || (uri == null) || (name == null)) throw new NullPointerException();
+			if (node == null) throw new NullPointerException("node = null");
+			if (uri== null) throw new NullPointerException("uri = null");
+			if (name== null) throw new NullPointerException("name = null");
 			this.uri = uri;
 			this.name = name;
 			this.list = new ArrayList<Node>();

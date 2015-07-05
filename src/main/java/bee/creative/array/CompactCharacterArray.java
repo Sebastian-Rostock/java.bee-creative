@@ -29,6 +29,8 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactCharacterArraySection(final CompactCharacterArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactCharacterSubArraySection(final CompactCharacterSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code char}-Array.
-	 */
-	protected static final char[] VOID = new char[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code char}-Array.
@@ -270,6 +273,8 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	 */
 	@Override
 	protected char[] newArray(final int length) {
-		if (length == 0) return CompactCharacterArray.VOID;
 		return new char[length];
 	}
 

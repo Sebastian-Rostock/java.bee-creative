@@ -43,9 +43,11 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -97,6 +99,8 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 
 	}
 
+	{}
+
 	/**
 	 * Dieser Konstruktor initialisiert die {@link List}.
 	 */
@@ -126,29 +130,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		super(collection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final int customItemIndex(final Object item) {
-		return this.indexOf(item);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final boolean customItemEquals(final Object key, final int hash, final Object item) {
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final int customItemCompare(final Object key, final int hash, final Object item) {
-		return 0;
-	}
+	{}
 
 	/**
 	 * Diese Methode gibt die relative Ausrichtungsposition der Elemente im Array zurück. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am
@@ -175,6 +157,32 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 */
 	public final void setAlignment(final float alignment) throws IllegalArgumentException {
 		this.items.setAlignment(alignment);
+	}
+
+	{}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected final int customItemIndex(final Object item) {
+		return this.indexOf(item);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected final boolean customItemEquals(final Object key, final int hash, final Object item) {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected final int customItemCompare(final Object key, final int hash, final Object item) {
+		return 0;
 	}
 
 	/**
@@ -226,7 +234,6 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 */
 	@Override
 	public final boolean addAll(final int index, final Collection<? extends GItem> collection) {
-		if (collection == null) throw new NullPointerException();
 		if (collection.isEmpty()) return false;
 		final Object[] items = collection.toArray();
 		final int count = items.length;

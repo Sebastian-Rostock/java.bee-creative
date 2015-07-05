@@ -29,6 +29,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code float}-Array.
-	 */
-	protected static final float[] VOID = new float[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code float}-Array.
@@ -270,6 +273,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	protected float[] newArray(final int length) {
-		if (length == 0) return CompactFloatArray.VOID;
 		return new float[length];
 	}
 

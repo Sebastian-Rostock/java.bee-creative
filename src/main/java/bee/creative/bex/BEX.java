@@ -193,8 +193,6 @@ public class BEX {
 		return new String(value.section(0, value.length() - 1).toBytes(), BEX.CHARSET);
 	}
 
-	{}
-
 	/**
 	 * Diese Methode gibt einen neuen {@link BEXFileEncoder} zurück.
 	 * 

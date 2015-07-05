@@ -29,6 +29,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactShortArraySection(final CompactShortArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactShortSubArraySection(final CompactShortSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code short}-Array.
-	 */
-	protected static final short[] VOID = new short[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code short}-Array.
@@ -270,6 +273,8 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactShortArray extends CompactArray<short[], Short> implements S
 	 */
 	@Override
 	protected short[] newArray(final int length) {
-		if (length == 0) return CompactShortArray.VOID;
 		return new short[length];
 	}
 

@@ -172,6 +172,8 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

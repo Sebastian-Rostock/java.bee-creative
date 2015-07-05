@@ -53,6 +53,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 			super(set, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -106,7 +108,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		 */
 		@Override
 		public boolean add(final GItem item) {
-			if (!this.isInRange(item)) throw new IllegalArgumentException("entry out of range");
+			if (!this.isInRange(item)) throw new IllegalArgumentException("item out of range");
 			return this.data.add(item);
 		}
 
@@ -225,6 +227,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 			final boolean lastInclusive) throws IllegalArgumentException {
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -375,6 +379,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 			super(array, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -501,6 +507,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 
 	}
 
+	{}
+
 	/**
 	 * Dieses Feld speichert den {@link Comparator}.
 	 */
@@ -514,7 +522,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
 		super();
-		if (comparator == null) throw new NullPointerException("comparator is null");
+		if (comparator == null) throw new NullPointerException("comparator = null");
 		this.comparator = comparator;
 	}
 
@@ -541,10 +549,12 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	 */
 	public CompactNavigableSet(final Collection<? extends GItem> collection, final Comparator<? super GItem> comparator) throws NullPointerException {
 		this(comparator);
-		if (collection == null) throw new NullPointerException("collection is null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}
+
+	{}
 
 	/**
 	 * Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
@@ -581,6 +591,8 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getItem(index);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

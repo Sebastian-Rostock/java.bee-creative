@@ -54,6 +54,8 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 		super(collection);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

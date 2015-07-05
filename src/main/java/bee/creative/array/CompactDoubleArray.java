@@ -29,6 +29,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactDoubleArraySection(final CompactDoubleArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactDoubleSubArraySection(final CompactDoubleSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code double}-Array.
-	 */
-	protected static final double[] VOID = new double[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code double}-Array.
@@ -270,6 +273,8 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	 */
 	@Override
 	protected double[] newArray(final int length) {
-		if (length == 0) return CompactDoubleArray.VOID;
 		return new double[length];
 	}
 

@@ -71,6 +71,8 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

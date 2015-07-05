@@ -28,6 +28,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -130,9 +132,11 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactByteArraySection(final CompactByteArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -188,9 +192,11 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactByteSubArraySection(final CompactByteSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -226,10 +232,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code byte}-Array.
-	 */
-	protected static final byte[] VOID = new byte[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code byte}-Array.
@@ -269,6 +272,8 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -290,7 +295,6 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	 */
 	@Override
 	protected byte[] newArray(final int length) {
-		if (length == 0) return CompactByteArray.VOID;
 		return new byte[length];
 	}
 

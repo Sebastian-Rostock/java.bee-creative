@@ -43,6 +43,8 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 		super(map);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

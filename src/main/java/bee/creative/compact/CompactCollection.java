@@ -31,6 +31,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 			super(data, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -60,6 +62,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 			super(data, from, last);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -69,6 +73,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieser Konstruktor initialisiert die {@link Collection}.
@@ -98,10 +104,12 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	public CompactCollection(final Collection<? extends GItem> collection) {
 		super();
-		if (collection == null) throw new NullPointerException("collection is null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
 		this.addAll(collection);
 	}
+
+	{}
 
 	/**
 	 * Diese Methode gibt das {@code index}-te Element zurück.
@@ -133,6 +141,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	protected final void setItems(final int index, final Object[] items) {
 		this.items.set(index, items);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

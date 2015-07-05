@@ -43,6 +43,8 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 		super(map);
 	}
 
+	{}
+
 	/**
 	 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
 	 * 
@@ -58,6 +60,8 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	 * @param value Wert.
 	 */
 	protected abstract void setKey(GKey key, final GValue value);
+
+	{}
 
 	/**
 	 * {@inheritDoc}
@@ -81,7 +85,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	 */
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException("value = null");
 		this.items.set(index, value);
 		this.setKey(key, value);
 	}
@@ -91,7 +95,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	 */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException("value = null");
 		return super.put(key, value);
 	}
 

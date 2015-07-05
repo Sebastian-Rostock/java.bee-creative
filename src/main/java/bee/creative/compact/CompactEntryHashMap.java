@@ -53,6 +53,8 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 		super(map);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

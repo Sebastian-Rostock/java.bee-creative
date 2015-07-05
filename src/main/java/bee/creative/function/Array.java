@@ -433,7 +433,7 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 	 */
 	public boolean collect(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException();
-		return collect(target, 0, length());
+		return this.collect(target, 0, this.length());
 	}
 
 	/**
@@ -451,11 +451,9 @@ public abstract class Array implements Get<Value>, Iterable<Value> {
 			@Override
 			protected boolean collect(final Collector target, final int offset, final int length) {
 				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
-				if (offset2 >= 0) {
-					return array.collect(target, offset2, length);
-				} else if (length2 <= 0) {
-					return Array.this.collect(target, offset, length);
-				} else {
+				if (offset2 >= 0) return array.collect(target, offset2, length);
+				else if (length2 <= 0) return Array.this.collect(target, offset, length);
+				else {
 					if (!Array.this.collect(target, offset, -offset2)) return false;
 					return array.collect(target, 0, length2);
 				}

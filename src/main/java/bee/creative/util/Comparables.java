@@ -3,6 +3,7 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -122,356 +123,6 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Comparable}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 * @param <GEntry2> Typ der Elemente des gegebenen {@link Comparable}s.
-	 */
-	static abstract class AbstractDelegatingComparable<GEntry, GEntry2> implements Comparable<GEntry> {
-
-		/**
-		 * Dieses Feld speichert den {@link Comparable}.
-		 */
-		final Comparable<? super GEntry2> comparable;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Comparable}.
-		 * 
-		 * @param comparable {@link Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
-		 */
-		public AbstractDelegatingComparable(final Comparable<? super GEntry2> comparable) throws NullPointerException {
-			if (comparable == null) throw new NullPointerException();
-			this.comparable = comparable;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.comparable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof AbstractDelegatingComparable<?, ?>)) return false;
-			final AbstractDelegatingComparable<?, ?> data = (AbstractDelegatingComparable<?, ?>)object;
-			return Objects.equals(this.comparable, data.comparable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.comparable);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
-	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
-	 * 
-	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class NullComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Comparable}.
-		 * 
-		 * @param comparable {@link Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
-		 */
-		public NullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-			super(comparable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GEntry entry) {
-			return ((entry == null) ? 1 : this.comparable.compareTo(entry));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof NullComparable<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Comparable}, der einen gegebenen {@link Comparator} sowie ein gegebenes Element zur Berechnung des Navigationswert
-	 * verwendet. Das gegebene Element ist hierbei das erstes Argument des {@link Comparator}s. Der Navigationswert für ein Element {@code element} sowie das
-	 * gegebene Element {@code entry} und den gegebenen {@link Comparator} {@code comparator} ergibt sich aus:
-	 * 
-	 * <pre>comparator.compare(entry, element)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class EntryComparable<GEntry> implements Comparable<GEntry> {
-
-		/**
-		 * Dieses Feld speichert das erste Argument für den {@link Comparator}.
-		 */
-		final GEntry entry;
-
-		/**
-		 * Dieses Feld speichert den {@link Comparator}.
-		 */
-		final Comparator<? super GEntry> comparator;
-
-		/**
-		 * Dieser Konstruktor initialisiert Element und {@link Comparator}.
-		 * 
-		 * @param entry erstes Argument des {@link Comparator}s.
-		 * @param comparator {@link Comparator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
-		 */
-		public EntryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
-			this.entry = entry;
-			if (comparator == null) throw new NullPointerException();
-			this.comparator = comparator;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GEntry entry) {
-			return this.comparator.compare(this.entry, entry);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.entry, this.comparator);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof EntryComparable<?>)) return false;
-			final EntryComparable<?> data = (EntryComparable<?>)object;
-			return Objects.equals(this.entry, data.entry) && Objects.equals(this.comparator, data.comparator);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.entry, this.comparator);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Comparable}, der den Navigationswert eines gegebenen {@link Comparable}s umkehrt. Der Navigationswert für ein
-	 * Element {@code element} sowie ein {@link Comparable} {@code comparable} ergibt sich aus:
-	 * 
-	 * <pre>-comparable.compareTo(element)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class ReverseComparable<GEntry> extends AbstractDelegatingComparable<GEntry, GEntry> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Comparable}.
-		 * 
-		 * @param comparable {@link Comparable}.
-		 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
-		 */
-		public ReverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-			super(comparable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GEntry entry) {
-			return -this.comparable.compareTo(entry);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ReverseComparable<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
-	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
-	 * für ein Element {@code element} sowie die {@link Comparable}s {@code comparable1} und {@code comparable2} ergibt sich aus:
-	 * 
-	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class ChainedComparable<GEntry> implements Comparable<GEntry> {
-
-		/**
-		 * Dieses Feld speichert den primären {@link Comparable}.
-		 */
-		final Comparable<? super GEntry> comparable1;
-
-		/**
-		 * Dieses Feld speichert den sekundären {@link Comparable}.
-		 */
-		final Comparable<? super GEntry> comparable2;
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Comparable}.
-		 * 
-		 * @param comparable1 primärer {@link Comparable}.
-		 * @param comparable2 sekundärer {@link Comparable}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ChainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2) throws NullPointerException {
-			if ((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
-			this.comparable1 = comparable1;
-			this.comparable2 = comparable2;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GEntry entry) {
-			final int comp = this.comparable1.compareTo(entry);
-			return ((comp != 0) ? comp : this.comparable2.compareTo(entry));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.comparable1, this.comparable2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ChainedComparable<?>)) return false;
-			final ChainedComparable<?> data = (ChainedComparable<?>)object;
-			return Objects.equals(this.comparable1, data.comparable1) && Objects.equals(this.comparable2, data.comparable2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.comparable1, this.comparable2);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen konvertierenden {@link Comparable}, der die mit einem gegebenen {@link Converter} konvertierten Elemente zur Berechnung
-	 * des Navigationswerts an einen gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element}, einen {@link Converter}
-	 * {@code onverter} und einen {@link Comparable} {@code comparable} ergibt sich aus:
-	 * 
-	 * <pre>comparable.compareTo(converter.convert(element))</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
-	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
-	 */
-	public static final class ConvertedComparable<GInput, GOutput> extends AbstractDelegatingComparable<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieser Konstruktor initialisiert {@link Comparable} und {@link Converter}.
-		 * 
-		 * @param comparable {@link Comparable}.
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ConvertedComparable(final Comparable<? super GOutput> comparable, final Converter<? super GInput, ? extends GOutput> converter)
-			throws NullPointerException {
-			super(comparable);
-			if (converter == null) throw new NullPointerException();
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compareTo(final GInput entry) {
-			return this.comparable.compareTo(this.converter.convert(entry));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.comparable, this.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ConvertedComparable<?, ?>)) return false;
-			final ConvertedComparable<?, ?> data = (ConvertedComparable<?, ?>)object;
-			return Objects.equals(this.comparable, data.comparable) && Objects.equals(this.converter, data.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.converter, this.comparable);
-		}
-
-	}
-
-	/**
 	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
 	 * 
 	 * @param comparable {@link Comparable}.
@@ -560,94 +211,179 @@ public class Comparables {
 		Comparables.check(fromIndex, toIndex);
 	}
 
+	{}
+
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, das {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
-	 * {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode wählt aus den gegebenen Elementen ein Element mit der kleinsten Ordnung und gibt es zurück. Der Navigationswert eines solchen Elements ist
+	 * bezogen auf jedes der gegebenen Elemente immer kleiner oder gleich {@code 0}.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable Elemente.
+	 * @return Element mit der kleinsten Ordnung oder {@code null}.
+	 */
+	public static <GEntry extends Comparable<? super GEntry>> GEntry min(final Iterable<? extends GEntry> iterable) {
+		final Iterator<? extends GEntry> iterator = iterable.iterator();
+		if (!iterator.hasNext()) return null;
+		GEntry result = iterator.next();
+		while (iterator.hasNext()) {
+			final GEntry entry = iterator.next();
+			if (entry.compareTo(result) < 0) {
+				result = entry;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Diese Methode wählt aus den gegebenen Elementen ein Element mit der größten Ordnung und gibt es zurück. Der Navigationswert eines solchen Elements ist
+	 * bezogen auf jedes der gegebenen Elemente immer größer oder gleich {@code 0}.
+	 * 
+	 * @param <GEntry> Typ der Elemente.
+	 * @param iterable Elemente.
+	 * @return Element mit der kleinsten Ordnung oder {@code null}.
+	 */
+	public static <GEntry extends Comparable<? super GEntry>> GEntry max(final Iterable<? extends GEntry> iterable) {
+		final Iterator<? extends GEntry> iterator = iterable.iterator();
+		if (!iterator.hasNext()) return null;
+		GEntry result = iterator.next();
+		while (iterator.hasNext()) {
+			final GEntry entry = iterator.next();
+			if (entry.compareTo(result) > 0) {
+				result = entry;
+			}
+		}
+		return result;
+	}
+
+	{}
+
+	/**
+	 * Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
+	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>((element == null) ? 1 : comparable.compareTo(element))</pre>
 	 * 
-	 * @see NullComparable
 	 * @param <GEntry> Typ der Elemente.
-	 * @param comparable {@link Comparable}
-	 * @return {@link NullComparable}
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
+	 * @param comparable {@link Comparable}.
+	 * @return {@code null}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GEntry> NullComparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-		return new NullComparable<GEntry>(comparable);
+	public static <GEntry> Comparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException();
+		return new Comparable<GEntry>() {
+
+			@Override
+			public int compareTo(final GEntry entry) {
+				return ((entry == null) ? 1 : comparable.compareTo(entry));
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
-	 * verwendet, und gibt ihn zurück. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element
-	 * {@code element} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
+	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code element} ergibt sich
+	 * aus:
 	 * 
 	 * <pre>comparator.compare(entry, element)</pre>
 	 * 
-	 * @see EntryComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param entry erstes Argument des {@link Comparator}s.
 	 * @param comparator {@link Comparator}.
-	 * @return {@link EntryComparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
+	 * @return {@code entry}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GEntry> EntryComparable<GEntry> entryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
-		return new EntryComparable<GEntry>(entry, comparator);
+	public static <GEntry> Comparable<GEntry> entryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
+		if (comparator == null) throw new NullPointerException();
+		return new Comparable<GEntry>() {
+
+			@Override
+			public int compareTo(final GEntry element) {
+				return comparator.compare(entry, element);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Comparable}, der den Navigationswert des gegebenen {@link Comparable}s umkehrt, und gibt ihn zurück. Der Navigationswert
-	 * für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für ein Element
+	 * {@code element} ergibt sich aus:
 	 * 
 	 * <pre>- comparable.compareTo(element)</pre>
 	 * 
-	 * @see ReverseComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable {@link Comparable}.
-	 * @return {@link ReverseComparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
+	 * @return {@code reverse}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GEntry> ReverseComparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-		return new ReverseComparable<GEntry>(comparable);
+	public static <GEntry> Comparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException();
+		return new Comparable<GEntry>() {
+
+			@Override
+			public int compareTo(final GEntry entry) {
+				return -comparable.compareTo(entry);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Comparable}, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet und
-	 * nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat, und gibt ihn zurück. Der
-	 * Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
+	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
+	 * für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>(comparable1.compareTo(element) != 0) ? comparable1.compareTo(element) : comparable2.compareTo(element)</pre>
 	 * 
-	 * @see ChainedComparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @param comparable1 erster {@link Comparable}.
 	 * @param comparable2 zweiter {@link Comparable}.
-	 * @return {@link ChainedComparable}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @return {@code chained}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist.
 	 */
-	public static <GEntry> ChainedComparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
+	public static <GEntry> Comparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 		throws NullPointerException {
-		return new ChainedComparable<GEntry>(comparable1, comparable2);
+		if ((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
+		return new Comparable<GEntry>() {
+
+			@Override
+			public int compareTo(final GEntry entry) {
+				final int result = comparable1.compareTo(entry);
+				if (result != 0) return result;
+				return comparable2.compareTo(entry);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Comparable}, der die mit dem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des
-	 * Navigationswerts an den gegebenen {@link Comparable} delegiert, und gibt ihn zurück. Der Navigationswert für ein Element {@code element} ergibt sich aus:
+	 * Diese Methode gint einen konvertierenden {@link Comparable} zurück, der die mit dem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des
+	 * Navigationswerts an den gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code element} ergibt sich aus:
 	 * 
 	 * <pre>comparable.compareTo(converter.convert(element))</pre>
 	 * 
 	 * @see Converter
-	 * @see ConvertedComparable
 	 * @param <GInput> Typ der Eingabe des {@link Converter}s sowie der Elemente.
 	 * @param <GOutput> Typ der Ausgabe des {@link Converter}s sowie der Elemente des gegebenen {@link Comparable}s.
 	 * @param converter {@link Converter}.
 	 * @param comparable {@link Comparable}.
-	 * @return {@link ConvertedComparable}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @return {@code converted}-{@link Comparable}.
+	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparable} {@code null} ist.
 	 */
-	public static <GInput, GOutput> ConvertedComparable<GInput, GOutput> convertedComparable(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Comparable<GInput> convertedComparable(final Converter<? super GInput, ? extends GOutput> converter,
 		final Comparable<? super GOutput> comparable) throws NullPointerException {
-		return new ConvertedComparable<GInput, GOutput>(comparable, converter);
+		if ((converter == null) || (comparable == null)) throw new NullPointerException();
+		return new Comparable<GInput>() {
+
+			@Override
+			public int compareTo(final GInput entry) {
+				return comparable.compareTo(converter.convert(entry));
+			}
+
+		};
 	}
+
+	{}
 
 	/**
 	 * Diese Methode führt auf dem gegebenen Array eine binäre Suche mit dem gegebenen {@link Comparable} als Suchkriterium aus und gibt die Position des ersten
@@ -1041,6 +777,8 @@ public class Comparables {
 		if ((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(items.get(from)) == 0)) return from;
 		return -from - 2;
 	}
+
+	{}
 
 	/**
 	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.

@@ -140,55 +140,55 @@ public class BEXDecoder {
 			final IAMListDecoder chldUriTextList = nodeData.list(3);
 			final IAMListDecoder chldNameTextList = nodeData.list(4);
 			final IAMListDecoder chldValueTextList = nodeData.list(5);
-			final IAMListDecoder _attrUriRefList = nodeData.list(6);
-			final IAMListDecoder _attrNameRefList = nodeData.list(7);
-			final IAMListDecoder _attrValueRefList = nodeData.list(8);
-			final IAMListDecoder _attrParentRefList = nodeData.list(9);
-			final IAMListDecoder _chldUriRefList = nodeData.list(10);
-			final IAMListDecoder _chldNameRefList = nodeData.list(11);
-			final IAMListDecoder _chldContentRefList = nodeData.list(12);
-			final IAMListDecoder _chldAttributesRefList = nodeData.list(13);
-			final IAMListDecoder _chldParentRefList = nodeData.list(14);
-			final IAMListDecoder _attrListRangeList = nodeData.list(15);
-			final IAMListDecoder _chldListRangeList = nodeData.list(16);
+			final IAMListDecoder attrUriRefList = nodeData.list(6);
+			final IAMListDecoder attrNameRefList = nodeData.list(7);
+			final IAMListDecoder attrValueRefList = nodeData.list(8);
+			final IAMListDecoder attrParentRefList = nodeData.list(9);
+			final IAMListDecoder chldUriRefList = nodeData.list(10);
+			final IAMListDecoder chldNameRefList = nodeData.list(11);
+			final IAMListDecoder chldContentRefList = nodeData.list(12);
+			final IAMListDecoder chldAttributesRefList = nodeData.list(13);
+			final IAMListDecoder chldParentRefList = nodeData.list(14);
+			final IAMListDecoder attrListRangeList = nodeData.list(15);
+			final IAMListDecoder chldListRangeList = nodeData.list(16);
 			if (false || //
-				(_attrUriRefList.itemCount() != 1) || //
-				(_attrNameRefList.itemCount() != 1) || //
-				(_attrValueRefList.itemCount() != 1) || //
-				(_attrParentRefList.itemCount() != 1) || //
-				(_chldUriRefList.itemCount() != 1) || //
-				(_chldNameRefList.itemCount() != 1) || //
-				(_chldContentRefList.itemCount() != 1) || //
-				(_chldAttributesRefList.itemCount() != 1) || //
-				(_chldParentRefList.itemCount() != 1) || //
-				(_attrListRangeList.itemCount() != 1) || //
-				(_chldListRangeList.itemCount() != 1) //
+				(attrUriRefList.itemCount() != 1) || //
+				(attrNameRefList.itemCount() != 1) || //
+				(attrValueRefList.itemCount() != 1) || //
+				(attrParentRefList.itemCount() != 1) || //
+				(chldUriRefList.itemCount() != 1) || //
+				(chldNameRefList.itemCount() != 1) || //
+				(chldContentRefList.itemCount() != 1) || //
+				(chldAttributesRefList.itemCount() != 1) || //
+				(chldParentRefList.itemCount() != 1) || //
+				(attrListRangeList.itemCount() != 1) || //
+				(chldListRangeList.itemCount() != 1) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final MMFArray attrUriRef = _attrUriRefList.item(0);
-			final MMFArray attrNameRef = _attrNameRefList.item(0);
-			final MMFArray attrValueRef = _attrValueRefList.item(0);
-			final MMFArray attrParentRef = _attrParentRefList.item(0);
-			final MMFArray chldUriRef = _chldUriRefList.item(0);
-			final MMFArray chldNameRef = _chldNameRefList.item(0);
-			final MMFArray chldContentRef = _chldContentRefList.item(0);
-			final MMFArray chldAttributesRef = _chldAttributesRefList.item(0);
-			final MMFArray chldParentRef = _chldParentRefList.item(0);
-			final MMFArray chldListRange = _chldListRangeList.item(0);
-			final MMFArray attrListRange = _attrListRangeList.item(0);
-			final int _attrCount = attrNameRef.length();
-			final int _chldCount = chldNameRef.length();
+			final MMFArray attrUriRef = attrUriRefList.item(0);
+			final MMFArray attrNameRef = attrNameRefList.item(0);
+			final MMFArray attrValueRef = attrValueRefList.item(0);
+			final MMFArray attrParentRef = attrParentRefList.item(0);
+			final MMFArray chldUriRef = chldUriRefList.item(0);
+			final MMFArray chldNameRef = chldNameRefList.item(0);
+			final MMFArray chldContentRef = chldContentRefList.item(0);
+			final MMFArray chldAttributesRef = chldAttributesRefList.item(0);
+			final MMFArray chldParentRef = chldParentRefList.item(0);
+			final MMFArray chldListRange = chldListRangeList.item(0);
+			final MMFArray attrListRange = attrListRangeList.item(0);
+			final int attrCount = attrNameRef.length();
+			final int chldCount = chldNameRef.length();
 
 			if (false || //
 				(rootRef < 0) || //
-				(_chldCount <= rootRef) || //
-				((attrUriRef.length() != _attrCount) && (attrUriRef.length() != 0)) || //
-				(attrValueRef.length() != _attrCount) || //
-				((attrParentRef.length() != _attrCount) && (attrParentRef.length() != 0)) || //
-				((chldUriRef.length() != _chldCount) && (chldUriRef.length() != 0)) || //
-				(chldContentRef.length() != _chldCount) || //
-				(chldAttributesRef.length() != _chldCount) || //
-				((chldParentRef.length() != _chldCount) && (chldParentRef.length() != 0)) || //
+				(chldCount <= rootRef) || //
+				((attrUriRef.length() != attrCount) && (attrUriRef.length() != 0)) || //
+				(attrValueRef.length() != attrCount) || //
+				((attrParentRef.length() != attrCount) && (attrParentRef.length() != 0)) || //
+				((chldUriRef.length() != chldCount) && (chldUriRef.length() != 0)) || //
+				(chldContentRef.length() != chldCount) || //
+				(chldAttributesRef.length() != chldCount) || //
+				((chldParentRef.length() != chldCount) && (chldParentRef.length() != 0)) || //
 				(chldListRange.length() < 3) || //
 				(attrListRange.length() < 2) //
 			) throw new IAMException(IAMException.INVALID_VALUE);

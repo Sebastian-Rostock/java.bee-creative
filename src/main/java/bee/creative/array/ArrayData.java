@@ -29,6 +29,8 @@ public abstract class ArrayData<GArray> {
 	 */
 	protected int size;
 
+	{}
+
 	/**
 	 * Diese Methode gibt das interne Array zurück.
 	 * 

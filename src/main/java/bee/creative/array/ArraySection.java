@@ -27,13 +27,15 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 */
 	public static <GSection extends ArraySection<?>> GSection validate(final GSection section) throws NullPointerException, IndexOutOfBoundsException,
 		IllegalArgumentException {
-		if (section == null) throw new NullPointerException("section is null");
-		if (section.array() == null) throw new NullPointerException("array is null");
+		if (section == null) throw new NullPointerException("section = null");
+		if (section.array() == null) throw new NullPointerException("array = null");
 		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
 		if (section.finalIndex() < section.startIndex()) throw new IllegalArgumentException("finalIndex < startIndex");
 		if (section.finalIndex() > section.arrayLength()) throw new IndexOutOfBoundsException("finalIndex > arrayLength");
 		return section;
 	}
+
+	{}
 
 	/**
 	 * Diese Methode gibt die Länge des gegebenen Arrays zurück.
@@ -151,18 +153,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 */
 	public abstract int finalIndex();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		int hash = 1;
-		final GArray array = this.array();
-		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
-			hash = (31 * hash) + this.hashCode(array, index);
-		}
-		return hash;
-	}
+	{}
 
 	/**
 	 * {@inheritDoc}
@@ -190,6 +181,19 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 			if (size1 == size2) return 0;
 			return 1;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		final GArray array = this.array();
+		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
+			hash = (31 * hash) + this.hashCode(array, index);
+		}
+		return hash;
 	}
 
 	/**

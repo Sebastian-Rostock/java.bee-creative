@@ -34,6 +34,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -137,9 +139,11 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -204,9 +208,11 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -250,6 +256,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 
 	}
 
+	{}
+
 	/**
 	 * Dieses Feld speichert das {@code GValue}-Array.
 	 */
@@ -287,6 +295,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	public CompactObjectArray(final ArraySection<GValue[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

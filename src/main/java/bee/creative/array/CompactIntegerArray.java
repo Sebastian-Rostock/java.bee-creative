@@ -29,6 +29,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 			super(owner, startIndex, finalIndex);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -131,9 +133,11 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactIntegerArraySection(final CompactIntegerArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -189,9 +193,11 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 */
 		public CompactIntegerSubArraySection(final CompactIntegerSubArray owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -227,10 +233,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	}
 
-	/**
-	 * Dieses Feld speichert das leere {@code int}-Array.
-	 */
-	protected static final int[] VOID = new int[0];
+	{}
 
 	/**
 	 * Dieses Feld speichert das {@code int}-Array.
@@ -270,6 +273,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		super(section);
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -291,7 +296,6 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	protected int[] newArray(final int length) {
-		if (length == 0) return CompactIntegerArray.VOID;
 		return new int[length];
 	}
 

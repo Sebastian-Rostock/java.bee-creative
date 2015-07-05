@@ -71,6 +71,8 @@ public abstract class ShortArraySection extends ArraySection<short[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

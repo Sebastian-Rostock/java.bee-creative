@@ -51,6 +51,8 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 		super(map, comparator);
 	}
 
+	{}
+
 	/**
 	 * Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
 	 * 
@@ -89,7 +91,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException("value = null");
 		this.items.set(index, value);
 		this.setKey(key, value);
 	}
@@ -108,7 +110,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@Override
 	public GValue put(final GKey key, final GValue value) {
-		if (value == null) throw new NullPointerException();
+		if (value == null) throw new NullPointerException("value = null");
 		return super.put(key, value);
 	}
 

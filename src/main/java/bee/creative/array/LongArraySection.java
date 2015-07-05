@@ -71,6 +71,8 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

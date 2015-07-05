@@ -45,9 +45,11 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist.
 		 */
 		public AbstractNavigableKeySet(final GData data) throws NullPointerException {
-			if (data == null) throw new NullPointerException("data is null");
+			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
 		}
+
+		{}
 
 		/**
 		 * Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
@@ -59,6 +61,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			if (entry == null) return null;
 			return entry.getKey();
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -258,6 +262,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			super(data);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -287,6 +293,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			super(data);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -315,6 +323,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -358,6 +368,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			public EntrySet(final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data) {
 				this.data = data;
 			}
+
+			{}
 
 			/**
 			 * {@inheritDoc}
@@ -406,6 +418,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 				this.data = data;
 			}
 
+			{}
+
 			/**
 			 * {@inheritDoc}
 			 */
@@ -432,6 +446,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 * 
@@ -446,6 +462,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			final boolean lastInclusive) {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -509,7 +527,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public GValue put(final GKey key, final GValue value) {
-			if (!this.isInRange(key)) throw new IllegalArgumentException("Entry out of range");
+			if (!this.isInRange(key)) throw new IllegalArgumentException("key out of range");
 			return this.data.put(key, value);
 		}
 
@@ -631,6 +649,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			final boolean lastInclusive) throws IllegalArgumentException {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -773,8 +793,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
-			if (!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
-			if (!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
+			if (!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, fromInclusive, toKey, toInclusive);
 		}
 
@@ -783,7 +803,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-			if (!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, this.fromItem, this.fromInclusive, toKey, inclusive);
 		}
 
@@ -792,7 +812,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-			if (!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this.data, fromKey, inclusive, this.lastItem, this.lastInclusive);
 		}
 
@@ -823,6 +843,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
 
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -965,8 +987,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
-			if (!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromElement out of range");
-			if (!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
+			if (!this.isInRange(toKey, toInclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, toInclusive, fromKey, fromInclusive);
 		}
 
@@ -975,7 +997,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
-			if (!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toElement out of range");
+			if (!this.isInRange(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, toKey, inclusive, this.fromItem, this.fromInclusive);
 		}
 
@@ -984,11 +1006,13 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		 */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
-			if (!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromElement out of range");
+			if (!this.isInRange(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this.data, this.lastItem, this.lastInclusive, fromKey, inclusive);
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Dieses Feld speichert den {@link Comparator}.
@@ -1002,7 +1026,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
 	 */
 	public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
-		if (comparator == null) throw new NullPointerException("comparator is null");
+		if (comparator == null) throw new NullPointerException("comparator = null");
 		this.comparator = comparator;
 	}
 
@@ -1031,10 +1055,12 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	 */
 	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
-		if (map == null) throw new NullPointerException("map is null");
+		if (map == null) throw new NullPointerException("map = null");
 		this.allocate(map.size());
 		this.putAll(map);
 	}
+
+	{}
 
 	/**
 	 * Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
@@ -1094,6 +1120,8 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getEntry(index);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

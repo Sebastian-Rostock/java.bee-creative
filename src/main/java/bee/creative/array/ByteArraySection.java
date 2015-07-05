@@ -71,6 +71,8 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */

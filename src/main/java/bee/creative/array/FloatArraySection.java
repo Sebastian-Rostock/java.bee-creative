@@ -71,6 +71,8 @@ public abstract class FloatArraySection extends ArraySection<float[]> {
 		});
 	}
 
+	{}
+
 	/**
 	 * {@inheritDoc}
 	 */
