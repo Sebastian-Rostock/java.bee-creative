@@ -653,10 +653,4 @@ public final class Bytes {
 		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
 	}
 
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Bytes() {
-	}
-
 }

@@ -27,7 +27,7 @@ import java.util.Set;
  * @param <GInput> Typ der Eingabe.
  * @param <GOutput> Typ der Ausgabe.
  */
-public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Converter<GInput, GOutput>, Comparator<GInput> {
+public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Converter<GInput, GOutput>, Comparator<GInput>, Iterable<GOutput> {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zur Haltung der Einträge eines {@link Unique}s.
@@ -94,6 +94,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			this.owner = owner;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -142,6 +144,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			this.owner = owner;
 			this.entrySet = new EntrySet<GInput, GOutput>(owner);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -234,6 +238,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			this.outputs = outputs;
 		}
 
+		{}
+
 		/**
 		 * Diese Methode ermittelt via {@link Comparables#binarySearch(List, Comparable)} den Index der gegebenen Eingabe in {@link #inputs} und gibt diesen oder
 		 * <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
@@ -260,6 +266,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @param index Position.
 		 */
 		protected abstract void remove(final int index);
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -358,6 +366,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			super(owner, values, values);
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -399,6 +409,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public ListMapData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
 			super(owner, inputs, outputs);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -449,6 +461,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			this.owner = owner;
 			this.verifyLength(16);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -546,6 +560,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			 */
 			GValue value;
 
+			{}
+
 			/**
 			 * {@inheritDoc}
 			 */
@@ -556,6 +572,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 		}
 
+		{}
+
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
@@ -565,6 +583,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public HashSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
 			super(owner);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -660,6 +680,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			 */
 			GOutput output;
 
+			{}
+
 			/**
 			 * {@inheritDoc}
 			 */
@@ -679,6 +701,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public HashMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
 			super(owner);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -787,6 +811,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 			this.data = data;
 		}
 
+		{}
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -853,6 +879,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 	}
 
+	{}
+
 	/**
 	 * Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code List}-{@link Data}.
 	 * 
@@ -869,6 +897,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 */
 	public static final boolean HASHDATA = false;
 
+	{}
+
 	/**
 	 * Dieses Feld speichert die {@link Data}.
 	 */
@@ -879,6 +909,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * werden können.
 	 */
 	protected final Map<GInput, GOutput> entryMap = new EntryMap<GInput, GOutput>(this);
+
+	{}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object}s nach {@code GInput} zulässig ist. Sie wird von der
@@ -947,6 +979,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		return this.entryMap;
 	}
 
+	{}
+
 	/**
 	 * Der berechnete {@link Object#hashCode() Streuwert} wird von den Schlüsseln der {@link Map} verwendet. Die Eingabe ist nie {@code null}.
 	 * <p>
@@ -973,6 +1007,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	@Override
 	public boolean equals(final GInput input1, final GInput input2) throws NullPointerException {
 		return Objects.equals(input1, input2);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterator<GOutput> iterator() {
+		return this.entryMap.values().iterator();
 	}
 
 	/**

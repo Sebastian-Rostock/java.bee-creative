@@ -122,93 +122,47 @@ public class Comparables {
 
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param comparable {@link Comparable}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparable} {@code null} ist.
-	 */
+	{}
+
+	@SuppressWarnings ("javadoc")
 	static void check(final Comparable<?> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException();
+		if (comparable == null) throw new NullPointerException("comparable = null");
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param fromIndex Anfang des Suchraums (inklusiv).
-	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 */
+	@SuppressWarnings ("javadoc")
 	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
-		if (fromIndex > toIndex) throw new IllegalArgumentException();
+		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param length Größe des Bereiches.
-	 * @param fromIndex Anfang des Suchraums (inklusiv).
-	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > length}.
-	 */
+	@SuppressWarnings ("javadoc")
 	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
 		Comparables.check(fromIndex, toIndex);
-		if (fromIndex < 0) throw new IndexOutOfBoundsException();
-		if (toIndex > length) throw new IndexOutOfBoundsException();
+		if (fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex < 0");
+		if (toIndex > length) throw new IndexOutOfBoundsException("toIndex > length");
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param array Array als Suchraum.
-	 * @param fromIndex Anfang des Suchraums (inklusiv).
-	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable}.
-	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebene {@link Comparable} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > array.length}.
-	 */
-	static void check(final Object[] array, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
-		IllegalArgumentException, IndexOutOfBoundsException {
-		if (array == null) throw new NullPointerException();
+	@SuppressWarnings ("javadoc")
+	static void check(final Get<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
+		IllegalArgumentException {
+		if (items == null) throw new NullPointerException("items = null");
 		Comparables.check(comparable);
-		Comparables.check(array.length, fromIndex, toIndex);
+		Comparables.check(fromIndex, toIndex);
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param list {@link List} als Suchraum.
-	 * @param fromIndex Anfang des Suchraums (inklusiv).
-	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable}.
-	 * @throws NullPointerException Wenn die gegebene {@link List} bzw. der gegebene {@link Comparable} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
-	 */
+	@SuppressWarnings ("javadoc")
 	static void check(final List<?> list, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException, IndexOutOfBoundsException {
-		if (list == null) throw new NullPointerException();
+		if (list == null) throw new NullPointerException("list = null");
 		Comparables.check(comparable);
 		Comparables.check(list.size(), fromIndex, toIndex);
 	}
 
-	/**
-	 * Diese Methode prüft ihre Eingaben und löst bei Fehlern entsprechende {@link RuntimeException}s aus.
-	 * 
-	 * @param items {@link Get} als Suchraum.
-	 * @param fromIndex Anfang des Suchraums (inklusiv).
-	 * @param toIndex Ende des Suchraums (exklusiv).
-	 * @param comparable {@link Comparable}.
-	 * @throws NullPointerException Wenn die gegebene {@link Get} bzw. der gegebene {@link Comparable} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
-	 */
-	static void check(final Get<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
-		IllegalArgumentException {
-		if (items == null) throw new NullPointerException();
+	@SuppressWarnings ("javadoc")
+	static void check(final Object[] array, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
+		IllegalArgumentException, IndexOutOfBoundsException {
+		if (array == null) throw new NullPointerException("array = null");
 		Comparables.check(comparable);
-		Comparables.check(fromIndex, toIndex);
+		Comparables.check(array.length, fromIndex, toIndex);
 	}
 
 	{}
@@ -220,8 +174,10 @@ public class Comparables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable Elemente.
 	 * @return Element mit der kleinsten Ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
 	public static <GEntry extends Comparable<? super GEntry>> GEntry min(final Iterable<? extends GEntry> iterable) {
+		if (iterable == null) throw new NullPointerException("iterable = null");
 		final Iterator<? extends GEntry> iterator = iterable.iterator();
 		if (!iterator.hasNext()) return null;
 		GEntry result = iterator.next();
@@ -241,8 +197,10 @@ public class Comparables {
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable Elemente.
 	 * @return Element mit der kleinsten Ordnung oder {@code null}.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
 	public static <GEntry extends Comparable<? super GEntry>> GEntry max(final Iterable<? extends GEntry> iterable) {
+		if (iterable == null) throw new NullPointerException("iterable = null");
 		final Iterator<? extends GEntry> iterator = iterable.iterator();
 		if (!iterator.hasNext()) return null;
 		GEntry result = iterator.next();
@@ -269,12 +227,12 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> nullComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException();
+		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Comparable<GEntry>() {
 
 			@Override
 			public int compareTo(final GEntry entry) {
-				return ((entry == null) ? 1 : comparable.compareTo(entry));
+				return entry == null ? 1 : comparable.compareTo(entry);
 			}
 
 		};
@@ -294,7 +252,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> entryComparable(final GEntry entry, final Comparator<? super GEntry> comparator) throws NullPointerException {
-		if (comparator == null) throw new NullPointerException();
+		if (comparator == null) throw new NullPointerException("comparator = null");
 		return new Comparable<GEntry>() {
 
 			@Override
@@ -317,7 +275,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
 	public static <GEntry> Comparable<GEntry> reverseComparable(final Comparable<? super GEntry> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException();
+		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Comparable<GEntry>() {
 
 			@Override
@@ -343,7 +301,8 @@ public class Comparables {
 	 */
 	public static <GEntry> Comparable<GEntry> chainedComparable(final Comparable<? super GEntry> comparable1, final Comparable<? super GEntry> comparable2)
 		throws NullPointerException {
-		if ((comparable1 == null) || (comparable2 == null)) throw new NullPointerException();
+		if (comparable1 == null) throw new NullPointerException("comparable1 = null");
+		if (comparable2 == null) throw new NullPointerException("comparable2 = null");
 		return new Comparable<GEntry>() {
 
 			@Override
@@ -372,7 +331,8 @@ public class Comparables {
 	 */
 	public static <GInput, GOutput> Comparable<GInput> convertedComparable(final Converter<? super GInput, ? extends GOutput> converter,
 		final Comparable<? super GOutput> comparable) throws NullPointerException {
-		if ((converter == null) || (comparable == null)) throw new NullPointerException();
+		if (converter == null) throw new NullPointerException("converter = null");
+		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Comparable<GInput>() {
 
 			@Override
@@ -776,14 +736,6 @@ public class Comparables {
 		from--;
 		if ((fromIndex <= from) && (from < toIndex) && (comparable.compareTo(items.get(from)) == 0)) return from;
 		return -from - 2;
-	}
-
-	{}
-
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Comparables() {
 	}
 
 }

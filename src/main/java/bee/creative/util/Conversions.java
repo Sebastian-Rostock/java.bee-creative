@@ -326,67 +326,31 @@ public class Conversions {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den {@link Converter}, der die Eingabe einer {@link Conversion} ermittelt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 */
-	public static final class ConversionInputConverter<GInput> extends AbstractConverter<Conversion<? extends GInput, ?>, GInput> {
+	{}
 
-		/**
-		 * Dieses Feld speichert den {@link ConversionInputConverter}.
-		 */
-		public static final Converter<?, ?> INSTANCE = new ConversionInputConverter<Object>();
+	@SuppressWarnings ("javadoc")
+	static final Converter<?, ?> conversionInputConverter = //
+		new Converter<Conversion<?, ?>, Object>() {
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GInput convert(final Conversion<? extends GInput, ?> input) {
-			return input.input();
-		}
+			@Override
+			public Object convert(final Conversion<?, ?> input) {
+				return input.input();
+			}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof ConversionInputConverter);
-		}
+		};
 
-	}
+	@SuppressWarnings ("javadoc")
+	static final Converter<?, ?> conversionOutputConverter = //
+		new Converter<Conversion<?, ?>, Object>() {
 
-	/**
-	 * Diese Klasse implementiert den {@link Converter}, der die Ausgabe einer {@link Conversion} ermittelt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class ConversionOutputConverter<GOutput> extends AbstractConverter<Conversion<?, ? extends GOutput>, GOutput> {
+			@Override
+			public Object convert(final Conversion<?, ?> input) {
+				return input.output();
+			}
 
-		/**
-		 * Dieses Feld speichert den {@link ConversionOutputConverter}.
-		 */
-		public static final Converter<?, ?> INSTANCE = new ConversionOutputConverter<Object>();
+		};
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GOutput convert(final Conversion<?, ? extends GOutput> input) {
-			return input.output();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof ConversionOutputConverter);
-		}
-
-	}
+	{}
 
 	/**
 	 * Diese Methode erzeugt eine statische {@link Conversion}, deren Eingabe und Ausgabe konstant sind, und gibt sie zurück.
@@ -484,32 +448,24 @@ public class Conversions {
 	 * Diese Methode gibt den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#input()
-	 * @see ConversionInputConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @return {@link Conversion#input()}-{@link Converter}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInputConverter() {
-		return (Converter<Conversion<? extends GInput, ?>, GInput>)ConversionInputConverter.INSTANCE;
+		return (Converter<Conversion<? extends GInput, ?>, GInput>)conversionInputConverter;
 	}
 
 	/**
 	 * Diese Methode gibt den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#output()
-	 * @see ConversionOutputConverter
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link Conversion#output()}-{@link Converter}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutputConverter() {
-		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)ConversionOutputConverter.INSTANCE;
-	}
-
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Conversions() {
+		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)conversionOutputConverter;
 	}
 
 }

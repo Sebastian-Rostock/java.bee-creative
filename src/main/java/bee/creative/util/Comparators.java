@@ -965,10 +965,4 @@ public class Comparators {
 		return StringAlphanumericalComparator.INSTANCE;
 	}
 
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Comparators() {
-	}
-
 }

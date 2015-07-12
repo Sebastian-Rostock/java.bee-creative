@@ -40,7 +40,7 @@ public class Assignments {
 		 * 
 		 * @param parent {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
 		 * @param source Quellobjekt.
-		 * @throws NullPointerException Wenn das gegebene {@link Assignment} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code parent} {@code null} ist.
 		 */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
 			if (parent == null) throw new NullPointerException();

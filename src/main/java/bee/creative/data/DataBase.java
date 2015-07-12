@@ -12,7 +12,7 @@ import java.io.IOException;
  * @see DataOutput
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Data {
+public interface DataBase {
 
 	/**
 	 * Diese Methode gibt die intern verwalteten Nutzdaten zurück.

@@ -6,13 +6,13 @@ import java.io.IOException;
 import bee.creative.util.Bytes;
 
 /**
- * Diese Schnittstelle definiert eine Erweiterung eines {@link Closeable} {@link DataInput} um die in {@link Data} spezifizierte Navigationsposition.
+ * Diese Schnittstelle definiert eine Erweiterung eines {@link Closeable} {@link DataInput} um die in {@link DataBase} spezifizierte Navigationsposition.
  * 
- * @see Data
+ * @see DataBase
  * @see DataInput
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface DataSource extends Data, DataInput, Closeable {
+public interface DataSource extends DataBase, DataInput, Closeable {
 
 	/**
 	 * Diese Methode liest die gegebene Anzahl an {@code byte}s und gibt diese als {@code int} interpretiert zurück.

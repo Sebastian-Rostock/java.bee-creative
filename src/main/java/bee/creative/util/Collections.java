@@ -849,7 +849,6 @@ public class Collections {
 		 */
 		public ReverseList(final List<GValue> list) throws NullPointerException {
 			super(list);
-
 		}
 
 		/**
@@ -1752,6 +1751,8 @@ public class Collections {
 		}
 
 	}
+
+	{}
 
 	/**
 	 * Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
