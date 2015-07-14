@@ -131,7 +131,7 @@ public class Builders {
 		/**
 		 * Diese Methode gibt die interne Abbildung zurück.
 		 * 
-		 * @see BaseMapBuilder#MapBuilder(Map)
+		 * @see BaseMapBuilder#BaseMapBuilder(Map)
 		 * @return interne Abbildung.
 		 */
 		public Map<GKey, GValue> map() {
@@ -221,7 +221,7 @@ public class Builders {
 	 * @param <GValue> Typ des Werts.
 	 * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
 	 */
-	public static abstract class BaseValueBuilder<GValue, GThiz> extends BaseBuilder<GValue, GThiz> {
+	public static abstract class BaseValueBuilder<GValue, GThiz> extends BaseBuilder<GValue, GThiz> implements Iterable<GValue> {
 
 		/**
 		 * Dieses Feld speichert den Wert.
@@ -288,6 +288,16 @@ public class Builders {
 		@Override
 		public GValue build() throws IllegalStateException {
 			return this.get();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GValue> iterator() {
+			final GValue value = this.get();
+			if (value == null) return Iterators.voidIterator();
+			return Iterators.entryIterator(value);
 		}
 
 		/**
