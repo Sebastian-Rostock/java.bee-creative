@@ -1,7 +1,6 @@
 package bee.creative.xml;
 
 import java.util.Map.Entry;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
@@ -10,7 +9,7 @@ import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory} zur Erzeugung eines {@link DocumentBuilder}.
+ * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
@@ -22,17 +21,16 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * 
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class FeatureData extends BaseFeatureData<FeatureData> {
+	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeFeatureData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
-		}
+		public abstract GOwner closeFeatureData();
 
 		{}
 
@@ -40,7 +38,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FeatureData thiz() {
+		protected FeatureData<GOwner> thiz() {
 			return this;
 		}
 
@@ -51,17 +49,16 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * 
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class SchemaData extends BaseSchemaData<SchemaData> {
+	public static abstract class SchemaData<GOwner> extends BaseSchemaData<SchemaData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeSchemaData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
-		}
+		public abstract GOwner closeSchemaData();
 
 		{}
 
@@ -69,18 +66,19 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SchemaData thiz() {
+		protected SchemaData<GOwner> thiz() {
 			return this;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die Eigenschaften eines {@link DocumentBuilderFactory}.
+	 * Diese Klasse implementiert den Konfigurator für die Eigenschaften einer {@link DocumentBuilderFactory}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class PropertyData extends BaseMapBuilder<String, Boolean, PropertyData> {
+	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Boolean, PropertyData<GOwner>> {
 
 		/**
 		 * Diese Methode wählt {@code "Coalescing"} und gibt {@code this} zurück.
@@ -89,7 +87,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setCoalescing(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forCoalescing() {
+		public PropertyData<GOwner> forCoalescing() {
 			return this.forKey("Coalescing");
 		}
 
@@ -100,7 +98,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forExpandEntityReferences() {
+		public PropertyData<GOwner> forExpandEntityReferences() {
 			return this.forKey("ExpandEntityReferences");
 		}
 
@@ -111,7 +109,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forIgnoringComments() {
+		public PropertyData<GOwner> forIgnoringComments() {
 			return this.forKey("IgnoringComments");
 		}
 
@@ -122,7 +120,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setIgnoringElementContentWhitespace(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forIgnoringElementContentWhitespace() {
+		public PropertyData<GOwner> forIgnoringElementContentWhitespace() {
 			return this.forKey("IgnoringElementContentWhitespace");
 		}
 
@@ -133,7 +131,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setNamespaceAware(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forNamespaceAware() {
+		public PropertyData<GOwner> forNamespaceAware() {
 			return this.forKey("NamespaceAware");
 		}
 
@@ -144,7 +142,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setValidating(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forValidating() {
+		public PropertyData<GOwner> forValidating() {
 			return this.forKey("Validating");
 		}
 
@@ -155,7 +153,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 		 * @return {@code this}.
 		 */
-		public PropertyData forXIncludeAware() {
+		public PropertyData<GOwner> forXIncludeAware() {
 			return this.forKey("XIncludeAware");
 		}
 
@@ -174,9 +172,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closePropertyData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
-		}
+		public abstract GOwner closePropertyData();
 
 		{}
 
@@ -184,7 +180,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected PropertyData thiz() {
+		protected PropertyData<GOwner> thiz() {
 			return this;
 		}
 
@@ -195,17 +191,16 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * 
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class AttributeData extends BaseMapBuilder<String, Object, AttributeData> {
+	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, Object, AttributeData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeAttributeData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
-		}
+		public abstract GOwner closeAttributeData();
 
 		{}
 
@@ -213,7 +208,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected AttributeData thiz() {
+		protected AttributeData<GOwner> thiz() {
 			return this;
 		}
 
@@ -229,27 +224,50 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	@SuppressWarnings ("hiding")
-	final FeatureData featureData = //
-		new FeatureData();
+	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+
+		@Override
+		public GThiz closeFeatureData() {
+			return BaseDocumentBuilderFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openSchemaData()}.
 	 */
-	final SchemaData schemaData = //
-		new SchemaData();
+	final SchemaData<GThiz> schemaData = new SchemaData<GThiz>() {
+
+		@Override
+		public GThiz closeSchemaData() {
+			return BaseDocumentBuilderFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openPropertyData()}.
 	 */
-	final PropertyData propertyData = //
-		new PropertyData();
+	final PropertyData<GThiz> propertyData = new PropertyData<GThiz>() {
+
+		@Override
+		public GThiz closePropertyData() {
+			return BaseDocumentBuilderFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}.
 	 */
-	final AttributeData attributeData = //
-		new AttributeData();
+	final AttributeData<GThiz> attributeData = new AttributeData<GThiz>() {
+
+		@Override
+		public GThiz closeAttributeData() {
+			return BaseDocumentBuilderFactoryData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -299,6 +317,12 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		return this.thiz();
 	}
 
+	/**
+	 * Diese Methode setzt die {@link DocumentBuilderFactory} auf {@code null} und gibt {@code this} zurück.
+	 * 
+	 * @see #useFactory(DocumentBuilderFactory)
+	 * @return {@code this}.
+	 */
 	public GThiz resetFactory() {
 		return this.useFactory(null);
 	}
@@ -313,7 +337,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 */
 	public GThiz updateFactory() throws ParserConfigurationException {
 		final DocumentBuilderFactory factory = this.getFactory();
-		final PropertyData propertyData = this.propertyData;
+		factory.setSchema(this.schemaData.build());
+		final PropertyData<GThiz> propertyData = this.propertyData;
 		factory.setCoalescing(propertyData.forCoalescing().getBoolean());
 		factory.setExpandEntityReferences(propertyData.forExpandEntityReferences().getBoolean());
 		factory.setIgnoringComments(propertyData.forIgnoringComments().getBoolean());
@@ -331,22 +356,22 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory#getFeature(String) Fähigkeiten} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData openFeatureData() {
+	public FeatureData<GThiz> openFeatureData() {
 		return this.featureData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für das {@link DocumentBuilderFactory#getSchema() Schema} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für das {@link Schema} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @return Konfigurator.
 	 */
-	public SchemaData openSchemaData() {
+	public SchemaData<GThiz> openSchemaData() {
 		return this.schemaData;
 	}
 
@@ -362,17 +387,17 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 	 * @return Konfigurator.
 	 */
-	public PropertyData openPropertyData() {
+	public PropertyData<GThiz> openPropertyData() {
 		return this.propertyData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory#getAttribute(String) Attribute} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @return Konfigurator.
 	 */
-	public AttributeData openAttributeData() {
+	public AttributeData<GThiz> openAttributeData() {
 		return this.attributeData;
 	}
 
@@ -386,6 +411,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getFactory()
 	 */
 	@Override
 	public DocumentBuilderFactory build() throws IllegalStateException {

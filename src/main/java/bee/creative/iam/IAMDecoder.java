@@ -1,5 +1,6 @@
 package bee.creative.iam;
 
+import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
@@ -22,8 +23,7 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMMapDecoder}.
 		 */
-		public static final IAMMapDecoder EMPTY = //
-			new IAMMapDecoder();
+		public static final IAMMapDecoder EMPTY = new IAMMapDecoder();
 
 		{}
 
@@ -270,7 +270,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public int find(final int... key) throws NullPointerException {
-			final IAMArray array = key.length == 0 ? IAM.EMPTY_ARRAY : IAM.toArray(key);
+			final IAMArray array = key.length == 0 ? IAMBaseArray.EMPTY : IAM.toArray(key);
 			int i = this.rangeMask;
 			if (i != 0) {
 				final IAMArray range = this.rangeOffset;
@@ -305,8 +305,7 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMListDecoder}.
 		 */
-		public static final IAMListDecoder EMPTY = //
-			new IAMListDecoder();
+		public static final IAMListDecoder EMPTY = new IAMListDecoder();
 
 		{}
 
@@ -442,8 +441,7 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMIndexDecoder}.
 		 */
-		public static final IAMIndexDecoder EMPTY = //
-			new IAMIndexDecoder();
+		public static final IAMIndexDecoder EMPTY = new IAMIndexDecoder();
 
 		{}
 

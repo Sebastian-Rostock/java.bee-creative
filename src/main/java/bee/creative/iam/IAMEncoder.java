@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
@@ -604,7 +605,7 @@ public class IAMEncoder {
 		@Override
 		public IAMArray key(final int entryIndex) {
 			final List<IAMEntry> datas = this.entries.datas;
-			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMBaseArray.EMPTY;
 			return IAM.toArray(datas.get(entryIndex).key);
 		}
 
@@ -614,7 +615,7 @@ public class IAMEncoder {
 		@Override
 		public IAMArray value(final int entryIndex) {
 			final List<IAMEntry> datas = this.entries.datas;
-			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			if ((entryIndex < 0) || (entryIndex >= datas.size())) return IAMBaseArray.EMPTY;
 			return IAM.toArray(datas.get(entryIndex).value);
 		}
 
@@ -910,7 +911,7 @@ public class IAMEncoder {
 		@Override
 		public IAMArray item(final int itemIndex) {
 			final List<IAMItem> datas = this.items.datas;
-			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAM.EMPTY_ARRAY;
+			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAMBaseArray.EMPTY;
 			return IAM.toArray(datas.get(itemIndex).item);
 		}
 
@@ -1125,7 +1126,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public IAMMap map(final int index) {
-			if ((index < 0) || (index >= this.mapCount())) return IAM.EMPTY_MAP;
+			if ((index < 0) || (index >= this.mapCount())) return IAMBaseMap.EMPTY;
 			return this.maps.get(index).toMap();
 		}
 
@@ -1142,7 +1143,7 @@ public class IAMEncoder {
 		 */
 		@Override
 		public IAMList list(final int index) {
-			if ((index < 0) || (index >= this.listCount())) return IAM.EMPTY_LIST;
+			if ((index < 0) || (index >= this.listCount())) return IAMBaseList.EMPTY;
 			return this.lists.get(index).toList();
 		}
 

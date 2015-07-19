@@ -10,7 +10,7 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link XPath}.
+ * Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link XPath}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
@@ -18,21 +18,20 @@ import bee.creative.util.Objects;
 public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die Sprache einer {@link XPath}.
+	 * Diese Klasse implementiert den Konfigurator einer {@link XPathFactory} eines {@link XPath}.
 	 * 
-	 * @see XPath#setNamespaceContext(NamespaceContext)
+	 * @see XPathFactory#newXPath()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ContextData extends BaseValueBuilder<NamespaceContext, ContextData> {
+	public static abstract class FacroryData<GOwner> extends BaseXPathFactoryData<FacroryData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeLanguageData() {
-			return BaseXPathData.this.thiz();
-		}
+		public abstract GOwner closeFacroryData();
 
 		{}
 
@@ -40,7 +39,35 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ContextData thiz() {
+		protected FacroryData<GOwner> thiz() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Konfigurator für den {@link NamespaceContext} eines {@link XPath}.
+	 * 
+	 * @see XPath#setNamespaceContext(NamespaceContext)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
+	 */
+	public static abstract class ContextData<GOwner> extends BaseValueBuilder<NamespaceContext, ContextData<GOwner>> {
+
+		/**
+		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		 * 
+		 * @return Besitzer.
+		 */
+		public abstract GOwner closeLanguageData();
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected ContextData<GOwner> thiz() {
 			return this;
 		}
 
@@ -51,17 +78,16 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * 
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class VariableData extends BaseValueBuilder<XPathVariableResolver, VariableData> {
+	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeListenerData() {
-			return BaseXPathData.this.thiz();
-		}
+		public abstract GOwner closeListenerData();
 
 		{}
 
@@ -69,7 +95,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected VariableData thiz() {
+		protected VariableData<GOwner> thiz() {
 			return this;
 		}
 
@@ -80,17 +106,16 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * 
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class FunctionData extends BaseValueBuilder<XPathFunctionResolver, FunctionData> {
+	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeResolverData() {
-			return BaseXPathData.this.thiz();
-		}
+		public abstract GOwner closeResolverData();
 
 		{}
 
@@ -98,30 +123,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FunctionData thiz() {
-			return this;
-		}
-
-	}
-
-	public final class FacroryData extends BaseXPathFactoryData<FacroryData> {
-
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
-		 * @return Besitzer.
-		 */
-		public GThiz closeFacroryData() {
-			return BaseXPathData.this.thiz();
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected FacroryData thiz() {
+		protected FunctionData<GOwner> thiz() {
 			return this;
 		}
 
@@ -137,26 +139,50 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFacroryData()}.
 	 */
-	final FacroryData facroryData = //
-		new FacroryData();
+	final FacroryData<GThiz> facroryData = new FacroryData<GThiz>() {
+
+		@Override
+		public GThiz closeFacroryData() {
+			return BaseXPathData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openContextData()}.
 	 */
-	final ContextData contextData = //
-		new ContextData();
+	final ContextData<GThiz> contextData = new ContextData<GThiz>() {
+
+		@Override
+		public GThiz closeLanguageData() {
+			return BaseXPathData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openVariableData()}.
 	 */
-	final VariableData variableData = //
-		new VariableData();
+	final VariableData<GThiz> variableData = new VariableData<GThiz>() {
+
+		@Override
+		public GThiz closeListenerData() {
+			return BaseXPathData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}.
 	 */
-	final FunctionData functionData = //
-		new FunctionData();
+	final FunctionData<GThiz> functionData = new FunctionData<GThiz>() {
+
+		@Override
+		public GThiz closeResolverData() {
+			return BaseXPathData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -178,11 +204,12 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 	/**
 	 * Diese Methode gibt das {@link XPath} zurück.<br>
-	 * Wenn über {@link #useXPath(XPath)} noch keine {@link XPath} gesetzt wurde, wird über {@link XPath#newInstance(String)} eine neue erstellt, über
-	 * {@link #useXPath(XPath)} gesetzt und über {@link #updateXPath()} aktualisiert. Das zur Erstellung verwendete Objektmodell kann über
-	 * {@link #openContextData()} konfiguriert werden.
+	 * Wenn über {@link #useXPath(XPath)} noch keine {@link XPath} gesetzt wurde, wird über {@link XPathFactory#newXPath()} eine neue erstellt, über
+	 * {@link #useXPath(XPath)} gesetzt und über {@link #updateXPath()} aktualisiert. Die zur Erstellung verwendete {@link XPathFactory} kann über
+	 * {@link #openFacroryData()} konfiguriert werden.
 	 * 
 	 * @see #useXPath(XPath)
+	 * @see #updateXPath()
 	 * @return {@link XPath}.
 	 */
 	public XPath getXPath() {
@@ -217,12 +244,11 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	}
 
 	/**
-	 * Diese Methode aktualisiert die Einstellungen der {@link XPath} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf die über {@link #getXPath()} ermittelte {@link XPath} die Einstellungen übertragen, die in {@link #openVariableData()}
-	 * , {@link #openFunctionData()} und {@link #openFeatureData()} konfiguriert sind.
+	 * Diese Methode aktualisiert die Einstellungen des {@link XPath} und gibt {@code this} zurück. Bei dieser Aktualisierung werden auf den über
+	 * {@link #getXPath()} ermittelten {@link XPath} die Einstellungen übertragen, die in {@link #openContextData()}, {@link #openVariableData()} und
+	 * {@link #openFunctionData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
-	 * @throws XPathConfigurationException Wenn {@link XPath#setFeature(String, boolean)} bzw. {@link #getXPath()} eine entsprechende Ausnahme auslöst.
 	 */
 	public GThiz updateXPath() {
 		final XPath factory = this.getXPath();
@@ -243,7 +269,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * 
 	 * @return Konfigurator.
 	 */
-	public FacroryData openFacroryData() {
+	public FacroryData<GThiz> openFacroryData() {
 		return this.facroryData;
 	}
 
@@ -253,7 +279,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @return Konfigurator.
 	 */
-	public ContextData openContextData() {
+	public ContextData<GThiz> openContextData() {
 		return this.contextData;
 	}
 
@@ -263,7 +289,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator.
 	 */
-	public VariableData openVariableData() {
+	public VariableData<GThiz> openVariableData() {
 		return this.variableData;
 	}
 
@@ -273,7 +299,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator.
 	 */
-	public FunctionData openFunctionData() {
+	public FunctionData<GThiz> openFunctionData() {
 		return this.functionData;
 	}
 
@@ -287,6 +313,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getXPath()
 	 */
 	@Override
 	public XPath build() throws IllegalStateException {
@@ -298,7 +326,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.contextData, this.variableData, this.functionData, this.facroryData);
+		return Objects.toStringCall(this, this.facroryData, this.contextData, this.variableData, this.functionData);
 	}
 
 }

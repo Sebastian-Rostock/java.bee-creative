@@ -29,7 +29,6 @@ public final class Script implements Get<Script.Range>, Iterable<Script.Range> {
 		/**
 		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind.
 		 */
-		@SuppressWarnings ("hiding")
 		public static final Range EMPTY = new Range((char)0, 0, 0);
 
 		{}

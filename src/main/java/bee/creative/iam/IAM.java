@@ -27,6 +27,25 @@ public class IAM {
 	public static abstract class IAMBaseList implements IAMList {
 
 		/**
+		 * Dieses Feld speichert die leere {@link IAMBaseList}.
+		 */
+		public static final IAMBaseList EMPTY = new IAMBaseList() {
+
+			@Override
+			public IAMArray item(final int itemIndex) {
+				return IAMBaseArray.EMPTY;
+			}
+
+			@Override
+			public int itemCount() {
+				return 0;
+			}
+
+		};
+
+		{}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -83,6 +102,41 @@ public class IAM {
 	public static abstract class IAMBaseMap implements IAMMap {
 
 		/**
+		 * Dieses Feld speichert die leere {@link IAMBaseMap}.
+		 */
+		public static final IAMBaseMap EMPTY = new IAMBaseMap() {
+
+			@Override
+			public IAMArray key(final int entryIndex) {
+				return IAMBaseArray.EMPTY;
+			}
+
+			@Override
+			public IAMArray value(final int entryIndex) {
+				return IAMBaseArray.EMPTY;
+			}
+
+			@Override
+			public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
+				return IAMBaseEntry.EMPTY;
+			}
+
+			@Override
+			public int entryCount() {
+				return 0;
+			}
+
+			@Override
+			public int find(final int... key) throws NullPointerException {
+				if (key == null) throw new NullPointerException();
+				return -1;
+			}
+
+		};
+
+		{}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -119,7 +173,7 @@ public class IAM {
 		 */
 		@Override
 		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAM.EMPTY_ENTRY;
+			if ((entryIndex < 0) || (entryIndex >= this.entryCount())) return IAMBaseEntry.EMPTY;
 			return IAM.toEntry(this.key(entryIndex), this.value(entryIndex));
 		}
 
@@ -160,6 +214,25 @@ public class IAM {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class IAMBaseEntry implements IAMEntry {
+
+		/**
+		 * Dieses Feld speichert das leere {@link IAMBaseEntry}.
+		 */
+		public static final IAMBaseEntry EMPTY = new IAMBaseEntry() {
+
+			@Override
+			public IAMArray value() {
+				return IAMBaseArray.EMPTY;
+			}
+
+			@Override
+			public IAMArray key() {
+				return IAMBaseArray.EMPTY;
+			}
+
+		};
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -230,6 +303,25 @@ public class IAM {
 	public static abstract class IAMBaseArray implements IAMArray {
 
 		/**
+		 * Dieses Feld speichert das leere {@link IAMBaseArray}.
+		 */
+		public static final IAMBaseArray EMPTY = new IAMBaseArray() {
+
+			@Override
+			public int get(final int index) {
+				return 0;
+			}
+
+			@Override
+			public int length() {
+				return 0;
+			}
+
+		};
+
+		{}
+
+		/**
 		 * Diese Methode implementiert die Erzeugung des Abschnitts in {@link #section(int, int)}. die Parameter sind bereits geprüft.
 		 * 
 		 * @param offset Beginn des Abschnitts.
@@ -237,7 +329,7 @@ public class IAM {
 		 * @return Abschnitt.
 		 */
 		protected IAMArray newSection(final int offset, final int length) {
-			if (length == 0) return IAM.EMPTY_ARRAY;
+			if (length == 0) return IAMBaseArray.EMPTY;
 			return new IAMBaseArray() {
 
 				@Override
@@ -390,6 +482,35 @@ public class IAM {
 	public static abstract class IAMBaseIndex implements IAMIndex {
 
 		/**
+		 * Dieses Feld speichert den leeren {@link IAMBaseIndex}.
+		 */
+		public static final IAMBaseIndex EMPTY = new IAMBaseIndex() {
+
+			@Override
+			public IAMMap map(final int index) {
+				return IAMBaseMap.EMPTY;
+			}
+
+			@Override
+			public int mapCount() {
+				return 0;
+			}
+
+			@Override
+			public IAMList list(final int index) {
+				return IAMBaseList.EMPTY;
+			}
+
+			@Override
+			public int listCount() {
+				return 0;
+			}
+
+		};
+
+		{}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -444,92 +565,6 @@ public class IAM {
 	{}
 
 	/**
-	 * Dieses Feld speichert die leere {@link IAMMap}.
-	 */
-	public static final IAMMap EMPTY_MAP = new IAMBaseMap() {
-
-		@Override
-		public IAMArray key(final int entryIndex) {
-			return IAM.EMPTY_ARRAY;
-		}
-
-		@Override
-		public IAMArray value(final int entryIndex) {
-			return IAM.EMPTY_ARRAY;
-		}
-
-		@Override
-		public IAMEntry entry(final int entryIndex) throws IndexOutOfBoundsException {
-			return IAM.EMPTY_ENTRY;
-		}
-
-		@Override
-		public int entryCount() {
-			return 0;
-		}
-
-		@Override
-		public int find(final int... key) throws NullPointerException {
-			if (key == null) throw new NullPointerException();
-			return -1;
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert die leere {@link IAMList}.
-	 */
-	public static final IAMList EMPTY_LIST = new IAMBaseList() {
-
-		@Override
-		public IAMArray item(final int itemIndex) {
-			return IAM.EMPTY_ARRAY;
-		}
-
-		@Override
-		public int itemCount() {
-			return 0;
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert ein leeres {@link IAMArray}.
-	 */
-	public static final IAMArray EMPTY_ARRAY = new IAMBaseArray() {
-
-		@Override
-		public int get(final int index) {
-			return 0;
-		}
-
-		@Override
-		public int length() {
-			return 0;
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den leeren {@link IAMEntry}.
-	 */
-	public static final IAMEntry EMPTY_ENTRY = new IAMBaseEntry() {
-
-		@Override
-		public IAMArray value() {
-			return IAM.EMPTY_ARRAY;
-		}
-
-		@Override
-		public IAMArray key() {
-			return IAM.EMPTY_ARRAY;
-		}
-
-	};
-
-	{}
-
-	/**
 	 * Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
 	 * {@link IAMArray} übertragen!
 	 * 
@@ -538,7 +573,7 @@ public class IAM {
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
 	public static IAMArray toArray(final byte[] array) {
-		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		if (array.length == 0) return IAMBaseArray.EMPTY;
 		return new IAMBaseArray() {
 
 			@Override
@@ -564,7 +599,7 @@ public class IAM {
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
 	public static IAMArray toArray(final short[] array) {
-		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		if (array.length == 0) return IAMBaseArray.EMPTY;
 		return new IAMBaseArray() {
 
 			@Override
@@ -590,7 +625,7 @@ public class IAM {
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
 	public static IAMArray toArray(final int... array) {
-		if (array.length == 0) return IAM.EMPTY_ARRAY;
+		if (array.length == 0) return IAMBaseArray.EMPTY;
 		return new IAMBaseArray() {
 
 			@Override
@@ -616,7 +651,7 @@ public class IAM {
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist.
 	 */
 	public static IAMEntry toEntry(final IAMArray key, final IAMArray value) throws NullPointerException {
-		if ((key.length() == 0) && (value.length() == 0)) return IAM.EMPTY_ENTRY;
+		if ((key.length() == 0) && (value.length() == 0)) return IAMBaseEntry.EMPTY;
 		return new IAMBaseEntry() {
 
 			@Override

@@ -18,100 +18,14 @@ import bee.creative.util.Objects;
 public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFactory, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link XPathFactory}.
-	 * 
-	 * @see XPathFactory#setFeature(String, boolean)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public final class FeatureData extends BaseFeatureData<FeatureData> {
-
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
-		 * @return Besitzer.
-		 */
-		public GThiz closeFeatureData() {
-			return BaseXPathFactoryData.this.thiz();
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected FeatureData thiz() {
-			return this;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver} einer {@link XPathFactory}.
-	 * 
-	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public final class VariableData extends BaseValueBuilder<XPathVariableResolver, VariableData> {
-
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
-		 * @return Besitzer.
-		 */
-		public GThiz closeListenerData() {
-			return BaseXPathFactoryData.this.thiz();
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected VariableData thiz() {
-			return this;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver} einer {@link XPathFactory}.
-	 * 
-	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public final class FunctionData extends BaseValueBuilder<XPathFunctionResolver, FunctionData> {
-
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
-		 * @return Besitzer.
-		 */
-		public GThiz closeResolverData() {
-			return BaseXPathFactoryData.this.thiz();
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected FunctionData thiz() {
-			return this;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die Sprache einer {@link XPathFactory}.<br>
-	 * Initialisiert wird diese Sprache via {@link #useDEFAULT_OBJECT_MODEL_URI()}.
+	 * Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}. Initialisiert wird dieses via
+	 * {@link #useDEFAULT_OBJECT_MODEL_URI()}.
 	 * 
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ModelData extends BaseValueBuilder<String, ModelData> {
+	public static abstract class ModelData<GOwner> extends BaseValueBuilder<String, ModelData<GOwner>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den Wert via {@link #useDEFAULT_OBJECT_MODEL_URI()}.
@@ -128,7 +42,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * @see #use(BaseValueBuilder)
 		 * @return {@code this}.
 		 */
-		public ModelData useDEFAULT_OBJECT_MODEL_URI() {
+		public ModelData<GOwner> useDEFAULT_OBJECT_MODEL_URI() {
 			return super.use(XPathFactory.DEFAULT_OBJECT_MODEL_URI);
 		}
 
@@ -137,9 +51,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeLanguageData() {
-			return BaseXPathFactoryData.this.thiz();
-		}
+		public abstract GOwner closeLanguageData();
 
 		{}
 
@@ -147,7 +59,91 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ModelData thiz() {
+		protected ModelData<GOwner> thiz() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link XPathFactory}.
+	 * 
+	 * @see XPathFactory#setFeature(String, boolean)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
+	 */
+	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
+
+		/**
+		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		 * 
+		 * @return Besitzer.
+		 */
+		public abstract GOwner closeFeatureData();
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected FeatureData<GOwner> thiz() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver} einer {@link XPathFactory}.
+	 * 
+	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
+	 */
+	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
+
+		/**
+		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		 * 
+		 * @return Besitzer.
+		 */
+		public abstract GOwner closeListenerData();
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected VariableData<GOwner> thiz() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver} einer {@link XPathFactory}.
+	 * 
+	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
+	 */
+	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
+
+		/**
+		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		 * 
+		 * @return Besitzer.
+		 */
+		public abstract GOwner closeResolverData();
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected FunctionData<GOwner> thiz() {
 			return this;
 		}
 
@@ -161,28 +157,52 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	XPathFactory factory;
 
 	/**
+	 * Dieses Feld speichert den Konfigurator für {@link #openModelData()}.
+	 */
+	final ModelData<GThiz> modelData = new ModelData<GThiz>() {
+
+		@Override
+		public GThiz closeLanguageData() {
+			return BaseXPathFactoryData.this.thiz();
+		}
+
+	};
+
+	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData featureData = //
-		new FeatureData();
+	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+
+		@Override
+		public GThiz closeFeatureData() {
+			return BaseXPathFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openVariableData()}.
 	 */
-	final VariableData variableData = //
-		new VariableData();
+	final VariableData<GThiz> variableData = new VariableData<GThiz>() {
+
+		@Override
+		public GThiz closeListenerData() {
+			return BaseXPathFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}.
 	 */
-	final FunctionData functionData = //
-		new FunctionData();
+	final FunctionData<GThiz> functionData = new FunctionData<GThiz>() {
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openModelData()}.
-	 */
-	final ModelData modelData = //
-		new ModelData();
+		@Override
+		public GThiz closeResolverData() {
+			return BaseXPathFactoryData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -222,16 +242,6 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	}
 
 	/**
-	 * Diese Methode setzt die {@link XPathFactory} auf {@code null} und gibt {@code this} zurück.
-	 * 
-	 * @see #useFactory(XPathFactory)
-	 * @return {@code this}.
-	 */
-	public GThiz resetFactory() {
-		return this.useFactory(null);
-	}
-
-	/**
 	 * Diese Methode setzt die {@link XPathFactory} und gibt {@code this} zurück.
 	 * 
 	 * @param factory {@link XPathFactory} oder {@code null}.
@@ -240,6 +250,16 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	public GThiz useFactory(final XPathFactory factory) {
 		this.factory = factory;
 		return this.thiz();
+	}
+
+	/**
+	 * Diese Methode setzt die {@link XPathFactory} auf {@code null} und gibt {@code this} zurück.
+	 * 
+	 * @see #useFactory(XPathFactory)
+	 * @return {@code this}.
+	 */
+	public GThiz resetFactory() {
+		return this.useFactory(null);
 	}
 
 	/**
@@ -266,42 +286,42 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für das {@link XPathFactory#newInstance(String) Objektmodel} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für das Objektmodel und gibt ihn zurück.
 	 * 
 	 * @see XPathFactory#newInstance(String)
 	 * @return Konfigurator.
 	 */
-	public ModelData openModelData() {
+	public ModelData<GThiz> openModelData() {
 		return this.modelData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link XPathFactory#getFeature(String) Fähigkeiten} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
 	 * 
 	 * @see XPathFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData openFeatureData() {
+	public FeatureData<GThiz> openFeatureData() {
 		return this.featureData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link XPathFactory#setXPathVariableResolver(XPathVariableResolver) Fehlerbehandlung} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link XPathVariableResolver} und gibt ihn zurück.
 	 * 
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator.
 	 */
-	public VariableData openVariableData() {
+	public VariableData<GThiz> openVariableData() {
 		return this.variableData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link XPathFactory#setXPathFunctionResolver(XPathFunctionResolver) URL-Auflöser} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link XPathFunctionResolver} und gibt ihn zurück.
 	 * 
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator.
 	 */
-	public FunctionData openFunctionData() {
+	public FunctionData<GThiz> openFunctionData() {
 		return this.functionData;
 	}
 
@@ -315,6 +335,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getFactory()
 	 */
 	@Override
 	public XPathFactory build() throws IllegalStateException {

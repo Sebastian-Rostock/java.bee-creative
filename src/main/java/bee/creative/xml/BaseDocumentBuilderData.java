@@ -3,7 +3,6 @@ package bee.creative.xml;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import bee.creative.util.Builders.BaseBuilder;
@@ -11,7 +10,7 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder} zur Erzeugung eines {@link Document}.
+ * Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
@@ -19,20 +18,20 @@ import bee.creative.util.Objects;
 public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<DocumentBuilder, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory} zur Erzeugung eines {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory} eines {@link DocumentBuilder}.
 	 * 
+	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class FactoryData extends BaseDocumentBuilderFactoryData<FactoryData> {
+	public static abstract class FactoryData<GOwner> extends BaseDocumentBuilderFactoryData<FactoryData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeFactoryData() {
-			return BaseDocumentBuilderData.this.thiz();
-		}
+		public abstract GOwner closeFactoryData();
 
 		{}
 
@@ -40,28 +39,27 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData thiz() {
+		protected FactoryData<GOwner> thiz() {
 			return this;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler} einer {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler} eines {@link DocumentBuilder}.
 	 * 
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class HandlerData extends BaseValueBuilder<ErrorHandler, HandlerData> {
+	public static abstract class HandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, HandlerData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeListenerData() {
-			return BaseDocumentBuilderData.this.thiz();
-		}
+		public abstract GOwner closeListenerData();
 
 		{}
 
@@ -69,28 +67,27 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected HandlerData thiz() {
+		protected HandlerData<GOwner> thiz() {
 			return this;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link EntityResolver} einer {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link EntityResolver} eines {@link DocumentBuilder}.
 	 * 
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ResolverData extends BaseValueBuilder<EntityResolver, ResolverData> {
+	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<EntityResolver, ResolverData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeResolverData() {
-			return BaseDocumentBuilderData.this.thiz();
-		}
+		public abstract GOwner closeResolverData();
 
 		{}
 
@@ -98,7 +95,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResolverData thiz() {
+		protected ResolverData<GOwner> thiz() {
 			return this;
 		}
 
@@ -114,20 +111,38 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData factoryData = //
-		new FactoryData();
+	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+
+		@Override
+		public GThiz closeFactoryData() {
+			return BaseDocumentBuilderData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}.
 	 */
-	final HandlerData handlerData = //
-		new HandlerData();
+	final HandlerData<GThiz> handlerData = new HandlerData<GThiz>() {
+
+		@Override
+		public GThiz closeListenerData() {
+			return BaseDocumentBuilderData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData resolverData = //
-		new ResolverData();
+	final ResolverData<GThiz> resolverData = new ResolverData<GThiz>() {
+
+		@Override
+		public GThiz closeResolverData() {
+			return BaseDocumentBuilderData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -147,10 +162,10 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	}
 
 	/**
-	 * Diese Methode gibt die {@link DocumentBuilder} zurück.<br>
-	 * Wenn über {@link #useBuilder(DocumentBuilder)} noch keine {@link DocumentBuilder} gesetzt wurde, wird über
-	 * {@link DocumentBuilderFactory#newDocumentBuilder()} eine neue erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über {@link #updateBuilder()}
-	 * aktualisiert.
+	 * Diese Methode gibt den {@link DocumentBuilder} zurück.<br>
+	 * Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde, wird über
+	 * {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über {@link #updateBuilder()}
+	 * aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #openFactoryData()} konfiguriert ist.
 	 * 
 	 * @see #useBuilder(DocumentBuilder)
 	 * @see #updateBuilder()
@@ -167,7 +182,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	}
 
 	/**
-	 * Diese Methode setzt die {@link DocumentBuilder} und gibt {@code this} zurück.
+	 * Diese Methode setzt den {@link DocumentBuilder} und gibt {@code this} zurück.
 	 * 
 	 * @param builder {@link DocumentBuilder} oder {@code null}.
 	 * @return {@code this}.
@@ -189,7 +204,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 
 	/**
 	 * Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück.<br>
-	 * Bei dieser Aktualisierung werden auf den über {@link #getBuilder()} ermittelte {@link DocumentBuilder} die Einstellungen übertragen, die in
+	 * Bei dieser Aktualisierung werden auf den über {@link #getBuilder()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in
 	 * {@link #openHandlerData()} und {@link #openResolverData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
@@ -209,29 +224,30 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory} und gibt ihn zurück.
 	 * 
+	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @return Konfigurator.
 	 */
-	public FactoryData openFactoryData() {
+	public FactoryData<GThiz> openFactoryData() {
 		return this.factoryData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilder#setErrorHandler(ErrorHandler) Fehlerbehandlung} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator.
 	 */
-	public HandlerData openHandlerData() {
+	public HandlerData<GThiz> openHandlerData() {
 		return this.handlerData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilder#setEntityResolver(EntityResolver) URL-Auflöser} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link EntityResolver} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @return Konfigurator.
 	 */
-	public ResolverData openResolverData() {
+	public ResolverData<GThiz> openResolverData() {
 		return this.resolverData;
 	}
 
@@ -245,6 +261,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getBuilder()
 	 */
 	@Override
 	public DocumentBuilder build() throws IllegalStateException {

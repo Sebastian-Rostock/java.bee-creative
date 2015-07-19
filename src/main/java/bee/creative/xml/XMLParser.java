@@ -8,6 +8,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import bee.creative.util.Objects;
 
+/**
+ * Diese Klasse implementiert einen Konfigurator zum {@link #parse() Parsen} sowie {@link #create() Erstellen} eines {@link Document}.
+ * 
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ */
 public final class XMLParser {
 
 	/**
@@ -16,7 +21,7 @@ public final class XMLParser {
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public final class SourceData extends BaseInputSourceData<SourceData> {
+	public final class SourceData extends BaseSourceData<SourceData> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
@@ -72,24 +77,35 @@ public final class XMLParser {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData sourceData = //
-		new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openBuilderData()}.
 	 */
-	final BuilderData builderData = //
-		new BuilderData();
+	final BuilderData builderData = new BuilderData();
 
 	{}
 
-	public Document parse() throws SAXException, IOException, ParserConfigurationException {
-		final InputSource source = this.sourceData.build();
+	/**
+	 * Diese Methode parst die Eingabedaten in ein {@link Document} und gibt dieses zurück.
+	 * 
+	 * @return {@link Document}.
+	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
+	 * @throws IOException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
+	 */
+	public Document parse() throws SAXException, IOException {
+		final InputSource source = this.sourceData.getInputSource();
 		final DocumentBuilder builder = this.builderData.build();
 		final Document result = builder.parse(source);
 		return result;
 	}
 
+	/**
+	 * Diese Methode erzeugt ein neues {@link Document} und gibt dieses zurück.
+	 * 
+	 * @return {@link Document}.
+	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst.
+	 */
 	public Document create() throws ParserConfigurationException {
 		final DocumentBuilder builder = this.builderData.build();
 		final Document result = builder.newDocument();
@@ -97,7 +113,7 @@ public final class XMLParser {
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für das Dokument (z.B. xml-Datei) und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Eingabedaten (z.B. xml-Datei) und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @return Konfigurator.

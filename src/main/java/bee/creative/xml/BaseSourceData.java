@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -14,13 +15,15 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source}, die für die Eringabedaten eines {@link Schema} bzw. {@link Transformer}
- * genutzt wird.
+ * Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema} bzw.
+ * {@link Transformer} genutzt wird.
  * 
+ * @see DocumentBuilder#parse(InputSource)
  * @see SchemaFactory#newSchema(Source)
  * @see Transformer#transform(Source, Result)
  * @see TransformerFactory#newTemplates(Source)
@@ -55,7 +58,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useSource(Source)} auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
+	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see URL#toExternalForm()
@@ -68,8 +71,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useSource(Source)} auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this}
-	 * zurück.
+	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(File)
@@ -81,7 +83,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useReader(Reader)} über eine {@link StringReader} mit dem gegebenen Text und gibt {@code this} zurück.
+	 * Diese Methode setzt die Quelldaten über {@link StringReader} mit dem gegebenen Text auf eine {@link StreamSource} und gibt {@code this} zurück.
 	 * 
 	 * @see #useReader(Reader)
 	 * @see StringReader#StringReader(String)
@@ -93,7 +95,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useSource(Source)} auf eine {@link DOMSource} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
+	 * Diese Methode setzt die Quelldaten auf eine {@link DOMSource} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see DOMSource#DOMSource(Node)
@@ -105,8 +107,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useSource(Source)} auf eine {@link StreamSource} mit dem gegebenen {@link Reader} und gibt {@code this}
-	 * zurück.
+	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link Reader} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(Reader)
@@ -118,8 +119,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten via {@link #useSource(Source)} auf eine {@link StreamSource} mit dem gegebenen {@link InputStream} und gibt {@code this}
-	 * zurück.
+	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link InputStream} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(InputStream)
@@ -131,7 +131,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt den {@link Source#getSystemId() System-Identifikator} und gibt {@code this} zurück.
+	 * Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
 	 * 
 	 * @see Source#setSystemId(String)
 	 * @param systemID System-Identifikator oder {@code null}.
@@ -145,8 +145,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten und gibt {@code this} zurück.<br>
-	 * Der aktuelle {@link Source#getSystemId() System-Identifikator} wird beibehalten, sofern er nicht {@code null} ist.
+	 * Diese Methode setzt die Quelldaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
 	 * 
 	 * @see #getSource()
 	 * @see #useSystemID(String)
@@ -168,19 +167,39 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @see #useSource(Source)
 	 * @see #useStream(InputStream)
 	 * @see #useSystemID(String)
-	 * @return Quelldaten.
+	 * @see DOMSource
+	 * @see StreamSource
+	 * @return Quelldaten oder {@code null}.
 	 */
 	public Source getSource() {
 		return this.source;
 	}
 
 	/**
-	 * Diese Methode setzt die Quelldaten auf {@code null} und gibt {@code this} zurück.
+	 * Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.
 	 * 
-	 * @se {@link #useSource(Source)}
+	 * @return Quelldaten oder {@code null}.
+	 */
+	public InputSource getInputSource() {
+		final Source source = this.getSource();
+		if (!(source instanceof StreamSource)) return null;
+		final StreamSource stream = (StreamSource)source;
+		final InputSource result = new InputSource();
+		result.setSystemId(source.getSystemId());
+		result.setCharacterStream(stream.getReader());
+		result.setByteStream(stream.getInputStream());
+		return result;
+	}
+
+	/**
+	 * Diese Methode setzt die Quelldaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
+	 * 
+	 * @see #useSource(Source)
+	 * @see #useSystemID(String)
 	 * @return {@code this}.
 	 */
 	public GThiz resetSource() {
+		this.useSystemID(null);
 		return this.useSource(null);
 	}
 
@@ -188,6 +207,8 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getSource()
 	 */
 	@Override
 	public Source build() throws IllegalStateException {

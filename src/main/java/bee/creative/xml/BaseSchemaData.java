@@ -1,9 +1,6 @@
 package bee.creative.xml;
 
-import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
@@ -19,21 +16,20 @@ import bee.creative.util.Objects;
 public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Transformer}.
+	 * Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Schema}.
 	 * 
-	 * @see Transformer#transform(Source, Result)
+	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class SourceData extends BaseSourceData<SourceData> {
+	public static abstract class SourceData<GOwner> extends BaseSourceData<SourceData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeSourceData() {
-			return BaseSchemaData.this.thiz();
-		}
+		public abstract GOwner closeSourceData();
 
 		{}
 
@@ -41,27 +37,27 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SourceData thiz() {
+		protected SourceData<GOwner> thiz() {
 			return this;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory}.
+	 * Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory} eines {@link Schema}.
 	 * 
+	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class SchemaFactoryData extends BaseSchemaFactoryData<SchemaFactoryData> {
+	public static abstract class FactoryData<GOwner> extends BaseSchemaFactoryData<FactoryData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeFactoryData() {
-			return BaseSchemaData.this.thiz();
-		}
+		public abstract GOwner closeFactoryData();
 
 		{}
 
@@ -69,7 +65,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SchemaFactoryData thiz() {
+		protected FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -85,14 +81,26 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final SchemaFactoryData factoryData = //
-		new SchemaFactoryData();
+	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+
+		@Override
+		public GThiz closeFactoryData() {
+			return BaseSchemaData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData sourceData = //
-		new SourceData();
+	final SourceData<GThiz> sourceData = new SourceData<GThiz>() {
+
+		@Override
+		public GThiz closeSourceData() {
+			return BaseSchemaData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -113,8 +121,10 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Diese Methode gibt das {@link Schema} zurück.<br>
 	 * Wenn über {@link #useSchema(Schema)} noch kein {@link Schema} gesetzt wurden, werden über {@link SchemaFactory#newSchema(Source)} ein neues erstellt und
-	 * über {@link #useSchema(Schema)} gesetzt. Wenn über {@link #openSourceData()} keine Quelldaten konfiguriert sind, wird {@code null} geliefert.
+	 * über {@link #useSchema(Schema)} gesetzt. Die zur erstellung verwendeten Quelldaten können über {@link #openSourceData()} konfiguriert werden. Wenn diese
+	 * {@code null} sind, wird {@code null} geliefert.
 	 * 
+	 * @see #useSchema(Schema)
 	 * @return {@link Schema} oder {@code null}.
 	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst.
 	 */
@@ -140,7 +150,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	}
 
 	/**
-	 * Diese Methode setzt das {@link Schema} auf {@code null} und gibt {@code this} zurück.
+	 * Diese Methode setzt das {@link Schema} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getSchema()} {@code null} liefern soll, müssen die
+	 * {@link #openSourceData() Quelldaten} ebenfalls {@link SourceData#resetSource() rückgesetzt} werden.
 	 * 
 	 * @see #useSchema(Schema)
 	 * @return {@code this}.
@@ -152,19 +163,20 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Diese Methode öffnet den Konfigurator für die Schemadaten (z.B. xsd-Datei) und gibt ihn zurück.
 	 * 
-	 * @see TransformerFactory#newTemplates(Source)
+	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public SourceData openSourceData() {
+	public SourceData<GThiz> openSourceData() {
 		return this.sourceData;
 	}
 
 	/**
 	 * Diese Methode öffnet den Konfigurator für die {@link SchemaFactory} und gibt ihn zurück.
 	 * 
+	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public SchemaFactoryData openFactoryData() {
+	public FactoryData<GThiz> openFactoryData() {
 		return this.factoryData;
 	}
 
@@ -178,6 +190,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getSchema()
 	 */
 	@Override
 	public Schema build() throws IllegalStateException {

@@ -11,7 +11,12 @@ import bee.creative.util.Unique.UniqueMap;
 
 public class XMLEvaluator {
 
-	final class XPathData extends BaseXPathData<XPathData> {
+	/**
+	 * Diese Klasse implementiert den Konfigurator für einen {@link XPath}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public final class XPathData extends BaseXPathData<XPathData> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
@@ -25,9 +30,7 @@ public class XMLEvaluator {
 		{}
 
 		/**
-		 * Diese Methode gibt das zurück.
-		 * 
-		 * @return
+		 * {@inheritDoc}
 		 */
 		@Override
 		protected XPathData thiz() {
@@ -36,8 +39,17 @@ public class XMLEvaluator {
 
 	}
 
-	final class CacheData extends UniqueMap<String, XPathExpression> {
+	/**
+	 * Diese Klasse implementiert den Puffer für die erzeugten {@link XPathExpression}.
+	 * 
+	 * @see XMLEvaluator#compile(String)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public final class CacheData extends UniqueMap<String, XPathExpression> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		protected XPathExpression compile(final String input) {
 			final XPath xxath = XMLEvaluator.this.xpathData.build();
@@ -56,16 +68,9 @@ public class XMLEvaluator {
 
 	XPathExpression expression;
 
-	final XPathData xpathData = //
-		new XPathData();
+	final XPathData xpathData = new XPathData();
 
-	final CacheData cacheData = //
-		new CacheData();
-
-	public XPathExpression compile(final String expression) throws IllegalStateException {
-		final XPathExpression result = this.cacheData.get(expression);
-		return result;
-	}
+	final CacheData cacheData = new CacheData();
 
 	public Node getBase() {
 		return this.base;
@@ -89,15 +94,25 @@ public class XMLEvaluator {
 		return this;
 	}
 
+	public XMLEvaluator resetCache() {
+		cacheData.entryMap().clear();
+		return this;
+	}
+
 	public XMLEvaluator resetExpression() {
 		return this.useExpression((XPathExpression)null);
 	}
 
-	public Number evaluate(final QName resultType) throws XPathExpressionException {
+	public XPathExpression compile(final String expression) throws IllegalStateException {
+		final XPathExpression result = this.cacheData.get(expression);
+		return result;
+	}
+
+	public Object evaluate(final QName resultType) throws XPathExpressionException {
 		final Node b = this.getBase();
 		final XPathExpression ex = this.getExpression();
 		final Object res = ex.evaluate(b, resultType);
-		return (Number)res;
+		return res;
 	}
 
 	public Node evaluateNode() throws XPathExpressionException {

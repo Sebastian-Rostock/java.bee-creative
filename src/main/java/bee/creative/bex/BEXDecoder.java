@@ -21,7 +21,14 @@ public class BEXDecoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class BEXFileDecoder extends BEXBaseFile {
+	public static final class BEXFileDecoder extends BEXBaseFile {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link BEXFileDecoder}.
+		 */
+		public static final BEXFileDecoder EMPTY = new BEXFileDecoder();
+
+		{}
 
 		/**
 		 * Dieses Feld speichert die Referenz des Wurzelelements.
@@ -112,6 +119,30 @@ public class BEXDecoder {
 		 * Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle.
 		 */
 		protected final MMFArray attrListRange;
+
+		/**
+		 * Dieser Konstruktor initialisiert den leeren {@link BEXFileDecoder}.
+		 */
+		BEXFileDecoder() {
+			this.rootRef = -1;
+			this.attrUriText = IAMListDecoder.EMPTY;
+			this.attrNameText = IAMListDecoder.EMPTY;
+			this.attrValueText = IAMListDecoder.EMPTY;
+			this.chldUriText = IAMListDecoder.EMPTY;
+			this.chldNameText = IAMListDecoder.EMPTY;
+			this.chldValueText = IAMListDecoder.EMPTY;
+			this.attrUriRef = MMFArray.EMPTY;
+			this.attrNameRef = MMFArray.EMPTY;
+			this.attrValueRef = MMFArray.EMPTY;
+			this.attrParentRef = MMFArray.EMPTY;
+			this.chldUriRef = MMFArray.EMPTY;
+			this.chldNameRef = MMFArray.EMPTY;
+			this.chldContentRef = MMFArray.EMPTY;
+			this.chldAttributesRef = MMFArray.EMPTY;
+			this.chldParentRef = MMFArray.EMPTY;
+			this.chldListRange = MMFArray.EMPTY;
+			this.attrListRange = MMFArray.EMPTY;
+		}
 
 		/**
 		 * Dieser Kontrukteur initialisiert dieses {@link BEXFile} als Sicht auf den gegebenen Speicherbereich.
@@ -221,6 +252,7 @@ public class BEXDecoder {
 		 */
 		@Override
 		public BEXNode root() {
+			if (this.rootRef < 0) return new BEXNodeDecoder(this);
 			return new BEXNodeDecoder(BEXDecoder.keyOf(BEXDecoder.BEX_ELEM_NODE, this.rootRef), this);
 		}
 
@@ -278,6 +310,13 @@ public class BEXDecoder {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class BEXListDecoder extends BEXBaseList {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link BEXListDecoder}.
+		 */
+		public static final BEXListDecoder EMPTY = new BEXListDecoder(BEXFileDecoder.EMPTY);
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Schlüssel.
@@ -505,6 +544,13 @@ public class BEXDecoder {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class BEXNodeDecoder extends BEXBaseNode {
+
+		/**
+		 * Dieses Feld speichert den leeren {@link BEXNodeDecoder}.
+		 */
+		public static final BEXNodeDecoder EMPTY = new BEXNodeDecoder(BEXFileDecoder.EMPTY);
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Schlüssel.

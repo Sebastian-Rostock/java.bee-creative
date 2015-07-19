@@ -2,15 +2,22 @@ package bee.creative.xml;
 
 import java.util.Map.Entry;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Objects;
+import bee.creative.xml.BaseTemplatesData.FactoryData;
 
+/**
+ * Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link Transformer}.
+ * 
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ */
 public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer, GThiz> {
 
 	/**
@@ -18,8 +25,9 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * 
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class PropertyData extends BaseMapBuilder<String, String, PropertyData> {
+	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, String, PropertyData<GOwner>> {
 
 		/**
 		 * Diese Methode wählt {@link OutputKeys#INDENT} und gibt {@code this} zurück.
@@ -27,7 +35,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forINDENT() {
+		public PropertyData<GOwner> forINDENT() {
 			return this.forKey(OutputKeys.INDENT);
 		}
 
@@ -37,7 +45,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forVERSION() {
+		public PropertyData<GOwner> forVERSION() {
 			return this.forKey(OutputKeys.VERSION);
 		}
 
@@ -47,7 +55,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forMETHOD() {
+		public PropertyData<GOwner> forMETHOD() {
 			return this.forKey(OutputKeys.METHOD);
 		}
 
@@ -57,7 +65,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forENCODING() {
+		public PropertyData<GOwner> forENCODING() {
 			return this.forKey(OutputKeys.ENCODING);
 		}
 
@@ -67,7 +75,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forMEDIA_TYPE() {
+		public PropertyData<GOwner> forMEDIA_TYPE() {
 			return this.forKey(OutputKeys.MEDIA_TYPE);
 		}
 
@@ -77,7 +85,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forSTANDALONE() {
+		public PropertyData<GOwner> forSTANDALONE() {
 			return this.forKey(OutputKeys.STANDALONE);
 		}
 
@@ -87,7 +95,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forOMIT_XML_DECLARATION() {
+		public PropertyData<GOwner> forOMIT_XML_DECLARATION() {
 			return this.forKey(OutputKeys.OMIT_XML_DECLARATION);
 		}
 
@@ -97,7 +105,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData forCDATA_SECTION_ELEMENTS() {
+		public PropertyData<GOwner> forCDATA_SECTION_ELEMENTS() {
 			return this.forKey(OutputKeys.CDATA_SECTION_ELEMENTS);
 		}
 
@@ -106,9 +114,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closePropertyData() {
-			return BaseTransformerData.this.thiz();
-		}
+		public abstract GOwner closePropertyData();
 
 		{}
 
@@ -116,7 +122,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected PropertyData thiz() {
+		protected PropertyData<GOwner> thiz() {
 			return this;
 		}
 
@@ -127,17 +133,16 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * 
 	 * @see Transformer#setParameter(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ParameterData extends BaseMapBuilder<String, Object, ParameterData> {
+	public static abstract class ParameterData<GOwner> extends BaseMapBuilder<String, Object, ParameterData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public BaseTransformerData closeParameterData() {
-			return BaseTransformerData.this;
-		}
+		public abstract GOwner closeParameterData();
 
 		{}
 
@@ -145,7 +150,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ParameterData thiz() {
+		protected ParameterData<GOwner> thiz() {
 			return this;
 		}
 
@@ -154,19 +159,18 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	/**
 	 * Diese Klasse implementiert den Konfigurator für die {@link Templates} zur Erzeugung eines {@link Transformer}.
 	 * 
-	 * @see TransformerFactory#newTemplates(Source)
+	 * @see Templates#newTransformer()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class TemplatesData extends BaseTemplatesData<TemplatesData> {
+	public static abstract class TemplatesData<GOwner> extends BaseTemplatesData<TemplatesData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public BaseTransformerData closeTemplatesData() {
-			return BaseTransformerData.this;
-		}
+		public abstract GOwner closeTemplatesData();
 
 		{}
 
@@ -174,7 +178,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected TemplatesData thiz() {
+		protected TemplatesData<GOwner> thiz() {
 			return this;
 		}
 
@@ -190,20 +194,38 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openPropertyData()}.
 	 */
-	final PropertyData propertyData = //
-		new PropertyData();
+	final PropertyData<GThiz> propertyData = new PropertyData<GThiz>() {
+
+		@Override
+		public GThiz closePropertyData() {
+			return BaseTransformerData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openParameterData()}.
 	 */
-	final ParameterData parameterData = //
-		new ParameterData();
+	final ParameterData<GThiz> parameterData = new ParameterData<GThiz>() {
+
+		@Override
+		public GThiz closeParameterData() {
+			return BaseTransformerData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openTemplatesData()}.
 	 */
-	final TemplatesData templatesData = //
-		new TemplatesData();
+	final TemplatesData<GThiz> templatesData = new TemplatesData<GThiz>() {
+
+		@Override
+		public GThiz closeTemplatesData() {
+			return BaseTransformerData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -222,6 +244,20 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		return this.thiz();
 	}
 
+	/**
+	 * Diese Methode gibt den {@link Transformer} zurück.<br>
+	 * Wenn über {@link #useTransformer(Transformer)} noch kein {@link Transformer} gesetzt wurde, wird über {@link Templates#newTransformer()} bzw.
+	 * {@link TransformerFactory#newTransformer()} ein neuer erstellt, über {@link #useTransformer(Transformer)} gesetzt und über {@link #updateTransformer()}
+	 * aktualisiert. Für die Erstellung werden entweder die {@link Templates} oder die {@link TransformerFactoryConfigurationError} genutzt, die in
+	 * {@link #openTemplatesData()} konfiguriert sind. Die {@link TransformerFactory} wird nur dann verwendet, wenn die {@link Templates} {@code null} sind.
+	 * 
+	 * @see #useTransformer(Transformer)
+	 * @see #updateTransformer()
+	 * @return {@link Transformer}.
+	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()}, {@link Templates#newTransformer()} bzw.
+	 *         {@link TransformerFactory#newTransformer()} eine entsprechende Ausnahme auslöst.
+	 */
+
 	public Transformer getTransformer() throws TransformerConfigurationException {
 		Transformer result = this.transformer;
 		if (result != null) return result;
@@ -233,31 +269,74 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		return result;
 	}
 
+	/**
+	 * Diese Methode setzt den {@link Transformer} und gibt {@code this} zurück.
+	 * 
+	 * @param transformer {@link Transformer} oder {@code null}.
+	 * @return {@code this}.
+	 */
 	public GThiz useTransformer(final Transformer transformer) {
 		this.transformer = transformer;
 		return this.thiz();
 	}
 
+	/**
+	 * Diese Methode setzt den {@link Transformer} auf {@code null} und gibt {@code this} zurück.
+	 * 
+	 * @return {@code this}.
+	 */
+	public GThiz resetTemplates() {
+		return this.useTransformer(null);
+	}
+
+	/**
+	 * Diese Methode aktualisiert die Einstellungen des {@link Transformer} und gibt {@code this} zurück.<br>
+	 * Bei dieser Aktualisierung werden auf den über {@link #getTransformer()} ermittelten {@link Transformer} die Einstellungen übertragen, die in
+	 * {@link #openPropertyData()} und {@link #openParameterData()} konfiguriert sind.
+	 * 
+	 * @return {@code this}.
+	 * @throws TransformerConfigurationException Wenn {@link #getTransformer()} eine entsprechende Ausnahme auslöst.
+	 */
+
 	public GThiz updateTransformer() throws TransformerConfigurationException {
 		final Transformer result = this.getTransformer();
-		for (final Entry<String, Object> entry: this.parameterData) {
-			result.setParameter(entry.getKey(), entry.getValue());
-		}
 		for (final Entry<String, String> entry: this.propertyData) {
 			result.setOutputProperty(entry.getKey(), entry.getValue());
+		}
+		for (final Entry<String, Object> entry: this.parameterData) {
+			result.setParameter(entry.getKey(), entry.getValue());
 		}
 		return this.thiz();
 	}
 
-	public PropertyData openPropertyData() {
+	/**
+	 * Diese Methode öffnet den Konfigurator für die Ausgabeeigenschaften und gibt ihn zurück.
+	 * 
+	 * @see Transformer#setOutputProperty(String, String)
+	 * @return Konfigurator.
+	 */
+	public PropertyData<GThiz> openPropertyData() {
 		return this.propertyData;
 	}
 
-	public ParameterData openParameterData() {
+	/**
+	 * Diese Methode öffnet den Konfigurator für die Parameter und gibt ihn zurück.
+	 * 
+	 * @see Transformer#setParameter(String, Object)
+	 * @return Konfigurator.
+	 */
+	public ParameterData<GThiz> openParameterData() {
 		return this.parameterData;
 	}
 
-	public TemplatesData openTemplatesData() {
+	/**
+	 * Diese Methode öffnet den Konfigurator für die {@link Templates} und gibt ihn zurück.
+	 * 
+	 * @see Templates#newTransformer()
+	 * @see TransformerFactory#newTransformer()
+	 * @return Konfigurator.
+	 */
+	public TemplatesData<GThiz> openTemplatesData() {
 		return this.templatesData;
 	}
 
@@ -271,6 +350,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getTransformer()
 	 */
 	@Override
 	public Transformer build() throws IllegalStateException {

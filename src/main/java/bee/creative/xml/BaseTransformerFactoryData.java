@@ -14,9 +14,11 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung eines {@link Templates} oder {@link Transformer} .
+ * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung von {@link Templates} oder eines
+ * {@link Transformer}.
  * 
  * @see TransformerFactory#newTemplates(Source)
+ * @see TransformerFactory#newTransformer()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
  */
@@ -27,17 +29,16 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * 
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class FeatureData extends BaseFeatureData<FeatureData> {
+	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeFeatureData() {
-			return BaseTransformerFactoryData.this.thiz();
-		}
+		public abstract GOwner closeFeatureData();
 
 		{}
 
@@ -45,7 +46,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FeatureData thiz() {
+		protected FeatureData<GOwner> thiz() {
 			return this;
 		}
 
@@ -56,17 +57,16 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * 
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class AttributeData extends BaseMapBuilder<String, String, AttributeData> {
+	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, String, AttributeData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeAttributeData() {
-			return BaseTransformerFactoryData.this.thiz();
-		}
+		public abstract GOwner closeAttributeData();
 
 		{}
 
@@ -74,7 +74,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected AttributeData thiz() {
+		protected AttributeData<GOwner> thiz() {
 			return this;
 		}
 
@@ -85,17 +85,16 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * 
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ListenerData extends BaseValueBuilder<ErrorListener, ListenerData> {
+	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<ErrorListener, ListenerData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeListenerData() {
-			return BaseTransformerFactoryData.this.thiz();
-		}
+		public abstract GOwner closeListenerData();
 
 		{}
 
@@ -103,7 +102,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ListenerData thiz() {
+		protected ListenerData<GOwner> thiz() {
 			return this;
 		}
 
@@ -114,17 +113,16 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * 
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ResolverData extends BaseValueBuilder<URIResolver, ResolverData> {
+	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<URIResolver, ResolverData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeResolverData() {
-			return BaseTransformerFactoryData.this.thiz();
-		}
+		public abstract GOwner closeResolverData();
 
 		{}
 
@@ -132,7 +130,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResolverData thiz() {
+		protected ResolverData<GOwner> thiz() {
 			return this;
 		}
 
@@ -148,26 +146,50 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData featureData = //
-		new FeatureData();
+	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+
+		@Override
+		public GThiz closeFeatureData() {
+			return BaseTransformerFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}.
 	 */
-	final AttributeData attributeData = //
-		new AttributeData();
+	final AttributeData<GThiz> attributeData = new AttributeData<GThiz>() {
+
+		@Override
+		public GThiz closeAttributeData() {
+			return BaseTransformerFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openListenerData()}.
 	 */
-	final ListenerData listenerData = //
-		new ListenerData();
+	final ListenerData<GThiz> listenerData = new ListenerData<GThiz>() {
+
+		@Override
+		public GThiz closeListenerData() {
+			return BaseTransformerFactoryData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData resolverData = //
-		new ResolverData();
+	final ResolverData<GThiz> resolverData = new ResolverData<GThiz>() {
+
+		@Override
+		public GThiz closeResolverData() {
+			return BaseTransformerFactoryData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -177,7 +199,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseTransformerFactoryData data) {
+	public GThiz use(final BaseTransformerFactoryData<?> data) {
 		if (data == null) return this.thiz();
 		this.factory = data.factory;
 		this.featureData.use(data.featureData);
@@ -217,6 +239,12 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		return this.thiz();
 	}
 
+	/**
+	 * Diese Methode setzt die {@link TransformerFactory} auf {@code null} und gibt {@code this} zurück.
+	 * 
+	 * @see #useFactory(TransformerFactory)
+	 * @return {@code this}.
+	 */
 	public GThiz resetFactory() {
 		return this.useFactory(null);
 	}
@@ -247,42 +275,42 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link TransformerFactory#getFeature(String) Fähigkeiten} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
 	 * 
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData openFeatureData() {
+	public FeatureData<GThiz> openFeatureData() {
 		return this.featureData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link TransformerFactory#getAttribute(String) Attribute} der und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für die Attribute der und gibt ihn zurück.
 	 * 
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @return Konfigurator.
 	 */
-	public AttributeData openAttributeData() {
+	public AttributeData<GThiz> openAttributeData() {
 		return this.attributeData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link TransformerFactory#getErrorListener() Fehlerbehandlung} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link ErrorListener} und gibt ihn zurück.
 	 * 
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @return Konfigurator.
 	 */
-	public ListenerData openListenerData() {
+	public ListenerData<GThiz> openListenerData() {
 		return this.listenerData;
 	}
 
 	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link TransformerFactory#getURIResolver() URL-Auflöser} und gibt ihn zurück.
+	 * Diese Methode öffnet den Konfigurator für den {@link URIResolver} und gibt ihn zurück.
 	 * 
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @return Konfigurator.
 	 */
-	public ResolverData openResolverData() {
+	public ResolverData<GThiz> openResolverData() {
 		return this.resolverData;
 	}
 
@@ -296,6 +324,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getFactory()
 	 */
 	@Override
 	public TransformerFactory build() throws IllegalStateException {

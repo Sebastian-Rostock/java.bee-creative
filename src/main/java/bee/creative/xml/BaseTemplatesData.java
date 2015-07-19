@@ -22,17 +22,16 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * 
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class ScriptData extends BaseSourceData<ScriptData> {
+	public static abstract class SourceData<GOwner> extends BaseSourceData<SourceData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeSourceData() {
-			return BaseTemplatesData.this.thiz();
-		}
+		public abstract GOwner closeSourceData();
 
 		{}
 
@@ -40,7 +39,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ScriptData thiz() {
+		protected SourceData<GOwner> thiz() {
 			return this;
 		}
 
@@ -50,17 +49,16 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * Diese Klasse implementiert den Konfigurator für die {@link TransformerFactory}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public final class FactoryData extends BaseTransformerFactoryData<FactoryData> {
+	public static abstract class FactoryData<GOwner> extends BaseTransformerFactoryData<FactoryData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
 		 * @return Besitzer.
 		 */
-		public GThiz closeFactoryData() {
-			return BaseTemplatesData.this.thiz();
-		}
+		public abstract GOwner closeFactoryData();
 
 		{}
 
@@ -68,7 +66,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData thiz() {
+		protected FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -84,14 +82,26 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openScriptData()}.
 	 */
-	final ScriptData scriptData = //
-		new ScriptData();
+	final SourceData<GThiz> scriptData = new SourceData<GThiz>() {
+
+		@Override
+		public GThiz closeSourceData() {
+			return BaseTemplatesData.this.thiz();
+		}
+
+	};
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData factoryData = //
-		new FactoryData();
+	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+
+		@Override
+		public GThiz closeFactoryData() {
+			return BaseTemplatesData.this.thiz();
+		}
+
+	};
 
 	{}
 
@@ -112,9 +122,10 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	/**
 	 * Diese Methode gibt die {@link Templates} zurück.<br>
 	 * Wenn über {@link #useTemplates(Templates)} noch keine {@link Templates} gesetzt wurden, werden über {@link TransformerFactory#newTemplates(Source)} neue
-	 * erstellt und über {@link #useTemplates(Templates)} gesetzt. Wenn über {@link #openScriptData()} keine Quelldaten konfiguriert sind oder über
-	 * {@link #resetTemplates()} die {@link Templates} auf {@code null} gesetzt wurden, wird {@code null} geliefert.
+	 * erstellt und über {@link #useTemplates(Templates)} gesetzt. Die zur erstellung verwendeten Quelldaten können über {@link #openScriptData()} konfiguriert
+	 * werden. Wenn diese {@code null} sind, wird {@code null} geliefert.
 	 * 
+	 * @see #useTemplates(Templates)
 	 * @return {@link Templates} oder {@code null}.
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst.
 	 */
@@ -140,8 +151,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	}
 
 	/**
-	 * Diese Methode leert die {@link Templates} und gibt {@code this} zurück.<br>
-	 * Wenn {@link #getTemplates()} {@code null} liefern sollen, müssen die {@link #openScriptData() Transformationsdaten} ebenfalls geleert werden.
+	 * Diese Methode setzt die {@link Templates} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getTemplates()} {@code null} liefern soll, müssen die
+	 * {@link #openScriptData() Transformationsdaten} ebenfalls {@link SourceData#resetSource() rückgesetzt} werden.
 	 * 
 	 * @return {@code this}.
 	 */
@@ -155,16 +166,17 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator.
 	 */
-	public ScriptData openScriptData() {
+	public SourceData<GThiz> openScriptData() {
 		return this.scriptData;
 	}
 
 	/**
 	 * Diese Methode öffnet den Konfigurator für die {@link TransformerFactory} und gibt ihn zurück.
 	 * 
+	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator.
 	 */
-	public FactoryData openFactoryData() {
+	public FactoryData<GThiz> openFactoryData() {
 		return this.factoryData;
 	}
 
@@ -178,6 +190,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @see #getTemplates()
 	 */
 	@Override
 	public Templates build() throws IllegalStateException {
