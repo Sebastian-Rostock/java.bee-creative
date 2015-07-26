@@ -81,7 +81,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorListener} einer {@link TransformerFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorListener}.
 	 * 
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -109,7 +109,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link URIResolver} einer {@link TransformerFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link URIResolver}.
 	 * 
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

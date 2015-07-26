@@ -14,14 +14,15 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema} bzw.
- * {@link Transformer} genutzt wird.
+ * Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
+ * {@link Validator}, {@link DocumentBuilder} bzw. {@link Transformer} genutzt wird.
  * 
  * @see DocumentBuilder#parse(InputSource)
  * @see SchemaFactory#newSchema(Source)

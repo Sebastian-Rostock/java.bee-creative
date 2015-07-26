@@ -411,7 +411,8 @@ public class Pointers {
 	 * @return {@link HardPointer}.
 	 */
 	public static <GData> Pointer<GData> hardPointer(final GData data) {
-		return ((data == null) ? Pointers.<GData>nullPointer() : new HardPointer<GData>(data));
+		if (data == null) return Pointers.nullPointer();
+		return new HardPointer<>(data);
 	}
 
 	/**
@@ -424,7 +425,8 @@ public class Pointers {
 	 * @return {@link WeakPointer}.
 	 */
 	public static <GData> Pointer<GData> weakPointer(final GData data) {
-		return ((data == null) ? Pointers.<GData>nullPointer() : new WeakPointer<GData>(data));
+		if (data == null) return Pointers.nullPointer();
+		return new WeakPointer<>(data);
 	}
 
 	/**
@@ -438,7 +440,8 @@ public class Pointers {
 	 * @return {@link SoftPointer}.
 	 */
 	public static <GData> Pointer<GData> softPointer(final GData data) {
-		return ((data == null) ? Pointers.<GData>nullPointer() : new SoftPointer<GData>(data));
+		if (data == null) return Pointers.nullPointer();
+		return new SoftPointer<>(data);
 	}
 
 	/**

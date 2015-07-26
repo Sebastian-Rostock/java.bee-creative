@@ -16,7 +16,7 @@ import bee.creative.util.Objects;
 public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Schema}.
+	 * Diese Klasse implementiert den Konfigurator für die Schemadaten eines {@link Schema}.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -44,7 +44,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory} eines {@link Schema}.
+	 * Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory}.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -131,9 +131,9 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	public Schema getSchema() throws SAXException {
 		Schema result = this.schema;
 		if (result != null) return result;
-		final Source source = this.sourceData.build();
+		final Source source = this.sourceData.getSource();
 		if (source == null) return null;
-		result = this.factoryData.build().newSchema(source);
+		result = this.factoryData.getFactory().newSchema(source);
 		this.useSchema(result);
 		return result;
 	}

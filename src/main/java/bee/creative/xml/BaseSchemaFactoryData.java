@@ -76,7 +76,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler} einer {@link SchemaFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
 	 * 
 	 * @see SchemaFactory#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -104,7 +104,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link LSResourceResolver} einer {@link SchemaFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link LSResourceResolver}.
 	 * 
 	 * @see SchemaFactory#setResourceResolver(LSResourceResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -322,8 +322,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * {@link #openHandlerData()}, {@link #openResolverData()}, {@link #openFeatureData()} und {@link #openPropertyData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
-	 * @throws SAXException Wenn {@link SchemaFactory#setFeature(String, boolean)} bzw. {@link SchemaFactory#setProperty(String, Object)} eine entsprechende
-	 *         Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link #getFactory()}, {@link SchemaFactory#setFeature(String, boolean)} bzw. {@link SchemaFactory#setProperty(String, Object)}
+	 *         eine entsprechende Ausnahme auslöst.
 	 */
 	public GThiz updateFactory() throws SAXException {
 		final SchemaFactory factory = this.getFactory();

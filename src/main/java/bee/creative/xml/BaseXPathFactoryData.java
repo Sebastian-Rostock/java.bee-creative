@@ -18,8 +18,8 @@ import bee.creative.util.Objects;
 public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFactory, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}. Initialisiert wird dieses via
-	 * {@link #useDEFAULT_OBJECT_MODEL_URI()}.
+	 * Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}.<br>
+	 * Initialisiert wird dieses via {@link #useDEFAULT_OBJECT_MODEL_URI()}.
 	 * 
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -94,7 +94,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver} einer {@link XPathFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver}.
 	 * 
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -122,7 +122,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver} einer {@link XPathFactory}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver}.
 	 * 
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]

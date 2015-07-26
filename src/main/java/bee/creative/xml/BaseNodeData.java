@@ -9,7 +9,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import bee.creative.util.Builders.BaseBuilder;
+import bee.creative.util.Objects;
 
+/**
+ * Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
+ * 
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ */
 public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBuilder<Node, GThiz> {
 
 	/**
@@ -149,33 +156,18 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	public static final NamedNodeMap EMPTY_ATTR_MAP = new NamedNodeMap() {
 
 		@Override
-		public Node setNamedItemNS(final Node arg) throws DOMException {
-			return null;
-		}
-
-		@Override
-		public Node setNamedItem(final Node arg) throws DOMException {
-			return null;
-		}
-
-		@Override
-		public Node removeNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
-			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
-		}
-
-		@Override
-		public Node removeNamedItem(final String name) throws DOMException {
-			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
-		}
-
-		@Override
 		public Node item(final int index) {
 			return null;
 		}
 
 		@Override
-		public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
-			return null;
+		public int getLength() {
+			return 0;
+		}
+
+		@Override
+		public Node setNamedItem(final Node arg) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
 		}
 
 		@Override
@@ -184,8 +176,23 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		}
 
 		@Override
-		public int getLength() {
-			return 0;
+		public Node setNamedItemNS(final Node arg) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
+		}
+
+		@Override
+		public Node getNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
+			return null;
+		}
+
+		@Override
+		public Node removeNamedItem(final String name) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
+		}
+
+		@Override
+		public Node removeNamedItemNS(final String namespaceURI, final String localName) throws DOMException {
+			throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, "");
 		}
 
 	};
@@ -216,6 +223,11 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 
 	{}
 
+	/**
+	 * Diese Methode gibt einen neuen Konfigurator für einen Attributknoten zurück.
+	 * 
+	 * @return Konfigurator.
+	 */
 	protected AttrData<GThiz> newAttrData() {
 		return new AttrData<GThiz>() {
 
@@ -227,6 +239,11 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		};
 	}
 
+	/**
+	 * Diese Methode gibt einen neuen Konfigurator für einen Kindnoten zurück.
+	 * 
+	 * @return Konfigurator.
+	 */
 	protected ChldData<GThiz> newChldData() {
 		return new ChldData<GThiz>() {
 
@@ -238,47 +255,92 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		};
 	}
 
-	protected void checkNode() {
-		if (!this.hasNode()) throw new IllegalStateException("node = null");
-	}
-
+	/**
+	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	 * 
+	 * @param data Konfigurator oder {@code null}.
+	 * @return {@code this}.
+	 */
 	protected GThiz use(final BaseNodeData<?> data) {
 		if (data == null) return this.thiz();
 		this.node = data.node;
 		return this.thiz();
 	}
 
-	protected GThiz use(final Node node) {
+	protected GThiz useNode(final Node node) {
 		this.node = node;
 		return this.thiz();
 	}
 
-	public boolean isType(final int nodeType) {
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
+	 * 
+	 * @see #getType()
+	 * @param nodeType Knotentyp.
+	 * @return {@code true}, wenn der {@link #getNode() aktuelle Knoten} den gegebenen Knotentyp hat.
+	 */
+	public boolean hasType(final int nodeType) {
 		return this.getType() == nodeType;
 	}
 
-	public boolean isType_TEXT() {
-		return this.isType(Node.TEXT_NODE);
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#TEXT_NODE} ist.
+	 * 
+	 * @see #hasType(int)
+	 * @return {@code true} bei einem Textknoten.
+	 */
+	public boolean hasType_TEXT() {
+		return this.hasType(Node.TEXT_NODE);
 	}
 
-	public boolean isType_ELEM() {
-		return this.isType(Node.ELEMENT_NODE);
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ELEMENT_NODE} ist.
+	 * 
+	 * @see #hasType(int)
+	 * @return {@code true} bei einem Elementknoten.
+	 */
+	public boolean hasType_ELEM() {
+		return this.hasType(Node.ELEMENT_NODE);
 	}
 
-	public boolean isType_ATTR() {
-		return this.isType(Node.ATTRIBUTE_NODE);
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ATTRIBUTE_NODE} ist.
+	 * 
+	 * @see #hasType(int)
+	 * @return {@code true} bei einem Attributknoten.
+	 */
+	public boolean hasType_ATTR() {
+		return this.hasType(Node.ATTRIBUTE_NODE);
 	}
 
-	public boolean isType_DOCU() {
-		return this.isType(Node.DOCUMENT_NODE);
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#DOCUMENT_NODE} ist.
+	 * 
+	 * @see #hasType(int)
+	 * @return {@code true} bei einem Dokumentknoten.
+	 */
+	public boolean hasType_DOCU() {
+		return this.hasType(Node.DOCUMENT_NODE);
 	}
 
+	/**
+	 * Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück.<br>
+	 * Wenn es {@link #hasNode() keinen solchen Knoten gibt}, wird {@code 0} geliefert.
+	 * 
+	 * @return Knotentyp oder {@code 0}.
+	 */
 	public int getType() {
 		final Node node = this.node;
-		if (node == null) return -1;
+		if (node == null) return 0;
 		return node.getNodeType();
 	}
 
+	/**
+	 * Diese Methode gibt den aktuellen Knote oder {@code null} zurück.
+	 * 
+	 * @see #useNode(Node)
+	 * @return Knoten oder {@code null}.
+	 */
 	public Node getNode() {
 		return this.node;
 	}
@@ -294,18 +356,27 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		return node.getNodeValue();
 	}
 
+	/**
+	 * Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	 * Wenn der der aktuelle Knoten {@code null} ist oder keinen Elternknoten hat, wird {@code null} geliefert.
+	 * 
+	 * @see Attr#getOwnerElement()
+	 * @see Node#getParentNode()
+	 * @return Elternknoten oder {@code null}.
+	 */
 	public Node getParent() {
 		final Node node = this.node;
 		if (node == null) return null;
-		if (node instanceof Attr) return ((Attr)node).getOwnerElement();
+		if (node.getNodeType() == Node.ATTRIBUTE_NODE) return ((Attr)node).getOwnerElement();
 		return node.getParentNode();
 	}
 
 	/**
-	 * Diese Methode gibt das {@link Document} des {@link #node() aktuellen Knoten} zurück.
+	 * Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück.<br>
+	 * Wenn der der aktuelle Knoten {@code null} ist, wird {@code null} geliefert.
 	 * 
 	 * @see Node#getOwnerDocument()
-	 * @return {@link Document} des {@link #node() aktuellen Knoten}.
+	 * @return {@link Document} oder {@code null}.
 	 */
 	public Document getDocument() {
 		final Node node = this.node;
@@ -357,23 +428,22 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		final Attr item = this.getDocument().createAttribute(name);
 		final NamedNodeMap list = this.getAttrMap();
 		list.setNamedItem(item);
-		return this.newAttrData().use(item);
+		return this.newAttrData().useNode(item);
 	}
 
 	public AttrData<GThiz> newAttr(final String uri, final String name) {
 		final Attr item = this.getDocument().createAttributeNS(uri, name);
 		final NamedNodeMap list = this.getAttrMap();
 		list.setNamedItemNS(item);
-		return this.newAttrData().use(item);
+		return this.newAttrData().useNode(item);
 	}
 
 	public ChldData<GThiz> newText() throws DOMException {
-		this.checkNode();
 		final Node node = this.node;
 		final Document docu = this.getDocument();
 		final Node text = docu.createTextNode("");
 		node.appendChild(text);
-		return this.newChldData().use(text);
+		return this.newChldData().useNode(text);
 	}
 
 	/**
@@ -400,12 +470,11 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
 	 */
 	public ChldData<GThiz> newElem(final String name) throws DOMException {
-		this.checkNode();
 		final Node node = this.node;
 		final Document docu = this.getDocument();
 		final Node elem = docu.createElement(name);
 		node.appendChild(elem);
-		return this.newChldData().use(elem);
+		return this.newChldData().useNode(elem);
 	}
 
 	/**
@@ -419,56 +488,72 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
 	 */
 	public ChldData<GThiz> newElem(final String uri, final String name) throws DOMException {
-		this.checkNode();
 		final Node node = this.node;
 		final Document docu = this.getDocument();
 		final Node elem = docu.createElementNS(uri, name);
 		node.appendChild(elem);
-		return this.newChldData().use(elem);
+		return this.newChldData().useNode(elem);
 	}
 
 	public AttrData<GThiz> openAttr(final int index) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
-		return this.newAttrData().use(item);
+		return this.newAttrData().useNode(item);
 	}
 
 	public AttrData<GThiz> openAttr(final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItem(name);
-		return this.newAttrData().use(item);
+		return this.newAttrData().useNode(item);
 	}
 
 	public AttrData<GThiz> openAttr(final String uri, final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItemNS(uri, name);
-		return this.newAttrData().use(item);
+		return this.newAttrData().useNode(item);
 	}
 
 	public ChldData<GThiz> openChld(final int index) {
 		final NodeList list = this.getChldList();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
-		return this.newChldData().use(item);
+		return this.newChldData().useNode(item);
 	}
 
 	public ChldData<GThiz> openChld(final String name) {
-
+		// TODO
 		return this.newChldData();
 	}
 
 	public ChldData<GThiz> openChld(final String uri, final String name) {
+		// TODO
 
 		return this.newChldData();
 	}
 
 	{}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected abstract GThiz thiz();
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see #getNode()
+	 */
 	@Override
 	public Node build() throws IllegalStateException {
 		return this.getNode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Objects.toStringCall(this, this.getNode());
 	}
 
 }

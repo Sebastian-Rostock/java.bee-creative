@@ -25,8 +25,8 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public XMLNode use(Node node) {
-		return super.use(node);
+	public XMLNode useNode(Node node) {
+		return super.useNode(node);
 	}
 
 	/**

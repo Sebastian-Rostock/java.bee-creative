@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
+import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Objects;
@@ -45,7 +46,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für das Schema einer {@link DocumentBuilderFactory}.
+	 * Diese Klasse implementiert den Konfigurator für das {@link Schema} einer {@link DocumentBuilderFactory}.
 	 * 
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -295,9 +296,10 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see #useFactory(DocumentBuilderFactory)
 	 * @see #updateFactory()
 	 * @return {@link DocumentBuilderFactory}.
+	 * @throws SAXException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 */
-	public DocumentBuilderFactory getFactory() throws ParserConfigurationException {
+	public DocumentBuilderFactory getFactory() throws SAXException, ParserConfigurationException {
 		DocumentBuilderFactory result = this.factory;
 		if (result != null) return result;
 		result = DocumentBuilderFactory.newInstance();
@@ -333,11 +335,12 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * {@link #openSchemaData()}, {@link #openFeatureData()}, {@link #openPropertyData()} und {@link #openAttributeData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
+	 * @throws SAXException Wenn {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateFactory() throws ParserConfigurationException {
+	public GThiz updateFactory() throws SAXException, ParserConfigurationException {
 		final DocumentBuilderFactory factory = this.getFactory();
-		factory.setSchema(this.schemaData.build());
+		factory.setSchema(this.schemaData.getSchema());
 		final PropertyData<GThiz> propertyData = this.propertyData;
 		factory.setCoalescing(propertyData.forCoalescing().getBoolean());
 		factory.setExpandEntityReferences(propertyData.forExpandEntityReferences().getBoolean());
@@ -347,7 +350,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		factory.setValidating(propertyData.forValidating().getBoolean());
 		factory.setXIncludeAware(propertyData.forXIncludeAware().getBoolean());
 		for (final Entry<String, Boolean> entry: this.featureData) {
-			factory.setFeature(entry.getKey(), entry.getValue().booleanValue());
+			factory.setFeature(entry.getKey(), Boolean.TRUE.equals(entry.getValue()));
 		}
 		for (final Entry<String, Object> entry: this.attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
@@ -418,7 +421,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	public DocumentBuilderFactory build() throws IllegalStateException {
 		try {
 			return this.getFactory();
-		} catch (final ParserConfigurationException cause) {
+		} catch (final SAXException | ParserConfigurationException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}

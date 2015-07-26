@@ -1,14 +1,21 @@
 package bee.creative.xml;
 
 import java.io.StringWriter;
+import java.io.Writer;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import bee.creative.util.Objects;
 
+/**
+ * Diese Klasse implementiert einen Konfigurator zum {@link #transform() Transformieren} sowie {@link #transformToString() Formatieren} eines {@link Document}.
+ * 
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+ */
 public final class XMLFormatter {
 
 	/**
@@ -102,20 +109,17 @@ public final class XMLFormatter {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData sourceData = //
-		new SourceData();
+	final SourceData sourceData = new SourceData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openResultData()}.
 	 */
-	final ResultData resultData = //
-		new ResultData();
+	final ResultData resultData = new ResultData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openTransformerData()}.
 	 */
-	final TransformerData transformerData = //
-		new TransformerData();
+	final TransformerData transformerData = new TransformerData();
 
 	{}
 
@@ -133,8 +137,17 @@ public final class XMLFormatter {
 		return this;
 	}
 
+	/**
+	 * Diese Methode führt die Transformation aus und gibt {@code this} zurück.
+	 * 
+	 * @see #openSourceData()
+	 * @see #openResultData()
+	 * @see Transformer#transform(Source, Result)
+	 * @return {@code this}.
+	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst.
+	 */
 	public XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this.transformerData.build();
+		final Transformer transformer = this.transformerData.getTransformer();
 		synchronized (transformer) {
 			final Source source = this.sourceData.build();
 			final Result result = this.resultData.build();
@@ -144,31 +157,61 @@ public final class XMLFormatter {
 	}
 
 	/**
-	 * Diese Methode gibt das zurück.
+	 * Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.<br>
+	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein temporäres {@link DOMResult} eingesetzt.
 	 * 
-	 * @return
-	 * @throws TransformerException
+	 * @see ResultData#useNode()
+	 * @see #openResultData()
+	 * @return Dokumentknoten.
+	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst.
 	 */
-	public String transformToText() throws TransformerException {
-		final StringWriter result = new StringWriter();
-		this.openResultData().useWriter(result).closeResultData().transform();
-		return result.toString();
-	}
-
 	public Node transformToNode() throws TransformerException {
 		final DOMResult result = new DOMResult();
 		this.openResultData().useResult(result).closeResultData().transform();
 		return result.getNode();
 	}
 
+	/**
+	 * Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.<br>
+	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein temporärer {@link StringWriter} eingesetzt.
+	 * 
+	 * @see StringWriter
+	 * @see ResultData#useWriter(Writer)
+	 * @see #openResultData()
+	 * @return Zeichenkette.
+	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst.
+	 */
+	public String transformToString() throws TransformerException {
+		final StringWriter result = new StringWriter();
+		this.openResultData().useWriter(result).closeResultData().transform().openResultData().resetResult();
+		return result.toString();
+	}
+
+	/**
+	 * Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
+	 * 
+	 * @see Transformer#transform(Source, Result)
+	 * @return Konfigurator.
+	 */
 	public SourceData openSourceData() {
 		return this.sourceData;
 	}
 
+	/**
+	 * Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
+	 * 
+	 * @see Transformer#transform(Source, Result)
+	 * @return Konfigurator.
+	 */
 	public ResultData openResultData() {
 		return this.resultData;
 	}
 
+	/**
+	 * Diese Methode öffnet den Konfigurator für den {@link Transformer} und gibt ihn zurück.
+	 * 
+	 * @return Konfigurator.
+	 */
 	public TransformerData openTransformerData() {
 		return this.transformerData;
 	}

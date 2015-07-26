@@ -8,13 +8,16 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.validation.Validator;
 import org.w3c.dom.Node;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Result}, das für die Ausgabedaten eines {@link Transformer} genutzt wird.
+ * Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Result}, das für die Ausgabedaten eines {@link Transformer} oder {@link Validator}
+ * genutzt wird.
  * 
+ * @see Validator#validate(Source, Result)
  * @see Transformer#transform(Source, Result)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.

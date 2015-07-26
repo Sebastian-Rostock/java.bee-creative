@@ -157,7 +157,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link Templates} zur Erzeugung eines {@link Transformer}.
+	 * Diese Klasse implementiert den Konfigurator für die {@link Templates}.
 	 * 
 	 * @see Templates#newTransformer()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -254,10 +254,9 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @see #useTransformer(Transformer)
 	 * @see #updateTransformer()
 	 * @return {@link Transformer}.
-	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()}, {@link Templates#newTransformer()} bzw.
-	 *         {@link TransformerFactory#newTransformer()} eine entsprechende Ausnahme auslöst.
+	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()}, {@link TemplatesData#getTemplates()}, {@link Templates#newTransformer()}
+	 *         bzw. {@link TransformerFactory#newTransformer()} eine entsprechende Ausnahme auslöst.
 	 */
-
 	public Transformer getTransformer() throws TransformerConfigurationException {
 		Transformer result = this.transformer;
 		if (result != null) return result;

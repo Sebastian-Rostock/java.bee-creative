@@ -3,6 +3,7 @@ package bee.creative.xml;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import bee.creative.util.Builders.BaseBuilder;
@@ -18,13 +19,13 @@ import bee.creative.util.Objects;
 public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator einer {@link XPathFactory} eines {@link XPath}.
+	 * Diese Klasse implementiert den Konfigurator einer {@link XPathFactory}.
 	 * 
 	 * @see XPathFactory#newXPath()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers.
 	 */
-	public static abstract class FacroryData<GOwner> extends BaseXPathFactoryData<FacroryData<GOwner>> {
+	public static abstract class FactoryData<GOwner> extends BaseXPathFactoryData<FactoryData<GOwner>> {
 
 		/**
 		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
@@ -39,14 +40,14 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FacroryData<GOwner> thiz() {
+		protected FactoryData<GOwner> thiz() {
 			return this;
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link NamespaceContext} eines {@link XPath}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link NamespaceContext}.
 	 * 
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -74,7 +75,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver} einer {@link XPath}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver}.
 	 * 
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -102,7 +103,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver} einer {@link XPath}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver}.
 	 * 
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -139,7 +140,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFacroryData()}.
 	 */
-	final FacroryData<GThiz> facroryData = new FacroryData<GThiz>() {
+	final FactoryData<GThiz> facroryData = new FactoryData<GThiz>() {
 
 		@Override
 		public GThiz closeFacroryData() {
@@ -211,12 +212,12 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see #useXPath(XPath)
 	 * @see #updateXPath()
 	 * @return {@link XPath}.
+	 * @throws XPathFactoryConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme auslöst.
 	 */
-	public XPath getXPath() {
+	public XPath getXPath() throws XPathFactoryConfigurationException {
 		XPath result = this.xpath;
 		if (result != null) return result;
-		final XPathFactory x = this.facroryData.build();
-		result = x.newXPath();
+		result = this.facroryData.getFactory().newXPath();
 		this.useXPath(result);
 		this.updateXPath();
 		return result;
@@ -249,8 +250,9 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * {@link #openFunctionData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
+	 * @throws XPathFactoryConfigurationException Wenn {@link #getXPath()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateXPath() {
+	public GThiz updateXPath() throws XPathFactoryConfigurationException {
 		final XPath factory = this.getXPath();
 		for (final NamespaceContext value: this.contextData) {
 			factory.setNamespaceContext(value);
@@ -269,7 +271,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * 
 	 * @return Konfigurator.
 	 */
-	public FacroryData<GThiz> openFacroryData() {
+	public FactoryData<GThiz> openFacroryData() {
 		return this.facroryData;
 	}
 
@@ -318,7 +320,11 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 */
 	@Override
 	public XPath build() throws IllegalStateException {
-		return this.getXPath();
+		try {
+			return this.getXPath();
+		} catch (final XPathFactoryConfigurationException cause) {
+			throw new IllegalStateException(cause);
+		}
 	}
 
 	/**

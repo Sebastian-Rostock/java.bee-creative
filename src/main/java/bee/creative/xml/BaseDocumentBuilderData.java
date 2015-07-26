@@ -5,6 +5,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
@@ -18,7 +19,7 @@ import bee.creative.util.Objects;
 public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<DocumentBuilder, GThiz> {
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory} eines {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
 	 * 
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -46,7 +47,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler} eines {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
 	 * 
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -74,7 +75,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	}
 
 	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link EntityResolver} eines {@link DocumentBuilder}.
+	 * Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
 	 * 
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -104,7 +105,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	{}
 
 	/**
-	 * Dieses Feld speichert die {@link DocumentBuilderFactory}.
+	 * Dieses Feld speichert den {@link DocumentBuilder}.
 	 */
 	DocumentBuilder builder;
 
@@ -170,12 +171,13 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see #useBuilder(DocumentBuilder)
 	 * @see #updateBuilder()
 	 * @return {@link DocumentBuilder}.
+	 * @throws SAXException Wenn {@link FactoryData#getFactory()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public DocumentBuilder getBuilder() throws ParserConfigurationException {
+	public DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
 		DocumentBuilder result = this.builder;
 		if (result != null) return result;
-		result = this.factoryData.build().newDocumentBuilder();
+		result = this.factoryData.getFactory().newDocumentBuilder();
 		this.useBuilder(result);
 		this.updateBuilder();
 		return result;
@@ -208,9 +210,10 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * {@link #openHandlerData()} und {@link #openResolverData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
+	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateBuilder() throws ParserConfigurationException {
+	public GThiz updateBuilder() throws SAXException, ParserConfigurationException {
 		final DocumentBuilder builder = this.getBuilder();
 		for (final ErrorHandler value: this.handlerData) {
 			builder.setErrorHandler(value);
@@ -268,7 +271,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	public DocumentBuilder build() throws IllegalStateException {
 		try {
 			return this.getBuilder();
-		} catch (final ParserConfigurationException cause) {
+		} catch (final SAXException | ParserConfigurationException cause) {
 			throw new IllegalStateException(cause);
 		}
 	}

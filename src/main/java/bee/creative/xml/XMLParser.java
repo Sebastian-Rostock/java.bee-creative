@@ -90,12 +90,13 @@ public final class XMLParser {
 	 * Diese Methode parst die Eingabedaten in ein {@link Document} und gibt dieses zurück.
 	 * 
 	 * @return {@link Document}.
-	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
 	 * @throws IOException Wenn {@link DocumentBuilder#parse(InputSource)} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
+	 * @throws ParserConfigurationException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Document parse() throws SAXException, IOException {
+	public Document parse() throws IOException, SAXException, ParserConfigurationException {
 		final InputSource source = this.sourceData.getInputSource();
-		final DocumentBuilder builder = this.builderData.build();
+		final DocumentBuilder builder = this.builderData.getBuilder();
 		final Document result = builder.parse(source);
 		return result;
 	}
@@ -104,10 +105,11 @@ public final class XMLParser {
 	 * Diese Methode erzeugt ein neues {@link Document} und gibt dieses zurück.
 	 * 
 	 * @return {@link Document}.
+	 * @throws SAXException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Document create() throws ParserConfigurationException {
-		final DocumentBuilder builder = this.builderData.build();
+	public Document create() throws SAXException, ParserConfigurationException {
+		final DocumentBuilder builder = this.builderData.getBuilder();
 		final Document result = builder.newDocument();
 		return result;
 	}

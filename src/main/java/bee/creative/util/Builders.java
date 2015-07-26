@@ -403,7 +403,7 @@ public class Builders {
 	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
-		if (converter == null) throw new NullPointerException();
+		if (converter == null) throw new NullPointerException("converter = null");
 		return new Builder<GOutput>() {
 
 			@Override

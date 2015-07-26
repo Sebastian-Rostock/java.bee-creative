@@ -127,12 +127,13 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * 
 	 * @see #useTemplates(Templates)
 	 * @return {@link Templates} oder {@code null}.
-	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst.
+	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link TransformerFactory#newTemplates(Source)} eine entsprechende
+	 *         Ausnahme auslöst.
 	 */
 	public Templates getTemplates() throws TransformerConfigurationException {
 		Templates result = this.templates;
 		if (result != null) return result;
-		final Source source = this.scriptData.build();
+		final Source source = this.scriptData.getSource();
 		if (source == null) return null;
 		result = this.factoryData.getFactory().newTemplates(source);
 		this.useTemplates(result);
