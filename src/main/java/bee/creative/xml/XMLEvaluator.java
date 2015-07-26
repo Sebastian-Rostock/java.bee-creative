@@ -62,7 +62,7 @@ public final class XMLEvaluator {
 			try {
 				final XPath xxath = XMLEvaluator.this.xpathData.getXPath();
 				return xxath.compile(input);
-			} catch (final XPathExpressionException | RuntimeException | XPathFactoryConfigurationException cause) {
+			} catch (final XPathExpressionException | XPathFactoryConfigurationException cause) {
 				throw new IllegalStateException(cause);
 			}
 		}
@@ -116,6 +116,15 @@ public final class XMLEvaluator {
 	}
 
 	/**
+	 * Diese Methode gibt den Puffer zurück, in dem die {@link #compile(String) kompilierten} Ausdrücke zur Wiederverwendung vorgehalten werden.
+	 * 
+	 * @return Puffer der Ausdrücke.
+	 */
+	public CacheData getCache() {
+		return this.cacheData;
+	}
+
+	/**
 	 * Diese Methode gibt den aktuellen Ausdruck zurück.
 	 * 
 	 * @return Ausdruck oder {@code null}.
@@ -131,9 +140,10 @@ public final class XMLEvaluator {
 	 * @see #useExpression(XPathExpression)
 	 * @param expression Ausdruck oder {@code null}.
 	 * @return {@code this}.
-	 * @throws IllegalStateException
+	 * @throws XPathExpressionException Wenn {@link #compile(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws XPathFactoryConfigurationException Wenn {@link #compile(String)} eine entsprechende Ausnahme auslöst.
 	 */
-	public XMLEvaluator useExpression(final String expression) throws IllegalStateException {
+	public XMLEvaluator useExpression(final String expression) throws XPathExpressionException, XPathFactoryConfigurationException {
 		return this.useExpression(this.compile(expression));
 	}
 
@@ -148,6 +158,11 @@ public final class XMLEvaluator {
 		return this;
 	}
 
+	/**
+	 * Diese Methode leert den Puffer der {@link #compile(String) kompilierten} Ausdrücke und gibt {@code this} zurück.
+	 * 
+	 * @return {@code this}.
+	 */
 	public XMLEvaluator resetCache() {
 		this.cacheData.entryMap().clear();
 		return this;
@@ -163,44 +178,115 @@ public final class XMLEvaluator {
 		return this.useExpression((XPathExpression)null);
 	}
 
-	public XPathExpression compile(final String expression) throws IllegalStateException {
+	/**
+	 * Diese Methode kompiliert den gegebenen Ausdruck und gibt ihn als {@link XPathExpression} zurück.<br>
+	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert. Die kompilierten Ausdrücke werden {@link #getCache() gepuffert}.
+	 * 
+	 * @param expression Ausdruck oder {@code null}.
+	 * @return {@link XPathExpression} oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link XPath#compile(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws XPathFactoryConfigurationException Wenn {@link XPathData#getXPath()} eine entsprechende Ausnahme auslöst.
+	 */
+	public XPathExpression compile(final String expression) throws XPathExpressionException, XPathFactoryConfigurationException {
 		if (expression == null) return null;
-		final XPathExpression result = this.cacheData.get(expression);
-		return result;
+		try {
+			final XPathExpression result = this.cacheData.get(expression);
+			return result;
+		} catch (final RuntimeException exception) {
+			final Throwable cause = exception.getCause();
+			if (cause instanceof XPathExpressionException) throw (XPathExpressionException)cause;
+			if (cause instanceof XPathFactoryConfigurationException) throw (XPathFactoryConfigurationException)cause;
+			throw exception;
+		}
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in den gegebenen Ergebnistyp und gibt das Ergebnis zurück.<br>
+	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert.
+	 * 
+	 * @see XPathConstants
+	 * @param resultType Ergebnistyp.
+	 * @return Ergebnis oser {@code null}.
+	 * @throws XPathExpressionException Wenn {@link XPathExpression#evaluate(Object, QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public Object evaluate(final QName resultType) throws XPathExpressionException {
+		if (this.expression == null) return null;
 		final Object result = this.expression.evaluate(this.base, resultType);
 		return result;
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Knoten und diesen zurück.
+	 * 
+	 * @see #evaluate(QName)
+	 * @see XPathConstants#NODE
+	 * @return Knoten oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link #evaluate(QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public Node evaluateNode() throws XPathExpressionException {
 		final Object result = this.evaluate(XPathConstants.NODE);
 		return (Node)result;
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in eine Zeichenkette und diese zurück.
+	 * 
+	 * @see #evaluate(QName)
+	 * @see XPathConstants#STRING
+	 * @return Zeichenkette oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link #evaluate(QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public String evaluateString() throws XPathExpressionException {
 		final Object result = this.evaluate(XPathConstants.STRING);
 		return (String)result;
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Wahrheitswert und diesen zurück.
+	 * 
+	 * @see #evaluate(QName)
+	 * @see XPathConstants#BOOLEAN
+	 * @return Wahrheitswert oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link #evaluate(QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public Boolean evaluateBoolean() throws XPathExpressionException {
 		final Object result = this.evaluate(XPathConstants.BOOLEAN);
 		return (Boolean)result;
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Zahlenwert und diesen zurück.
+	 * 
+	 * @see #evaluate(QName)
+	 * @see XPathConstants#NUMBER
+	 * @return Zahlenwert oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link #evaluate(QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public Number evaluateNumber() throws XPathExpressionException {
 		final Object result = this.evaluate(XPathConstants.NUMBER);
 		return (Number)result;
 	}
 
+	/**
+	 * Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in eine Knotenliste und diesen zurück.
+	 * 
+	 * @see #evaluate(QName)
+	 * @see XPathConstants#NODESET
+	 * @return Knotenliste oder {@code null}.
+	 * @throws XPathExpressionException Wenn {@link #evaluate(QName)} eine entsprechende Ausnahme auslöst.
+	 */
 	public NodeList evaluateNodeList() throws XPathExpressionException {
 		final Object result = this.evaluate(XPathConstants.NODESET);
 		return (NodeList)result;
 	}
 
+	/**
+	 * Diese Methode öffnet den Konfigurator für den {@link XPath} und gibt ihn zurück.
+	 * 
+	 * @return Konfigurator.
+	 */
 	public XPathData openXpathData() {
-		return xpathData;
+		return this.xpathData;
 	}
 
 	{}

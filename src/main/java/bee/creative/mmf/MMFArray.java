@@ -172,7 +172,7 @@ public class MMFArray extends IAMBaseArray {
 	 */
 	@Override
 	protected MMFArray newSection(final int offset, final int length) {
-		return this;
+		return MMFArray.EMPTY;
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class MMFArray extends IAMBaseArray {
 	 */
 	@Override
 	public final MMFArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return this.newSection(0, 0);
+		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return MMFArray.EMPTY;
 		return this.newSection(offset, length);
 	}
 

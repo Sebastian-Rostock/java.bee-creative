@@ -129,7 +129,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 				final GOwner owner = this.closeChld();
 				if (!this.hasNode()) return owner;
 				final Node parent = owner.getNode();
-				parent.removeChild(this.node);
+				parent.removeChild(this.getNode());
 				return owner;
 			} catch (final RuntimeException cause) {
 				throw new IllegalStateException(cause);
@@ -267,11 +267,6 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		return this.thiz();
 	}
 
-	protected GThiz useNode(final Node node) {
-		this.node = node;
-		return this.thiz();
-	}
-
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
 	 * 
@@ -330,7 +325,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @return Knotentyp oder {@code 0}.
 	 */
 	public int getType() {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return 0;
 		return node.getNodeType();
 	}
@@ -345,27 +340,76 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		return this.node;
 	}
 
+	/**
+	 * Diese Methode setzt den {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
+	 * 
+	 * @param node Knoten oder {@code null}.
+	 * @return {@code this}.
+	 */
+	protected GThiz useNode(final Node node) {
+		this.node = node;
+		return this.thiz();
+	}
+
+	/**
+	 * Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück zurück.
+	 * 
+	 * @see #getValue(String)
+	 * @return Wert bzw. Inhalt oder {@code null}.
+	 */
 	public String getValue() {
 		return this.getValue(null);
 	}
 
+	/**
+	 * Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück.<br>
+	 * Wenn der Knoten ein {@link #hasType_ELEM() Elementknoten} ist, wird dessen {@link Node#getTextContent() Inhalt} geliefert. Wenn es {@link #hasNode() keinen
+	 * aktuellen Knoten gibt}, wird der gegebene Vorgabewert geliefert. Andernfalls wird der {@link Node#getNodeValue() Wert} des Knoten geliefert.
+	 * 
+	 * @see #hasType_ELEM()
+	 * @see Node#getNodeValue()
+	 * @see Node#getTextContent()
+	 * @param defaultValue Vorgabewert.
+	 * @return Wert bzw. Inhalt oder Vorgabewert.
+	 */
 	public String getValue(final String defaultValue) {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return defaultValue;
 		if (node.getNodeType() == Node.ELEMENT_NODE) return node.getTextContent();
 		return node.getNodeValue();
 	}
 
 	/**
+	 * Diese Methode setzt den Wert des {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
+	 * 
+	 * @see Node#setNodeValue(String)
+	 * @see Node#setTextContent(String)
+	 * @param value Wert.
+	 * @return {@code this}.
+	 * @throws DOMException Wenn {@link Node#setNodeValue(String)} bzw. {@link Node#setTextContent(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
+	 */
+	public GThiz useValue(final String value) throws DOMException, IllegalStateException {
+		if (!this.hasNode()) throw new IllegalStateException();
+		final Node node = this.getNode();
+		if (node.getNodeType() == Node.ELEMENT_NODE) {
+			node.setTextContent(value);
+		} else {
+			node.setNodeValue(value);
+		}
+		return this.thiz();
+	}
+
+	/**
 	 * Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
-	 * Wenn der der aktuelle Knoten {@code null} ist oder keinen Elternknoten hat, wird {@code null} geliefert.
+	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keinen Elternknoten hat, wird {@code null} geliefert.
 	 * 
 	 * @see Attr#getOwnerElement()
 	 * @see Node#getParentNode()
 	 * @return Elternknoten oder {@code null}.
 	 */
 	public Node getParent() {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return null;
 		if (node.getNodeType() == Node.ATTRIBUTE_NODE) return ((Attr)node).getOwnerElement();
 		return node.getParentNode();
@@ -379,67 +423,121 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @return {@link Document} oder {@code null}.
 	 */
 	public Document getDocument() {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return null;
 		if (node instanceof Document) return (Document)node;
 		return node.getOwnerDocument();
 	}
 
+	/**
+	 * Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Attribute hat, wird {@link #EMPTY_ATTR_MAP} geliefert.
+	 * 
+	 * @see Node#getAttributes()
+	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}.
+	 */
 	public NamedNodeMap getAttrMap() {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_ATTR_MAP;
-		final NamedNodeMap list = node.getAttributes();
-		if (list == null) return BaseNodeData.EMPTY_ATTR_MAP;
-		return list;
+		final NamedNodeMap result = node.getAttributes();
+		if (result == null) return BaseNodeData.EMPTY_ATTR_MAP;
+		return result;
 	}
 
+	/**
+	 * Diese Methode gibt die Anzahl der Attributknoten des {@link #getNode() aktuellen Knoten} zurück.
+	 * 
+	 * @see #getAttrMap()
+	 * @return Attributknotenanzahl.
+	 */
 	public int getAttrCount() {
 		return this.getAttrMap().getLength();
 	}
 
+	/**
+	 * Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Kindknoten hat, wird {@link #EMPTY_CHLD_LIST} geliefert.
+	 * 
+	 * @see Node#getChildNodes()
+	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}.
+	 */
 	public NodeList getChldList() {
-		final Node node = this.node;
+		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_CHLD_LIST;
-		final NodeList list = node.getChildNodes();
-		if (list == null) return BaseNodeData.EMPTY_CHLD_LIST;
-		return list;
+		final NodeList result = node.getChildNodes();
+		if (result == null) return BaseNodeData.EMPTY_CHLD_LIST;
+		return result;
 	}
 
+	/**
+	 * Diese Methode gibt die Anzahl der Kindknoten des {@link #getNode() aktuellen Knoten} zurück.
+	 * 
+	 * @see #getChldList()
+	 * @return Kindknotenanzahl.
+	 */
 	public int getChldCount() {
 		return this.getChldList().getLength();
 	}
 
+	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn es einen {@link #getNode() aktuelle Knoten} gibt, d.h. dieser nicht {@code null} ist.
+	 * 
+	 * @return {@code true}, wenn {@link #getNode()} nicht {@code null} liefert.
+	 */
 	public boolean hasNode() {
 		return this.getNode() != null;
 	}
 
-	public GThiz useValue(final String value) {
-		final Node node = this.node;
-		if (node == null) throw new IllegalStateException();
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			node.setTextContent(value);
-		} else {
-			node.setNodeValue(value);
-		}
-		return this.thiz();
-	}
-
-	public AttrData<GThiz> newAttr(final String name) {
+	/**
+	 * Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen Namen in die Attributknotenliste ein und gibt den Konfigurator dieses Knoten
+	 * zurück.
+	 * 
+	 * @see Document#createAttribute(String)
+	 * @see NamedNodeMap#setNamedItem(Node)
+	 * @param name Name.
+	 * @return Konfigurator des Attributknoten.
+	 * @throws DOMException Wenn {@link NamedNodeMap#setNamedItem(Node)} bzw. {@link Document#createAttribute(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
+	 */
+	public AttrData<GThiz> newAttr(final String name) throws DOMException, IllegalStateException {
+		if (!this.hasNode()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttribute(name);
 		final NamedNodeMap list = this.getAttrMap();
 		list.setNamedItem(item);
 		return this.newAttrData().useNode(item);
 	}
 
-	public AttrData<GThiz> newAttr(final String uri, final String name) {
+	/**
+	 * Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen URI und Namen in die Attributknotenliste ein und gibt den Konfigurator dieses
+	 * Knoten zurück.
+	 * 
+	 * @see Document#createAttributeNS(String, String)
+	 * @see NamedNodeMap#setNamedItemNS(Node)
+	 * @param uri URI.
+	 * @param name Name.
+	 * @return Konfigurator des Attributknoten.
+	 * @throws DOMException Wenn {@link NamedNodeMap#setNamedItemNS(Node)} bzw. {@link Document#createAttributeNS(String, String)} eine entsprechende Ausnahme
+	 *         auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
+	 */
+	public AttrData<GThiz> newAttr(final String uri, final String name) throws DOMException, IllegalStateException {
+		if (!this.hasType_ELEM()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttributeNS(uri, name);
 		final NamedNodeMap list = this.getAttrMap();
 		list.setNamedItemNS(item);
 		return this.newAttrData().useNode(item);
 	}
 
-	public ChldData<GThiz> newText() throws DOMException {
-		final Node node = this.node;
+	/**
+	 * Diese Methode fügt einen neuen {@link Text Textknoten} an die Kindknotenliste an und gibt den Konfigurator dieses Knoten zurück.
+	 * 
+	 * @return Konfigurator des Textknoten.
+	 * @throws DOMException Wenn {@link Node#appendChild(Node)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
+	 */
+	public ChldData<GThiz> newText() throws DOMException, IllegalStateException {
+		if (!this.hasNode()) throw new IllegalStateException();
+		final Node node = this.getNode();
 		final Document docu = this.getDocument();
 		final Node text = docu.createTextNode("");
 		node.appendChild(text);
@@ -447,30 +545,32 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/**
-	 * Diese Methode fügt an der {@link #index() aktuellen Position} einen neuen {@link Text} mit dem gegebenen Wert ein, bewegt die {@link #index() aktuelle
-	 * Position} hinter den eingefügten Knoten und gibt {@code this} zurück.
+	 * Diese Methode fügt einen neuen {@link Text Textknoten} mit dem gegebenen Wert an die Kindknotenliste an und gibt {@code this} zurück.
 	 * 
-	 * @see #insert(Node)
-	 * @see Document#createTextNode(String)
+	 * @see #newText()
+	 * @see #useValue(String)
 	 * @param text Wert.
 	 * @return {@code this}.
-	 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+	 * @throws DOMException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz newText(final String text) throws DOMException {
+	public GThiz newText(final String text) throws DOMException, IllegalStateException {
 		return this.newText().useValue(text).closeChld();
 	}
 
 	/**
-	 * Diese Methode fügt an der {@link #index() aktuellen Position} ein neues {@link Element} mit dem gegebenen Namen ein, bewegt die {@link #index() aktuelle
-	 * Position} hinter den eingefügten Knoten und gibt einen neuen {@link XMLNode} zum eingefügten {@link Element} zurück.
+	 * Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen Namen an die Kindknotenliste an und gibt den Konfigurator dieses Knoten
+	 * zurück.
 	 * 
 	 * @see Document#createElement(String)
 	 * @param name Name.
-	 * @return {@link XMLNode} zum erzeugten Knoten.
-	 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+	 * @return Konfigurator des Elementknoten.
+	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElement(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public ChldData<GThiz> newElem(final String name) throws DOMException {
-		final Node node = this.node;
+	public ChldData<GThiz> newElem(final String name) throws DOMException, IllegalStateException {
+		if (!this.hasNode()) throw new IllegalStateException();
+		final Node node = this.getNode();
 		final Document docu = this.getDocument();
 		final Node elem = docu.createElement(name);
 		node.appendChild(elem);
@@ -478,55 +578,117 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/**
-	 * Diese Methode fügt an der {@link #index() aktuellen Position} ein neues {@link Element} mit den gegebenen Eigenschaften ein, bewegt die {@link #index()
-	 * aktuelle Position} hinter den eingefügten Knoten und gibt einen neuen {@link XMLNode} zum eingefügten {@link Element} zurück.
+	 * Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen URI und Namen an die Kindknotenliste an und gibt den Konfigurator dieses
+	 * Knoten zurück.
 	 * 
 	 * @see Document#createElementNS(String, String)
-	 * @param uri Uri.
+	 * @param uri URI.
 	 * @param name Name.
-	 * @return {@link XMLNode} zum erzeugten Knoten.
-	 * @throws DOMException Wenn Eingaben oder Modifikation ungültig sind.
+	 * @return Konfigurator des Elementknoten.
+	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElementNS(String, String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public ChldData<GThiz> newElem(final String uri, final String name) throws DOMException {
-		final Node node = this.node;
+	public ChldData<GThiz> newElem(final String uri, final String name) throws DOMException, IllegalStateException {
+		if (!this.hasNode()) throw new IllegalStateException();
+		final Node node = this.getNode();
 		final Document docu = this.getDocument();
 		final Node elem = docu.createElementNS(uri, name);
 		node.appendChild(elem);
 		return this.newChldData().useNode(elem);
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück.<br>
+	 * Negative Positionen zählen vom Ende der Attributknotenliste.
+	 * 
+	 * @see #getAttrMap()
+	 * @param index Position.
+	 * @return Konfigurator.
+	 */
 	public AttrData<GThiz> openAttr(final int index) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newAttrData().useNode(item);
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen Namen zurück.
+	 * 
+	 * @see NamedNodeMap#getNamedItem(String)
+	 * @param name Name.
+	 * @return Konfigurator.
+	 */
 	public AttrData<GThiz> openAttr(final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItem(name);
 		return this.newAttrData().useNode(item);
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen URI und Namen zurück.
+	 * 
+	 * @see NamedNodeMap#getNamedItemNS(String, String)
+	 * @param uri URI.
+	 * @param name Name.
+	 * @return Konfigurator.
+	 */
 	public AttrData<GThiz> openAttr(final String uri, final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItemNS(uri, name);
 		return this.newAttrData().useNode(item);
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück.<br>
+	 * Negative Positionen zählen vom Ende der Kindknotenliste.
+	 * 
+	 * @see #getChldList()
+	 * @param index Position.
+	 * @return Konfigurator.
+	 */
 	public ChldData<GThiz> openChld(final int index) {
 		final NodeList list = this.getChldList();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newChldData().useNode(item);
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen Namen zurück.
+	 * 
+	 * @see #getChldList()
+	 * @see Node#getNodeType()
+	 * @see Node#getNodeName()
+	 * @param name Name.
+	 * @return Konfigurator.
+	 */
 	public ChldData<GThiz> openChld(final String name) {
-		// TODO
+		final NodeList list = this.getChldList();
+		for (int i = 0, length = list.getLength(); i < length; i++) {
+			final Node item = list.item(i);
+			if ((item.getNodeType() == Node.ELEMENT_NODE) && Objects.equals(name, item.getNodeName())) //
+				return this.newChldData().useNode(item);
+		}
 		return this.newChldData();
 	}
 
+	/**
+	 * Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen URI und Namen zurück.
+	 * 
+	 * @see #getChldList()
+	 * @see Node#getNodeType()
+	 * @see Node#getLocalName()
+	 * @see Node#getNamespaceURI()
+	 * @param uri URI.
+	 * @param name Name.
+	 * @return Konfigurator.
+	 */
 	public ChldData<GThiz> openChld(final String uri, final String name) {
-		// TODO
-
+		final NodeList list = this.getChldList();
+		for (int i = 0, length = list.getLength(); i < length; i++) {
+			final Node item = list.item(i);
+			if ((item.getNodeType() == Node.ELEMENT_NODE) && Objects.equals(uri, item.getNamespaceURI()) && Objects.equals(name, item.getLocalName())) //
+				return this.newChldData().useNode(item);
+		}
 		return this.newChldData();
 	}
 
