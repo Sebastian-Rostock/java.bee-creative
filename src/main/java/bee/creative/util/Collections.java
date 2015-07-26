@@ -25,10 +25,10 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	static abstract class AbstractReverseList<GValue> extends AbstractList<GValue> {
+	static abstract class BaseReverseList<GValue> extends AbstractList<GValue> {
 
 		/**
-		 * Diese Klasse implementiert den {@link ListIterator} einer {@link AbstractReverseList}.
+		 * Diese Klasse implementiert den {@link ListIterator} einer {@link BaseReverseList}.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Elemente.
@@ -36,27 +36,27 @@ public class Collections {
 		static final class ReverseIterator<GValue> implements ListIterator<GValue> {
 
 			/**
-			 * Dieses Feld speichert die {@link AbstractReverseList}.
+			 * Dieses Feld speichert die {@link BaseReverseList}.
 			 */
-			final AbstractReverseList<GValue> list;
+			final BaseReverseList<GValue> list;
 
 			/**
-			 * Dieses Feld speichert die Größe der {@link AbstractReverseList}.
+			 * Dieses Feld speichert die Größe der {@link BaseReverseList}.
 			 */
 			int size;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractReverseList#list}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link BaseReverseList#list}.
 			 */
 			final ListIterator<GValue> iterator;
 
 			/**
-			 * Dieser Konstruktor initialisiert {@link AbstractReverseList} und Index.
+			 * Dieser Konstruktor initialisiert {@link BaseReverseList} und Index.
 			 * 
-			 * @param list {@link AbstractReverseList}.
+			 * @param list {@link BaseReverseList}.
 			 * @param index Index.
 			 */
-			public ReverseIterator(final AbstractReverseList<GValue> list, final int index) {
+			public ReverseIterator(final BaseReverseList<GValue> list, final int index) {
 				this.size = list.size();
 				this.list = list;
 				this.iterator = list.listIterator(this.size - index);
@@ -151,7 +151,7 @@ public class Collections {
 		 * @param list {@link List}
 		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 		 */
-		public AbstractReverseList(final List<GValue> list) throws NullPointerException {
+		public BaseReverseList(final List<GValue> list) throws NullPointerException {
 			if (list == null) throw new NullPointerException();
 			this.list = list;
 		}
@@ -295,10 +295,10 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	static abstract class AbstractChainedList<GValue> extends AbstractList<GValue> {
+	static abstract class BaseChainedList<GValue> extends AbstractList<GValue> {
 
 		/**
-		 * Diese Klasse implementiert den {@link ListIterator} zu {@link AbstractChainedList}.
+		 * Diese Klasse implementiert den {@link ListIterator} zu {@link BaseChainedList}.
 		 * 
 		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Elemente.
@@ -306,12 +306,12 @@ public class Collections {
 		static final class ChainedIterator<GValue> implements ListIterator<GValue> {
 
 			/**
-			 * Dieses Feld speichert die {@link AbstractChainedList}.
+			 * Dieses Feld speichert die {@link BaseChainedList}.
 			 */
-			final AbstractChainedList<GValue> list;
+			final BaseChainedList<GValue> list;
 
 			/**
-			 * Dieses Feld speichert die Größe von {@link AbstractChainedList#list1}.
+			 * Dieses Feld speichert die Größe von {@link BaseChainedList#list1}.
 			 */
 			int size;
 
@@ -321,22 +321,22 @@ public class Collections {
 			ListIterator<GValue> iterator;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractChainedList#list1}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link BaseChainedList#list1}.
 			 */
 			final ListIterator<GValue> iterator1;
 
 			/**
-			 * Dieses Feld speichert den {@link ListIterator} von {@link AbstractChainedList#list2}.
+			 * Dieses Feld speichert den {@link ListIterator} von {@link BaseChainedList#list2}.
 			 */
 			final ListIterator<GValue> iterator2;
 
 			/**
-			 * Dieser Konstruktor initialisiert {@link AbstractChainedList} und Index.
+			 * Dieser Konstruktor initialisiert {@link BaseChainedList} und Index.
 			 * 
-			 * @param list {@link AbstractChainedList}.
+			 * @param list {@link BaseChainedList}.
 			 * @param index Index.
 			 */
-			public ChainedIterator(final AbstractChainedList<GValue> list, final int index) {
+			public ChainedIterator(final BaseChainedList<GValue> list, final int index) {
 				this.size = list.list1.size();
 				this.list = list;
 				if (index < this.size) {
@@ -456,7 +456,7 @@ public class Collections {
 		 * @param extendMode Erweiterungsmodus.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public AbstractChainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
+		public BaseChainedList(final List<GValue> values1, final List<GValue> values2, final boolean extendMode) throws NullPointerException {
 			if ((values1 == null) || (values2 == null)) throw new NullPointerException();
 			this.extendMode = extendMode;
 			this.list1 = values1;
@@ -620,7 +620,7 @@ public class Collections {
 	 * @param <GEntry> Typ der Elemente dieser {@link List}.
 	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
 	 */
-	static abstract class AbstractTranscodedList<GEntry, GEntry2> extends AbstractList<GEntry> {
+	static abstract class BaseTranscodedList<GEntry, GEntry2> extends AbstractList<GEntry> {
 
 		/**
 		 * Dieses Feld speichert die {@link List} mit den internen Elementen.
@@ -649,7 +649,7 @@ public class Collections {
 		 *        gültigen Eingabe für die Umwandlung.
 		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 		 */
-		public AbstractTranscodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
+		public BaseTranscodedList(final List<GEntry2> data, final FilterConverter<? super GEntry, ? extends GEntry2> parser,
 			final FilterConverter<? super GEntry2, ? extends GEntry> formatter) throws NullPointerException {
 			if ((data == null) || (parser == null) || (formatter == null)) throw new NullPointerException();
 			this.data = data;
@@ -839,7 +839,7 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	public static final class ReverseList<GValue> extends AbstractReverseList<GValue> {
+	public static final class ReverseList<GValue> extends BaseReverseList<GValue> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link List}.
@@ -867,7 +867,7 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	public static final class ReverseRandomAccessList<GValue> extends AbstractReverseList<GValue> implements RandomAccess {
+	public static final class ReverseRandomAccessList<GValue> extends BaseReverseList<GValue> implements RandomAccess {
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link List}.
@@ -895,7 +895,7 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	public static final class ChainedList<GValue> extends AbstractChainedList<GValue> {
+	public static final class ChainedList<GValue> extends BaseChainedList<GValue> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen,
@@ -919,7 +919,7 @@ public class Collections {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Elemente.
 	 */
-	public static final class ChainedRandomAccessList<GValue> extends AbstractChainedList<GValue> implements RandomAccess {
+	public static final class ChainedRandomAccessList<GValue> extends BaseChainedList<GValue> implements RandomAccess {
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link List}s und den Erweiterungsmodus. Wenn ein Elemente zwischen beiden {@link List}s eingefügt werden sollen,
@@ -1452,7 +1452,7 @@ public class Collections {
 	 * @param <GEntry> Typ der Elemente dieser {@link List}.
 	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
 	 */
-	public static final class TranscodedList<GEntry, GEntry2> extends AbstractTranscodedList<GEntry, GEntry2> {
+	public static final class TranscodedList<GEntry, GEntry2> extends BaseTranscodedList<GEntry, GEntry2> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
@@ -1479,7 +1479,7 @@ public class Collections {
 	 * @param <GEntry> Typ der Elemente dieser {@link List}.
 	 * @param <GEntry2> Typ der Elemente der internen {@link List}.
 	 */
-	public static final class TranscodedRandomAccessList<GEntry, GEntry2> extends AbstractTranscodedList<GEntry, GEntry2> implements RandomAccess {
+	public static final class TranscodedRandomAccessList<GEntry, GEntry2> extends BaseTranscodedList<GEntry, GEntry2> implements RandomAccess {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Konvertierte {@link List}.
@@ -1668,7 +1668,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return -Iterators.skip(this.iterator(), -1) - 1;
+			return Iterables.size(this);
 		}
 
 		/**
@@ -1728,7 +1728,7 @@ public class Collections {
 		 */
 		@Override
 		public int size() {
-			return -Iterators.skip(this.iterator(), -1) - 1;
+			return Iterables.size(this);
 		}
 
 		/**

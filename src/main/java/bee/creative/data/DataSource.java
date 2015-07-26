@@ -17,7 +17,7 @@ public interface DataSource extends DataBase, DataInput, Closeable {
 	/**
 	 * Diese Methode liest die gegebene Anzahl an {@code byte}s und gibt diese als {@code int} interpretiert zurück.
 	 * 
-	 * @see Bytes#getInt(byte[], int, int)
+	 * @see Bytes#getIntBE(byte[], int, int)
 	 * @param size Anzahl der {@code byte}s (0..4).
 	 * @return Zahlenwert.
 	 * @throws IOException Wenn ein I/O Fehler eintritt.
@@ -27,7 +27,7 @@ public interface DataSource extends DataBase, DataInput, Closeable {
 	/**
 	 * Diese Methode liest die gegebene Anzahl an {@code byte}s und gibt diese als {@code long} interpretiert zurück.
 	 * 
-	 * @see Bytes#getLong(byte[], int, int)
+	 * @see Bytes#getLongBE(byte[], int, int)
 	 * @param size Anzahl der {@code byte}s (0..8).
 	 * @return Zahlenwert.
 	 * @throws IOException Wenn ein I/O Fehler eintritt.

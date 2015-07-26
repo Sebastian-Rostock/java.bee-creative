@@ -791,6 +791,12 @@ public class Iterables {
 
 	}
 
+	{}
+
+	public static int size(final Iterable<?> iterator) throws NullPointerException {
+		return -Iterators.skip(iterator.iterator(), -1) - 1;
+	}
+
 	/**
 	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterable}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
 	 * des {@link Iterable}s {@code true} zurück.

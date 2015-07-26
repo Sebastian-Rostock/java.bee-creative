@@ -61,7 +61,7 @@ public abstract class BaseDataSource implements DataSource {
 	public int readUnsignedByte() throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, 1);
-		return Bytes.get1(array, 0);
+		return Bytes.getInt1(array, 0);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public abstract class BaseDataSource implements DataSource {
 	public char readChar() throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, 2);
-		return (char)Bytes.get2(array, 0);
+		return (char)Bytes.getInt2BE(array, 0);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public abstract class BaseDataSource implements DataSource {
 	public int readInt() throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, 4);
-		return Bytes.get4(array, 0);
+		return Bytes.getInt4BE(array, 0);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public abstract class BaseDataSource implements DataSource {
 	public int readInt(final int size) throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, size);
-		return Bytes.getInt(array, 0, size);
+		return Bytes.getIntBE(array, 0, size);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public abstract class BaseDataSource implements DataSource {
 	public long readLong() throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, 8);
-		return Bytes.get8(array, 0);
+		return Bytes.getLongBE(array, 0);
 	}
 
 	/**
@@ -127,7 +127,7 @@ public abstract class BaseDataSource implements DataSource {
 	public long readLong(final int size) throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, size);
-		return Bytes.getLong(array, 0, size);
+		return Bytes.getLongBE(array, 0, size);
 	}
 
 	/**

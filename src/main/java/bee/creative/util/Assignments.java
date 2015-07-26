@@ -146,7 +146,7 @@ public class Assignments {
 		@SuppressWarnings ("javadoc")
 		static interface Entry {
 
-			public abstract void assign(Assignment<Object> scope);
+			public abstract void assign(Assignment<?> scope);
 
 		}
 
@@ -157,7 +157,7 @@ public class Assignments {
 			return new Entry() {
 
 				@Override
-				public void assign(final Assignment<Object> scope) {
+				public void assign(final Assignment<?> scope) {
 					assigner.assign(target, scope.assignment(source));
 				}
 
@@ -169,7 +169,7 @@ public class Assignments {
 			return new Entry() {
 
 				@Override
-				public void assign(final Assignment<Object> scope) {
+				public void assign(final Assignment<?> scope) {
 					target.assign(scope.assignment(source));
 				}
 

@@ -135,7 +135,7 @@ public class BufferDataSource extends BaseDataSource {
 				return this.data.getShort() & 0xFFFF;
 			case 3:
 				this.data.get(this.array, 0, 3);
-				return Bytes.get3(this.array, 0);
+				return Bytes.getInt3BE(this.array, 0);
 			case 4:
 				return this.data.getInt();
 			default:
@@ -165,18 +165,18 @@ public class BufferDataSource extends BaseDataSource {
 				return this.data.getShort() & 0xFFFF;
 			case 3:
 				this.data.get(this.array, 0, 3);
-				return Bytes.get3(this.array, 0);
+				return Bytes.getInt3BE(this.array, 0);
 			case 4:
 				return this.data.getInt();
 			case 5:
 				this.data.get(this.array, 0, 5);
-				return Bytes.get5(this.array, 0);
+				return Bytes.getLong5BE(this.array, 0);
 			case 6:
 				this.data.get(this.array, 0, 6);
-				return Bytes.get6(this.array, 0);
+				return Bytes.getLong6BE(this.array, 0);
 			case 7:
 				this.data.get(this.array, 0, 7);
-				return Bytes.get7(this.array, 0);
+				return Bytes.getLong7BE(this.array, 0);
 			case 8:
 				return this.data.getLong();
 			default:

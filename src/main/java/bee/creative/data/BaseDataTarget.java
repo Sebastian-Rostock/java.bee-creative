@@ -48,7 +48,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeByte(final int v) throws IOException {
 		final byte[] array = this.array;
-		Bytes.set1(array, 0, v);
+		Bytes.setInt1(array, 0, v);
 		this.write(array, 0, 1);
 	}
 
@@ -58,7 +58,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeShort(final int v) throws IOException {
 		final byte[] array = this.array;
-		Bytes.set2(array, 0, v);
+		Bytes.setInt2BE(array, 0, v);
 		this.write(array, 0, 2);
 	}
 
@@ -76,7 +76,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeInt(final int v) throws IOException {
 		final byte[] array = this.array;
-		Bytes.set4(array, 0, v);
+		Bytes.setInt4BE(array, 0, v);
 		this.write(array, 0, 4);
 	}
 
@@ -86,7 +86,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeInt(final int v, final int size) throws IOException {
 		final byte[] array = this.array;
-		Bytes.setInt(array, 0, v, size);
+		Bytes.setIntBE(array, 0, v, size);
 		this.write(array, 0, size);
 	}
 
@@ -96,7 +96,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeLong(final long v) throws IOException {
 		final byte[] array = this.array;
-		Bytes.set8(array, 0, v);
+		Bytes.setLong8BE(array, 0, v);
 		this.write(array, 0, 8);
 	}
 
@@ -106,7 +106,7 @@ public abstract class BaseDataTarget implements DataTarget {
 	@Override
 	public void writeLong(final long v, final int size) throws IOException {
 		final byte[] array = this.array;
-		Bytes.setLong(array, 0, v, size);
+		Bytes.setLongBE(array, 0, v, size);
 		this.write(array, 0, size);
 	}
 
@@ -134,7 +134,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		final int len = s.length();
 		final byte[] data = new byte[len];
 		for (int i = 0; i < len; i++) {
-			Bytes.set1(data, i, s.charAt(i));
+			Bytes.setInt1(data, i, s.charAt(i));
 		}
 		this.write(data);
 	}
