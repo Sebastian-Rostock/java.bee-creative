@@ -117,7 +117,7 @@ public abstract class BaseDataSource implements DataSource {
 	public long readLong() throws IOException {
 		final byte[] array = this.array;
 		this.readFully(array, 0, 8);
-		return Bytes.getLongBE(array, 0);
+		return Bytes.getLong8BE(array, 0);
 	}
 
 	/**

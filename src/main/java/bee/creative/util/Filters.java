@@ -665,6 +665,51 @@ public class Filters {
 		return (Filter<GInput>)NullFilter.INSTANCE;
 	}
 
+	public static <GItem> Filter<GItem> comparableFilterEQ(final Comparable<? super GItem> comparable) {
+		return new Filter<GItem>() {
+
+			@Override
+			public boolean accept(final GItem input) {
+				return comparable.compareTo(input) == 0;
+			}
+
+		};
+	}
+
+	public static <GItem> Filter<GItem> comparableFilterNE(final Comparable<? super GItem> comparable) {
+		return negationFilter(comparableFilterEQ(comparable));
+	}
+
+	public static <GItem> Filter<GItem> comparableFilterGT(final Comparable<? super GItem> comparable) {
+		return new Filter<GItem>() {
+
+			@Override
+			public boolean accept(final GItem input) {
+				return comparable.compareTo(input) <= 0;
+			}
+
+		};
+	}
+
+	public static <GItem> Filter<GItem> comparableFilterGE(final Comparable<? super GItem> comparable) {
+		return negationFilter(comparableFilterLT(comparable));
+	}
+
+	public static <GItem> Filter<GItem> comparableFilterLT(final Comparable<? super GItem> comparable) {
+		return new Filter<GItem>() {
+
+			@Override
+			public boolean accept(final GItem input) {
+				return comparable.compareTo(input) >= 0;
+			}
+
+		};
+	}
+
+	public static <GItem> Filter<GItem> comparableFilterLE(final Comparable<? super GItem> comparable) {
+		return negationFilter(comparableFilterGT(comparable));
+	}
+
 	/**
 	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode der nur die Eingaben akzeptiert, die Instanzen der gegebenen
 	 * {@link Class} oder ihrer Nachfahren sind.

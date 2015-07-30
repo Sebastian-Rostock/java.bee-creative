@@ -906,9 +906,15 @@ public class Iterators {
 	 * @param iterator {@link Iterator}.
 	 * @return {@link Iterator} oder {@link VoidIterator#INSTANCE}.
 	 */
-	@SuppressWarnings ("unchecked")
 	public static <GEntry> Iterator<GEntry> iterator(final Iterator<? extends GEntry> iterator) {
-		return (Iterator<GEntry>)((iterator != null) ? iterator : VoidIterator.INSTANCE);
+		if (iterator == null) return Iterators.voidIterator();
+		return (Iterator<GEntry>)iterator;
+	}
+
+	
+	public static <GEntry> Iterator<GEntry> iterator(final Iterable<? extends GEntry> iterable) {
+		if (iterable== null) return Iterators.voidIterator();
+		return iterator(iterable.iterator());
 	}
 
 	/**

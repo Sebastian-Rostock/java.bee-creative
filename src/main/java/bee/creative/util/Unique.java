@@ -248,7 +248,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>)-1)</code>.
 		 */
 		protected int index(final GInput input) {
-			return Comparables.binarySearch(this.inputs, Comparables.entryComparable(input, this.owner));
+			return Comparables.binarySearch(this.inputs, Comparables.itemComparable(input, this.owner));
 		}
 
 		/**

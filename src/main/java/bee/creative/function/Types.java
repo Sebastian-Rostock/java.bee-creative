@@ -9,7 +9,6 @@ import bee.creative.function.Values.NumberValue;
 import bee.creative.function.Values.ObjectValue;
 import bee.creative.function.Values.StringValue;
 import bee.creative.util.Converter;
-import bee.creative.util.Objects;
 
 /**
  * Diese Klasse implementiert Datentypen für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Number} und
@@ -90,7 +89,7 @@ public class Types {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.id());
+			return this.getClass().getSimpleName();
 		}
 
 	}
@@ -120,6 +119,14 @@ public class Types {
 			return NullType.ID;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.valueOf(null);
+		}
+
 	}
 
 	/**
@@ -145,6 +152,14 @@ public class Types {
 		@Override
 		public int id() {
 			return ArrayType.ID;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Array.class.getSimpleName();
 		}
 
 	}
@@ -174,6 +189,14 @@ public class Types {
 			return ObjectType.ID;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Object.class.getSimpleName();
+		}
+
 	}
 
 	/**
@@ -199,6 +222,14 @@ public class Types {
 		@Override
 		public int id() {
 			return FunctionType.ID;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Function.class.getSimpleName();
 		}
 
 	}
@@ -228,6 +259,14 @@ public class Types {
 			return StringType.ID;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.class.getSimpleName();
+		}
+
 	}
 
 	/**
@@ -255,6 +294,14 @@ public class Types {
 			return NumberType.ID;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Number.class.getSimpleName();
+		}
+
 	}
 
 	/**
@@ -280,6 +327,14 @@ public class Types {
 		@Override
 		public int id() {
 			return BooleanType.ID;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Boolean.class.getSimpleName();
 		}
 
 	}

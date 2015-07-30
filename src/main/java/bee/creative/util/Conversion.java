@@ -17,10 +17,10 @@ import java.util.List;
  * Converter<I, O> converter = // ...
  * Comparator<O> comparator = // ...
  * List<Conversion<I, O>> conversions = new ArrayList<Conversion<I, O>>();
- * Iterables.appendAll(conversions, Iterables.convertedIterable(Conversions.staticConversionConverter(converter), entries));
- * Collections.sort(conversions, Comparators.convertedComparator(Conversions.<O>conversionOutputConverter(), comparator));
- * Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInputConverter(), conversions);
- * Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutputConverter(), conversions);}
+ * Iterables.appendAll(conversions, Iterables.convertedIterable(Conversions.staticConversion(converter), entries));
+ * Collections.sort(conversions, Comparators.convertedComparator(Conversions.<O>conversionOutput(), comparator));
+ * Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInput(), conversions);
+ * Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutput(), conversions);}
  * </pre>
  * 
  * @see Converter
@@ -47,13 +47,13 @@ public interface Conversion<GInput, GOutput> {
 	public GOutput output();
 
 	/**
-	 * Der Streuwert entspricht dem der Ausgabe. {@inheritDoc}
+	 * Der Streuwert entspricht dem der {@link #output() Ausgabe}. {@inheritDoc}
 	 */
 	@Override
 	public int hashCode();
 
 	/**
-	 * Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer Ausgaben. {@inheritDoc}
+	 * Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #output() Ausgaben}. {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object object);

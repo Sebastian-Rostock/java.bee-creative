@@ -1,6 +1,5 @@
 package bee.creative.util;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -176,169 +175,6 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert den leeren {@link Converter}, dessen Ausgabe gleich seiner Eingabe ist.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Ein-/Ausgeba.
-	 */
-	public static final class VoidConverter<GValue> extends AbstractConverter<GValue, GValue> {
-
-		/**
-		 * Dieses Feld speichert den {@link VoidConverter}.
-		 */
-		public static final VoidConverter<?> INSTANCE = new VoidConverter<Object>();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GValue convert(final GValue input) {
-			return input;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof VoidConverter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe mit Hilfe eines gegebenen {@link bee.creative.util.Field}s in seine Ausgabe
-	 * überführt. Der {@link Converter} liest die Eigenschaft der Eingabe, die durch das {@link bee.creative.util.Field} definiert wird.
-	 * 
-	 * @see Field#get(Object)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts.
-	 */
-	public static final class FieldConverter<GInput, GValue> implements Converter<GInput, GValue> {
-
-		/**
-		 * Dieses Feld speichert das {@link bee.creative.util.Field}.
-		 */
-		final bee.creative.util.Field<? super GInput, ? extends GValue> field;
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link bee.creative.util.Field}.
-		 * 
-		 * @param field {@link bee.creative.util.Field}.
-		 * @throws NullPointerException Wenn das gegebene {@link bee.creative.util.Field} null ist.
-		 */
-		public FieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-			if (field == null) throw new NullPointerException();
-			this.field = field;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GValue convert(final GInput data) {
-			return this.field.get(data);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.field);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FieldConverter<?, ?>)) return false;
-			final FieldConverter<?, ?> data = (FieldConverter<?, ?>)object;
-			return Objects.equals(this.field, data.field);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.field);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Lesen eines gegebenen {@link Field}s an der Eingabe ermittelt wird.
-	 * 
-	 * @see Field#get(Object)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class FixedFieldConverter<GInput, GOutput> implements Converter<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert das {@link Field}.
-		 */
-		final Field field;
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Field}.
-		 * 
-		 * @param field {@link Field}.
-		 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
-		 */
-		public FixedFieldConverter(final Field field) throws NullPointerException {
-			if (field == null) throw new NullPointerException();
-			this.field = field;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput convert(final GInput input) {
-			try {
-				return (GOutput)this.field.get(input);
-			} catch (final IllegalAccessException e) {
-				throw new IllegalArgumentException(e);
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.field);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FixedFieldConverter<?, ?>)) return false;
-			final FixedFieldConverter<?, ?> data = (FixedFieldConverter<?, ?>)object;
-			return Objects.equals(this.field, data.field);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.field);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Aufrufen einer gegebenen {@link Method} an der Eingabe ermittelt wird.
 	 * 
 	 * @see Method#invoke(Object, Object...)
@@ -409,57 +245,6 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Lesen eines durch einen Namen gegebenen {@link Field}s an der Eingabe
-	 * ermittelt wird.
-	 * 
-	 * @see Field#get(Object)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class NamedFieldConverter<GInput, GOutput> extends AbstractNamedConverter<GInput, GOutput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den Namen.
-		 * 
-		 * @param name Name.
-		 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
-		 */
-		public NamedFieldConverter(final String name) throws NullPointerException {
-			super(name);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput convert(final GInput input) {
-			if (input == null) throw new NullPointerException();
-			try {
-				return (GOutput)input.getClass().getField(this.name).get(input);
-			} catch (final IllegalAccessException e) {
-				throw new IllegalArgumentException(e);
-			} catch (final NoSuchFieldException e) {
-				throw new IllegalArgumentException(e);
-			} catch (final SecurityException e) {
-				throw new IllegalArgumentException(e);
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof NamedFieldConverter<?, ?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert einen {@link Converter}, dessen Ausgabe durch das Aufrufen einer durch einen Namen gegebenen {@link Method} an der Eingabe
 	 * ermittelt wird.
 	 * 
@@ -508,65 +293,6 @@ public class Converters {
 			if (object == this) return true;
 			if (!(object instanceof NamedMethodConverter<?, ?>)) return false;
 			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der für jede Eingabe immer eine gegebene Ausgabe liefert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Ausgabe.
-	 */
-	public static final class ValueConverter<GValue> implements Converter<Object, GValue> {
-
-		/**
-		 * Dieses Feld speichert die Ausgabe.
-		 */
-		final GValue value;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Ausgabe.
-		 * 
-		 * @param value Ausgabe.
-		 */
-		public ValueConverter(final GValue value) {
-			this.value = value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GValue convert(final Object input) {
-			return this.value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.value);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ValueConverter<?>)) return false;
-			final ValueConverter<?> data = (ValueConverter<?>)object;
-			return Objects.equals(this.value, data.value);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.value);
 		}
 
 	}
@@ -853,139 +579,26 @@ public class Converters {
 
 	}
 
+	{}
+
 	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert. Die Synchronisation erfolgt via
-	 * {@code synchronized(this)}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
+	 * Dieses Feld speichert den neutralen {@link Converter}, dessen Ausgabe gleich seiner Eingabe ist.
 	 */
-	public static final class SynchronizedConverter<GInput, GOutput> extends AbstractDelegatingConverter<GInput, GOutput, GInput, GOutput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Converter}.
-		 * 
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
-		 */
-		public SynchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			super(converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
+	public static final Converter<?, ?> NEUTRAL_CONVERTER = new Converter<Object, Object>() {
+	
 		@Override
-		public GOutput convert(final GInput input) {
-			synchronized (this) {
-				return this.converter.convert(input);
-			}
+		public Object convert(final Object input) {
+			return input;
 		}
-
-		/**
-		 * {@inheritDoc}
-		 */
+	
 		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof SynchronizedConverter<?, ?>)) return false;
-			return super.equals(object);
+		public String toString() {
+			return "NEUTRAL_CONVERTER";
 		}
+	
+	};
 
-	}
-
-	/**
-	 * Diese Methode gibt den leeren {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
-	 * 
-	 * @see VoidConverter
-	 * @param <GInput> Typ der Ein-/Ausgabe.
-	 * @return {@link VoidConverter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GInput> VoidConverter<GInput> voidConverter() {
-		return (VoidConverter<GInput>)VoidConverter.INSTANCE;
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link FieldConverter} mit dem gegebenen {@link bee.creative.util.Field}s und gibt ihn zurück.
-	 * 
-	 * @see FieldConverter
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts.
-	 * @param field {@link bee.creative.util.Field}.
-	 * @return {@link FieldConverter}.
-	 */
-	public static <GInput, GValue> FieldConverter<GInput, GValue> fieldConverter(final bee.creative.util.Field<? super GInput, ? extends GValue> field) {
-		return new FieldConverter<GInput, GValue>(field);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch seinen Namen gegebenen {@link Field}s an der Eingabe ermittelt
-	 * wird, und gibt ihn zurück.
-	 * 
-	 * @see NamedFieldConverter
-	 * @see Class#getField(String)
-	 * @see Field#get(Object)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param name Name.
-	 * @return {@link NamedFieldConverter}.
-	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
-	 */
-	public static <GInput, GOutput> NamedFieldConverter<GInput, GOutput> fieldConverter(final String name) throws NullPointerException {
-		return new NamedFieldConverter<GInput, GOutput>(name);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des durch einen Namen und eine {@link Class} gegebenen {@link Field}s an der
-	 * Eingabe ermittelt wird, und gibt ihn zurück.
-	 * 
-	 * @see #fieldConverter(Field)
-	 * @see Class#getField(String)
-	 * @see Field#get(Object)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param name Name.
-	 * @param clazz {@link Class}.
-	 * @return {@link FixedFieldConverter}.
-	 * @throws NullPointerException Wenn der gegebene Name bzw. die gegebene {@link Class} {@code null} ist.
-	 * @throws NoSuchFieldException Wenn an der gegebenen {@link Class} kein {@link Field} mit dem gegebenen Namen existiert.
-	 * @throws SecurityException Wenn auf das {@link Field} nicht zugegriffen werden darf.
-	 */
-	public static <GInput, GOutput> FixedFieldConverter<GInput, GOutput> fieldConverter(final String name, final Class<? extends GInput> clazz)
-		throws NullPointerException, NoSuchFieldException, SecurityException {
-		return Converters.fieldConverter(clazz.getField(name));
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Lesen des gegebenen {@link Field}s an der Eingabe ermittelt wird, und gibt ihn
-	 * zurück.
-	 * 
-	 * @see FixedFieldConverter
-	 * @see Class#getField(String)
-	 * @see Field#get(Object)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param field {@link Field}.
-	 * @return {@link FixedFieldConverter}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
-	 */
-	public static <GInput, GOutput> FixedFieldConverter<GInput, GOutput> fieldConverter(final Field field) throws NullPointerException {
-		return new FixedFieldConverter<GInput, GOutput>(field);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der für jede Eingabe immer die gegebene Ausgabe liefert, und gibt ihn zurück.
-	 * 
-	 * @see ValueConverter
-	 * @param <GValue> Typ der Ausgabe.
-	 * @param value Ausgabe.
-	 * @return {@link ValueConverter}.
-	 */
-	public static <GValue> ValueConverter<GValue> valueConverter(final GValue value) {
-		return new ValueConverter<GValue>(value);
-	}
+	{}
 
 	/**
 	 * Diese Methode erzeugt einen {@link Converter}, dessen Ausgabe durch das Aufrufen der durch ihren Namen gegebenen {@link Method} an der Eingabe ermittelt
@@ -996,12 +609,37 @@ public class Converters {
 	 * @see Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @param name Name.
+	 * @param methodName Name.
 	 * @return {@link NamedMethodConverter}.
 	 * @throws NullPointerException Wenn der gegebene Name {@code null} ist.
 	 */
-	public static <GInput, GOutput> NamedMethodConverter<GInput, GOutput> methodConverter(final String name) throws NullPointerException {
-		return new NamedMethodConverter<GInput, GOutput>(name);
+	public static <GInput, GOutput> Converter<GInput, GOutput> javaMethod(final String methodName) throws NullPointerException {
+		if (methodName == null) throw new NullPointerException("methodName = null");
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				if (input == null) throw new NullPointerException("input = null");
+				try {
+					final java.lang.reflect.Method method = input.getClass().getMethod(methodName);
+					try {
+						@SuppressWarnings ("unchecked")
+						final GOutput result = (GOutput)method.invoke(input);
+						return result;
+					} catch (final IllegalAccessException | InvocationTargetException e) {
+						throw new IllegalArgumentException(e);
+					}
+				} catch (final SecurityException | NoSuchMethodException e) {
+					throw new IllegalArgumentException(e);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("javaMethod", methodName);
+			}
+
+		};
 	}
 
 	/**
@@ -1020,9 +658,11 @@ public class Converters {
 	 * @throws NoSuchMethodException Wenn an der gegebenen {@link Class} keine {@link Method} mit dem gegebenen Namen existiert.
 	 * @throws SecurityException Wenn auf die {@link Method} nicht zugegriffen werden darf.
 	 */
-	public static <GInput, GOutput> FixedMethodConverter<GInput, GOutput> methodConverter(final String name, final Class<? extends GInput> clazz)
-		throws NullPointerException, NoSuchMethodException, SecurityException {
-		return Converters.methodConverter(clazz.getMethod(name));
+	public static <GInput, GOutput> Converter<GInput, GOutput> javaMethod(final Class<GInput> inputType, final String methodName) throws NullPointerException,
+		NoSuchMethodException, SecurityException {
+		if (inputType == null) throw new NullPointerException("inputType = null");
+		if (methodName == null) throw new NullPointerException("methodName = null");
+		return Converters.javaMethod(inputType.getMethod(methodName));
 	}
 
 	/**
@@ -1034,11 +674,91 @@ public class Converters {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param method {@link Method}.
-	 * @return {@link FixedMethodConverter}.
-	 * @throws NullPointerException Wenn die gegebene {@link Method} {@code null} ist.
+	 * @return method {@link FixedMethodConverter}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 */
-	public static <GInput, GOutput> FixedMethodConverter<GInput, GOutput> methodConverter(final Method method) throws NullPointerException {
-		return new FixedMethodConverter<GInput, GOutput>(method);
+	public static <GInput, GOutput> Converter<GInput, GOutput> javaMethod(final java.lang.reflect.Method method) throws NullPointerException {
+		if (method == null) throw new NullPointerException("method = null");
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				try {
+					@SuppressWarnings ("unchecked")
+					final GOutput result = (GOutput)method.invoke(input);
+					return result;
+				} catch (final IllegalAccessException | InvocationTargetException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("javaMethod", method);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt den neutralen {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
+	 * 
+	 * @param <GInput> Typ der Ein-/Ausgabe.
+	 * @return {@link #NEUTRAL_CONVERTER}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GInput> Converter<Object, GInput> neutralConverter() {
+		return (Converter<Object, GInput>)Converters.NEUTRAL_CONVERTER;
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, welcher dessen Ausgabe dem Wert einer über das gegebene {@link Field} beschriebenen Eigenschaft der
+	 * Eingabe entspricht. Für eine Eingabe {@code input} liefert der {@link Converter} damit {@code field.get(input)}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param field {@link Field}.
+	 * @return {@code field}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GInput, GValue> Converter<GInput, GValue> fieldConverter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
+		if (field == null) throw new NullPointerException("field = null");
+		return new Converter<GInput, GValue>() {
+
+			@Override
+			public GValue convert(final GInput input) {
+				return field.get(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("fieldConverter", field);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, welcher stats die gegebene Ausgabe liefert.
+	 * 
+	 * @param <GValue> Typ der Ausgabe.
+	 * @param value Ausgabe.
+	 * @return {@code value}-{@link Converter}.
+	 */
+	public static <GValue> Converter<Object, GValue> valueConverter(final GValue value) {
+		return new Converter<Object, GValue>() {
+
+			@Override
+			public GValue convert(final Object input) {
+				return value;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("valueConverter", value);
+			}
+
+		};
 	}
 
 	/**
@@ -1120,18 +840,27 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der den gegebenen {@link Converter} synchronisiert, und gibt ihn zurück.
+	 * Diese Methode gibt einen einen {@link Converter} zurück, der den gegebenen {@link Converter} via {@code synchronized(this)} synchronisiert.
 	 * 
-	 * @see SynchronizedConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
-	 * @return {@link SynchronizedConverter}.
+	 * @return {@code synchronized}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> SynchronizedConverter<GInput, GOutput> synchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter)
+	public static <GInput, GOutput> Converter<GInput, GOutput> synchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter)
 		throws NullPointerException {
-		return new SynchronizedConverter<GInput, GOutput>(converter);
+		if (converter == null) throw new NullPointerException("converter = null");
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				synchronized (this) {
+					return converter.convert(input);
+				}
+			}
+
+		};
 	}
 
 	/**

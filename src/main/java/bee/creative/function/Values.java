@@ -105,7 +105,7 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.data());
+			return String.valueOf(this.data());
 		}
 
 	}

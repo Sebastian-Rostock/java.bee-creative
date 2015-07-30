@@ -226,7 +226,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@Override
 	public Iterator<GItem> iterator() {
-		return Iterators.iterator(this.items().iterator());
+		return Iterators.iterator(this.items());
 	}
 
 	/**

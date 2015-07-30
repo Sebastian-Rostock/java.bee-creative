@@ -175,12 +175,12 @@ public class Builders {
 	 * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
 	 */
 	public static abstract class BaseItemsBuilder<GItem, GItems extends Collection<GItem>, GThiz> extends BaseBuilder<GItems, GThiz> implements Iterable<GItem> {
-	
+
 		/**
 		 * Dieses Feld speichert die Sammlung.
 		 */
 		protected GItems items;
-	
+
 		/**
 		 * Dieser Konstruktor initialisiert die interne Sammlung.
 		 * 
@@ -191,9 +191,9 @@ public class Builders {
 			if (items == null) throw new NullPointerException("items = null");
 			this.items = items;
 		}
-	
+
 		{}
-	
+
 		/**
 		 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 * 
@@ -207,7 +207,7 @@ public class Builders {
 			this.clearItems();
 			return this.useItems(data);
 		}
-	
+
 		/**
 		 * Diese Methode fügt das gegebene Element zur {@link #getItems() internen Sammlung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -218,7 +218,7 @@ public class Builders {
 			this.items.add(item);
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode fügt die gegebenen Elemente zur {@link #getItems() internen Sammlung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -230,7 +230,7 @@ public class Builders {
 			Iterables.appendAll(this.items, items);
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode gibt die interne Sammlung zurück.
 		 * 
@@ -239,7 +239,7 @@ public class Builders {
 		public GItems getItems() {
 			return this.items;
 		}
-	
+
 		/**
 		 * Diese Methode leert die {@link #getItems() interne Sammlung} und gibt {@code this} zurück.
 		 * 
@@ -249,7 +249,7 @@ public class Builders {
 			this.items.clear();
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode macht die {@link #getItems() interne Sammlung} datentypsicher und gibt {@code this} zurück.
 		 * 
@@ -261,7 +261,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeChecked(Class<GItem> clazz);
-	
+
 		/**
 		 * Diese Methode macht die {@link #getItems() interne Sammlung} threadsicher und gibt {@code this} zurück.
 		 * 
@@ -272,7 +272,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeSynchronized();
-	
+
 		/**
 		 * Diese Methode macht die {@link #getItems() interne Sammlung} unveränderlich und gibt {@code this} zurück.
 		 * 
@@ -283,9 +283,9 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeUnmodifiable();
-	
+
 		{}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -293,7 +293,7 @@ public class Builders {
 		public GItems build() throws IllegalStateException {
 			return this.items;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -301,7 +301,7 @@ public class Builders {
 		public Iterator<GItem> iterator() {
 			return this.items.iterator();
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -309,7 +309,7 @@ public class Builders {
 		public String toString() {
 			return Objects.toString(true, this.items);
 		}
-	
+
 	}
 
 	/**
@@ -323,17 +323,17 @@ public class Builders {
 	 */
 	public static abstract class BaseEntriesBuilder<GKey, GValue, GEntries extends Map<GKey, GValue>, GThiz> extends BaseBuilder<GEntries, GThiz> implements
 		Iterable<Entry<GKey, GValue>> {
-	
+
 		/**
 		 * Dieses Feld speichert den über {@link #forKey(Object)} gewählten Schlüssel.
 		 */
 		protected GKey key;
-	
+
 		/**
 		 * Dieses Feld speichert die interne Abbildung.
 		 */
 		protected GEntries entries;
-	
+
 		/**
 		 * Dieser Konstruktor initialisiert die interne {@link Map}.
 		 * 
@@ -344,9 +344,9 @@ public class Builders {
 			if (entries == null) throw new NullPointerException("entries = null");
 			this.entries = entries;
 		}
-	
+
 		{}
-	
+
 		/**
 		 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 		 * 
@@ -360,7 +360,7 @@ public class Builders {
 			this.clearEntries();
 			return this.useEntries(data.getEntries());
 		}
-	
+
 		/**
 		 * Diese Methode fügt den gegebenen Eintrag zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -372,7 +372,7 @@ public class Builders {
 			if (entry == null) return this.thiz();
 			return this.useEntry(entry.getKey(), entry.getValue());
 		}
-	
+
 		/**
 		 * Diese Methode fügt den gegebenen Eintrag zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -385,7 +385,7 @@ public class Builders {
 			this.entries.put(key, value);
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode fügt die gegebenen Einträge zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -397,7 +397,7 @@ public class Builders {
 			if (entries == null) return this.thiz();
 			return this.useEntries(entries.entrySet());
 		}
-	
+
 		/**
 		 * Diese Methode fügt die gegebenen Einträge zur {@link #getEntries() internen Abbildung} hinzu und gibt {@code this} zurück.
 		 * 
@@ -412,7 +412,7 @@ public class Builders {
 			}
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode gibt die interne {@link Map} zurück.
 		 * 
@@ -422,7 +422,7 @@ public class Builders {
 		public GEntries getEntries() {
 			return this.entries;
 		}
-	
+
 		/**
 		 * Diese Methode wählt den gegebenen Schlüssel und gibt {@code this} zurück. Dieser Schlüssel wird in den nachfolgenden Aufrufen von {@link #getValue()} und
 		 * {@link #useValue(Object)} verwendet.
@@ -436,7 +436,7 @@ public class Builders {
 			this.key = key;
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode gibt den Wert zum {@link #forKey(Object) gewählten Schlüssel} zurück.
 		 * 
@@ -447,7 +447,7 @@ public class Builders {
 		public GValue getValue() {
 			return this.entries.get(this.key);
 		}
-	
+
 		/**
 		 * Diese Methode setzt den Wert zum {@link #forKey(Object) gewählten Schlüssel} und gibt {@code this} zurück.
 		 * 
@@ -460,7 +460,7 @@ public class Builders {
 			this.useEntry(this.key, value);
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode leert die {@link #getEntries() interne Abbildung} und gibt {@code this} zurück.
 		 * 
@@ -470,7 +470,7 @@ public class Builders {
 			this.entries.clear();
 			return this.thiz();
 		}
-	
+
 		/**
 		 * Diese Methode macht die {@link #getEntries() interne Abbildung} datentypsicher und gibt {@code this} zurück.
 		 * 
@@ -481,7 +481,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeChecked(Class<GKey> keyClazz, Class<GValue> valueClazz);
-	
+
 		/**
 		 * Diese Methode macht die {@link #getEntries() interne Abbildung} threadsicher und gibt {@code this} zurück.
 		 * 
@@ -490,7 +490,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeSynchronized();
-	
+
 		/**
 		 * Diese Methode macht die {@link #getEntries() interne Abbildung} unveränderlich und gibt {@code this} zurück.
 		 * 
@@ -499,9 +499,9 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public abstract GThiz makeUnmodifiable();
-	
+
 		{}
-	
+
 		/**
 		 * {@inheritDoc}
 		 * 
@@ -511,7 +511,7 @@ public class Builders {
 		public GEntries build() throws IllegalStateException {
 			return this.getEntries();
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -519,7 +519,7 @@ public class Builders {
 		public Iterator<Entry<GKey, GValue>> iterator() {
 			return this.entries.entrySet().iterator();
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -527,7 +527,7 @@ public class Builders {
 		public String toString() {
 			return Objects.toString(true, this.entries);
 		}
-	
+
 	}
 
 	/**
@@ -1011,7 +1011,7 @@ public class Builders {
 	 */
 	public static <GValue> Builder<GValue> cachedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
 		IllegalArgumentException {
-		if (builder == null) throw new NullPointerException();
+		if (builder == null) throw new NullPointerException("builder = null");
 		Pointers.pointer(mode, null);
 		return new Builder<GValue>() {
 

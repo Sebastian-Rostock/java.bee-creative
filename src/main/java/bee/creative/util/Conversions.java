@@ -1,8 +1,5 @@
 package bee.creative.util;
 
-import bee.creative.util.Converters.AbstractConverter;
-import bee.creative.util.Converters.AbstractDelegatingConverter;
-
 /**
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion von {@link Conversion}s.
  * 
@@ -14,13 +11,13 @@ import bee.creative.util.Converters.AbstractDelegatingConverter;
 public class Conversions {
 
 	/**
-	 * Diese Klasse implementiert eine abstracte {@link Conversion}.
+	 * Diese Klasse implementiert {@link #hashCode()} und {@link #equals(Object)} einer abstracten {@link Conversion}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	static abstract class AbstractConversion<GInput, GOutput> implements Conversion<GInput, GOutput> {
+	public static abstract class BaseConversion<GInput, GOutput> implements Conversion<GInput, GOutput> {
 
 		/**
 		 * {@inheritDoc}
@@ -43,405 +40,227 @@ public class Conversions {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert eine statische {@link Conversion}, deren Ein- und Ausgabe konstant sind.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class StaticConversion<GInput, GOutput> extends AbstractConversion<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert die Eingabe.
-		 */
-		final GInput input;
-
-		/**
-		 * Dieses Feld speichert die Ausgeb.
-		 */
-		final GOutput output;
-
-		/**
-		 * Dieser Konstruktor initialisiert Eingabe und Ausgabe.
-		 * 
-		 * @param input Eingabe.
-		 * @param output Ausgabe.
-		 */
-		public StaticConversion(final GInput input, final GOutput output) {
-			this.input = input;
-			this.output = output;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GInput input() {
-			return this.input;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GOutput output() {
-			return this.output;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.input, this.output);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, deren Ausgabe mit einem gegebenen
-	 * {@link Converter} ermittelt wird.
-	 * 
-	 * @see StaticConversion
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class StaticConversionConverter<GInput, GOutput> extends
-		AbstractDelegatingConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Converter}.
-		 * 
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
-		 */
-		public StaticConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			super(converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Conversion<GInput, GOutput> convert(final GInput input) {
-			return new StaticConversion<GInput, GOutput>(input, this.converter.convert(input));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof StaticConversionConverter<?, ?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt
-	 * werden.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class InverseConversion<GInput, GOutput> extends AbstractConversion<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert die {@link Conversion}.
-		 */
-		final Conversion<? extends GOutput, ? extends GInput> conversion;
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Conversion}.
-		 * 
-		 * @param conversion {@link Conversion}.
-		 * @throws NullPointerException Wenn die gegebene {@link Conversion} {@code null} ist.
-		 */
-		public InverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) throws NullPointerException {
-			if (conversion == null) throw new NullPointerException();
-			this.conversion = conversion;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GInput input() {
-			return this.conversion.output();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GOutput output() {
-			return this.conversion.input();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.conversion);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Converter}, der seine Eingabe in eine {@link InverseConversion} überführt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class InverseConversionConverter<GInput, GOutput> extends
-		AbstractConverter<Conversion<GInput, GOutput>, InverseConversion<GOutput, GInput>> {
-
-		/**
-		 * Dieses Feld speichert den {@link InverseConversionConverter}.
-		 */
-		public static final Converter<?, ?> INSTANCE = new InverseConversionConverter<Object, Object>();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public InverseConversion<GOutput, GInput> convert(final Conversion<GInput, GOutput> input) {
-			return new InverseConversion<GOutput, GInput>(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof InverseConversionConverter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe eines gegebenen {@link Converter}s aus der gegebenen Eingabe
-	 * ermittelt wird.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class DynamicConversion<GInput, GOutput> extends AbstractConversion<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert die Eingabe.
-		 */
-		final GInput input;
-
-		/**
-		 * Dieses Feld speichert den {@link Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieser Konstruktor initialisiert Eingabe und {@link Converter}.
-		 * 
-		 * @param input Eingabe.
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn der gegebenen {@link Converter} {@code null} ist.
-		 */
-		public DynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			if (converter == null) throw new NullPointerException();
-			this.input = input;
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GInput input() {
-			return this.input;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GOutput output() {
-			return this.converter.convert(this.input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.input, this.converter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Converter}, der seine Eingabe in eine {@link DynamicConversion} mit einem gegebenen {@link Converter} überführt.
-	 * 
-	 * @see DynamicConversion
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	public static final class DynamicConversionConverter<GInput, GOutput> extends
-		AbstractDelegatingConverter<GInput, Conversion<GInput, GOutput>, GInput, GOutput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Converter}.
-		 * 
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
-		 */
-		public DynamicConversionConverter(final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-			super(converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Conversion<GInput, GOutput> convert(final GInput input) {
-			return new DynamicConversion<GInput, GOutput>(input, this.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof DynamicConversionConverter<?, ?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
 	{}
 
-	@SuppressWarnings ("javadoc")
-	static final Converter<?, ?> conversionInputConverter = //
-		new Converter<Conversion<?, ?>, Object>() {
+	/**
+	 * Dieses Feld speichert den {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
+	 * 
+	 * @see #inverseConversion(Conversion)
+	 */
+	public static final Converter<?, ?> INVERSE_CONVERSION = new Converter<Conversion<?, ?>, Object>() {
 
-			@Override
-			public Object convert(final Conversion<?, ?> input) {
-				return input.input();
-			}
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return Conversions.inverseConversion(input);
+		}
 
-		};
+		@Override
+		public String toString() {
+			return "INVERSE_CONVERSION";
+		}
 
-	@SuppressWarnings ("javadoc")
-	static final Converter<?, ?> conversionOutputConverter = //
-		new Converter<Conversion<?, ?>, Object>() {
+	};
 
-			@Override
-			public Object convert(final Conversion<?, ?> input) {
-				return input.output();
-			}
+	/**
+	 * Dieses Feld speichert den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
+	 */
+	public static final Converter<?, ?> CONVERSION_INPUT = new Converter<Conversion<?, ?>, Object>() {
 
-		};
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.input();
+		}
+
+		@Override
+		public String toString() {
+			return "CONVERSION_INPUT";
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
+	 */
+	public static final Converter<?, ?> CONVERSION_OUTPUT = new Converter<Conversion<?, ?>, Object>() {
+
+		@Override
+		public Object convert(final Conversion<?, ?> input) {
+			return input.output();
+		}
+
+		@Override
+		public String toString() {
+			return "CONVERSION_OUTPUT";
+		}
+
+	};
 
 	{}
 
 	/**
-	 * Diese Methode erzeugt eine statische {@link Conversion}, deren Eingabe und Ausgabe konstant sind, und gibt sie zurück.
+	 * Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
 	 * 
-	 * @see StaticConversion
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param output Ausgabe.
-	 * @return {@link StaticConversion}.
+	 * @return {@code static}-{@link Conversion}.
 	 */
-	public static <GInput, GOutput> StaticConversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
-		return new StaticConversion<GInput, GOutput>(input, output);
+	public static <GInput, GOutput> Conversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
+		return new BaseConversion<GInput, GOutput>() {
+
+			@Override
+			public GInput input() {
+				return input;
+			}
+
+			@Override
+			public GOutput output() {
+				return output;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("staticConversion", input, output);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link StaticConversion} überführt, und gibt ihh zurück. Die Ausgabe der
-	 * {@link StaticConversion} wird hierbei mit dem gegebenen {@link Converter} ermittelt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in mit dem gegebenen {@link Converter} umwandelt und das Paar dieser beiden Objekte
+	 * als {@link Conversion} liefert.
 	 * 
 	 * @see #staticConversion(Object, Object)
-	 * @see StaticConversionConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
-	 * @return {@link StaticConversionConverter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
+	 * @return {@link Converter} zu {@link #staticConversion(Object, Object)}.
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversionConverter(
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-		return new StaticConversionConverter<GInput, GOutput>(converter);
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
+		if (converter == null) throw new NullPointerException("converter = null");
+		return new Converter<GInput, Conversion<GInput, GOutput>>() {
+
+			@Override
+			public Conversion<GInput, GOutput> convert(final GInput input) {
+				return Conversions.<GInput, GOutput>staticConversion(input, converter.convert(input));
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("staticConversion", converter);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt eine inverse {@link Conversion}, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe einer gegebenen {@link Conversion} ermittelt
-	 * werden, und gibt sie zurück.
+	 * Diese Methode gibt einen {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
 	 * 
-	 * @see InverseConversion
+	 * @see #inverseConversion(Conversion)
+	 * @param <GInput> Typ des Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @return {@link Converter} zu {@link #inverseConversion(Conversion)}.
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <GInput, GOutput> Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> inverseConversion() {
+		return (Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>>)Conversions.INVERSE_CONVERSION;
+	}
+
+	/**
+	 * Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
+	 * werden.
+	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
-	 * @return {@link InverseConversion}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Conversion} {@code null} ist.
+	 * @return {@code inverse}-{@link Conversion}.
+	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist.
 	 */
-	public static <GInput, GOutput> InverseConversion<GInput, GOutput> inverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
-		return new InverseConversion<GInput, GOutput>(conversion);
+	public static <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
+		if (conversion == null) throw new NullPointerException("conversion = null");
+		return new Conversion<GInput, GOutput>() {
+
+			@Override
+			public GInput input() {
+				return conversion.output();
+			}
+
+			@Override
+			public GOutput output() {
+				return conversion.input();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("inverseConversion", conversion);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in eine {@link InverseConversion} überführt.
+	 * Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Converter} aus der gegebenen Eingabe
+	 * ermittelt wird.
 	 * 
-	 * @see #inverseConversion(Conversion)
-	 * @see InverseConversionConverter
-	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link InverseConversionConverter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GInput, GOutput> Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> inverseConversionConverter() {
-		return (Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>>)InverseConversionConverter.INSTANCE;
-	}
-
-	/**
-	 * Diese Methode erzeugt eine dynamische {@link Conversion}, deren Ausgabe mit Hilfe des gegebenen {@link Converter}s aus der gegebenen Eingabe ermittelt
-	 * wird, und gibt sie zurück.
-	 * 
-	 * @see DynamicConversion
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param converter {@link Converter}.
-	 * @return {@link DynamicConversion}.
-	 * @throws NullPointerException Wenn der gegebenen {@link Converter} {@code null} ist.
+	 * @return {@code dynamic}-{@link Conversion}.
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> DynamicConversion<GInput, GOutput> dynamicConversion(final GInput input,
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-		return new DynamicConversion<GInput, GOutput>(input, converter);
+	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
+		if (converter == null) throw new NullPointerException("converter = null");
+		return new Conversion<GInput, GOutput>() {
+
+			@Override
+			public GInput input() {
+				return input;
+			}
+
+			@Override
+			public GOutput output() {
+				return converter.convert(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("dynamicConversion", input, converter);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Converter}, der seine Eingabe in eine {@link DynamicConversion} mit dem gegebenen {@link Converter} überführt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit dem gegebenen {@link Converter} via {@link #dynamicConversion(Object, Converter)}
+	 * in seine Ausgabe überführt.
 	 * 
-	 * @see DynamicConversionConverter
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
-	 * @return {@link DynamicConversionConverter}.
-	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
+	 * @return {@link Converter} zu {@link #dynamicConversion(Object, Converter)}.
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversionConverter(
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
-		return new DynamicConversionConverter<GInput, GOutput>(converter);
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
+		if (converter == null) throw new NullPointerException("converter = null");
+		return new Converter<GInput, Conversion<GInput, GOutput>>() {
+
+			@Override
+			public Conversion<GInput, GOutput> convert(final GInput input) {
+				return Conversions.<GInput, GOutput>dynamicConversion(input, converter);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("dynamicConversion", converter);
+			}
+
+		};
 	}
 
 	/**
@@ -449,11 +268,11 @@ public class Conversions {
 	 * 
 	 * @see Conversion#input()
 	 * @param <GInput> Typ des Eingabe.
-	 * @return {@link Conversion#input()}-{@link Converter}.
+	 * @return {@link Converter} zu {@link Conversion#input()}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInputConverter() {
-		return (Converter<Conversion<? extends GInput, ?>, GInput>)conversionInputConverter;
+	public static <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInput() {
+		return (Converter<Conversion<? extends GInput, ?>, GInput>)Conversions.CONVERSION_INPUT;
 	}
 
 	/**
@@ -461,11 +280,11 @@ public class Conversions {
 	 * 
 	 * @see Conversion#output()
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link Conversion#output()}-{@link Converter}.
+	 * @return {@link Converter} zu {@link Conversion#output()}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutputConverter() {
-		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)conversionOutputConverter;
+	public static <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutput() {
+		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)Conversions.CONVERSION_OUTPUT;
 	}
 
 }
