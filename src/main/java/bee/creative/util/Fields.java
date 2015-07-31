@@ -575,6 +575,29 @@ public final class Fields {
 	{}
 
 	/**
+	 * Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
+	 * 
+	 * @param <GValue> Typ des Werts.
+	 * @param value Wert.
+	 * @return {@code value}-{@link Field}.
+	 */
+	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
+		return new BaseField<Object, GValue>() {
+
+			@Override
+			public GValue get(final Object input) {
+				return value;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("valueField", value);
+			}
+
+		};
+	}
+
+	/**
 	 * Diese Methode gibt ein {@link Field} zurück, welches die über das native {@link java.lang.reflect.Field Datenfeld} gegebene Eigenschaft der Eingabe
 	 * abbildet.
 	 * 
@@ -583,10 +606,10 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param field Datenfeld.
-	 * @return {@code java}-{@link Field}.
+	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final java.lang.reflect.Field field) throws NullPointerException {
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
 
@@ -612,7 +635,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("javaField", field);
+				return Objects.toStringCall("nativeField", field);
 			}
 
 		};
@@ -620,16 +643,16 @@ public final class Fields {
 
 	/**
 	 * Diese Methode gibt ein {@link Field} zurück, welches die über ein natives {@link java.lang.reflect.Field Datenfeld} beschriebene Eigenschaft der Eingabe
-	 * abbildet. Das Datenfeld wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
+	 * abbildet. Das native Datenfeld wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
 	 * 
 	 * @see Class#getField(String)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param fieldName Name des Datenfelds.
-	 * @return {@code java}-{@link Field}.
+	 * @param fieldName Name des nativen Datenfelds.
+	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final String fieldName) throws NullPointerException {
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String fieldName) throws NullPointerException {
 		if (fieldName == null) throw new NullPointerException("fieldName = null");
 		return new Field<GInput, GValue>() {
 
@@ -667,7 +690,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("javaField", fieldName);
+				return Objects.toStringCall("nativeField", fieldName);
 			}
 
 		};
@@ -682,10 +705,10 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param getMethod Methode zum Lesen der Eigenschaft, z.B. {@code input.get()}.
 	 * @param setMethod Methode zum Schreiben der Eigenschaft, z.B. {@code input.set(value)}.
-	 * @return {@code java}-{@link Field}.
+	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
 		throws NullPointerException {
 		if (getMethod == null) throw new NullPointerException("getMethod = null");
 		if (setMethod == null) throw new NullPointerException("setMethod = null");
@@ -713,7 +736,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("javaField", getMethod, setMethod);
+				return Objects.toStringCall("nativeField", getMethod, setMethod);
 			}
 
 		};
@@ -726,32 +749,32 @@ public final class Fields {
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param inputType Klasse der Eingabe.
-	 * @param fieldName Name des Datenfelds.
-	 * @return {@code java}-{@link Field}.
+	 * @param fieldName Name des nativen Datenfelds.
+	 * @return {@code native}-{@link Field}.
 	 * @throws SecurityException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NoSuchFieldException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code fieldName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final Class<GInput> inputType, final String fieldName) throws SecurityException,
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputType, final String fieldName) throws SecurityException,
 		NoSuchFieldException, NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (fieldName == null) throw new NullPointerException("fieldName = null");
-		return Fields.javaField(inputType.getField(fieldName));
+		return Fields.nativeField(inputType.getField(fieldName));
 	}
 
 	/**
 	 * Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} beschriebene Eigenschaft der Eingabe
-	 * abbildet. Die Methoden werden bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
+	 * abbildet. Die nativen Methoden werden bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param valueType Klasse des Werts der Eigenschaft.
-	 * @param getName Name der Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
-	 * @param setName Name der Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
-	 * @return {@code java}-{@link Field}.
+	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
+	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
+	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final Class<GValue> valueType, final String getName, final String setName)
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GValue> valueType, final String getName, final String setName)
 		throws NullPointerException {
 		if (valueType == null) throw new NullPointerException("valueType = null");
 		if (getName == null) throw new NullPointerException("getName = null");
@@ -792,7 +815,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("javaField", getName, setName);
+				return Objects.toStringCall("nativeField", getName, setName);
 			}
 
 		};
@@ -806,43 +829,20 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param inputType Klasse der Eingabe.
 	 * @param valueType Klasse des Werts der Eigenschaft.
-	 * @param getName Name der Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
-	 * @param setName Name der Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
-	 * @return {@code java}-{@link Field}.
+	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
+	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
+	 * @return {@code native}-{@link Field}.
 	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> javaField(final Class<GInput> inputType, final Class<GValue> valueType, final String getName,
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputType, final Class<GValue> valueType, final String getName,
 		final String setName) throws SecurityException, NoSuchMethodException, NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (valueType == null) throw new NullPointerException("valueType = null");
 		if (getName == null) throw new NullPointerException("getName = null");
 		if (setName == null) throw new NullPointerException("setName = null");
-		return Fields.javaField(inputType.getMethod(getName), inputType.getMethod(setName, valueType));
-	}
-
-	/**
-	 * Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
-	 * 
-	 * @param <GValue> Typ des Werts.
-	 * @param value Wert.
-	 * @return {@code value}-{@link Field}.
-	 */
-	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return new BaseField<Object, GValue>() {
-
-			@Override
-			public GValue get(final Object input) {
-				return value;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("valueField", value);
-			}
-
-		};
+		return Fields.nativeField(inputType.getMethod(getName), inputType.getMethod(setName, valueType));
 	}
 
 	/**
@@ -1004,25 +1004,21 @@ public final class Fields {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein umkodierendes {@link Field}, dessen Methoden zum Lesen und Schreiben des Werts mit je einem {@link Converter} an das gegebene
-	 * {@link Field} angebunden sind, und gibt es zurück.
+	 * Diese Methode gibt ein umkodierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren nutzt. Wenn {@code parser}
+	 * {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer {@code null} geliefert.
 	 * <p>
-	 * * Diese Klasse implementiert ein umkodierendes {@link Field}, dessen Methoden zum Lesen und Schreiben des Werts mit je einem {@link Converter} an ein
-	 * gegebenes {@link Field} angebunden sind. Beim Lesen des Werts der Eigenschaft einer Eingabe via {@link #get(Object)} wird der über das gegebene
-	 * {@link Field} ermittelte interne Wert mit dem formatierenden {@link Converter} in den externen Wert überführt, sofern dieser {@link Converter} nicht
-	 * {@code null} ist. Andernfalls wird immer {@code null} geliefert. Beim Schreiben des Werts via {@link #set(Object, Object)} wird der gegebene externe Wert
-	 * mit dem parsenden {@link Converter} in den internen Wert überführt und der über das gegebene {@link Field} gesetzt, sofern dieser {@link Converter} nicht
-	 * {@code null} ist. Andernfalls das Schreiben ignoriert.
+	 * Das gelieferte {@link Field} gibt beim Lesen den (externen) Wert zurück, der über den gegebenen {@code formatter} aus dem über das gegebene {@link Field}
+	 * ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser über den {@code parser} in einen (internen) Wert überfüght,
+	 * welcher anschließend an das gegebene {@link Field} delegiert wird.
 	 * 
-	 * @see TranscodedField
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param <GValue2> Typ des internen Werts des {@link Field}s.
 	 * @param field {@link Field}.
 	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
 	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @return {@link TranscodedField}.
-	 * @throws NullPointerException Wenn das gegebene {@link Field} {@code null} ist.
+	 * @return {@code transcoded}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
 	public static <GInput, GValue, GValue2> Field<GInput, GValue> transcodedField(final Field<? super GInput, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {

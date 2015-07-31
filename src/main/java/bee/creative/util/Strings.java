@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.util.Converters.CachedConverter;
-import bee.creative.util.Converters.SynchronizedConverter;
 
 /**
  * Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken mit Zeichenketten zur Verfügung.

@@ -4,10 +4,9 @@ import java.util.Iterator;
 import bee.creative.util.Field;
 import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
-import bee.creative.util.Iterables.FilteredIterable;
 
 /**
- * Diese Klasse implementiert eine {@link Selection}, die ein {@link FilteredIterable} verwendet.
+ * Diese Klasse implementiert eine {@link Selection}, die auf einem {@link Iterable} aufsetzt.
  * 
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze.
@@ -23,7 +22,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	 * Dieser Konstruktor initialisiert das {@link Iterable}.
 	 * 
 	 * @param items {@link Iterable} der {@link Item}s.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
@@ -51,7 +50,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
-		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.fieldFilter(field, Filters.containsFilter(value)), this.items));
+		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
 	}
 
 	/**

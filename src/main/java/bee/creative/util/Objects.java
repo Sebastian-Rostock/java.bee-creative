@@ -18,6 +18,15 @@ import java.util.Map.Entry;
 public class Objects {
 
 	/**
+	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}, sodass diese für Objekte mit dieser
+	 * Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode verwendet.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface UseToString {
+	}
+
+	/**
 	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)}
 	 * ermittelten {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht.
 	 * 
@@ -133,15 +142,8 @@ public class Objects {
 		}
 
 	}
-
-	/**
-	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}, sodass diese für Objekte mit dieser
-	 * Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode verwendet.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static interface UseToString {
-	}
+	
+	{}
 
 	/**
 	 * Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
@@ -202,14 +204,14 @@ public class Objects {
 	static String mapToString(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
-		String space = (format ? "{\n  " : "{ ");
+		String space = (format ? "{\n  " : "{");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
 			output.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
 		}
-		return output.append((format ? "\n}" : " }")).toString();
+		return output.append((format ? "\n}" : "}")).toString();
 	}
 
 	/**
@@ -225,14 +227,14 @@ public class Objects {
 		if (object == null) return "null";
 		final int size = Array.getLength(object);
 		if (size == 0) return "[]";
-		String space = (format ? "[\n  " : "[ ");
+		String space = (format ? "[\n  " : "[");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
 		for (int i = 0; i < size; i++) {
 			output.append(space).append(Objects.toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
-		return output.append((format ? "\n]" : " ]")).toString();
+		return output.append((format ? "\n]" : "]")).toString();
 	}
 
 	/**
@@ -281,14 +283,14 @@ public class Objects {
 		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
-		String space = (format ? "[\n  " : "[ ");
+		String space = (format ? "[\n  " : "[");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder output = new StringBuilder();
 		do {
 			output.append(space).append(Objects.toString(format, format, iter.next()));
 			space = comma;
 		} while (iter.hasNext());
-		return output.append((format ? "\n]" : " ]")).toString();
+		return output.append((format ? "\n]" : "]")).toString();
 	}
 
 	/**
@@ -477,43 +479,6 @@ public class Objects {
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
 	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equals(Object, Object)}.
-	 * 
-	 * @see Objects#equals(Object, Object)
-	 * @see Objects#equals(Object...)
-	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
-	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
-	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
-	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
-	 */
-	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4) {
-		return Objects.equals(object1, object2) && Objects.equals(object3, object4);
-	}
-
-	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equals(Object, Object)}.
-	 * 
-	 * @see Objects#equals(Object, Object)
-	 * @see Objects#equals(Object...)
-	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
-	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
-	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
-	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
-	 * @param object5 {@code 4}-tes Objekt oder {@code null}.
-	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
-	 */
-	public static boolean equals(final Object object1, final Object object2, final Object object3, final Object object4, final Object object5,
-		final Object object6) {
-		return Objects.equals(object1, object2) && Objects.equals(object3, object4) && Objects.equals(object5, object6);
-	}
-
-	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
 	 * {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
 	 * @see Objects#equalsEx(Object, Object)
@@ -587,43 +552,6 @@ public class Objects {
 			if (!Objects.equalsEx(objects1[i], objects2[i])) return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Objects#equalsEx(Object, Object)
-	 * @see Objects#equalsEx(Object...)
-	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
-	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
-	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
-	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
-	 */
-	public static boolean equalsEx(final Object object1, final Object object2, final Object object3, final Object object4) {
-		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4);
-	}
-
-	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
-	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Objects#equalsEx(Object, Object)
-	 * @see Objects#equalsEx(Object...)
-	 * @param object1 {@code 0}-tes Objekt oder {@code null}.
-	 * @param object2 {@code 1}-tes Objekt oder {@code null}.
-	 * @param object3 {@code 2}-tes Objekt oder {@code null}.
-	 * @param object4 {@code 3}-tes Objekt oder {@code null}.
-	 * @param object5 {@code 4}-tes Objekt oder {@code null}.
-	 * @param object6 {@code 5}-tes Objekt oder {@code null}.
-	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
-	 */
-	public static boolean equalsEx(final Object object1, final Object object2, final Object object3, final Object object4, final Object object5,
-		final Object object6) {
-		return Objects.equalsEx(object1, object2) && Objects.equalsEx(object3, object4) && Objects.equalsEx(object5, object6);
 	}
 
 	/**
@@ -758,12 +686,6 @@ public class Objects {
 	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if (object == null) throw new NullPointerException();
 		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
-	}
-
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Objects() {
 	}
 
 }

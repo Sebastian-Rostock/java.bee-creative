@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 /**
- * Diese Klasse implementiert mehrere Hilfsfunktionen zum Vergleich von Objekten sowie zur Erzeugung von {@link Comparator}en.
+ * Diese Klasse implementiert grundlegende {@link Comparator}.
  * 
  * @see Comparator
  * @author Sebastian Rostock 2011.

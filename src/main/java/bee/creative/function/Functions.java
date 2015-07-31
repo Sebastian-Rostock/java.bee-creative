@@ -1112,7 +1112,7 @@ public final class Functions {
 		 */
 		@Override
 		public int hashCode() {
-			return Objects.hashEx(this.function, this.params);
+			return Objects.hash(this.function) ^ Objects.hash((Object[])this.params);
 		}
 
 		/**

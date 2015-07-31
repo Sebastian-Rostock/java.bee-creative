@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
+import bee.creative.util.Pointers.SoftPointer;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Filter}n.
+ * Diese Klasse implementiert grundlegende {@link Filter}.
  * 
  * @see Filter
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -14,798 +16,346 @@ import java.util.HashSet;
 public class Filters {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Filter}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
+	 * Dieses Feld speichert den {@link Filter}, der die {@code null}-Eingabe ablehnat und alle anderen Eingaben akzeptiert.
 	 */
-	static abstract class AbstractFilter<GInput> implements Filter<GInput> {
+	public static final Filter<?> NULL_FILTER = new Filter<Object>() {
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return 0;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Filter}, der seine Berechnungen an zwei gegebene {@link Filter} delegiert.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	static abstract class AbstractJunctionFilter<GInput> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den primären {@link Filter}.
-		 */
-		final Filter<? super GInput> filter1;
-
-		/**
-		 * Dieses Feld speichert den sekundären {@link Filter}.
-		 */
-		final Filter<? super GInput> filter2;
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Filter}.
-		 * 
-		 * @param filter1 primärer {@link Filter}.
-		 * @param filter2 sekundärer {@link Filter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public AbstractJunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			if ((filter1 == null) || (filter2 == null)) throw new NullPointerException();
-			this.filter1 = filter1;
-			this.filter2 = filter2;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter1, this.filter2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof AbstractJunctionFilter<?>)) return false;
-			final AbstractJunctionFilter<?> data = (AbstractJunctionFilter<?>)object;
-			return Objects.equals(this.filter1, data.filter1) && Objects.equals(this.filter2, data.filter2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.filter1, this.filter2);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Filter}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GInput2> Typ der Eingabe des gegebenen {@link Filter}s.
-	 */
-	static abstract class AbstractDelegatingFilter<GInput, GInput2> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter}.
-		 */
-		final Filter<? super GInput2> filter;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Filter}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public AbstractDelegatingFilter(final Filter<? super GInput2> filter) throws NullPointerException {
-			if (filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof AbstractDelegatingFilter<?, ?>)) return false;
-			final AbstractDelegatingFilter<?, ?> data = (AbstractDelegatingFilter<?, ?>)object;
-			return Objects.equals(this.filter, data.filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.filter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Filter}, der die {@code null}-Eingabe ablehnat und alle anderen Eingaben akzeptiert. Die Eingabeakzeptanz für eine
-	 * Eingabe {@code input} ergibt sich aus:
-	 * 
-	 * <pre>input != null</pre>
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class NullFilter extends AbstractFilter<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link NullFilter}.
-		 */
-		public static final NullFilter INSTANCE = new NullFilter();
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean accept(final Object input) {
 			return input != null;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof NullFilter);
+		public String toString() {
+			return "NULL_FILTER";
 		}
 
-	}
+	};
 
 	/**
-	 * Diese Klasse implementiert den {@link Filter}, der nur die Eingaben akzeptiert, die Instanzen einer gegebenen Klasse oder ihrer Nachfahren sind.
-	 * 
-	 * @see Class#isInstance(Object)
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
+	 * Dieses Feld speichert den {@link Filter}, der jede Eingabe ablehnt.
 	 */
-	public static final class ClassFilter<GInput> extends AbstractFilter<GInput> {
+	public static final Filter<Object> REJECT_FILTER = new Filter<Object>() {
 
-		/**
-		 * Dieses Feld speichert die Klasse.
-		 */
-		final Class<?> clazz;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Klasse.
-		 * 
-		 * @param clazz Klasse.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public ClassFilter(final Class<?> clazz) throws NullPointerException {
-			if (clazz == null) throw new NullPointerException();
-			this.clazz = clazz;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.clazz.isInstance(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.clazz);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ClassFilter<?>)) return false;
-			final ClassFilter<?> data = (ClassFilter<?>)object;
-			return Objects.equals(this.clazz, data.clazz);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Filter}, der jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer {@code true}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class AcceptFilter extends AbstractFilter<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link AcceptFilter}.
-		 */
-		public static final AcceptFilter INSTANCE = new AcceptFilter();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final Object input) {
-			return true;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof AcceptFilter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link Filter}, der jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer {@code false}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class RejectFilter extends AbstractFilter<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link RejectFilter}.
-		 */
-		public static final RejectFilter INSTANCE = new RejectFilter();
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean accept(final Object input) {
 			return false;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof RejectFilter);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Negation ({@code !}-Operator) eines gegebenen {@link Filter}s berechnet. Der {@link Filter}
-	 * akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn der gegebene
-	 * {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie einen {@link Filter} {@code filter} ergibt sich aus:
-	 * 
-	 * <pre>!filter.accept(input)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class NegationFilter<GInput> extends AbstractDelegatingFilter<GInput, GInput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Filter}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public NegationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-			super(filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return !this.filter.accept(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof NegationFilter<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der nur die in einer gegebenen {@link Collection} enthaltenen Eingaben akzeptiert. Die Eingabeakzeptanz
-	 * für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
-	 * 
-	 * <pre>collection.contains(input)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class ContainsFilter<GInput> implements Filter<GInput> {
-
-		/**
-		 * Dieses Feld speichert die {@link Collection}.
-		 */
-		final Collection<?> collection;
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Collection}.
-		 * 
-		 * @param collection {@link Collection}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public ContainsFilter(final Collection<?> collection) {
-			if (collection == null) throw new NullPointerException();
-			this.collection = collection;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.collection.contains(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.collection);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ContainsFilter<?>)) return false;
-			final ContainsFilter<?> data = (ContainsFilter<?>)object;
-			return Objects.equals(this.collection, data.collection);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.collection);
+			return "REJECT_FILTER";
 		}
 
-	}
+	};
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, dessen konvertierte Eingabe von einem gegebenen {@link Filter} bewertet wird. Der {@link Filter}
-	 * konvertiert seine Eingabe mit einem gegebenen {@link Converter} zur Eingabe eines gegebenen {@link Filter}s. Der {@link Filter} akzeptiert eine Eingabe nur
-	 * dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen {@link Filter} die
-	 * konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input}, einen {@link Filter} {@code filter} sowie einen {@link Converter}
-	 * {@code converter} ergibt sich aus:
-	 * 
-	 * <pre>filter.accept(converter.convert(input))</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des {@link Filter}s sowie des gegebenen {@link Converter}s.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Eingabe des gegebenen {@link Filter}s.
+	 * Dieses Feld speichert den {@link Filter}, der jede Eingabe akzeptiert.
 	 */
-	public static final class ConvertedFilter<GInput, GOutput> extends AbstractDelegatingFilter<GInput, GOutput> {
+	public static final Filter<Object> ACCEPT_FILTER = new Filter<Object>() {
 
-		/**
-		 * Dieses Feld speichert den {@link Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieser Konstruktor initialisiert {@link Filter} und {@link Converter}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @param converter {@link Converter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ConvertedFilter(final Converter<? super GInput, ? extends GOutput> converter, final Filter<? super GOutput> filter) {
-			super(filter);
-			if (filter == null) throw new NullPointerException();
-			if (converter == null) throw new NullPointerException();
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public boolean accept(final GInput input) {
-			return this.filter.accept(this.converter.convert(input));
+		public boolean accept(final Object input) {
+			return true;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter, this.converter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ConvertedFilter<?, ?>)) return false;
-			final ConvertedFilter<?, ?> data = (ConvertedFilter<?, ?>)object;
-			return Objects.equals(this.converter, data.converter) && Objects.equals(this.filter, data.filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.converter, this.filter);
+			return "ACCEPT_FILTER";
 		}
 
-	}
+	};
+
+	{}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter}
-	 * akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab, wenn
-	 * die beiden gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter} {@code filter1} und
-	 * {@code filter2} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Converter} zurück.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code Boolean.TRUE.equals(converter.convert(input))}.
 	 * 
-	 * <pre>filter1.accept(input) || filter2.accept(input)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
+	 * @param converter {@link Converter}.
+	 * @return {@link Converter}-Adapter.
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static final class DisjunctionFilter<GInput> extends AbstractJunctionFilter<GInput> {
+	public static <GInput> Filter<GInput> converterAdapter(final Converter<? super GInput, Boolean> converter) throws NullPointerException {
+		if (converter == null) throw new NullPointerException("converter = null");
+		return new Filter<GInput>() {
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Filter}.
-		 * 
-		 * @param filter1 primärer {@link Filter}.
-		 * @param filter2 sekundärer {@link Filter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public DisjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			super(filter1, filter2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) || this.filter2.accept(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof DisjunctionFilter<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) zweier gegebener {@link Filter} berechnet. Der
-	 * {@link Filter} akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die Eingabe genau dann ab,
-	 * wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei {@link Filter}
-	 * {@code filter1} und {@code filter2} ergibt sich aus:
-	 * 
-	 * <pre>filter1.accept(input) &amp;&amp; filter2.accept(input)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class ConjunctionFilter<GInput> extends AbstractJunctionFilter<GInput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Filter}.
-		 * 
-		 * @param filter1 primärer {@link Filter}.
-		 * @param filter2 sekundärer {@link Filter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ConjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			super(filter1, filter2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) && this.filter2.accept(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof ConjunctionFilter<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) zweier gegebener {@link Filter} berechnet. Der {@link Filter}
-	 * akzeptiert eine Eingabe nur dann, wenn die beiden gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die Eingabe genau dann ab,
-	 * wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} sowie zwei
-	 * {@link Filter} {@code filter1} und {@code filter2} ergibt sich aus:
-	 * 
-	 * <pre>filter1.accept(input) == filter2.accept(input)</pre>
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class EquivalenceFilter<GInput> extends AbstractJunctionFilter<GInput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert die {@link Filter}.
-		 * 
-		 * @param filter1 primärer {@link Filter}.
-		 * @param filter2 sekundärer {@link Filter}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public EquivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2) {
-			super(filter1, filter2);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			return this.filter1.accept(input) == this.filter2.accept(input);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof EquivalenceFilter<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Filter}, der einen gegebenen {@link Filter} synchronisiert. Die Synchronisation erfolgt via
-	 * {@code synchronized(this)}.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 */
-	public static final class SynchronizedFilter<GInput> extends AbstractDelegatingFilter<GInput, GInput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Filter}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-		 */
-		public SynchronizedFilter(final Filter<? super GInput> filter) {
-			super(filter);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean accept(final GInput input) {
-			synchronized (this) {
-				return this.filter.accept(input);
+			@Override
+			public boolean accept(final GInput input) {
+				final Boolean result = converter.convert(input);
+				return (result != null) && result.booleanValue();
 			}
-		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if ((object == this) || Objects.equals(object, this.filter)) return true;
-			if (!(object instanceof SynchronizedFilter<?>)) return false;
-			return super.equals(object);
-		}
+			@Override
+			public String toString() {
+				return Objects.toStringCall("converterAdapter", converter);
+			}
 
+		};
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind. Die Eingabeakzeptanz für eine Eingabe
-	 * {@code input} ergibt sich aus:
+	 * Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code input != null}.
 	 * 
-	 * <pre>input != null</pre>
-	 * 
-	 * @see NullFilter#INSTANCE
 	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link NullFilter}.
+	 * @return {@link #NULL_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> nullFilter() {
-		return (Filter<GInput>)NullFilter.INSTANCE;
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterEQ(final Comparable<? super GItem> comparable) {
-		return new Filter<GItem>() {
-
-			@Override
-			public boolean accept(final GItem input) {
-				return comparable.compareTo(input) == 0;
-			}
-
-		};
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterNE(final Comparable<? super GItem> comparable) {
-		return negationFilter(comparableFilterEQ(comparable));
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterGT(final Comparable<? super GItem> comparable) {
-		return new Filter<GItem>() {
-
-			@Override
-			public boolean accept(final GItem input) {
-				return comparable.compareTo(input) <= 0;
-			}
-
-		};
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterGE(final Comparable<? super GItem> comparable) {
-		return negationFilter(comparableFilterLT(comparable));
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterLT(final Comparable<? super GItem> comparable) {
-		return new Filter<GItem>() {
-
-			@Override
-			public boolean accept(final GItem input) {
-				return comparable.compareTo(input) >= 0;
-			}
-
-		};
-	}
-
-	public static <GItem> Filter<GItem> comparableFilterLE(final Comparable<? super GItem> comparable) {
-		return negationFilter(comparableFilterGT(comparable));
+		return (Filter<GInput>)Filters.NULL_FILTER;
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode der nur die Eingaben akzeptiert, die Instanzen der gegebenen
-	 * {@link Class} oder ihrer Nachfahren sind.
+	 * Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code inputType.isInstance(input)}.
 	 * 
-	 * @see ClassFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param clazz {@link Class}.
-	 * @return {@link ClassFilter}.
+	 * @param inputType {@link Class} der akzeptierten Eingaben.
+	 * @return {@code type}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code inputType} {@code null} ist.
 	 */
-	public static <GInput> ClassFilter<GInput> classFilter(final Class<?> clazz) {
-		return new ClassFilter<GInput>(clazz);
+	public static <GInput> Filter<GInput> typeFilter(final Class<?> inputType) throws NullPointerException {
+		if (inputType == null) throw new NullPointerException("inputType = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return inputType.isInstance(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("typeFilter", inputType);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe akzeptiert. Die Eingabeakzeptanz ist immer
-	 * {@code true}.
+	 * Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe ablehnt.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code false}.
 	 * 
-	 * @see AcceptFilter#INSTANCE
 	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link AcceptFilter}.
-	 */
-	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> acceptFilter() {
-		return (Filter<GInput>)AcceptFilter.INSTANCE;
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, dessen {@link Filter#accept(Object)}-Methode jede Eingabe ablehnt. Die Eingabeakzeptanz ist immer
-	 * {@code false}.
-	 * 
-	 * @see RejectFilter#INSTANCE
-	 * @param <GInput> Typ der Eingabe.
-	 * @return {@link RejectFilter}.
+	 * @return {@link #REJECT_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GInput> Filter<GInput> rejectFilter() {
-		return (Filter<GInput>)RejectFilter.INSTANCE;
+		return (Filter<GInput>)Filters.REJECT_FILTER;
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Negation ({@code !}-Operator) des gegebenen {@link Filter}s berechnet, und gibt diesen zurück. Der
-	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn der gegebene {@link Filter} die Eingabe ablehnt und er lehnt eine Eingabe nur dann ab, wenn
-	 * der gegebene {@link Filter} die Eingabe akzeptiert. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe akzeptiert.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code true}.
 	 * 
-	 * <pre>!filter.accept(input)</pre>
-	 * 
-	 * @see NegationFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param filter {@link Filter}.
-	 * @return {@link NegationFilter}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @return {@link #ACCEPT_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if (filter == null) throw new NullPointerException();
-		if (filter == AcceptFilter.INSTANCE) return Filters.rejectFilter();
-		if (filter == RejectFilter.INSTANCE) return Filters.acceptFilter();
-		if (filter instanceof NegationFilter<?>) return (Filter<GInput>)((NegationFilter<?>)filter).filter;
-		return new NegationFilter<GInput>(filter);
+	public static <GInput> Filter<GInput> acceptFilter() {
+		return (Filter<GInput>)Filters.ACCEPT_FILTER;
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der nur die gegebenen Eingaben akzeptiert, und gibt diesen zurück.
+	 * Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
+	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf Eingaben bestückt.
+	 * 
+	 * @see #cachedFilter(Filter)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param filter {@link Filter}.
+	 * @return {@code cached}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		return Filters.cachedFilter(Integer.MAX_VALUE, Pointers.SOFT, filter);
+	}
+
+	/**
+	 * Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
+	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf Eingaben bestückt.
+	 * 
+	 * @see #converterAdapter(Converter)
+	 * @see Converters#filterAdapter(Filter)
+	 * @see Converters#cachedConverter(int, int, int, Converter)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
+	 * @param mode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD},
+	 *        {@link Pointers#SOFT}, {@link Pointers#WEAK}).
+	 * @param filter {@link Filter}.
+	 * @return {@code cached}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@link Converters#cachedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst.
+	 */
+	public static <GInput> Filter<GInput> cachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
+		IllegalArgumentException {
+		if (filter == null) throw new NullPointerException("filter = null");
+		return Filters.converterAdapter(Converters.cachedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
 	 * 
 	 * @see #containsFilter(Collection)
 	 * @param <GInput> Typ der Eingabe.
-	 * @param inputs Eingaben.
-	 * @return {@link Filter}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @param items akzeptierte Eingaben.
+	 * @return {@code contains}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> containsFilter(final Object... inputs) throws NullPointerException {
-		if (inputs.length == 0) return Filters.<GInput>rejectFilter();
-		if (inputs.length == 1) return Filters.containsFilter(Collections.singleton(inputs[0]));
-		return Filters.containsFilter(new HashSet<Object>(Arrays.asList(inputs)));
+	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
+		if (items == null) throw new NullPointerException("items = null");
+		if (items.length == 0) return Filters.rejectFilter();
+		if (items.length == 1) return Filters.containsFilter(Collections.singleton(items[0]));
+		return Filters.containsFilter(new HashSet<>(Arrays.asList(items)));
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der nur die in der gegebenen {@link Collection} enthaltenen Eingaben akzeptiert, und gibt diesen zurück. Die
-	 * Eingabeakzeptanz für eine Eingabe {@code input} sowie eine {@link Collection} {@code collection} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
 	 * 
-	 * <pre>collection.contains(input)</pre>
-	 * 
-	 * @see ContainsFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param collection {@link Collection}.
-	 * @return {@link ContainsFilter}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @param collection {@link Collection} der akzeptierten Eingaben.
+	 * @return {@code contains}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code collection} {@code null} ist.
 	 */
-	public static <GInput> ContainsFilter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
-		return new ContainsFilter<GInput>(collection);
+	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
+		if (collection == null) throw new NullPointerException("collection = null");
+		if (collection.isEmpty()) return Filters.rejectFilter();
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return collection.contains(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("containsFilter", collection);
+			}
+
+		};
 	}
 
-	public static <GInput, GOutput> Filter<GInput> fieldFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) == 0}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code equal}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> equalFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException("comparable = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return comparable.compareTo(input) == 0;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("equalFilter", comparable);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) >= 0}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code lower}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> lowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException("comparable = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return comparable.compareTo(input) >= 0;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("lowerFilter", comparable);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) <= 0}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
+	 * @return {@code higher}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> higherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException("comparable = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return comparable.compareTo(input) <= 0;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("higherFilter", comparable);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code !filter.accept(input)}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param filter {@link Filter}.
+	 * @return {@code negation}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		if (filter == null) throw new NullPointerException("filter = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return !filter.accept(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("negationFilter", filter);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Field} zur Eingabe des gegebenen
+	 * {@link Filter} navigiert.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(field.get(input))}.
+	 * 
+	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
+	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie des Werts des {@link Field}.
+	 * @param field {@link Field} zur Navigation.
+	 * @param filter {@link Field}.
+	 * @return {@code navigated}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code field} bzw. {@code filter} {@code null} ist.
+	 */
+	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
 		throws NullPointerException {
-		if (filter == null) throw new NullPointerException();
-		if (field == null) throw new NullPointerException();
+		if (field == null) throw new NullPointerException("field = null");
+		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
 
 			@Override
@@ -813,30 +363,30 @@ public class Filters {
 				return filter.accept(field.get(input));
 			}
 
+			@Override
+			public String toString() {
+				return Objects.toStringCall("navigatedFilter", field, filter);
+			}
+
 		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, dessen konvertierte Eingabe vom gegebenen {@link Filter} bewertet wird, und gibt diesen zurück. Der erzeugte
-	 * {@link Filter} konvertiert seine Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen {@link Filter}s. Der erzeugte {@link Filter}
-	 * akzeptiert eine Eingabe nur dann, wenn der gegebenen {@link Filter} die konvertierte Eingabe akzeptiert und er lehnt eine Eingabe ab, wenn der gegebenen
-	 * {@link Filter} die konvertierte Eingabe ablehnt. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
+	 * {@link Filter} navigiert.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(converter.convert(input))}.
 	 * 
-	 * <pre>filter.accept(converter.convert(input))</pre>
-	 * 
-	 * @see Converter
-	 * @see ConvertedFilter
-	 * @param <GInput> Typ der Eingabe des {@link Filter}s sowie des gegebenen {@link Converter}s.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Eingabe des gegebenen {@link Filter Filters}.
-	 * @param converter {@link Converter}.
-	 * @param filter {@link Filter}.
-	 * @return {@link ConvertedFilter}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
+	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Converter}.
+	 * @param converter {@link Converter} zur Navigation.
+	 * @param filter {@link Field}.
+	 * @return {@code navigated}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code converter} bzw. {@code filter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Filter<GInput> convertedFilter(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Converter<? super GInput, ? extends GOutput> converter,
 		final Filter<? super GOutput> filter) throws NullPointerException {
-		if (filter == null) throw new NullPointerException();
-		if (converter == null) throw new NullPointerException();
+		if (converter == null) throw new NullPointerException("converter = null");
+		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
 
 			@Override
@@ -844,89 +394,127 @@ public class Filters {
 				return filter.accept(converter.convert(input));
 			}
 
+			@Override
+			public String toString() {
+				return Objects.toStringCall("navigatedFilter", converter, filter);
+			}
+
 		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Disjunktion ({@code ||}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der
-	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn mindestens einer der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die
-	 * Eingabe genau dann ab, wenn beide gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden <br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) || filter2.accept(input)}.
 	 * 
-	 * <pre>filter1.accept(input) || filter2.accept(input)</pre>
-	 * 
-	 * @see DisjunctionFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param filter1 {@link Filter} 1.
-	 * @param filter2 {@link Filter} 2.
-	 * @return {@link DisjunctionFilter}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @param filter1 erster {@link Filter}.
+	 * @param filter2 zweiter {@link Filter}.
+	 * @return {@code disjunction}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
 	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if ((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
-			return Filters.negationFilter(Filters.conjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
-		return new DisjunctionFilter<GInput>(filter1, filter2);
+		if (filter1 == null) throw new NullPointerException("filter1 = null");
+		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return filter1.accept(input) || filter2.accept(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("disjunctionFilter", filter1, filter2);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Konjunktion ({@code &amp;&amp;}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen
-	 * zurück. Der erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn alle der gegebenen {@link Filter} die Eingabe akzeptiert und er lehnt die
-	 * Eingabe genau dann ab, wenn mindestens einer der gegebenen {@link Filter} die Eingabe ablehnen. Die Eingabeakzeptanz für eine Eingabe {@code input} ergibt
-	 * sich aus:
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden <br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) && filter2.accept(input)}.
 	 * 
-	 * <pre>filter1.accept(input) &amp;&amp; filter2.accept(input)</pre>
-	 * 
-	 * @see ConjunctionFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param filter1 {@link Filter} 1.
-	 * @param filter2 {@link Filter} 2.
-	 * @return {@link ConjunctionFilter}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @param filter1 erster {@link Filter}.
+	 * @param filter2 zweiter {@link Filter}.
+	 * @return {@code conjunction}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
 	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		if ((filter1 instanceof NegationFilter<?>) && (filter2 instanceof NegationFilter<?>))
-			return Filters.negationFilter(Filters.disjunctionFilter(Filters.negationFilter(filter1), Filters.negationFilter(filter2)));
-		return new ConjunctionFilter<GInput>(filter1, filter2);
+		if (filter1 == null) throw new NullPointerException("filter1 = null");
+		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return filter1.accept(input) && filter2.accept(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("conjunctionFilter", filter1, filter2);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der die Äquivalenz ({@code ==}-Operator) der gegebenen {@link Filter} berechnet, und gibt diesen zurück. Der
-	 * erzeugte {@link Filter} akzeptiert eine Eingabe nur dann, wenn beide gegebenen {@link Filter} die Eingabe akzeptieren bzw. ablehnen und er lehnt die
-	 * Eingabe genau dann ab, wenn einer der gegebenen {@link Filter} die Eingabe akzeptiert und der andere sie ablehnt. Die Eingabeakzeptanz für eine Eingabe
-	 * {@code input} ergibt sich aus:
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert bzw. abgelehnt
+	 * werden <br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) == filter2.accept(input)}.
 	 * 
-	 * <pre>filter1.accept(input) == filter2.accept(input)</pre>
-	 * 
-	 * @see EquivalenceFilter
 	 * @param <GInput> Typ der Eingabe.
-	 * @param filter1 {@link Filter} 1.
-	 * @param filter2 {@link Filter} 2.
-	 * @return {@link EquivalenceFilter}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @param filter1 erster {@link Filter}.
+	 * @param filter2 zweiter {@link Filter}.
+	 * @return {@code equivalence}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
-	public static <GInput> EquivalenceFilter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
-		return new EquivalenceFilter<GInput>(filter1, filter2);
+		if (filter1 == null) throw new NullPointerException("filter1 = null");
+		if (filter2 == null) throw new NullPointerException("filter2 = null");
+		return new Filter<GInput>() {
+
+			@Override
+			public boolean accept(final GInput input) {
+				return filter1.accept(input) == filter2.accept(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("equivalenceFilter", filter1, filter2);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen {@link Filter}, der den gegebenen {@link Filter} synchronisiert, und gibt diesen zurück.
+	 * Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(this)} synchronisiert.
 	 * 
-	 * @see SynchronizedFilter
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
-	 * @return {@link SynchronizedFilter}.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 * @return {@code synchronized}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> SynchronizedFilter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return new SynchronizedFilter<GInput>(filter);
-	}
+	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		if (filter == null) throw new NullPointerException("filter = null");
+		return new Filter<GInput>() {
 
-	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
-	 */
-	Filters() {
+			@Override
+			public boolean accept(final GInput input) {
+				synchronized (this) {
+					return filter.accept(input);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("synchronizedFilter", filter);
+			}
+
+		};
 	}
 
 }

@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion von {@link Conversion}s.
+ * Diese Klasse implementiert grundlegende {@link Conversion}.
  * 
  * @see Converter
  * @see Converters

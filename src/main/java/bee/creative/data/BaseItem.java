@@ -51,7 +51,7 @@ public abstract class BaseItem implements Item {
 	protected Iterable<? extends Assigner<? super Item, ? super Item>> assigners(final Assignment<? extends Item> assignment) {
 		final Type<?> thisType = this.type(), thatType = assignment.value().type();
 		return Iterables.filteredIterable(Filters.nullFilter(), Iterables.convertedIterable(BaseItem.FIELD_ASSIGNER_CONVERTER, //
-			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>voidIterable()));
+			thisType.is(thatType) ? thatType.fields() : thatType.is(thisType) ? thisType.fields() : Iterables.<Field<?, ?>>emptyIterable()));
 	}
 
 	{}

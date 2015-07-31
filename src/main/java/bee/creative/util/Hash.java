@@ -50,7 +50,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		/**
 		 * Dieses Feld speichert die Position der aktuellen einfach verketteten Liste in der Tabelle.
 		 */
-		int index;
+		int index = 0;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Abbildung und sucht den ersten Eintrag.
@@ -61,6 +61,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			this.hash = hash;
 			this.seek();
 		}
+
+		{}
 
 		/**
 		 * Diese Methode sucht den nächsten Eintrag.
@@ -78,6 +80,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			}
 			this.next = null;
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -117,6 +121,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	}
 
+	{}
+
 	/**
 	 * Dieses Feld speichert die Anzahl der Einträge.
 	 */
@@ -126,6 +132,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * Dieses Feld speichert die Tabelle, in der die einfach verketteter Listen der Einträge einsortiert werden.
 	 */
 	Object[] table = new Object[0];
+
+	{}
 
 	/**
 	 * Diese Methode soll den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück geben.
@@ -400,6 +408,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		this.size = 0;
 		Arrays.fill(this.table, null);
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}

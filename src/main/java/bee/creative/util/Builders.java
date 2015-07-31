@@ -18,7 +18,7 @@ import bee.creative.util.Pointers.NullPointer;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Builder}n.
+ * Diese Klasse implementiert grundlegende {@link Builder}.
  * <p>
  * Im nachfolgenden Beispiel wird ein gepufferter {@link Builder} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse
  * {@code Helper} verwendet:
@@ -153,7 +153,7 @@ public class Builders {
 		public Iterator<GValue> iterator() {
 			final GValue value = this.get();
 			if (value == null) return Iterators.voidIterator();
-			return Iterators.entryIterator(value);
+			return Iterators.itemIterator(value);
 		}
 
 		/**
@@ -1069,7 +1069,7 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt einen synchronisierten {@link Builder} zurück. Die Synchronisation erfolgt via {@code synchronized(this)}.
+	 * Diese Methode gibt einen synchronisierten {@link Builder} zurück, der den gegebenen {@link Builder} via {@code synchronized(this)} synchronisiert.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.

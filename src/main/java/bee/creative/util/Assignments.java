@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Assignment}n und {@link Assignable}s.
+ * Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
  * 
  * @see Assignment
  * @see Assignable

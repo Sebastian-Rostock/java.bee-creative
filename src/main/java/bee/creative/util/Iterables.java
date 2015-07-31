@@ -220,38 +220,6 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Klasse implementiert das leere {@link Iterable}.
-	 * 
-	 * @see VoidIterator
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class VoidIterable extends AbstractIterable<Object> {
-
-		/**
-		 * Dieses Feld speichert das {@link VoidIterable}.
-		 */
-		public static final Iterable<?> INSTANCE = new VoidIterable();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public Iterator<Object> iterator() {
-			return (Iterator<Object>)VoidIterator.INSTANCE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof VoidIterable);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert ein {@link Iterable} über ein einzelnes, gegebenes Element.
 	 * 
 	 * @see EntryIterator
@@ -474,136 +442,6 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Klasse implementiert ein {@link Iterable}, das eine begrenzte Anzahl an Elementen eines gegebenen {@link Iterable}s liefert.
-	 * 
-	 * @see LimitedIterator
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class LimitedIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
-
-		/**
-		 * Dieses Feld speichert die Anzahl.
-		 */
-		final int count;
-
-		/**
-		 * Dieser Konstruktor initialisiert Anzahl und {@link Iterable}.
-		 * 
-		 * @param count Anzahl.
-		 * @param iterable {@link Iterable}.
-		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
-		 */
-		public LimitedIterable(final int count, final Iterable<? extends GEntry> iterable) throws NullPointerException, IllegalArgumentException {
-			super(iterable);
-			if (count < 0) throw new IllegalArgumentException();
-			this.count = count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<GEntry> iterator() {
-			return new LimitedIterator<GEntry>(this.count, this.iterable.iterator());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.count, this.iterable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof LimitedIterable<?>)) return false;
-			final LimitedIterable<?> data = (LimitedIterable<?>)object;
-			return (this.count == data.count) && Objects.equals(this.iterable, data.iterable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.count, this.iterable);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein {@link Iterable}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterable}s
-	 * liefert.
-	 * 
-	 * @see FilteredIterator
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class FilteredIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
-
-		/**
-		 * Dieses Feld speichert den {@link Filter}.
-		 */
-		final Filter<? super GEntry> filter;
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Filter} und {@link Iterable}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @param iterable {@link Iterable}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
-			super(iterable);
-			if (filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<GEntry> iterator() {
-			return new FilteredIterator<GEntry>(this.filter, this.iterable.iterator());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.filter, this.iterable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FilteredIterable<?>)) return false;
-			final FilteredIterable<?> data = (FilteredIterable<?>)object;
-			return Objects.equals(this.filter, data.filter) && Objects.equals(this.iterable, data.iterable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.filter, this.iterable);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert.
 	 * 
 	 * @see ChainedIterator
@@ -638,8 +476,8 @@ public class Iterables {
 		@SuppressWarnings ("unchecked")
 		@Override
 		public Iterator<GEntry> iterator() {
-			return new ChainedIterator<GEntry>(new ConvertedIterator<Iterable<? extends GEntry>, Iterator<? extends GEntry>>(
-				(IterableIteratorConverter<GEntry>)IterableIteratorConverter.INSTANCE, this.iterable.iterator()));
+			return Iterators
+				.chainedIterator(Iterators.convertedIterator(Iterables.<Iterable<? extends GEntry>>iterableIteratorConverter(), this.iterable.iterator()));
 		}
 
 		/**
@@ -721,75 +559,31 @@ public class Iterables {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt.
-	 * 
-	 * @see UnmodifiableIterator
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
-	 */
-	public static final class UnmodifiableIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterable}.
-		 * 
-		 * @param iterable {@link Iterable}.
-		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
-		 */
-		public UnmodifiableIterable(final Iterable<? extends GEntry> iterable) throws NullPointerException {
-			super(iterable);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<GEntry> iterator() {
-			return new UnmodifiableIterator<GEntry>(this.iterable.iterator());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof UnmodifiableIterable<?>)) return false;
-			return super.equals(object);
-		}
-
-	}
+	{}
 
 	/**
-	 * Diese Klasse implementiert den {@link Converter}, der den {@link Iterator} eines {@link Iterable}s ermittelt.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GEntry> Typ der Elemente.
+	 * Dieses Feld speichert das leere {@link Iterable}.
 	 */
-	public static final class IterableIteratorConverter<GEntry> extends AbstractConverter<Iterable<? extends GEntry>, Iterator<? extends GEntry>> {
+	public static final Iterable<?> EMPTY_ITERABLE = new Iterable<Object>() {
 
-		/**
-		 * Dieses Feld speichert den {@link IterableIteratorConverter}.
-		 */
-		public static final IterableIteratorConverter<?> INSTANCE = new IterableIteratorConverter<Object>();
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public Iterator<? extends GEntry> convert(final Iterable<? extends GEntry> input) {
+		public Iterator<Object> iterator() {
+			return Iterators.voidIterator();
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Converter}, der den {@link Iterator} eines {@link Iterable} ermittelt.
+	 */
+	public static final Converter<?, ?> ITERABLE_ITERATOR = new Converter<Iterable<?>, Iterator<?>>() {
+
+		@Override
+		public Iterator<?> convert(final Iterable<?> input) {
 			return input.iterator();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			return (object == this) || (object instanceof IterableIteratorConverter);
-		}
-
-	}
+	};
 
 	{}
 
@@ -903,7 +697,7 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt den gegebenen {@link Iterable} oder den leeren {@link Iterable} zurück.
 	 * 
-	 * @see Iterables#voidIterable()
+	 * @see Iterables#emptyIterable()
 	 * @param <GEntry> Typ der Elemente.
 	 * @param iterable {@link Iterable}.
 	 * @return {@link Iterable} oder {@code void}-{@link Iterable}.
@@ -916,15 +710,13 @@ public class Iterables {
 	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der den {@link Iterator} eines {@link Iterable} ermittelt.
 	 * 
-	 * @see IterableIteratorConverter
-	 * @see Converter
 	 * @see Iterable#iterator()
 	 * @param <GEntry> Typ der Elemente.
-	 * @return {@link IterableIteratorConverter}.
+	 * @return {@link #ITERABLE_ITERATOR}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry> IterableIteratorConverter<GEntry> iterableIteratorConverter() {
-		return (IterableIteratorConverter<GEntry>)IterableIteratorConverter.INSTANCE;
+	public static <GEntry> Converter<Iterable<GEntry>, Iterator<GEntry>> iterableIteratorConverter() {
+		return (Converter<Iterable<GEntry>, Iterator<GEntry>>)ITERABLE_ITERATOR;
 	}
 
 	/**
@@ -936,15 +728,15 @@ public class Iterables {
 	 * @return {@link VoidIterable}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry> Iterable<GEntry> voidIterable() {
-		return (Iterable<GEntry>)VoidIterable.INSTANCE;
+	public static <GEntry> Iterable<GEntry> emptyIterable() {
+		return (Iterable<GEntry>)EMPTY_ITERABLE;
 	}
 
 	/**
 	 * Diese Methode gibt ein {@link Iterable} über das gegebene Element zurück.
 	 * 
 	 * @see EntryIterable
-	 * @see Iterators#entryIterator(Object)
+	 * @see Iterators#itemIterator(Object)
 	 * @param <GEntry> Typ des Elements.
 	 * @param entry Element.
 	 * @return {@link EntryIterable}
@@ -996,6 +788,71 @@ public class Iterables {
 	}
 
 	/**
+	 * Diese Klasse implementiert ein {@link Iterable}, das eine begrenzte Anzahl an Elementen eines gegebenen {@link Iterable}s liefert.
+	 * 
+	 * @see LimitedIterator
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class LimitedIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
+
+		/**
+		 * Dieses Feld speichert die Anzahl.
+		 */
+		final int count;
+
+		/**
+		 * Dieser Konstruktor initialisiert Anzahl und {@link Iterable}.
+		 * 
+		 * @param count Anzahl.
+		 * @param iterable {@link Iterable}.
+		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+		 */
+		public LimitedIterable(final int count, final Iterable<? extends GEntry> iterable) throws NullPointerException, IllegalArgumentException {
+			super(iterable);
+			if (count < 0) throw new IllegalArgumentException();
+			this.count = count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return new LimitedIterator<GEntry>(this.count, this.iterable.iterator());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.count, this.iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof LimitedIterable<?>)) return false;
+			final LimitedIterable<?> data = (LimitedIterable<?>)object;
+			return (this.count == data.count) && Objects.equals(this.iterable, data.iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.count, this.iterable);
+		}
+
+	}
+
+	/**
 	 * Diese Methode erzeugt ein {@link Iterable}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterable}s liefert, und
 	 * gibt es zurück.
 	 * 
@@ -1009,6 +866,71 @@ public class Iterables {
 	public static <GEntry> FilteredIterable<GEntry> filteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable)
 		throws NullPointerException {
 		return new FilteredIterable<GEntry>(filter, iterable);
+	}
+
+	/**
+	 * Diese Klasse implementiert ein {@link Iterable}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterable}s
+	 * liefert.
+	 * 
+	 * @see FilteredIterator
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
+	 */
+	public static final class FilteredIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
+
+		/**
+		 * Dieses Feld speichert den {@link Filter}.
+		 */
+		final Filter<? super GEntry> filter;
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link Filter} und {@link Iterable}.
+		 * 
+		 * @param filter {@link Filter}.
+		 * @param iterable {@link Iterable}.
+		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+		 */
+		public FilteredIterable(final Filter<? super GEntry> filter, final Iterable<? extends GEntry> iterable) throws NullPointerException {
+			super(iterable);
+			if (filter == null) throw new NullPointerException();
+			this.filter = filter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return new FilteredIterator<GEntry>(this.filter, this.iterable.iterator());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.filter, this.iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof FilteredIterable<?>)) return false;
+			final FilteredIterable<?> data = (FilteredIterable<?>)object;
+			return Objects.equals(this.filter, data.filter) && Objects.equals(this.iterable, data.iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toStringCall(this, this.filter, this.iterable);
+		}
+
 	}
 
 	/**
@@ -1089,9 +1011,42 @@ public class Iterables {
 	}
 
 	/**
-	 * Dieser Konstruktor ist versteckt und verhindert damit die Erzeugung von Instanzen der Klasse.
+	 * Diese Klasse implementiert ein {@link Iterable}, das den {@link Iterator} eins gegebenen {@link Iterable} als {@link UnmodifiableIterator} bereitstellt.
+	 * 
+	 * @see UnmodifiableIterator
+	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GEntry> Typ der Elemente.
 	 */
-	Iterables() {
+	public static final class UnmodifiableIterable<GEntry> extends AbstractDelegatingIterable<GEntry, GEntry> {
+
+		/**
+		 * Dieser Konstruktor initialisiert den {@link Iterable}.
+		 * 
+		 * @param iterable {@link Iterable}.
+		 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
+		 */
+		public UnmodifiableIterable(final Iterable<? extends GEntry> iterable) throws NullPointerException {
+			super(iterable);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<GEntry> iterator() {
+			return new UnmodifiableIterator<GEntry>(this.iterable.iterator());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(final Object object) {
+			if (object == this) return true;
+			if (!(object instanceof UnmodifiableIterable<?>)) return false;
+			return super.equals(object);
+		}
+
 	}
 
 }
