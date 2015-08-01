@@ -1,6 +1,6 @@
 package bee.creative.bex;
 
-import bee.creative.util.Comparables.Get;
+import bee.creative.util.Comparables.Items;
 
 /**
  * Diese Schnittstelle definiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
@@ -8,7 +8,7 @@ import bee.creative.util.Comparables.Get;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface BEXList extends Get<BEXNode>, Iterable<BEXNode> {
+public interface BEXList extends Items<BEXNode>, Iterable<BEXNode> {
 
 	/**
 	 * Dieses Feld speichert die Typkennung einer undefinierten Knotenliste.

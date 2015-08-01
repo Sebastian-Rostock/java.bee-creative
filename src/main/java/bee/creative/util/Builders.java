@@ -26,7 +26,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * <pre>
  * public final class Helper {
  * 
- *   static final {@literal Builder<Helper> CACHE = Builders.synchronizedBuilder(Builders.cachedBuilder(new Builder<Helper>()} {
+ *   static final {@literal Builder<Helper> CACHE = Builders.synchronizedBuilder(Builders.bufferedBuilder(new Builder<Helper>()} {
  *   
  *     public Helper build() {
  *       return new Helper();
@@ -152,7 +152,7 @@ public class Builders {
 		@Override
 		public Iterator<GValue> iterator() {
 			final GValue value = this.get();
-			if (value == null) return Iterators.voidIterator();
+			if (value == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(value);
 		}
 
@@ -988,14 +988,14 @@ public class Builders {
 	 * Diese Methode gibt einen gepufferten {@link Builder} zurück, der den vonm gegebenen {@link Builder} erzeugten Datensatz mit Hilfe eines {@link SoftPointer}
 	 * verwaltet.
 	 * 
-	 * @see #cachedBuilder(int, Builder)
+	 * @see #bufferedBuilder(int, Builder)
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
-	 * @return {@code cached}-{@link Builder}.
+	 * @return {@code buffered}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist.
 	 */
-	public static <GValue> Builder<GValue> cachedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
-		return Builders.cachedBuilder(Pointers.SOFT, builder);
+	public static <GValue> Builder<GValue> bufferedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
+		return Builders.bufferedBuilder(Pointers.SOFT, builder);
 	}
 
 	/**
@@ -1005,11 +1005,11 @@ public class Builders {
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param mode {@link Pointer}-Modus ({@link Pointers#HARD}, {@link Pointers#WEAK}, {@link Pointers#SOFT}).
 	 * @param builder {@link Builder}.
-	 * @return {@code cached}-{@link Builder}.
+	 * @return {@code buffered}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist.
 	 */
-	public static <GValue> Builder<GValue> cachedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
+	public static <GValue> Builder<GValue> bufferedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
 		IllegalArgumentException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		Pointers.pointer(mode, null);
@@ -1032,7 +1032,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("cachedBuilder", mode, builder);
+				return Objects.toStringCall("bufferedBuilder", mode, builder);
 			}
 
 		};
@@ -1046,10 +1046,10 @@ public class Builders {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 * @param converter {@link Converter}.
 	 * @param builder {@link Builder}.
-	 * @return {@code converted}-{@link Builder}.
+	 * @return {@code navigated}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Builder<GOutput> navigatedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -1062,7 +1062,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedBuilder", converter, builder);
+				return Objects.toStringCall("navigatedBuilder", converter, builder);
 			}
 
 		};

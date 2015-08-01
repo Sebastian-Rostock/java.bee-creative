@@ -197,7 +197,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @return {@link Iterator} über die Einträge.
 	 */
 	protected final Iterator<GEntry> getEntries() {
-		return ((this.size == 0) ? Iterators.<GEntry>voidIterator() : new HashIterator<GKey, GEntry>(this));
+		return ((this.size == 0) ? Iterators.<GEntry>emptyIterator() : new HashIterator<GKey, GEntry>(this));
 	}
 
 	/**

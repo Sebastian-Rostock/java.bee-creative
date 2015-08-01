@@ -16,7 +16,7 @@ import bee.creative.util.Pointers.SoftPointer;
  * <pre>
  * public final class Helper {
  * 
- *   static final {@literal Converter<Thread, Helper> CACHE = Converters.synchronizedConverter(Converters.cachedConverter(new Converter<Thread, Helper>()} {
+ *   static final {@literal Converter<Thread, Helper> CACHE = Converters.synchronizedConverter(Converters.bufferedConverter(new Converter<Thread, Helper>()} {
  *   
  *     public Helper convert(Thread value) {
  *       return new Helper(value);
@@ -64,6 +64,33 @@ public class Converters {
 	{}
 
 	/**
+	 * Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Field} zurück.<br>
+	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code field.get(input)}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param field {@link Field}.
+	 * @return {@link Field}-Adapter.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GInput, GValue> Converter<GInput, GValue> fieldAdapter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
+		if (field == null) throw new NullPointerException("field = null");
+		return new Converter<GInput, GValue>() {
+
+			@Override
+			public GValue convert(final GInput input) {
+				return field.get(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("fieldAdapter", field);
+			}
+
+		};
+	}
+
+	/**
 	 * Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Filter} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(input))}.
 	 * 
@@ -90,28 +117,96 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, dessen Ausgabe dem Wert der über das gegebene {@link Field} beschriebenen Eigenschaft der Eingabe
-	 * entspricht.<br>
-	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code field.get(input)}.
+	 * Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
+	 * ließt. Die native Methode wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
 	 * 
+	 * @see Class#getMethod(String, Class...)
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts.
-	 * @param field {@link Field}.
-	 * @return {@code field}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param methodName Name der nativen Methode.
+	 * @return {@code native}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code methodName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Converter<GInput, GValue> fieldConverter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
-		return new Converter<GInput, GValue>() {
+	public static <GInput, GOutput> Converter<GInput, GOutput> nativeMethod(final String methodName) throws NullPointerException {
+		if (methodName == null) throw new NullPointerException("methodName = null");
+		return new Converter<GInput, GOutput>() {
 
 			@Override
-			public GValue convert(final GInput input) {
-				return field.get(input);
+			public GOutput convert(final GInput input) {
+				if (input == null) throw new NullPointerException("input = null");
+				try {
+					final java.lang.reflect.Method method = input.getClass().getMethod(methodName);
+					try {
+						@SuppressWarnings ("unchecked")
+						final GOutput result = (GOutput)method.invoke(input);
+						return result;
+					} catch (final IllegalAccessException | InvocationTargetException e) {
+						throw new IllegalArgumentException(e);
+					}
+				} catch (final SecurityException | NoSuchMethodException e) {
+					throw new IllegalArgumentException(e);
+				}
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("fieldConverter", field);
+				return Objects.toStringCall("nativeMethod", methodName);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
+	 * ließt.
+	 * 
+	 * @see #nativeMethod(java.lang.reflect.Method)
+	 * @see Class#getMethod(String, Class...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param inputType {@link Class} der Eingabe.
+	 * @param methodName Name der nativen Methode.
+	 * @return {@code native}-{@link Converter}.
+	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
+	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist.
+	 */
+	public static <GInput, GOutput> Converter<GInput, GOutput> nativeMethod(final Class<GInput> inputType, final String methodName) throws SecurityException,
+		NoSuchMethodException, NullPointerException {
+		if (inputType == null) throw new NullPointerException("inputType = null");
+		if (methodName == null) throw new NullPointerException("methodName = null");
+		return Converters.nativeMethod(inputType.getMethod(methodName));
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der die über die native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe ließt.
+	 * 
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param method Nativen Methode.
+	 * @return {@code native}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+	 */
+	public static <GInput, GOutput> Converter<GInput, GOutput> nativeMethod(final java.lang.reflect.Method method) throws NullPointerException {
+		if (method == null) throw new NullPointerException("method = null");
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				try {
+					@SuppressWarnings ("unchecked")
+					final GOutput result = (GOutput)method.invoke(input);
+					return result;
+				} catch (final IllegalAccessException | InvocationTargetException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("nativeMethod", method);
 			}
 
 		};
@@ -141,102 +236,6 @@ public class Converters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
-	 * ließt. Die native Methode wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
-	 * 
-	 * @see Class#getMethod(String, Class...)
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param methodName Name der nativen Methode.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code methodName} {@code null} ist.
-	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final String methodName) throws NullPointerException {
-		if (methodName == null) throw new NullPointerException("methodName = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Method method = input.getClass().getMethod(methodName);
-					try {
-						@SuppressWarnings ("unchecked")
-						final GOutput result = (GOutput)method.invoke(input);
-						return result;
-					} catch (final IllegalAccessException | InvocationTargetException e) {
-						throw new IllegalArgumentException(e);
-					}
-				} catch (final SecurityException | NoSuchMethodException e) {
-					throw new IllegalArgumentException(e);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("nativeConverter", methodName);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
-	 * ließt.
-	 * 
-	 * @see #nativeConverter(java.lang.reflect.Method)
-	 * @see Class#getMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param methodName Name der nativen Methode.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist.
-	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final Class<GInput> inputType, final String methodName) throws SecurityException,
-		NoSuchMethodException, NullPointerException {
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (methodName == null) throw new NullPointerException("methodName = null");
-		return Converters.nativeConverter(inputType.getMethod(methodName));
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der die über die native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe ließt.
-	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param method Nativen Methode.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
-	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final java.lang.reflect.Method method) throws NullPointerException {
-		if (method == null) throw new NullPointerException("method = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GOutput result = (GOutput)method.invoke(input);
-					return result;
-				} catch (final IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("nativeConverter", method);
-			}
-
-		};
-	}
-
-	/**
 	 * Diese Methode gibt den neutralen {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
 	 * 
 	 * @param <GInput> Typ der Ein-/Ausgabe.
@@ -248,20 +247,51 @@ public class Converters {
 	}
 
 	/**
+	 * Diese Methode gibt einen verketteten {@link Converter} zurück, der seine Eingabe durch den ersten und zweiten {@link Converter} umgewandelt wird.<br>
+	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code converter2.convert(converter1.convert(input))}.
+	 * 
+	 * @param <GInput> Typ der Eingabe des erzeugten sowie der Eingabe des ersten {@link Converter}.
+	 * @param <GValue> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Converter}.
+	 * @param <GOutput> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Converter}.
+	 * @param converter1 erster {@link Converter}.
+	 * @param converter2 zweiter {@link Converter}.
+	 * @return {@code chained}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code converter1} bzw. {@code converter2} {@code null} ist.
+	 */
+	public static <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
+		final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
+		if (converter1 == null) throw new NullPointerException("converter1 = null");
+		if (converter2 == null) throw new NullPointerException("converter2 = null");
+		return new Converter<GInput, GOutput>() {
+	
+			@Override
+			public GOutput convert(final GInput input) {
+				return converter2.convert(converter1.convert(input));
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toStringCall("chainedConverter", converter1, converter2);
+			}
+	
+		};
+	}
+
+	/**
 	 * Diese Methode gibt einen gepufferten {@link Converter} zurück, der die zu seinen Eingaben über den gegebenen {@link Converter} ermittelten Ausgaben intern
 	 * in einer {@link Map} (genauer {@link LinkedHashMap}) zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf
 	 * Eingaben und die Werte als {@link SoftPointer} auf die Ausgaben bestückt.
 	 * 
-	 * @see #cachedConverter(int, int, int, Converter)
+	 * @see #bufferedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe sowie der Datensätze in den Schlüsseln der internen {@link Map}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Datensätze in den Werten der internen {@link Map}.
 	 * @param converter {@link Converter}.
-	 * @return {@code cached}-{@link Converter}.
+	 * @return {@code buffered}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(final Converter<? super GInput, ? extends GOutput> converter)
+	public static <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final Converter<? super GInput, ? extends GOutput> converter)
 		throws NullPointerException {
-		return Converters.cachedConverter(-1, Pointers.SOFT, Pointers.SOFT, converter);
+		return Converters.bufferedConverter(-1, Pointers.SOFT, Pointers.SOFT, converter);
 	}
 
 	/**
@@ -278,11 +308,11 @@ public class Converters {
 	 * @param outputMode Modus, in dem die {@link Pointer} auf die Ausgabe-Datensätze für die Werte der {@link Map} erzeugt werden ({@link Pointers#HARD},
 	 *        {@link Pointers#SOFT}, {@link Pointers#WEAK}).
 	 * @param converter {@link Converter}.
-	 * @return {@code cached}-{@link Converter}.
+	 * @return {@code buffered}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Pointers#pointer(int, Object)} eine entsprechende Ausnahme auslöst.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> cachedConverter(final int limit, final int inputMode, final int outputMode,
+	public static <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final int limit, final int inputMode, final int outputMode,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException, IllegalArgumentException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		Pointers.pointer(inputMode, null);
@@ -332,38 +362,7 @@ public class Converters {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall("cachedConverter", limit, inputMode, outputMode, converter);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen verketteten {@link Converter} zurück, der seine Eingabe durch den ersten und zweiten {@link Converter} umgewandelt wird.<br>
-	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code converter2.convert(converter1.convert(input))}.
-	 * 
-	 * @param <GInput> Typ der Eingabe des erzeugten sowie der Eingabe des ersten {@link Converter}.
-	 * @param <GValue> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Converter}.
-	 * @param <GOutput> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Converter}.
-	 * @param converter1 erster {@link Converter}.
-	 * @param converter2 zweiter {@link Converter}.
-	 * @return {@code chained}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code converter1} bzw. {@code converter2} {@code null} ist.
-	 */
-	public static <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
-		final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
-		if (converter1 == null) throw new NullPointerException("converter1 = null");
-		if (converter2 == null) throw new NullPointerException("converter2 = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				return converter2.convert(converter1.convert(input));
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("chainedConverter", converter1, converter2);
+				return Objects.toStringCall("bufferedConverter", limit, inputMode, outputMode, converter);
 			}
 
 		};

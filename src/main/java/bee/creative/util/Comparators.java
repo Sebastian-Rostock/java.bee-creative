@@ -12,9 +12,26 @@ import java.util.Iterator;
 public class Comparators {
 
 	/**
+	 * Dieses Feld speichert den {@link Comparator} für die natürliche Ordnung.
+	 */
+	public static final Comparator<?> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
+
+		@Override
+		public int compare(final Comparable<Object> item1, final Comparable<Object> item2) {
+			return item1.compareTo(item2);
+		}
+
+		@Override
+		public String toString() {
+			return "NATURAL_COMPARATOR";
+		}
+
+	};
+
+	/**
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der als Zeichenkette kodierte Dezimalzahlen vergleicht.
 	 */
-	public static final Comparator<String> STRING_NUMERICAL_COMPARATOR = new Comparator<String>() {
+	public static final Comparator<String> NUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -41,7 +58,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "STRING_NUMERICAL_COMPARATOR";
+			return "NUMERICAL_COMPARATOR";
 		}
 
 	};
@@ -49,7 +66,7 @@ public class Comparators {
 	/**
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, der Groß-/Kleinschreibung ignoriert.
 	 */
-	public static final Comparator<String> STRING_ALPHABETICAL_COMPARATOR = new Comparator<String>() {
+	public static final Comparator<String> ALPHABETICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -58,7 +75,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "STRING_ALPHABETICAL_COMPARATOR";
+			return "ALPHABETICAL_COMPARATOR";
 		}
 
 	};
@@ -67,7 +84,7 @@ public class Comparators {
 	 * Dieses Feld speichert den {@link String}-{@link Comparator}, gemischte Zeichenkette aus kodierten Dezimalzahlen und normalem Text vergleicht und dabei
 	 * Groß-/Kleinschreibung ignoriert.
 	 */
-	public static final Comparator<String> STRING_ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
+	public static final Comparator<String> ALPHANUMERICAL_COMPARATOR = new Comparator<String>() {
 
 		@Override
 		public int compare(final String item1, final String item2) {
@@ -140,7 +157,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "STRING_ALPHANUMERICAL_COMPARATOR";
+			return "ALPHANUMERICAL_COMPARATOR";
 		}
 
 	};
@@ -150,7 +167,7 @@ public class Comparators {
 	 * 
 	 * @see Comparators#compare(long, long)
 	 */
-	public static final Comparator<Number> NUMBER_LONG_COMPARATOR = new Comparator<Number>() {
+	public static final Comparator<Number> LONG_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -159,7 +176,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "NUMBER_LONG_COMPARATOR";
+			return "LONG_COMPARATOR";
 		}
 
 	};
@@ -169,7 +186,7 @@ public class Comparators {
 	 * 
 	 * @see Comparators#compare(float, float)
 	 */
-	public static final Comparator<Number> NUMBER_FLOAT_COMPARATOR = new Comparator<Number>() {
+	public static final Comparator<Number> FLOAT_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -178,7 +195,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "NUMBER_FLOAT_COMPARATOR";
+			return "FLOAT_COMPARATOR";
 		}
 
 	};
@@ -188,7 +205,7 @@ public class Comparators {
 	 * 
 	 * @see Comparators#compare(int, int)
 	 */
-	public static final Comparator<Number> NUMBER_INTEGER_COMPARATOR = new Comparator<Number>() {
+	public static final Comparator<Number> INTEGER_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -197,7 +214,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "NUMBER_INTEGER_COMPARATOR";
+			return "INTEGER_COMPARATOR";
 		}
 
 	};
@@ -207,7 +224,7 @@ public class Comparators {
 	 * 
 	 * @see Comparators#compare(double, double)
 	 */
-	public static final Comparator<Number> NUMBER_DOUBLE_COMPARATOR = new Comparator<Number>() {
+	public static final Comparator<Number> DOUBLE_COMPARATOR = new Comparator<Number>() {
 
 		@Override
 		public int compare(final Number item1, final Number item2) {
@@ -216,24 +233,7 @@ public class Comparators {
 
 		@Override
 		public String toString() {
-			return "NUMBER_DOUBLE_COMPARATOR";
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Comparator} für die natürliche Ordnung.
-	 */
-	public static final Comparator<?> NATURAL_COMPARATOR = new Comparator<Comparable<Object>>() {
-
-		@Override
-		public int compare(final Comparable<Object> item1, final Comparable<Object> item2) {
-			return item1.compareTo(item2);
-		}
-
-		@Override
-		public String toString() {
-			return "NATURAL_COMPARATOR";
+			return "DOUBLE_COMPARATOR";
 		}
 
 	};
@@ -505,10 +505,10 @@ public class Comparators {
 	 * @param <GItem2> Typ der Ausgabe des {@link Converter} sowie der Elemente des gegebenen {@link Comparator}.
 	 * @param converter {@link Converter}.
 	 * @param comparator {@link Comparator}.
-	 * @return {@code converted}-{@link Comparator}.
+	 * @return {@code navigated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparator} {@code null} ist.
 	 */
-	public static <GItem, GItem2> Comparator<GItem> convertedComparator(final Converter<? super GItem, ? extends GItem2> converter,
+	public static <GItem, GItem2> Comparator<GItem> navigatedComparator(final Converter<? super GItem, ? extends GItem2> converter,
 		final Comparator<? super GItem2> comparator) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (comparator == null) throw new NullPointerException("comparator = null");
@@ -521,7 +521,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedComparator", converter, comparator);
+				return Objects.toStringCall("navigatedComparator", converter, comparator);
 			}
 
 		};

@@ -18,8 +18,9 @@ import java.util.Map.Entry;
 public class Objects {
 
 	/**
-	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}, sodass diese für Objekte mit dieser
-	 * Schnittstelle den Rückgabewert derer {@link Object#toString()}-Methode verwendet.
+	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}. Für Objekte mit dieser Schnittstelle
+	 * nutzt diese Methode die von den Objekten bereitgestellten {@link Object#toString()}-Methoden. Diese Markierung ist nur sinnvoll für {@link Map},
+	 * {@link Iterable} und {@link CharSequence}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -142,7 +143,7 @@ public class Objects {
 		}
 
 	}
-	
+
 	{}
 
 	/**
@@ -164,10 +165,10 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und
-	 * {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren hierarchische Formatierung
-	 * sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis {@link Object#toString()}
-	 * -Methode zurück gegeben.
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}, native Arrays,
+	 * {@link CharSequence} und {@link Iterable} je eine eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren
+	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
+	 * der {@link Object#toString()}-Methode geliefert.
 	 * 
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -179,10 +180,10 @@ public class Objects {
 		final String output;
 		if (object.getClass().isArray()) {
 			output = Objects.arrayToString(format, object);
-		} else if (object instanceof String) {
-			output = Objects.stringToString(format, (String)object);
 		} else if (object instanceof UseToString) {
 			output = String.valueOf(object);
+		} else if (object instanceof CharSequence) {
+			output = Objects.stringToString(format, (CharSequence)object);
 		} else if (object instanceof Map<?, ?>) {
 			output = Objects.mapToString(format, (Map<?, ?>)object);
 		} else if (object instanceof Iterable<?>) {
@@ -245,7 +246,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static String stringToString(final boolean format, final String object) {
+	static String stringToString(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
 		final StringBuilder output = new StringBuilder("\"");
@@ -254,21 +255,21 @@ public class Objects {
 		while (next < size) {
 			switch (object.charAt(next)) {
 				case '\"':
-					output.append(object.substring(last + 1, last = next)).append("\\\"");
+					output.append(object.subSequence(last + 1, last = next)).append("\\\"");
 					break;
 				case '\t':
-					output.append(object.substring(last + 1, last = next)).append("\\t");
+					output.append(object.subSequence(last + 1, last = next)).append("\\t");
 					break;
 				case '\n':
-					output.append(object.substring(last + 1, last = next)).append(space);
+					output.append(object.subSequence(last + 1, last = next)).append(space);
 					break;
 				case '\r':
-					output.append(object.substring(last + 1, last = next)).append("\\r");
+					output.append(object.subSequence(last + 1, last = next)).append("\\r");
 					break;
 			}
 			next++;
 		}
-		return output.append(object.substring(last + 1, size)).append("\"").toString();
+		return output.append(object.subSequence(last + 1, size)).append("\"").toString();
 	}
 
 	/**
@@ -686,6 +687,19 @@ public class Objects {
 	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if (object == null) throw new NullPointerException();
 		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
+	}
+
+	/**
+	 * Diese Methode gibt das gegebenen Objekt nur dann zurück, wenn es {@code null} ist oder ein Nachfahre von {@link UseToString} ist. Andernfalls wird die
+	 * Klasse des Objekts geliefert.
+	 * 
+	 * @see UseToString
+	 * @see Object#getClass()
+	 * @return {@link Object}, dass für {@link #iterator} in {@link #toString()} verwendet werden sollte.
+	 */
+	public static Object useObjectOrClass(Object object) {
+		if (object == null || object instanceof UseToString) return object;
+		return object.getClass();
 	}
 
 }

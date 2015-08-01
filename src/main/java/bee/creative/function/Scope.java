@@ -1,6 +1,6 @@
 package bee.creative.function;
 
-import bee.creative.util.Comparables.Get;
+import bee.creative.util.Comparables.Items;
 
 /**
  * Diese Schnittstelle definiert den Ausführungskontext einer Funktion. Ein solcher Ausführungskontext stellt eine unveränderliche Liste von Parameterwerten
@@ -13,7 +13,7 @@ import bee.creative.util.Comparables.Get;
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public interface Scope extends Get<Value>, Iterable<Value> {
+public interface Scope extends Items<Value>, Iterable<Value> {
 
 	/**
 	 * Diese Methode gibt den {@code index}-ten Parameterwert zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch zusätzliche

@@ -810,7 +810,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 		/**
@@ -837,7 +837,7 @@ public class Collections {
 
 	/**
 	 * Diese Schnittstelle definiert eine Kombination aus einem {@link Filter} und einem {@link Converter}, bei welcher über {@link #accept(Object)} eine gültige
-	 * Eingabe Eingabe für {@link #convert(Object)} erkannt werden kann.
+	 * Eingabe für {@link #convert(Object)} erkannt werden kann.
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -1465,7 +1465,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}
@@ -1655,7 +1655,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}

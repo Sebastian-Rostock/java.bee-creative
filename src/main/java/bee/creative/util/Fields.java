@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -568,36 +569,6 @@ public final class Fields {
 	{}
 
 	/**
-	 * Dieses Feld speichert das indifferente Objekt für {@link #aggregateField(Field, Converter, Converter, Object, Object)}.
-	 */
-	static final Object SKIP = new Object();
-
-	{}
-
-	/**
-	 * Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
-	 * 
-	 * @param <GValue> Typ des Werts.
-	 * @param value Wert.
-	 * @return {@code value}-{@link Field}.
-	 */
-	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return new BaseField<Object, GValue>() {
-
-			@Override
-			public GValue get(final Object input) {
-				return value;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("valueField", value);
-			}
-
-		};
-	}
-
-	/**
 	 * Diese Methode gibt ein {@link Field} zurück, welches die über das native {@link java.lang.reflect.Field Datenfeld} gegebene Eigenschaft der Eingabe
 	 * abbildet.
 	 * 
@@ -846,6 +817,29 @@ public final class Fields {
 	}
 
 	/**
+	 * Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
+	 * 
+	 * @param <GValue> Typ des Werts.
+	 * @param value Wert.
+	 * @return {@code value}-{@link Field}.
+	 */
+	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
+		return new BaseField<Object, GValue>() {
+
+			@Override
+			public GValue get(final Object input) {
+				return value;
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("valueField", value);
+			}
+
+		};
+	}
+
+	/**
 	 * Diese Methode gibt ein navigierendes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
 	 * {@link Field} navigiert. Das Lesen der Eigenschaft einer Einagbe {@code input} erfolgt damit über {@code field.get(converter.convert(input))} und ein Wert
 	 * {@code value} wird dann via {@code field.set(converter.convert(input), value)} geschrieben.
@@ -855,7 +849,7 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts.
 	 * @param converter {@link Converter} zur Navigation.
 	 * @param field {@link Field} zur Manipulation.
-	 * @return {@code converted}-{@link Field}.
+	 * @return {@code navigated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code field} {@code null} ist.
 	 */
 	public static <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GOutput> converter,
@@ -877,127 +871,6 @@ public final class Fields {
 			@Override
 			public String toString() {
 				return Objects.toStringCall("navigatedField", converter, field);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie {@code null} als Leer- und Mischwert nutzt.
-	 * 
-	 * @see #aggregateField(Field, Converter, Converter, Object, Object)
-	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
-	 * @param field {@link Field}.
-	 * @return {@code aggregate}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
-	 */
-	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregateField(final Field<? super GInput, GValue> field)
-		throws NullPointerException {
-		return Fields.aggregateField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), null, null);
-	}
-
-	/**
-	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie die gegebenen Leer- und Mischwerte nutzt.
-	 * 
-	 * @see #aggregateField(Field, Converter, Converter, Object, Object)
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
-	 * @param field {@link Field}.
-	 * @param emptyValue Leerwert.
-	 * @param mixedValue Mischwert.
-	 * @return {@code aggregate}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
-	 */
-	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregateField(final Field<? super GItem, GValue> field, final GValue emptyValue,
-		final GValue mixedValue) throws NullPointerException {
-		return Fields.aggregateField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
-	}
-
-	/**
-	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie {@code null} als Leer-
-	 * und Mischwert nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
-	 * {@code null} geliefert.
-	 * 
-	 * @see #aggregateField(Field, Converter, Converter, Object, Object)
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts dieses {@link Field}s.
-	 * @param <GValue2> Typ des Werts der Elemente.
-	 * @param field {@link Field}.
-	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
-	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @return {@code aggregate}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
-	 */
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregateField(final Field<? super GItem, GValue2> field,
-		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
-		return Fields.aggregateField(field, parser, formatter, null, null);
-	}
-
-	/**
-	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie die gegebenen Leer-
-	 * und Mischwerte nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
-	 * {@code null} geliefert.
-	 * <p>
-	 * Das gelieferte {@link Field} gibt beim Lesen den Wert zurück, der unter allen Elementen der iterierbaren Eingabe {@link Objects#equals(Object) äquivalent}
-	 * ist. Ermittelt wird der Wert der Eigenschaft eines Elements mit Hilfe des gegebenen {@link Field}. Wenn kein einheitlicher Wert existiert, wird beim Lesen
-	 * der gegebene Mischwert geliefert. Beim Schreiben wird der Wert der Eigenschaft für alle Elemente der iterierbaren Eingabe über das gegebene {@link Field}
-	 * zugewiesen.
-	 * <p>
-	 * Mit einem aggregierenden {@link Field} können mehrere Elemente parallel modifiziert werden, indem jedes aus der iterierbaren Eingabe stammende Elemente zur
-	 * Bearbeitung an das gegebene {@link Field} weitergeleitet wird. Ein dabei gegebenenfalls notwendiges Standardverhalten wird dazu über entsprechende Werte
-	 * bereit gestellt.<br>
-	 * Für das Standardverhalten beim Lesen des Wert der Eigenschaft lassen sich drei Zustände unterscheiden:
-	 * <ul>
-	 * <li>Der {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) ist {@code null}. Hier wird der Wert {@code null} geliefert.</li>
-	 * <li>Die Eingabe ist leer oder {@code null}. Hier wird der gegebene Leerwert geliefert.</li>
-	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der gegebene Mischwert geliefert.</li>
-	 * </ul>
-	 * 
-	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
-	 * @param <GValue> Typ des Werts dieses {@link Field}s.
-	 * @param <GValue2> Typ des Werts der Elemente.
-	 * @param field {@link Field}.
-	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
-	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @param emptyValue Leerwert.
-	 * @param mixedValue Mischwert.
-	 * @return {@code aggregate}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
-	 */
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregateField(final Field<? super GItem, GValue2> field,
-		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
-		final GValue mixedValue) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
-		return new Field<Iterable<? extends GItem>, GValue>() {
-
-			@Override
-			public GValue get(final Iterable<? extends GItem> input) {
-				if (formatter == null) return null;
-				if (input == null) return emptyValue;
-				GValue2 next = null;
-				Object last = Fields.SKIP;
-				for (final GItem input2: input) {
-					next = field.get(input2);
-					if ((last != Fields.SKIP) && !Objects.equals(last, next)) return mixedValue;
-					last = next;
-				}
-				if (last == Fields.SKIP) return emptyValue;
-				return formatter.convert(next);
-			}
-
-			@Override
-			public void set(final Iterable<? extends GItem> input, final GValue value) {
-				if ((input == null) || (parser == null)) return;
-				final GValue2 value2 = parser.convert(value);
-				for (final GItem entry: Iterables.iterable(input)) {
-					field.set(entry, value2);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("aggregateField", field, parser, formatter, emptyValue, mixedValue);
 			}
 
 		};
@@ -1040,6 +913,128 @@ public final class Fields {
 			@Override
 			public String toString() {
 				return Objects.toStringCall("transcodedField", field, parser, formatter);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie {@code null} als Leer- und Mischwert nutzt.
+	 * 
+	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
+	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
+	 * @param field {@link Field}.
+	 * @return {@code aggregated}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
+		throws NullPointerException {
+		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), null, null);
+	}
+
+	/**
+	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie die gegebenen Leer- und Mischwerte nutzt.
+	 * 
+	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
+	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
+	 * @param field {@link Field}.
+	 * @param emptyValue Leerwert.
+	 * @param mixedValue Mischwert.
+	 * @return {@code aggregated}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyValue,
+		final GValue mixedValue) throws NullPointerException {
+		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
+	}
+
+	/**
+	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie {@code null} als Leer-
+	 * und Mischwert nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
+	 * {@code null} geliefert.
+	 * 
+	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
+	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts dieses {@link Field}s.
+	 * @param <GValue2> Typ des Werts der Elemente.
+	 * @param field {@link Field}.
+	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
+	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
+	 * @return {@code aggregated}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
+		return Fields.aggregatedField(field, parser, formatter, null, null);
+	}
+
+	/**
+	 * Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie die gegebenen Leer-
+	 * und Mischwerte nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
+	 * {@code null} geliefert.
+	 * <p>
+	 * Das gelieferte {@link Field} gibt beim Lesen den Wert zurück, der unter allen Elementen der iterierbaren Eingabe {@link Objects#equals(Object) äquivalent}
+	 * ist. Ermittelt wird der Wert der Eigenschaft eines Elements mit Hilfe des gegebenen {@link Field}. Wenn kein einheitlicher Wert existiert, wird beim Lesen
+	 * der gegebene Mischwert geliefert. Beim Schreiben wird der Wert der Eigenschaft für alle Elemente der iterierbaren Eingabe über das gegebene {@link Field}
+	 * zugewiesen.
+	 * <p>
+	 * Mit einem aggregierenden {@link Field} können mehrere Elemente parallel modifiziert werden, indem jedes aus der iterierbaren Eingabe stammende Elemente zur
+	 * Bearbeitung an das gegebene {@link Field} weitergeleitet wird. Ein dabei gegebenenfalls notwendiges Standardverhalten wird dazu über entsprechende Werte
+	 * bereit gestellt.<br>
+	 * Für das Standardverhalten beim Lesen des Wert der Eigenschaft lassen sich drei Zustände unterscheiden:
+	 * <ul>
+	 * <li>Der {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) ist {@code null}. Hier wird der Wert {@code null} geliefert.</li>
+	 * <li>Die Eingabe ist leer oder {@code null}. Hier wird der gegebene Leerwert geliefert.</li>
+	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der gegebene Mischwert geliefert.</li>
+	 * </ul>
+	 * 
+	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
+	 * @param <GValue> Typ des Werts dieses {@link Field}s.
+	 * @param <GValue2> Typ des Werts der Elemente.
+	 * @param field {@link Field}.
+	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
+	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
+	 * @param emptyValue Leerwert.
+	 * @param mixedValue Mischwert.
+	 * @return {@code aggregated}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+	 */
+	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
+		final GValue mixedValue) throws NullPointerException {
+		if (field == null) throw new NullPointerException("field = null");
+		return new Field<Iterable<? extends GItem>, GValue>() {
+
+			@Override
+			public GValue get(final Iterable<? extends GItem> input) {
+				if (formatter == null) return null;
+				if (input == null) return emptyValue;
+				final Iterator<? extends GItem> iterator = input.iterator();
+				if (!iterator.hasNext()) return emptyValue;
+				final GItem item = iterator.next();
+				final GValue2 value = field.get(item);
+				while (iterator.hasNext()) {
+					final GItem item2 = iterator.next();
+					final GValue2 value2 = field.get(item2);
+					if (!Objects.equals(value, value2)) return mixedValue;
+				}
+				return formatter.convert(value);
+			}
+
+			@Override
+			public void set(final Iterable<? extends GItem> input, final GValue value) {
+				if ((input == null) || (parser == null)) return;
+				final GValue2 value2 = parser.convert(value);
+				for (final GItem entry: input) {
+					field.set(entry, value2);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("aggregatedField", field, parser, formatter, emptyValue, mixedValue);
 			}
 
 		};

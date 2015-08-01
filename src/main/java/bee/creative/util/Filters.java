@@ -161,14 +161,14 @@ public class Filters {
 	 * Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf Eingaben bestückt.
 	 * 
-	 * @see #cachedFilter(Filter)
+	 * @see #bufferedFilter(Filter)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
-	 * @return {@code cached}-{@link Filter}.
+	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> cachedFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		return Filters.cachedFilter(Integer.MAX_VALUE, Pointers.SOFT, filter);
+	public static <GInput> Filter<GInput> bufferedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		return Filters.bufferedFilter(Integer.MAX_VALUE, Pointers.SOFT, filter);
 	}
 
 	/**
@@ -177,20 +177,20 @@ public class Filters {
 	 * 
 	 * @see #converterAdapter(Converter)
 	 * @see Converters#filterAdapter(Filter)
-	 * @see Converters#cachedConverter(int, int, int, Converter)
+	 * @see Converters#bufferedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param limit Maximum für die Anzahl der Einträge in der internen {@link Map}.
 	 * @param mode Modus, in dem die {@link Pointer} auf die Eingabe-Datensätze für die Schlüssel der {@link Map} erzeugt werden ({@link Pointers#HARD},
 	 *        {@link Pointers#SOFT}, {@link Pointers#WEAK}).
 	 * @param filter {@link Filter}.
-	 * @return {@code cached}-{@link Filter}.
+	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Converters#cachedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Converters#bufferedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst.
 	 */
-	public static <GInput> Filter<GInput> cachedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
+	public static <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
 		IllegalArgumentException {
 		if (filter == null) throw new NullPointerException("filter = null");
-		return Filters.converterAdapter(Converters.cachedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
+		return Filters.converterAdapter(Converters.bufferedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
 	}
 
 	/**
@@ -315,32 +315,6 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
-	 * Die Akzeptanz einer Eingabe {@code input} ist {@code !filter.accept(input)}.
-	 * 
-	 * @param <GInput> Typ der Eingabe.
-	 * @param filter {@link Filter}.
-	 * @return {@code negation}-{@link Filter}.
-	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
-	 */
-	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
-		if (filter == null) throw new NullPointerException("filter = null");
-		return new Filter<GInput>() {
-
-			@Override
-			public boolean accept(final GInput input) {
-				return !filter.accept(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toStringCall("negationFilter", filter);
-			}
-
-		};
-	}
-
-	/**
 	 * Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Field} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(field.get(input))}.
@@ -399,6 +373,32 @@ public class Filters {
 				return Objects.toStringCall("navigatedFilter", converter, filter);
 			}
 
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
+	 * Die Akzeptanz einer Eingabe {@code input} ist {@code !filter.accept(input)}.
+	 * 
+	 * @param <GInput> Typ der Eingabe.
+	 * @param filter {@link Filter}.
+	 * @return {@code negation}-{@link Filter}.
+	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
+	 */
+	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
+		if (filter == null) throw new NullPointerException("filter = null");
+		return new Filter<GInput>() {
+	
+			@Override
+			public boolean accept(final GInput input) {
+				return !filter.accept(input);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toStringCall("negationFilter", filter);
+			}
+	
 		};
 	}
 

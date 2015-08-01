@@ -5,7 +5,7 @@ import java.util.Iterator;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.NumberValue;
-import bee.creative.util.Comparables.Get;
+import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators.GetIterator;
 import bee.creative.util.Objects;
 
@@ -16,7 +16,7 @@ import bee.creative.util.Objects;
  * @see ArrayValue
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Array implements Get<Value>, Iterable<Value> {
+public abstract class Array implements Items<Value>, Iterable<Value> {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.

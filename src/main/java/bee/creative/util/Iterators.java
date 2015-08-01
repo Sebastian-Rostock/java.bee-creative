@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import bee.creative.util.Comparables.Get;
+import bee.creative.util.Comparables.Items;
 import bee.creative.util.Objects.UseToString;
 
 /**
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Iterator}en.
+ * Diese Klasse implementiert grundlegende {@link Iterator}.
  * 
  * @see Iterator
  * @see Iterable
@@ -26,554 +26,43 @@ public class Iterators {
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des Elementes.
 	 */
-	static abstract class AbstractIterator<GItem> implements Iterator<GItem>, UseToString {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten {@link Iterator} über ein einzelnes Element.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Elementes.
-	 */
-	static abstract class AbstractSingletonIterator<GItem> extends AbstractIterator<GItem> {
-
-		/**
-		 * Dieses Feld speichert den Zustand.
-		 */
-		boolean hasNext = true;
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return this.hasNext;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			if (!this.hasNext) throw new NoSuchElementException();
-			this.hasNext = false;
-			return null;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw (this.hasNext ? new IllegalStateException() : new UnsupportedOperationException());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen abstrakten, delegierenden {@link Iterator}.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 * @param <GItem2> Typ der Elemente des gegebenen {@link Iterator}s.
-	 */
-	static abstract class AbstractDelegatingIterator<GItem, GItem2> extends AbstractIterator<GItem> {
-
-		/**
-		 * Dieses Feld speichert den {@link Iterator}.
-		 */
-		final Iterator<? extends GItem2> iterator;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterator}.
-		 * 
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-		 */
-		public AbstractDelegatingIterator(final Iterator<? extends GItem2> iterator) throws NullPointerException {
-			if (iterator == null) throw new NullPointerException();
-			this.iterator = iterator;
-		}
-
-		/**
-		 * Diese Methode gibt {@link #iterator} oder seine {@link Class} zurück.
-		 * 
-		 * @return {@link Object}, dass für {@link #iterator} in {@link #toString()} verwendet werden sollte.
-		 */
-		Object toStringIterator() {
-			return (this.iterator instanceof UseToString) ? this.iterator : this.iterator.getClass();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return this.iterator.hasNext();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			this.iterator.remove();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.toStringIterator());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den leeren {@link Iterator}.
-	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class VoidIterator extends AbstractIterator<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link VoidIterator}.
-		 */
-		public static final Iterator<?> INSTANCE = new VoidIterator();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return false;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object next() {
-			throw new NoSuchElementException();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw new IllegalStateException();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der eine gegebene Anzahl an Elementen eines {@link Get} liefert.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static final class GetIterator<GItem> extends AbstractIterator<GItem> {
-
-		/**
-		 * Dieses Feld speichert das {@link Get}.
-		 */
-		final Get<? extends GItem> get;
-
-		/**
-		 * Dieses Feld speichert den maximalen Index.
-		 */
-		final int count;
-
-		/**
-		 * Dieses Feld speichert den aktuellen Wert.
-		 */
-		int index;
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Get} und die Anzahl. Die Iteration beginnt bei Index {@code 0}.
-		 * 
-		 * @param get {@link Get}, dessen Elemente geliefert werden.
-		 * @param count Anzahl.
-		 * @throws NullPointerException Wenn das gegebene {@link Get} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
-		 */
-		public GetIterator(final Get<? extends GItem> get, final int count) throws NullPointerException, IllegalArgumentException {
-			this(get, 0, count);
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Get}, den Index des ersten Elements und die Anzahl.
-		 * 
-		 * @param get {@link Get}, dessen Elemente geliefert werden.
-		 * @param index Index.
-		 * @param count Anzahl.
-		 * @throws NullPointerException Wenn das gegebene {@link Get} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
-		 */
-		public GetIterator(final Get<? extends GItem> get, final int index, final int count) throws NullPointerException, IllegalArgumentException {
-			if (get == null) throw new NullPointerException();
-			if (count < 0) throw new IllegalArgumentException();
-			this.get = get;
-			this.index = index;
-			this.count = index + count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return this.index < this.count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			return this.get.get(this.index++);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.get, this.count);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator} über ein einzelnes Element, dass durch einen gegebenen {@link Builder} bereitgestellt wird.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Elements.
-	 */
-	public static final class BuilderIterator<GItem> extends AbstractSingletonIterator<GItem> {
-
-		/**
-		 * Dieses Feld speichert den {@link Builder}.
-		 */
-		final Builder<? extends GItem> builder;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Builder}.
-		 * 
-		 * @param builder {@link Builder}.
-		 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
-		 */
-		public BuilderIterator(final Builder<? extends GItem> builder) throws NullPointerException {
-			if (builder == null) throw new NullPointerException();
-			this.builder = builder;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			super.next();
-			return this.builder.build();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der eine gegebene Anzahl an {@link Integer}s ab dem Wert {@code 0} liefert. Ein {@link IntegerIterator},
-	 * der mit der Anzahl {@code count} erstellt wird, liefert damit die Werte {@code 0}, {@code 1}, {@code 2}, ..., {@code count-1}.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class IntegerIterator extends AbstractIterator<Integer> {
-
-		/**
-		 * Dieses Feld speichert die Anzahl.
-		 */
-		final int count;
-
-		/**
-		 * Dieses Feld speichert den aktuellen Wert.
-		 */
-		int value;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Anzahl.
-		 * 
-		 * @param count Anzahl.
-		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
-		 */
-		public IntegerIterator(final int count) throws IllegalArgumentException {
-			if (count < 0) throw new IllegalArgumentException();
-			this.value = 0;
-			this.count = count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return this.value < this.count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Integer next() {
-			return Integer.valueOf(this.value++);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.count);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der kein Element eines gegebenen {@link Iterator}s mehrfach liefert. Die {@link Collection} zum
-	 * Ausschluss von Dopplungen kann im Konstruktor angegeben werden.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static final class UniqueIterator<GItem> extends AbstractDelegatingIterator<GItem, GItem> {
-
-		/**
-		 * Dieses Feld speichert die {@link Collection} zum Ausschluss von Dopplungen.
-		 */
-		final Collection<GItem> collection;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterator} und verwendet ein {@link HashSet} zum Ausschluss von Dopplungen.
-		 * 
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-		 */
-		public UniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-			this(iterator, new HashSet<GItem>());
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterator} sowie die {@link Collection} zum Ausschluss von Dopplungen.
-		 * 
-		 * @param iterator {@link Iterator}.
-		 * @param collection {@link Collection} zum Ausschluss von Dopplungen.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public UniqueIterator(final Iterator<? extends GItem> iterator, final Collection<GItem> collection) throws NullPointerException {
-			super(Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator));
-			this.collection = collection;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			final GItem next = this.iterator.next();
-			this.collection.add(next);
-			return next;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der eine begrenzte Anzahl an Elementen eines gegebenen {@link Iterator}s liefert.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static final class LimitedIterator<GItem> extends AbstractDelegatingIterator<GItem, GItem> {
-
-		/**
-		 * Dieses Feld speichert die maximale Anzahl der verbleibenden Elementen.
-		 */
-		int count;
-
-		/**
-		 * Dieser Konstruktor initialisiert Anzahl und {@link Iterator}.
-		 * 
-		 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
-		 */
-		public LimitedIterator(final int count, final Iterator<? extends GItem> iterator) throws NullPointerException, IllegalArgumentException {
-			super(iterator);
-			if (count < 0) throw new IllegalArgumentException();
-			this.count = count;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			return (this.count > 0) && this.iterator.hasNext();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			if (this.count == 0) throw new NoSuchElementException();
-			this.count--;
-			return this.iterator.next();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.count, this.toStringIterator());
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen verketteten {@link Iterator}, der über alle Elemente der eingegebenen {@link Iterator}en in der gegebenen Reihenfolge
-	 * läuft. Wenn einer der eingegebenen {@link Iterator}en {@code null} ist, wird er ausgelassen.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static final class ChainedIterator<GItem> extends AbstractDelegatingIterator<GItem, Iterator<? extends GItem>> {
-
-		/**
-		 * Dieses Feld speichert den aktiven {@link Iterator}.
-		 */
-		Iterator<? extends GItem> entries;
-
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterator} über die {@link Iterator}en. Der {@link Iterator} darf {@code null} liefern.
-		 * 
-		 * @param iterator {@link Iterator} über die {@link Iterator}en.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-		 */
-		public ChainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterator) throws NullPointerException {
-			super(iterator);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			while (true) {
-				while (this.entries == null) {
-					if (!this.iterator.hasNext()) return false;
-					this.entries = this.iterator.next();
-				}
-				if (this.entries.hasNext()) return true;
-				this.entries = null;
-			}
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			if (this.entries == null) throw new NoSuchElementException();
-			return this.entries.next();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			if (this.entries == null) throw new IllegalStateException();
-			this.entries.remove();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterator}s liefert.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterator} s.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente.
-	 */
-	public static final class ConvertedIterator<GInput, GOutput> extends AbstractDelegatingIterator<GOutput, GInput> {
-
-		/**
-		 * Dieses Feld speichert den {@link Converter}.
-		 */
-		final Converter<? super GInput, ? extends GOutput> converter;
-
-		/**
-		 * Dieser Konstruktor initialisiert {@link Converter} und {@link Iterator}.
-		 * 
-		 * @param converter {@link Converter}.
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ConvertedIterator(final Converter<? super GInput, ? extends GOutput> converter, final Iterator<? extends GInput> iterator)
-			throws NullPointerException {
-			super(iterator);
-			if (converter == null) throw new NullPointerException();
-			this.converter = converter;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GOutput next() {
-			return this.converter.convert(this.iterator.next());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.converter, this.toStringIterator());
-		}
+	public static abstract class BaseIterator<GItem> implements Iterator<GItem>, UseToString {
 
 	}
 
 	{}
 
 	/**
-	 * Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator}s zurück.
+	 * Dieses Feld speichert den leeren {@link Iterator}.
+	 */
+	public static final Iterator<?> EMPTY_ITERATOR = new BaseIterator<Object>() {
+
+		@Override
+		public boolean hasNext() {
+			return false;
+		}
+
+		@Override
+		public Object next() {
+			throw new NoSuchElementException();
+		}
+
+		@Override
+		public void remove() {
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public String toString() {
+			return "EMPTY_ITERATOR";
+		}
+
+	};
+
+	{}
+
+	/**
+	 * Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
 	 * 
 	 * @param <GItem> Typ des Elements.
 	 * @see Iterators#skip(Iterator, int)
@@ -593,8 +82,7 @@ public class Iterators {
 	 * Diese Methode versucht die gegebenen Anzahl an Elemente im gegebenen {@link Iterator} zu überspringen und gibt die Anzahl der noch zu überspringenden
 	 * Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene {@link Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine
 	 * weiteren Elemente mehr liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der Elemente des gegebenen
-	 * {@link Iterator}s zurück gegeben. Damit bestimmt {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des {@link Iterator}s {@code iterator}
-	 * .
+	 * {@link Iterator} zurück gegeben. Damit bestimmt {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des gegebenen {@link Iterator}.
 	 * 
 	 * @see Iterator#hasNext()
 	 * @param iterator {@link Iterator}.
@@ -612,17 +100,18 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung
-	 * des {@link Iterator}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur dann
+	 * {@code true} zurück, wenn Elemente entfernt wurden.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
 	 * @param collection {@link Collection}.
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static boolean retainAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		if ((iterator == null) || (collection == null)) throw new NullPointerException();
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (!collection.contains(iterator.next())) {
@@ -634,35 +123,37 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur bei Veränderung der
-	 * {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
+	 * zurück, wenn Elemente entfernt wurden.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static boolean retainAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if ((collection == null) || (iterator == null)) throw new NullPointerException();
-		final List<Object> list = new ArrayList<Object>();
+		if (collection == null) throw new NullPointerException("collection = null");
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		final List<Object> list = new ArrayList<>();
 		Iterators.appendAll(list, iterator);
 		return collection.retainAll(list);
 	}
 
 	/**
-	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator}s in die gegebene {@link Collection} ein und gibt nur bei Veränderungen an der
-	 * {@link Collection} {@code true} zurück.
+	 * Diese Methode fügt alle Elemente des gegebenen {@link Iterator} in die gegebene {@link Collection} ein und gibt nur dann {@code true} zurück, wenn Elemente
+	 * eingefügt wurden.
 	 * 
 	 * @see Collection#addAll(Collection)
 	 * @param <GItem> Typ der Elemente.
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterator<? extends GItem> iterator) throws NullPointerException {
-		if ((collection == null) || (iterator == null)) throw new NullPointerException();
+		if (collection == null) throw new NullPointerException("collection = null");
+		if (iterator == null) throw new NullPointerException("iterator = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.add(iterator.next())) {
@@ -673,15 +164,15 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s und gibt nur bei Veränderung des {@link Iterator}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} und gibt nur dann {@code true} zurück, wenn Elemente entfernt wurden.
 	 * 
 	 * @see Iterator#remove()
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
 	 */
 	public static boolean removeAll(final Iterator<?> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException();
+		if (iterator == null) throw new NullPointerException("iterator = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			iterator.next();
@@ -692,17 +183,18 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s, die in der gegebenen {@link Collection} vorkommen, und gibt nur bei Veränderung des
-	 * {@link Iterator}s {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}, die in der gegebenen {@link Collection} vorkommen, und gibt nur dann {@code true}
+	 * zurück, wenn Elemente entfernt wurden.
 	 * 
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
 	 * @param collection {@link Collection}.
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static boolean removeAll(final Iterator<?> iterator, final Collection<?> collection) throws NullPointerException {
-		if ((iterator == null) || (collection == null)) throw new NullPointerException();
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.contains(iterator.next())) {
@@ -714,17 +206,18 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}s aus der gegebenen {@link Collection} und gibt nur bei Veränderungen an der
-	 * {@link Collection} {@code true} zurück.
+	 * Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} aus der gegebenen {@link Collection} und gibt nur dann {@code true} zurück, wenn
+	 * Elemente entfernt wurden.
 	 * 
 	 * @see Collection#removeAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static boolean removeAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if ((collection == null) || (iterator == null)) throw new NullPointerException();
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		boolean modified = false;
 		while (iterator.hasNext()) {
 			if (collection.remove(iterator.next())) {
@@ -735,388 +228,504 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterator}s in der gegebenen {@link Collection} enthalten sind.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterator} in der gegebenen {@link Collection} enthalten sind.
 	 * 
 	 * @see Collection#containsAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei vollständiger Inklusion.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} bzw. die gegebene {@link Collection} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
 	public static boolean containsAll(final Collection<?> collection, final Iterator<?> iterator) throws NullPointerException {
-		if ((collection == null) || (iterator == null)) throw new NullPointerException();
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		if (collection == null) throw new NullPointerException("collection = null");
 		while (iterator.hasNext())
 			if (!collection.contains(iterator.next())) return false;
 		return true;
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link Iterator} oder {@link VoidIterator#INSTANCE} zurück.
+	 * Diese Methode gibt den gegebenen {@link Iterator} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterator} {@code null} ist, wird {@link #EMPTY_ITERATOR}
+	 * geliefert.
 	 * 
-	 * @see Iterators#voidIterator()
+	 * @see Iterators#emptyIterator()
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterator {@link Iterator}.
-	 * @return {@link Iterator} oder {@link VoidIterator#INSTANCE}.
+	 * @param iterator {@link Iterator} oder {@code null}.
+	 * @return {@link Iterator} oder {@link #EMPTY_ITERATOR}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static <GItem> Iterator<GItem> iterator(final Iterator<? extends GItem> iterator) {
-		if (iterator == null) return Iterators.voidIterator();
+		if (iterator == null) return Iterators.emptyIterator();
 		return (Iterator<GItem>)iterator;
 	}
 
+	/**
+	 * Diese Methode gibt den {@link Iterator} des gegebenen {@link Iterable} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterable} {@code null} ist, wird
+	 * {@link #EMPTY_ITERATOR} geliefert.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param iterable {@link Iterable} oder {@code null}.
+	 * @return {@link Iterable#iterator()} oder {@link #EMPTY_ITERATOR}.
+	 */
 	public static <GItem> Iterator<GItem> iterator(final Iterable<? extends GItem> iterable) {
-		if (iterable == null) return Iterators.voidIterator();
+		if (iterable == null) return Iterators.emptyIterator();
 		return Iterators.iterator(iterable.iterator());
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Iterator} zurück, der einmalig das gegebenen Element liefert.
+	 * 
+	 * @see #itemIterator(Object, int)
+	 * @param <GItem> Typ des Elements.
+	 * @param item Element.
+	 * @return {@code item}-{@link Iterator}.
+	 */
+	public static <GItem> Iterator<GItem> itemIterator(final GItem item) {
+		return Iterators.itemIterator(item, 1);
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Iterator} zurück, der das gegebenen Element die gegebene Anzahl mal liefert.
+	 * 
+	 * @param <GItem> Typ des Elements.
+	 * @param item Element.
+	 * @param count Anzahl der iterierbaren Elemente.
+	 * @return {@code item}-{@link Iterator}.
+	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
+	 */
+	public static <GItem> Iterator<GItem> itemIterator(final GItem item, final int count) throws IllegalArgumentException {
+		if (count == 0) return Iterators.emptyIterator();
+		if (count < 0) throw new IllegalArgumentException("count < 0");
+		return new BaseIterator<GItem>() {
+
+			int index = 0;
+
+			@Override
+			public boolean hasNext() {
+				return this.index < count;
+			}
+
+			@Override
+			public GItem next() {
+				if (!this.hasNext()) throw new NoSuchElementException();
+				this.index++;
+				return item;
+			}
+
+			@Override
+			public void remove() {
+				throw (this.hasNext() ? new IllegalStateException() : new UnsupportedOperationException());
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("itemIterator", item, count);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Iterator} über die Elemente eines Abschnitts der gegebenen {@link Items} zurück.
+	 * 
+	 * @param <GItem> Typ der Elemente.
+	 * @param items {@link Items}.
+	 * @param fromIndex Index des ersten Elements, dass vom erzeugten {@link Iterator} geliefert wird.
+	 * @param toIndex Index nach dem letzten Element, dass vom erzeugten {@link Iterator} geliefert wird.
+	 * @return {@link Items}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
+	 */
+	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException,
+		IllegalArgumentException {
+		if (items == null) throw new NullPointerException("items = null");
+		Comparables.check(fromIndex, toIndex);
+		return new BaseIterator<GItem>() {
+
+			int index = fromIndex;
+
+			@Override
+			public boolean hasNext() {
+				return this.index < toIndex;
+			}
+
+			@Override
+			public GItem next() {
+				if (this.index == toIndex) throw new NoSuchElementException();
+				return items.get(this.index++);
+			}
+
+			@Override
+			public void remove() {
+				if (this.index == fromIndex) throw new IllegalStateException();
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("itemsIterator", items, fromIndex, toIndex);
+			}
+
+		};
 	}
 
 	/**
 	 * Diese Methode gibt den leeren {@link Iterator} zurück.
 	 * 
-	 * @see VoidIterator
 	 * @param <GItem> Typ der Elemente.
-	 * @return {@link VoidIterator}.
+	 * @return {@link #EMPTY_ITERATOR}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterator<GItem> voidIterator() {
-		return (Iterator<GItem>)VoidIterator.INSTANCE;
+	public static <GItem> Iterator<GItem> emptyIterator() {
+		return (Iterator<GItem>)Iterators.EMPTY_ITERATOR;
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Iterator} über das gegebene Element zurück.
+	 * Diese Methode gibt einen {@link Iterator} zurück, der die gegebene Anzahl an {@link Integer} ab dem Wert {@code 0} liefert, d.h {@code 0}, {@code 1}, ...,
+	 * {@code count-1}.
 	 * 
-	 * @see EntryIterator
-	 * @param <GItem> Typ des Elements.
-	 * @param entry Element.
-	 * @return {@link EntryIterator}
-	 */
-	public static <GItem> Iterator<GItem> itemIterator(final GItem entry) {
-		return new EntryIterator<GItem>(entry);
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator} über ein einzelnes, gegebenes Element.
-	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ des Elements.
-	 */
-	public static final class EntryIterator<GItem> extends AbstractSingletonIterator<GItem> {
-	
-		/**
-		 * Dieses Feld speichert das Element.
-		 */
-		final GItem value;
-	
-		/**
-		 * Dieser Konstruktor initialisiert das Element.
-		 * 
-		 * @param entry Element.
-		 */
-		public EntryIterator(final GItem entry) {
-			this.value = entry;
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			super.next();
-			return this.value;
-		}
-	
-	}
-
-	/**
-	 * Diese Methode gibt den {@link Iterator} über das durch den gegebenen {@link Builder} bereitgestellte Element zurück.
-	 * 
-	 * @see BuilderIterator
-	 * @param <GItem> Typ des Elements.
-	 * @param builder {@link Builder}.
-	 * @return {@link BuilderIterator}
-	 * @throws NullPointerException Wenn der gegebene {@link Builder} {@code null} ist.
-	 */
-	public static <GItem> Iterator<GItem> builderIterator(final Builder<? extends GItem> builder) throws NullPointerException {
-		return new BuilderIterator<GItem>(builder);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen {@link Iterator}, der die gegebene Anzahl an {@link Integer}s ab dem Wert {@code 0} liefert, und gibt ihn zurück.
-	 * 
-	 * @see IntegerIterator
 	 * @param count Anzahl.
-	 * @return {@link IntegerIterator}.
-	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+	 * @return {@link Integer}-{@link Iterator}.
+	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
 	 */
 	public static Iterator<Integer> integerIterator(final int count) throws IllegalArgumentException {
-		return new IntegerIterator(count);
+		if (count < 0) throw new IllegalArgumentException("count < 0");
+		return new Iterator<Integer>() {
+
+			int value = 0;
+
+			@Override
+			public boolean hasNext() {
+				return this.value < count;
+			}
+
+			@Override
+			public Integer next() {
+				return Integer.valueOf(this.value++);
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("integerIterator", count);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück. Als
-	 * {@link Collection} zum Ausschluss von Dopplungen wird ein {@link HashSet} verwendet.
+	 * Diese Methode gibt einen {@link Iterator} zurück, der die gegebene maximale Anzahl an Elementen des gegebenen {@link Iterator} liefert.
 	 * 
-	 * @see UniqueIterator
 	 * @param <GItem> Typ der Elemente.
+	 * @param count Maximale Anzahl der vom gegebenen {@link Iterator} gelieferten Elemente.
 	 * @param iterator {@link Iterator}.
-	 * @return {@link UniqueIterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-	 */
-	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		return new UniqueIterator<GItem>(iterator);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen einen {@link Iterator}, der kein Element des gegebenen {@link Iterator}s mehrfach liefert, und gibt ihn zurück.
-	 * 
-	 * @see UniqueIterator
-	 * @param <GItem> Typ der Elemente.
-	 * @param iterator {@link Iterator}.
-	 * @return {@link UniqueIterator}.
-	 * @param collection {@link Collection} zum Ausschluss von Dopplungen.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	 */
-	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator, final Collection<GItem> collection)
-		throws NullPointerException {
-		return new UniqueIterator<GItem>(iterator, collection);
-	}
-
-	/**
-	 * Diese Methode erzeugt einen einen {@link Iterator}, der die gegebene maximale Anzahl der Elemente des gegebenen {@link Iterator}s liefert, und gibt ihn
-	 * zurück.
-	 * 
-	 * @see LimitedIterator
-	 * @param <GItem> Typ der Elemente.
-	 * @param count Anzahl der maximal vom gegebenen {@link Iterator} gelieferten Elemente.
-	 * @param iterator {@link Iterator}.
-	 * @return {@link LimitedIterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die gegebene Anzahl negativ ist.
+	 * @return {@code limited}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
 	 */
 	public static <GItem> Iterator<GItem> limitedIterator(final int count, final Iterator<? extends GItem> iterator) throws NullPointerException,
 		IllegalArgumentException {
-		return new LimitedIterator<GItem>(count, iterator);
+		if (count < 0) throw new IllegalArgumentException("count < 0");
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		if (count == 0) return Iterators.emptyIterator();
+		return new BaseIterator<GItem>() {
+
+			int index = 0;
+
+			@Override
+			public boolean hasNext() {
+				return (this.index < count) && iterator.hasNext();
+			}
+
+			@Override
+			public GItem next() {
+				if (this.index == count) throw new NoSuchElementException();
+				this.index++;
+				return iterator.next();
+			}
+
+			@Override
+			public void remove() {
+				iterator.remove();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public String toString() {
+				return Objects.toStringCall("limitedIterator", count, iterator);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen filternden {@link Iterator}, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}s
-	 * liefert, und gibt ihn zurück.
+	 * Diese Methode gibt einen filternden {@link Iterator} zurück, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}
+	 * liefert.
 	 * 
-	 * @see Filter
-	 * @see FilteredIterator
+	 * @see Filter#accept(Object)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @param filter {@link Filter}.
-	 * @return {@link FilteredIterator}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @return {@code filtered}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterator} {@code null} ist.
 	 */
 	public static <GItem> Iterator<GItem> filteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator)
 		throws NullPointerException {
-		return new FilteredIterator<GItem>(filter, iterator);
+		if (filter == null) throw new NullPointerException("filter = null");
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		return new BaseIterator<GItem>() {
+
+			Boolean has;
+
+			GItem item;
+
+			@Override
+			public boolean hasNext() {
+				if (this.has != null) return this.has.booleanValue();
+				while (iterator.hasNext()) {
+					if (filter.accept(this.item = iterator.next())) {
+						this.has = Boolean.TRUE;
+						return true;
+					}
+				}
+				this.has = Boolean.FALSE;
+				return false;
+			}
+
+			@Override
+			public GItem next() {
+				if (!this.hasNext()) throw new NoSuchElementException();
+				this.has = null;
+				return this.item;
+			}
+
+			@Override
+			public void remove() {
+				if (this.has != null) throw new IllegalStateException();
+				iterator.remove();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("filteredIterator", filter, iterator);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der nur die von einem gegebenen {@link Filter} akzeptierten Elemente eines gegebenen {@link Iterator}s
-	 * liefert.
+	 * Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
+	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in ein {@link HashSet} eingefügt.
 	 * 
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @see #uniqueIterator(Collection, Iterator)
 	 * @param <GItem> Typ der Elemente.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code unique}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
 	 */
-	public static final class FilteredIterator<GItem> extends AbstractDelegatingIterator<GItem, GItem> {
-	
-		/**
-		 * Dieses Feld speichert den {@link Filter}.
-		 */
-		final Filter<? super GItem> filter;
-	
-		/**
-		 * Dieses Feld speichert {@code true}, wenn ein nächstes Element existiert.
-		 */
-		Boolean hasNext;
-	
-		/**
-		 * Dieses Feld speichert das nächste Element.
-		 */
-		GItem entry;
-	
-		/**
-		 * Dieser Konstruktor initialisiert {@link Filter} und {@link Iterator}.
-		 * 
-		 * @param filter {@link Filter}.
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public FilteredIterator(final Filter<? super GItem> filter, final Iterator<? extends GItem> iterator) throws NullPointerException {
-			super(iterator);
-			if (filter == null) throw new NullPointerException();
-			this.filter = filter;
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean hasNext() {
-			if (this.hasNext != null) return this.hasNext.booleanValue();
-			while (this.iterator.hasNext())
-				if (this.filter.accept(this.entry = this.iterator.next())) return (this.hasNext = Boolean.TRUE).booleanValue();
-			return (this.hasNext = Boolean.FALSE).booleanValue();
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			if (!this.hasNext()) throw new NoSuchElementException();
-			this.hasNext = null;
-			return this.entry;
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			if (this.hasNext != null) throw new IllegalStateException();
-			this.iterator.remove();
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toStringCall(this, this.filter, this.toStringIterator());
-		}
-	
+	public static <GItem> Iterator<GItem> uniqueIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		return Iterators.uniqueIterator(new HashSet<GItem>(), iterator);
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
-	 * und gibt ihn zurück.
+	 * Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
+	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in die gegebenen {@link Collection} eingefügt.
 	 * 
-	 * @see ChainedIterator
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterators {@link Iterator} über die {@link Iterator}en.
-	 * @return {@link ChainedIterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 * @param collection {@link Collection} zum Ausschluss von Mehrfachvorkommen.
+	 * @param iterator {@link Iterator}.
+	 * @return {@code unique}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code collection} {@code null} ist.
 	 */
-	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) throws NullPointerException {
-		return new ChainedIterator<GItem>(iterators);
+	public static <GItem> Iterator<GItem> uniqueIterator(final Collection<GItem> collection, final Iterator<? extends GItem> iterator)
+		throws NullPointerException {
+		if (collection == null) throw new NullPointerException("collection = null");
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		final Iterator<GItem> iterator2 = Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(collection)), iterator);
+		return new BaseIterator<GItem>() {
+
+			@Override
+			public boolean hasNext() {
+				return iterator2.hasNext();
+			}
+
+			@Override
+			public GItem next() {
+				final GItem item = iterator2.next();
+				collection.add(item);
+				return item;
+			}
+
+			@Override
+			public void remove() {
+				iterator2.remove();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("uniqueIterator", collection, iterator);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
-	 * und gibt ihn zurück.
+	 * Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert.
 	 * 
-	 * @see #chainedIterator(Iterator)
+	 * @see #chainedIterator(Iterable)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterator1 {@link Iterator} 1.
-	 * @param iterator2 {@link Iterator} 2.
-	 * @return {@link ChainedIterator}.
+	 * @param iterator1 erster {@link Iterator} oder {@code null}.
+	 * @param iterator2 zweiter {@link Iterator} oder {@code null}.
+	 * @return {@code chained}-{@link Iterator}.
 	 */
 	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends GItem> iterator1, final Iterator<? extends GItem> iterator2) {
 		return Iterators.chainedIterator(Arrays.asList(iterator1, iterator2));
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
-	 * und gibt ihn zurück.
+	 * Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert. Das
+	 * gegebene {@link Iterable} darf {@code null} liefern.
 	 * 
 	 * @see #chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterators {@link Iterator}-Array.
-	 * @return {@link ChainedIterator}.
-	 * @throws NullPointerException Wenn die gegebenen {@link Iterator}en {@code null} sind.
+	 * @param iterable {@link Iterable} über die {@link Iterator}.
+	 * @return {@code chained}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
-	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends GItem>... iterators) throws NullPointerException {
-		if (iterators == null) throw new NullPointerException();
-		return Iterators.chainedIterator(Arrays.asList(iterators));
+	public static <GItem> Iterator<GItem> chainedIterator(final Iterable<? extends Iterator<? extends GItem>> iterable) throws NullPointerException {
+		if (iterable == null) throw new NullPointerException("iterable = null");
+		return Iterators.chainedIterator(iterable.iterator());
 	}
 
 	/**
-	 * Diese Methode erzeugt einen verketteten {@link Iterator}, der alle Elemente der gegebenen {@link Iterator Iteratoren} in der gegebenen Reihenfolge liefert,
-	 * und gibt ihn zurück.
+	 * Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert. Der
+	 * gegebene {@link Iterator} darf {@code null} liefern.
 	 * 
-	 * @see #chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterators {@link Iterable} über die {@link Iterator}en.
-	 * @return {@link ChainedIterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
+	 * @param iterators {@link Iterator}, dessen Elemente ({@link Iterator}) verkettet werden.
+	 * @return {@code chained}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterators} {@code null} ist.
 	 */
-	public static <GItem> Iterator<GItem> chainedIterator(final Iterable<? extends Iterator<? extends GItem>> iterators) throws NullPointerException {
-		return Iterators.chainedIterator(iterators.iterator());
+	public static <GItem> Iterator<GItem> chainedIterator(final Iterator<? extends Iterator<? extends GItem>> iterators) throws NullPointerException {
+		if (iterators == null) throw new NullPointerException("iterators = null");
+		return new BaseIterator<GItem>() {
+
+			Iterator<? extends GItem> iterator;
+
+			@Override
+			public boolean hasNext() {
+				while (true) {
+					while (this.iterator == null) {
+						if (!iterators.hasNext()) return false;
+						this.iterator = iterators.next();
+					}
+					if (this.iterator.hasNext()) return true;
+					this.iterator = null;
+				}
+			}
+
+			@Override
+			public GItem next() {
+				if (this.iterator == null) throw new NoSuchElementException();
+				return this.iterator.next();
+			}
+
+			@Override
+			public void remove() {
+				if (this.iterator == null) throw new IllegalStateException();
+				this.iterator.remove();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("chainedIterator", iterators);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen konvertierenden {@link Iterator}, der die vom gegebenen {@link Converter Converter} konvertierten Elemente des gegebenen
-	 * {@link Iterator}s liefert, und gibt ihn zurück.
+	 * Diese Methode gibt einen navigierenden {@link Iterator} zurück, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen
+	 * {@link Iterator} liefert.
 	 * 
-	 * @see Converter
-	 * @see ConvertedIterator
-	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter}s sowie der Elemente des gegebenen {@link Iterator Iterators}.
-	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie der Elemente des erzeugten {@link Iterator Iterators}.
+	 * @see Converter#convert(Object)
+	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie der Elemente des gegebenen {@link Iterator}.
+	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
 	 * @param converter {@link Converter}.
-	 * @return {@link ConvertedIterator}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @return {@code navigated}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
-		return new ConvertedIterator<GInput, GOutput>(converter, iterator);
+		if (converter == null) throw new NullPointerException("converter = null");
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		return new BaseIterator<GOutput>() {
+
+			@Override
+			public boolean hasNext() {
+				return iterator.hasNext();
+			}
+
+			@Override
+			public GOutput next() {
+				return converter.convert(iterator.next());
+			}
+
+			@Override
+			public void remove() {
+				iterator.remove();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("navigatedIterator", converter, iterator);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode erzeugt einen unmodifizierbaren {@link Iterator}, und gibt ihn zurück.
+	 * Diese Methode gibt einen unveränderlichen {@link Iterator} zurück, der die Elemente des gegebenen {@link Iterator} liefert und dessen
+	 * {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst.
 	 * 
-	 * @see Iterator#remove()
-	 * @see UnmodifiableIterator
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
-	 * @return {@link UnmodifiableIterator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Iterator} {@code null} ist.
+	 * @return {@code unmodifiable}-{@link Iterator}.
+	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
 	 */
 	public static <GItem> Iterator<GItem> unmodifiableIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-		return new UnmodifiableIterator<GItem>(iterator);
-	}
+		if (iterator == null) throw new NullPointerException("iterator = null");
+		return new BaseIterator<GItem>() {
 
-	/**
-	 * Diese Klasse implementiert einen {@link Iterator}, der die Elemente eines gegebene {@link Iterator}s liefert und dessen {@link #remove()} eine
-	 * {@link UnsupportedOperationException} auslöst.
-	 * 
-	 * @see Iterator#remove()
-	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
-	public static final class UnmodifiableIterator<GItem> extends AbstractDelegatingIterator<GItem, GItem> {
-	
-		/**
-		 * Dieser Konstruktor initialisiert den {@link Iterator}.
-		 * 
-		 * @param iterator {@link Iterator}.
-		 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
-		 */
-		public UnmodifiableIterator(final Iterator<? extends GItem> iterator) throws NullPointerException {
-			super(iterator);
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public GItem next() {
-			return this.iterator.next();
-		}
-	
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-	
+			@Override
+			public boolean hasNext() {
+				return iterator.hasNext();
+			}
+
+			@Override
+			public GItem next() {
+				return iterator.next();
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toStringCall("unmodifiableIterator", iterator);
+			}
+
+		};
 	}
 
 }
