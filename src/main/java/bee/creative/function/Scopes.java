@@ -2,7 +2,7 @@ package bee.creative.function;
 
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
-import bee.creative.util.Iterators.GetIterator;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
@@ -28,7 +28,7 @@ public final class Scopes {
 		 */
 		@Override
 		public Iterator<Value> iterator() {
-			return new GetIterator<Value>(this, this.size());
+			return Iterators.itemsIterator(this, 0, this.size());
 		}
 
 		/**
@@ -229,7 +229,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "values", this.values});
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "values", this.values});
 		}
 
 	}
@@ -307,7 +307,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "context", this.context});
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "context", this.context});
 		}
 
 	}
@@ -424,7 +424,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCallFormat(true, true, this, new Object[]{"scope", this.scope, "values", this.values, "functions", this.params});
+			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "values", this.values, "functions", this.params});
 		}
 
 	}

@@ -205,7 +205,7 @@ public class Comparables {
 
 	/**
 	 * Diese Methode gibt einen {@link Comparable} zurück, der {@code null}-Elemente als minimal betrachtet und alle anderen Eingaben an einen gegebenen
-	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ergibt sich aus: {@code ((item == null) ? 1 : comparable.compareTo(item))}.
+	 * {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ist {@code ((item == null) ? 1 : comparable.compareTo(item))}.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparable {@link Comparable}.
@@ -231,8 +231,8 @@ public class Comparables {
 
 	/**
 	 * Diese Methode gibt einen {@link Comparable} zurück, der den gegebenen {@link Comparator} sowie das gegebene Element zur Berechnung des Navigationswert
-	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code item2} ergibt sich
-	 * aus: {@code comparator.compare(item, item2)}.
+	 * verwendet. Das gegebene Element wird als erstes Argument des {@link Comparator}s verwendet. Der Navigationswert für ein Element {@code item2} ist
+	 * {@code comparator.compare(item, item2)}.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param item erstes Argument des {@link Comparator}s.
@@ -259,7 +259,7 @@ public class Comparables {
 
 	/**
 	 * Diese Methode gibt einen {@link Comparable} zurück, der den Navigationswert des gegebenen {@link Comparable} umkehrt. Der Navigationswert für ein Element
-	 * {@code item} ergibt sich aus: {@code - comparable.compareTo(item)}.
+	 * {@code item} ist {@code - comparable.compareTo(item)}.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparable {@link Comparable}.
@@ -286,7 +286,7 @@ public class Comparables {
 	/**
 	 * Diese Methode gibt einen verketteten {@link Comparable} zurück, der den Navigationswert eines Elements zuerst über den ersten {@link Comparable} berechnet
 	 * und nur dann den zweiten {@link Comparable} verwendet, wenn der erste {@link Comparable} den Navigationswert {@code 0} ermittelt hat. Der Navigationswert
-	 * für ein Element {@code item} ergibt sich aus: {@code (comparable1.compareTo(item) != 0) ? comparable1.compareTo(item) : comparable2.compareTo(item)}.
+	 * für ein Element {@code item} ist {@code (comparable1.compareTo(item) != 0) ? comparable1.compareTo(item) : comparable2.compareTo(item)}.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparable1 erster {@link Comparable}.
@@ -316,9 +316,8 @@ public class Comparables {
 	}
 
 	/**
-	 * Diese Methode gint einen konvertierenden {@link Comparable} zurück, der die mit dem gegebenen {@link Converter} konvertierten Elemente zur Berechnung des
-	 * Navigationswerts an den gegebenen {@link Comparable} delegiert. Der Navigationswert für ein Element {@code item} ergibt sich aus:
-	 * {@code comparable.compareTo(converter.convert(item))}.
+	 * Diese Methode gint einen navigierten {@link Comparable} zurück, der von seinem Element mit dem gegebenen {@link Converter} zum Element des gegebenen
+	 * {@link Comparable} navigiert. Der Navigationswert für ein Element {@code item} ist {@code comparable.compareTo(converter.convert(item))}.
 	 * 
 	 * @see Converter
 	 * @param <GItem> Typ der Eingabe des {@link Converter}s sowie der Elemente.

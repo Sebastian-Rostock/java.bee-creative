@@ -25,122 +25,6 @@ public class Objects {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface UseToString {
-	}
-
-	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)}
-	 * ermittelten {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static abstract class AbstractObject {
-
-		/**
-		 * Dieses Feld speichert das Objekt.
-		 */
-		final Object object;
-
-		/**
-		 * Dieser Konstruktor initialisiert das Objekt.
-		 * 
-		 * @param object Objekt.
-		 */
-		public AbstractObject(final Object object) {
-			this.object = object;
-		}
-
-		/**
-		 * Diese Methode gibt das Objekt zurück.
-		 * 
-		 * @return Objekt.
-		 */
-		public Object object() {
-			return this.object;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
-	 * {@link Object#toString() Textdarstelung} eines gegebenen Objekts entspricht.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class NormalObject extends AbstractObject {
-
-		/**
-		 * Dieser Konstruktor initialisiert das Objekt.
-		 * 
-		 * @param object Objekt.
-		 */
-		public NormalObject(final Object object) {
-			super(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof NormalObject)) return false;
-			final NormalObject data = (NormalObject)object;
-			return Objects.equals(this.object, data.object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toString(false, this.object);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
-	 * formatierten {@link Object#toString() Textdarstelung} eines gegebenen Objekts entspricht.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	static final class FormatObject extends AbstractObject {
-
-		/**
-		 * Dieser Konstruktor initialisiert das Objekt.
-		 * 
-		 * @param object Objekt.
-		 */
-		public FormatObject(final Object object) {
-			super(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof FormatObject)) return false;
-			final FormatObject data = (FormatObject)object;
-			return Objects.equals(this.object, data.object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Objects.toString(true, this.object);
-		}
 
 	}
 
@@ -348,83 +232,6 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Arrays#hashCode(int[])
-	 * @see Arrays#hashCode(long[])
-	 * @see Arrays#hashCode(byte[])
-	 * @see Arrays#hashCode(char[])
-	 * @see Arrays#hashCode(short[])
-	 * @see Arrays#hashCode(float[])
-	 * @see Arrays#hashCode(double[])
-	 * @see Arrays#hashCode(boolean[])
-	 * @see Objects#hashEx(Object...)
-	 * @param object Objekt oder {@code null}.
-	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
-	 */
-	public static int hashEx(final Object object) {
-		if (object == null) return 0;
-		final Class<?> clazz = object.getClass();
-		if (!clazz.isArray()) return object.hashCode();
-		if (clazz == int[].class) return Arrays.hashCode((int[])object);
-		if (clazz == long[].class) return Arrays.hashCode((long[])object);
-		if (clazz == byte[].class) return Arrays.hashCode((byte[])object);
-		if (clazz == char[].class) return Arrays.hashCode((char[])object);
-		if (clazz == short[].class) return Arrays.hashCode((short[])object);
-		if (clazz == float[].class) return Arrays.hashCode((float[])object);
-		if (clazz == double[].class) return Arrays.hashCode((double[])object);
-		if (clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
-		return Objects.hashEx((Object[])object);
-	}
-
-	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Objects#hashEx(Object)
-	 * @param objects Objekte oder {@code null}.
-	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
-	 */
-	public static int hashEx(final Object... objects) {
-		if (objects == null) return 0;
-		int hash = 0x811C9DC5;
-		for (final Object object: objects) {
-			hash = (hash * 0x01000193) ^ Objects.hashEx(object);
-		}
-		return hash;
-	}
-
-	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Objects#hashEx(Object)
-	 * @see Objects#hashEx(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
-	 */
-	public static int hashEx(final Object object1, final Object object2) {
-		return ((0x50C5D1F ^ Objects.hashEx(object1)) * 0x01000193) ^ Objects.hashEx(object2);
-	}
-
-	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
-	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
-	 * @see Objects#hashEx(Object)
-	 * @see Objects#hashEx(Object...)
-	 * @param object1 Objekt oder {@code null}.
-	 * @param object2 Objekt oder {@code null}.
-	 * @param object3 Objekt oder {@code null}.
-	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
-	 */
-	public static int hashEx(final Object object1, final Object object2, final Object object3) {
-		return (Objects.hashEx(object1, object2) * 0x01000193) ^ Objects.hashEx(object3);
-	}
-
-	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
 	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
 	 * {@link Objects#equals(Object, Object)}.
@@ -478,18 +285,95 @@ public class Objects {
 	}
 
 	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
+	 * aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Arrays#hashCode(int[])
+	 * @see Arrays#hashCode(long[])
+	 * @see Arrays#hashCode(byte[])
+	 * @see Arrays#hashCode(char[])
+	 * @see Arrays#hashCode(short[])
+	 * @see Arrays#hashCode(float[])
+	 * @see Arrays#hashCode(double[])
+	 * @see Arrays#hashCode(boolean[])
+	 * @see Objects#deepHash(Object...)
+	 * @param object Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int deepHash(final Object object) {
+		if (object == null) return 0;
+		final Class<?> clazz = object.getClass();
+		if (!clazz.isArray()) return object.hashCode();
+		if (clazz == int[].class) return Arrays.hashCode((int[])object);
+		if (clazz == long[].class) return Arrays.hashCode((long[])object);
+		if (clazz == byte[].class) return Arrays.hashCode((byte[])object);
+		if (clazz == char[].class) return Arrays.hashCode((char[])object);
+		if (clazz == short[].class) return Arrays.hashCode((short[])object);
+		if (clazz == float[].class) return Arrays.hashCode((float[])object);
+		if (clazz == double[].class) return Arrays.hashCode((double[])object);
+		if (clazz == boolean[].class) return Arrays.hashCode((boolean[])object);
+		return Objects.deepHash((Object[])object);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
+	 * aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#deepHash(Object)
+	 * @param objects Objekte oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int deepHash(final Object... objects) {
+		if (objects == null) return 0;
+		int hash = 0x811C9DC5;
+		for (final Object object: objects) {
+			hash = (hash * 0x01000193) ^ Objects.deepHash(object);
+		}
+		return hash;
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
+	 * aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#deepHash(Object)
+	 * @see Objects#deepHash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int deepHash(final Object object1, final Object object2) {
+		return ((0x50C5D1F ^ Objects.deepHash(object1)) * 0x01000193) ^ Objects.deepHash(object2);
+	}
+
+	/**
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
+	 * aus der Hilfsklasse {@link Arrays} verwendet.
+	 * 
+	 * @see Objects#deepHash(Object)
+	 * @see Objects#deepHash(Object...)
+	 * @param object1 Objekt oder {@code null}.
+	 * @param object2 Objekt oder {@code null}.
+	 * @param object3 Objekt oder {@code null}.
+	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
+	 */
+	public static int deepHash(final Object object1, final Object object2, final Object object3) {
+		return (Objects.deepHash(object1, object2) * 0x01000193) ^ Objects.deepHash(object3);
+	}
+
+	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
 	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
-	 * {@link Objects#equalsEx(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
+	 * {@link Objects#deepEquals(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
-	 * @see Objects#equalsEx(Object, Object)
+	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean equalsEx(final Object... objects) {
+	public static boolean deepEquals(final Object... objects) {
 		if (objects == null) return true;
 		for (int i = 0, size = objects.length; i < size; i += 2) {
-			if (!Objects.equalsEx(objects[i], objects[i + 1])) return false;
+			if (!Objects.deepEquals(objects[i], objects[i + 1])) return false;
 		}
 		return true;
 	}
@@ -511,12 +395,12 @@ public class Objects {
 	 * @see Arrays#equals(float[], float[])
 	 * @see Arrays#equals(double[], double[])
 	 * @see Arrays#equals(boolean[], boolean[])
-	 * @see Objects#equalsEx(Object[], Object[])
+	 * @see Objects#deepEquals(Object[], Object[])
 	 * @param object1 Objekt 1 oder {@code null}.
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean equalsEx(final Object object1, final Object object2) {
+	public static boolean deepEquals(final Object object1, final Object object2) {
 		if (object1 == object2) return true;
 		if ((object1 == null) || (object2 == null)) return false;
 		final Class<?> c1 = object1.getClass();
@@ -531,37 +415,33 @@ public class Objects {
 		if (c1 == float[].class) return (c2 == float[].class) && Arrays.equals((float[])object1, (float[])object2);
 		if (c1 == double[].class) return (c2 == double[].class) && Arrays.equals((double[])object1, (double[])object2);
 		if (c1 == boolean[].class) return (c2 == boolean[].class) && Arrays.equals((boolean[])object1, (boolean[])object2);
-		return Objects.equalsEx((Object[])object1, (Object[])object2);
+		return Objects.deepEquals((Object[])object1, (Object[])object2);
 	}
 
 	/**
 	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
-	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#equalsEx(Object, Object)} ermittelt. Für Arrays
+	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#deepEquals(Object, Object)} ermittelt. Für Arrays
 	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
 	 * 
-	 * @see Objects#equalsEx(Object, Object)
+	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
 	 * @param objects2 Array 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean equalsEx(final Object[] objects1, final Object[] objects2) {
+	public static boolean deepEquals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
 		if (length != objects2.length) return false;
 		for (int i = 0; i < length; i++) {
-			if (!Objects.equalsEx(objects1[i], objects2[i])) return false;
+			if (!Objects.deepEquals(objects1[i], objects2[i])) return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und
-	 * {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Der Rückgabewert entspricht:
-	 * 
-	 * <pre>
-	 * Objects.toString(false, object)
-	 * </pre>
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toString(false, object)}.
 	 * 
 	 * @see Objects#toString(boolean, Object)
 	 * @param object Objekt oder {@code null}.
@@ -572,10 +452,11 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}s, Arrays, {@link String}s und
-	 * {@link Iterable}s je eine einene eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung
-	 * aktiviert werden. Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}
-	 * -Methode zurück gegeben.
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}, Arrays, {@link CharSequence} und
+	 * {@link Iterable} je eine einene eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette kann deren hierarchische Formatierung
+	 * aktiviert werden.
+	 * <p>
+	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode geliefert.
 	 * 
 	 * @see Objects#toString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -596,47 +477,50 @@ public class Objects {
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt.
 	 */
 	public static Object toStringObject(final boolean format, final Object object) {
-		return ((object == null) ? "null" : (format ? new FormatObject(object) : new NormalObject(object)));
+		if (object == null) return "null";
+		return new Object() {
+
+			@Override
+			public String toString() {
+				return Objects.toString(format, object);
+			}
+
+		};
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toStringCall(false, false, name, args)}.
 	 * 
-	 * <pre>
-	 * Objects.toStringCallFormat(false, false, name, args)
-	 * </pre>
-	 * 
-	 * @see Objects#toStringCallFormat(boolean, boolean, String, Object...)
+	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
 	 */
 	public static String toStringCall(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCallFormat(false, false, name, args);
+		return Objects.toStringCall(false, false, name, args);
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)}.
 	 * 
-	 * <pre>
-	 * Objects.toStringCallFormat(false, false, object.getClass().getSimpleName(), args)
-	 * </pre>
-	 * 
-	 * @see #toStringCallFormat(boolean, boolean, String, Object...)
+	 * @see #toStringCall(boolean, boolean, String, Object...)
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
 	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCallFormat(false, false, object.getClass().getSimpleName(), args);
+		return Objects.toStringCall(false, false, object.getClass().getSimpleName(), args);
 	}
 
 	/**
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
-	 * hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente beschriftete Parameter interpretiert. Ein
-	 * beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und einem Wert {@code args[i+1]} für jede gerade Position {@code i}.
+	 * hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente als beschriftete Parameter interpretiert.
+	 * Ein beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und dem darauf folgenden Wert {@code args[i+1]} für jede gerade Position
+	 * {@code i}.
 	 * 
 	 * @param name Funktionsname.
 	 * @param format Formatiermodus.
@@ -645,8 +529,9 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
 	 */
-	public static String toStringCallFormat(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
-		if ((name == null) || (args == null)) throw new NullPointerException();
+	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+		if (name == null) throw new NullPointerException("name = null");
+		if (args == null) throw new NullPointerException("args = null");
 		final StringBuilder output = new StringBuilder(name);
 		if (args.length != 0) {
 			String join = (format ? "(\n  " : "( ");
@@ -670,13 +555,10 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht:
+	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
+	 * {@code Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)}.
 	 * 
-	 * <pre>
-	 * Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args)
-	 * </pre>
-	 * 
-	 * @see #toStringCallFormat(boolean, boolean, String, Object...)
+	 * @see #toStringCall(boolean, boolean, String, Object...)
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.
 	 * @param object {@link Object}.
@@ -684,22 +566,22 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static String toStringCallFormat(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
-		if (object == null) throw new NullPointerException();
-		return Objects.toStringCallFormat(format, label, object.getClass().getSimpleName(), args);
+	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+		if (object == null) throw new NullPointerException("object = null");
+		return Objects.toStringCall(format, label, object.getClass().getSimpleName(), args);
 	}
 
-	/**
-	 * Diese Methode gibt das gegebenen Objekt nur dann zurück, wenn es {@code null} ist oder ein Nachfahre von {@link UseToString} ist. Andernfalls wird die
-	 * Klasse des Objekts geliefert.
-	 * 
-	 * @see UseToString
-	 * @see Object#getClass()
-	 * @return {@link Object}, dass für {@link #iterator} in {@link #toString()} verwendet werden sollte.
-	 */
-	public static Object useObjectOrClass(Object object) {
-		if (object == null || object instanceof UseToString) return object;
-		return object.getClass();
-	}
+	// /**
+	// * Diese Methode gibt das gegebenen Objekt nur dann zurück, wenn es {@code null} ist oder ein Nachfahre von {@link UseToString} ist. Andernfalls wird die
+	// * Klasse des Objekts geliefert.
+	// *
+	// * @see UseToString
+	// * @see Object#getClass()
+	// * @return {@link Object}, dass für {@link #iterator} in {@link #toString()} verwendet werden sollte.
+	// */
+	// public static Object useObjectOrClass(Object object) {
+	// if (object == null || object instanceof UseToString) return object;
+	// return object.getClass();
+	// }
 
 }

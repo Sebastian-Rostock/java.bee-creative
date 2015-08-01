@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.util.Converters.CachedConverter;
 
 /**
  * Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken mit Zeichenketten zur Verfügung.
@@ -78,7 +77,7 @@ public class Strings {
 	/**
 	 * Dieses Feld speichert den {@link Converter} zur Kompilation von {@link Pattern}.
 	 */
-	static final Converter<String, Pattern> PATTERN_CONVERTER = Converters.synchronizedConverter(Converters.cachedConverter(Strings.patternConverter(0)));
+	static final Converter<String, Pattern> PATTERN_CONVERTER = Converters.synchronizedConverter(Converters.bufferedConverter(Strings.patternConverter(0)));
 
 	/**
 	 * Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden

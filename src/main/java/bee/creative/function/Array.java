@@ -6,7 +6,7 @@ import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.NumberValue;
 import bee.creative.util.Comparables.Items;
-import bee.creative.util.Iterators.GetIterator;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
@@ -518,7 +518,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 */
 	@Override
 	public Iterator<Value> iterator() {
-		return new GetIterator<Value>(this, this.length());
+		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
 	{}

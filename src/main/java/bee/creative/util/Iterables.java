@@ -3,7 +3,6 @@ package bee.creative.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.util.Collections.BaseChainedList.ChainedIterator;
 import bee.creative.util.Objects.UseToString;
 
 /**
@@ -38,6 +37,11 @@ public class Iterables {
 			return Iterators.emptyIterator();
 		}
 
+		@Override
+		public String toString() {
+			return "EMPTY_ITERABLE";
+		}
+
 	};
 
 	/**
@@ -50,13 +54,25 @@ public class Iterables {
 			return input.iterator();
 		}
 
+		@Override
+		public String toString() {
+			return "ITERABLE_ITERATOR";
+		}
+
 	};
 
 	{}
 
-	public static int size(final Iterable<?> iterator) throws NullPointerException {
-		if (iterator == null) throw new NullPointerException("iterator = null");
-		return -Iterators.skip(iterator.iterator(), -1) - 1;
+	/**
+	 * Diese Methode gibt die Anzahl der vom gegebenen {@link Iterable} gelieferten Elemente zurück.
+	 * 
+	 * @param iterable {@link Iterable}.
+	 * @return Anzahl der gelieferten Elemente.
+	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
+	 */
+	public static int size(final Iterable<?> iterable) throws NullPointerException {
+		if (iterable == null) throw new NullPointerException("iterable = null");
+		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
 
 	/**
@@ -297,7 +313,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("limitedIterable", count, Objects.useObjectOrClass(iterable));
+				return Objects.toStringCall("limitedIterable", count, iterable);
 			}
 
 		};
@@ -327,7 +343,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("filteredIterable", filter, Objects.useObjectOrClass(iterable));
+				return Objects.toStringCall("filteredIterable", filter, iterable);
 			}
 
 		};
@@ -353,7 +369,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("uniqueIterable", Objects.useObjectOrClass(iterable));
+				return Objects.toStringCall("uniqueIterable", iterable);
 			}
 
 		};
@@ -366,14 +382,15 @@ public class Iterables {
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterables {@link Iterable}, dessen Elemente ({@link Iterator}) verkettet werden.
 	 * @return {@code chained}-{@link Iterable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Iterable} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist.
 	 */
 	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) throws NullPointerException {
+		if (iterables == null) throw new NullPointerException("iterables = null");
 		return new BaseIterable<GItem>() {
 
 			@Override
 			public Iterator<GItem> iterator() {
-				return Iterators.chainedIterator(Iterators.navigatedIterator(Iterables.<GItem>iterableIterator(), iterables.iterator()));
+				return Iterators.chainedIterator(Iterators.convertedIterator(Iterables.<GItem>iterableIterator(), iterables.iterator()));
 			}
 
 			@Override
@@ -385,60 +402,63 @@ public class Iterables {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
-	 * zurück.
+	 * Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 * 
-	 * @see Iterables#chainedIterable(Iterable)
-	 * @see Iterables#chainedIterable(Iterable, Iterable)
+	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterables {@link Iterable}-Array.
-	 * @return {@link ChainedIterable}.
-	 * @throws NullPointerException Wenn das gegebene {@link Iterable}-Array {@code null} ist.
+	 * @param iterables Array, dessen Elemente ({@link Iterator}) verkettet werden.
+	 * @return {@code chained}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> ChainedIterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
-		if (iterables == null) throw new NullPointerException();
+	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
+		if (iterables == null) throw new NullPointerException("iterables = null");
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
 
 	/**
-	 * Diese Methode erzeugt ein verkettetes {@link Iterable}, das alle Elemente der gegebenen {@link Iterable}s in der gegebenen Reihenfolge liefert, und gibt es
-	 * zurück.
+	 * Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 * 
-	 * @see ChainedIterable
+	 * @see Iterators#chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
-	 * @param iterable1 {@link Iterable} 1.
-	 * @param iterable2 {@link Iterable} 2.
-	 * @return {@link ChainedIterable}.
+	 * @param iterable1 erstes {@link Iterable}.
+	 * @param iterable2 zweites {@link Iterable}.
+	 * @return {@code chained}-{@link Iterable}.
+	 * @throws NullPointerException Wenn {@code iterable1} bzw. {@code iterable2} {@code null} ist.
 	 */
-	public static <GItem> ChainedIterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2) {
-		return chainedIterable(Arrays.asList(iterable1, iterable2));
+	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2)
+		throws NullPointerException {
+		if (iterable1 == null) throw new NullPointerException("iterable1 = null");
+		if (iterable2 == null) throw new NullPointerException("iterable2 = null");
+		return Iterables.chainedIterable(Arrays.asList(iterable1, iterable2));
 	}
 
 	/**
-	 * Diese Methode gibt ein navigierendes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen {@link Iterable}
-	 * liefert.
+	 * Diese Methode gibt ein umgewandeltes {@link Iterable} zurück, das die vom gegebenen {@link Converter} konvertierten Elemente der gegebenen {@link Iterable}
+	 * in der gegebenen Reihenfolge liefert.
 	 * 
-	 * @see Iterators#navigatedIterator(Converter, Iterator)
+	 * @see Iterators#convertedIterator(Converter, Iterator)
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie der Elemente des gegebenen {@link Iterable}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterable}.
 	 * @param converter {@link Converter}.
 	 * @param iterable {@link Iterable}.
-	 * @return {@code navigated}-{@link Iterable}.
+	 * @return {@code converted}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GOutput> Iterable<GOutput> navigatedIterable(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
 		final Iterable<? extends GInput> iterable) throws NullPointerException {
 		return new BaseIterable<GOutput>() {
 
 			@Override
 			public Iterator<GOutput> iterator() {
-				return Iterators.navigatedIterator(converter, iterable.iterator());
+				return Iterators.convertedIterator(converter, iterable.iterator());
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedIterable", converter, Objects.useObjectOrClass(iterable));
+				return Objects.toStringCall("convertedIterable", converter, iterable);
 			}
 
 		};
@@ -464,7 +484,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("unmodifiableIterator", Objects.useObjectOrClass(iterable));
+				return Objects.toStringCall("unmodifiableIterator", iterable);
 			}
 
 		};

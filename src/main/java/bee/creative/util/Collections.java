@@ -810,7 +810,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 		/**
@@ -1465,7 +1465,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}
@@ -1655,7 +1655,7 @@ public class Collections {
 		 */
 		@Override
 		public Iterator<GItem> iterator() {
-			return Iterators.navigatedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
+			return Iterators.convertedIterator(this.formatter, Iterators.filteredIterator(this.formatter, this.data.iterator()));
 		}
 
 	}

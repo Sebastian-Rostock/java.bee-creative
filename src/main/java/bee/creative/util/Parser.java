@@ -188,6 +188,7 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist.
 	 */
 	public final void take(final String symbols) throws NullPointerException {
+		if (symbols == null) throw new NullPointerException("symbols = null");
 		this.target.append(symbols.toString());
 	}
 
@@ -225,7 +226,7 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	protected void string(final String value) throws NullPointerException {
-		value.length();
+		if (value == null) throw new NullPointerException("value = null");
 		this.target.setLength(0);
 		this.target.append(value);
 	}
@@ -256,12 +257,12 @@ public class Parser {
 	/**
 	 * Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
 	 * 
-	 * @param value Eingabe.
+	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	protected void source(final String value) throws NullPointerException {
-		value.length();
-		this.length = (this.chars = (this.source = value).toCharArray()).length;
+	protected void source(final String source) throws NullPointerException {
+		if (source == null) throw new NullPointerException("source = null");
+		this.length = (this.chars = (this.source = source).toCharArray()).length;
 		this.reset();
 	}
 

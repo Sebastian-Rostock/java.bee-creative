@@ -840,7 +840,7 @@ public final class Fields {
 	}
 
 	/**
-	 * Diese Methode gibt ein navigierendes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
+	 * Diese Methode gibt ein navigiertes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
 	 * {@link Field} navigiert. Das Lesen der Eigenschaft einer Einagbe {@code input} erfolgt damit über {@code field.get(converter.convert(input))} und ein Wert
 	 * {@code value} wird dann via {@code field.set(converter.convert(input), value)} geschrieben.
 	 * 

@@ -7,7 +7,7 @@ import java.util.List;
 import bee.creative.util.Comparables;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
-import bee.creative.util.Iterators.GetIterator;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
@@ -365,7 +365,7 @@ public final class Script implements Items<Script.Range>, Iterable<Script.Range>
 	 */
 	@Override
 	public Iterator<Range> iterator() {
-		return new GetIterator<Range>(this, this.length());
+		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
 	/**

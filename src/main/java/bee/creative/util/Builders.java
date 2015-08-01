@@ -14,7 +14,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import bee.creative.util.Pointers.NullPointer;
 import bee.creative.util.Pointers.SoftPointer;
 
 /**
@@ -1023,7 +1022,7 @@ public class Builders {
 				if (pointer != null) {
 					final GValue data = pointer.data();
 					if (data != null) return data;
-					if (pointer == NullPointer.INSTANCE) return null;
+					if (pointer == Pointers.NULL_POINTER) return null;
 				}
 				final GValue data = builder.build();
 				this.pointer = Pointers.pointer(mode, data);
@@ -1039,17 +1038,17 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Builder} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem Datensatz des gegebenen {@link Builder}
-	 * ermittelt wird.
+	 * Diese Methode gibt einen umgewandelten {@link Builder} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem Datensatz des gegebenen
+	 * {@link Builder} ermittelt wird.
 	 * 
 	 * @param <GInput> Typ des Datensatzes des gegebenen {@link Builder}s sowie der Eingabe des gegebenen {@link Converter}s.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter}s sowie des Datensatzes.
 	 * @param converter {@link Converter}.
 	 * @param builder {@link Builder}.
-	 * @return {@code navigated}-{@link Builder}.
+	 * @return {@code converted}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Builder<GOutput> navigatedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -1062,7 +1061,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedBuilder", converter, builder);
+				return Objects.toStringCall("convertedBuilder", converter, builder);
 			}
 
 		};

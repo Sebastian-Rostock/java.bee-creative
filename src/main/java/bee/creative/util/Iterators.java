@@ -652,7 +652,7 @@ public class Iterators {
 	}
 
 	/**
-	 * Diese Methode gibt einen navigierenden {@link Iterator} zurück, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen
+	 * Diese Methode gibt einen umgewandelten {@link Iterator} zurück, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen
 	 * {@link Iterator} liefert.
 	 * 
 	 * @see Converter#convert(Object)
@@ -660,10 +660,10 @@ public class Iterators {
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterator}.
 	 * @param iterator {@link Iterator}.
 	 * @param converter {@link Converter}.
-	 * @return {@code navigated}-{@link Iterator}.
+	 * @return {@code converted}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} bzw. {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Iterator<GOutput> navigatedIterator(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Iterator<GOutput> convertedIterator(final Converter<? super GInput, ? extends GOutput> converter,
 		final Iterator<? extends GInput> iterator) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (iterator == null) throw new NullPointerException("iterator = null");
@@ -686,7 +686,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedIterator", converter, iterator);
+				return Objects.toStringCall("convertedIterator", converter, iterator);
 			}
 
 		};

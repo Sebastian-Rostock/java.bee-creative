@@ -413,7 +413,7 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator}s umkehrt.
+	 * Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
@@ -438,8 +438,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt einen neuen {@link Comparator} zurück, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator}s analog zu Zeichenketten
-	 * vergleicht.
+	 * Diese Methode gibt einen neuen {@link Comparator} zurück, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator} analog zu Zeichenketten
+	 * (d.h. lexikographisch) vergleicht.
 	 * 
 	 * @see #compare(Iterable, Iterable, Comparator)
 	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
@@ -496,8 +496,8 @@ public class Comparators {
 	}
 
 	/**
-	 * Diese Methode gibt einen konvertierenden {@link Comparator} zurück, der seine Eingaben mit dem gegebenen {@link Converter} umwandelt und an den gegebenen
-	 * {@link Comparator} delegiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
+	 * Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Converter} zu den Eingaben des gegebenen
+	 * {@link Comparator} navigiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
 	 * {@code comparator.compare(converter.convert(item1), converter.convert(item2))}.
 	 * 
 	 * @see Converter

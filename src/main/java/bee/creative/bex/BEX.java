@@ -9,7 +9,7 @@ import bee.creative.iam.IAM;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
-import bee.creative.util.Iterators.GetIterator;
+import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
@@ -71,7 +71,7 @@ public class BEX {
 		 */
 		@Override
 		public Iterator<BEXNode> iterator() {
-			return new GetIterator<>(this, this.length());
+			return Iterators.itemsIterator(this, 0, this.length());
 		}
 
 		/**
