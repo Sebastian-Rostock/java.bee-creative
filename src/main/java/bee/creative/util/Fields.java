@@ -890,10 +890,10 @@ public final class Fields {
 	 * @param field {@link Field}.
 	 * @param parser {@link Converter} zum Umwandeln des externen in den internen Wert (Parsen) für das Schreiben oder {@code null}.
 	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
-	 * @return {@code transcoded}-{@link Field}.
+	 * @return {@code converted}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue, GValue2> Field<GInput, GValue> transcodedField(final Field<? super GInput, GValue2> field,
+	public static <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
@@ -912,7 +912,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("transcodedField", field, parser, formatter);
+				return Objects.toInvokeString("convertedField", field, parser, formatter);
 			}
 
 		};

@@ -124,7 +124,7 @@ public class Types {
 		 */
 		@Override
 		public String toString() {
-			return String.valueOf(null);
+			return "null";
 		}
 
 	}
