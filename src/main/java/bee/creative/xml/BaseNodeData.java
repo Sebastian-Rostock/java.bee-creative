@@ -715,7 +715,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.getNode());
+		return Objects.toInvokeString(this, this.getNode());
 	}
 
 }

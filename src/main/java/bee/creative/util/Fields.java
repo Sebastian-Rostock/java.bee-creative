@@ -243,7 +243,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toStringCall("setField", field);
+					return Objects.toInvokeString("setField", field);
 				}
 
 			};
@@ -353,7 +353,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toStringCall("listField", field);
+					return Objects.toInvokeString("listField", field);
 				}
 
 			};
@@ -489,7 +489,7 @@ public final class Fields {
 
 				@Override
 				public String toString() {
-					return Objects.toStringCall("mapField", field);
+					return Objects.toInvokeString("mapField", field);
 				}
 
 			};
@@ -606,7 +606,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeField", field);
+				return Objects.toInvokeString("nativeField", field);
 			}
 
 		};
@@ -661,7 +661,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeField", fieldName);
+				return Objects.toInvokeString("nativeField", fieldName);
 			}
 
 		};
@@ -707,7 +707,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeField", getMethod, setMethod);
+				return Objects.toInvokeString("nativeField", getMethod, setMethod);
 			}
 
 		};
@@ -786,7 +786,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeField", getName, setName);
+				return Objects.toInvokeString("nativeField", getName, setName);
 			}
 
 		};
@@ -833,7 +833,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("valueField", value);
+				return Objects.toInvokeString("valueField", value);
 			}
 
 		};
@@ -870,7 +870,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedField", converter, field);
+				return Objects.toInvokeString("navigatedField", converter, field);
 			}
 
 		};
@@ -912,7 +912,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("transcodedField", field, parser, formatter);
+				return Objects.toInvokeString("transcodedField", field, parser, formatter);
 			}
 
 		};
@@ -1034,7 +1034,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("aggregatedField", field, parser, formatter, emptyValue, mixedValue);
+				return Objects.toInvokeString("aggregatedField", field, parser, formatter, emptyValue, mixedValue);
 			}
 
 		};
@@ -1075,7 +1075,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("conditionalField", condition, accept, reject);
+				return Objects.toInvokeString("conditionalField", condition, accept, reject);
 			}
 
 		};
@@ -1110,7 +1110,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("synchronizedField", field);
+				return Objects.toInvokeString("synchronizedField", field);
 			}
 
 		};

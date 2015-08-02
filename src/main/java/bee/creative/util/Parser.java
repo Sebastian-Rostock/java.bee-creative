@@ -273,7 +273,7 @@ public class Parser {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.source);
+		return Objects.toInvokeString(this, this.source);
 	}
 
 }

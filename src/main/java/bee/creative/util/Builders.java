@@ -977,7 +977,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("valueBuilder", value);
+				return Objects.toInvokeString("valueBuilder", value);
 			}
 
 		};
@@ -1031,7 +1031,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("bufferedBuilder", mode, builder);
+				return Objects.toInvokeString("bufferedBuilder", mode, builder);
 			}
 
 		};
@@ -1061,7 +1061,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedBuilder", converter, builder);
+				return Objects.toInvokeString("convertedBuilder", converter, builder);
 			}
 
 		};
@@ -1088,7 +1088,7 @@ public class Builders {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("synchronizedBuilder", builder);
+				return Objects.toInvokeString("synchronizedBuilder", builder);
 			}
 
 		};

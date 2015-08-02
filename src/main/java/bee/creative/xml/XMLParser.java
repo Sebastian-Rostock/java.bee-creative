@@ -140,7 +140,7 @@ public final class XMLParser {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.sourceData, this.builderData);
+		return Objects.toInvokeString(this, this.sourceData, this.builderData);
 	}
 
 }

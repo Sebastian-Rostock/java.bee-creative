@@ -394,7 +394,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nullComparator", comparator);
+				return Objects.toInvokeString("nullComparator", comparator);
 			}
 
 		};
@@ -431,7 +431,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("reverseComparator", comparator);
+				return Objects.toInvokeString("reverseComparator", comparator);
 			}
 
 		};
@@ -458,7 +458,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("iterableComparator", comparator);
+				return Objects.toInvokeString("iterableComparator", comparator);
 			}
 
 		};
@@ -489,7 +489,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("chainedComparator", comparator1, comparator2);
+				return Objects.toInvokeString("chainedComparator", comparator1, comparator2);
 			}
 
 		};
@@ -521,7 +521,7 @@ public class Comparators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedComparator", converter, comparator);
+				return Objects.toInvokeString("navigatedComparator", converter, comparator);
 			}
 
 		};

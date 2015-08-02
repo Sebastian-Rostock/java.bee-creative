@@ -123,7 +123,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.function);
+			return Objects.toInvokeString(this, this.function);
 		}
 
 	}
@@ -169,7 +169,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toInvokeString(this);
 		}
 
 	}
@@ -218,7 +218,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toInvokeString(this);
 		}
 
 	}
@@ -316,7 +316,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(ArrayFunction.class.getSimpleName(), this.mode());
+			return Objects.toInvokeString(ArrayFunction.class.getSimpleName(), this.mode());
 		}
 
 	}
@@ -372,8 +372,7 @@ public final class Functions {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "function", this.function, "result", this.result, "exception",
-					this.exception});
+				return Objects.toFormatString(true, true, this, "scope", this.scope, "function", this.function, "result", this.result, "exception", this.exception);
 			}
 
 		}
@@ -729,7 +728,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.value);
+			return Objects.toInvokeString(this, this.value);
 		}
 
 	}
@@ -831,7 +830,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.index);
+			return Objects.toInvokeString(this, this.index);
 		}
 
 	}
@@ -965,8 +964,8 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			if (this.scope == null) return Objects.toStringCall(this, this.function);
-			return Objects.toStringCall(this, this.scope, this.function);
+			if (this.scope == null) return Objects.toInvokeString(this, this.function);
+			return Objects.toInvokeString(this, this.scope, this.function);
 		}
 
 	}
@@ -1131,7 +1130,7 @@ public final class Functions {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this, new Object[]{"function", this.function, "functions", this.params});
+			return Objects.toFormatString(true, true, this, "function", this.function, "functions", this.params);
 		}
 
 	}

@@ -366,7 +366,7 @@ public class Pointers {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedPointer", converter, pointer);
+				return Objects.toInvokeString("convertedPointer", converter, pointer);
 			}
 
 		};

@@ -163,7 +163,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemsSection", items, indices);
+				return Objects.toInvokeString("itemsSection", items, indices);
 			}
 
 		};
@@ -197,7 +197,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemsSection", items, fromIndex, toIndex);
+				return Objects.toInvokeString("itemsSection", items, fromIndex, toIndex);
 			}
 
 		};
@@ -223,7 +223,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nullComparable", comparable);
+				return Objects.toInvokeString("nullComparable", comparable);
 			}
 
 		};
@@ -251,7 +251,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemComparable", item, comparator);
+				return Objects.toInvokeString("itemComparable", item, comparator);
 			}
 
 		};
@@ -277,7 +277,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("reverseComparable", comparable);
+				return Objects.toInvokeString("reverseComparable", comparable);
 			}
 
 		};
@@ -309,7 +309,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("chainedComparable", comparable1, comparable2);
+				return Objects.toInvokeString("chainedComparable", comparable1, comparable2);
 			}
 
 		};
@@ -340,7 +340,7 @@ public class Comparables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedComparable", converter, comparable);
+				return Objects.toInvokeString("navigatedComparable", converter, comparable);
 			}
 
 		};

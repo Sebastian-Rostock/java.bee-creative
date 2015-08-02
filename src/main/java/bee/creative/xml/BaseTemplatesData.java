@@ -208,7 +208,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.scriptData, this.factoryData);
+		return Objects.toInvokeString(this, this.scriptData, this.factoryData);
 	}
 
 }

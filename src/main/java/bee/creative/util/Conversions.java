@@ -121,7 +121,7 @@ public class Conversions {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("staticConversion", input, output);
+				return Objects.toInvokeString("staticConversion", input, output);
 			}
 
 		};
@@ -150,7 +150,7 @@ public class Conversions {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("staticConversion", converter);
+				return Objects.toInvokeString("staticConversion", converter);
 			}
 
 		};
@@ -195,7 +195,7 @@ public class Conversions {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("inverseConversion", conversion);
+				return Objects.toInvokeString("inverseConversion", conversion);
 			}
 
 		};
@@ -229,7 +229,7 @@ public class Conversions {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("dynamicConversion", input, converter);
+				return Objects.toInvokeString("dynamicConversion", input, converter);
 			}
 
 		};
@@ -257,7 +257,7 @@ public class Conversions {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("dynamicConversion", converter);
+				return Objects.toInvokeString("dynamicConversion", converter);
 			}
 
 		};

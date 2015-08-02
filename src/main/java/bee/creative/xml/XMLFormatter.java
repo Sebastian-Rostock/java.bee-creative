@@ -223,7 +223,7 @@ public final class XMLFormatter {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.sourceData, this.resultData, this.transformerData);
+		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.transformerData);
 	}
 
 }

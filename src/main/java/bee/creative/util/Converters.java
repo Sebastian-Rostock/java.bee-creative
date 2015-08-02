@@ -84,7 +84,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("fieldAdapter", field);
+				return Objects.toInvokeString("fieldAdapter", field);
 			}
 
 		};
@@ -110,7 +110,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("filterAdapter", filter);
+				return Objects.toInvokeString("filterAdapter", filter);
 			}
 
 		};
@@ -151,7 +151,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeMethod", methodName);
+				return Objects.toInvokeString("nativeMethod", methodName);
 			}
 
 		};
@@ -206,7 +206,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("nativeMethod", method);
+				return Objects.toInvokeString("nativeMethod", method);
 			}
 
 		};
@@ -229,7 +229,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("valueConverter", value);
+				return Objects.toInvokeString("valueConverter", value);
 			}
 
 		};
@@ -263,17 +263,17 @@ public class Converters {
 		if (converter1 == null) throw new NullPointerException("converter1 = null");
 		if (converter2 == null) throw new NullPointerException("converter2 = null");
 		return new Converter<GInput, GOutput>() {
-	
+
 			@Override
 			public GOutput convert(final GInput input) {
 				return converter2.convert(converter1.convert(input));
 			}
-	
+
 			@Override
 			public String toString() {
-				return Objects.toStringCall("chainedConverter", converter1, converter2);
+				return Objects.toInvokeString("chainedConverter", converter1, converter2);
 			}
-	
+
 		};
 	}
 
@@ -362,7 +362,7 @@ public class Converters {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall("bufferedConverter", limit, inputMode, outputMode, converter);
+				return Objects.toInvokeString("bufferedConverter", limit, inputMode, outputMode, converter);
 			}
 
 		};
@@ -395,7 +395,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("conditionalConverter", condition, acceptConverter, rejectConverter);
+				return Objects.toInvokeString("conditionalConverter", condition, acceptConverter, rejectConverter);
 			}
 
 		};
@@ -424,7 +424,7 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("synchronizedConverter", converter);
+				return Objects.toInvokeString("synchronizedConverter", converter);
 			}
 
 		};

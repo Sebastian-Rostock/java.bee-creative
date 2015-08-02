@@ -232,7 +232,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemIterable", item, count);
+				return Objects.toInvokeString("itemIterable", item, count);
 			}
 
 		};
@@ -270,7 +270,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("integerIterable", count);
+				return Objects.toInvokeString("integerIterable", count);
 			}
 
 		};
@@ -313,7 +313,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("limitedIterable", count, iterable);
+				return Objects.toInvokeString("limitedIterable", count, iterable);
 			}
 
 		};
@@ -343,7 +343,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("filteredIterable", filter, iterable);
+				return Objects.toInvokeString("filteredIterable", filter, iterable);
 			}
 
 		};
@@ -369,7 +369,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("uniqueIterable", iterable);
+				return Objects.toInvokeString("uniqueIterable", iterable);
 			}
 
 		};
@@ -395,7 +395,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("chainedIterable", iterables);
+				return Objects.toInvokeString("chainedIterable", iterables);
 			}
 
 		};
@@ -458,7 +458,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedIterable", converter, iterable);
+				return Objects.toInvokeString("convertedIterable", converter, iterable);
 			}
 
 		};
@@ -484,7 +484,7 @@ public class Iterables {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("unmodifiableIterator", iterable);
+				return Objects.toInvokeString("unmodifiableIterator", iterable);
 			}
 
 		};

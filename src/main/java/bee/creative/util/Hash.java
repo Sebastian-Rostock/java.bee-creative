@@ -2,7 +2,9 @@ package bee.creative.util;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Diese abstrakte Klasse implementiert die Basis einer {@link Object#hashCode() Streuwert}-basierten Abbildung von Schlüsseln auf Werte. Die Einträge der
@@ -24,13 +26,89 @@ import java.util.NoSuchElementException;
 public abstract class Hash<GKey, GValue, GEntry> {
 
 	/**
+	 * Diese Klasse implementiert einen einfachen Eintrag eines {@link Hash}-{@link Set}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ des Werts.
+	 */
+	public static final class SetEntry<GValue> {
+
+		/**
+		 * Dieses Feld speichert den nächsten Eintrag oder {@code null}.
+		 */
+		public SetEntry<GValue> next;
+
+		/**
+		 * Dieses Feld speichert den {@link Unique#hashCode() Streuwert} von {@link #value}.
+		 */
+		public int hash;
+
+		/**
+		 * Dieses Feld speichert den Wert.
+		 */
+		public GValue value;
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.valueOf(this.value);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen einfachen Eintrag einer {@link Hash}-{@link Map}.
+	 * 
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	public static final class MapEntry<GInput, GOutput> {
+
+		/**
+		 * Dieses Feld speichert den nächsten Eintrag oder {@code null}.
+		 */
+		public MapEntry<GInput, GOutput> next;
+
+		/**
+		 * Dieses Feld speichert den {@link Unique#hashCode() Streuwert} von {@link #input}.
+		 */
+		public int hash;
+
+		/**
+		 * Dieses Feld speichert die Eingabe.
+		 */
+		public GInput input;
+
+		/**
+		 * Dieses Feld speichert die Ausgabe.
+		 */
+		public GOutput output;
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.valueOf(this.input) + "=" + String.valueOf(this.output);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert den {@link Iterator} über die Einträge der Abbildung.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GEntry> Typ der Einträge.
 	 */
-	protected static final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
+	public static final class HashIterator<GKey, GEntry> implements Iterator<GEntry> {
 
 		/**
 		 * Dieses Feld speichert die Abbildung.
@@ -56,8 +134,10 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		 * Dieser Konstruktor initialisiert die Abbildung und sucht den ersten Eintrag.
 		 * 
 		 * @param hash Abbildung.
+		 * @throws NullPointerException Wenn {@code hash} {@code null} ist.
 		 */
-		public HashIterator(final Hash<GKey, ?, GEntry> hash) {
+		public HashIterator(final Hash<GKey, ?, GEntry> hash) throws NullPointerException {
+			if (hash == null) throw new NullPointerException("hash = null");
 			this.hash = hash;
 			this.seek();
 		}
@@ -87,7 +167,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean hasNext() {
+		public boolean hasNext() {
 			return this.next != null;
 		}
 
@@ -416,7 +496,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this);
+		return Objects.toInvokeString(this);
 	}
 
 }

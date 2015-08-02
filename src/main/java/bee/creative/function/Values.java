@@ -265,8 +265,8 @@ public final class Values {
 		 */
 		@Override
 		public String toString() {
-			if (this.value != null) return Objects.toStringCall(true, true, this, new Object[]{"value", this.value});
-			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "function", this.function});
+			if (this.value != null) return Objects.toFormatString(true, true, this, "value", this.value);
+			return Objects.toFormatString(true, true, this, "scope", this.scope, "function", this.function);
 		}
 
 	}

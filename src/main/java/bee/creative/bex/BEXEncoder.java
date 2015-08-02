@@ -1109,7 +1109,7 @@ public class BEXEncoder {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.attrTablePart.items.size(), this.chldTablePart.items.size());
+			return Objects.toInvokeString(this, this.attrTablePart.items.size(), this.chldTablePart.items.size());
 		}
 
 	}

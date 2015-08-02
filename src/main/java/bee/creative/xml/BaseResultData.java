@@ -181,7 +181,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.result, this.systemID);
+		return Objects.toInvokeString(this, this.result, this.systemID);
 	}
 
 }

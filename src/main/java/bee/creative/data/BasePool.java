@@ -253,7 +253,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this);
+		return Objects.toInvokeString(this);
 	}
 
 }

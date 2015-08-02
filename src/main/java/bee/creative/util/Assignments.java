@@ -130,7 +130,7 @@ public class Assignments {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.source);
+			return Objects.toInvokeString(this, this.source);
 		}
 
 	}
@@ -295,7 +295,7 @@ public class Assignments {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.map);
+			return Objects.toInvokeString(this, this.map);
 		}
 
 	}

@@ -89,7 +89,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("converterAdapter", converter);
+				return Objects.toInvokeString("converterAdapter", converter);
 			}
 
 		};
@@ -127,7 +127,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("typeFilter", inputType);
+				return Objects.toInvokeString("typeFilter", inputType);
 			}
 
 		};
@@ -230,7 +230,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("containsFilter", collection);
+				return Objects.toInvokeString("containsFilter", collection);
 			}
 
 		};
@@ -256,7 +256,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("equalFilter", comparable);
+				return Objects.toInvokeString("equalFilter", comparable);
 			}
 
 		};
@@ -282,7 +282,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("lowerFilter", comparable);
+				return Objects.toInvokeString("lowerFilter", comparable);
 			}
 
 		};
@@ -308,7 +308,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("higherFilter", comparable);
+				return Objects.toInvokeString("higherFilter", comparable);
 			}
 
 		};
@@ -339,7 +339,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedFilter", field, filter);
+				return Objects.toInvokeString("navigatedFilter", field, filter);
 			}
 
 		};
@@ -370,7 +370,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("navigatedFilter", converter, filter);
+				return Objects.toInvokeString("navigatedFilter", converter, filter);
 			}
 
 		};
@@ -388,17 +388,17 @@ public class Filters {
 	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
-	
+
 			@Override
 			public boolean accept(final GInput input) {
 				return !filter.accept(input);
 			}
-	
+
 			@Override
 			public String toString() {
-				return Objects.toStringCall("negationFilter", filter);
+				return Objects.toInvokeString("negationFilter", filter);
 			}
-	
+
 		};
 	}
 
@@ -425,7 +425,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("disjunctionFilter", filter1, filter2);
+				return Objects.toInvokeString("disjunctionFilter", filter1, filter2);
 			}
 
 		};
@@ -454,7 +454,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("conjunctionFilter", filter1, filter2);
+				return Objects.toInvokeString("conjunctionFilter", filter1, filter2);
 			}
 
 		};
@@ -484,7 +484,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("equivalenceFilter", filter1, filter2);
+				return Objects.toInvokeString("equivalenceFilter", filter1, filter2);
 			}
 
 		};
@@ -511,7 +511,7 @@ public class Filters {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("synchronizedFilter", filter);
+				return Objects.toInvokeString("synchronizedFilter", filter);
 			}
 
 		};

@@ -417,7 +417,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.featureData, this.propertyData, this.handlerData, this.resolverData, this.languageData);
+		return Objects.toInvokeString(this, this.featureData, this.propertyData, this.handlerData, this.resolverData, this.languageData);
 	}
 
 }

@@ -164,7 +164,7 @@ public abstract class BaseItem implements Item {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this);
+		return Objects.toInvokeString(this);
 	}
 
 }

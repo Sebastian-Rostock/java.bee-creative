@@ -281,7 +281,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.factoryData, this.handlerData, this.resolverData);
+		return Objects.toInvokeString(this, this.factoryData, this.handlerData, this.resolverData);
 	}
 
 }

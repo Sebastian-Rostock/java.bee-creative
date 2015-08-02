@@ -55,7 +55,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toInvokeString(this);
 		}
 
 	}
@@ -229,7 +229,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "values", this.values});
+			return Objects.toFormatString(true, true, this, "scope", this.scope, "values", this.values);
 		}
 
 	}
@@ -307,7 +307,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "context", this.context});
+			return Objects.toFormatString(true, true, this, "scope", this.scope, "context", this.context);
 		}
 
 	}
@@ -424,7 +424,7 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(true, true, this, new Object[]{"scope", this.scope, "values", this.values, "functions", this.params});
+			return Objects.toFormatString(true, true, this, "scope", this.scope, "values", this.values, "functions", this.params);
 		}
 
 	}

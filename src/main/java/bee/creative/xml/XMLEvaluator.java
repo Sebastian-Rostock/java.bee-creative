@@ -296,7 +296,7 @@ public final class XMLEvaluator {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.base, this.expression, this.xpathData, this.cacheData);
+		return Objects.toInvokeString(this, this.base, this.expression, this.xpathData, this.cacheData);
 	}
 
 }

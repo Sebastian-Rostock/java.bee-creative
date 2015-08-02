@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene Eingaben
  * über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen
- * Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits via {@link #compile(Object)} erzeugt wurde, wird deren Wiederverwendung via
+ * Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #compile(Object) erzeugt} wurde, wird deren Wiederverwendung via
  * {@link #reuse(Object, Object)} signalisiert.
  * 
  * @see Unique#get(Object)
@@ -30,7 +30,7 @@ import java.util.Set;
 public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Converter<GInput, GOutput>, Comparator<GInput>, Iterable<GOutput> {
 
 	/**
-	 * Diese Schnittstelle definiert ein Objekt zur Haltung der Einträge eines {@link Unique}s.
+	 * Diese Schnittstelle definiert die Verwaltung der Einträge eines {@link Unique} als Abbildung von Eingaben auf Ausgaben, analog zu einer {@link Map}.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
@@ -39,20 +39,46 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	public static interface Data<GInput, GOutput> extends Iterable<Entry<GInput, GOutput>> {
 
 		/**
-		 * Diese Methode gibt die Ausgabe zurück, die der gegebenen Eingabe zugeordnet ist.
+		 * Diese Methode wählt die gegebene Eingabe.
 		 * 
-		 * @param key Eingabe.
-		 * @return Ausgabe oder {@code null}.
+		 * @param input Eingabe.
+		 * @throws RuntimeException Wenn {@code input} ungültig ist, z.B. {@code null}.
 		 */
-		public GOutput get(GInput key);
+		public void forInput(GInput input) throws RuntimeException;
 
 		/**
-		 * Diese Methode ordnet der gegebenen Eingabe die gegebene Ausgabe zu. Wenn die Ausgabe {@code null} ist, wird die Zuordnung entfernt.
+		 * Diese Methode gibt die Ausgabe zur gewählten Eingabe zurück.
 		 * 
-		 * @param key Eingabe.
-		 * @param value Ausgabe oder {@code null}.
+		 * @see #forInput(Object)
+		 * @see #hasOutput()
+		 * @return Ausgabe.
+		 * @throws RuntimeException Wenn keine Eingabe {@link #forInput(Object) gewählt} ist oder keine Ausgabe {@link #hasOutput() existiert}.
 		 */
-		public void set(GInput key, GOutput value);
+		public GOutput getOutput() throws RuntimeException;
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn zur {@link #forInput(Object) gewählten} Eingabe eine Ausgabe existiert.
+		 * 
+		 * @see #forInput(Object)
+		 * @return {@code true}, wenn eine Ausgabe existiert.
+		 */
+		public boolean hasOutput();
+
+		/**
+		 * Diese Methode ordnet der {@link #forInput(Object) gewählten} Eingabe die gegebene Ausgabe zu.
+		 * 
+		 * @see #forInput(Object)
+		 * @param output Ausgabe.
+		 * @throws RuntimeException Wenn {@code output} ungültig ist, z.B. {@code null}.
+		 */
+		public void setOutput(GOutput output) throws RuntimeException;
+
+		/**
+		 * Diese Methode entfernt die Zuordnung der {@link #forInput(Object) gewählten} Eingabe zu ihrer Ausgabe.
+		 * 
+		 * @see #forInput(Object)
+		 */
+		public void popOutput();
 
 		/**
 		 * Diese Methode gibt die Anzahl der Einträge zurück.
@@ -70,135 +96,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Diese Klasse implementiert das {@link Set} zu {@link Unique#data}.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	static final class EntrySet<GInput, GOutput> extends AbstractSet<Entry<GInput, GOutput>> {
-
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
-		final Unique<GInput, GOutput> owner;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
-		 * 
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
-		public EntrySet(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
-			this.owner = owner;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.owner.data.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Iterator<Entry<GInput, GOutput>> iterator() {
-			return this.owner.data.iterator();
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert die {@link Map}-Sicht auf die Einträge von {@link Unique#data}.
-	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	static final class EntryMap<GInput, GOutput> extends AbstractMap<GInput, GOutput> {
-
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
-		final Unique<GInput, GOutput> owner;
-
-		/**
-		 * Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}.
-		 */
-		final EntrySet<GInput, GOutput> entrySet;
-
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
-		 * 
-		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
-		public EntryMap(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
-			this.owner = owner;
-			this.entrySet = new EntrySet<GInput, GOutput>(owner);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int size() {
-			return this.owner.data.size();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Set<Entry<GInput, GOutput>> entrySet() {
-			return this.entrySet;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput get(final Object key) {
-			if (!this.owner.check(key)) return null;
-			return this.owner.data.get((GInput)key);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public GOutput remove(final Object key) {
-			if (!this.owner.check(key)) return null;
-			final GOutput value = this.owner.data.get((GInput)key);
-			if (value == null) return null;
-			this.owner.data.set((GInput)key, null);
-			return value;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@SuppressWarnings ("unchecked")
-		@Override
-		public boolean containsKey(final Object key) {
-			return this.owner.check(key) && (this.owner.data.get((GInput)key) != null);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique}s in {@link List}s mit Zugriff über eine binäre Suche.
+	 * Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in sortierten Listen mit Zugriff über eine binäre Suche.
 	 * 
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
@@ -206,7 +104,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	protected static abstract class ListData<GInput, GOutput> implements Data<GInput, GOutput> {
+	public static abstract class BaseListData<GInput, GOutput> implements Data<GInput, GOutput> {
 
 		/**
 		 * Dieses Feld speichert den Besitzer.
@@ -224,32 +122,33 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		protected final List<GOutput> outputs;
 
 		/**
+		 * Dieses Feld speichert die gewählte Eingabe.
+		 */
+		protected GInput input;
+
+		/**
+		 * Dieses Feld speichert den Index der Eingabe.
+		 */
+		protected int index;
+
+		/**
 		 * Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
 		 * 
 		 * @param owner Besitzer.
 		 * @param inputs Eingaben.
 		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn eines der Argumente {@code null} ist.
+		 * @throws NullPointerException Wenn {@code owner}, {@code inputs} bzw. {@code outputs} {@code null} ist.
 		 */
-		public ListData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			if ((owner == null) || (inputs == null) || (outputs == null)) throw new NullPointerException();
+		public BaseListData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
+			if (owner == null) throw new NullPointerException("owner = null");
+			if (inputs == null) throw new NullPointerException("inputs = null");
+			if (outputs == null) throw new NullPointerException("outputs = null");
 			this.owner = owner;
 			this.inputs = inputs;
 			this.outputs = outputs;
 		}
 
 		{}
-
-		/**
-		 * Diese Methode ermittelt via {@link Comparables#binarySearch(List, Comparable)} den Index der gegebenen Eingabe in {@link #inputs} und gibt diesen oder
-		 * <code>(-(<i>Einfügeposition</i>)-1)</code> zurück.
-		 * 
-		 * @param input Eingabe.
-		 * @return Index oder <code>(-(<i>Einfügeposition</i>)-1)</code>.
-		 */
-		protected int index(final GInput input) {
-			return Comparables.binarySearch(this.inputs, Comparables.itemComparable(input, this.owner));
-		}
 
 		/**
 		 * Diese Methode fügt die gegebene Ein- und Ausgabe an der gegebenen Position in {@link #inputs} bzw. {@link #outputs} ein.
@@ -273,26 +172,53 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GOutput get(final GInput key) {
-			final int index = this.index(key);
-			return index >= 0 ? this.outputs.get(index) : null;
+		public void forInput(final GInput input) throws RuntimeException {
+			this.index = Comparables.binarySearch(this.inputs, Comparables.itemComparable(input, this.owner));
+			this.input = input;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final GInput key, final GOutput value) {
-			int index = this.index(key);
+		public GOutput getOutput() throws RuntimeException {
+			final int index = this.index;
+			if (index < 0) throw new IllegalStateException();
+			return this.outputs.get(index);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasOutput() {
+			return this.index >= 0;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setOutput(final GOutput output) throws RuntimeException {
+			int index = this.index;
 			if (index < 0) {
-				if (value == null) return;
 				index = -index - 1;
-				this.insert(index, key, value);
-			} else if (value == null) {
-				this.remove(index);
+				this.insert(index, this.input, output);
+				this.input = null;
 			} else {
-				this.outputs.set(index, value);
+				this.outputs.set(index, output);
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void popOutput() {
+			final int index = this.index;
+			if (index < 0) return;
+			this.remove(index);
+			this.input = null;
 		}
 
 		/**
@@ -312,7 +238,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 				int index = 0;
 
-				int count = ListData.this.size();
+				int count = BaseListData.this.size();
 
 				@Override
 				public boolean hasNext() {
@@ -322,12 +248,12 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 				@Override
 				public Entry<GInput, GOutput> next() {
 					final int index = this.index++;
-					return new SimpleImmutableEntry<GInput, GOutput>(ListData.this.inputs.get(index), ListData.this.outputs.get(index));
+					return new SimpleImmutableEntry<>(BaseListData.this.inputs.get(index), BaseListData.this.outputs.get(index));
 				}
 
 				@Override
 				public void remove() {
-					ListData.this.remove(this.index - 1);
+					BaseListData.this.remove(this.index - 1);
 					this.count--;
 				}
 
@@ -339,101 +265,13 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toInvokeString(this);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique.UniqueSet}s in {@link List}s mit Zugriff über eine binäre
-	 * Suche.
-	 * 
-	 * @see Unique#compare(Object, Object)
-	 * @see Comparables#binarySearch(List, Comparable)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GValue> Typ der Werte.
-	 */
-	protected static final class ListSetData<GValue> extends ListData<GValue, GValue> {
-
-		/**
-		 * Dieser Konstruktor initialisiert Besitzer und Werte.
-		 * 
-		 * @param owner Besitzer.
-		 * @param values Werte.
-		 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-		 */
-		public ListSetData(final Unique<GValue, GValue> owner, final List<GValue> values) throws NullPointerException {
-			super(owner, values, values);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void insert(final int index, final GValue key, final GValue value) {
-			this.inputs.add(index, key);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void remove(final int index) {
-			this.inputs.remove(index);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge einer {@link Unique.UniqueMap} in {@link List}s mit Zugriff über eine binäre
-	 * Suche.
-	 * 
-	 * @see Unique#compare(Object, Object)
-	 * @see Comparables#binarySearch(List, Comparable)
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
-	protected static final class ListMapData<GInput, GOutput> extends ListData<GInput, GOutput> {
-
-		/**
-		 * Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
-		 * 
-		 * @param owner Besitzer.
-		 * @param inputs Eingaben.
-		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn eines der Argumente {@code null} ist.
-		 */
-		public ListMapData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			super(owner, inputs, outputs);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void insert(final int index, final GInput key, final GOutput value) {
-			this.inputs.add(index, key);
-			this.outputs.add(index, value);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected void remove(final int index) {
-			this.inputs.remove(index);
-			this.outputs.remove(index);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique}s in einem {@link Hash}.
+	 * Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in einem {@link Hash}.
 	 * 
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
@@ -442,7 +280,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param <GEntry> Typ der Einträge.
 	 */
-	protected static abstract class HashData<GInput, GOutput, GEntry> extends Hash<GInput, GOutput, GEntry> implements Data<GInput, GOutput>,
+	public static abstract class BaseHashData<GInput, GOutput, GEntry> extends Hash<GInput, GOutput, GEntry> implements Data<GInput, GOutput>,
 		Converter<GEntry, Entry<GInput, GOutput>> {
 
 		/**
@@ -451,13 +289,23 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		protected final Unique<GInput, GOutput> owner;
 
 		/**
+		 * Dieses Feld speichert die gewählte Eingabe.
+		 */
+		protected GInput input;
+
+		/**
+		 * Dieses Feld speichert den gewählten Eintrag.
+		 */
+		protected GEntry entry;
+
+		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 * @throws NullPointerException Wenn {@code owner} {@code null} ist.
 		 */
-		public HashData(final Unique<GInput, GOutput> owner) throws NullPointerException {
-			if (owner == null) throw new NullPointerException();
+		public BaseHashData(final Unique<GInput, GOutput> owner) throws NullPointerException {
+			if (owner == null) throw new NullPointerException("owner = null");
 			this.owner = owner;
 			this.verifyLength(16);
 		}
@@ -476,21 +324,49 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GOutput get(final GInput input) {
-			final GEntry entry = this.findEntry(input);
-			return entry != null ? this.getEntryValue(entry) : null;
+		public void forInput(final GInput input) throws RuntimeException {
+			this.entry = this.findEntry(input);
+			this.input = input;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void set(final GInput input, final GOutput output) {
-			if (output != null) {
-				this.appendEntry(input, output, true);
-			} else {
-				this.removeEntry(input, true);
-			}
+		public GOutput getOutput() throws RuntimeException {
+			final GEntry entry = this.entry;
+			if (entry == null) throw new IllegalStateException();
+			return this.getEntryValue(entry);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean hasOutput() {
+			return this.entry != null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setOutput(final GOutput output) {
+			this.appendEntry(this.input, output, true);
+			this.input = null;
+			this.entry = null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void popOutput() {
+			final GEntry entry = this.entry;
+			if (entry == null) return;
+			this.removeEntry(this.input, true);
+			this.input = null;
+			this.entry = null;
 		}
 
 		/**
@@ -522,63 +398,132 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this);
+			return Objects.toInvokeString(this);
 		}
 
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge eines {@link Unique.UniqueSet}s in einem {@link Hash}.
+	 * Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} Listen mit Zugriff über eine binäre Suche.
+	 * 
+	 * @see Unique#compare(Object, Object)
+	 * @see Comparables#binarySearch(List, Comparable)
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GValue> Typ der Werte.
+	 */
+	public static final class ListSetData<GValue> extends BaseListData<GValue, GValue> {
+
+		/**
+		 * Dieser Konstruktor initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn {@code owner} {@code null} ist.
+		 */
+		public ListSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
+			this(owner, new ArrayList<GValue>());
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert Besitzer und Werte.
+		 * 
+		 * @param owner Besitzer.
+		 * @param values Werte.
+		 * @throws NullPointerException Wenn {@code owner} bzw. {@code values} {@code null} ist.
+		 */
+		public ListSetData(final Unique<GValue, GValue> owner, final List<GValue> values) throws NullPointerException {
+			super(owner, values, values);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void insert(final int index, final GValue key, final GValue value) {
+			this.inputs.add(index, value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void remove(final int index) {
+			this.inputs.remove(index);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in Listen mit Zugriff über eine binäre Suche.
+	 * 
+	 * @see Unique#compare(Object, Object)
+	 * @see Comparables#binarySearch(List, Comparable)
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 */
+	public static final class ListMapData<GInput, GOutput> extends BaseListData<GInput, GOutput> {
+
+		/**
+		 * Dieser Konstruktor initialisiert den Besitzer.
+		 * 
+		 * @param owner Besitzer.
+		 * @throws NullPointerException Wenn {@code owner} {@code null} ist.
+		 */
+		public ListMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
+			this(owner, new ArrayList<GInput>(), new ArrayList<GOutput>());
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
+		 * 
+		 * @param owner Besitzer.
+		 * @param inputs Eingaben.
+		 * @param outputs Ausgaben.
+		 * @throws NullPointerException Wenn {@code owner}, {@code inputs} bzw. {@code outputs} {@code null} ist.
+		 */
+		public ListMapData(final Unique<GInput, GOutput> owner, final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
+			super(owner, inputs, outputs);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void insert(final int index, final GInput key, final GOutput value) {
+			this.inputs.add(index, key);
+			this.outputs.add(index, value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void remove(final int index) {
+			this.inputs.remove(index);
+			this.outputs.remove(index);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} in einem {@link Hash}.
 	 * 
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte.
 	 */
-	protected static final class HashSetData<GValue> extends HashData<GValue, GValue, HashSetData.Entry<GValue>> {
-
-		/**
-		 * Diese Klasse implementiert einen Eintrag mit Wert.
-		 * 
-		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GValue> Typ des Werts.
-		 */
-		static final class Entry<GValue> {
-
-			/**
-			 * Dieses Feld speichert den nächsten Eintrag oder {@code null}.
-			 */
-			Entry<GValue> next;
-
-			/**
-			 * Dieses Feld speichert den {@link Unique#hashCode() Streuwert} von {@link #value}.
-			 */
-			int hash;
-
-			/**
-			 * Dieses Feld speichert den Wert.
-			 */
-			GValue value;
-
-			{}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return this.value.toString();
-			}
-
-		}
-
-		{}
+	public static final class HashSetData<GValue> extends BaseHashData<GValue, GValue, Hash.SetEntry<GValue>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 * @throws NullPointerException Wenn {@code owner} {@code null} ist.
 		 */
 		public HashSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
 			super(owner);
@@ -590,7 +535,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GValue getEntryKey(final Entry<GValue> entry) {
+		protected GValue getEntryKey(final SetEntry<GValue> entry) {
 			return entry.value;
 		}
 
@@ -598,7 +543,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Entry<GValue> getEntryNext(final Entry<GValue> entry) {
+		protected SetEntry<GValue> getEntryNext(final SetEntry<GValue> entry) {
 			return entry.next;
 		}
 
@@ -606,7 +551,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void setEntryNext(final Entry<GValue> entry, final Entry<GValue> next) {
+		protected void setEntryNext(final SetEntry<GValue> entry, final SetEntry<GValue> next) {
 			entry.next = next;
 		}
 
@@ -614,7 +559,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GValue getEntryValue(final Entry<GValue> entry) {
+		protected GValue getEntryValue(final SetEntry<GValue> entry) {
 			return entry.value;
 		}
 
@@ -622,7 +567,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean getEntryEquals(final Entry<GValue> entry, final GValue key, final int hash) {
+		protected boolean getEntryEquals(final SetEntry<GValue> entry, final GValue key, final int hash) {
 			return (entry.hash == hash) && this.owner.equals(entry.value, key);
 		}
 
@@ -630,8 +575,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Entry<GValue> createEntry(final GValue key, final GValue value, final Entry<GValue> next, final int hash) {
-			final Entry<GValue> entry = new Entry<GValue>();
+		protected SetEntry<GValue> createEntry(final GValue key, final GValue value, final SetEntry<GValue> next, final int hash) {
+			final SetEntry<GValue> entry = new SetEntry<>();
 			entry.next = next;
 			entry.hash = hash;
 			entry.value = value;
@@ -641,7 +586,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung der Einträge einer {@link Unique.UniqueMap} in einem {@link Hash}.
+	 * Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in einem {@link Hash}.
 	 * 
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
@@ -649,54 +594,13 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 */
-	protected static final class HashMapData<GInput, GOutput> extends HashData<GInput, GOutput, HashMapData.Entry<GInput, GOutput>> {
-
-		/**
-		 * Diese Klasse implementiert einen Eintrag mit Ein- und Ausgabe.
-		 * 
-		 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GInput> Typ der Eingabe.
-		 * @param <GOutput> Typ der Ausgabe.
-		 */
-		static final class Entry<GInput, GOutput> {
-
-			/**
-			 * Dieses Feld speichert den nächsten Eintrag oder {@code null}.
-			 */
-			Entry<GInput, GOutput> next;
-
-			/**
-			 * Dieses Feld speichert den {@link Unique#hashCode() Streuwert} von {@link #input}.
-			 */
-			int hash;
-
-			/**
-			 * Dieses Feld speichert die Eingabe.
-			 */
-			GInput input;
-
-			/**
-			 * Dieses Feld speichert die Ausgabe.
-			 */
-			GOutput output;
-
-			{}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public String toString() {
-				return this.input + "=" + this.output;
-			}
-
-		}
+	public static final class HashMapData<GInput, GOutput> extends BaseHashData<GInput, GOutput, Hash.MapEntry<GInput, GOutput>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
+		 * @throws NullPointerException Wenn {@code owner} {@code null} ist.
 		 */
 		public HashMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
 			super(owner);
@@ -708,7 +612,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GInput getEntryKey(final Entry<GInput, GOutput> entry) {
+		protected GInput getEntryKey(final MapEntry<GInput, GOutput> entry) {
 			return entry.input;
 		}
 
@@ -716,7 +620,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Entry<GInput, GOutput> getEntryNext(final Entry<GInput, GOutput> entry) {
+		protected MapEntry<GInput, GOutput> getEntryNext(final MapEntry<GInput, GOutput> entry) {
 			return entry.next;
 		}
 
@@ -724,7 +628,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected void setEntryNext(final Entry<GInput, GOutput> entry, final Entry<GInput, GOutput> next) {
+		protected void setEntryNext(final MapEntry<GInput, GOutput> entry, final MapEntry<GInput, GOutput> next) {
 			entry.next = next;
 		}
 
@@ -732,7 +636,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GOutput getEntryValue(final Entry<GInput, GOutput> entry) {
+		protected GOutput getEntryValue(final MapEntry<GInput, GOutput> entry) {
 			return entry.output;
 		}
 
@@ -740,7 +644,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected boolean getEntryEquals(final bee.creative.util.Unique.HashMapData.Entry<GInput, GOutput> entry, final GInput key, final int hash) {
+		protected boolean getEntryEquals(final bee.creative.util.Unique.HashMapData.MapEntry<GInput, GOutput> entry, final GInput key, final int hash) {
 			return (entry.hash == hash) && this.owner.equals(entry.input, key);
 		}
 
@@ -748,8 +652,8 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Entry<GInput, GOutput> createEntry(final GInput key, final GOutput value, final Entry<GInput, GOutput> next, final int hash) {
-			final Entry<GInput, GOutput> entry = new Entry<GInput, GOutput>();
+		protected MapEntry<GInput, GOutput> createEntry(final GInput key, final GOutput value, final MapEntry<GInput, GOutput> next, final int hash) {
+			final MapEntry<GInput, GOutput> entry = new MapEntry<GInput, GOutput>();
 			entry.next = next;
 			entry.hash = hash;
 			entry.input = key;
@@ -773,20 +677,20 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @see Unique.HashSetData
 		 */
 		public UniqueSet() {
-			this.data = new HashSetData<GValue>(this);
+			this(Unique.HASH);
 		}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashSetData} oder {@link Unique.ListSetData}.
 		 * 
-		 * @see Unique#LISTDATA
-		 * @see Unique#HASHDATA
+		 * @see Unique#LIST
+		 * @see Unique#HASH
 		 * @see Unique.HashSetData
 		 * @see Unique.ListSetData
-		 * @param mode {@code true}, wenn {@link Unique.ListMapData} verwendet werden soll.
+		 * @param mode {@code true}, wenn {@link Unique.ListSetData} bzw. {@code false}, wenn {@link Unique.HashSetData} verwendet werden soll.
 		 */
 		public UniqueSet(final boolean mode) {
-			this.data = mode ? new ListSetData<GValue>(this, new ArrayList<GValue>()) : new HashSetData<GValue>(this);
+			this.data = mode ? new ListSetData<>(this) : new HashSetData<>(this);
 		}
 
 		/**
@@ -794,20 +698,21 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * 
 		 * @see Unique.ListSetData
 		 * @param values Werte.
-		 * @throws NullPointerException Wenn die gegebenen Werte {@code null} sind.
+		 * @throws NullPointerException Wenn {@code values} {@code null} sind.
 		 */
 		public UniqueSet(final List<GValue> values) throws NullPointerException {
+			if (values == null) throw new NullPointerException("values = null");
 			this.data = new ListSetData<GValue>(this, values);
 		}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
 		 * 
-		 * @param data {@link Unique.Data}.
-		 * @throws NullPointerException Wenn die gegebenen {@link Unique.Data} {@code null} ist.
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public UniqueSet(final Data<GValue, GValue> data) throws NullPointerException {
-			if (data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
 		}
 
@@ -838,20 +743,20 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @see Unique.HashMapData
 		 */
 		public UniqueMap() {
-			this.data = new HashMapData<GInput, GOutput>(this);
+			this(Unique.HASH);
 		}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashMapData} oder {@link Unique.ListMapData}.
 		 * 
-		 * @see Unique#LISTDATA
-		 * @see Unique#HASHDATA
+		 * @see Unique#LIST
+		 * @see Unique#HASH
 		 * @see Unique.HashMapData
 		 * @see Unique.ListMapData
-		 * @param mode {@code true}, wenn {@link Unique.ListMapData} verwendet werden soll.
+		 * @param mode {@code true}, wenn {@link Unique.ListMapData} bzw. {@code false}, wenn {@link Unique.HashMapData} verwendet werden soll.
 		 */
 		public UniqueMap(final boolean mode) {
-			this.data = mode ? new ListMapData<GInput, GOutput>(this, new ArrayList<GInput>(), new ArrayList<GOutput>()) : new HashMapData<GInput, GOutput>(this);
+			this.data = mode ? new ListMapData<>(this) : new HashMapData<>(this);
 		}
 
 		/**
@@ -860,20 +765,20 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * @see Unique.ListMapData
 		 * @param inputs Eingaben.
 		 * @param outputs Ausgaben.
-		 * @throws NullPointerException Wenn eines der Argumente {@code null} ist.
+		 * @throws NullPointerException Wenn {@code inputs} bzw. {@code outputs} {@code null} ist.
 		 */
 		public UniqueMap(final List<GInput> inputs, final List<GOutput> outputs) throws NullPointerException {
-			this.data = new ListMapData<GInput, GOutput>(this, inputs, outputs);
+			this.data = new ListMapData<>(this, inputs, outputs);
 		}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
 		 * 
 		 * @param data {@link Unique.Data}.
-		 * @throws NullPointerException Wenn die gegebenen {@link Unique.Data} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
 		public UniqueMap(final Data<GInput, GOutput> data) throws NullPointerException {
-			if (data == null) throw new NullPointerException();
+			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
 		}
 
@@ -882,20 +787,22 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	{}
 
 	/**
-	 * Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code List}-{@link Data}.
+	 * Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code List}-{@link Data}.<br>
+	 * Derartige Nutzdaten basieren auf {@link #compare(Object, Object)}.
 	 * 
 	 * @see ListSetData
 	 * @see ListMapData
 	 */
-	public static final boolean LISTDATA = true;
+	public static final boolean LIST = true;
 
 	/**
-	 * Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code Hash}-{@link Data}.
+	 * Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code Hash}-{@link Data}.<br>
+	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}.
 	 * 
 	 * @see HashSetData
 	 * @see HashMapData
 	 */
-	public static final boolean HASHDATA = false;
+	public static final boolean HASH = false;
 
 	{}
 
@@ -905,15 +812,75 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	protected Data<GInput, GOutput> data;
 
 	/**
+	 * Dieses Feld speichert das {@link Set} zu {@link Map#entrySet()}.
+	 */
+	protected final Set<Entry<GInput, GOutput>> entrySet = new AbstractSet<Entry<GInput, GOutput>>() {
+
+		@Override
+		public int size() {
+			return Unique.this.data.size();
+		}
+
+		@Override
+		public Iterator<Entry<GInput, GOutput>> iterator() {
+			return Unique.this.data.iterator();
+		}
+
+	};
+
+	/**
 	 * Dieses Feld speichert die {@link Map}-Sicht auf die internen Einträge, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge eingefügt
 	 * werden können.
 	 */
-	protected final Map<GInput, GOutput> entryMap = new EntryMap<GInput, GOutput>(this);
+	protected final Map<GInput, GOutput> entryMap = new AbstractMap<GInput, GOutput>() {
+
+		@Override
+		public int size() {
+			return Unique.this.data.size();
+		}
+
+		@Override
+		public Set<Entry<GInput, GOutput>> entrySet() {
+			return Unique.this.entrySet;
+		}
+
+		@SuppressWarnings ("unchecked")
+		@Override
+		public GOutput get(final Object key) {
+			if (!Unique.this.check(key)) return null;
+			final Data<GInput, GOutput> data = Unique.this.data;
+			data.forInput((GInput)key);
+			if (!data.hasOutput()) return null;
+			return data.getOutput();
+		}
+
+		@SuppressWarnings ("unchecked")
+		@Override
+		public GOutput remove(final Object key) {
+			if (!Unique.this.check(key)) return null;
+			final Data<GInput, GOutput> data = Unique.this.data;
+			data.forInput((GInput)key);
+			if (!data.hasOutput()) return null;
+			final GOutput value = data.getOutput();
+			data.popOutput();
+			return value;
+		}
+
+		@SuppressWarnings ("unchecked")
+		@Override
+		public boolean containsKey(final Object key) {
+			if (!Unique.this.check(key)) return false;
+			final Data<GInput, GOutput> data = Unique.this.data;
+			data.forInput((GInput)key);
+			return data.hasOutput();
+		}
+
+	};
 
 	{}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object}s nach {@code GInput} zulässig ist. Sie wird von der
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object} nach {@code GInput} zulässig ist. Sie wird von der
 	 * {@link Map}-Sich {@link #entryMap()} verwendet.
 	 * 
 	 * @param input {@link Object}.
@@ -943,37 +910,36 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	protected abstract GOutput compile(GInput input);
 
 	/**
-	 * Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet ist, w ird deren
-	 * Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe jedoch noch keine Ausgabe zugeordnet sein, wird diese via
-	 * {@link Unique#compile(Object)} erzeugt und mit der Eingabe assoziiert.
+	 * Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet
+	 * {@link Data#hasOutput() ist}, wird deren Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe noch keine Ausgabe
+	 * zugeordnet sein, wird diese via {@link Unique#compile(Object)} erzeugt und mit der Eingabe {@link Data#setOutput(Object) assoziiert}.
 	 * 
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @see Unique#compare(Object, Object)
 	 * @param input Eingabe.
 	 * @return Ausgabe.
-	 * @throws NullPointerException Wenn die gegebene Eingabe oder die erzeugte Ausgabe {@code null} sind.
+	 * @throws RuntimeException Wenn die gegebene Eingabe bzw. die erzeugte Ausgabe ungültig ist.
 	 */
-	@SuppressWarnings ("unchecked")
-	public GOutput get(final GInput input) throws NullPointerException {
-		if (input == null) throw new NullPointerException();
-		final Object value = this.data.get(input);
-		if (value == null) {
+	public GOutput get(final GInput input) throws RuntimeException {
+		final Data<GInput, GOutput> data = this.data;
+		data.forInput(input);
+		if (data.hasOutput()) {
+			final GOutput output = data.getOutput();
+			this.reuse(input, output);
+			return output;
+		} else {
 			final GOutput output = this.compile(input);
-			if (output == null) throw new NullPointerException();
-			this.data.set(input, output);
+			data.setOutput(output);
 			return output;
 		}
-		final GOutput output = (GOutput)value;
-		this.reuse(input, output);
-		return output;
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Map}-Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge
+	 * Diese Methode gibt eine {@link Map} als Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge
 	 * eingefügt werden können.
 	 * 
-	 * @return {@link Map}-Sicht.
+	 * @return {@link Map} der Einträge.
 	 */
 	public Map<GInput, GOutput> entryMap() {
 		return this.entryMap;
@@ -982,7 +948,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	{}
 
 	/**
-	 * Der berechnete {@link Object#hashCode() Streuwert} wird von den Schlüsseln der {@link Map} verwendet. Die Eingabe ist nie {@code null}.
+	 * Der berechnete {@link Object#hashCode() Streuwert} wird von den Schlüsseln der {@link Map} verwendet.
 	 * <p>
 	 * {@inheritDoc}
 	 * 
@@ -1028,7 +994,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/**
-	 * Die berechnete {@link Comparator#compare(Object, Object) Vergleichswert} wird von den Schlüsseln der {@link Map} verwendet.
+	 * Der berechnete {@link Comparator#compare(Object, Object) Vergleichswert} wird von den Schlüsseln der {@link Map} verwendet.
 	 * <p>
 	 * {@inheritDoc}
 	 * 
@@ -1039,6 +1005,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	@Override
 	public int compare(final GInput input1, final GInput input2) throws NullPointerException {
 		return Comparators.compare(this.hash(input1), this.hash(input2));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this.data);
 	}
 
 }

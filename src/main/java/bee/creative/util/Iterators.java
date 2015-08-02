@@ -319,7 +319,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemIterator", item, count);
+				return Objects.toInvokeString("itemIterator", item, count);
 			}
 
 		};
@@ -363,7 +363,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("itemsIterator", items, fromIndex, toIndex);
+				return Objects.toInvokeString("itemsIterator", items, fromIndex, toIndex);
 			}
 
 		};
@@ -411,7 +411,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("integerIterator", count);
+				return Objects.toInvokeString("integerIterator", count);
 			}
 
 		};
@@ -458,7 +458,7 @@ public class Iterators {
 			 */
 			@Override
 			public String toString() {
-				return Objects.toStringCall("limitedIterator", count, iterator);
+				return Objects.toInvokeString("limitedIterator", count, iterator);
 			}
 
 		};
@@ -513,7 +513,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("filteredIterator", filter, iterator);
+				return Objects.toInvokeString("filteredIterator", filter, iterator);
 			}
 
 		};
@@ -570,7 +570,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("uniqueIterator", collection, iterator);
+				return Objects.toInvokeString("uniqueIterator", collection, iterator);
 			}
 
 		};
@@ -645,7 +645,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("chainedIterator", iterators);
+				return Objects.toInvokeString("chainedIterator", iterators);
 			}
 
 		};
@@ -686,7 +686,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("convertedIterator", converter, iterator);
+				return Objects.toInvokeString("convertedIterator", converter, iterator);
 			}
 
 		};
@@ -722,7 +722,7 @@ public class Iterators {
 
 			@Override
 			public String toString() {
-				return Objects.toStringCall("unmodifiableIterator", iterator);
+				return Objects.toInvokeString("unmodifiableIterator", iterator);
 			}
 
 		};

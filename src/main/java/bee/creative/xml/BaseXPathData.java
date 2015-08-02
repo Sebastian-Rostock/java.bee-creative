@@ -332,7 +332,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.facroryData, this.contextData, this.variableData, this.functionData);
+		return Objects.toInvokeString(this, this.facroryData, this.contextData, this.variableData, this.functionData);
 	}
 
 }

@@ -18,9 +18,9 @@ import java.util.Map.Entry;
 public class Objects {
 
 	/**
-	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, boolean, Object)}. Für Objekte mit dieser Schnittstelle
-	 * nutzt diese Methode die von den Objekten bereitgestellten {@link Object#toString()}-Methoden. Diese Markierung ist nur sinnvoll für {@link Map},
-	 * {@link Iterable} und {@link CharSequence}.
+	 * Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen
+	 * von {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#toString(boolean, Object)} realisierten, gesonderten
+	 * Textdarstellungen verwendet werden sollen.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -38,14 +38,14 @@ public class Objects {
 	 */
 	static String indent(final String value) {
 		if (value == null) return "null";
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
 		final int size = value.length();
 		while ((next = value.indexOf('\n', next)) >= 0) {
-			output.append(value.substring(last + 1, last = next)).append("\n  ");
+			result.append(value.substring(last + 1, last = next)).append("\n  ");
 			next++;
 		}
-		return output.append(value.substring(last + 1, size)).toString();
+		return result.append(value.substring(last + 1, size)).toString();
 	}
 
 	/**
@@ -61,21 +61,21 @@ public class Objects {
 	 */
 	static String toString(final boolean format, final boolean indent, final Object object) {
 		if (object == null) return "null";
-		final String output;
+		final String result;
 		if (object.getClass().isArray()) {
-			output = Objects.arrayToString(format, object);
+			result = Objects.arrayToString(format, object);
 		} else if (object instanceof UseToString) {
-			output = String.valueOf(object);
+			result = String.valueOf(object);
 		} else if (object instanceof CharSequence) {
-			output = Objects.stringToString(format, (CharSequence)object);
+			result = Objects.stringToString(format, (CharSequence)object);
 		} else if (object instanceof Map<?, ?>) {
-			output = Objects.mapToString(format, (Map<?, ?>)object);
+			result = Objects.mapToString(format, (Map<?, ?>)object);
 		} else if (object instanceof Iterable<?>) {
-			output = Objects.iterableToString(format, (Iterable<?>)object);
+			result = Objects.iterableToString(format, (Iterable<?>)object);
 		} else {
-			output = String.valueOf(object);
+			result = String.valueOf(object);
 		}
-		return (indent ? Objects.indent(output) : output);
+		return (indent ? Objects.indent(result) : result);
 	}
 
 	/**
@@ -91,12 +91,12 @@ public class Objects {
 		if (object.isEmpty()) return "{}";
 		String space = (format ? "{\n  " : "{");
 		final String comma = (format ? ",\n  " : ", ");
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			output.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
+			result.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
 			space = comma;
 		}
-		return output.append((format ? "\n}" : "}")).toString();
+		return result.append((format ? "\n}" : "}")).toString();
 	}
 
 	/**
@@ -114,12 +114,12 @@ public class Objects {
 		if (size == 0) return "[]";
 		String space = (format ? "[\n  " : "[");
 		final String comma = (format ? ",\n  " : ", ");
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < size; i++) {
-			output.append(space).append(Objects.toString(format, format, Array.get(object, i)));
+			result.append(space).append(Objects.toString(format, format, Array.get(object, i)));
 			space = comma;
 		}
-		return output.append((format ? "\n]" : "]")).toString();
+		return result.append((format ? "\n]" : "]")).toString();
 	}
 
 	/**
@@ -133,27 +133,27 @@ public class Objects {
 	static String stringToString(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
-		final StringBuilder output = new StringBuilder("\"");
+		final StringBuilder result = new StringBuilder("\"");
 		int last = -1, next = 0;
 		final int size = object.length();
 		while (next < size) {
 			switch (object.charAt(next)) {
 				case '\"':
-					output.append(object.subSequence(last + 1, last = next)).append("\\\"");
+					result.append(object.subSequence(last + 1, last = next)).append("\\\"");
 					break;
 				case '\t':
-					output.append(object.subSequence(last + 1, last = next)).append("\\t");
+					result.append(object.subSequence(last + 1, last = next)).append("\\t");
 					break;
 				case '\n':
-					output.append(object.subSequence(last + 1, last = next)).append(space);
+					result.append(object.subSequence(last + 1, last = next)).append(space);
 					break;
 				case '\r':
-					output.append(object.subSequence(last + 1, last = next)).append("\\r");
+					result.append(object.subSequence(last + 1, last = next)).append("\\r");
 					break;
 			}
 			next++;
 		}
-		return output.append(object.subSequence(last + 1, size)).append("\"").toString();
+		return result.append(object.subSequence(last + 1, size)).append("\"").toString();
 	}
 
 	/**
@@ -170,12 +170,12 @@ public class Objects {
 		if (!iter.hasNext()) return "[]";
 		String space = (format ? "[\n  " : "[");
 		final String comma = (format ? ",\n  " : ", ");
-		final StringBuilder output = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		do {
-			output.append(space).append(Objects.toString(format, format, iter.next()));
+			result.append(space).append(Objects.toString(format, format, iter.next()));
 			space = comma;
 		} while (iter.hasNext());
-		return output.append((format ? "\n]" : "]")).toString();
+		return result.append((format ? "\n]" : "]")).toString();
 	}
 
 	/**
@@ -197,11 +197,11 @@ public class Objects {
 	 */
 	public static int hash(final Object... objects) {
 		if (objects == null) return 0;
-		int hash = 0x811C9DC5;
+		int result = 0x811C9DC5;
 		for (final Object object: objects) {
-			hash = (hash * 0x01000193) ^ Objects.hash(object);
+			result = (result * 0x01000193) ^ Objects.hash(object);
 		}
-		return hash;
+		return result;
 	}
 
 	/**
@@ -325,11 +325,11 @@ public class Objects {
 	 */
 	public static int deepHash(final Object... objects) {
 		if (objects == null) return 0;
-		int hash = 0x811C9DC5;
+		int result = 0x811C9DC5;
 		for (final Object object: objects) {
-			hash = (hash * 0x01000193) ^ Objects.deepHash(object);
+			result = (result * 0x01000193) ^ Objects.deepHash(object);
 		}
-		return hash;
+		return result;
 	}
 
 	/**
@@ -468,8 +468,8 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode erzeugt ein neues Objekt, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
-	 * {@link Object#toString() Textdarstelung} des gegebenen Objekts entspricht, und gibt es zurück.
+	 * Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
+	 * Textdarstelung des gegebenen Objekts entspricht.
 	 * 
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
@@ -492,28 +492,29 @@ public class Objects {
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, name, args)}.
 	 * 
-	 * @see Objects#toStringCall(boolean, boolean, String, Object...)
+	 * @see Objects#toFormatString(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-Array {@code null} ist.
+	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toStringCall(final String name, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, name, args);
+	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
+		return Objects.toFormatString(false, false, name, args);
 	}
 
 	/**
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)}.
 	 * 
-	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @see #toFormatString(boolean, boolean, String, Object...)
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
+	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toStringCall(final Object object, final Object... args) throws NullPointerException {
-		return Objects.toStringCall(false, false, object.getClass().getSimpleName(), args);
+	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
+		if (object == null) throw new NullPointerException("object = null");
+		return Objects.toFormatString(false, false, object.getClass().getSimpleName(), args);
 	}
 
 	/**
@@ -527,38 +528,38 @@ public class Objects {
 	 * @param label Aktivierung der Argumentbeschriftung.
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
-	 * @throws NullPointerException Wenn der gegebenen Funktionsname bzw. das gegebenen Argument-/Parameter-Array {@code null} ist.
+	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+	public static String toFormatString(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
 		if (name == null) throw new NullPointerException("name = null");
 		if (args == null) throw new NullPointerException("args = null");
-		final StringBuilder output = new StringBuilder(name);
+		final StringBuilder result = new StringBuilder(name);
 		if (args.length != 0) {
 			String join = (format ? "(\n  " : "( ");
 			final String comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					output.append(join).append(Objects.toString(format, format, args[i])).append(" = ").append(Objects.toString(format, format, args[i + 1]));
+					result.append(join).append(Objects.toString(format, format, args[i])).append(" = ").append(Objects.toString(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
 				for (int i = 0, size = args.length; i < size; i++) {
-					output.append(join).append(Objects.toString(format, format, args[i]));
+					result.append(join).append(Objects.toString(format, format, args[i]));
 					join = comma;
 				}
 			}
-			output.append((format ? "\n)" : " )"));
+			result.append((format ? "\n)" : " )"));
 		} else {
-			output.append("()");
+			result.append("()");
 		}
-		return output.toString();
+		return result.toString();
 	}
 
 	/**
 	 * Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)}.
 	 * 
-	 * @see #toStringCall(boolean, boolean, String, Object...)
+	 * @see #toFormatString(boolean, boolean, String, Object...)
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.
 	 * @param object {@link Object}.
@@ -566,22 +567,9 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static String toStringCall(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+	public static String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if (object == null) throw new NullPointerException("object = null");
-		return Objects.toStringCall(format, label, object.getClass().getSimpleName(), args);
+		return Objects.toFormatString(format, label, object.getClass().getSimpleName(), args);
 	}
-
-	// /**
-	// * Diese Methode gibt das gegebenen Objekt nur dann zurück, wenn es {@code null} ist oder ein Nachfahre von {@link UseToString} ist. Andernfalls wird die
-	// * Klasse des Objekts geliefert.
-	// *
-	// * @see UseToString
-	// * @see Object#getClass()
-	// * @return {@link Object}, dass für {@link #iterator} in {@link #toString()} verwendet werden sollte.
-	// */
-	// public static Object useObjectOrClass(Object object) {
-	// if (object == null || object instanceof UseToString) return object;
-	// return object.getClass();
-	// }
 
 }

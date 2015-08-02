@@ -1,14 +1,14 @@
 package bee.creative.util;
 
 /**
- * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Test Testmethode} benötigt werden.
+ * Diese Klasse implementiert ein Objekt zur Messung der Rechenzeit sowie der Speicherbelegung, die von einer {@link Method Testmethode} benötigt werden.
  * <p>
- * Im nachfolgenden Beispiel wird eine anonyme {@link Test Testmethode} initialisiert und gleich vermessen:
+ * Im nachfolgenden Beispiel wird eine anonyme {@link Method Testmethode} instanziiert und vermessen:
  * 
  * <pre>
  * Tester result = new Tester(new Test() {
  * 
- * 	public void run() {
+ * 	public void run() throws Throwable {
  * 		// ...
  * 	}
  * 
@@ -20,11 +20,11 @@ package bee.creative.util;
 public class Tester {
 
 	/**
-	 * Diese Schnittstelle definiert die Testmethode eines {@link Tester}s.
+	 * Diese Schnittstelle definiert die Testmethode eines {@link Tester}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static interface Test {
+	public static interface Method {
 
 		/**
 		 * Diese Methode führt den Test aus. Ein gegebenenfalls geworfenes {@link Throwable} wird dann im {@link Tester} gespeichert.
@@ -40,7 +40,7 @@ public class Tester {
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class Updater extends Thread {
+	public static final class Sampler extends Thread {
 
 		/**
 		 * Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll.
@@ -66,13 +66,39 @@ public class Tester {
 		 * Dieser Konstruktor initialisiert das Interval in Millisekunden.
 		 * 
 		 * @param millis Interval der Messung in Millisekunden.
-		 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner oder gleich {@code 0} ist.
+		 * @throws IllegalArgumentException Wenn {@code millis <= 0} ist.
 		 */
-		public Updater(final int millis) throws IllegalArgumentException {
-			if (millis <= 0) throw new IllegalArgumentException();
+		public Sampler(final int millis) throws IllegalArgumentException {
+			super(Sampler.class.getSimpleName());
+			if (millis <= 0) throw new IllegalArgumentException("millis <= 0");
 			this.millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
+
+		{}
+
+		/**
+		 * Diese Methode aktiviert die periodische Messung.
+		 * 
+		 * @see #start()
+		 */
+		public void activate() {
+			this.start();
+		}
+
+		/**
+		 * Diese Methode deaktiviert die periodische Messung.
+		 * 
+		 * @see #join()
+		 */
+		public void deactivate() {
+			this.millis = 0;
+			try {
+				this.join();
+			} catch (final InterruptedException e) {}
+		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -98,28 +124,9 @@ public class Tester {
 			this.usedTime += leaveTime - enterTime;
 		}
 
-		/**
-		 * Diese Methode aktiviert die periodische Messung.
-		 * 
-		 * @see #start()
-		 */
-		public void activate() {
-			this.start();
-		}
-
-		/**
-		 * Diese Methode deaktiviert die periodische Messung.
-		 * 
-		 * @see #join()
-		 */
-		public void deactivate() {
-			this.millis = 0;
-			try {
-				this.join();
-			} catch (final InterruptedException e) {}
-		}
-
 	}
+
+	{}
 
 	/**
 	 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die von der Testmethode benötigt wurde.
@@ -129,7 +136,7 @@ public class Tester {
 	public final long usedTime;
 
 	/**
-	 * Dieses Feld speichert die Speicherbelegung in Byte, die von der Testmethode benötigt wurde.
+	 * Dieses Feld speichert die Speicherbelegung in Byte, die von der Testmethode (maximal) benötigt wurde.
 	 * 
 	 * @see Runtime#freeMemory()
 	 * @see Runtime#totalMemory()
@@ -167,9 +174,9 @@ public class Tester {
 	public final long leaveMemory;
 
 	/**
-	 * Dieses Feld speichert das {@link Throwable} der Testmethode oder {@code null}.
+	 * Dieses Feld speichert die Fehlerursache, wenn die Testmethode eiene ausnahme auslöst, oder {@code null}.
 	 */
-	public final Throwable throwable;
+	public final Throwable cause;
 
 	/**
 	 * Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Die Messung der Speicherbelegung erfolgt synchron von und nach dem
@@ -178,50 +185,51 @@ public class Tester {
 	 * @param method Testmethode.
 	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
 	 */
-	public Tester(final Test method) throws NullPointerException {
+	public Tester(final Method method) throws NullPointerException {
 		this(0, method);
 	}
 
 	/**
 	 * Dieser Konstruktor ruft die gegebenen Testmethode auf und ermittelt die Messwerte. Wenn das gegebene Interval größer als {@code 0} ist, wird ein
-	 * {@link Thread} zur asynchronen Messung der Speicherbelegung verwendet.
+	 * {@link Sampler} zur asynchronen Messung der maximalen Speicherbelegung verwendet.
 	 * 
 	 * @param millis Interval der asynchronen Messung der Speicherbelegung in Millisekunden oder {@code 0}.
 	 * @param method Testmethode.
-	 * @throws NullPointerException Wenn die gegebene Testmethode {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das gegebene Interval kleiner als {@code 0} ist.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code millis < 0} ist.
 	 */
-	public Tester(final int millis, final Test method) throws NullPointerException, IllegalArgumentException {
-		if (millis < 0) throw new IllegalArgumentException();
-		if (method == null) throw new NullPointerException();
+	public Tester(final int millis, final Method method) throws NullPointerException, IllegalArgumentException {
+		if (millis < 0) throw new IllegalArgumentException("millis < 0");
+		if (method == null) throw new NullPointerException("method = null");
 		final Runtime runtime = Runtime.getRuntime();
-		Throwable throwable = null;
+		Throwable cause = null;
 		final long enterMemory, enterTime, leaveMemory, leaveTime;
 		if (millis > 0) {
-			final Updater updater = new Updater(millis);
+			final Sampler sampler = new Sampler(millis);
 			runtime.gc();
-			updater.activate();
+			sampler.activate();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
 			try {
 				method.run();
-			} catch (final Throwable e) {
-				throwable = e;
+			} catch (final Throwable cause2) {
+				cause = cause2;
+			} finally {
+				leaveTime = System.nanoTime();
+				sampler.deactivate();
 			}
-			leaveTime = System.nanoTime();
-			updater.deactivate();
 			runtime.gc();
 			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
-			this.usedTime = leaveTime - enterTime - updater.usedTime;
-			this.usedMemory = Math.max(updater.usedMemory, leaveMemory) - enterMemory;
+			this.usedTime = leaveTime - enterTime - sampler.usedTime;
+			this.usedMemory = Math.max(sampler.usedMemory, leaveMemory) - enterMemory;
 		} else {
 			runtime.gc();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
 			enterTime = System.nanoTime();
 			try {
 				method.run();
-			} catch (final Throwable e) {
-				throwable = e;
+			} catch (final Throwable cause2) {
+				cause = cause2;
 			}
 			leaveTime = System.nanoTime();
 			runtime.gc();
@@ -233,15 +241,17 @@ public class Tester {
 		this.enterMemory = enterMemory;
 		this.leaveTime = leaveTime;
 		this.leaveMemory = leaveMemory;
-		this.throwable = throwable;
+		this.cause = cause;
 	}
+
+	{}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		return String.format("usedTime: %4.3f ms  usedMemory:  %+4.3f MB  throwable: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.throwable);
+		return String.format("usedTime: %4.3f ms  usedMemory:  %+4.3f MB  cause: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.cause);
 	}
 
 }

@@ -352,7 +352,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 */
 	@Override
 	public String toString() {
-		return Objects.toStringCall(this, this.modelData, this.featureData, this.variableData, this.functionData);
+		return Objects.toInvokeString(this, this.modelData, this.featureData, this.variableData, this.functionData);
 	}
 
 }

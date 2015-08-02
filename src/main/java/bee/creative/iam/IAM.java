@@ -87,7 +87,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("IAMList", this.itemCount());
+			return Objects.toInvokeString("IAMList", this.itemCount());
 		}
 
 	}
@@ -203,7 +203,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("IAMMap", this.entryCount());
+			return Objects.toInvokeString("IAMMap", this.entryCount());
 		}
 
 	}
@@ -557,7 +557,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall("IAMIndex", this.maps(), this.lists());
+			return Objects.toInvokeString("IAMIndex", this.maps(), this.lists());
 		}
 
 	}

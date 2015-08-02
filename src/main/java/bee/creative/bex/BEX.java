@@ -33,7 +33,7 @@ public class BEX {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.root());
+			return Objects.toInvokeString(this, this.root());
 		}
 
 	}
@@ -98,7 +98,7 @@ public class BEX {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this);
+			return Objects.toInvokeString(this, this);
 		}
 
 	}
@@ -135,7 +135,7 @@ public class BEX {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toStringCall(this, this.key(), this.type(), this.index(), //
+			return Objects.toInvokeString(this, this.key(), this.type(), this.index(), //
 				this.uri(), this.name(), this.value(), this.children().length(), this.attributes().length());
 		}
 
