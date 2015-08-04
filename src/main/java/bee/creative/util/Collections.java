@@ -61,7 +61,7 @@ public class Collections {
 				if (list == null) throw new NullPointerException("list = null");
 				this.size = list.size();
 				this.list = list;
-				this.iterator = list.listIterator(this.size - index);
+				this.iterator = list.list.listIterator(this.size - index);
 			}
 
 			{}

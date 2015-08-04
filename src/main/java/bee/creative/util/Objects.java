@@ -64,6 +64,8 @@ public class Objects {
 		final String result;
 		if (object.getClass().isArray()) {
 			result = Objects.arrayToString(format, object);
+		} else if (object instanceof Character) {
+			result = Objects.charToString((Character)object);
 		} else if (object instanceof UseToString) {
 			result = String.valueOf(object);
 		} else if (object instanceof CharSequence) {
@@ -97,6 +99,34 @@ public class Objects {
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
+	}
+
+	/**
+	 * Diese Methode gibt den gegebenen {@link Character} als {@link Object#toString() Textdarstelung} zurück.
+	 * 
+	 * @param object {@link Character} oder {@code null}.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 */
+	static String charToString(final Character object) {
+		if (object == null) return "null";
+		final StringBuilder result = new StringBuilder(4).append('\'');
+		switch (object.charValue()) {
+			case '\'':
+				result.append("\\\'");
+				break;
+			case '\t':
+				result.append("\\t");
+				break;
+			case '\n':
+				result.append("\\n");
+				break;
+			case '\r':
+				result.append("\\r");
+				break;
+			default:
+				result.append(object.charValue());
+		}
+		return result.append('\'').toString();
 	}
 
 	/**
@@ -535,11 +565,11 @@ public class Objects {
 		if (args == null) throw new NullPointerException("args = null");
 		final StringBuilder result = new StringBuilder(name);
 		if (args.length != 0) {
-			String join = (format ? "(\n  " : "( ");
+			String join = (format ? "(\n  " : "(");
 			final String comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects.toString(format, format, args[i])).append(" = ").append(Objects.toString(format, format, args[i + 1]));
+					result.append(join).append(Objects.toString(format, format, args[i])).append(": ").append(Objects.toString(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
@@ -548,7 +578,7 @@ public class Objects {
 					join = comma;
 				}
 			}
-			result.append((format ? "\n)" : " )"));
+			result.append((format ? "\n)" : ")"));
 		} else {
 			result.append("()");
 		}

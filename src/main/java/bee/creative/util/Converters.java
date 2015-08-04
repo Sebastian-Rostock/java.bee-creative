@@ -242,8 +242,8 @@ public class Converters {
 	 * @return {@link #NEUTRAL_CONVERTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Converter<Object, GInput> neutralConverter() {
-		return (Converter<Object, GInput>)Converters.NEUTRAL_CONVERTER;
+	public static <GInput> Converter<GInput, GInput> neutralConverter() {
+		return (Converter<GInput, GInput>)Converters.NEUTRAL_CONVERTER;
 	}
 
 	/**
