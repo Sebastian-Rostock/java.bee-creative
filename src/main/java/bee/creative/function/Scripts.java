@@ -1138,7 +1138,6 @@ public class Scripts {
 			final ProxyFunction result = this.proxy(name);
 			if (this.skipSpace().type != '{') throw new ScriptException() //
 				.setRange(this.range).setScript(this.script).setHint(" Parametrisierter Funktionsaufruf erwartet.");
-			this.skip();
 			final Function function = this.doCompileScope();
 			result.set(function);
 			return result;

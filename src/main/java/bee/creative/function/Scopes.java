@@ -2,8 +2,8 @@ package bee.creative.function;
 
 import java.util.Iterator;
 import bee.creative.function.Functions.CompositeFunction;
+import bee.creative.function.Values.LazyValue;
 import bee.creative.util.Iterators;
-import bee.creative.util.Objects;
 import bee.creative.util.Objects.UseToString;
 
 /**
@@ -47,7 +47,15 @@ public final class Scopes {
 			if (object == this) return true;
 			if (!(object instanceof Scope)) return false;
 			final Scope data = (Scope)object;
-			return Array.valueOf(this).equals(Array.valueOf(data));
+			return this.toArray().equals(data.toArray());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Array toArray() {
+			return Array.valueOf(this);
 		}
 
 		/**
@@ -55,64 +63,53 @@ public final class Scopes {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this);
+			return this.toArray().toString();
 		}
 
 	}
 
+	{}
+
 	/**
-	 * Diese Klasse implementiert den leeren Ausführungskontext zum Aufruf einer Funktion ohne Parameterwerte. Als Kontextobjekt wird
-	 * {@link Contexts#getDefaultContext()} verwendet.
-	 * 
-	 * @see #get(int)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefaultContext()}
+	 * verwendet.
 	 */
-	public static final class VoidScope extends BaseScope {
+	public static final Scope EMPTY_SCOPE = new BaseScope() {
 
-		/**
-		 * Dieses Feld speichert den leeren Ausführungskontext, dass keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefaultContext()}
-		 * verwendet.
-		 */
-		public static final VoidScope INSTANCE = new VoidScope();
-
-		{}
-
-		/**
-		 * Dieser Konstruktor ist versteckt.
-		 */
-		VoidScope() {
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc} Die {@link IndexOutOfBoundsException} wird immer ausgelöst.
-		 */
 		@Override
 		public Value get(final int index) throws IndexOutOfBoundsException {
 			throw new IndexOutOfBoundsException();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Rückgabewert ist {@code 0}.
-		 */
 		@Override
 		public int size() {
 			return 0;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Rückgabewert ist {@link Contexts#getDefaultContext()}.
-		 */
 		@Override
 		public Context context() {
 			return Contexts.defaultContext;
 		}
 
+		@Override
+		public String toString() {
+			return "EMPTY_SCOPE";
+		}
+
+	};
+
+	{}
+
+	public static Scope emptyScope() {
+		return EMPTY_SCOPE;
+	}
+
+	public static Scope valueScope(final Scope scope, final Array values) throws NullPointerException {
+		return valueScope(scope, values, true);
+	}
+
+	public static Scope valueScope(final Scope scope, final Array values, final boolean replace) throws NullPointerException {
+		return new ValueScope(scope, values, replace);
 	}
 
 	/**
@@ -123,7 +120,7 @@ public final class Scopes {
 	 * @see #get(int)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ValueScope extends BaseScope {
+	static final class ValueScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den übergeordneten Ausführungskontext, dessen zusätzlichen Parameterwerte genutzt werden.
@@ -228,10 +225,14 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
-			return Objects.toFormatString(true, true, this, "scope", this.scope, "values", this.values);
+		public Array toArray() {
+			return this.values;
 		}
 
+	}
+
+	public static Scope contextScope(final Scope scope, final Context context) throws NullPointerException {
+		return new ContextScope(scope, context);
 	}
 
 	/**
@@ -240,7 +241,7 @@ public final class Scopes {
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ContextScope extends BaseScope {
+	static final class ContextScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den Ausführungskontext.
@@ -306,10 +307,14 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
-			return Objects.toFormatString(true, true, this, "scope", this.scope, "context", this.context);
+		public Array toArray() {
+			return this.scope.toArray();
 		}
 
+	}
+
+	public static Scope CompositeScope(final Scope scope, final Function... params) throws NullPointerException {
+		return new CompositeScope(scope, params);
 	}
 
 	/**
@@ -321,7 +326,7 @@ public final class Scopes {
 	 * @see CompositeFunction
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class CompositeScope extends BaseScope {
+	static final class CompositeScope extends BaseScope {
 
 		/**
 		 * Dieses Feld speichert den übergeordneten Ausführungskontext, der für die Parameterfunktionen genutzt wird.
@@ -423,8 +428,26 @@ public final class Scopes {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
-			return Objects.toFormatString(true, true, this, "scope", this.scope, "values", this.values, "functions", this.params);
+		public Array toArray() {
+			return new Array() {
+
+				@Override
+				public Value get(final int index) throws IndexOutOfBoundsException {
+					if (index < 0) throw new IndexOutOfBoundsException();
+					final int length = CompositeScope.this.values.length;
+					if (index >= length) throw new IndexOutOfBoundsException();
+					Value result = CompositeScope.this.values[index];
+					if (result != null) return result;
+					result = LazyValue.valueOf(CompositeScope.this.scope, CompositeScope.this.params[index]);
+					return result;
+				}
+
+				@Override
+				public int length() {
+					return CompositeScope.this.size();
+				}
+
+			};
 		}
 
 	}

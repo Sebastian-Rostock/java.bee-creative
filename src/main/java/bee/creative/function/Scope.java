@@ -43,4 +43,13 @@ public interface Scope extends Items<Value>, Iterable<Value> {
 	 */
 	public Context context();
 
+	/**
+	 * Diese Methode gibt ein {@link Array} als Sicht auf die zugesicherten Parameterwerte zurück.
+	 * 
+	 * @see #get(int)
+	 * @see #size()
+	 * @return {@link Array} der Parameterwerte.
+	 */
+	public Array toArray();
+
 }
