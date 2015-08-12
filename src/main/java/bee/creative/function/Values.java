@@ -1,6 +1,7 @@
 package bee.creative.function;
 
-import bee.creative.function.Scopes.CompositeScope;
+import bee.creative.function.Scripts.ScriptFormatter;
+import bee.creative.function.Scripts.ScriptFormatterInput;
 import bee.creative.function.Types.ArrayType;
 import bee.creative.function.Types.BooleanType;
 import bee.creative.function.Types.FunctionType;
@@ -12,53 +13,19 @@ import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert {@link Value}s für {@code null}-, {@link Value}{@code []}-, {@link Object}-, {@link Function}-, {@link String}-, {@link Number}-
- * und {@link Boolean}-Nutzdaten.
+ * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Number} und
+ * {@link Boolean}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class Values {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
+	 * Diese Klasse implementiert einen abstrakten Wert.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Nutzdaten.
 	 */
-	public static abstract class BaseValue<GData> implements Value {
-
-		/**
-		 * Dieses Feld speichert die Nutzdaten.
-		 */
-		protected GData data;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
-		 */
-		public BaseValue() {
-			this.data = null;
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public BaseValue(final GData data) throws NullPointerException {
-			if (data == null) throw new NullPointerException("data = null");
-			this.data = data;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final GData data() {
-			return this.data;
-		}
+	public static abstract class BaseValue implements Value, ScriptFormatterInput {
 
 		/**
 		 * {@inheritDoc}
@@ -79,8 +46,6 @@ public final class Values {
 
 		/**
 		 * {@inheritDoc}
-		 * 
-		 * @see Objects#hash(Object)
 		 */
 		@Override
 		public int hashCode() {
@@ -89,8 +54,6 @@ public final class Values {
 
 		/**
 		 * {@inheritDoc}
-		 * 
-		 * @see Objects#equals(Object, Object)
 		 */
 		@Override
 		public boolean equals(final Object object) {
@@ -104,8 +67,67 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put(this.data());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public String toString() {
-			return String.valueOf(this.data());
+			return Scripts.scriptFormatter().formatValue(this);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen abstrakten Wert, dem zur Vollständigkeit nur noch der {@link #type() Datentyp} fehlt.
+	 * 
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GData> Typ der Nutzdaten.
+	 */
+	public static abstract class DataValue<GData> extends BaseValue {
+
+		/**
+		 * Dieses Feld speichert die Nutzdaten.
+		 */
+		protected GData data;
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
+		 */
+		public DataValue() {
+			this.data = null;
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+		 */
+		public DataValue(final GData data) throws NullPointerException {
+			if (data == null) throw new NullPointerException("data = null");
+			this.data = data;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GData data() {
+			return this.data;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put(this.data);
 		}
 
 	}
@@ -116,24 +138,23 @@ public final class Values {
 	 * berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der Funktion werden die Verweise auf
 	 * Ausführungskontext und Funktion aufgelöst.
 	 * 
-	 * @see CompositeScope
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class LazyValue implements Value {
+	public static final class ReturnValue extends BaseValue {
 
-		/**
-		 * Diese Methode konvertiert den gegebenen Funktionsaufruf in einen {@link LazyValue} und gibt diesen zurück.
-		 * 
-		 * @param scope Ausführungskontext.
-		 * @param function auszuwertende Funktion.
-		 * @return {@link LazyValue}.
-		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
-		 */
-		public static LazyValue valueOf(final Scope scope, final Function function) throws NullPointerException {
-			return new LazyValue(scope, function);
-		}
-
-		{}
+		// /**
+		// * Diese Methode konvertiert den gegebenen Funktionsaufruf in einen {@link ReturnValue} und gibt diesen zurück.
+		// *
+		// * @param scope Ausführungskontext.
+		// * @param function auszuwertende Funktion.
+		// * @return {@link ReturnValue}.
+		// * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
+		// */
+		// public static ReturnValue valueOf(final Scope scope, final Function function) throws NullPointerException {
+		// return new ReturnValue(scope, function);
+		// }
+		//
+		// {}
 
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
@@ -163,7 +184,7 @@ public final class Values {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
-		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
+		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
 			if (scope == null) throw new NullPointerException("scope = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
@@ -230,43 +251,12 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return this.value().valueTo(type);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
-			return this.value().valueTo(type, context);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return this.value().hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof Value)) return false;
-			return this.value().equals(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			if (this.value != null) return Objects.toFormatString(true, true, this, "value", this.value);
-			return Objects.toFormatString(true, true, this, "scope", this.scope, "function", this.function);
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			if (this.value != null) {
+				target.putValue(this.value);
+			} else {
+				target.putScope(this.function).putParams(this.scope);
+			}
 		}
 
 	}
@@ -277,29 +267,23 @@ public final class Values {
 	 * @see NullType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NullValue extends BaseValue<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link NullType}.
-		 */
-		public static final NullType TYPE = new NullType();
+	public static final class NullValue extends DataValue<Object> {
 
 		/**
 		 * Dieses Feld speichert den {@link NullValue}.
 		 */
-		public static final NullValue INSTANCE = new NullValue();
+		public static final NullValue NULL = new NullValue();
 
 		{}
 
 		/**
-		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE} zurück
-		 * gegeben.
+		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#NULL} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#NULL} geliefert.
 		 * 
 		 * @param value Wert oder {@code null}.
-		 * @return Wert oder {@link NullValue#INSTANCE}.
+		 * @return Wert oder {@link NullValue#NULL}.
 		 */
 		public static Value valueOf(final Value value) {
-			if (value == null) return NullValue.INSTANCE;
+			if (value == null) return NullValue.NULL;
 			return value;
 		}
 
@@ -310,7 +294,7 @@ public final class Values {
 		 */
 		@Override
 		public NullType type() {
-			return NullValue.TYPE;
+			return NullType.TYPE;
 		}
 
 	}
@@ -321,27 +305,7 @@ public final class Values {
 	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ArrayValue extends BaseValue<Array> {
-
-		/**
-		 * Dieses Feld speichert den {@link ArrayType}.
-		 */
-		public static final ArrayType TYPE = new ArrayType();
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Wertliste in einen {@link Value} und gibt diesen zurück.
-		 * 
-		 * @param data Wertliste.
-		 * @return {@link ArrayValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static ArrayValue valueOf(final Array data) throws NullPointerException {
-			return new ArrayValue(data);
-		}
-
-		{}
+	public static final class ArrayValue extends DataValue<Array> {
 
 		/**
 		 * Dieser Konstruktor initialisiert den Datensatz.
@@ -360,7 +324,15 @@ public final class Values {
 		 */
 		@Override
 		public ArrayType type() {
-			return ArrayValue.TYPE;
+			return ArrayType.TYPE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.putArray(this.data);
 		}
 
 	}
@@ -371,27 +343,7 @@ public final class Values {
 	 * @see ObjectType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ObjectValue extends BaseValue<Object> {
-
-		/**
-		 * Dieses Feld speichert den {@link ObjectType}.
-		 */
-		public static final ObjectType TYPE = new ObjectType();
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert das gegebene Object in einen {@link ObjectValue} und gibt diesen zurück.
-		 * 
-		 * @param data Object.
-		 * @return {@link ObjectValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static ObjectValue valueOf(final Object data) throws NullPointerException {
-			return new ObjectValue(data);
-		}
-
-		{}
+	public static final class ObjectValue extends DataValue<Object> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -410,7 +362,7 @@ public final class Values {
 		 */
 		@Override
 		public ObjectType type() {
-			return ObjectValue.TYPE;
+			return ObjectType.TYPE;
 		}
 
 	}
@@ -421,27 +373,7 @@ public final class Values {
 	 * @see FunctionType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionValue extends BaseValue<Function> {
-
-		/**
-		 * Dieses Feld speichert den {@link FunctionType}.
-		 */
-		public static final FunctionType TYPE = new FunctionType();
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert die gegebene Funktion in einen {@link FunctionValue} und gibt diesen zurück.
-		 * 
-		 * @param data Funktion.
-		 * @return {@link FunctionValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static FunctionValue valueOf(final Function data) throws NullPointerException {
-			return new FunctionValue(data);
-		}
-
-		{}
+	public static final class FunctionValue extends DataValue<Function> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -460,7 +392,15 @@ public final class Values {
 		 */
 		@Override
 		public FunctionType type() {
-			return FunctionValue.TYPE;
+			return FunctionType.TYPE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.putFunction(this.data);
 		}
 
 	}
@@ -471,27 +411,7 @@ public final class Values {
 	 * @see StringType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class StringValue extends BaseValue<String> {
-
-		/**
-		 * Dieses Feld speichert den {@link StringType}.
-		 */
-		public static final StringType TYPE = new StringType();
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Test in einen {@link StringValue} und gibt diesen zurück.
-		 * 
-		 * @param data Text.
-		 * @return {@link StringValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static StringValue valueOf(final String data) throws NullPointerException {
-			return new StringValue(data);
-		}
-
-		{}
+	public static final class StringValue extends DataValue<String> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -510,7 +430,7 @@ public final class Values {
 		 */
 		@Override
 		public StringType type() {
-			return StringValue.TYPE;
+			return StringType.TYPE;
 		}
 
 	}
@@ -521,27 +441,7 @@ public final class Values {
 	 * @see NumberType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class NumberValue extends BaseValue<Number> {
-
-		/**
-		 * Dieses Feld speichert den {@link NumberType}.
-		 */
-		public static final NumberType TYPE = new NumberType();
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Zahlenwert in einen {@link NumberValue} und gibt diesen zurück.
-		 * 
-		 * @param data Zahlenwert.
-		 * @return {@link NumberValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static NumberValue valueOf(final Number data) throws NullPointerException {
-			return new NumberValue(data);
-		}
-
-		{}
+	public static final class NumberValue extends DataValue<Number> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -560,7 +460,7 @@ public final class Values {
 		 */
 		@Override
 		public NumberType type() {
-			return NumberValue.TYPE;
+			return NumberType.TYPE;
 		}
 
 	}
@@ -571,12 +471,7 @@ public final class Values {
 	 * @see BooleanType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BooleanValue extends BaseValue<Boolean> {
-
-		/**
-		 * Dieses Feld speichert den {@link BooleanType}.
-		 */
-		public static final BooleanType TYPE = new BooleanType();
+	public static final class BooleanValue extends DataValue<Boolean> {
 
 		/**
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#TRUE}.
@@ -630,7 +525,7 @@ public final class Values {
 		 */
 		@Override
 		public BooleanType type() {
-			return BooleanValue.TYPE;
+			return BooleanType.TYPE;
 		}
 
 	}
@@ -641,6 +536,55 @@ public final class Values {
 	 * Dieses Feld speichert den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
 	 */
 	static Converter<? super Object, ? extends Value> defaultConverter;
+
+	{}
+
+	/**
+	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value Wert} und gibt diesen zurück.<br>
+	 * Abhängig vom Datentyp des gegebenen Objekts kann hierfür automatisch ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue},
+	 * {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet werden.
+	 * <ul>
+	 * <li>Wenn der via {@link #setDefaultConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
+	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis geliefert.</li>
+	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#NULL} geliefert.</li>
+	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert geliefert.</li>
+	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} geliefert.</li>
+	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} geliefert.</li>
+	 * <li>Wenn das Objekt eine {@link Number} ist, wird dieser als {@link NumberValue} geliefert.</li>
+	 * <li>Wenn das Objekt ein {@link Boolean} ist, wird dieser als {@link BooleanValue} geliefert.</li>
+	 * <li>Wenn das Objekt eine {@link Function} ist, wird dieser als {@link FunctionValue} geliefert.</li>
+	 * <li>Wenn das Objekt ein Array ist, wird dieses als {@link ArrayValue} geliefert.</li>
+	 * <li>In allen anderen Fällen wird der Datensatz als {@link ObjectValue} geliefert.</li>
+	 * </ul>
+	 * 
+	 * @see Converter#convert(Object)
+	 * @see Array#from(Object)
+	 * @see ArrayValue#ArrayValue(Array)
+	 * @see StringValue#StringValue(String)
+	 * @see NumberValue#NumberValue(Number)
+	 * @see BooleanValue#valueOf(Boolean)
+	 * @see FunctionValue#FunctionValue(Function)
+	 * @see ObjectValue#valueOf(Object)
+	 * @param data Datensatz oder {@code null}.
+	 * @return {@link Value}.
+	 */
+	public static Value valueOf(final Object data) {
+		final Converter<? super Object, ? extends Value> converter = Values.defaultConverter;
+		if (converter != null) {
+			final Value value = converter.convert(data);
+			if (value != null) return value;
+		}
+		if (data == null) return NullValue.NULL;
+		if (data instanceof Value) return (Value)data;
+		if (data instanceof Array) return new ArrayValue((Array)data);
+		if (data instanceof String) return new StringValue((String)data);
+		if (data instanceof Number) return new NumberValue((Number)data);
+		if (data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
+		if (data instanceof Function) return new FunctionValue((Function)data);
+		final Array array = Array.from(data);
+		if (array != null) return new ArrayValue(array);
+		return new ObjectValue(data);
+	}
 
 	/**
 	 * Diese Methode gibt den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)} zurück.
@@ -658,53 +602,6 @@ public final class Values {
 	 */
 	public static void setDefaultConverter(final Converter<? super Object, ? extends Value> value) {
 		Values.defaultConverter = value;
-	}
-
-	/**
-	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value} und gibt diesen zurück. Abhängig vom Datentyp des gegebenen Objekts kann hierfür
-	 * automatisch ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue}, {@link StringValue}, {@link NumberValue} oder {@link BooleanValue}
-	 * verwendet werden.
-	 * <ul>
-	 * <li>Wenn der via {@link #setDefaultConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
-	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis zurück gegeben.</li>
-	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#INSTANCE} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt eine {@link Number} ist, wird dieser als {@link NumberValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein {@link Boolean} ist, wird dieser als {@link BooleanValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt eine {@link Function} ist, wird dieser als {@link FunctionValue} zurück gegeben.</li>
-	 * <li>Wenn das Objekt ein Array ist, wird dieses als {@link ArrayValue} zurück gegeben.</li>
-	 * <li>In allen anderen Fällen wird der Datensatz als {@link ObjectValue} zurück gegeben.</li>
-	 * </ul>
-	 * 
-	 * @see Converter#convert(Object)
-	 * @see Array#from(Object)
-	 * @see ArrayValue#valueOf(Array)
-	 * @see StringValue#valueOf(String)
-	 * @see NumberValue#valueOf(Number)
-	 * @see BooleanValue#valueOf(Boolean)
-	 * @see FunctionValue#valueOf(Function)
-	 * @see ObjectValue#valueOf(Object)
-	 * @param data Datensatz oder {@code null}.
-	 * @return {@link Value}.
-	 */
-	public static Value valueOf(final Object data) {
-		final Converter<? super Object, ? extends Value> converter = Values.defaultConverter;
-		if (converter != null) {
-			final Value value = converter.convert(data);
-			if (value != null) return value;
-		}
-		if (data == null) return NullValue.INSTANCE;
-		if (data instanceof Value) return (Value)data;
-		if (data instanceof Array) return ArrayValue.valueOf((Array)data);
-		if (data instanceof String) return StringValue.valueOf((String)data);
-		if (data instanceof Number) return NumberValue.valueOf((Number)data);
-		if (data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
-		if (data instanceof Function) return FunctionValue.valueOf((Function)data);
-		final Array array = Array.from(data);
-		if (array != null) return ArrayValue.valueOf(array);
-		return ObjectValue.valueOf(data);
 	}
 
 }

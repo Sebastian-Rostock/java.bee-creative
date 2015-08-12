@@ -2,6 +2,8 @@ package bee.creative.function;
 
 import java.util.Collection;
 import java.util.Iterator;
+import bee.creative.function.Scripts.ScriptFormatter;
+import bee.creative.function.Scripts.ScriptFormatterInput;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.BooleanValue;
 import bee.creative.function.Values.NumberValue;
@@ -16,7 +18,7 @@ import bee.creative.util.Objects;
  * @see ArrayValue
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Array implements Items<Value>, Iterable<Value> {
+public abstract class Array implements Items<Value>, Iterable<Value>, ScriptFormatterInput {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.
@@ -93,7 +95,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Byte#valueOf(byte)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -105,7 +107,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Byte.valueOf(values[index]));
+				return new NumberValue(Byte.valueOf(values[index]));
 			}
 
 			@Override
@@ -120,7 +122,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Short#valueOf(short)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -132,7 +134,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Short.valueOf(values[index]));
+				return new NumberValue(Short.valueOf(values[index]));
 			}
 
 			@Override
@@ -147,7 +149,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Integer#valueOf(int)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -159,7 +161,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Integer.valueOf(values[index]));
+				return new NumberValue(Integer.valueOf(values[index]));
 			}
 
 			@Override
@@ -174,7 +176,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Long#valueOf(long)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -186,7 +188,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Long.valueOf(values[index]));
+				return new NumberValue(Long.valueOf(values[index]));
 			}
 
 			@Override
@@ -201,7 +203,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Float#valueOf(float)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -213,7 +215,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Float.valueOf(values[index]));
+				return new NumberValue(Float.valueOf(values[index]));
 			}
 
 			@Override
@@ -228,7 +230,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Double#valueOf(double)
-	 * @see NumberValue#valueOf(Number)
+	 * @see NumberValue#NumberValue(Number)
 	 * @param data Zahlenliste.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -240,7 +242,7 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
-				return NumberValue.valueOf(Double.valueOf(values[index]));
+				return new NumberValue(Double.valueOf(values[index]));
 			}
 
 			@Override
@@ -299,33 +301,6 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 			@Override
 			public int length() {
 				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt eine Wertliste als Sicht auf die Parameterwerte des gegebenen Ausführungskontexts zurück.
-	 * 
-	 * @see Scope#get(int)
-	 * @see Scope#size()
-	 * @param scope Ausführungskontext.
-	 * @return Wertliste der Parameterwerte.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(final Scope scope) throws NullPointerException {
-		if (scope.size() == 0) return Array.EMPTY;
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				if ((index < 0) || (index >= scope.size())) throw new IndexOutOfBoundsException();
-				return scope.get(index);
-			}
-
-			@Override
-			public int length() {
-				return scope.size();
 			}
 
 		};
@@ -513,14 +488,6 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 		};
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Iterator<Value> iterator() {
-		return Iterators.itemsIterator(this, 0, this.length());
-	}
-
 	{}
 
 	/**
@@ -561,8 +528,24 @@ public abstract class Array implements Items<Value>, Iterable<Value> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Iterator<Value> iterator() {
+		return Iterators.itemsIterator(this, 0, this.length());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		target.putArray(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String toString() {
-		return Objects.toString(this);
+		return Scripts.scriptFormatter().format(this);
 	}
 
 }

@@ -1,8 +1,8 @@
 package bee.creative.function;
 
 import bee.creative.function.Values.ArrayValue;
-import bee.creative.function.Values.BaseValue;
 import bee.creative.function.Values.BooleanValue;
+import bee.creative.function.Values.DataValue;
 import bee.creative.function.Values.FunctionValue;
 import bee.creative.function.Values.NullValue;
 import bee.creative.function.Values.NumberValue;
@@ -27,7 +27,7 @@ public class Types {
 	 * @param <GData> Typ der Nutzdaten des Werts.
 	 * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} oder {@link #valueOf(Value, Context)} konvertiert werden kann.
 	 */
-	public static abstract class BaseType<GData, GValue extends BaseValue<GData>> implements Type<GValue>, Converter<Value, GData> {
+	public static abstract class BaseType<GData, GValue extends DataValue<GData>> implements Type<GValue>, Converter<Value, GData> {
 
 		/**
 		 * {@inheritDoc}
@@ -108,6 +108,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 0;
+		/**
+		 * Dieses Feld speichert den {@link NullType}.
+		 */
+		public static final NullType TYPE = new NullType();
 
 		{}
 
@@ -143,6 +147,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 1;
+		/**
+		 * Dieses Feld speichert den {@link ArrayType}.
+		 */
+		public static final ArrayType TYPE = new ArrayType();
 
 		{}
 
@@ -178,6 +186,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 2;
+		/**
+		 * Dieses Feld speichert den {@link ObjectType}.
+		 */
+		public static final ObjectType TYPE = new ObjectType();
 
 		{}
 
@@ -213,6 +225,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 3;
+		/**
+		 * Dieses Feld speichert den {@link FunctionType}.
+		 */
+		public static final FunctionType TYPE = new FunctionType();
 
 		{}
 
@@ -248,6 +264,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 4;
+		/**
+		 * Dieses Feld speichert den {@link StringType}.
+		 */
+		public static final StringType TYPE = new StringType();
 
 		{}
 
@@ -283,6 +303,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 5;
+		/**
+		 * Dieses Feld speichert den {@link NumberType}.
+		 */
+		public static final NumberType TYPE = new NumberType();
 
 		{}
 
@@ -318,6 +342,10 @@ public class Types {
 		 * @see Type#id()
 		 */
 		public static final int ID = 6;
+		/**
+		 * Dieses Feld speichert den {@link BooleanType}.
+		 */
+		public static final BooleanType TYPE = new BooleanType();
 
 		{}
 

@@ -77,15 +77,15 @@ public class Contexts {
 			if (type == value.type()) return (GValue)value;
 			switch (type.id()) {
 				case ArrayType.ID:
-					return (GValue)ArrayValue.valueOf(this.castToArray(value));
+					return (GValue)new ArrayValue(this.castToArray(value));
 				case ObjectType.ID:
-					return (GValue)ObjectValue.valueOf(this.castToObject(value));
+					return (GValue)new ObjectValue(this.castToObject(value));
 				case FunctionType.ID:
-					return (GValue)FunctionValue.valueOf(this.castToFunction(value));
+					return (GValue)new FunctionValue(this.castToFunction(value));
 				case StringType.ID:
-					return (GValue)StringValue.valueOf(this.castToString(value));
+					return (GValue)new StringValue(this.castToString(value));
 				case NumberType.ID:
-					return (GValue)NumberValue.valueOf(this.castToNumber(value));
+					return (GValue)new NumberValue(this.castToNumber(value));
 				case BooleanType.ID:
 					return (GValue)BooleanValue.valueOf(this.castToBoolean(value));
 			}
