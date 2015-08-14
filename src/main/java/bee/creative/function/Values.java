@@ -1,8 +1,11 @@
 package bee.creative.function;
 
 import javax.lang.model.type.NullType;
+import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
+import bee.creative.function.Scripts.ScriptTracer;
+import bee.creative.function.Scripts.ScriptTracerInput;
 import bee.creative.util.Objects;
 
 /**
@@ -384,7 +387,7 @@ public final class Values {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class FunctionValue extends DataValue<Function> {
+	public static final class FunctionValue extends DataValue<Function> implements ScriptTracerInput {
 
 		/**
 		 * Dieses Feld speichert den Identifikator des Datentyps.
@@ -416,6 +419,14 @@ public final class Values {
 		@Override
 		public Type<?> type() {
 			return FunctionValue.TYPE;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+			return new ValueFunction(new FunctionValue(tracer.trace(this.data)));
 		}
 
 		/**

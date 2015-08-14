@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import bee.creative.function.Functions.ClosureFunction;
 import bee.creative.function.Functions.InvokeFunction;
-import bee.creative.function.Functions.LazyFunction;
 import bee.creative.function.Functions.ParamFunction;
 import bee.creative.function.Functions.ProxyFunction;
 import bee.creative.function.Functions.TraceFunction;
@@ -284,7 +283,7 @@ public class Scripts {
 	 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog
 	 * zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einer Funktion kompiliert werden.</li>
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link ArrayFunction#ARRAY_VIEW_FUNCTION}.</li>
+	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link Functions#ARRAY_VIEW_FUNCTION}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
 	 * als {@link FunctionValue}s angegeben.</li>
 	 * </ul>
@@ -785,7 +784,7 @@ public class Scripts {
 		 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
 		 * 
 		 * @see #compileFunction()
-		 * @see InvokeFunction#chained()
+		 * @see InvokeFunction#direct()
 		 * @see InvokeFunction#execute(Scope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
@@ -1334,18 +1333,19 @@ public class Scripts {
 		 * 
 		 * @see Object#toString()
 		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
-		 * @param object Objekt.
+		 * @param value Objekt.
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code object} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter put(final Object object) throws NullPointerException, IllegalStateException {
-			if (object == null) throw new NullPointerException("object = null");
+		public ScriptFormatter put(final Object value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("object = null");
 			this.checkFormatting();
-			if (object instanceof ScriptFormatterInput) {
-				((ScriptFormatterInput)object).toScript(this);
+			if (value instanceof ScriptFormatterInput) {
+				((ScriptFormatterInput)value).toScript(this);
 			} else {
-				this.items.add(object.toString());
+				this.items.add(value.toString());
 			}
 			return this;
 		}
@@ -1366,9 +1366,10 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
 		public ScriptFormatter putArray(final Array value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("value = null");
 			this.checkFormatting();
 			final int length = value.length();
 			if (length == 0) return this.put("[]");
@@ -1390,7 +1391,7 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
 		public ScriptFormatter putValue(final Value value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
@@ -1411,10 +1412,43 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn einer der Werte nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
 		public ScriptFormatter putScope(final Function value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("value = null");
 			return this.put("{: ").putFunction(value).put("}");
+		}
+
+		/**
+		 * Diese Methode fügt den Quelltext der zugesicherten Parameterwerte des gegebenen Ausführungskontexts an und gibt {@code this} zurück.<br>
+		 * Diese Parameterwerte werden via {@link Scope#toArray() scope.toArray()} in eine Wertliste überführt. Wenn diese Wertliste leer ist, wird {@code "()"}
+		 * angefügt. Andernfalls werden die nummerierten Parameterwerte in {@code "("} und {@code ")"} eingeschlossen, sowie mit {@code ";"} separiert über
+		 * {@link #putValue(Value)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als {@code "$i: "} angefügt. Nach der öffnenden
+		 * Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem
+		 * Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
+		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
+		 * 
+		 * @see #putFunction(Function)
+		 * @see #putBreakInc()
+		 * @see #putBreakDec()
+		 * @see #putBreakSpace()
+		 * @see #putIndent()
+		 * @param value Ausführungskontext.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
+		 */
+		public ScriptFormatter putParams(final Scope value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("value = null");
+			final int length = value.size();
+			if (length == 0) return this.put("()");
+			final Array array = value.toArray();
+			(length > 1 ? this.putIndent() : this).put("(").putBreakInc().put("$1: ").putValue(array.get(0));
+			for (int i = 1; i < length; i++) {
+				this.put(";").putBreakSpace().put("$").put(new Integer(i + 1)).put(": ").putValue(array.get(i));
+			}
+			return this.putBreakDec().put(")");
 		}
 
 		/**
@@ -1434,9 +1468,10 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
 		public ScriptFormatter putParams(final Function... value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("value = null");
 			final int length = value.length;
 			if (length == 0) return this.put("()");
 			(length > 1 ? this.putIndent() : this).put("(").putBreakInc().putFunction(value[0]);
@@ -1446,37 +1481,21 @@ public class Scripts {
 			return this.putBreakDec().put(")");
 		}
 
-		public ScriptFormatter putParams(final Scope scope) {
-			final int length = scope.size();
-			if (length == 0) return this.put("()");
-			final Array array = scope.toArray();
-			(length > 1 ? this.putIndent() : this).put("(").putBreakInc().put("$1: ").putValue(array.get(0));
-			for (int i = 1; i < length; i++) {
-				this.put(";").putBreakSpace().put("$").put(new Integer(i + 1)).put(": ").putValue(array.get(i));
-			}
-			return this.putBreakDec().put(")");
-		}
-
 		/**
-		 * Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.
-		 * <p>
-		 * Wenn die Funktion eine {@link ArrayFunction} ist, wird {@code "$"} angefügt. Wenn die Funktion eine {@link ParamFunction} ist, wird {@code "$i"}
-		 * angefügt, wobei {@code i} der um eins vergrößerte Parameterindex ist. Wenn die Funktion eine {@link ValueFunction} ist, wird ihr Wert via
-		 * {@link #putValue(Value)} angefügt. Wenn die Funktion eine {@link ClosureFunction} ist, wird ihre Funktion über {@link #putScope(Function)} angefügt. Wenn
-		 * die Funktion eine {@link LazyFunction} oder eine {@link ScriptTracer} ist, wird ihre Funktion über {@link #putFunction(Function)} angefügt. Wenn die
-		 * Funktion eine {@link ProxyFunction} ist, werden ihr Name über {@link #put(Object)} und ihre Funktion über {@link #putFunction(Function)} angefügt. Wenn
-		 * die Funktion eine {@link InvokeFunction} ist, werden ihre aufzurufende Funktion über {@link #putFunction(Function)} und ihre Parameterfunktionen über
-		 * {@link #putParams(Function...)} angefügt. Andernfalls wird die Funktion über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)}
-		 * formatiert.
+		 * Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
+		 * Wenn die Funktion ein {@link ScriptFormatterInput} ist, wird sie über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
+		 * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)} angefügt.
 		 * 
-		 * @see ScriptFormatterInput TODO
+		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
+		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)
 		 * @param value Funktion.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
 		public ScriptFormatter putFunction(final Function value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (value == null) throw new NullPointerException("value = null");
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
 			} else {
@@ -1563,6 +1582,17 @@ public class Scripts {
 			return string.toString();
 		}
 
+		/**
+		 * Diese Methode formatiert das gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
+		 * Das Objekt wird über {@link #put(Object)} angefügt.
+		 * 
+		 * @see #put(Object)
+		 * @param object Objekt.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn {@code object} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann.
+		 */
 		public String format(final Object object) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			this.startFormatting();
 			try {
@@ -1575,15 +1605,17 @@ public class Scripts {
 
 		/**
 		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Werte werden mit {@code ';'} separiert.
+		 * Die Werte werden über {@link #putValue(Value)} angefügt und mit {@code ';'} separiert.
 		 * 
+		 * @see #putValue(Value)
 		 * @param values Wert.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
 		public String formatValue(final Value... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (values == null) throw new NullPointerException("values = null");
 			this.startFormatting();
 			try {
 				final int length = values.length;
@@ -1600,15 +1632,17 @@ public class Scripts {
 
 		/**
 		 * Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Funktionen werden mit {@code ';'} separiert.
+		 * Die Funktionen werden über {@link #putFunction(Function)} angefügt und mit {@code ';'} separiert.
 		 * 
+		 * @see #putFunction(Function)
 		 * @param functions Funktionen.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
 		public String formatFunction(final Function... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (functions == null) throw new NullPointerException("functions = null");
 			this.startFormatting();
 			try {
 				final int length = functions.length;
@@ -1625,6 +1659,15 @@ public class Scripts {
 
 	}
 
+	/**
+	 * Diese Schnittstelle definiert ein Objekt, welches sich selbst in seine Quelltextdarstellung überführen und diese an einen {@link ScriptFormatter} anfügen
+	 * kann.
+	 * 
+	 * @see ScriptFormatter#put(Object)
+	 * @see ScriptFormatter#putValue(Value)
+	 * @see ScriptFormatter#putFunction(Function)
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static interface ScriptFormatterInput {
 
 		/**
@@ -1815,16 +1858,20 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Klasse implementiert das Argument für die Methoden des {@link ScriptTracerHelper}s.
-	 * <p>
-	 * Diese Klasse implementiert eine Funktion zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen mit Hilfe eines {@link ScriptTracerHelper}s und
-	 * {@link ScriptTracer}s. Die genaue Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
+	 * Diese Klasse implementiert ein Objekt zur Verwaltung der Zustandsdaten einer {@link TraceFunction} zur Verfolgung und Überwachung der Verarbeitung von
+	 * Funktionen. Dieses Objekt wird dazu das Argument für die Methoden des {@link ScriptTracerHelper} genutzt, welcher auf die Ereignisse der Überwachung
+	 * reagieren kann.
 	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see ScriptTracerHelper
 	 * @see TraceFunction
+	 * @see ScriptTracerHelper
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ScriptTracer {
+
+		/**
+		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
+		 */
+		ScriptTracerHelper helper = ScriptTracerHelper.DEFAULT;
 
 		/**
 		 * Dieses Feld speichert den Ausführungskontext der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
@@ -1851,26 +1898,7 @@ public class Scripts {
 		 */
 		RuntimeException exception;
 
-		/**
-		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
-		 */
-		ScriptTracerHelper helper = ScriptTracerHelper.DEFAULT;
-
-		public Scope getScope() {
-			return this.scope;
-		}
-
-		public Function getFunction() {
-			return this.function;
-		}
-
-		public Value getResult() {
-			return this.result;
-		}
-
-		public RuntimeException getException() {
-			return this.exception;
-		}
+		{}
 
 		/**
 		 * Diese Methode gibt den {@link ScriptTracerHelper} zurück.
@@ -1881,58 +1909,143 @@ public class Scripts {
 			return this.helper;
 		}
 
-		public void useScope(final Scope scope) {
-			this.scope = scope;
-		}
-
-		public void useFunction(final Function function) {
-			this.function = function;
-		}
-
-		public void setResult(final Value result) {
-			this.result = result;
-			exception = null;
-		}
-
-		public void setException(final RuntimeException exception) {
-			result = null;
-			this.exception = exception;
-		}
-
-		public void setHelper(final ScriptTracerHelper helper) {
-			this.helper = helper;
+		/**
+		 * Diese Methode gibt den aktuellen Ausführungskontext zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
+		 * 
+		 * @return Ausführungskontext oder {@code null}.
+		 */
+		public Scope getScope() {
+			return this.scope;
 		}
 
 		/**
-		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link ScriptTracerHelper} oder unverändert zurück. Sie sollte zur
-		 * rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von {@link ScriptTracer#function}
-		 * verwendet werden.
-		 * <p>
-		 * Wenn die Funktion eine {@link InvokeFunction} ist, wird eine {@link InvokeFunction} zurück gegeben, deren Parameterfunktionen in eine
-		 * {@link TraceFunction} umgewandelt wurden. Wenn die Funktion eine {@link ValueFunction} ist und ihr Ergebniswert ein {@link FunctionValue} ist, wird diese
-		 * ebenfalls in eine {@link TraceFunction} umgewandelt und als {@link ValueFunction} zurück gegeben. Wenn die Funktion eine {@link ClosureFunction} ist,
-		 * wird deren Funktion ebenfalls in eine {@link TraceFunction} umgewandelt. Andernfalls wird die gegebene Funktion zurück gegeben.
+		 * Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getScope() aktuellen Ausführungskontext} ausgewertet wird.
 		 * 
-		 * @param helper {@link ScriptTracerHelper}.
+		 * @return Funktion oder {@code null}.
+		 */
+		public Function getFunction() {
+			return this.function;
+		}
+
+		/**
+		 * Diese Methode gibt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} zurück.
+		 * 
+		 * @return Ergebniswert oder {@code null}.
+		 */
+		public Value getResult() {
+			return this.result;
+		}
+
+		/**
+		 * Diese Methode gibt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} zurück.
+		 * 
+		 * @return Ausnahme oder {@code null}.
+		 */
+		public RuntimeException getException() {
+			return this.exception;
+		}
+
+		/**
+		 * Diese Methode setzt die Überwachungsmethoden und gibt {@code this} zurück.
+		 * 
+		 * @param value Überwachungsmethoden.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useHelper(final ScriptTracerHelper value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.helper = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt den aktuellen Ausführungskontext und gibt {@code this} zurück. Dieser wird zur Auswertung der {@link #getFunction() aktuellen
+		 * Funktion} verwendet.
+		 * 
+		 * @param value Ausführungskontext.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useScope(final Scope value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.scope = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die aktuelle Funktion und gibt {@code this} zurück. Diese wird mit dem {@link #getScope() aktuellen Ausführungskontext} ausgewertet.
+		 * 
+		 * @param value Funktion.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useFunction(final Function value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.function = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} und gibt {@code this} zurück. Die {@link #getException()
+		 * aktuelle Ausnahme} wird damit auf {@code null} gesetzt.
+		 * 
+		 * @param value Ergebniswert.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useResult(final Value value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.result = value;
+			this.exception = null;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} und gibt {@code this} zurück. Der {@link #getResult() aktuelle
+		 * Ergebniswert} wird damit auf {@code null} gesetzt.
+		 * 
+		 * @param value Ausnahme.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useException(final RuntimeException value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.result = null;
+			this.exception = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt alle aktuellen Einstellungen auf {@code null} und gibt {@code this} zurück.
+		 * 
+		 * @see #getScope()
+		 * @see #getFunction()
+		 * @see #getResult()
+		 * @see #getException()
+		 * @return {@code this}.
+		 */
+		public ScriptTracer clear() {
+			this.scope = null;
+			this.function = null;
+			this.result = null;
+			this.exception = null;
+			return this;
+		}
+
+		/**
+		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} oder unverändert zurück. Sie sollte zur rekursiven Weiterverfolgung in
+		 * {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von {@link ScriptTracer#function} verwendet werden.
+		 * <p>
+		 * Wenn die Funktion ein {@link ScriptTracerInput} ist, wird das Ergebnis von {@link ScriptTracerInput#toTrace(ScriptTracer)} zurück gegeben. Andernfalls
+		 * wird die gegebene Funktion zurück gegeben.
+		 * 
 		 * @param function Funktion.
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
-		public Function traceFunction(final Function function) throws NullPointerException {
+		public Function trace(final Function function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (function instanceof ScriptTracerInput) return ((ScriptTracerInput)function).toTrace(this);
-
-			final Object clazz = function.getClass();
-
-			if (clazz == ValueFunction.class) {
-				final ValueFunction function2 = (ValueFunction)function;
-				final Value value = function2.value;
-				if (value.getClass() == FunctionValue.class) return new ValueFunction(new FunctionValue(new TraceFunction(this, (Function)value.data())));
-			} else if (clazz == ClosureFunction.class) {
-				final ClosureFunction function2 = (ClosureFunction)function;
-				if (function2.scope == null) return new ClosureFunction(new TraceFunction(this, function2.function));
-				return new ClosureFunction(function2.scope, new TraceFunction(this, function2.function));
-			}
 			return function;
 		}
 
@@ -1943,29 +2056,24 @@ public class Scripts {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toFormatString(true, true, this, "scope", this.scope, "function", this.function, "result", this.result, "exception", this.exception);
-		}
-
-		public void clear() {
-			scope = null;
-			function = null;
-			result = null;
-			exception = null;
+			return Objects.toFormatString(true, true, this, "helper", this.helper, "scope", this.scope, "function", this.function, "result", this.result,
+				"exception", this.exception);
 		}
 
 	}
 
-	public static interface ScriptTracerInput extends Function {
+	/**
+	 * Diese Schnittstelle definiert ein Objekt, welches sich selbst in eine {@link TraceFunction} überführen kann.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static interface ScriptTracerInput {
 
 		/**
-		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link ScriptTracer} oder unverändert zurück. Sie sollte zur
-		 * rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von {@link ScriptTracer#function}
-		 * verwendet werden.
-		 * <p>
-		 * Wenn die Funktion eine {@link InvokeFunction} ist, wird eine {@link InvokeFunction} zurück gegeben, deren Parameterfunktionen in eine
-		 * {@link TraceFunction} umgewandelt wurden. Wenn die Funktion eine {@link ValueFunction} ist und ihr Ergebniswert ein {@link FunctionValue} ist, wird diese
-		 * ebenfalls in eine {@link TraceFunction} umgewandelt und als {@link ValueFunction} zurück gegeben. Wenn die Funktion eine {@link ClosureFunction} ist,
-		 * wird deren Funktion ebenfalls in eine {@link TraceFunction} umgewandelt. Andernfalls wird die gegebene Funktion zurück gegeben.
+		 * Diese Methode gibt dieses Objekt als als {@link TraceFunction} mit dem gegebenen {@link ScriptTracer} zurück.<br>
+		 * Sie sollte zur rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation der
+		 * {@link ScriptTracer#getFunction() aktuellen Funktion} des {@link ScriptTracer} verwendet werden.<br>
+		 * Wenn dieses Objekt ein Wert ist, muss er sich in einer {@link ValueFunction} liefern.
 		 * 
 		 * @param tracer {@link ScriptTracer}.
 		 * @return Funktion.
@@ -1976,7 +2084,7 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert die Methoden zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen.
+	 * Diese Schnittstelle definiert die Überwachungsmethoden zur Verfolgung der Verarbeitung von Funktionen.
 	 * 
 	 * @see ScriptTracer
 	 * @see TraceFunction
@@ -1984,6 +2092,9 @@ public class Scripts {
 	 */
 	public static interface ScriptTracerHelper {
 
+		/**
+		 * Dieses Feld speichert den {@code default}-{@link ScriptTracerHelper}, dessen Methoden den {@link ScriptTracer} nicht modifizieren.
+		 */
 		public static final ScriptTracerHelper DEFAULT = new ScriptTracerHelper() {
 
 			@Override

@@ -209,7 +209,7 @@ public final class Functions {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ScriptTracer
 	 */
-	public static final class TraceFunction extends BaseFunction {
+	public static final class TraceFunction extends BaseFunction implements ScriptTracerInput {
 
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracer}.
@@ -263,34 +263,40 @@ public final class Functions {
 		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Ausführungskontext sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die
 		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
 		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getScope() aktuellen
-		 * Ausführungskontext} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#setResult(Value) gespeichert}.<br>
+		 * Ausführungskontext} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#useResult(Value) gespeichert}.<br>
 		 * Abschließend werden dann {@link ScriptTracerHelper#onReturn(ScriptTracer) tracer().helper().onReturn(tracer())} aufgerufen und der
 		 * {@link ScriptTracer#getResult() aktuelle Ergebniswert} zurück gegeben.<br>
-		 * Wenn eine {@link RuntimeException} auftritt, wird diese im {@link #tracer()} {@link ScriptTracer#setException(RuntimeException) gespeichert}, wird
+		 * Wenn eine {@link RuntimeException} auftritt, wird diese im {@link #tracer()} {@link ScriptTracer#useException(RuntimeException) gespeichert}, wird
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer) tracer().helper().onThrow(tracer())} aufgerufen und die {@link ScriptTracer#getException() altuelle
 		 * Ausnahme} des {@link #tracer()} ausgelöst.<br>
-		 * In jedem Fall wird der Zustand des {@link #tracer()} beim Verlassen dieser Methode {@link ScriptTracer#clear() bereinigt}.
+		 * In jedem Fall wird der Zustand des {@link #tracer()} beim Verlassen dieser Methode {@link ScriptTracer#clear() bereinigt}.<br>
+		 * Der verwendete {@link ScriptTracerHelper} wird nur einmalig zu Beginn der Auswertung über den {@link #tracer()} ermittelt.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
 			final ScriptTracer tracer = this.tracer;
-			final ScriptTracerHelper helper = tracer.getHelper();
 			try {
-				tracer.useScope(scope);
-				tracer.useFunction(this.function);
-				helper.onExecute(tracer);
+				final ScriptTracerHelper helper = tracer.getHelper();
+				helper.onExecute(tracer.useScope(scope).useFunction(this.function));
 				try {
-					tracer.setResult(tracer.getFunction().execute(tracer.getScope()));
-					helper.onReturn(tracer);
+					helper.onReturn(tracer.useResult(tracer.getFunction().execute(tracer.getScope())));
 					return tracer.getResult();
 				} catch (final RuntimeException exception) {
-					tracer.setException(exception);
-					helper.onThrow(tracer);
+					helper.onThrow(tracer.useException(exception));
 					throw tracer.getException();
 				}
 			} finally {
 				tracer.clear();
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		*/
+		@Override
+		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+			if (this.tracer.equals(tracer)) return this;
+			return tracer.trace(this.function);
 		}
 
 		/**
@@ -309,7 +315,7 @@ public final class Functions {
 	 * @see #execute(Scope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ValueFunction extends BaseFunction {
+	public static final class ValueFunction extends BaseFunction implements ScriptTracerInput {
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
@@ -346,6 +352,15 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			return this.value;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+			if (this.value instanceof ScriptTracerInput) return ((ScriptTracerInput)this.value).toTrace(tracer);
+			return this;
 		}
 
 		/**
@@ -565,9 +580,9 @@ public final class Functions {
 		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
 			final Function[] params = this.params;
 			for (int i = 0, size = params.length; i < size; i++) {
-				params[i] = tracer.traceFunction(params[i]);
+				params[i] = tracer.trace(params[i]);
 			}
-			return new InvokeFunction(tracer.traceFunction(this.function), this.direct, params);
+			return new InvokeFunction(tracer.trace(this.function), this.direct, params);
 		}
 
 		/**
@@ -587,7 +602,7 @@ public final class Functions {
 	 * @see #execute(Scope)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ClosureFunction extends BaseFunction {
+	public static final class ClosureFunction extends BaseFunction implements ScriptTracerInput {
 
 		/**
 		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
@@ -673,6 +688,15 @@ public final class Functions {
 			final Scope scope2 = this.scope;
 			if (scope2 == null) return new FunctionValue(new ClosureFunction(scope, this.function));
 			return this.function.execute(Scope.valueScope(scope2, scope.toArray(), false));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+			if (this.scope == null) return new ClosureFunction(tracer.trace(this.function));
+			return new ClosureFunction(this.scope, tracer.trace(this.function));
 		}
 
 		/**
