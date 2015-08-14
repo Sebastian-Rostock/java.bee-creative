@@ -5,11 +5,9 @@ import bee.creative.function.Scripts.ScriptFormatterInput;
 import bee.creative.function.Scripts.ScriptTracer;
 import bee.creative.function.Scripts.ScriptTracerHelper;
 import bee.creative.function.Scripts.ScriptTracerInput;
-import bee.creative.function.Types.ArrayType;
-import bee.creative.function.Types.FunctionType;
 import bee.creative.function.Values.ArrayValue;
 import bee.creative.function.Values.FunctionValue;
-import bee.creative.function.Values.ReturnValue;
+import bee.creative.function.Values.LazyValue;
 
 /**
  * Diese Klasse implementiert Hilfsklassen und Hilfsmethoden zur Erzeugung von Funktionen.
@@ -44,6 +42,82 @@ public final class Functions {
 		@Override
 		public String toString() {
 			return Scripts.scriptFormatter().formatFunction(this);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link LazyValue}.
+	 * 
+	 * @see LazyValue
+	 * @see #execute(Scope)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class LazyFunction extends BaseFunction {
+
+		/**
+		 * Diese Methode gibt die gegebene Funktion als {@link LazyFunction} zurück. Wenn diese bereits eine {@link LazyFunction} ist, wird sie unverändert zurück
+		 * gegeben.
+		 * 
+		 * @param function Funktion.
+		 * @return {@link LazyFunction}.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public static LazyFunction valueOf(final Function function) throws NullPointerException {
+			if (function instanceof LazyFunction) return (LazyFunction)function;
+			return new LazyFunction(function);
+		}
+
+		{}
+
+		/**
+		 * Dieses Feld speichert die auszuwertende Funktion.
+		 */
+		final Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #execute(Scope)} zur Erzeugung eines {@link LazyValue} genutzt wird.
+		 * 
+		 * @param function auszuwertende Funktion.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public LazyFunction(final Function function) throws NullPointerException {
+			if (function == null) throw new NullPointerException("function = null");
+			this.function = function;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt die auszuwertende Funktion zurück.
+		 * 
+		 * @return auszuwertende Funktion.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Der Ergebniswert entspricht {@code new LazyValue(scope, this.function())}.
+		 * 
+		 * @see #function()
+		 * @see LazyValue#LazyValue(Scope, Function)
+		 */
+		@Override
+		public LazyValue execute(final Scope scope) {
+			return new LazyValue(scope, this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.putFunction(this.function);
 		}
 
 	}
@@ -128,97 +202,9 @@ public final class Functions {
 
 	}
 
-	{}
-
-	{}
-
-	{}
-
 	/**
-	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link ReturnValue} zu einer gegebenen,
-	 * auszuwertenden Funktion ist.
-	 * 
-	 * @see ReturnValue
-	 * @see LazyFunction#execute(Scope)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class LazyFunction extends BaseFunction {
-
-		/**
-		 * Diese Methode konvertiert die gegebene Funktion in eine {@link LazyFunction} und gibt diese zurück.
-		 * 
-		 * @param value auszuwertende Funktion.
-		 * @return {@link LazyFunction}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 */
-		public static LazyFunction valueOf(final Function value) throws NullPointerException {
-			return new LazyFunction(value);
-		}
-
-		{}
-
-		/**
-		 * Dieses Feld speichert die auszuwertende Funktion.
-		 */
-		final Function function;
-
-		/**
-		 * Dieser Konstruktor initialisiert die auszuwertende Funktion.
-		 * 
-		 * @param function auszuwertende Funktion.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 */
-		public LazyFunction(final Function function) throws NullPointerException {
-			if (function == null) throw new NullPointerException("function = null");
-			this.function = function;
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt die auszuwertende Funktion zurück.
-		 * 
-		 * @return auszuwertende Funktion.
-		 */
-		public Function function() {
-			return this.function;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Ergebniswert entspricht {@code ReturnValue.valueOf(scope, this.function())}.
-		 * 
-		 * @see #function()
-		 * @see ReturnValue#valueOf(Scope, Function)
-		 */
-		@Override
-		public ReturnValue execute(final Scope scope) {
-			return new ReturnValue(scope, this.function);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine Funktion zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen mit Hilfe eines {@link ScriptTracerHelper}s und
-	 * {@link ScriptTracer}s. Die genaue Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
-	 * <p>
-	 * Hierbei werden zuerst ein {@link ScriptTracer} mit dem gegebenen Ausführungskontext sowie der {@link #function() aufzurufenden Funktion} erzeugt und die
-	 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen. Anschließend werden die Funktion {@link ScriptTracer#function} mit dem
-	 * Ausführungskontext {@link ScriptTracer#scope} ausgewertet und das Ergebnis auf {@link ScriptTracer#result} respeichert. Abschließend werden dann
-	 * {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen und der Ergebniswert von {@link ScriptTracer#result} zurück gegeben. Wenn eine
-	 * {@link RuntimeException} auftritt, werden diese auf {@link ScriptTracer#exception} gespeichert, {@link ScriptTracerHelper#onThrow(ScriptTracer)} aufgerufen
-	 * und die {@link RuntimeException} von {@link ScriptTracer#exception} ausgelöst.
+	 * Diese Klasse implementiert eine Funktion zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen mit Hilfe eines {@link ScriptTracer}. Die genaue
+	 * Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ScriptTracer
@@ -252,7 +238,7 @@ public final class Functions {
 		{}
 
 		/**
-		 * Diese Methode gibt den {@link ScriptTracer} zurück.
+		 * Diese Methode gibt den {@link ScriptTracer} zurück, dessen Zustand in {@link #execute(Scope)} modifiziert wird.
 		 * 
 		 * @return {@link ScriptTracer}.
 		 */
@@ -273,24 +259,37 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
+		 * <p>
+		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Ausführungskontext sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die
+		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
+		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getScope() aktuellen
+		 * Ausführungskontext} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#setResult(Value) gespeichert}.<br>
+		 * Abschließend werden dann {@link ScriptTracerHelper#onReturn(ScriptTracer) tracer().helper().onReturn(tracer())} aufgerufen und der
+		 * {@link ScriptTracer#getResult() aktuelle Ergebniswert} zurück gegeben.<br>
+		 * Wenn eine {@link RuntimeException} auftritt, wird diese im {@link #tracer()} {@link ScriptTracer#setException(RuntimeException) gespeichert}, wird
+		 * {@link ScriptTracerHelper#onThrow(ScriptTracer) tracer().helper().onThrow(tracer())} aufgerufen und die {@link ScriptTracer#getException() altuelle
+		 * Ausnahme} des {@link #tracer()} ausgelöst.<br>
+		 * In jedem Fall wird der Zustand des {@link #tracer()} beim Verlassen dieser Methode {@link ScriptTracer#clear() bereinigt}.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
 			final ScriptTracer tracer = this.tracer;
-			final ScriptTracerHelper helper = tracer.helper;
-			tracer.scope = scope;
-			tracer.function = this.function;
-			helper.onExecute(tracer);
+			final ScriptTracerHelper helper = tracer.getHelper();
 			try {
-				tracer.result = tracer.function.execute(tracer.scope);
-				tracer.exception = null;
-				helper.onReturn(tracer);
-				return tracer.result;
-			} catch (final RuntimeException exception) {
-				tracer.result = null;
-				tracer.exception = exception;
-				helper.onThrow(tracer);
-				throw tracer.exception;
+				tracer.useScope(scope);
+				tracer.useFunction(this.function);
+				helper.onExecute(tracer);
+				try {
+					tracer.setResult(tracer.getFunction().execute(tracer.getScope()));
+					helper.onReturn(tracer);
+					return tracer.getResult();
+				} catch (final RuntimeException exception) {
+					tracer.setException(exception);
+					helper.onThrow(tracer);
+					throw tracer.getException();
+				}
+			} finally {
+				tracer.clear();
 			}
 		}
 
@@ -305,36 +304,12 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion mit konstantem Ergebniswert.
+	 * Diese Klasse implementiert eine Funktion, welche immer den gleichen gegebenen Ergebniswert liefert.
 	 * 
+	 * @see #execute(Scope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see ValueFunction#execute(Scope)
 	 */
 	public static final class ValueFunction extends BaseFunction {
-
-		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
-		 * 
-		 * @see #valueOf(Value)
-		 * @param data Ergebniswert.
-		 * @return {@link ValueFunction}.
-		 */
-		public static ValueFunction valueOf(final Value data) {
-			return new ValueFunction(data);
-		}
-
-		/**
-		 * Diese Methode erzeugt eine Funktion mit konstantem Ergebniswert und gibt diese zurück.
-		 * 
-		 * @see Values#valueOf(Object)
-		 * @param data Nutzdaten des Ergebniswerts oder {@code null}.
-		 * @return {@link ValueFunction}.
-		 */
-		public static ValueFunction valueOf(final Object data) {
-			return ValueFunction.valueOf(Values.valueOf(data));
-		}
-
-		{}
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
@@ -386,8 +361,8 @@ public final class Functions {
 	/**
 	 * Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte des Ausführungskontexts entspricht.
 	 * 
+	 * @see #execute(Scope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see ParamFunction#execute(Scope)
 	 */
 	public static final class ParamFunction extends BaseFunction {
 
@@ -400,14 +375,14 @@ public final class Functions {
 		{}
 
 		/**
-		 * Diese Methode erzeugt eine eine projizierende Funktion, deren Ergebniswert dem {@code index}-ten Parameterwert des Ausführungskontexts entspricht, und
-		 * gibt diese zurück.
+		 * Diese Methode gibt eine Funktion zurück, welche den {@code index}-ten Parameterwert des Ausführungskontexts als Ergebniswert liefert.
 		 * 
 		 * @param index Index des Parameterwerts.
 		 * @return {@link ParamFunction}.
-		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
+		 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist.
 		 */
 		public static ParamFunction valueOf(final int index) throws IndexOutOfBoundsException {
+			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if (index < ParamFunction.INSTANCES.length) return ParamFunction.INSTANCES[index];
 			return new ParamFunction(index);
 		}
@@ -423,10 +398,10 @@ public final class Functions {
 		 * Dieser Konstruktor initialisiert den Index des Parameterwerts.
 		 * 
 		 * @param index Index des Parameterwerts.
-		 * @throws IndexOutOfBoundsException Wenn der gegebene Index negativ ist.
+		 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist.
 		 */
 		public ParamFunction(final int index) throws IndexOutOfBoundsException {
-			if (index < 0) throw new IndexOutOfBoundsException();
+			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 			this.index = index;
 		}
 
@@ -467,47 +442,17 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse definiert eine komponierte Funktion, die den Aufruf einer gegebenen Funktion mit den Ergebniswerten mehrerer gegebener Parameterfunktionen
-	 * berechnet.
+	 * Diese Klasse definiert eine Funktion, die den Aufruf einer gegebenen Funktion mit den Ergebniswerten mehrerer gegebener Parameterfunktionen berechnet.
 	 * 
+	 * @see #execute(Scope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @see InvokeFunction#execute(Scope)
 	 */
 	public static final class InvokeFunction extends BaseFunction implements ScriptTracerInput {
 
 		/**
-		 * Diese Methode erzeugt eine Funktion, die den Aufruf der gegebenen Funktion mit den Ergebniswerten der gegebenen Parameterfunktionen berechnet, und gibt
-		 * diese zurück.
-		 * 
-		 * @param function aufzurufende Funktion.
-		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @return {@link InvokeFunction}.
-		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
+		 * Dieses Feld speichert {@code true}, wenn die Verkettung aktiviert ist.
 		 */
-		public static InvokeFunction valueOf(final Function function, final Function... functions) throws NullPointerException {
-			return new InvokeFunction(function, functions);
-		}
-
-		/**
-		 * Diese Methode erzeugt eine Funktion, die den Aufruf der gegebenen Funktion mit den Ergebniswerten der gegebenen Parameterfunktionen berechnet, und gibt
-		 * diese zurück.
-		 * 
-		 * @param function aufzurufende Funktion.
-		 * @param chained Verketung.
-		 * @param functions Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @return {@link InvokeFunction}.
-		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
-		 */
-		public static InvokeFunction valueOf(final Function function, final boolean chained, final Function... functions) throws NullPointerException {
-			return new InvokeFunction(function, chained, functions);
-		}
-
-		{}
-
-		/**
-		 * Dieses Feld speichert die Verkettung.
-		 */
-		final boolean chained;
+		final boolean direct;
 
 		/**
 		 * Dieses Feld speichert die aufzurufende Funktion.
@@ -520,28 +465,19 @@ public final class Functions {
 		final Function[] params;
 
 		/**
-		 * Dieser Konstruktor initialisiert die aufzurufende Funktion und die Parameterfunktionen.
-		 * 
-		 * @param function aufzurufende Funktion.
-		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
-		 */
-		public InvokeFunction(final Function function, final Function... params) throws NullPointerException {
-			this(function, false, params);
-		}
-
-		/**
 		 * Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verketung und die Parameterfunktionen.
 		 * 
 		 * @param function aufzurufende Funktion.
-		 * @param chained Verketung.
+		 * @param direct {@code true}, wenn die aufzurufende Funktion direkt mit den Ergebnissen der Parameterfunktionen ausgewertet werden soll, und {@code false},
+		 *        wenn die aufzurufende Funktion mit dem Ausführungskontext zu einer Funktion ausgewertet werden soll, welche dann mit den Ergebnissen der
+		 *        Parameterfunktionen ausgewertet werden soll.
 		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-		 * @throws NullPointerException Wenn {@code function} bzw. {@code functions} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist.
 		 */
-		public InvokeFunction(final Function function, final boolean chained, final Function... params) throws NullPointerException {
+		public InvokeFunction(final Function function, final boolean direct, final Function... params) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (params == null) throw new NullPointerException("params = null");
-			this.chained = chained;
+			this.direct = direct;
 			this.function = function;
 			this.params = params;
 		}
@@ -549,13 +485,15 @@ public final class Functions {
 		{}
 
 		/**
-		 * Diese Methode gibt die Verkettung zurück.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #function() aufzurufende Funktion} direkt mit den Ergebnissen der {@link #params()
+		 * Parameterfunktionen} aufgerufen wird. Andernfalls wird die {@link #function() aufzurufende Funktion} mit dem in {@link #execute(Scope)} gegebenen
+		 * Ausführungskontext zu einer Funktion ausgewertet, welche dann mit den Ergebnissen der {@link #params() Parameterfunktionen} aufgerufen wird.
 		 * 
 		 * @return Verkettung.
 		 * @see #execute(Scope)
 		 */
-		public boolean chained() {
-			return this.chained;
+		public boolean direct() {
+			return this.direct;
 		}
 
 		/**
@@ -578,44 +516,46 @@ public final class Functions {
 			return this.function;
 		}
 
-		/**
-		 * Diese Methode überführt die gegebenen, komponierte Funktion in eine neue komponierte Funktion, bei der jede Parameterfunktion in eine
-		 * {@link LazyFunction} konvertiert wurde, und gibt diese zurück.
-		 * 
-		 * @param function komponierte Funktion.
-		 * @return neue komponierte Funktion mit {@link LazyFunction}s als Parameterfunktionen.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 */
-		public static InvokeFunction applyTo(final InvokeFunction function) throws NullPointerException {
-			final Function[] functions = function.params.clone();
-			for (int i = 0, size = functions.length; i < size; i++) {
-				functions[i] = LazyFunction.valueOf(functions[i]);
-			}
-			return InvokeFunction.valueOf(function.function, function.chained, functions);
-		}
-
 		{}
 
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Wenn die {@link #chained() Verkettung} deaktiviert ist, ergibt sich dieser Ergebniswert aus dem Aufruf der {@link #function() aufzurufende Funktion} mit
-		 * den Parameterwerten, die sich aus der Auswertung der {@link #params() Parameterfunktionen} mit dem gegebenen Ausführungskontext ergeben. Ist die
-		 * {@link #chained() Verkettung} dagegen aktiviert, wird statt der {@link #function() aufzurufende Funktion} die Funktion verwendet, die bei der Auswertung
-		 * der {@link #function() aufzurufenden Funktion} mit dem gegebenen Ausführungskontext ermittelt wurde.<br>
-		 * <p>
 		 * Der Ergebniswert entspricht
-		 * {@code (this.chained() ? this.function().execute(scope).valueTo(FunctionValue.TYPE, scope.context()).data() : this.function()).execute(new CompositeScope(scope, this.functions()))}.
+		 * {@code (this.direct() ? this.function() : this.function().execute(scope).valueTo(FunctionValue.TYPE, scope.context()).data()).execute(Scope#invokeScope(scope, this.params()))}.
 		 * 
-		 * @see #chained()
-		 * @see #function()
+		 * @see #direct()
 		 * @see #params()
-		 * @see CompositeScope
+		 * @see #function()
+		 * @see Scope#invokeScope(Scope, Function...)
 		 */
 		@Override
-		public Value execute(final Scope scope) {
-			return (this.chained ? scope.context().cast(this.function.execute(scope), FunctionType.TYPE).data() : this.function).execute(Scope.invokeScope(scope,
-				this.params));
+		public Value execute(Scope scope) {
+			final Function function;
+			if (this.direct) {
+				function = this.function;
+			} else {
+				final Value value = this.function.execute(scope);
+				function = value.valueTo(FunctionValue.TYPE, scope.context()).data();
+			}
+			scope = Scope.invokeScope(scope, this.params);
+			final Value result = function.execute(scope);
+			return result;
+		}
+
+		/**
+		 * Diese Methode gibt eine zu dieser Funktion gleichwertige {@link InvokeFunction} zurück, bei welcher {@link #function()} und jede Parameterfunktion in
+		 * {@link #params()} in eine {@link LazyFunction} konvertiert wurde.
+		 * 
+		 * @see LazyFunction#valueOf(Function)
+		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link LazyFunction} sind.
+		 */
+		public InvokeFunction toLazy() {
+			final Function[] functions = this.params.clone();
+			for (int i = 0, size = functions.length; i < size; i++) {
+				functions[i] = LazyFunction.valueOf(functions[i]);
+			}
+			return new InvokeFunction(LazyFunction.valueOf(this.function), this.direct, functions);
 		}
 
 		/**
@@ -627,7 +567,7 @@ public final class Functions {
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = tracer.traceFunction(params[i]);
 			}
-			return new InvokeFunction(tracer.traceFunction(this.function), this.chained, params);
+			return new InvokeFunction(tracer.traceFunction(this.function), this.direct, params);
 		}
 
 		/**
@@ -641,28 +581,13 @@ public final class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion, die einen Ausführungskontext an eine gegebene Funktion binden kann.
+	 * Diese Klasse implementiert eine Funktion, welche die zusätzliche Parameterwerte eines Ausführungskontexts an eine gegebene Funktion bindet und diese
+	 * gebundene Funktion anschließend als {@link FunctionValue} liefert.
 	 * 
 	 * @see #execute(Scope)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ClosureFunction extends BaseFunction {
-
-		/**
-		 * Diese Methode konvertiert die gegebene Funktion in eine {@link ClosureFunction} und gibt diese zurück. Die {@link #execute(Scope)}-Methode der erzeugten
-		 * {@link ClosureFunction} {@link ClosureFunction#ClosureFunction(Scope, Function) bindet} den ihr übergebenen Ausführungskontext an die gegebene Funktion
-		 * und gibt die so erzeugte Funktion als {@link FunctionValue} zurück.
-		 * 
-		 * @see ClosureFunction#ClosureFunction(Function)
-		 * @param function auszuwertende Funktion.
-		 * @return {@link ClosureFunction}.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 */
-		public static ClosureFunction valueOf(final Function function) throws NullPointerException {
-			return new ClosureFunction(function);
-		}
-
-		{}
 
 		/**
 		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
@@ -675,11 +600,11 @@ public final class Functions {
 		final Function function;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Funktion. Die {@link #execute(Scope)}-Methode bindet den ihr übergebenen Ausführungskontext an die gegebene Funktion
-		 * und gibt die so erzeugte Funktion als {@link FunctionValue} zurück.
+		 * Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #execute(Scope)} die die zusätzliche Parameterwerte des Ausführungskontext gebunden
+		 * werden.
 		 * 
 		 * @see #execute(Scope)
-		 * @param function auszuwertende Funktion.
+		 * @param function zu bindende Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Function function) throws NullPointerException {
@@ -689,13 +614,13 @@ public final class Functions {
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert den gebundenen Ausführungskontext und die Funktion. Die {@link #execute(Scope)}-Methode delegiert die Parameterwerte des
-		 * ihr übergebenen Ausführungskontext zusammen mit den Parameterwerten des gebundenen Ausführungskontext als zusätzliche Parameterwerte an die gegebene
-		 * Funktion und gibt deren Ergebniswert zurück.
+		 * Dieser Konstruktor initialisiert den Ausführungskontext sowie die gebundene Funktion und sollte nur von {@link ClosureFunction#execute(Scope)} genutzt
+		 * werden. Die {@link #execute(Scope)}-Methode delegiert die zugesicherten Parameterwerte des ihr übergebenen Ausführungskontext zusammen mit den
+		 * zusätzlichen Parameterwerten des gebundenen Ausführungskontext an die gegebene Funktion und liefert deren Ergebniswert.
 		 * 
 		 * @see #execute(Scope)
-		 * @param scope gebundener Ausführungskontext.
-		 * @param function auszuwertende Funktion.
+		 * @param scope Ausführungskontext mit den zusätzlichen Parameterwerten.
+		 * @param function gebundene Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
 		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
@@ -734,14 +659,19 @@ public final class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Wenn diese Funktion über {@link #ClosureFunction(Function)} erzeugt wurde, entspricht der Ergebniswert
-		 * {@code new FunctionValue(new ClosureFunction(scope, this.function()))}. Wenn sie dagegen über {@link #ClosureFunction(Scope, Function)} erzeugt wurde,
-		 * entspricht der Ergebniswert {@code this.function().execute(new ValueScope(this.scope(), Array.valueOf(scope), false))}.
+		 * Wenn diese Funktion über {@link #ClosureFunction(Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
+		 * {@code new FunctionValue(new ClosureFunction(scope, this.function()))}. Damit wird der gegebene Ausführungskontext an die Funktion {@link #function()}
+		 * gebunden und als {@link FunctionValue} zurück gegeben.
+		 * <p>
+		 * Wenn sie dagegen über {@link #ClosureFunction(Scope, Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
+		 * {@code this.function().execute(Scope.valueScope(this.scope(), scope.toArray(), false))}. Damit werden die gebundene Funktion mit den zugesicherten
+		 * Parameterwerten des gegebenen sowie den zusätzlichen Parameterwerten des gebundenen Ausführungskontexts ausgewertet und der so ermittelte Ergebniswert
+		 * geliefert.
 		 */
 		@Override
 		public Value execute(final Scope scope) {
 			final Scope scope2 = this.scope;
-			if (scope2 == null) return FunctionValue.valueOf(new ClosureFunction(scope, this.function));
+			if (scope2 == null) return new FunctionValue(new ClosureFunction(scope, this.function));
 			return this.function.execute(Scope.valueScope(scope2, scope.toArray(), false));
 		}
 
@@ -758,13 +688,9 @@ public final class Functions {
 	{}
 
 	/**
-	 * Dieses Feld speichert die {@link CallFunction}.
-	 * <p>
-	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (function: FunctionValue, params: ArrayValue): Value}. Der Ergebniswert entspricht
-	 * {@code function(params[0], params[1], ...)}.
-	 * <p>
-	 * Der Ergebniswert entspricht dem Ergebnis der Funktion, die als erster Parameterwerte ({@link FunctionValue}) des gegebenen Ausführungskontexts gegeben ist
-	 * und mit den Werten im {@link ArrayValue} des zweiten Parameterwertes aufgerufen wird.
+	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FunctionValue, params: ArrayValue): Value}, deren Ergebniswert via
+	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als erster Parameterwerte des Ausführungskontexts gegeben Funktion mit
+	 * den im zweiten Parameterwert gegebenen Parametern.
 	 */
 	public static final Function CALL_FUNCTION = new BaseFunction() {
 
@@ -772,24 +698,22 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() !=2");
 			final Context context = scope.context();
-			return context.cast(scope.get(0), FunctionType.TYPE).data().execute(Scope.valueScope(scope, context.cast(scope.get(1), ArrayType.TYPE).data()));
+			final Function method = context.cast(scope.get(0), FunctionValue.TYPE).data();
+			final Scope params = Scope.valueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data());
+			return method.execute(params);
 		}
 
 		@Override
-		public String toString() {
-			return "CALL_FUNCTION";
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("CALL_FUNCTION");
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert die {@link ApplyFunction}.
-	 * <p>
-	 * Diese Klasse implementiert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, function: FunctionValue): Value}. Der Ergebniswert
-	 * entspricht {@code function(params1, ..., paramsN)}.
-	 * <p>
-	 * Der Ergebniswert entspricht dem der Funktion, die als letzter Parameterwert des gegebenen Ausführungskontexts gegeben ist und mit den davor liegenden
-	 * Parameterwerten aufgerufen wird.
+	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, method: FunctionValue): Value}, deren Ergebniswert via
+	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzter Parameterwert des Ausführungskontexts gegeben Funktion mit den
+	 * davor liegenden Parameterwerten.
 	 */
 	public static final Function APPLY_FUNCTION = new BaseFunction() {
 
@@ -797,12 +721,14 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			final int index = scope.size() - 1;
 			final Context context = scope.context();
-			return context.cast(scope.get(index), FunctionType.TYPE).data().execute(Scope.valueScope(scope, scope.toArray().section(0, index)));
+			final Function method = context.cast(scope.get(index), FunctionValue.TYPE).data();
+			final Scope params = Scope.valueScope(scope, scope.toArray().section(0, index));
+			return method.execute(params);
 		}
 
 		@Override
-		public String toString() {
-			return "APPLY_FUNCTION";
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("APPLY_FUNCTION");
 		}
 
 	};

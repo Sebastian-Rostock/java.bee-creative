@@ -294,59 +294,59 @@ public class Scripts {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class ScriptCompiler {
-	
+
 		/**
 		 * Dieses Feld speichert den aktuellen Bereich.
 		 */
 		private Range range = Range.EMPTY;
-	
+
 		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
 		 */
 		private ScriptCompilerHelper helper = ScriptCompilerHelper.DEFAULT;
-	
+
 		/**
 		 * Dieses Feld speichert den {@link Iterator} über die Bereiche von {@link #script()}.
 		 */
 		private Iterator<Range> iterator;
-	
+
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
 		private Script script = Script.EMPTY;
-	
+
 		/**
 		 * Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter.
 		 */
 		private final Map<String, ProxyFunction> proxies = new HashMap<>();
-	
+
 		/**
 		 * Dieses Feld speichert die Parameternamen.
 		 */
 		private LinkedList<String> params = new LinkedList<String>();
-	
+
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
 		 */
 		private boolean arrayEnabled = true;
-	
+
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Funktionszeigern.
 		 */
 		private boolean handlerEnabled = true;
-	
+
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Bindung des Ausführungskontexts.
 		 */
 		private boolean closureEnabled = true;
-	
+
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen.
 		 */
 		private boolean chainingEnabled = true;
-	
+
 		{}
-	
+
 		/**
 		 * Diese Methode beginnt die Kompilation und sollte nur in Verbindung mit {@link #stopCompiling()} verwendet werden.
 		 * 
@@ -357,7 +357,7 @@ public class Scripts {
 			this.iterator = this.script.iterator();
 			this.skip();
 		}
-	
+
 		/**
 		 * Diese Methode beendet die Kompilation und sollte nur in Verbindung mit {@link #startCompiling()} verwendet werden.
 		 */
@@ -365,7 +365,7 @@ public class Scripts {
 			this.proxies.clear();
 			this.iterator = null;
 		}
-	
+
 		/**
 		 * Diese Methode prüft den Kompilationsstatus.
 		 * 
@@ -374,7 +374,7 @@ public class Scripts {
 		protected final void checkIdling() throws IllegalStateException {
 			if (this.iterator != null) throw new IllegalStateException();
 		}
-	
+
 		/**
 		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#EMPTY} zurück.<br>
 		 * Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
@@ -385,7 +385,7 @@ public class Scripts {
 			if (!this.iterator.hasNext()) return this.range = Range.EMPTY;
 			return this.range = this.iterator.next();
 		}
-	
+
 		/**
 		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den ersten bedeutsamen Bereich oder {@link Range#EMPTY}
 		 * zurück. Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
@@ -397,7 +397,7 @@ public class Scripts {
 			for (int type = this.range.type; (type == '_') || (type == '/'); type = this.skip().type) {}
 			return this.range;
 		}
-	
+
 		/**
 		 * Diese Methode interpretiert die gegebene Zeichenkette als positive Zahl und gibt diese oder {@code -1} zurück.
 		 * 
@@ -414,7 +414,7 @@ public class Scripts {
 				return -1;
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} oder eine {@link Function} und gibt diesen zurück.
 		 * 
@@ -427,7 +427,7 @@ public class Scripts {
 			this.skip();
 			if (this.skipSpace().type == ']') {
 				this.skip();
-				return ArrayValue.valueOf(Array.EMPTY);
+				return new ArrayValue(Array.EMPTY);
 			}
 			boolean value = true;
 			for (final LinkedList<Function> array = new LinkedList<Function>(); true;) {
@@ -442,12 +442,12 @@ public class Scripts {
 					case ']': {
 						this.skip();
 						final int size = array.size();
-						if (!value) return InvokeFunction.valueOf(Functions.ARRAY_COPY_FUNCTION, false, array.toArray(new Function[size]));
+						if (!value) return new InvokeFunction(Functions.ARRAY_COPY_FUNCTION, true, array.toArray(new Function[size]));
 						final Value[] values = new Value[size];
 						for (int i = 0; i < size; i++) {
 							values[i] = array.get(i).execute(null);
 						}
-						return ArrayValue.valueOf(Array.valueOf(values));
+						return new ArrayValue(Array.valueOf(values));
 					}
 					default:
 						throw new ScriptException() //
@@ -455,7 +455,7 @@ public class Scripts {
 				}
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in einen {@link Value} und gibt diesen zurück.
 		 * 
@@ -468,7 +468,7 @@ public class Scripts {
 			throw new ScriptException() //
 				.setRange(this.range).setScript(this.script).setHint(" Wertliste erwartet.");
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
 		 * 
@@ -477,10 +477,10 @@ public class Scripts {
 		 */
 		protected Function doCompileArrayAsFunction() throws ScriptException {
 			final Object array = this.doCompileArray();
-			if (array instanceof Value) return ValueFunction.valueOf(array);
+			if (array instanceof Value) return new ValueFunction((Value)array);
 			return (Function)array;
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den beim aktuellen Bereich beginnende Wert und gibt diesen zurück.
 		 * 
@@ -505,7 +505,7 @@ public class Scripts {
 				case '{':
 					if (this.closureEnabled) throw new ScriptException() //
 						.setRange(this.range).setScript(this.script).setHint(" Ungebundene Funktion unzulässig.");
-					return FunctionValue.valueOf(this.doCompileScope());
+					return new FunctionValue(this.doCompileScope());
 				default:
 					try {
 						value = this.helper.compileValue(this, this.section());
@@ -521,7 +521,7 @@ public class Scripts {
 					return value;
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den aktuellen Bereich zu einen Funktions- oder Parameternamen und gibt diesen oder {@code null} zurück.
 		 * 
@@ -556,7 +556,7 @@ public class Scripts {
 			this.skip();
 			return name;
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
 		 * 
@@ -574,7 +574,7 @@ public class Scripts {
 			result.set(function);
 			return result;
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
 		 * 
@@ -614,7 +614,7 @@ public class Scripts {
 				}
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diese zurück.
 		 * 
@@ -623,7 +623,7 @@ public class Scripts {
 		 */
 		protected Function doCompileFunction() throws ScriptException {
 			Function function;
-			boolean chained = false;
+			boolean indirect = false;
 			switch (this.skipSpace().type) {
 				case '$': {
 					this.skip();
@@ -644,7 +644,7 @@ public class Scripts {
 				case '{': {
 					function = this.doCompileScope();
 					if (this.skipSpace().type != '(') return this.closureEnabled ? //
-						ClosureFunction.valueOf(function) : ValueFunction.valueOf(FunctionValue.valueOf(function));
+						new ClosureFunction(function) : new ValueFunction(new FunctionValue(function));
 					if (!this.chainingEnabled) throw new ScriptException() //
 						.setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
@@ -654,9 +654,9 @@ public class Scripts {
 				}
 				default: {
 					final Value value = this.doCompileValue();
-					if (!(value instanceof FunctionValue)) return ValueFunction.valueOf(value);
+					if (!(value instanceof FunctionValue)) return new ValueFunction(value);
 					if (this.skipSpace().type != '(') {
-						if (this.handlerEnabled) return ValueFunction.valueOf(value);
+						if (this.handlerEnabled) return new ValueFunction(value);
 						throw new ScriptException() //
 							.setRange(this.range).setScript(this.script).setHint(" Funktionsverweise sind nicht zulässig.");
 					}
@@ -664,14 +664,14 @@ public class Scripts {
 				}
 			}
 			do {
-				if (chained && !this.chainingEnabled) throw new ScriptException() //
+				if (indirect && !this.chainingEnabled) throw new ScriptException() //
 					.setRange(this.range).setScript(this.script).setHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				this.skipSpace();
 				for (final LinkedList<Function> functions = new LinkedList<Function>(); true;) {
 					if (this.range.type == ')') {
 						this.skip();
-						function = InvokeFunction.valueOf(function, chained, functions.toArray(new Function[functions.size()]));
+						function = new InvokeFunction(function, !indirect, functions.toArray(new Function[functions.size()]));
 						break;
 					}
 					functions.add(this.doCompileFunction());
@@ -684,11 +684,11 @@ public class Scripts {
 						case ')':
 					}
 				}
-				chained = true;
+				indirect = true;
 			} while (this.skipSpace().type == '(');
 			return function;
 		}
-	
+
 		/**
 		 * Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
 		 * 
@@ -702,7 +702,7 @@ public class Scripts {
 			this.proxies.put(name, result = new ProxyFunction(name));
 			return result;
 		}
-	
+
 		/**
 		 * Diese Methode gibt den aktuellen Bereich zurück.
 		 * 
@@ -711,7 +711,7 @@ public class Scripts {
 		public final Range range() {
 			return this.range;
 		}
-	
+
 		/**
 		 * Diese Methode gibt den zu kompilierenden Quelltext zurück.
 		 * 
@@ -720,7 +720,7 @@ public class Scripts {
 		public final Script script() {
 			return this.script;
 		}
-	
+
 		/**
 		 * Diese Methode gibt die genutzten Kompilationsmethoden zurück.
 		 * 
@@ -729,7 +729,7 @@ public class Scripts {
 		public final ScriptCompilerHelper helper() {
 			return this.helper;
 		}
-	
+
 		/**
 		 * Diese Methode gibt die Liste der aktellen Parameternamen zurück.
 		 * 
@@ -738,7 +738,7 @@ public class Scripts {
 		public final List<String> params() {
 			return Collections.unmodifiableList(this.params);
 		}
-	
+
 		/**
 		 * Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
 		 * 
@@ -748,7 +748,7 @@ public class Scripts {
 		public final String section() {
 			return this.range.extract(this.script.source());
 		}
-	
+
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn Wertlisten zulässig sind (z.B. {@code [1;2]}).
 		 * 
@@ -758,7 +758,7 @@ public class Scripts {
 		public final boolean isArrayEnabled() {
 			return this.arrayEnabled;
 		}
-	
+
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(ScriptCompiler, String)} als {@link FunctionValue}
 		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
@@ -769,7 +769,7 @@ public class Scripts {
 		public final boolean isHandlerEnabled() {
 			return this.handlerEnabled;
 		}
-	
+
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link ClosureFunction}s kompiliert werden.
 		 * 
@@ -779,7 +779,7 @@ public class Scripts {
 		public final boolean isClosureEnabled() {
 			return this.closureEnabled;
 		}
-	
+
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die Verkettung von Funktionen zulässig ist, d.h. ob die Funktion, die von einem Funktionsaufruf
 		 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
@@ -792,7 +792,7 @@ public class Scripts {
 		public final boolean isChainingEnabled() {
 			return this.chainingEnabled;
 		}
-	
+
 		/**
 		 * Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
 		 * 
@@ -807,7 +807,7 @@ public class Scripts {
 			this.script = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die zu nutzenden Kompilationsmethoden und gibt {@code this} zurück.
 		 * 
@@ -822,7 +822,7 @@ public class Scripts {
 			this.helper = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
 		 * 
@@ -834,7 +834,7 @@ public class Scripts {
 		public ScriptCompiler useParams(final String... value) throws NullPointerException, IllegalStateException {
 			return this.useParams(Arrays.asList(value.clone()));
 		}
-	
+
 		/**
 		 * Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
 		 * 
@@ -849,7 +849,7 @@ public class Scripts {
 			this.params = new LinkedList<String>(value);
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die Zulässigkeit von Wertlisten.
 		 * 
@@ -863,7 +863,7 @@ public class Scripts {
 			this.arrayEnabled = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die Zulässigkeit von Funktionszeigern.
 		 * 
@@ -877,7 +877,7 @@ public class Scripts {
 			this.handlerEnabled = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die Zulässigkeit der Bindung des Ausführungskontexts.
 		 * 
@@ -891,7 +891,7 @@ public class Scripts {
 			this.closureEnabled = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode setzt die Zulässigkeit der Verkettung von Funktionen.
 		 * 
@@ -905,7 +905,7 @@ public class Scripts {
 			this.chainingEnabled = value;
 			return this;
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den Quelltext in einen Wert und gibt diesen zurück.
 		 * 
@@ -924,7 +924,7 @@ public class Scripts {
 				this.stopCompiling();
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Liste von Werten und gibt diese zurück. Die Werte müssen durch Bereiche vom Typ {@code ';'} separiert
 		 * sein.
@@ -950,7 +950,7 @@ public class Scripts {
 				this.stopCompiling();
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück. Die Parameterfunktion müssen durch Bereiche vom Typ
 		 * {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem {@link ScriptCompilerHelper#compileName(ScriptCompiler, String) Namen} und ist sonst
@@ -977,7 +977,7 @@ public class Scripts {
 				this.stopCompiling();
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Funktion und gibt diese zurück.
 		 * 
@@ -996,7 +996,7 @@ public class Scripts {
 				this.stopCompiling();
 			}
 		}
-	
+
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Liste von Funktionen und gibt diese zurück. Die Funktionen müssen durch Bereiche vom Typ {@code ';'}
 		 * separiert sein.
@@ -1022,7 +1022,7 @@ public class Scripts {
 				this.stopCompiling();
 			}
 		}
-	
+
 	}
 
 	/**
@@ -1032,24 +1032,24 @@ public class Scripts {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface ScriptCompilerHelper {
-	
+
 		/**
 		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden immer {@code null} liefern.
 		 */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
-	
+
 			@Override
 			public String compileName(final ScriptCompiler compiler, final String section) throws ScriptException {
 				return null;
 			}
-	
+
 			@Override
 			public Value compileValue(final ScriptCompiler compiler, final String section) throws ScriptException {
 				return null;
 			}
-	
+
 		};
-	
+
 		/**
 		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebenen Funktions- bzw. Parameternamen zurück.
 		 * 
@@ -1061,7 +1061,7 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Namen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
 		public String compileName(ScriptCompiler compiler, String section) throws ScriptException;
-	
+
 		/**
 		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue}
 		 * geliefert werden.
@@ -1075,7 +1075,7 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
 		public Value compileValue(ScriptCompiler compiler, String section) throws ScriptException;
-	
+
 	}
 
 	/**
@@ -1825,53 +1825,53 @@ public class Scripts {
 	 * @see TraceFunction
 	 */
 	public static final class ScriptTracer {
-	
+
 		/**
-		 * Dieses Feld speichert den Ausführungskontext der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den
-		 * Aufruf angepasst werden.
+		 * Dieses Feld speichert den Ausführungskontext der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
+		 * angepasst werden.
 		 */
 		Scope scope;
-	
+
 		/**
 		 * Dieses Feld speichert die Function, die nach {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen wird bzw. vor
-		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} oder {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen wurde. Diese kann in der
-		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf angepasst werden.
+		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} oder {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen wurde. Diese kann in der Methode
+		 * {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf angepasst werden.
 		 */
 		Function function;
-	
+
 		/**
 		 * Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode
 		 * {@link ScriptTracerHelper#onReturn(ScriptTracer)} angepasst werden.
 		 */
 		Value result;
-	
+
 		/**
 		 * Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} angepasst werden.
 		 */
 		RuntimeException exception;
-	
+
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
 		 */
 		ScriptTracerHelper helper = ScriptTracerHelper.DEFAULT;
-	
+
 		public Scope getScope() {
 			return this.scope;
 		}
-	
+
 		public Function getFunction() {
 			return this.function;
 		}
-	
+
 		public Value getResult() {
 			return this.result;
 		}
-	
+
 		public RuntimeException getException() {
 			return this.exception;
 		}
-	
+
 		/**
 		 * Diese Methode gibt den {@link ScriptTracerHelper} zurück.
 		 * 
@@ -1880,31 +1880,33 @@ public class Scripts {
 		public ScriptTracerHelper getHelper() {
 			return this.helper;
 		}
-	
+
 		public void useScope(final Scope scope) {
 			this.scope = scope;
 		}
-	
+
 		public void useFunction(final Function function) {
 			this.function = function;
 		}
-	
+
 		public void setResult(final Value result) {
 			this.result = result;
+			exception = null;
 		}
-	
+
 		public void setException(final RuntimeException exception) {
+			result = null;
 			this.exception = exception;
 		}
-	
+
 		public void setHelper(final ScriptTracerHelper helper) {
 			this.helper = helper;
 		}
-	
+
 		/**
-		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link ScriptTracerHelper} oder unverändert zurück. Sie sollte
-		 * zur rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von
-		 * {@link ScriptTracer#function} verwendet werden.
+		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link ScriptTracerHelper} oder unverändert zurück. Sie sollte zur
+		 * rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von {@link ScriptTracer#function}
+		 * verwendet werden.
 		 * <p>
 		 * Wenn die Funktion eine {@link InvokeFunction} ist, wird eine {@link InvokeFunction} zurück gegeben, deren Parameterfunktionen in eine
 		 * {@link TraceFunction} umgewandelt wurden. Wenn die Funktion eine {@link ValueFunction} ist und ihr Ergebniswert ein {@link FunctionValue} ist, wird diese
@@ -1919,23 +1921,23 @@ public class Scripts {
 		public Function traceFunction(final Function function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (function instanceof ScriptTracerInput) return ((ScriptTracerInput)function).toTrace(this);
-	
+
 			final Object clazz = function.getClass();
-	
+
 			if (clazz == ValueFunction.class) {
 				final ValueFunction function2 = (ValueFunction)function;
 				final Value value = function2.value;
-				if (value.getClass() == FunctionValue.class) return ValueFunction.valueOf(FunctionValue.valueOf(new TraceFunction(this, (Function)value.data())));
+				if (value.getClass() == FunctionValue.class) return new ValueFunction(new FunctionValue(new TraceFunction(this, (Function)value.data())));
 			} else if (clazz == ClosureFunction.class) {
 				final ClosureFunction function2 = (ClosureFunction)function;
-				if (function2.scope == null) return ClosureFunction.valueOf(new TraceFunction(this, function2.function));
+				if (function2.scope == null) return new ClosureFunction(new TraceFunction(this, function2.function));
 				return new ClosureFunction(function2.scope, new TraceFunction(this, function2.function));
 			}
 			return function;
 		}
-	
+
 		{}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -1943,11 +1945,18 @@ public class Scripts {
 		public String toString() {
 			return Objects.toFormatString(true, true, this, "scope", this.scope, "function", this.function, "result", this.result, "exception", this.exception);
 		}
-	
+
+		public void clear() {
+			scope = null;
+			function = null;
+			result = null;
+			exception = null;
+		}
+
 	}
 
 	public static interface ScriptTracerInput extends Function {
-	
+
 		/**
 		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} mit dem gegebenen {@link ScriptTracer} oder unverändert zurück. Sie sollte zur
 		 * rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von {@link ScriptTracer#function}
@@ -1963,7 +1972,7 @@ public class Scripts {
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
 		public Function toTrace(final ScriptTracer tracer) throws NullPointerException;
-	
+
 	}
 
 	/**
@@ -1974,23 +1983,23 @@ public class Scripts {
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface ScriptTracerHelper {
-	
+
 		public static final ScriptTracerHelper DEFAULT = new ScriptTracerHelper() {
-	
+
 			@Override
 			public void onThrow(final ScriptTracer event) {
 			}
-	
+
 			@Override
 			public void onReturn(final ScriptTracer event) {
 			}
-	
+
 			@Override
 			public void onExecute(final ScriptTracer event) {
 			}
-	
+
 		};
-	
+
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
 		 * {@link ScriptTracer#exception} kann hierbei angepasst werden.
@@ -1999,7 +2008,7 @@ public class Scripts {
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onThrow(ScriptTracer event);
-	
+
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
 		 * {@link ScriptTracer#result} kann hierbei angepasst werden.
@@ -2008,7 +2017,7 @@ public class Scripts {
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onReturn(ScriptTracer event);
-	
+
 		/**
 		 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link ScriptTracer#scope} und {@link ScriptTracer#function} können hierbei
 		 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Ausführungskontext durchzuführen.
@@ -2018,7 +2027,7 @@ public class Scripts {
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onExecute(ScriptTracer event);
-	
+
 	}
 
 	{}

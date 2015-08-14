@@ -1,13 +1,12 @@
 package bee.creative.function;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Values.ArrayValue;
-import bee.creative.function.Values.BooleanValue;
-import bee.creative.function.Values.NumberValue;
 import bee.creative.util.Comparables.Items;
+import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
@@ -15,7 +14,6 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus primitiven Arrays, {@link Collection}s
  * und {@link Scope}s.
  * 
- * @see ArrayValue
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public abstract class Array implements Items<Value>, Iterable<Value>, ScriptFormatterInput {
@@ -60,253 +58,6 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	{}
 
 	/**
-	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese oder {@code null} zurück. Wenn das gegebene Objekt {@link Class#isArray()
-	 * kein} oder ein unpassendes Array ist, wird {@code null} zurück gegeben.
-	 * 
-	 * @see Array#valueOf(int[])
-	 * @see Array#valueOf(long[])
-	 * @see Array#valueOf(byte[])
-	 * @see Array#valueOf(short[])
-	 * @see Array#valueOf(float[])
-	 * @see Array#valueOf(double[])
-	 * @see Array#valueOf(boolean[])
-	 * @see Array#valueOf(Value[])
-	 * @see Array#valueOf(Object[])
-	 * @param data Objekt.
-	 * @return Wertliste oder {@code null}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array from(final Object data) throws NullPointerException {
-		final Class<?> clazz = data.getClass();
-		if (!clazz.isArray()) return null;
-		if (clazz == int[].class) return Array.valueOf((int[])data);
-		if (clazz == long[].class) return Array.valueOf((long[])data);
-		if (clazz == byte[].class) return Array.valueOf((byte[])data);
-		if (clazz == char[].class) return null;
-		if (clazz == short[].class) return Array.valueOf((short[])data);
-		if (clazz == float[].class) return Array.valueOf((float[])data);
-		if (clazz == double[].class) return Array.valueOf((double[])data);
-		if (clazz == boolean[].class) return Array.valueOf((boolean[])data);
-		if (clazz == Value[].class) return Array.valueOf((Value[])data);
-		return Array.valueOf((Object[])data);
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Byte#valueOf(byte)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(byte[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final byte[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Byte.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Short#valueOf(short)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(short[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final short[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Short.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Integer#valueOf(int)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(int[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final int[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Integer.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Long#valueOf(long)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(long[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final long[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Long.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Float#valueOf(float)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(float[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final float[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Float.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Zahlenliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Double#valueOf(double)
-	 * @see NumberValue#NumberValue(Number)
-	 * @param data Zahlenliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(double[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final double[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return new NumberValue(Double.valueOf(values[index]));
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Wahrheitswertliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see BooleanValue#valueOf(boolean)
-	 * @param data Wahrheitswertliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(boolean[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final boolean[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return BooleanValue.valueOf(values[index]);
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-
-	}
-
-	/**
-	 * Diese Methode konvertiert die gegebene Objektliste in eine Wertliste und gibt diese zurück.
-	 * 
-	 * @see Values#valueOf(Object)
-	 * @param data Objektliste.
-	 * @return {@link Array}.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static Array valueOf(Object[] data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
-		final Object[] values = data = data.clone();
-		return new Array() {
-
-			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				return Values.valueOf(values[index]);
-			}
-
-			@Override
-			public int length() {
-				return values.length;
-			}
-
-		};
-	}
-
-	/**
 	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @param data Werte.
@@ -329,6 +80,20 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 			}
 
 		};
+	}
+
+	/**
+	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 * 
+	 * @see #valueOf(Value...)
+	 * @param data Werte.
+	 * @return {@link Array}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 */
+	public static Array valueOf(final Iterable<? extends Value> data) throws NullPointerException {
+		final ArrayList<Value> result = new ArrayList<>();
+		Iterables.appendAll(result, data);
+		return Array.valueOf(result);
 	}
 
 	/**

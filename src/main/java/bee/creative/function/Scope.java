@@ -3,13 +3,13 @@ package bee.creative.function;
 import java.util.Iterator;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Values.ReturnValue;
+import bee.creative.function.Values.LazyValue;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects.UseToString;
 
 /**
- * Diese Klasse implementiert einen abstrakten Ausführungskontext einer Funktion.<br>
+ * Diese Klasse implementiert den abstrakten Ausführungskontext einer Funktion.<br>
  * Ein Ausführungskontext stellt eine unveränderliche Liste von Parameterwerten sowie ein konstantes Kontextobjekt zur Verfügung. Über die {@link #size() Anzahl
  * der Parameterwerte} hinaus, können von der Methode {@link #get(int)} auch zusätzliche Parameterwerte eines übergeordneten Ausführungskontexts bereitgestellt
  * werden. Die Methode {@link #get(int)} muss für einen gegebenen Index immer den gleichen Wert liefern bzw. immer eine Ausnahme auslösen. Analoges gilt für die
@@ -22,14 +22,13 @@ import bee.creative.util.Objects.UseToString;
 public abstract class Scope implements Items<Value>, Iterable<Value>, UseToString, ScriptFormatterInput {
 
 	/**
-	 * Dieses Feld speichert den leeren Ausführungskontext, der keine Parameterwerte bereitstellt und als Kontextobjekt {@link Contexts#getDefaultContext()}
-	 * verwendet.
+	 * Dieses Feld speichert den leeren Ausführungskontext, der keine Parameterwerte bereitstellt und als Kontextobjekt {@link Context#DEFAULT} verwendet.
 	 */
 	public static final Scope EMPTY = new Scope() {
 
 		@Override
 		public Context context() {
-			return Contexts.defaultContext;
+			return Context.DEFAULT;
 		}
 
 	};
@@ -155,7 +154,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 						if (index >= length) throw new IndexOutOfBoundsException();
 						Value result = values[index];
 						if (result != null) return result;
-						result = new ReturnValue(scope, params[index]);
+						result = new LazyValue(scope, params[index]);
 						return values[index] = result;
 					}
 

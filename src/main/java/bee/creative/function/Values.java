@@ -1,15 +1,8 @@
 package bee.creative.function;
 
+import javax.lang.model.type.NullType;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Types.ArrayType;
-import bee.creative.function.Types.BooleanType;
-import bee.creative.function.Types.FunctionType;
-import bee.creative.function.Types.NullType;
-import bee.creative.function.Types.NumberType;
-import bee.creative.function.Types.ObjectType;
-import bee.creative.function.Types.StringType;
-import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 
 /**
@@ -32,7 +25,7 @@ public final class Values {
 		 */
 		@Override
 		public final <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return Contexts.defaultContext.cast(this, type);
+			return Context.DEFAULT.cast(this, type);
 		}
 
 		/**
@@ -140,21 +133,7 @@ public final class Values {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class ReturnValue extends BaseValue {
-
-		// /**
-		// * Diese Methode konvertiert den gegebenen Funktionsaufruf in einen {@link ReturnValue} und gibt diesen zurück.
-		// *
-		// * @param scope Ausführungskontext.
-		// * @param function auszuwertende Funktion.
-		// * @return {@link ReturnValue}.
-		// * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
-		// */
-		// public static ReturnValue valueOf(final Scope scope, final Function function) throws NullPointerException {
-		// return new ReturnValue(scope, function);
-		// }
-		//
-		// {}
+	public static final class LazyValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
@@ -184,7 +163,7 @@ public final class Values {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
-		public ReturnValue(final Scope scope, final Function function) throws NullPointerException {
+		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
 			if (scope == null) throw new NullPointerException("scope = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
@@ -272,18 +251,29 @@ public final class Values {
 		/**
 		 * Dieses Feld speichert den {@link NullValue}.
 		 */
-		public static final NullValue NULL = new NullValue();
+		public static final NullValue INSTANCE = new NullValue();
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 0;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<NullValue> TYPE = Type.simpleType(NullValue.TYPE_ID, "null");
 
 		{}
 
 		/**
-		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#NULL} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#NULL} geliefert.
+		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE}
+		 * geliefert.
 		 * 
 		 * @param value Wert oder {@code null}.
-		 * @return Wert oder {@link NullValue#NULL}.
+		 * @return Wert oder {@link NullValue#INSTANCE}.
 		 */
 		public static Value valueOf(final Value value) {
-			if (value == null) return NullValue.NULL;
+			if (value == null) return NullValue.INSTANCE;
 			return value;
 		}
 
@@ -293,8 +283,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NullType type() {
-			return NullType.TYPE;
+		public Type<?> type() {
+			return NullValue.TYPE;
 		}
 
 	}
@@ -302,10 +292,21 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert mit Wertlisten als Nutzdaten.
 	 * 
-	 * @see ArrayType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ArrayValue extends DataValue<Array> {
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 1;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<ArrayValue> TYPE = Type.simpleType(ArrayValue.TYPE_ID, "ARRAY");
+
+		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert den Datensatz.
@@ -323,8 +324,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ArrayType type() {
-			return ArrayType.TYPE;
+		public Type<?> type() {
+			return ArrayValue.TYPE;
 		}
 
 		/**
@@ -340,10 +341,21 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert mit beliebigen Objekten als Nutzdaten.
 	 * 
-	 * @see ObjectType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ObjectValue extends DataValue<Object> {
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 2;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<ObjectValue> TYPE = Type.simpleType(ObjectValue.TYPE_ID, "OBJECT");
+
+		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -361,8 +373,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public ObjectType type() {
-			return ObjectType.TYPE;
+		public Type<?> type() {
+			return ObjectValue.TYPE;
 		}
 
 	}
@@ -370,10 +382,21 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert für Funktionen als Nutzdaten.
 	 * 
-	 * @see FunctionType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class FunctionValue extends DataValue<Function> {
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 3;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<FunctionValue> TYPE = Type.simpleType(FunctionValue.TYPE_ID, "FUNCTION");
+
+		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -391,8 +414,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FunctionType type() {
-			return FunctionType.TYPE;
+		public Type<?> type() {
+			return FunctionValue.TYPE;
 		}
 
 		/**
@@ -408,10 +431,21 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert für {@link String} als Nutzdaten.
 	 * 
-	 * @see StringType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class StringValue extends DataValue<String> {
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 4;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<StringValue> TYPE = Type.simpleType(StringValue.TYPE_ID, "STRING");
+
+		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -429,8 +463,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public StringType type() {
-			return StringType.TYPE;
+		public Type<?> type() {
+			return StringValue.TYPE;
 		}
 
 	}
@@ -438,10 +472,21 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert für {@link Number} als Nutzdaten.
 	 * 
-	 * @see NumberType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class NumberValue extends DataValue<Number> {
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 5;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<NumberValue> TYPE = Type.simpleType(NumberValue.TYPE_ID, "NUMBER");
+
+		{}
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -459,8 +504,8 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public NumberType type() {
-			return NumberType.TYPE;
+		public Type<?> type() {
+			return NumberValue.TYPE;
 		}
 
 	}
@@ -468,7 +513,6 @@ public final class Values {
 	/**
 	 * Diese Klasse implementiert den Wert für {@link Boolean} als Nutzdaten.
 	 * 
-	 * @see BooleanType
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class BooleanValue extends DataValue<Boolean> {
@@ -482,6 +526,16 @@ public final class Values {
 		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#FALSE}.
 		 */
 		public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
+
+		/**
+		 * Dieses Feld speichert den Identifikator des Datentyps.
+		 */
+		public static final int TYPE_ID = 6;
+
+		/**
+		 * Dieses Feld speichert den Datentyp.
+		 */
+		public static final Type<BooleanValue> TYPE = Type.simpleType(BooleanValue.TYPE_ID, "BOOLEAN");
 
 		{}
 
@@ -524,84 +578,10 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public BooleanType type() {
-			return BooleanType.TYPE;
+		public Type<?> type() {
+			return BooleanValue.TYPE;
 		}
 
-	}
-
-	{}
-
-	/**
-	 * Dieses Feld speichert den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
-	 */
-	static Converter<? super Object, ? extends Value> defaultConverter;
-
-	{}
-
-	/**
-	 * Diese Methode konvertiert das gegebene Objekt in einen {@link Value Wert} und gibt diesen zurück.<br>
-	 * Abhängig vom Datentyp des gegebenen Objekts kann hierfür automatisch ein {@link ArrayValue}, {@link ObjectValue}, {@link FunctionValue},
-	 * {@link StringValue}, {@link NumberValue} oder {@link BooleanValue} verwendet werden.
-	 * <ul>
-	 * <li>Wenn der via {@link #setDefaultConverter(Converter)} registrierte {@link Converter} sowie das Ergebnis seiner {@link Converter#convert(Object)
-	 * Konvertierungsmethode} nicht {@code null} sind, wird dieses Ergebnis geliefert.</li>
-	 * <li>Wenn das Objekt {@code null} ist, wird {@link NullValue#NULL} geliefert.</li>
-	 * <li>Wenn das Objekt ein {@link Value} ist, wird dieser unverändert geliefert.</li>
-	 * <li>Wenn das Objekt ein {@link Array} ist, wird dieses als {@link ArrayValue} geliefert.</li>
-	 * <li>Wenn das Objekt ein {@link String} ist, wird dieser als {@link StringValue} geliefert.</li>
-	 * <li>Wenn das Objekt eine {@link Number} ist, wird dieser als {@link NumberValue} geliefert.</li>
-	 * <li>Wenn das Objekt ein {@link Boolean} ist, wird dieser als {@link BooleanValue} geliefert.</li>
-	 * <li>Wenn das Objekt eine {@link Function} ist, wird dieser als {@link FunctionValue} geliefert.</li>
-	 * <li>Wenn das Objekt ein Array ist, wird dieses als {@link ArrayValue} geliefert.</li>
-	 * <li>In allen anderen Fällen wird der Datensatz als {@link ObjectValue} geliefert.</li>
-	 * </ul>
-	 * 
-	 * @see Converter#convert(Object)
-	 * @see Array#from(Object)
-	 * @see ArrayValue#ArrayValue(Array)
-	 * @see StringValue#StringValue(String)
-	 * @see NumberValue#NumberValue(Number)
-	 * @see BooleanValue#valueOf(Boolean)
-	 * @see FunctionValue#FunctionValue(Function)
-	 * @see ObjectValue#valueOf(Object)
-	 * @param data Datensatz oder {@code null}.
-	 * @return {@link Value}.
-	 */
-	public static Value valueOf(final Object data) {
-		final Converter<? super Object, ? extends Value> converter = Values.defaultConverter;
-		if (converter != null) {
-			final Value value = converter.convert(data);
-			if (value != null) return value;
-		}
-		if (data == null) return NullValue.NULL;
-		if (data instanceof Value) return (Value)data;
-		if (data instanceof Array) return new ArrayValue((Array)data);
-		if (data instanceof String) return new StringValue((String)data);
-		if (data instanceof Number) return new NumberValue((Number)data);
-		if (data instanceof Boolean) return BooleanValue.valueOf((Boolean)data);
-		if (data instanceof Function) return new FunctionValue((Function)data);
-		final Array array = Array.from(data);
-		if (array != null) return new ArrayValue(array);
-		return new ObjectValue(data);
-	}
-
-	/**
-	 * Diese Methode gibt den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)} zurück.
-	 * 
-	 * @return {@code default}-{@link Converter} oder {@code null}.
-	 */
-	public static Converter<? super Object, ? extends Value> getDefaultConverter() {
-		return Values.defaultConverter;
-	}
-
-	/**
-	 * Diese Methode setzt den {@code default}-{@link Converter} zur Anpassung von {@link Values#valueOf(Object)}.
-	 * 
-	 * @param value {@code default}-{@link Converter} oder {@code null}.
-	 */
-	public static void setDefaultConverter(final Converter<? super Object, ? extends Value> value) {
-		Values.defaultConverter = value;
 	}
 
 }

@@ -9,6 +9,57 @@ package bee.creative.util;
 public class Translators {
 
 	/**
+	 * Diese Methode gibt einen {@link Translator} zurück, dessen Metoden an die gegebenen Objekte delegieren.<br>
+	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen
+	 * Klassen. Die Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen
+	 * Klassen sowie {@link Converter#convert(Object)} der gegebenen Konvertierungsmethode.
+	 * 
+	 * @param <GSource> Typ der Quellobjekte.
+	 * @param <GTarget> Typ der Zielobjekte.
+	 * @param sourceClass {@link Class} der Quellobjekte.
+	 * @param targetClass {@link Class} der Zielobjekte.
+	 * @param sourceConverter {@link Converter} zur übersetzung von Quellobjekten in Zielobjekte.
+	 * @param targetConverter {@link Converter} zur übersetzung von Zielobjekten in Quellobjekte.
+	 * @return {@link Translator}.
+	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceConverter} bzw. {@code targetConverter} {@code null} ist.
+	 */
+	public static <GSource, GTarget> Translator<GSource, GTarget> simpleTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
+		final Converter<GSource, GTarget> sourceConverter, final Converter<GTarget, GSource> targetConverter) throws NullPointerException {
+		if (sourceClass == null) throw new NullPointerException("sourceClass = null");
+		if (targetClass == null) throw new NullPointerException("targetClass = null");
+		if (sourceConverter == null) throw new NullPointerException("sourceConverter = null");
+		if (targetConverter == null) throw new NullPointerException("targetConverter = null");
+		return new Translator<GSource, GTarget>() {
+
+			@Override
+			public boolean isTarget(final Object object) {
+				return targetClass.isInstance(object);
+			}
+
+			@Override
+			public boolean isSource(final Object object) {
+				return sourceClass.isInstance(object);
+			}
+
+			@Override
+			public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
+				return sourceConverter.convert(sourceClass.cast(object));
+			}
+
+			@Override
+			public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
+				return targetConverter.convert(targetClass.cast(object));
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("defaultTranslator", sourceClass, targetClass, sourceConverter, targetConverter);
+			}
+
+		};
+	}
+
+	/**
 	 * Diese Methode gibt einen neutralen {@link Translator} zurück, dessen Quellobjekte gleich seinen Zielobjekten sind.<br>
 	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)}. Die Methoden
 	 * {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)}.
@@ -93,51 +144,47 @@ public class Translators {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Translator} zurück, dessen Metoden an die gegebenen Objekte delegieren.<br>
-	 * Die Methoden {@link Translator#isSource(Object)} und {@link Translator#isTarget(Object)} delegieren an {@link Class#isInstance(Object)} der gegebenen
-	 * Klassen. Die Methoden {@link Translator#toSource(Object)} und {@link Translator#toTarget(Object)} delegieren an {@link Class#cast(Object)} der gegebenen
-	 * Klassen sowie {@link Converter#convert(Object)} der gegebenen Konvertierungsmethode.
+	 * Diese Methode gibt einen verkettenden {@link Translator} zurück, der bei der Umwandlung von Quellobjekten über
+	 * {@code translator2.toTarget(translator1.toTarget(object))} in Zielobjekte sowie Zielobjekte über {@code translator1.toSource(translator2.toSource(object))}
+	 * in Quellobjekte überführt.
 	 * 
-	 * @param <GSource> Typ der Quellobjekte.
-	 * @param <GTarget> Typ der Zielobjekte.
-	 * @param sourceClass {@link Class} der Quellobjekte.
-	 * @param targetClass {@link Class} der Zielobjekte.
-	 * @param sourceConverter {@link Converter} zur übersetzung von Quellobjekten in Zielobjekte.
-	 * @param targetConverter {@link Converter} zur übersetzung von Zielobjekten in Quellobjekte.
-	 * @return {@link Translator}.
-	 * @throws NullPointerException Wenn {@code sourceClass}, {@code targetClass}, {@code sourceConverter} bzw. {@code targetConverter} {@code null} ist.
+	 * @param <GSource> Typ der Quellobjekte des erzeugten sowie des ersten {@link Translator}.
+	 * @param <GCenter> Typ der Zielobjekte des ersten sowie der Quellobjekte zweiten {@link Translator}.
+	 * @param <GTarget> Typ der Zielobjekte des erzeugten sowie des zweiten {@link Translator}.
+	 * @param translator1 erster {@link Translator}.
+	 * @param translator2 zweiter {@link Translator}.
+	 * @return {@code chained}-{@link Translator}.
+	 * @throws NullPointerException Wenn {@code translator1} bzw. {@code translator2} {@code null} ist.
 	 */
-	public static <GSource, GTarget> Translator<GSource, GTarget> defaultTranslator(final Class<GSource> sourceClass, final Class<GTarget> targetClass,
-		final Converter<GSource, GTarget> sourceConverter, final Converter<GTarget, GSource> targetConverter) throws NullPointerException {
-		if (sourceClass == null) throw new NullPointerException("sourceClass = null");
-		if (targetClass == null) throw new NullPointerException("targetClass = null");
-		if (sourceConverter == null) throw new NullPointerException("sourceConverter = null");
-		if (targetConverter == null) throw new NullPointerException("targetConverter = null");
+	public static <GSource, GCenter, GTarget> Translator<GSource, GTarget> chainedTranslator(final Translator<GSource, GCenter> translator1,
+		final Translator<GCenter, GTarget> translator2) throws NullPointerException {
+		if (translator1 == null) throw new NullPointerException("translator1 = null");
+		if (translator2 == null) throw new NullPointerException("translator2 = null");
 		return new Translator<GSource, GTarget>() {
 
 			@Override
 			public boolean isTarget(final Object object) {
-				return targetClass.isInstance(object);
+				return translator2.isTarget(object);
 			}
 
 			@Override
 			public boolean isSource(final Object object) {
-				return sourceClass.isInstance(object);
+				return translator1.isSource(object);
 			}
 
 			@Override
 			public GTarget toTarget(final Object object) throws ClassCastException, IllegalArgumentException {
-				return sourceConverter.convert(sourceClass.cast(object));
+				return translator2.toTarget(translator1.toTarget(object));
 			}
 
 			@Override
 			public GSource toSource(final Object object) throws ClassCastException, IllegalArgumentException {
-				return targetConverter.convert(targetClass.cast(object));
+				return translator1.toSource(translator2.toSource(object));
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("defaultTranslator", sourceClass, targetClass, sourceConverter, targetConverter);
+				return Objects.toInvokeString("chainedTranslator", translator1, translator2);
 			}
 
 		};
