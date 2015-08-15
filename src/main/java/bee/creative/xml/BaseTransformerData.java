@@ -263,7 +263,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		final Templates templates = this.templatesData.getTemplates();
 		final TransformerFactory factory = this.templatesData.factoryData.getFactory();
 		result = templates != null ? templates.newTransformer() : factory.newTransformer();
-		this.useTransformer(this.transformer);
+		this.useTransformer(result);
 		this.updateTransformer();
 		return result;
 	}

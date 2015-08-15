@@ -1,6 +1,5 @@
 package bee.creative.function;
 
-import javax.lang.model.type.NullType;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
@@ -27,7 +26,7 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final <GValue> GValue valueTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
+		public final <GValue> GValue dataTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
 			return Context.DEFAULT.cast(this, type);
 		}
 
@@ -35,7 +34,7 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final <GValue> GValue valueTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException,
+		public final <GValue> GValue dataTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException,
 			IllegalArgumentException {
 			return context.cast(this, type);
 		}
@@ -64,7 +63,7 @@ public final class Values {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put(this.data());
+			target.putData(this.data());
 		}
 
 		/**
@@ -122,8 +121,41 @@ public final class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public abstract Type<GData> type();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put(this.data);
+			target.putData(this.data);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link DataValue} als {@link ScriptTracerInput}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GData> Typ der Nutzdaten.
+	 */
+	public static abstract class TracerValue<GData> extends DataValue<GData> implements ScriptTracerInput {
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
+		 */
+		public TracerValue() {
+			super();
+		}
+
+		/**
+		 * Dieser Konstruktor initialisiert die Nutzdaten.
+		 * 
+		 * @param data Nutzdaten.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+		 */
+		public TracerValue(GData data) throws NullPointerException {
+			super(data);
 		}
 
 	}
@@ -136,7 +168,7 @@ public final class Values {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class LazyValue extends BaseValue {
+	public static final class VirtualValue extends BaseValue {
 
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
@@ -166,7 +198,7 @@ public final class Values {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
-		public LazyValue(final Scope scope, final Function function) throws NullPointerException {
+		public VirtualValue(final Scope scope, final Function function) throws NullPointerException {
 			if (scope == null) throw new NullPointerException("scope = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
@@ -237,362 +269,259 @@ public final class Values {
 			if (this.value != null) {
 				target.putValue(this.value);
 			} else {
-				target.putScope(this.function).putParams(this.scope);
+				target.putHandler(this.function).putScope(this.scope.toArray());
 			}
 		}
 
 	}
 
+	{}
+
 	/**
-	 * Diese Klasse implementiert den Wert zu {@code null}.
-	 * 
-	 * @see NullType
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * Dieses Feld speichert den {@link Value} zu {@code null}.
 	 */
-	public static final class NullValue extends DataValue<Object> {
+	public static final Value NULL = new DataValue<Object>() {
 
-		/**
-		 * Dieses Feld speichert den {@link NullValue}.
-		 */
-		public static final NullValue INSTANCE = new NullValue();
-
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 0;
-
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<NullValue> TYPE = Type.simpleType(NullValue.TYPE_ID, "null");
-
-		{}
-
-		/**
-		 * Diese Methode gibt den gegebenen Wert oder {@link NullValue#INSTANCE} zurück. Wenn die Eingabe {@code null} ist, wird {@link NullValue#INSTANCE}
-		 * geliefert.
-		 * 
-		 * @param value Wert oder {@code null}.
-		 * @return Wert oder {@link NullValue#INSTANCE}.
-		 */
-		public static Value valueOf(final Value value) {
-			if (value == null) return NullValue.INSTANCE;
-			return value;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public Type<?> type() {
-			return NullValue.TYPE;
+		public Type<Object> type() {
+			return Values.NULL_TYPE;
 		}
 
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Value} zu {@link Boolean#TRUE}.
+	 */
+	public static final DataValue<Boolean> TRUE = new DataValue<Boolean>(Boolean.TRUE) {
+
+		@Override
+		public Type<Boolean> type() {
+			return Values.BOOLEAN_TYPE;
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den {@link Value} zu {@link Boolean#FALSE}.
+	 */
+	public static final DataValue<Boolean> FALSE = new DataValue<Boolean>(Boolean.FALSE) {
+
+		@Override
+		public Type<Boolean> type() {
+			return Values.BOOLEAN_TYPE;
+		}
+
+	};
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #NULL_TYPE}.
+	 */
+	public static final int NULL_ID = 0;
+
+	/**
+	 * Dieses Feld speichert den Datentyp von {@link #NULL}.
+	 */
+	public static final Type<Object> NULL_TYPE = Type.simpleType(Values.NULL_ID, "null");
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #ARRAY_TYPE}.
+	 */
+	public static final int ARRAY_ID = 1;
+
+	/**
+	 * Dieses Feld speichert den Datentyp von {@link #arrayValue(Array)}.
+	 */
+	public static final Type<Array> ARRAY_TYPE = Type.simpleType(Values.ARRAY_ID, "ARRAY");
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #OBJECT_TYPE}.
+	 */
+	public static final int OBJECT_ID = 2;
+
+	/**
+	 * Dieses Feld speichert den Datentyp von {@link #objectValue(Object)}.
+	 */
+	public static final Type<Object> OBJECT_TYPE = Type.simpleType(Values.OBJECT_ID, "OBJECT");
+
+	/**
+	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 */
+	public static final int FUNCTION_ID = 3;
+
+	/**
+	 * Dieses Feld speichert den Datentyp.
+	 */
+	public static final Type<Function> FUNCTION_TYPE = Type.simpleType(Values.FUNCTION_ID, "FUNCTION");
+
+	/**
+	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 */
+	public static final int STRING_ID = 4;
+
+	/**
+	 * Dieses Feld speichert den Datentyp.
+	 */
+	public static final Type<String> STRING_TYPE = Type.simpleType(Values.STRING_ID, "STRING");
+
+	/**
+	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 */
+	public static final int NUMBER_ID = 5;
+
+	/**
+	 * Dieses Feld speichert den Datentyp.
+	 */
+	public static final Type<Number> NUMBER_TYPE = Type.simpleType(Values.NUMBER_ID, "NUMBER");
+
+	/**
+	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 */
+	public static final int BOOLEAN_ID = 6;
+
+	/**
+	 * Dieses Feld speichert den Datentyp.
+	 */
+	public static final Type<Boolean> BOOLEAN_TYPE = Type.simpleType(Values.BOOLEAN_ID, "BOOLEAN");
+
+	{}
+
+	/**
+	 * Diese Methode gibt den gegebenen Wert oder {@link Values#NULL} zurück.<br>
+	 * Wenn die Eingabe {@code null} ist, wird {@link Values#NULL} geliefert.
+	 * 
+	 * @param value Wert oder {@code null}.
+	 * @return Wert oder {@link Values#NULL}.
+	 */
+	public static Value nullValue(final Value value) {
+		if (value == null) return Values.NULL;
+		return value;
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert mit Wertlisten als Nutzdaten.
+	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Wertliste.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 * @return {@link Array}-{@link Value}.
 	 */
-	public static final class ArrayValue extends DataValue<Array> {
+	public static DataValue<Array> arrayValue(final Array data) throws NullPointerException {
+		return new DataValue<Array>(data) {
 
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 1;
+			@Override
+			public Type<Array> type() {
+				return Values.ARRAY_TYPE;
+			}
 
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<ArrayValue> TYPE = Type.simpleType(ArrayValue.TYPE_ID, "ARRAY");
+			@Override
+			public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+				target.putArray(this.data);
+			}
 
-		{}
-
-		/**
-		 * Dieser Konstruktor initialisiert den Datensatz.
-		 * 
-		 * @param data Datensatz.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public ArrayValue(final Array data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return ArrayValue.TYPE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putArray(this.data);
-		}
-
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert mit beliebigen Objekten als Nutzdaten.
+	 * Diese Methode gibt das gegebene Objekt als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Objekt.
+	 * @return {@link Object}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static final class ObjectValue extends DataValue<Object> {
+	public static DataValue<Object> objectValue(final Object data) throws NullPointerException {
+		return new DataValue<Object>(data) {
 
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 2;
+			@Override
+			public Type<Object> type() {
+				return Values.OBJECT_TYPE;
+			}
 
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<ObjectValue> TYPE = Type.simpleType(ObjectValue.TYPE_ID, "OBJECT");
-
-		{}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public ObjectValue(final Object data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return ObjectValue.TYPE;
-		}
-
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert für Funktionen als Nutzdaten.
+	 * Diese Methode gibt die gegebene Funktion als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Funktion.
+	 * @return {@link Function}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static final class FunctionValue extends DataValue<Function> implements ScriptTracerInput {
+	public static DataValue<Function> functionValue(final Function data) throws NullPointerException {
+		return new TracerValue<Function>(data) {
 
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 3;
+			@Override
+			public Type<Function> type() {
+				return Values.FUNCTION_TYPE;
+			}
 
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<FunctionValue> TYPE = Type.simpleType(FunctionValue.TYPE_ID, "FUNCTION");
+			@Override
+			public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+				return new ValueFunction(functionValue(tracer.trace(this.data)));
+			}
 
-		{}
+			@Override
+			public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+				target.putFunction(this.data);
+			}
 
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public FunctionValue(final Function data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return FunctionValue.TYPE;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
-			return new ValueFunction(new FunctionValue(tracer.trace(this.data)));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.data);
-		}
-
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert für {@link String} als Nutzdaten.
+	 * Diese Methode gibt die gegebene Zeichenkette als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Zeichenkette.
+	 * @return {@link String}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static final class StringValue extends DataValue<String> {
+	public static DataValue<String> stringValue(final String data) throws NullPointerException {
+		return new DataValue<String>(data) {
 
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 4;
+			@Override
+			public Type<String> type() {
+				return Values.STRING_TYPE;
+			}
 
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<StringValue> TYPE = Type.simpleType(StringValue.TYPE_ID, "STRING");
-
-		{}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public StringValue(final String data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return StringValue.TYPE;
-		}
-
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert für {@link Number} als Nutzdaten.
+	 * Diese Methode gibt den gegebene Zahlenwert als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Zahlenwert.
+	 * @return {@link Number}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static final class NumberValue extends DataValue<Number> {
+	public static DataValue<Number> numberValue(final Number data) throws NullPointerException {
+		return new DataValue<Number>(data) {
 
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 5;
+			@Override
+			public Type<Number> type() {
+				return Values.NUMBER_TYPE;
+			}
 
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<NumberValue> TYPE = Type.simpleType(NumberValue.TYPE_ID, "NUMBER");
-
-		{}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public NumberValue(final Number data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return NumberValue.TYPE;
-		}
-
+		};
 	}
 
 	/**
-	 * Diese Klasse implementiert den Wert für {@link Boolean} als Nutzdaten.
+	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link Value} zurück.
 	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param data Wahrheitswert.
+	 * @return {@link Boolean}-{@link Value}.
 	 */
-	public static final class BooleanValue extends DataValue<Boolean> {
+	public static DataValue<Boolean> booleanValue(final boolean data) {
+		return (data ? Values.TRUE : Values.FALSE);
+	}
 
-		/**
-		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#TRUE}.
-		 */
-		public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
-
-		/**
-		 * Dieses Feld speichert den {@link BooleanValue} für {@link Boolean#FALSE}.
-		 */
-		public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
-
-		/**
-		 * Dieses Feld speichert den Identifikator des Datentyps.
-		 */
-		public static final int TYPE_ID = 6;
-
-		/**
-		 * Dieses Feld speichert den Datentyp.
-		 */
-		public static final Type<BooleanValue> TYPE = Type.simpleType(BooleanValue.TYPE_ID, "BOOLEAN");
-
-		{}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Wahrheitswert in einen {@link BooleanValue} und gibt diesen zurück.
-		 * 
-		 * @param data Wahrheitswert.
-		 * @return {@link BooleanValue}.
-		 */
-		public static BooleanValue valueOf(final boolean data) {
-			return (data ? BooleanValue.TRUE : BooleanValue.FALSE);
-		}
-
-		/**
-		 * Diese Methode konvertiert den gegebenen Wahrheitswert in einen {@link BooleanValue} und gibt diesen zurück.
-		 * 
-		 * @param data Wahrheitswert.
-		 * @return {@link BooleanValue}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public static BooleanValue valueOf(final Boolean data) throws NullPointerException {
-			return BooleanValue.valueOf(data.booleanValue());
-		}
-
-		{}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public BooleanValue(final Boolean data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Type<?> type() {
-			return BooleanValue.TYPE;
-		}
-
+	/**
+	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link Value} zurück.
+	 * 
+	 * @param data Wahrheitswert.
+	 * @return {@link Boolean}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 */
+	public static DataValue<Boolean> booleanValue(final Boolean data) throws NullPointerException {
+		if (data == null) throw new NullPointerException("data = null");
+		return Values.booleanValue(data.booleanValue());
 	}
 
 }

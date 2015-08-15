@@ -10,42 +10,41 @@ package bee.creative.function;
 public abstract class Context {
 
 	/**
-	 * Dieses Feld speichert den leeren {@link Context}, dessen {@link #cast(Value, Type)}-Methode den ihr übergebenen Wert {@code value} unverändert zurück gibt,
-	 * wenn sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn {@code value.type().is(type)}, und welche sonst
-	 * eine {@link IllegalArgumentException} auslöst.
+	 * Dieses Feld speichert den leeren {@link Context}, dessen {@link #cast(Value, Type)}-Methode die Nutzdaten des ihr übergebenen Werts {@code value}
+	 * unverändert zurück gibt, wenn sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn
+	 * {@code value.type().is(type)}, und welche sonst eine {@link IllegalArgumentException} auslöst.
 	 */
 	public static final Context EMPTY = new Context() {
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public <GValue> GValue cast(final Value value, final Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
-			if (value.type().is(type)) return (GValue)value;
+		public <GData> GData cast(final Value value, final Type<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			if (value.type().is(type)) return (GData)value.data();
 			throw new IllegalArgumentException();
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert den {@code default}-{@link Context}, der in den Methoden {@link Value#valueTo(Type)} und {@link Type#valueOf(Value)} zur
-	 * kontextfreien Umwandlung von Werten verwendet wird. Wenn dieser {@code null} ist, lösen diese Methoden eine {@link NullPointerException} aus.
+	 * Dieses Feld speichert den {@code default}-{@link Context}, der in den Methoden {@link Value#dataTo(Type)} und {@link Type#dataOf(Value)} zur kontextfreien
+	 * Umwandlung von Werten verwendet wird. Wenn dieser {@code null} ist, lösen diese Methoden eine {@link NullPointerException} aus.
 	 */
 	public static Context DEFAULT = Context.EMPTY;
 
 	{}
 
 	/**
-	 * Diese Methode konvertiert den gegebenen Wert in einen Wert des gegebenen Datentyps und gibt ihn zurück.
+	 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) konvertierten {@link Value#data() Nutzdaten} des gegebenen Werts zurück.<br>
+	 * Hierbei werden die Nitzdaten {@link Value#data() value.data()} in den geforderten Datentyp konvertiert.
 	 * 
-	 * @see Type#valueOf(Value, Context)
-	 * @see Value#valueTo(Type, Context)
-	 * @param <GValue> Typ des Rückgabewerts.
+	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten des gegebenen Werts konvertiert werden.
 	 * @param value gegebener Wert.
 	 * @param type gegebener Datentyp.
-	 * @return konvertierter Wert.
+	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
+	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public abstract <GValue> GValue cast(Value value, Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public abstract <GData> GData cast(Value value, Type<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

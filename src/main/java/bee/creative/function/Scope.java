@@ -3,7 +3,7 @@ package bee.creative.function;
 import java.util.Iterator;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Values.LazyValue;
+import bee.creative.function.Values.VirtualValue;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects.UseToString;
@@ -154,7 +154,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 						if (index >= length) throw new IndexOutOfBoundsException();
 						Value result = values[index];
 						if (result != null) return result;
-						result = new LazyValue(scope, params[index]);
+						result = new VirtualValue(scope, params[index]);
 						return values[index] = result;
 					}
 
@@ -299,7 +299,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 */
 	@Override
 	public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-		target.putParams(this);
+		target.putScope(this.toArray());
 	}
 
 	/**

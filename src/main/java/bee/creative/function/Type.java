@@ -1,16 +1,69 @@
 package bee.creative.function;
 
+import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 
 /**
  * Diese Klasse implementiert den abstrakten Datentyp eines Werts, analog zur {@link Class} eines {@link Object}.<br>
- * Ein solcher Datentyp besitzt Methoden zum Konvertieren eines gegebenen Werts sowie zur Prüfung der Kompatibilität zu anderen Datentypen.
+ * Ein solcher Datentyp besitzt Methoden zum Konvertieren der Nutzdaten eines gegebenen Werts sowie zur Prüfung der Kompatibilität zu anderen Datentypen.
  * 
- * @see Value
+ * @see Value#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GValue> Typ des Werts, in welchen ein gegebener Wert via {@link #valueOf(Value)} oder {@link #valueOf(Value, Context)} konvertiert werden kann.
+ * @param <GData> Typ der von {@link #dataOf(Value)} bzw. {@link #dataOf(Value, Context)} gelieferten Nutzdaten.
  */
-public abstract class Type<GValue> {
+public abstract class Type<GData> {
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input)} in siene Ausgabe überführt.
+	 * 
+	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
+	 * @param type Datentyp.
+	 * @return {@code dataOf}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
+	 */
+	public static <GData> Converter<Value, GData> dataOf(final Type<? extends GData> type) throws NullPointerException {
+		if (type == null) throw new NullPointerException("type = null");
+		return new Converter<Value, GData>() {
+
+			@Override
+			public GData convert(final Value input) {
+				return type.dataOf(input);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("dataOf", type);
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input, context)} in siene Ausgabe überführt.
+	 * 
+	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
+	 * @param type Datentyp.
+	 * @param context Kontextobjekt.
+	 * @return {@code dataOf}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
+	 */
+	public static <GData> Converter<Value, GData> dataOf(final Type<? extends GData> type, final Context context) throws NullPointerException {
+		if (type == null) throw new NullPointerException("type = null");
+		if (context == null) throw new NullPointerException("context = null");
+		return new Converter<Value, GData>() {
+
+			@Override
+			public GData convert(final Value input) {
+				return type.dataOf(input, context);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("dataOf", type, context);
+			}
+
+		};
+	}
 
 	/**
 	 * Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
@@ -73,38 +126,34 @@ public abstract class Type<GValue> {
 	}
 
 	/**
-	 * Diese Methode konvertiert den gegebenen Wert kontextfrei in einen Wert dieses Datentyps und gibt ihn zurück.<br>
+	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code Context.DEFAULT.cast(value, this)}.
 	 * 
-	 * @see Type#id()
-	 * @see Value#type()
 	 * @see Context#DEFAULT
-	 * @see #valueOf(Value, Context)
+	 * @see Context#cast(Value, Type)
 	 * @param value gegebener Wert.
-	 * @return konvertierter Wert.
+	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code Context.DEFAUL} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
+	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GValue valueOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public final GData dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return Context.DEFAULT.cast(value, this);
 	}
 
 	/**
-	 * Diese Methode konvertiert den gegebenen Wert kontextsensitiv in einen Wert dieses Datentyps und gibt ihn zurück.<br>
+	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
 	 * 
-	 * @see Type#id()
-	 * @see Value#type()
 	 * @see Context#cast(Value, Type)
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
-	 * @return konvertierter Wert.
+	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der gegebene Wert nicht konvertiert werden kann.
+	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GValue valueOf(final Value value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public final GData dataOf(final Value value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return context.cast(value, this);
 	}
 

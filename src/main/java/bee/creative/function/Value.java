@@ -2,7 +2,7 @@ package bee.creative.function;
 
 /**
  * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer Funktion oder als Parameter in einem Ausführungskontext verwendet werden kann. Ein solcher
- * Wert besitzt dazu {@link Value#data() Nutzdaten}, einen {@link Value#type() Datentyp} und eine {@link #valueTo(Type) Konvertierungsmethode}.
+ * Wert besitzt dazu {@link Value#data() Nutzdaten}, einen {@link Value#type() Datentyp} und eine {@link #dataTo(Type) Konvertierungsmethode}.
  * 
  * @see Scope
  * @see Values
@@ -26,34 +26,33 @@ public interface Value {
 	public Object data();
 
 	/**
-	 * Diese Methode konvertiert diesen Wert kontextfrei in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
-	 * Der Rückgabewert entspricht {@code type.cast(this)}, d.h. {@code Context.DEFAULT.cast(this, type)}.
+	 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
+	 * Der Rückgabewert entspricht {@code Context.DEFAULT.cast(this, type)}.
 	 * 
-	 * @see Type#valueOf(Value)
+	 * @see Context#DEFAULT
 	 * @see Context#cast(Value, Type)
-	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
+	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 	 * @param type Datentyp.
-	 * @return konvertierter Wert.
-	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
+	 * @return Nutzdaten.
+	 * @throws NullPointerException Wenn {@code type} bzw. {@code Context.DEFAUL} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
+	 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 	 */
-	public <GValue> GValue valueTo(Type<GValue> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public <GData> GData dataTo(Type<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 	/**
-	 * Diese Methode konvertiert diesen Wert kontextsensitiv in einen Wert des gegebenen Datentyps und gibt diesen zurück.<br>
-	 * Der Rückgabewert entspricht {@code type.cast(this, context)}, d.h. {@code context.cast(this, type)}.
+	 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
+	 * Der Rückgabewert entspricht {@code context.cast(this, type)}.
 	 * 
-	 * @see Type#valueOf(Value, Context)
 	 * @see Context#cast(Value, Type)
-	 * @param <GValue> Typ des Werts, in welchen dieser Wert konvertiert wird.
+	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 	 * @param type Datentyp.
 	 * @param context Kontext.
-	 * @return konvertierter Wert.
+	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn der Datensatz nicht in den generische Datentyp des gegebenen {@link Type}{@code s} konvertiert werden kann.
+	 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 	 */
-	public <GValue> GValue valueTo(Type<GValue> type, Context context) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public <GData> GData dataTo(Type<GData> type, Context context) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 }

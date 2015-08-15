@@ -71,7 +71,7 @@ public class MMFArray extends IAMBaseArray {
 	 * Wenn die Bytereihenfolge {@code null} ist, wird die native Bytereihenfolge verwendet.
 	 * 
 	 * @param file Datei.
-	 * @param order Bytereihenfolge.
+	 * @param order Bytereihenfolge oder {@code null} für {@link ByteOrder#nativeOrder()}.
 	 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
 	 * @throws NullPointerException Wenn {@code file} {@code null} ist.
 	 */

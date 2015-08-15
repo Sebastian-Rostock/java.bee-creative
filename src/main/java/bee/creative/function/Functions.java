@@ -1,13 +1,12 @@
 package bee.creative.function;
 
+import java.util.Arrays;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
 import bee.creative.function.Scripts.ScriptTracer;
 import bee.creative.function.Scripts.ScriptTracerHelper;
 import bee.creative.function.Scripts.ScriptTracerInput;
-import bee.creative.function.Values.ArrayValue;
-import bee.creative.function.Values.FunctionValue;
-import bee.creative.function.Values.LazyValue;
+import bee.creative.function.Values.VirtualValue;
 
 /**
  * Diese Klasse implementiert Hilfsklassen und Hilfsmethoden zur Erzeugung von Funktionen.
@@ -33,7 +32,7 @@ public final class Functions {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put(this.toString());
+			target.put(this.getClass().getName());
 		}
 
 		/**
@@ -42,82 +41,6 @@ public final class Functions {
 		@Override
 		public String toString() {
 			return Scripts.scriptFormatter().formatFunction(this);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link LazyValue}.
-	 * 
-	 * @see LazyValue
-	 * @see #execute(Scope)
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class LazyFunction extends BaseFunction {
-
-		/**
-		 * Diese Methode gibt die gegebene Funktion als {@link LazyFunction} zurück. Wenn diese bereits eine {@link LazyFunction} ist, wird sie unverändert zurück
-		 * gegeben.
-		 * 
-		 * @param function Funktion.
-		 * @return {@link LazyFunction}.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 */
-		public static LazyFunction valueOf(final Function function) throws NullPointerException {
-			if (function instanceof LazyFunction) return (LazyFunction)function;
-			return new LazyFunction(function);
-		}
-
-		{}
-
-		/**
-		 * Dieses Feld speichert die auszuwertende Funktion.
-		 */
-		final Function function;
-
-		/**
-		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #execute(Scope)} zur Erzeugung eines {@link LazyValue} genutzt wird.
-		 * 
-		 * @param function auszuwertende Funktion.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 */
-		public LazyFunction(final Function function) throws NullPointerException {
-			if (function == null) throw new NullPointerException("function = null");
-			this.function = function;
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt die auszuwertende Funktion zurück.
-		 * 
-		 * @return auszuwertende Funktion.
-		 */
-		public Function function() {
-			return this.function;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 * <p>
-		 * Der Ergebniswert entspricht {@code new LazyValue(scope, this.function())}.
-		 * 
-		 * @see #function()
-		 * @see LazyValue#LazyValue(Scope, Function)
-		 */
-		@Override
-		public LazyValue execute(final Scope scope) {
-			return new LazyValue(scope, this.function);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function);
 		}
 
 	}
@@ -292,7 +215,7 @@ public final class Functions {
 
 		/**
 		 * {@inheritDoc}
-		*/
+		 */
 		@Override
 		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.tracer.equals(tracer)) return this;
@@ -369,6 +292,82 @@ public final class Functions {
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putValue(this.value);
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link VirtualValue}.
+	 * 
+	 * @see VirtualValue
+	 * @see #execute(Scope)
+	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class VirtualFunction extends BaseFunction {
+
+		/**
+		 * Diese Methode gibt die gegebene Funktion als {@link VirtualFunction} zurück. Wenn diese bereits eine {@link VirtualFunction} ist, wird sie unverändert
+		 * zurück gegeben.
+		 * 
+		 * @param function Funktion.
+		 * @return {@link VirtualFunction}.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public static VirtualFunction valueOf(final Function function) throws NullPointerException {
+			if (function instanceof VirtualFunction) return (VirtualFunction)function;
+			return new VirtualFunction(function);
+		}
+
+		{}
+
+		/**
+		 * Dieses Feld speichert die auszuwertende Funktion.
+		 */
+		final Function function;
+
+		/**
+		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #execute(Scope)} zur Erzeugung eines {@link VirtualValue} genutzt wird.
+		 * 
+		 * @param function auszuwertende Funktion.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public VirtualFunction(final Function function) throws NullPointerException {
+			if (function == null) throw new NullPointerException("function = null");
+			this.function = function;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt die auszuwertende Funktion zurück.
+		 * 
+		 * @return auszuwertende Funktion.
+		 */
+		public Function function() {
+			return this.function;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 * <p>
+		 * Der Ergebniswert entspricht {@code new LazyValue(scope, this.function())}.
+		 * 
+		 * @see #function()
+		 * @see VirtualValue#VirtualValue(Scope, Function)
+		 */
+		@Override
+		public VirtualValue execute(final Scope scope) {
+			return new VirtualValue(scope, this.function);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.putFunction(this.function);
 		}
 
 	}
@@ -537,7 +536,7 @@ public final class Functions {
 		 * {@inheritDoc}
 		 * <p>
 		 * Der Ergebniswert entspricht
-		 * {@code (this.direct() ? this.function() : this.function().execute(scope).valueTo(FunctionValue.TYPE, scope.context()).data()).execute(Scope#invokeScope(scope, this.params()))}.
+		 * {@code (this.direct() ? this.function() : this.function().execute(scope).valueTo(FunctionValue.TYPE, scope.context())).execute(Scope#invokeScope(scope, this.params()))}.
 		 * 
 		 * @see #direct()
 		 * @see #params()
@@ -551,7 +550,7 @@ public final class Functions {
 				function = this.function;
 			} else {
 				final Value value = this.function.execute(scope);
-				function = value.valueTo(FunctionValue.TYPE, scope.context()).data();
+				function = value.dataTo(Values.FUNCTION_TYPE, scope.context());
 			}
 			scope = Scope.invokeScope(scope, this.params);
 			final Value result = function.execute(scope);
@@ -560,17 +559,17 @@ public final class Functions {
 
 		/**
 		 * Diese Methode gibt eine zu dieser Funktion gleichwertige {@link InvokeFunction} zurück, bei welcher {@link #function()} und jede Parameterfunktion in
-		 * {@link #params()} in eine {@link LazyFunction} konvertiert wurde.
+		 * {@link #params()} in eine {@link VirtualFunction} konvertiert wurde.
 		 * 
-		 * @see LazyFunction#valueOf(Function)
-		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link LazyFunction} sind.
+		 * @see VirtualFunction#valueOf(Function)
+		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind.
 		 */
 		public InvokeFunction toLazy() {
 			final Function[] functions = this.params.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
-				functions[i] = LazyFunction.valueOf(functions[i]);
+				functions[i] = VirtualFunction.valueOf(functions[i]);
 			}
-			return new InvokeFunction(LazyFunction.valueOf(this.function), this.direct, functions);
+			return new InvokeFunction(VirtualFunction.valueOf(this.function), this.direct, functions);
 		}
 
 		/**
@@ -590,14 +589,14 @@ public final class Functions {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.function).putParams(this.params);
+			target.putFunction(this.function).putParams(Arrays.asList(this.params));
 		}
 
 	}
 
 	/**
 	 * Diese Klasse implementiert eine Funktion, welche die zusätzliche Parameterwerte eines Ausführungskontexts an eine gegebene Funktion bindet und diese
-	 * gebundene Funktion anschließend als {@link FunctionValue} liefert.
+	 * gebundene Funktion anschließend als {@link Values#functionValue(Function)} liefert.
 	 * 
 	 * @see #execute(Scope)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -676,7 +675,7 @@ public final class Functions {
 		 * <p>
 		 * Wenn diese Funktion über {@link #ClosureFunction(Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code new FunctionValue(new ClosureFunction(scope, this.function()))}. Damit wird der gegebene Ausführungskontext an die Funktion {@link #function()}
-		 * gebunden und als {@link FunctionValue} zurück gegeben.
+		 * gebunden und als {@link Values#functionValue(Function)} zurück gegeben.
 		 * <p>
 		 * Wenn sie dagegen über {@link #ClosureFunction(Scope, Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code this.function().execute(Scope.valueScope(this.scope(), scope.toArray(), false))}. Damit werden die gebundene Funktion mit den zugesicherten
@@ -686,7 +685,7 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			final Scope scope2 = this.scope;
-			if (scope2 == null) return new FunctionValue(new ClosureFunction(scope, this.function));
+			if (scope2 == null) return Values.functionValue(new ClosureFunction(scope, this.function));
 			return this.function.execute(Scope.valueScope(scope2, scope.toArray(), false));
 		}
 
@@ -704,7 +703,7 @@ public final class Functions {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putScope(this.function);
+			target.putHandler(this.function);
 		}
 
 	}
@@ -722,8 +721,8 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() !=2");
 			final Context context = scope.context();
-			final Function method = context.cast(scope.get(0), FunctionValue.TYPE).data();
-			final Scope params = Scope.valueScope(scope, context.cast(scope.get(1), ArrayValue.TYPE).data());
+			final Function method = context.cast(scope.get(0), Values.FUNCTION_TYPE);
+			final Scope params = Scope.valueScope(scope, context.cast(scope.get(1), Values.ARRAY_TYPE));
 			return method.execute(params);
 		}
 
@@ -745,7 +744,7 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			final int index = scope.size() - 1;
 			final Context context = scope.context();
-			final Function method = context.cast(scope.get(index), FunctionValue.TYPE).data();
+			final Function method = context.cast(scope.get(index), Values.FUNCTION_TYPE);
 			final Scope params = Scope.valueScope(scope, scope.toArray().section(0, index));
 			return method.execute(params);
 		}
@@ -768,7 +767,7 @@ public final class Functions {
 
 		@Override
 		public Value execute(final Scope scope) {
-			return new ArrayValue(Array.valueOf(scope.toArray().value()));
+			return Values.arrayValue(Array.valueOf(scope.toArray().value()));
 		}
 
 		@Override
@@ -788,7 +787,7 @@ public final class Functions {
 
 		@Override
 		public Value execute(final Scope scope) {
-			return new ArrayValue(scope.toArray());
+			return Values.arrayValue(scope.toArray());
 		}
 
 		@Override
