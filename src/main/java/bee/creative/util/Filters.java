@@ -16,7 +16,7 @@ import bee.creative.util.Pointers.SoftPointer;
 public class Filters {
 
 	/**
-	 * Dieses Feld speichert den {@link Filter}, der die {@code null}-Eingabe ablehnat und alle anderen Eingaben akzeptiert.
+	 * Dieses Feld speichert den {@link Filter}, der die {@code null}-Eingabe ablehnt und alle anderen Eingaben akzeptiert.
 	 */
 	public static final Filter<?> NULL_FILTER = new Filter<Object>() {
 

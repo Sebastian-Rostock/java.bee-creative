@@ -307,7 +307,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 */
 	@Override
 	public String toString() {
-		return new ScriptFormatter().format(this);
+		return new ScriptFormatter().formatData(this);
 	}
 
 }

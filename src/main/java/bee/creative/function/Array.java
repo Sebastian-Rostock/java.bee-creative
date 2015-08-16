@@ -310,7 +310,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 */
 	@Override
 	public String toString() {
-		return Scripts.scriptFormatter().format(this);
+		return Scripts.scriptFormatter().formatData(this);
 	}
 
 }

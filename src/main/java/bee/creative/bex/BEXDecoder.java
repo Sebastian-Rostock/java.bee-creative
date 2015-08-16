@@ -1,5 +1,6 @@
 package bee.creative.bex;
 
+import java.util.Arrays;
 import bee.creative.bex.BEX.BEXBaseFile;
 import bee.creative.bex.BEX.BEXBaseList;
 import bee.creative.bex.BEX.BEXBaseNode;
@@ -9,6 +10,9 @@ import bee.creative.iam.IAMDecoder.IAMListDecoder;
 import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
+import bee.creative.util.Filters;
+import bee.creative.util.Iterables;
+import bee.creative.util.Objects;
 
 /**
  * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link BEX} Datenstrukturen.
@@ -17,20 +21,74 @@ import bee.creative.util.Comparables.Items;
  */
 public class BEXDecoder {
 
-	// TODO Cache für MMFArray -> String, clear(), setEnable()
+	/**
+	 * Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListDecoder}
+	 * ermittelt werden.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static final class BEXTextCache implements Items<String> {
 
+		/**
+		 * Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden.
+		 */
 		protected final IAMListDecoder items;
 
+		/**
+		 * Dieses Feld puffert die Zeichenketten der Elemente.
+		 */
 		protected String[] cache;
 
+		/**
+		 * Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
+		 * 
+		 * @param items Elemente.
+		 */
 		BEXTextCache(final IAMListDecoder items) {
 			this.items = items;
-			this.setEnabled(true);
+			this.setEnabled(false);
 		}
 
 		/**
-		 * Diese Methode gibt die {@code index}-te Zeichenkette zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
+		 * Diese Methode gibt das {@code index}-te Element zurück.
+		 * 
+		 * @see IAMListDecoder#item(int)
+		 * @param index Index.
+		 * @return {@code index}-tes Element.
+		 */
+		public MMFArray item(final int index) {
+			return this.items.item(index);
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
+		 * Zeichenketten bei jedem Aufruf von {@link #get(int)} über {@link BEX#toString(MMFArray)} aud dem {@code index}-ten Element abgeleitet.
+		 * 
+		 * @see #get(int)
+		 * @return {@code true}, wenn die Pufferung aktiviert ist.
+		 */
+		public boolean getEnabled() {
+			return this.cache != null;
+		}
+
+		/**
+		 * Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
+		 * 
+		 * @see #get(int)
+		 * @param value {@code true}, wenn die Pufferung aktiviert ist.
+		 */
+		public void setEnabled(final boolean value) {
+			if (!value) {
+				this.cache = null;
+			} else if (this.cache == null) {
+				this.cache = new String[this.items.itemCount()];
+			}
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
 		 * 
 		 * @param index Index.
 		 * @return {@code index}-te Zeichenkette oder {@code ""}.
@@ -50,20 +108,12 @@ public class BEXDecoder {
 			}
 		}
 
-		public MMFArray item(final int i) {
-			return this.items.item(i);
-		}
-
-		public boolean getEnabled() {
-			return this.cache != null;
-		}
-
-		public void setEnabled(final boolean value) {
-			if (!value) {
-				this.cache = null;
-			} else if (this.cache == null) {
-				this.cache = new String[this.items.itemCount()];
-			}
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toString(Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this.cache)));
 		}
 
 	}
@@ -352,6 +402,60 @@ public class BEXDecoder {
 				}
 			}
 			return new BEXNodeDecoder(this);
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
+		 * 
+		 * @return Verwaltung der URI der Attributknoten.
+		 */
+		public BEXTextCache attrUriCache() {
+			return this.attrUriText;
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
+		 * 
+		 * @return Verwaltung der Namen der Attributknoten.
+		 */
+		public BEXTextCache attrNameCache() {
+			return this.attrNameText;
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
+		 * 
+		 * @return Verwaltung der Werte der Attributknoten.
+		 */
+		public BEXTextCache attrValueCache() {
+			return this.attrValueText;
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
+		 * 
+		 * @return Verwaltung der URI der Elementknoten.
+		 */
+		public BEXTextCache chldUriCache() {
+			return this.chldUriText;
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
+		 * 
+		 * @return Verwaltung der Namen der Elementknoten.
+		 */
+		public BEXTextCache chldNameCache() {
+			return this.chldNameText;
+		}
+
+		/**
+		 * Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
+		 * 
+		 * @return Verwaltung der Werte der Textknoten.
+		 */
+		public BEXTextCache chldValueCache() {
+			return this.chldValueText;
 		}
 
 	}

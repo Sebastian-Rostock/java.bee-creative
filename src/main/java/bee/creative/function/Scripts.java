@@ -15,6 +15,7 @@ import bee.creative.function.Functions.ProxyFunction;
 import bee.creative.function.Functions.TraceFunction;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Script.Range;
+import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
 
@@ -283,7 +284,7 @@ public class Scripts {
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
 	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link Functions#ARRAY_VIEW_FUNCTION}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileValue(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
-	 * als {@link FunctionValue}s angegeben.</li>
+	 * als {@link Values#functionValue(Function)}s angegeben.</li>
 	 * </ul>
 	 * 
 	 * @see #compileValue()
@@ -573,9 +574,10 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende, parametrisierte Funktion in einen {@link Values#functionValue(Function)} und gibt diesen
+		 * zurück.
 		 * 
-		 * @return Funktion als {@link FunctionValue}.
+		 * @return Funktion als {@link Values#functionValue(Function)}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
 		protected Function doCompileScope() throws ScriptException {
@@ -757,8 +759,9 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(ScriptCompiler, String)} als {@link FunctionValue}
-		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileValue(ScriptCompiler, String)} als
+		 * {@link Values#functionValue(Function)} gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B
+		 * {@code SORT(array; compFun)}).
 		 * 
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Funktionszeigern.
@@ -1060,15 +1063,15 @@ public class Scripts {
 		public String compileName(ScriptCompiler compiler, String section) throws ScriptException;
 
 		/**
-		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebenen Wert zurück. Funktionen müssen als {@link FunctionValue}
-		 * geliefert werden.
+		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebenen Wert zurück. Funktionen müssen als
+		 * {@link Values#functionValue(Function)} geliefert werden.
 		 * 
 		 * @see ScriptCompiler#proxy(String)
 		 * @see ScriptCompiler#range()
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
 		 * @param section aktuellen Bereich des Quelltexts ({@link ScriptCompiler#section()}).
-		 * @return Wert als {@link Value} oder Funktion als {@link FunctionValue}.
+		 * @return Wert als {@link Value} oder Funktion als {@link Values#functionValue(Function)}.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
 		public Value compileValue(ScriptCompiler compiler, String section) throws ScriptException;
@@ -1453,7 +1456,7 @@ public class Scripts {
 		 */
 		public ScriptFormatter putScope(final Iterable<? extends Value> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
-			checkFormatting();
+			this.checkFormatting();
 			final Iterator<? extends Value> iter = params.iterator();
 			if (iter.hasNext()) {
 				Value item = iter.next();
@@ -1465,7 +1468,7 @@ public class Scripts {
 						this.put(";").putBreakSpace().put("$").put(index).put(": ").putValue(item);
 						index++;
 					} while (iter.hasNext());
-					this.putBreakDec().put("]");
+					this.putBreakDec().put(")");
 				} else {
 					this.put("(").putBreakInc().put("$1: ").putValue(item).putBreakDec().put(")");
 				}
@@ -1494,8 +1497,7 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putParams(final Iterable<? extends Function> params) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
+		public ScriptFormatter putParams(final Iterable<? extends Function> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
 			this.checkFormatting();
 			final Iterator<? extends Function> iter = params.iterator();
@@ -1557,9 +1559,9 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück.
+		 * Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück. Diese ist {@code null}, wenn nicht eingerückt wird.
 		 * 
-		 * @return Zeichenkette zur Einrückung .
+		 * @return Zeichenkette zur Einrückung oder {@code null}.
 		 */
 		public String getIndent() {
 			return this.indent;
@@ -1575,15 +1577,14 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.
+		 * Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück. Wenn diese {@code null} ist, wird nicht
+		 * eingerückt.
 		 * 
-		 * @param indent Zeichenkette zur Einrückung (z.B. {@code "\t"} oder {@code "  "}).
+		 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		public ScriptFormatter useIndent(final String indent) throws NullPointerException, IllegalStateException {
-			if (indent == null) throw new NullPointerException("indent = null");
+		public ScriptFormatter useIndent(final String indent) throws IllegalStateException {
 			this.checkIdling();
 			this.indent = indent;
 			return this;
@@ -1619,7 +1620,7 @@ public class Scripts {
 				final Object item = items.get(i++);
 				if (item == Mark.DEFAULT) {
 					final Mark token = (Mark)items.get(i++);
-					if (token.isEnabled()) {
+					if (token.isEnabled() && (indent != null)) {
 						string.append('\n');
 						for (int count = token.level() - (token.isLast() ? 2 : 1); count > 0; count--) {
 							string.append(indent);
@@ -1635,20 +1636,39 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode formatiert das gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
-		 * Das Objekt wird über {@link #put(Object)} angefügt.
+		 * Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
+		 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
+		 * hierfür {@link #putData(Object)}, {@link #putValue(Value)} bzw. {@link #putFunction(Function)} aufgerufen werden.
 		 * 
-		 * @see #put(Object)
-		 * @param object Objekt.
+		 * @see #formatData(Iterable)
+		 * @see #formatValue(Iterable)
+		 * @see #formatFunction(Iterable)
+		 * @param <GItem> Typ der Elemente.
+		 * @param items Elemente.
+		 * @param formatter {@link Converter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code object} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann.
+		 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann.
 		 */
-		public String format(final Object object) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		private <GItem> String format(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
+			IllegalStateException, IllegalArgumentException {
 			this.startFormatting();
 			try {
-				this.put(object);
+				final Iterator<? extends GItem> iter = items.iterator();
+				if (!iter.hasNext()) return "";
+				GItem item = iter.next();
+				if (iter.hasNext()) {
+					this.putIndent();
+					formatter.convert(item);
+					do {
+						item = iter.next();
+						this.put(";").putBreakSpace();
+						formatter.convert(item);
+					} while (iter.hasNext());
+				} else {
+					formatter.convert(item);
+				}
 				return this.format();
 			} finally {
 				this.stopFormatting();
@@ -1656,30 +1676,95 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Werte werden über {@link #putValue(Value)} angefügt und mit {@code ';'} separiert.
+		 * Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatData(Arrays.asList(datas))}.
 		 * 
-		 * @see #putValue(Value)
-		 * @param values Wert.
+		 * @see #formatData(Iterable)
+		 * @param datas Objekte.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn {@code datas} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
+		 */
+		public String formatData(final Object... datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.formatData(Arrays.asList(datas));
+		}
+
+		/**
+		 * Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
+		 * Die Objekt werden über {@link #putData(Object)} angefügt und mit {@code ';'} separiert.
+		 * 
+		 * @see #putData(Object)
+		 * @param datas Objekte.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn {@code datas} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann.
+		 */
+		public String formatData(final Iterable<?> datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (datas == null) throw new NullPointerException("values = null");
+			return this.format(datas, new Converter<Object, Object>() {
+
+				@Override
+				public Object convert(final Object input) {
+					return ScriptFormatter.this.putData(input);
+				}
+
+			});
+		}
+
+		/**
+		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatValue(Arrays.asList(values))}.
+		 * 
+		 * @see #formatValue(Iterable)
+		 * @param values Werte.
 		 * @return formatierter Quelltext.
 		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
 		public String formatValue(final Value... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.formatValue(Arrays.asList(values));
+		}
+
+		/**
+		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
+		 * Die Werte werden über {@link #putValue(Value)} angefügt und mit {@code ';'} separiert.
+		 * 
+		 * @see #putValue(Value)
+		 * @param values Werte.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
+		 */
+		public String formatValue(final Iterable<? extends Value> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
-			this.startFormatting();
-			try {
-				final int length = values.length;
-				if (length == 0) return "";
-				(length == 1 ? this : this.putIndent()).putValue(values[0]);
-				for (int i = 1; i < length; i++) {
-					this.put(";").putBreakSpace().putValue(values[i]);
+			return this.format(values, new Converter<Value, Object>() {
+
+				@Override
+				public Object convert(final Value input) {
+					return ScriptFormatter.this.putValue(input);
 				}
-				return this.format();
-			} finally {
-				this.stopFormatting();
-			}
+
+			});
+		}
+
+		/**
+		 * Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatFunction(Arrays.asList(functions))}.
+		 * 
+		 * @see #formatFunction(Iterable)
+		 * @param functions Funktionen.
+		 * @return formatierter Quelltext.
+		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
+		 * @throws IllegalStateException Wenn aktuell formatiert wird.
+		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
+		 */
+		public String formatFunction(final Function... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (functions == null) throw new NullPointerException("functions = null");
+			return this.formatFunction(Arrays.asList(functions));
 		}
 
 		/**
@@ -1693,20 +1778,16 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
-		public String formatFunction(final Function... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public String formatFunction(final Iterable<? extends Function> functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
-			this.startFormatting();
-			try {
-				final int length = functions.length;
-				if (length == 0) return "";
-				(length == 1 ? this : this.putIndent()).putFunction(functions[0]);
-				for (int i = 1; i < length; i++) {
-					this.put(";").putBreakSpace().putFunction(functions[i]);
+			return this.format(functions, new Converter<Function, Object>() {
+
+				@Override
+				public Object convert(final Function input) {
+					return ScriptFormatter.this.putFunction(input);
 				}
-				return this.format();
-			} finally {
-				this.stopFormatting();
-			}
+
+			});
 		}
 
 	}

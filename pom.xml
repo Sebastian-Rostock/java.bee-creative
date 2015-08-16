@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>bee-creative</groupId>
 	<artifactId>bee-creative</artifactId>
-	<version>3.0.127</version>
+	<version>3.0.128</version>
 	<name>bee-creative</name> 
 	<description>Diese Bibliothek beinhaltet mehrere Hilfsklassen und Hilfsmethoden zur Realisirung funktionaler Operatoren auf Filtern, Iteratoren und Convertern im Zusammenhang mit anderen Schnittstellen.</description>
 	<licenses>

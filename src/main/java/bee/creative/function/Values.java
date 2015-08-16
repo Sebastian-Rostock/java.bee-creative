@@ -8,8 +8,8 @@ import bee.creative.function.Scripts.ScriptTracerInput;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Value}{@code []}, {@link Object}, {@link Function}, {@link String}, {@link Number} und
- * {@link Boolean}.
+ * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Array Wertlisten}, {@link Object Objekte}, {@link Function Funktionen}, {@link String
+ * Zeichenketten}, {@link Number Zahlen} und {@link Boolean Wahrheitswerte}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -154,7 +154,7 @@ public final class Values {
 		 * @param data Nutzdaten.
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 */
-		public TracerValue(GData data) throws NullPointerException {
+		public TracerValue(final GData data) throws NullPointerException {
 			super(data);
 		}
 
@@ -455,7 +455,7 @@ public final class Values {
 
 			@Override
 			public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
-				return new ValueFunction(functionValue(tracer.trace(this.data)));
+				return new ValueFunction(Values.functionValue(tracer.trace(this.data)));
 			}
 
 			@Override
