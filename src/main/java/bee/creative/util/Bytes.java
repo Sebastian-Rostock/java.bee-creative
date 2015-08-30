@@ -463,16 +463,16 @@ public final class Bytes {
 				return;
 			case 1:
 				Bytes.setInt1(array, index, value);
-				break;
+			break;
 			case 2:
 				Bytes.setInt2BE(array, index, value);
-				break;
+			break;
 			case 3:
 				Bytes.setInt3BE(array, index, value);
-				break;
+			break;
 			case 4:
 				Bytes.setInt4BE(array, index, value);
-				break;
+			break;
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -493,16 +493,16 @@ public final class Bytes {
 				return;
 			case 1:
 				Bytes.setInt1(array, index, value);
-				break;
+			break;
 			case 2:
 				Bytes.setInt2LE(array, index, value);
-				break;
+			break;
 			case 3:
 				Bytes.setInt3LE(array, index, value);
-				break;
+			break;
 			case 4:
 				Bytes.setInt4LE(array, index, value);
-				break;
+			break;
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -627,28 +627,28 @@ public final class Bytes {
 				return;
 			case 1:
 				Bytes.setInt1(array, index, (int)value);
-				break;
+			break;
 			case 2:
 				Bytes.setInt2BE(array, index, (int)value);
-				break;
+			break;
 			case 3:
 				Bytes.setInt3BE(array, index, (int)value);
-				break;
+			break;
 			case 4:
 				Bytes.setInt4BE(array, index, (int)value);
-				break;
+			break;
 			case 5:
 				Bytes.setLong5BE(array, index, value);
-				break;
+			break;
 			case 6:
 				Bytes.setLong6BE(array, index, value);
-				break;
+			break;
 			case 7:
 				Bytes.setLong7BE(array, index, value);
-				break;
+			break;
 			case 8:
 				Bytes.setLong8BE(array, index, value);
-				break;
+			break;
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -669,28 +669,28 @@ public final class Bytes {
 				return;
 			case 1:
 				Bytes.setInt1(array, index, (int)value);
-				break;
+			break;
 			case 2:
 				Bytes.setInt2LE(array, index, (int)value);
-				break;
+			break;
 			case 3:
 				Bytes.setInt3LE(array, index, (int)value);
-				break;
+			break;
 			case 4:
 				Bytes.setInt4LE(array, index, (int)value);
-				break;
+			break;
 			case 5:
 				Bytes.setLong5LE(array, index, value);
-				break;
+			break;
 			case 6:
 				Bytes.setLong6LE(array, index, value);
-				break;
+			break;
 			case 7:
 				Bytes.setLong7LE(array, index, value);
-				break;
+			break;
 			case 8:
 				Bytes.setLong8LE(array, index, value);
-				break;
+			break;
 			default:
 				throw new IllegalArgumentException();
 		}

@@ -122,8 +122,8 @@ public class Collections {
 			}
 
 			@Override
-			public boolean retainAll(final Collection<?> items) {
-				return items.retainAll(items);
+			public boolean retainAll(final Collection<?> items2) {
+				return items.retainAll(items2);
 			}
 
 			@Override
@@ -132,8 +132,8 @@ public class Collections {
 			}
 
 			@Override
-			public boolean removeAll(final Collection<?> items) {
-				return items.removeAll(items);
+			public boolean removeAll(final Collection<?> items2) {
+				return items.removeAll(items2);
 			}
 
 			@Override
@@ -169,8 +169,8 @@ public class Collections {
 			}
 
 			@Override
-			public boolean containsAll(final Collection<?> items) {
-				return items.containsAll(items);
+			public boolean containsAll(final Collection<?> items2) {
+				return items.containsAll(items2);
 			}
 
 			@Override

@@ -11,8 +11,7 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus primitiven Arrays, {@link Collection}s
- * und {@link Scope}s.
+ * Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -58,7 +57,46 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	{}
 
 	/**
-	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	 * Diese Methode konvertiert das gegebene native Array in eine Wertliste und gibt diese zurück.<br>
+	 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden. Die Elemente des
+	 * kopierten Arrays werden üver {@link Values#valueOf(Object)} bei jedem Zugriff via {@link #get(int)} in Werte überführt.
+	 * 
+	 * @see java.lang.reflect.Array#get(Object, int)
+	 * @see java.lang.reflect.Array#getLength(Object)
+	 * @see java.lang.reflect.Array#newInstance(Class, int)
+	 * @param data nativee Array.
+	 * @return {@link Array}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code data} {@link Class#isArray() kein Array ist}.
+	 */
+	public static Array from(Object data) throws NullPointerException, IllegalArgumentException {
+		if (data == null) throw new NullPointerException("data = null");
+		final int length = java.lang.reflect.Array.getLength(data);
+		if (length == 0) return Array.EMPTY;
+		final Object values = java.lang.reflect.Array.newInstance(data.getClass().getComponentType(), length);
+		System.arraycopy(data, 0, values, 0, length);
+		data = null;
+		return new Array() {
+
+			@Override
+			public Value get(final int index) throws IndexOutOfBoundsException {
+				if (index < 0) throw new IndexOutOfBoundsException("index < 0");
+				if (index >= length) throw new IndexOutOfBoundsException("index >= length");
+				final Object value = java.lang.reflect.Array.get(values, index);
+				return Values.valueOf(value);
+			}
+
+			@Override
+			public int length() {
+				return length;
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
+	 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
 	 * 
 	 * @param data Werte.
 	 * @return {@link Array}.
@@ -85,7 +123,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	/**
 	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
-	 * @see #valueOf(Value...)
+	 * @see #valueOf(Collection)
 	 * @param data Werte.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
@@ -99,6 +137,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	/**
 	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
+	 * @see Collection#toArray(Object[])
 	 * @see #valueOf(Value...)
 	 * @param data Werte.
 	 * @return {@link Array}.
@@ -310,7 +349,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 */
 	@Override
 	public String toString() {
-		return Scripts.scriptFormatter().formatData(this);
+		return Scripts.scriptFormatter().formatData((Object)this);
 	}
 
 }

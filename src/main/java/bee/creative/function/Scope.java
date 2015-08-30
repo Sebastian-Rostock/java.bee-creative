@@ -38,16 +38,16 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	/**
 	 * Diese Methode gibt einen neuen Ausführungskontexts zurück, welcher einer Funktion die gegebenen Parameterwerte sowie das Kontextobjekt des gegebenen
 	 * Ausführungskontexts zur Verfügung stellt.<br>
-	 * Sie ist eine Kurzform von {@code valueScope(scope, values, true)}.
+	 * Sie ist eine Abkürzung für {@code valueScope(scope, values, true)}.
 	 * 
-	 * @see #valueScope(Scope, Array, boolean)
+	 * @see #arrayScope(Scope, Array, boolean)
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param values zugesicherte Parameterwerte des erzeugten Ausführungskontexts.
 	 * @return {@code value}-{@link Scope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static Scope valueScope(final Scope scope, final Array values) throws NullPointerException {
-		return Scope.valueScope(scope, values, true);
+	public static Scope arrayScope(final Scope scope, final Array values) throws NullPointerException {
+		return Scope.arrayScope(scope, values, true);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * @return {@code value}-{@link Scope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static Scope valueScope(final Scope scope, final Array values, boolean replace) throws NullPointerException {
+	public static Scope arrayScope(final Scope scope, final Array values, boolean replace) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
 		if (values == null) throw new NullPointerException("values = null");
 		final int length = values.length();
@@ -107,7 +107,8 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * zur Wiederverwendung zwischengespeichert.<br>
 	 * Für einen {@code index >= size()} liefert die Methode {@link #get(int)} einen beliebigen Parameterwert von {@code scope}, d.h.
 	 * {@code scope.get(index - size())}. Für einen {@code index < size()} liefert die Methode {@link #get(int)} das Ergebnis von
-	 * {@code params[index].execute(scope)}.
+	 * {@code params[index].execute(scope)}.<br>
+	 * Die über {@link #toArray()} erzeugte Wertliste liefert für die noch nicht über {@link #get(int)} ermittelten Parameterwerte {@link VirtualValue}.
 	 * 
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param params Parameterfunktionen, deren Ergebniswerte als zugesicherte Parameterwerte genutzt werden.
@@ -124,13 +125,15 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 			public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 				final int length = values.length;
 				if (index >= length) return scope.get(index - length);
-				Value result = values[index];
-				if (result != null) return result;
-				final Function param = params[index];
-				if (param == null) throw new NullPointerException("params[index] = null");
-				result = param.execute(scope);
-				if (result == null) throw new NullPointerException("params[index].execute(scope) = null");
-				return values[index] = result;
+				synchronized (values) {
+					Value result = values[index];
+					if (result != null) return result;
+					final Function param = params[index];
+					if (param == null) throw new NullPointerException("params[index] = null");
+					result = param.execute(scope);
+					if (result == null) throw new NullPointerException("params[index].execute(scope) = null");
+					return values[index] = result;
+				}
 			}
 
 			@Override
@@ -152,10 +155,12 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 						if (index < 0) throw new IndexOutOfBoundsException();
 						final int length = values.length;
 						if (index >= length) throw new IndexOutOfBoundsException();
-						Value result = values[index];
-						if (result != null) return result;
-						result = new VirtualValue(scope, params[index]);
-						return values[index] = result;
+						synchronized (values) {
+							Value result = values[index];
+							if (result != null) return result;
+							result = new VirtualValue(scope, params[index]);
+							return values[index] = result;
+						}
 					}
 
 					@Override
@@ -307,7 +312,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 */
 	@Override
 	public String toString() {
-		return new ScriptFormatter().formatData(this);
+		return new ScriptFormatter().formatData((Object)this);
 	}
 
 }

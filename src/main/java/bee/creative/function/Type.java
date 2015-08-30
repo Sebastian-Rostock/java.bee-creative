@@ -130,7 +130,7 @@ public abstract class Type<GData> {
 	 * Der Rückgabewert entspricht {@code Context.DEFAULT.cast(value, this)}.
 	 * 
 	 * @see Context#DEFAULT
-	 * @see Context#cast(Value, Type)
+	 * @see Context#dataOf(Value, Type)
 	 * @param value gegebener Wert.
 	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code Context.DEFAUL} {@code null} ist.
@@ -138,14 +138,14 @@ public abstract class Type<GData> {
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
 	public final GData dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return Context.DEFAULT.cast(value, this);
+		return Context.DEFAULT.dataOf(value, this);
 	}
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
 	 * 
-	 * @see Context#cast(Value, Type)
+	 * @see Context#dataOf(Value, Type)
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
 	 * @return Nutzdaten.
@@ -154,7 +154,7 @@ public abstract class Type<GData> {
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
 	public final GData dataOf(final Value value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return context.cast(value, this);
+		return context.dataOf(value, this);
 	}
 
 	{}

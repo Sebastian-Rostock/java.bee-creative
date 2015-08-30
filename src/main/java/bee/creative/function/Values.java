@@ -1,10 +1,13 @@
 package bee.creative.function;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import bee.creative.function.Functions.ValueFunction;
 import bee.creative.function.Scripts.ScriptFormatter;
 import bee.creative.function.Scripts.ScriptFormatterInput;
 import bee.creative.function.Scripts.ScriptTracer;
 import bee.creative.function.Scripts.ScriptTracerInput;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /**
@@ -13,7 +16,7 @@ import bee.creative.util.Objects;
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Values {
+public class Values {
 
 	/**
 	 * Diese Klasse implementiert einen abstrakten Wert.
@@ -23,21 +26,41 @@ public final class Values {
 	public static abstract class BaseValue implements Value, ScriptFormatterInput {
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
+		 * Der Rückgabewert entspricht
+		 * 
+		 * @see Context#DEFAULT
+		 * @see Context#dataOf(Value, Type)
+		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
+		 * @param type Datentyp.
+		 * @return Nutzdaten.
+		 * @throws NullPointerException Wenn {@code type} bzw. {@code Context.DEFAUL} {@code null} ist.
+		 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
+		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
-		@Override
-		public final <GValue> GValue dataTo(final Type<GValue> type) throws NullPointerException, IllegalArgumentException {
-			return Context.DEFAULT.cast(this, type);
+		public final <GData> GData data(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+			return Context.DEFAULT.dataOf(this, type);
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
+		 * Der Rückgabewert entspricht {@code context.dataOf(this, type)}.
+		 * 
+		 * @see Context#dataOf(Value, Type)
+		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
+		 * @param type Datentyp.
+		 * @param context Kontext.
+		 * @return Nutzdaten.
+		 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
+		 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
+		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
-		@Override
-		public final <GValue> GValue dataTo(final Type<GValue> type, final Context context) throws NullPointerException, ClassCastException,
-			IllegalArgumentException {
-			return context.cast(this, type);
+
+		public final <GData> GData data(final Type<GData> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+			return context.dataOf(this, type);
 		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -214,7 +237,7 @@ public final class Values {
 		 * @return Ergebniswert.
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
-		public Value value() throws NullPointerException {
+		public synchronized Value value() throws NullPointerException {
 			Value result = this.value;
 			if (result != null) return result;
 			result = this.function.execute(this.scope);
@@ -344,46 +367,58 @@ public final class Values {
 	public static final Type<Object> OBJECT_TYPE = Type.simpleType(Values.OBJECT_ID, "OBJECT");
 
 	/**
-	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 * Dieses Feld speichert den Identifikator von {@link #FUNCTION_TYPE}.
 	 */
 	public static final int FUNCTION_ID = 3;
 
 	/**
-	 * Dieses Feld speichert den Datentyp.
+	 * Dieses Feld speichert den Datentyp von {@link #functionValue(Function)}.
 	 */
 	public static final Type<Function> FUNCTION_TYPE = Type.simpleType(Values.FUNCTION_ID, "FUNCTION");
 
 	/**
-	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 * Dieses Feld speichert den Identifikator von {@link #STRING_TYPE}.
 	 */
 	public static final int STRING_ID = 4;
 
 	/**
-	 * Dieses Feld speichert den Datentyp.
+	 * Dieses Feld speichert den Datentyp von {@link #stringValue(String)}.
 	 */
 	public static final Type<String> STRING_TYPE = Type.simpleType(Values.STRING_ID, "STRING");
 
 	/**
-	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 * Dieses Feld speichert den Identifikator von {@link #NUMBER_TYPE}.
 	 */
 	public static final int NUMBER_ID = 5;
 
 	/**
-	 * Dieses Feld speichert den Datentyp.
+	 * Dieses Feld speichert den Datentyp von {@link #numberValue(Number)}.
 	 */
 	public static final Type<Number> NUMBER_TYPE = Type.simpleType(Values.NUMBER_ID, "NUMBER");
 
 	/**
-	 * Dieses Feld speichert den Identifikator des Datentyps.
+	 * Dieses Feld speichert den Identifikator von {@link #BOOLEAN_TYPE}.
 	 */
 	public static final int BOOLEAN_ID = 6;
 
 	/**
-	 * Dieses Feld speichert den Datentyp.
+	 * Dieses Feld speichert den Datentyp von {@link #booleanValue(boolean)}.
 	 */
 	public static final Type<Boolean> BOOLEAN_TYPE = Type.simpleType(Values.BOOLEAN_ID, "BOOLEAN");
 
 	{}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code Context.DEFAULT.valueOf(data)}.
+	 * 
+	 * @see Context#valueOf(Object)
+	 * @param data Nutzdaten.
+	 * @return Wert mit den gegebenen Nutzdaten.
+	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
+	 */
+	public static Value valueOf(final Object data) throws IllegalArgumentException {
+		return Context.DEFAULT.valueOf(data);
+	}
 
 	/**
 	 * Diese Methode gibt den gegebenen Wert oder {@link Values#NULL} zurück.<br>
@@ -418,6 +453,37 @@ public final class Values {
 			}
 
 		};
+	}
+
+	/**
+	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
+	 * 
+	 * @see #arrayValue(Collection)
+	 * @param data Wertliste.
+	 * @return {@link Array}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 */
+	public static DataValue<Array> arrayValue(final Iterable<?> data) throws NullPointerException {
+		if (data == null) throw new NullPointerException("data = null");
+		final Collection<Object> result = new ArrayList<>();
+		Iterables.appendAll(result, data);
+		return Values.arrayValue(result);
+	}
+
+	/**
+	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
+	 * 
+	 * @see #arrayValue(Array)
+	 * @see Array#from(Object)
+	 * @see Collection#toArray()
+	 * @param data Wertliste.
+	 * @return {@link Array}-{@link Value}.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 */
+	public static DataValue<Array> arrayValue(final Collection<?> data) throws NullPointerException {
+		if (data == null) throw new NullPointerException("data = null");
+		if (data.size() == 0) return Values.arrayValue(Array.EMPTY);
+		return Values.arrayValue(Array.from(data.toArray()));
 	}
 
 	/**
@@ -479,6 +545,11 @@ public final class Values {
 			@Override
 			public Type<String> type() {
 				return Values.STRING_TYPE;
+			}
+
+			@Override
+			public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+				target.put("'").put(this.data.replaceAll("'", "''")).put("'");
 			}
 
 		};

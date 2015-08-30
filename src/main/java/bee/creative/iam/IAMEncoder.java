@@ -1241,7 +1241,7 @@ public class IAMEncoder {
 					case 3:
 						buffer.put((byte)0);
 				}
-				break;
+			break;
 			case 2:
 				for (int i = 0, length = values.length; i < length; i++) {
 					buffer.putShort((short)values[i]);
@@ -1249,12 +1249,12 @@ public class IAMEncoder {
 				if ((values.length & 1) == 1) {
 					buffer.putShort((short)0);
 				}
-				break;
+			break;
 			case 3:
 				for (int i = 0, length = values.length; i < length; i++) {
 					buffer.putInt(values[i]);
 				}
-				break;
+			break;
 		}
 	}
 
@@ -1331,8 +1331,11 @@ public class IAMEncoder {
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist.
 	 */
 	public static void write(final byte[][] source, final File target) throws IOException, NullPointerException {
-		try (RandomAccessFile file = new RandomAccessFile(target, "rw")) {
+		final RandomAccessFile file = new RandomAccessFile(target, "rw");
+		try {
 			IAMEncoder.write(source, file);
+		} finally {
+			file.close();
 		}
 	}
 

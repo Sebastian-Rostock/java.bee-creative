@@ -113,16 +113,16 @@ public class Objects {
 		switch (object.charValue()) {
 			case '\'':
 				result.append("\\\'");
-				break;
+			break;
 			case '\t':
 				result.append("\\t");
-				break;
+			break;
 			case '\n':
 				result.append("\\n");
-				break;
+			break;
 			case '\r':
 				result.append("\\r");
-				break;
+			break;
 			default:
 				result.append(object.charValue());
 		}
@@ -170,16 +170,16 @@ public class Objects {
 			switch (object.charAt(next)) {
 				case '\"':
 					result.append(object.subSequence(last + 1, last = next)).append("\\\"");
-					break;
+				break;
 				case '\t':
 					result.append(object.subSequence(last + 1, last = next)).append("\\t");
-					break;
+				break;
 				case '\n':
 					result.append(object.subSequence(last + 1, last = next)).append(space);
-					break;
+				break;
 				case '\r':
 					result.append(object.subSequence(last + 1, last = next)).append("\\r");
-					break;
+				break;
 			}
 			next++;
 		}

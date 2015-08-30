@@ -16,7 +16,7 @@ import bee.creative.function.Values.VirtualValue;
  * @see Function
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class Functions {
+public class Functions {
 
 	/**
 	 * Diese Klasse implementiert eine abstakte Funktion als {@link ScriptFormatterInput}.<br>
@@ -120,7 +120,12 @@ public final class Functions {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put(this.name);
+			final String name = this.name;
+			if ((name.indexOf('<') >= 0) || (name.indexOf('>') >= 0)) {
+				target.put("<").put(this.name.replaceAll("<", "<<").replaceAll(">", ">>")).put(">");
+			} else {
+				target.put(this.name);
+			}
 		}
 
 	}
@@ -550,7 +555,7 @@ public final class Functions {
 				function = this.function;
 			} else {
 				final Value value = this.function.execute(scope);
-				function = value.dataTo(Values.FUNCTION_TYPE, scope.context());
+				function = scope.context().dataOf(value, Values.FUNCTION_TYPE);
 			}
 			scope = Scope.invokeScope(scope, this.params);
 			final Value result = function.execute(scope);
@@ -686,7 +691,7 @@ public final class Functions {
 		public Value execute(final Scope scope) {
 			final Scope scope2 = this.scope;
 			if (scope2 == null) return Values.functionValue(new ClosureFunction(scope, this.function));
-			return this.function.execute(Scope.valueScope(scope2, scope.toArray(), false));
+			return this.function.execute(Scope.arrayScope(scope2, scope.toArray(), false));
 		}
 
 		/**
@@ -711,18 +716,18 @@ public final class Functions {
 	{}
 
 	/**
-	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FunctionValue, params: ArrayValue): Value}, deren Ergebniswert via
-	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als erster Parameterwerte des Ausführungskontexts gegeben Funktion mit
-	 * den im zweiten Parameterwert gegebenen Parametern.
+	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (method: Function, params: Array): Value}, deren Ergebniswert via
+	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameterwerte des Ausführungskontexts gegeben Funktion mit
+	 * den im zweiten Parameterwert gegebenen Parameterwertliste.
 	 */
 	public static final Function CALL_FUNCTION = new BaseFunction() {
 
 		@Override
 		public Value execute(final Scope scope) {
-			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() !=2");
+			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() != 2");
 			final Context context = scope.context();
-			final Function method = context.cast(scope.get(0), Values.FUNCTION_TYPE);
-			final Scope params = Scope.valueScope(scope, context.cast(scope.get(1), Values.ARRAY_TYPE));
+			final Function method = context.dataOf(scope.get(0), Values.FUNCTION_TYPE);
+			final Scope params = Scope.arrayScope(scope, context.dataOf(scope.get(1), Values.ARRAY_TYPE));
 			return method.execute(params);
 		}
 
@@ -734,8 +739,8 @@ public final class Functions {
 	};
 
 	/**
-	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, method: FunctionValue): Value}, deren Ergebniswert via
-	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzter Parameterwert des Ausführungskontexts gegeben Funktion mit den
+	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, method: Function): Value}, deren Ergebniswert via
+	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameterwert des Ausführungskontexts gegeben Funktion mit den
 	 * davor liegenden Parameterwerten.
 	 */
 	public static final Function APPLY_FUNCTION = new BaseFunction() {
@@ -743,9 +748,10 @@ public final class Functions {
 		@Override
 		public Value execute(final Scope scope) {
 			final int index = scope.size() - 1;
+			if (index < 0) throw new IllegalArgumentException("scope.size() < 1");
 			final Context context = scope.context();
-			final Function method = context.cast(scope.get(index), Values.FUNCTION_TYPE);
-			final Scope params = Scope.valueScope(scope, scope.toArray().section(0, index));
+			final Function method = context.dataOf(scope.get(index), Values.FUNCTION_TYPE);
+			final Scope params = Scope.arrayScope(scope, scope.toArray().section(0, index));
 			return method.execute(params);
 		}
 
@@ -758,7 +764,7 @@ public final class Functions {
 
 	/**
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte eines gegebenen Ausführungskontexts {@code scope} entspricht, d.h.
-	 * {@code Array.valueOf(scope#toArray().value())}.
+	 * {@code Array.valueOf(scope.toArray().value())}.
 	 * 
 	 * @see Array#valueOf(Value...)
 	 * @see Scope#toArray()
