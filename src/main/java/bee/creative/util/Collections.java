@@ -46,8 +46,8 @@ public class Collections {
 			}
 
 			@Override
-			public boolean contains(final Object o) {
-				return items1.contains(o) || items2.contains(o);
+			public boolean contains(final Object item) {
+				return items1.contains(item) || items2.contains(item);
 			}
 
 		};
@@ -81,8 +81,8 @@ public class Collections {
 			}
 
 			@Override
-			public boolean contains(final Object o) {
-				return items1.contains(o) && items2.contains(o);
+			public boolean contains(final Object item) {
+				return items1.contains(item) && items2.contains(item);
 			}
 
 		};
@@ -112,13 +112,13 @@ public class Collections {
 			}
 
 			@Override
-			public GItem set(final int index, final GItem item) {
-				return items.set(items.size() - index - 1, item);
+			public GItem set(final int index, final GItem item2) {
+				return items.set(items.size() - index - 1, item2);
 			}
 
 			@Override
-			public void add(final int index, final GItem item) {
-				items.add(items.size() - index, item);
+			public void add(final int index, final GItem item2) {
+				items.add(items.size() - index, item2);
 			}
 
 			@Override
@@ -152,20 +152,20 @@ public class Collections {
 			}
 
 			@Override
-			public int indexOf(final Object item) {
-				final int index = items.lastIndexOf(item);
+			public int indexOf(final Object item2) {
+				final int index = items.lastIndexOf(item2);
 				return index < 0 ? -1 : items.size() - index - 1;
 			}
 
 			@Override
-			public int lastIndexOf(final Object item) {
-				final int index = items.indexOf(item);
+			public int lastIndexOf(final Object item2) {
+				final int index = items.indexOf(item2);
 				return index < 0 ? -1 : items.size() - index - 1;
 			}
 
 			@Override
-			public boolean contains(final Object item) {
-				return items.contains(item);
+			public boolean contains(final Object item2) {
+				return items.contains(item2);
 			}
 
 			@Override
@@ -195,13 +195,13 @@ public class Collections {
 					}
 
 					@Override
-					public void set(final GItem item) {
-						iterator.set(item);
+					public void set(final GItem item2) {
+						iterator.set(item2);
 					}
 
 					@Override
-					public void add(final GItem item) {
-						iterator.add(item);
+					public void add(final GItem item2) {
+						iterator.add(item2);
 						iterator.hasPrevious();
 						iterator.previous();
 					}

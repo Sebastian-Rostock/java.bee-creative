@@ -7,7 +7,7 @@ import java.util.Comparator;
  * {@link #arrayLength()} mit dem Index des ersten Werts im Abschnitt ({@link #startIndex()}) sowie dem Index des ersten Werts nach dem Abschnitt (
  * {@link #finalIndex()}).
  * <p>
- * Die Methoden {@link #hashCode()}, {@link #equals(Object)} und {@link #toString()} reflektieren die Werte im Abschnitt.
+ * Die Methoden {@link #hashCode()}, {@link #equals(Object)} und {@link #toString()} reflektieren die Elemente im Abschnitt.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder
@@ -47,12 +47,12 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract int arrayLength(GArray array);
 
 	/**
-	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Werts des gegebenen Arrays zurück und wird in
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Elements des gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#hashCode()} verwendet.
 	 * 
 	 * @param array Array.
 	 * @param index Index.
-	 * @return {@link Object#hashCode() Streuwert} des {@code index}-ten Werts.
+	 * @return {@link Object#hashCode() Streuwert} des {@code index}-ten Elements.
 	 */
 	protected abstract int hashCode(GArray array, int index);
 
@@ -75,31 +75,31 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	}
 
 	/**
-	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in
+	 * Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#equals(Object)} verwendet.
 	 * 
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
 	 * @param index1 Index für Array 1.
 	 * @param index2 Index für Array 2.
-	 * @return {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Werte der gegebenen Arrays.
+	 * @return {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays.
 	 */
 	protected abstract boolean equals(GArray array1, GArray array2, int index1, int index2);
 
 	/**
-	 * Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Werte der gegebenen Arrays zurück und wird in
+	 * Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#compareTo(ArraySection)} verwendet.
 	 * 
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
 	 * @param index1 Index für Array 1.
 	 * @param index2 Index für Array 2.
-	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Werte der gegebenen Arrays.
+	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays.
 	 */
 	protected abstract int compareTo(GArray array1, GArray array2, int index1, int index2);
 
 	/**
-	 * Diese Methode fügt den {@code index}-ten Wert des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()}
+	 * Diese Methode fügt das {@code index}-ten Element des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()}
 	 * verwendet.
 	 * 
 	 * @see StringBuilder#append(char)
@@ -115,9 +115,9 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract void toString(GArray array, int index, StringBuilder target);
 
 	/**
-	 * Diese Methode gibt die Anzahl der Werte im Abschnitt zurück.
+	 * Diese Methode gibt die Anzahl der Elemente im Abschnitt zurück.
 	 * 
-	 * @return Anzahl der Werte im Abschnitt.
+	 * @return Anzahl der Elemente im Abschnitt.
 	 */
 	public int size() {
 		return this.finalIndex() - this.startIndex();
@@ -140,16 +140,16 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	}
 
 	/**
-	 * Diese Methode gibt den Index des ersten Werts im Abschnitt zurück.
+	 * Diese Methode gibt den Index des ersten Elements im Abschnitt zurück.
 	 * 
-	 * @return Index des ersten Werts im Abschnitt.
+	 * @return Index des ersten Elements im Abschnitt.
 	 */
 	public abstract int startIndex();
 
 	/**
-	 * Diese Methode gibt den Index des ersten Werts nach dem Abschnitt zurück.
+	 * Diese Methode gibt den Index des ersten Elements nach dem Abschnitt zurück.
 	 * 
-	 * @return Index des ersten Werts nach dem Abschnitt.
+	 * @return Index des ersten Elements nach dem Abschnitt.
 	 */
 	public abstract int finalIndex();
 
