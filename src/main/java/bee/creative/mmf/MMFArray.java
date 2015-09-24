@@ -123,7 +123,8 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
 	 * 
-	 * @return {@link MMFINT8Array}
+	 * @see ByteBuffer#get(int)
+	 * @return {@link MMFINT8Array}.
 	 */
 	public final MMFArray toINT8() {
 		return new MMFINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
@@ -132,7 +133,8 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
 	 * 
-	 * @return {@link MMFINT16Array}
+	 * @see ByteBuffer#getShort()
+	 * @return {@link MMFINT16Array}.
 	 */
 	public final MMFArray toINT16() {
 		return new MMFINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
@@ -141,7 +143,8 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
 	 * 
-	 * @return {@link MMFINT32Array}
+	 * @see ByteBuffer#getInt()
+	 * @return {@link MMFINT32Array}.
 	 */
 	public final MMFArray toINT32() {
 		return new MMFINT32Array(this.byteBuffer, this.byteOffset, this.byteLength);
@@ -150,7 +153,8 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
 	 * 
-	 * @return {@link MMFUINT8Array}
+	 * @see ByteBuffer#get()
+	 * @return {@link MMFUINT8Array}.
 	 */
 	public final MMFArray toUINT8() {
 		return new MMFUINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
@@ -159,7 +163,8 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
 	 * 
-	 * @return {@link MMFUINT16Array}
+	 * @see ByteBuffer#getShort()
+	 * @return {@link MMFUINT16Array}.
 	 */
 	public final MMFArray toUINT16() {
 		return new MMFUINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);

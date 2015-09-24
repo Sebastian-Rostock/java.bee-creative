@@ -199,6 +199,14 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			hash.removeEntry(hash.getEntryKey(last), false);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.index, this.hash.size, this.last, this.next);
+		}
+
 	}
 
 	{}
@@ -216,7 +224,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	{}
 
 	/**
-	 * Diese Methode soll den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück geben.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
 	 * 
 	 * @param key Schlüssel.
 	 * @return {@link Object#hashCode() Streuwert} des Schlüssels.
@@ -228,7 +236,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/**
-	 * Diese Methode soll den Schlüssel des gegebenen Eintrags zurück geben.
+	 * Diese Methode gibt den Schlüssel des gegebenen Eintrags zurück.
 	 * 
 	 * @param entry Eintrag.
 	 * @return Schlüssel des Eintrags.
@@ -236,7 +244,19 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract GKey getEntryKey(GEntry entry);
 
 	/**
-	 * Diese Methode soll den nächsten Eintrag des gegebenen Eintrags zurück geben.
+	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des Schlüssels des gegebenen Eintrags zurück.
+	 * 
+	 * @see #getKeyHash(Object)
+	 * @see #getEntryKey(Object)
+	 * @param entry Eintrag.
+	 * @return {@link Object#hashCode() Streuwert} des Schlüssels.
+	 */
+	protected int getEntryHash(final GEntry entry) {
+		return this.getKeyHash(this.getEntryKey(entry));
+	}
+
+	/**
+	 * Diese Methode gibt den nächsten Eintrag des gegebenen Eintrags zurück.
 	 * 
 	 * @param entry Eintrag.
 	 * @return nächster Eintrag des Eintrags oder {@code null}.
@@ -244,7 +264,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract GEntry getEntryNext(GEntry entry);
 
 	/**
-	 * Diese Methode soll den nächsten Eintrag des gegebenen Eintrags setzen bzw. aktualisieren.
+	 * Diese Methode setzt den nächsten Eintrag des gegebenen Eintrags.
 	 * 
 	 * @param entry Eintrag.
 	 * @param next nächster Eintrag.
@@ -252,7 +272,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract void setEntryNext(GEntry entry, GEntry next);
 
 	/**
-	 * Diese Methode soll den Wert des gegebenen Eintrags zurück geben.
+	 * Diese Methode gibt den Wert des gegebenen Eintrags zurück.
 	 * 
 	 * @param entry Eintrag.
 	 * @return Wert des Eintrags.
@@ -260,8 +280,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	protected abstract GValue getEntryValue(GEntry entry);
 
 	/**
-	 * Diese Methode soll nur dann {@code true} zurück geben, wenn der Schlüssel des gegebenen Eintrags gleich dem gegebenen Schlüssel ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der Schlüssel des gegebenen Eintrags gleich dem gegebenen Schlüssel ist.
 	 * 
+	 * @see #getEntryKey(Object)
 	 * @param entry Eintrag.
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
@@ -277,7 +298,8 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @return {@link Iterator} über die Einträge.
 	 */
 	protected final Iterator<GEntry> getEntries() {
-		return ((this.size == 0) ? Iterators.<GEntry>emptyIterator() : new HashIterator<GKey, GEntry>(this));
+		if (this.size == 0) return Iterators.emptyIterator();
+		return new HashIterator<>(this);
 	}
 
 	/**
@@ -340,13 +362,13 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param key Schlüssel.
 	 * @return Eintrag mit dem gegebenen Schlüssel oder {@code null}.
 	 */
+	@SuppressWarnings ("unchecked")
 	protected final GEntry findEntry(final GKey key) {
 		if (this.size == 0) return null;
 		final Object[] table = this.table;
 		final int hash = this.getKeyHash(key);
 		final int index = this.getIndex(hash, table.length);
-		for (@SuppressWarnings ("unchecked")
-		GEntry entry = (GEntry)table[index]; entry != null; entry = this.getEntryNext(entry)) {
+		for (GEntry entry = (GEntry)table[index]; entry != null; entry = this.getEntryNext(entry)) {
 			if (this.getEntryEquals(entry, key, hash)) return entry;
 		}
 		return null;
@@ -367,6 +389,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * 
 	 * @param newLength neue Größe der Tabelle.
 	 */
+	@SuppressWarnings ("unchecked")
 	protected final void verifyLength(final int newLength) {
 		final Object[] oldTable = this.table;
 		final int oldLength = oldTable.length;
@@ -377,14 +400,12 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			return;
 		}
 		for (int oldIndex = 0; oldIndex < oldLength; oldIndex++) {
-			@SuppressWarnings ("unchecked")
 			GEntry item = (GEntry)oldTable[oldIndex];
 			for (GEntry next; item != null; item = next) {
 				next = this.getEntryNext(item);
 				final GKey key = this.getEntryKey(item);
-				final int hash = this.getKeyHash(key);
+				final int hash = this.getEntryHash(item);
 				final int newIndex = this.getIndex(hash, newLength);
-				@SuppressWarnings ("unchecked")
 				final GEntry item2 = (GEntry)newTable[newIndex];
 				newTable[newIndex] = this.createEntry(key, this.getEntryValue(item), item2, hash);
 			}
@@ -415,6 +436,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param verifyLength Tabellgrößenenprüfung.
 	 * @return alter Eintrag oder {@code null}.
 	 */
+	@SuppressWarnings ({"unchecked"})
 	protected final GEntry appendEntry(final GKey key, final GValue value, final boolean verifyLength) {
 		final int hash = this.getKeyHash(key);
 		final Object[] table = this.table;
@@ -425,7 +447,6 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			return null;
 		}
 		final int index = this.getIndex(hash, table.length);
-		@SuppressWarnings ({"unchecked"})
 		GEntry item = (GEntry)table[index];
 		for (GEntry last = null, next; item != null; last = item, item = next) {
 			next = this.getEntryNext(item);
@@ -439,7 +460,6 @@ public abstract class Hash<GKey, GValue, GEntry> {
 			}
 		}
 		this.size++;
-		@SuppressWarnings ({"unchecked"})
 		final GEntry item2 = (GEntry)table[index];
 		table[index] = this.createEntry(key, value, item2, hash);
 		if (!verifyLength) return null;
@@ -456,12 +476,12 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * @param verifyLength Tabellgrößenenprüfung.
 	 * @return Eintrag oder {@code null}.
 	 */
+	@SuppressWarnings ("unchecked")
 	protected final GEntry removeEntry(final GKey key, final boolean verifyLength) {
 		if (this.size == 0) return null;
 		final Object[] table = this.table;
 		final int hash = this.getKeyHash(key);
 		final int index = this.getIndex(hash, table.length);
-		@SuppressWarnings ("unchecked")
 		GEntry item = (GEntry)table[index];
 		for (GEntry last = null, next; item != null; last = item, item = next) {
 			next = this.getEntryNext(item);
@@ -496,7 +516,14 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this);
+		return Objects.toString(new Iterable<GEntry>() {
+
+			@Override
+			public Iterator<GEntry> iterator() {
+				return Hash.this.getEntries();
+			}
+
+		});
 	}
 
 }

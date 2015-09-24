@@ -91,7 +91,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 			}
 
 			@Override
-			public Array toArray() {
+			public Array array() {
 				return values;
 			}
 
@@ -108,7 +108,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * Für einen {@code index >= size()} liefert die Methode {@link #get(int)} einen beliebigen Parameterwert von {@code scope}, d.h.
 	 * {@code scope.get(index - size())}. Für einen {@code index < size()} liefert die Methode {@link #get(int)} das Ergebnis von
 	 * {@code params[index].execute(scope)}.<br>
-	 * Die über {@link #toArray()} erzeugte Wertliste liefert für die noch nicht über {@link #get(int)} ermittelten Parameterwerte {@link VirtualValue}.
+	 * Die über {@link #array()} erzeugte Wertliste liefert für die noch nicht über {@link #get(int)} ermittelten Parameterwerte {@link VirtualValue}.
 	 * 
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param params Parameterfunktionen, deren Ergebniswerte als zugesicherte Parameterwerte genutzt werden.
@@ -147,7 +147,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 			}
 
 			@Override
-			public Array toArray() {
+			public Array array() {
 				return new Array() {
 
 					@Override
@@ -204,8 +204,8 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 			}
 
 			@Override
-			public Array toArray() {
-				return scope.toArray();
+			public Array array() {
+				return scope.array();
 			}
 
 		};
@@ -224,37 +224,37 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	}
 
 	/**
-	 * Diese Methode gibt das Kontextobjekt zurück. Funktionen können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch den Zustand
-	 * dieses Objekts modifizieren. Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
-	 * 
-	 * @return Kontextobjekt.
-	 */
-	public abstract Context context();
-
-	/**
 	 * Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück.
 	 * 
 	 * @see #get(int)
 	 * @see #size()
 	 * @return {@link Array} der Parameterwerte.
 	 */
-	public Array toArray() {
+	public Array array() {
 		if (this.size() == 0) return Array.EMPTY;
 		return new Array() {
-
+	
 			@Override
 			public Value get(final int index) throws IndexOutOfBoundsException {
 				if ((index < 0) || (index >= Scope.this.size())) throw new IndexOutOfBoundsException();
 				return Scope.this.get(index);
 			}
-
+	
 			@Override
 			public int length() {
 				return Scope.this.size();
 			}
-
+	
 		};
 	}
+
+	/**
+	 * Diese Methode gibt das Kontextobjekt zurück. Funktionen können aus diesem Objekt Informationen für ihre Berechnungen extrahieren oder auch den Zustand
+	 * dieses Objekts modifizieren. Das Kontextobjekt entspricht dem Kontext {@code this} in {@code Java}-Methoden.
+	 * 
+	 * @return Kontextobjekt.
+	 */
+	public abstract Context context();
 
 	{}
 
@@ -285,7 +285,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 */
 	@Override
 	public int hashCode() {
-		return this.toArray().hashCode();
+		return this.array().hashCode();
 	}
 
 	/**
@@ -296,7 +296,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 		if (object == this) return true;
 		if (!(object instanceof Scope)) return false;
 		final Scope data = (Scope)object;
-		return this.toArray().equals(data.toArray());
+		return this.array().equals(data.array());
 	}
 
 	/**
@@ -304,7 +304,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 */
 	@Override
 	public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-		target.putScope(this.toArray());
+		target.putScope(this.array());
 	}
 
 	/**

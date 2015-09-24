@@ -201,6 +201,25 @@ public class Comparators {
 	};
 
 	/**
+	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
+	 * 
+	 * @see Comparators#compare(double, double)
+	 */
+	public static final Comparator<Number> DOUBLE_COMPARATOR = new Comparator<Number>() {
+	
+		@Override
+		public int compare(final Number item1, final Number item2) {
+			return Comparators.compare(item1.doubleValue(), item2.doubleValue());
+		}
+	
+		@Override
+		public String toString() {
+			return "DOUBLE_COMPARATOR";
+		}
+	
+	};
+
+	/**
 	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()} vergleicht.
 	 * 
 	 * @see Comparators#compare(int, int)
@@ -215,25 +234,6 @@ public class Comparators {
 		@Override
 		public String toString() {
 			return "INTEGER_COMPARATOR";
-		}
-
-	};
-
-	/**
-	 * Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
-	 * 
-	 * @see Comparators#compare(double, double)
-	 */
-	public static final Comparator<Number> DOUBLE_COMPARATOR = new Comparator<Number>() {
-
-		@Override
-		public int compare(final Number item1, final Number item2) {
-			return Comparators.compare(item1.doubleValue(), item2.doubleValue());
-		}
-
-		@Override
-		public String toString() {
-			return "DOUBLE_COMPARATOR";
 		}
 
 	};

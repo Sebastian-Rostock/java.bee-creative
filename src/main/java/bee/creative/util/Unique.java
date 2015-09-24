@@ -543,6 +543,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		 * {@inheritDoc}
 		 */
 		@Override
+		protected int getEntryHash(final SetEntry<GValue> entry) {
+			return entry.hash;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		protected SetEntry<GValue> getEntryNext(final SetEntry<GValue> entry) {
 			return entry.next;
 		}
@@ -614,6 +622,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		@Override
 		protected GInput getEntryKey(final MapEntry<GInput, GOutput> entry) {
 			return entry.input;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected int getEntryHash(final MapEntry<GInput, GOutput> entry) {
+			return entry.hash;
 		}
 
 		/**

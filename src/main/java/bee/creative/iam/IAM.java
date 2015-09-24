@@ -7,6 +7,7 @@ import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
 import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /**
@@ -468,7 +469,7 @@ public class IAM {
 		 */
 		@Override
 		public String toString() {
-			return this.length() > 50 ? Objects.toString(this.section(0, 50)) + "..." : Objects.toString(this);
+			return this.length() > 50 ? Objects.toString(Iterables.chainedIterable(this.section(0, 45), Iterables.itemIterator("..."))) : Objects.toString(this);
 		}
 
 	}

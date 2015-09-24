@@ -691,7 +691,7 @@ public class Functions {
 		public Value execute(final Scope scope) {
 			final Scope scope2 = this.scope;
 			if (scope2 == null) return Values.functionValue(new ClosureFunction(scope, this.function));
-			return this.function.execute(Scope.arrayScope(scope2, scope.toArray(), false));
+			return this.function.execute(Scope.arrayScope(scope2, scope.array(), false));
 		}
 
 		/**
@@ -751,7 +751,7 @@ public class Functions {
 			if (index < 0) throw new IllegalArgumentException("scope.size() < 1");
 			final Context context = scope.context();
 			final Function method = context.dataOf(scope.get(index), Values.FUNCTION_TYPE);
-			final Scope params = Scope.arrayScope(scope, scope.toArray().section(0, index));
+			final Scope params = Scope.arrayScope(scope, scope.array().section(0, index));
 			return method.execute(params);
 		}
 
@@ -767,13 +767,13 @@ public class Functions {
 	 * {@code Array.valueOf(scope.toArray().value())}.
 	 * 
 	 * @see Array#valueOf(Value...)
-	 * @see Scope#toArray()
+	 * @see Scope#array()
 	 */
 	public static final Function ARRAY_COPY_FUNCTION = new BaseFunction() {
 
 		@Override
 		public Value execute(final Scope scope) {
-			return Values.arrayValue(Array.valueOf(scope.toArray().value()));
+			return Values.arrayValue(Array.valueOf(scope.array().value()));
 		}
 
 		@Override
@@ -787,13 +787,13 @@ public class Functions {
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte eines gegebenen Ausführungskontexts {@code scope} entspricht,
 	 * d.h. {@code scope#toArray()}.
 	 * 
-	 * @see Scope#toArray()
+	 * @see Scope#array()
 	 */
 	public static final Function ARRAY_VIEW_FUNCTION = new BaseFunction() {
 
 		@Override
 		public Value execute(final Scope scope) {
-			return Values.arrayValue(scope.toArray());
+			return Values.arrayValue(scope.array());
 		}
 
 		@Override

@@ -292,7 +292,7 @@ public class Values {
 			if (this.value != null) {
 				target.putValue(this.value);
 			} else {
-				target.putHandler(this.function).putScope(this.scope.toArray());
+				target.putHandler(this.function).putScope(this.scope.array());
 			}
 		}
 
