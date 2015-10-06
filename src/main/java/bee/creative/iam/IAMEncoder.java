@@ -1196,7 +1196,7 @@ public class IAMEncoder {
 	 * @param buffer {@link ByteBuffer}.
 	 * @param source Zahlenfolgen.
 	 */
-	protected static void putSize(final ByteBuffer buffer, final byte[][] source) {
+	static void putSize(final ByteBuffer buffer, final byte[][] source) {
 		int offset = 0;
 		buffer.putInt(0);
 		for (final byte[] data: source) {
@@ -1212,7 +1212,7 @@ public class IAMEncoder {
 	 * @param buffer {@link ByteBuffer}.
 	 * @param source Zahlenfolgen.
 	 */
-	protected static void putData(final ByteBuffer buffer, final byte[][] source) {
+	static void putData(final ByteBuffer buffer, final byte[][] source) {
 		IAMEncoder.write(source, buffer);
 	}
 
@@ -1227,7 +1227,7 @@ public class IAMEncoder {
 	 * @param type Datentyp ({@code 1=INT8/UINT8}, {@code 2=INT16/UINT16}, {@code 3=INT32}).
 	 * @param values Zahlenfolge.
 	 */
-	protected static void putArray(final ByteBuffer buffer, final int type, final int[] values) {
+	static void putArray(final ByteBuffer buffer, final int type, final int[] values) {
 		switch (type) {
 			case 1:
 				for (int i = 0, length = values.length; i < length; i++) {
@@ -1268,7 +1268,7 @@ public class IAMEncoder {
 	 * @param order Bytereihenfolge
 	 * @return Zahlenfolgen.
 	 */
-	protected static byte[][] encodeBytes(final List<? extends IAMBaseEncoder> source, final ByteOrder order) {
+	static byte[][] encodeBytes(final List<? extends IAMBaseEncoder> source, final ByteOrder order) {
 		final int count = source.size();
 		final byte[][] result = new byte[count][];
 		for (int i = 0; i < count; i++) {
@@ -1286,7 +1286,7 @@ public class IAMEncoder {
 	 * @param value Größe.
 	 * @return Datentyp ({@code 1..3}).
 	 */
-	protected static int computeSizeType(final int value) {
+	static int computeSizeType(final int value) {
 		if (value <= 255) return 1;
 		if (value <= 65535) return 2;
 		return 3;
@@ -1299,7 +1299,7 @@ public class IAMEncoder {
 	 * @param value Wert.
 	 * @return Datengrößentyps ({@code 1..3}).
 	 */
-	protected static int computeDataType(final int value) {
+	static int computeDataType(final int value) {
 		if ((-128 <= value) && (value <= 127)) return 1;
 		if ((-32768 <= value) && (value <= 32767)) return 2;
 		return 3;
@@ -1311,7 +1311,7 @@ public class IAMEncoder {
 	 * @param entryCount Anzahl der Einträge der Abbildung.
 	 * @return Bitmaske.
 	 */
-	protected static int computeRangeMask(final int entryCount) {
+	static int computeRangeMask(final int entryCount) {
 		int result = 2;
 		while (result < entryCount) {
 			result <<= 1;

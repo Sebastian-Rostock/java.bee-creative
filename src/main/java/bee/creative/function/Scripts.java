@@ -334,7 +334,7 @@ public class Scripts {
 		/**
 		 * Dieses Feld speichert die Parameternamen.
 		 */
-		private List<String> params = Collections.synchronizedList(new LinkedList<String>());
+		private final List<String> params = Collections.synchronizedList(new LinkedList<String>());
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
@@ -365,7 +365,6 @@ public class Scripts {
 		 */
 		protected final synchronized void startCompiling() throws IllegalStateException {
 			this.checkIdling();
-			this.proxies.clear();
 			this.iterator = this.script.iterator();
 			this.skip();
 		}
@@ -645,6 +644,22 @@ public class Scripts {
 		}
 
 		/**
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
+		 * 
+		 * @return Parameterfunktion.
+		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 */
+		protected ProxyFunction compileNextProxy() throws ScriptException {
+			final String name = this.compileNextName();
+			if ((name == null) || (this.parseIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
+			final ProxyFunction result = this.proxy(name);
+			if (this.skipSpace().type != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
+			final Function target = this.compileNextScope();
+			result.set(target);
+			return result;
+		}
+
+		/**
 		 * Diese Methode kompiliert den aktuellen, bedeutsamen Bereich zu einen Funktionsnamen, Parameternamen oder Parameterindex und gibt diesen zurück.<br>
 		 * Der Rückgabewert ist {@code null}, wenn der Bereich vom Typ {@code ':'}, {@code ';'}, {@code ')'}, <code>'}'</code>, {@code ']'} oder {@code 0} ist.
 		 * 
@@ -678,22 +693,6 @@ public class Scripts {
 			} catch (final RuntimeException cause) {
 				throw new ScriptException(cause).useSender(this).useHint(" Funktionsname, Parametername oder Parameterindex erwartet.");
 			}
-		}
-
-		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
-		 * 
-		 * @return Parameterfunktion.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
-		 */
-		protected ProxyFunction compileNextProxy() throws ScriptException {
-			final String name = this.compileNextName();
-			if ((name == null) || (this.parseIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
-			final ProxyFunction result = this.proxy(name);
-			if (this.skipSpace().type != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			final Function target = this.compileNextScope();
-			result.set(target);
-			return result;
 		}
 
 		/**
@@ -743,10 +742,12 @@ public class Scripts {
 		 */
 		public final ProxyFunction proxy(final String name) throws NullPointerException {
 			if (name == null) throw new NullPointerException("name = null");
-			ProxyFunction result = this.proxies.get(name);
-			if (result != null) return result;
-			this.proxies.put(name, result = new ProxyFunction(name));
-			return result;
+			synchronized (this.proxies) {
+				ProxyFunction result = this.proxies.get(name);
+				if (result != null) return result;
+				this.proxies.put(name, result = new ProxyFunction(name));
+				return result;
+			}
 		}
 
 		/**
@@ -782,7 +783,7 @@ public class Scripts {
 		 * @return Abbildung von Namen auf Platzhalter.
 		 */
 		public final Map<String, ProxyFunction> proxies() {
-			return Collections.unmodifiableMap(this.proxies);
+			return this.proxies;
 		}
 
 		/**
@@ -904,7 +905,8 @@ public class Scripts {
 			if (value == null) throw new NullPointerException("value = null");
 			if (value.contains(null)) throw new NullPointerException("value.contains(null)");
 			this.checkIdling();
-			this.params = new LinkedList<>(value);
+			this.params.clear();
+			this.params.addAll(value);
 			return this;
 		}
 
@@ -1093,6 +1095,16 @@ public class Scripts {
 			} finally {
 				this.stopCompiling();
 			}
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Objects.toInvokeString(this, this.helper, this.params, this.script, this.proxies);
 		}
 
 	}

@@ -78,7 +78,7 @@ public class Parser {
 	 * @see #take()
 	 * @see #index()
 	 * @see #symbol()
-	 * @see #string()
+	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int skip() {
@@ -152,14 +152,14 @@ public class Parser {
 	{}
 
 	/**
-	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #string() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
+	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
 	 * 
 	 * @see #take(int)
 	 * @see #skip()
 	 * @see #index()
 	 * @see #symbol()
-	 * @see #string()
+	 * @see #target()
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int take() {
@@ -168,10 +168,10 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode übernimmt das gegebene Zeichen in die {@link #string() Ausgabe}, sofern diese nicht negativ ist.
+	 * Diese Methode übernimmt das gegebene Zeichen in die {@link #target() Ausgabe}, sofern diese nicht negativ ist.
 	 * 
 	 * @see #take()
-	 * @see #string()
+	 * @see #target()
 	 * @param symbol Zeichen.
 	 */
 	public final void take(final int symbol) {
@@ -180,11 +180,11 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode übernimmt die gegebene Zeichenkette in die {@link #string() Ausgabe}.
+	 * Diese Methode übernimmt die gegebene Zeichenkette in die {@link #target() Ausgabe}.
 	 * 
 	 * @param symbols Zeichenkette.
 	 * @see #take()
-	 * @see #string()
+	 * @see #target()
 	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist.
 	 */
 	public final void take(final String symbols) throws NullPointerException {
@@ -193,12 +193,12 @@ public class Parser {
 	}
 
 	/**
-	 * Diese Methode leert die {@link #string() Ausgabe}.
+	 * Diese Methode leert die {@link #target() Ausgabe}.
 	 * 
 	 * @see #take()
 	 * @see #take(int)
 	 * @see #take(String)
-	 * @see #string()
+	 * @see #target()
 	 */
 	public final void clear() {
 		this.target.setLength(0);
@@ -215,7 +215,7 @@ public class Parser {
 	 * @see #symbol()
 	 * @return Ausgabe.
 	 */
-	public final String string() {
+	public final String target() {
 		return this.target.toString();
 	}
 

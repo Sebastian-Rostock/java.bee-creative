@@ -1,10 +1,16 @@
 package bee.creative.iam;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAM.IAMBaseIndex;
 import bee.creative.iam.IAM.IAMBaseList;
 import bee.creative.iam.IAM.IAMBaseMap;
 import bee.creative.mmf.MMFArray;
+import bee.creative.util.Bytes;
 
 /**
  * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link IAM} Datenstrukturen.
@@ -24,6 +30,11 @@ public class IAMDecoder {
 		 * Dieses Feld speichert den leeren {@link IAMMapDecoder}.
 		 */
 		public static final IAMMapDecoder EMPTY = new IAMMapDecoder();
+
+		/**
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP}.
+		 */
+		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
 
 		{}
 
@@ -293,6 +304,18 @@ public class IAMDecoder {
 			return -1;
 		}
 
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden. Wenn sie {@code false} liefert, werden
+		 * Einträge binär über die Ordnung ihrer Schlüssel gesucht.
+		 * 
+		 * @see #find(int...)
+		 * @return {@code true} bei Nutzung von {@link IAMArray#hash()} und {@code false} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
+		 *         {@link #find(int...)}.
+		 */
+		public boolean mode() {
+			return this.rangeMask != 0;
+		}
+
 	}
 
 	/**
@@ -306,6 +329,11 @@ public class IAMDecoder {
 		 * Dieses Feld speichert den leeren {@link IAMListDecoder}.
 		 */
 		public static final IAMListDecoder EMPTY = new IAMListDecoder();
+
+		/**
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST}.
+		 */
+		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
 
 		{}
 
@@ -443,6 +471,11 @@ public class IAMDecoder {
 		 */
 		public static final IAMIndexDecoder EMPTY = new IAMIndexDecoder();
 
+		/**
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_INDEX}.
+		 */
+		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFFF, 0xF00DBA5E);
+
 		{}
 
 		/**
@@ -564,6 +597,113 @@ public class IAMDecoder {
 	}
 
 	{}
+
+	/**
+	 * Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten einer {@code IAM_MAP}, {@code IAM_LIST} oder
+	 * {@code IAM_INDEX}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class IAMHeader {
+
+		/**
+		 * Dieses Feld speichert die Bitmaske.
+		 */
+		final int mask;
+
+		/**
+		 * Dieses Feld speichert den Vergleichswert.
+		 */
+		final int value;
+
+		@SuppressWarnings ("javadoc")
+		IAMHeader(final int mask, final int value) {
+			this.mask = mask;
+			this.value = value;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Kopfdaten eine gültige Datenstrukturkennung enthalten.
+		 * 
+		 * @param header Kopfdaten.
+		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten.
+		 */
+		public boolean isValid(final int header) {
+			return (header & this.mask) == this.value;
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * zurück.
+		 * 
+		 * @see #orderOf(byte[])
+		 * @param file Datei mit den Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws IOException Wenn {@link RandomAccessFile#RandomAccessFile(File, String)} bzw. {@link RandomAccessFile#read(byte[])} eine entsprechende Ausnahme
+		 *         auslöst.
+		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public ByteOrder orderOf(final File file) throws IOException, NullPointerException, IllegalArgumentException {
+			if (file == null) throw new NullPointerException("file = null");
+			try (RandomAccessFile source = new RandomAccessFile(file, "r")) {
+				final byte[] bytes = new byte[4];
+				if (source.read(bytes) < 4) throw new IllegalArgumentException();
+				return this.orderOf(bytes);
+			}
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * zurück.
+		 * 
+		 * @param bytes Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public ByteOrder orderOf(final byte[] bytes) throws NullPointerException, IllegalArgumentException {
+			if (bytes == null) throw new NullPointerException("bytes = null");
+			if (bytes.length < 4) throw new IllegalArgumentException();
+			if (this.isValid(Bytes.getInt4BE(bytes, 0))) return ByteOrder.BIG_ENDIAN;
+			if (this.isValid(Bytes.getInt4LE(bytes, 0))) return ByteOrder.LITTLE_ENDIAN;
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * zurück.
+		 * 
+		 * @see #orderOf(byte[])
+		 * @param buffer Puffer mit den Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException, IllegalArgumentException {
+			if (buffer == null) throw new NullPointerException("buffer = null");
+			if (buffer.remaining() < 4) throw new IllegalArgumentException();
+			final byte[] bytes = new byte[4];
+			buffer.get(bytes);
+			return this.orderOf(bytes);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return Integer.toHexString(this.value);
+		}
+
+	}
 
 	/**
 	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
