@@ -1,17 +1,17 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import bee.creative.function.Functions.ValueFunction;
-import bee.creative.function.Scripts.ScriptFormatter;
-import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Scripts.ScriptTracer;
-import bee.creative.function.Scripts.ScriptTracerInput;
+import bee.creative.fem.Functions.ValueFunction;
+import bee.creative.fem.Scripts.ScriptFormatter;
+import bee.creative.fem.Scripts.ScriptFormatterInput;
+import bee.creative.fem.Scripts.ScriptTracer;
+import bee.creative.fem.Scripts.ScriptTracerInput;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Array Wertlisten}, {@link Object Objekte}, {@link Function Funktionen}, {@link String
+ * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Array Wertlisten}, {@link Object Objekte}, {@link FEMFunction Funktionen}, {@link String
  * Zeichenketten}, {@link Number Zahlen} und {@link Boolean Wahrheitswerte}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -23,14 +23,14 @@ public class Values {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class BaseValue implements Value, ScriptFormatterInput {
+	public static abstract class BaseValue implements FEMValue, ScriptFormatterInput {
 
 		/**
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
 		 * Der Rückgabewert entspricht
 		 * 
 		 * @see Context#DEFAULT
-		 * @see Context#dataOf(Value, Type)
+		 * @see Context#dataOf(FEMValue, FEMType)
 		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 		 * @param type Datentyp.
 		 * @return Nutzdaten.
@@ -38,7 +38,7 @@ public class Values {
 		 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
-		public final <GData> GData data(final Type<GData> type) throws NullPointerException, IllegalArgumentException {
+		public final <GData> GData data(final FEMType<GData> type) throws NullPointerException, IllegalArgumentException {
 			return Context.DEFAULT.dataOf(this, type);
 		}
 
@@ -46,7 +46,7 @@ public class Values {
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
 		 * Der Rückgabewert entspricht {@code context.dataOf(this, type)}.
 		 * 
-		 * @see Context#dataOf(Value, Type)
+		 * @see Context#dataOf(FEMValue, FEMType)
 		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 		 * @param type Datentyp.
 		 * @param context Kontext.
@@ -56,7 +56,7 @@ public class Values {
 		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
 
-		public final <GData> GData data(final Type<GData> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+		public final <GData> GData data(final FEMType<GData> type, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			return context.dataOf(this, type);
 		}
 
@@ -76,8 +76,8 @@ public class Values {
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
-			if (!(object instanceof Value)) return false;
-			final Value data = (Value)object;
+			if (!(object instanceof FEMValue)) return false;
+			final FEMValue data = (FEMValue)object;
 			return Objects.equals(this.type(), data.type()) && Objects.equals(this.data(), data.data());
 		}
 
@@ -144,7 +144,7 @@ public class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public abstract Type<GData> type();
+		public abstract FEMType<GData> type();
 
 		/**
 		 * {@inheritDoc}
@@ -196,23 +196,23 @@ public class Values {
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
 		 * 
-		 * @see Function#execute(Scope)
+		 * @see FEMFunction#execute(FEMScope)
 		 */
-		Value value;
+		FEMValue value;
 
 		/**
 		 * Dieses Feld speichert den Ausführungskontext zum Aufruf der Funktion oder {@code null}.
 		 * 
-		 * @see Function#execute(Scope)
+		 * @see FEMFunction#execute(FEMScope)
 		 */
-		Scope scope;
+		FEMScope scope;
 
 		/**
 		 * Dieses Feld speichert die Funktion oder {@code null}.
 		 * 
-		 * @see Function#execute(Scope)
+		 * @see FEMFunction#execute(FEMScope)
 		 */
-		Function function;
+		FEMFunction function;
 
 		/**
 		 * Dieser Konstruktor initialisiert Ausführungskontext und Funktion.
@@ -221,7 +221,7 @@ public class Values {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
-		public VirtualValue(final Scope scope, final Function function) throws NullPointerException {
+		public VirtualValue(final FEMScope scope, final FEMFunction function) throws NullPointerException {
 			if (scope == null) throw new NullPointerException("scope = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
@@ -233,12 +233,12 @@ public class Values {
 		/**
 		 * Diese Methode gibt den Ergebniswert der Ausführung der Funktion mit dem Ausführungskontext zurück.
 		 * 
-		 * @see Function#execute(Scope)
+		 * @see FEMFunction#execute(FEMScope)
 		 * @return Ergebniswert.
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
-		public synchronized Value value() throws NullPointerException {
-			Value result = this.value;
+		public synchronized FEMValue value() throws NullPointerException {
+			FEMValue result = this.value;
 			if (result != null) return result;
 			result = this.function.execute(this.scope);
 			if (result == null) throw new NullPointerException("this.function().execute(this.scope()) = null");
@@ -253,7 +253,7 @@ public class Values {
 		 * 
 		 * @return Ausführungskontext oder {@code null}.
 		 */
-		public Scope scope() {
+		public FEMScope scope() {
 			return this.scope;
 		}
 
@@ -262,7 +262,7 @@ public class Values {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -272,7 +272,7 @@ public class Values {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Type<?> type() {
+		public FEMType<?> type() {
 			return this.value().type();
 		}
 
@@ -301,36 +301,36 @@ public class Values {
 	{}
 
 	/**
-	 * Dieses Feld speichert den {@link Value} zu {@code null}.
+	 * Dieses Feld speichert den {@link FEMValue} zu {@code null}.
 	 */
-	public static final Value NULL = new DataValue<Object>() {
+	public static final FEMValue NULL = new DataValue<Object>() {
 
 		@Override
-		public Type<Object> type() {
+		public FEMType<Object> type() {
 			return Values.NULL_TYPE;
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Value} zu {@link Boolean#TRUE}.
+	 * Dieses Feld speichert den {@link FEMValue} zu {@link Boolean#TRUE}.
 	 */
 	public static final DataValue<Boolean> TRUE = new DataValue<Boolean>(Boolean.TRUE) {
 
 		@Override
-		public Type<Boolean> type() {
+		public FEMType<Boolean> type() {
 			return Values.BOOLEAN_TYPE;
 		}
 
 	};
 
 	/**
-	 * Dieses Feld speichert den {@link Value} zu {@link Boolean#FALSE}.
+	 * Dieses Feld speichert den {@link FEMValue} zu {@link Boolean#FALSE}.
 	 */
 	public static final DataValue<Boolean> FALSE = new DataValue<Boolean>(Boolean.FALSE) {
 
 		@Override
-		public Type<Boolean> type() {
+		public FEMType<Boolean> type() {
 			return Values.BOOLEAN_TYPE;
 		}
 
@@ -344,7 +344,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #NULL}.
 	 */
-	public static final Type<Object> NULL_TYPE = Type.simpleType(Values.NULL_ID, "null");
+	public static final FEMType<Object> NULL_TYPE = FEMType.simpleType(Values.NULL_ID, "null");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #ARRAY_TYPE}.
@@ -354,7 +354,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #arrayValue(Array)}.
 	 */
-	public static final Type<Array> ARRAY_TYPE = Type.simpleType(Values.ARRAY_ID, "ARRAY");
+	public static final FEMType<Array> ARRAY_TYPE = FEMType.simpleType(Values.ARRAY_ID, "ARRAY");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #OBJECT_TYPE}.
@@ -364,7 +364,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #objectValue(Object)}.
 	 */
-	public static final Type<Object> OBJECT_TYPE = Type.simpleType(Values.OBJECT_ID, "OBJECT");
+	public static final FEMType<Object> OBJECT_TYPE = FEMType.simpleType(Values.OBJECT_ID, "OBJECT");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #FUNCTION_TYPE}.
@@ -372,9 +372,9 @@ public class Values {
 	public static final int FUNCTION_ID = 3;
 
 	/**
-	 * Dieses Feld speichert den Datentyp von {@link #functionValue(Function)}.
+	 * Dieses Feld speichert den Datentyp von {@link #functionValue(FEMFunction)}.
 	 */
-	public static final Type<Function> FUNCTION_TYPE = Type.simpleType(Values.FUNCTION_ID, "FUNCTION");
+	public static final FEMType<FEMFunction> FUNCTION_TYPE = FEMType.simpleType(Values.FUNCTION_ID, "FUNCTION");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #STRING_TYPE}.
@@ -384,7 +384,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #stringValue(String)}.
 	 */
-	public static final Type<String> STRING_TYPE = Type.simpleType(Values.STRING_ID, "STRING");
+	public static final FEMType<String> STRING_TYPE = FEMType.simpleType(Values.STRING_ID, "STRING");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #NUMBER_TYPE}.
@@ -394,7 +394,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #numberValue(Number)}.
 	 */
-	public static final Type<Number> NUMBER_TYPE = Type.simpleType(Values.NUMBER_ID, "NUMBER");
+	public static final FEMType<Number> NUMBER_TYPE = FEMType.simpleType(Values.NUMBER_ID, "NUMBER");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #BOOLEAN_TYPE}.
@@ -404,7 +404,7 @@ public class Values {
 	/**
 	 * Dieses Feld speichert den Datentyp von {@link #booleanValue(boolean)}.
 	 */
-	public static final Type<Boolean> BOOLEAN_TYPE = Type.simpleType(Values.BOOLEAN_ID, "BOOLEAN");
+	public static final FEMType<Boolean> BOOLEAN_TYPE = FEMType.simpleType(Values.BOOLEAN_ID, "BOOLEAN");
 
 	{}
 
@@ -416,7 +416,7 @@ public class Values {
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
 	 */
-	public static Value valueOf(final Object data) throws IllegalArgumentException {
+	public static FEMValue valueOf(final Object data) throws IllegalArgumentException {
 		return Context.DEFAULT.valueOf(data);
 	}
 
@@ -427,23 +427,23 @@ public class Values {
 	 * @param value Wert oder {@code null}.
 	 * @return Wert oder {@link Values#NULL}.
 	 */
-	public static Value nullValue(final Value value) {
+	public static FEMValue nullValue(final FEMValue value) {
 		if (value == null) return Values.NULL;
 		return value;
 	}
 
 	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
+	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
 	 * @param data Wertliste.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 * @return {@link Array}-{@link Value}.
+	 * @return {@link Array}-{@link FEMValue}.
 	 */
 	public static DataValue<Array> arrayValue(final Array data) throws NullPointerException {
 		return new DataValue<Array>(data) {
 
 			@Override
-			public Type<Array> type() {
+			public FEMType<Array> type() {
 				return Values.ARRAY_TYPE;
 			}
 
@@ -456,11 +456,11 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
+	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
 	 * @see #arrayValue(Collection)
 	 * @param data Wertliste.
-	 * @return {@link Array}-{@link Value}.
+	 * @return {@link Array}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<Array> arrayValue(final Iterable<?> data) throws NullPointerException {
@@ -471,13 +471,13 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link Value} zurück.
+	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
 	 * @see #arrayValue(Array)
 	 * @see Array#from(Object)
 	 * @see Collection#toArray()
 	 * @param data Wertliste.
-	 * @return {@link Array}-{@link Value}.
+	 * @return {@link Array}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<Array> arrayValue(final Collection<?> data) throws NullPointerException {
@@ -487,17 +487,17 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Value} zurück.
+	 * Diese Methode gibt das gegebene Objekt als {@link FEMValue} zurück.
 	 * 
 	 * @param data Objekt.
-	 * @return {@link Object}-{@link Value}.
+	 * @return {@link Object}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<Object> objectValue(final Object data) throws NullPointerException {
 		return new DataValue<Object>(data) {
 
 			@Override
-			public Type<Object> type() {
+			public FEMType<Object> type() {
 				return Values.OBJECT_TYPE;
 			}
 
@@ -505,22 +505,22 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt die gegebene Funktion als {@link Value} zurück.
+	 * Diese Methode gibt die gegebene Funktion als {@link FEMValue} zurück.
 	 * 
 	 * @param data Funktion.
-	 * @return {@link Function}-{@link Value}.
+	 * @return {@link FEMFunction}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static DataValue<Function> functionValue(final Function data) throws NullPointerException {
-		return new TracerValue<Function>(data) {
+	public static DataValue<FEMFunction> functionValue(final FEMFunction data) throws NullPointerException {
+		return new TracerValue<FEMFunction>(data) {
 
 			@Override
-			public Type<Function> type() {
+			public FEMType<FEMFunction> type() {
 				return Values.FUNCTION_TYPE;
 			}
 
 			@Override
-			public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+			public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 				return new ValueFunction(Values.functionValue(tracer.trace(this.data)));
 			}
 
@@ -533,17 +533,17 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt die gegebene Zeichenkette als {@link Value} zurück.
+	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
 	 * 
 	 * @param data Zeichenkette.
-	 * @return {@link String}-{@link Value}.
+	 * @return {@link String}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<String> stringValue(final String data) throws NullPointerException {
 		return new DataValue<String>(data) {
 
 			@Override
-			public Type<String> type() {
+			public FEMType<String> type() {
 				return Values.STRING_TYPE;
 			}
 
@@ -556,17 +556,17 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebene Zahlenwert als {@link Value} zurück.
+	 * Diese Methode gibt den gegebene Zahlenwert als {@link FEMValue} zurück.
 	 * 
 	 * @param data Zahlenwert.
-	 * @return {@link Number}-{@link Value}.
+	 * @return {@link Number}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<Number> numberValue(final Number data) throws NullPointerException {
 		return new DataValue<Number>(data) {
 
 			@Override
-			public Type<Number> type() {
+			public FEMType<Number> type() {
 				return Values.NUMBER_TYPE;
 			}
 
@@ -574,20 +574,20 @@ public class Values {
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link Value} zurück.
+	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link FEMValue} zurück.
 	 * 
 	 * @param data Wahrheitswert.
-	 * @return {@link Boolean}-{@link Value}.
+	 * @return {@link Boolean}-{@link FEMValue}.
 	 */
 	public static DataValue<Boolean> booleanValue(final boolean data) {
 		return (data ? Values.TRUE : Values.FALSE);
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link Value} zurück.
+	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link FEMValue} zurück.
 	 * 
 	 * @param data Wahrheitswert.
-	 * @return {@link Boolean}-{@link Value}.
+	 * @return {@link Boolean}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static DataValue<Boolean> booleanValue(final Boolean data) throws NullPointerException {

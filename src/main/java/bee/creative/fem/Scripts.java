@@ -1,4 +1,4 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,13 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import bee.creative.function.Functions.ClosureFunction;
-import bee.creative.function.Functions.InvokeFunction;
-import bee.creative.function.Functions.ParamFunction;
-import bee.creative.function.Functions.ProxyFunction;
-import bee.creative.function.Functions.TraceFunction;
-import bee.creative.function.Functions.ValueFunction;
-import bee.creative.function.Script.Range;
+import bee.creative.fem.Functions.ClosureFunction;
+import bee.creative.fem.Functions.InvokeFunction;
+import bee.creative.fem.Functions.ParamFunction;
+import bee.creative.fem.Functions.ProxyFunction;
+import bee.creative.fem.Functions.TraceFunction;
+import bee.creative.fem.Functions.ValueFunction;
+import bee.creative.fem.Script.Range;
 import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
@@ -267,7 +267,7 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen Kompiler für {@link Value Werte} und {@link Function Funktionen}.
+	 * Diese Klasse implementiert einen Kompiler für {@link FEMValue Werte} und {@link FEMFunction Funktionen}.
 	 * <p>
 	 * Die Bereichestypen eines Quelltexts haben folgende Bedeutung:
 	 * <ul>
@@ -285,7 +285,7 @@ public class Scripts {
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
 	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link Functions#ARRAY_VIEW_FUNCTION}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
-	 * als {@link Values#functionValue(Function)}s angegeben.</li>
+	 * als {@link Values#functionValue(FEMFunction)}s angegeben.</li>
 	 * </ul>
 	 * 
 	 * @see #compileValue()
@@ -295,14 +295,14 @@ public class Scripts {
 	public static class ScriptCompiler {
 
 		/**
-		 * Dieses Feld speichert den {@link Value} zu {@link Array#EMPTY}.
+		 * Dieses Feld speichert den {@link FEMValue} zu {@link Array#EMPTY}.
 		 */
-		static final Value EMPTY_ARRAY_VALUE = Values.arrayValue(Array.EMPTY);
+		static final FEMValue EMPTY_ARRAY_VALUE = Values.arrayValue(Array.EMPTY);
 
 		/**
-		 * Dieses Feld speichert die {@link Function} zu {@link #EMPTY_ARRAY_VALUE}.
+		 * Dieses Feld speichert die {@link FEMFunction} zu {@link #EMPTY_ARRAY_VALUE}.
 		 */
-		static final Function EMPTY_ARRAY_FUNCTION = new ValueFunction(ScriptCompiler.EMPTY_ARRAY_VALUE);
+		static final FEMFunction EMPTY_ARRAY_FUNCTION = new ValueFunction(ScriptCompiler.EMPTY_ARRAY_VALUE);
 
 		{}
 
@@ -426,22 +426,22 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Value} und gibt diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMValue} und gibt diesen zurück.
 		 * 
 		 * @see Values#arrayValue(Array)
-		 * @return Wertliste als {@link Value}.
+		 * @return Wertliste als {@link FEMValue}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected Value compileNextArrayAsValue() throws ScriptException {
+		protected FEMValue compileNextArrayAsValue() throws ScriptException {
 			if (!this.arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
-			final List<Value> result = new ArrayList<>();
+			final List<FEMValue> result = new ArrayList<>();
 			this.skip();
 			if (this.skipSpace().type == ']') {
 				this.skip();
 				return ScriptCompiler.EMPTY_ARRAY_VALUE;
 			}
 			while (true) {
-				final Value value = this.compileNextParamAsValue();
+				final FEMValue value = this.compileNextParamAsValue();
 				result.add(value);
 				switch (this.skipSpace().type) {
 					case ';': {
@@ -461,26 +461,26 @@ public class Scripts {
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link Function} und gibt diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMFunction} und gibt diesen zurück.
 		 * 
 		 * @see ValueFunction
 		 * @see InvokeFunction
 		 * @see Values#arrayValue(Array)
 		 * @see Functions#ARRAY_VIEW_FUNCTION
-		 * @return Wertliste als {@link Function}.
+		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected Function compileNextArrayAsFunction() throws ScriptException {
+		protected FEMFunction compileNextArrayAsFunction() throws ScriptException {
 			if (!this.arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
 			if (this.skipSpace().type == ']') {
 				this.skip();
 				return ScriptCompiler.EMPTY_ARRAY_FUNCTION;
 			}
-			final List<Function> list = new ArrayList<>();
+			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
 			while (true) {
-				final Function item = this.compileNextParamAsFunction();
+				final FEMFunction item = this.compileNextParamAsFunction();
 				list.add(item);
 				value = value && (item instanceof ValueFunction);
 				switch (this.skipSpace().type) {
@@ -493,12 +493,12 @@ public class Scripts {
 						this.skip();
 						final int size = list.size();
 						if (!value) {
-							final Function result = new InvokeFunction(Functions.ARRAY_VIEW_FUNCTION, true, list.toArray(new Function[size]));
+							final FEMFunction result = new InvokeFunction(Functions.ARRAY_VIEW_FUNCTION, true, list.toArray(new FEMFunction[size]));
 							return result;
 						}
-						final Value[] values = new Value[size];
+						final FEMValue[] values = new FEMValue[size];
 						for (int i = 0; i < size; i++) {
-							values[i] = list.get(i).execute(Scope.EMPTY);
+							values[i] = list.get(i).execute(FEMScope.EMPTY);
 						}
 						return new ValueFunction(Values.arrayValue(Array.valueOf(values)));
 					}
@@ -517,9 +517,9 @@ public class Scripts {
 		 * @return Parameter.
 		 * @throws ScriptException Wenn {@link #section()} ungültig ist.
 		 */
-		protected Function compileNextParam() throws ScriptException {
+		protected FEMFunction compileNextParam() throws ScriptException {
 			try {
-				final Function result = this.helper.compileParam(this, this.section());
+				final FEMFunction result = this.helper.compileParam(this, this.section());
 				if (result == null) throw new ScriptException().useSender(this).useHint(" Parameter erwartet.");
 				this.skip();
 				return result;
@@ -536,7 +536,7 @@ public class Scripts {
 		 * @return Wert.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected Value compileNextParamAsValue() throws ScriptException {
+		protected FEMValue compileNextParamAsValue() throws ScriptException {
 			switch (this.skipSpace().type) {
 				case 0:
 				case '$':
@@ -553,13 +553,13 @@ public class Scripts {
 				}
 				case '{': {
 					if (this.closureEnabled) throw new ScriptException().useSender(this).useHint(" Ungebundene Funktion unzulässig.");
-					final Function retult = this.compileNextScope();
+					final FEMFunction retult = this.compileNextScope();
 					return Values.functionValue(retult);
 				}
 				default: {
-					final Function param = this.compileNextParam();
+					final FEMFunction param = this.compileNextParam();
 					if (!(param instanceof ValueFunction)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
-					final Value result = param.execute(Scope.EMPTY);
+					final FEMValue result = param.execute(FEMScope.EMPTY);
 					return result;
 				}
 			}
@@ -571,8 +571,8 @@ public class Scripts {
 		 * @return Funktion.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected Function compileNextParamAsFunction() throws ScriptException {
-			Function result;
+		protected FEMFunction compileNextParamAsFunction() throws ScriptException {
+			FEMFunction result;
 			boolean indirect = false;
 			switch (this.skipSpace().type) {
 				case 0:
@@ -621,14 +621,14 @@ public class Scripts {
 				if (indirect && !this.chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				this.skipSpace();
-				final List<Function> list = new ArrayList<>();
+				final List<FEMFunction> list = new ArrayList<>();
 				while (true) {
 					if (this.range.type == ')') {
 						this.skip();
-						result = new InvokeFunction(result, !indirect, list.toArray(new Function[list.size()]));
+						result = new InvokeFunction(result, !indirect, list.toArray(new FEMFunction[list.size()]));
 						break;
 					}
-					final Function item = this.compileNextParamAsFunction();
+					final FEMFunction item = this.compileNextParamAsFunction();
 					list.add(item);
 					switch (this.skipSpace().type) {
 						default:
@@ -654,7 +654,7 @@ public class Scripts {
 			if ((name == null) || (this.parseIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
 			final ProxyFunction result = this.proxy(name);
 			if (this.skipSpace().type != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			final Function target = this.compileNextScope();
+			final FEMFunction target = this.compileNextScope();
 			result.set(target);
 			return result;
 		}
@@ -697,12 +697,12 @@ public class Scripts {
 
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich (<code>'{'</code>) beginnende, parametrisierte Funktion in einen
-		 * {@link Values#functionValue(Function)} und gibt diesen zurück.
+		 * {@link Values#functionValue(FEMFunction)} und gibt diesen zurück.
 		 * 
-		 * @return Funktion als {@link Values#functionValue(Function)}.
+		 * @return Funktion als {@link Values#functionValue(FEMFunction)}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected Function compileNextScope() throws ScriptException {
+		protected FEMFunction compileNextScope() throws ScriptException {
 			this.skip();
 			int count = 0;
 			while (true) {
@@ -720,7 +720,7 @@ public class Scripts {
 					}
 					case ':': {
 						this.skip();
-						final Function result = this.compileNextParamAsFunction();
+						final FEMFunction result = this.compileNextParamAsFunction();
 						if (this.skipSpace().type != '}') throw new ScriptException().useSender(this).useHint(" Zeichen «}» erwartet.");
 						this.skip();
 						this.params.subList(0, count).clear();
@@ -817,7 +817,7 @@ public class Scripts {
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} als
-		 * {@link Values#functionValue(Function)} gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B
+		 * {@link Values#functionValue(FEMFunction)} gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B
 		 * {@code SORT(array; compFun)}).
 		 * 
 		 * @see #compileFunction()
@@ -843,7 +843,7 @@ public class Scripts {
 		 * 
 		 * @see #compileFunction()
 		 * @see InvokeFunction#direct()
-		 * @see InvokeFunction#execute(Scope)
+		 * @see InvokeFunction#execute(FEMScope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
 		public final boolean isChainingEnabled() {
@@ -974,11 +974,11 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public Value compileValue() throws ScriptException, IllegalStateException {
+		public FEMValue compileValue() throws ScriptException, IllegalStateException {
 			this.startCompiling();
 			try {
 				if (this.skipSpace().type == 0) return null;
-				final Value result = this.compileNextParamAsValue();
+				final FEMValue result = this.compileNextParamAsValue();
 				if (this.skipSpace().type == 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
@@ -995,16 +995,16 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public Value[] compileValues() throws ScriptException, IllegalStateException {
+		public FEMValue[] compileValues() throws ScriptException, IllegalStateException {
 			this.startCompiling();
 			try {
-				if (this.skipSpace().type == 0) return new Value[0];
-				final List<Value> result = new ArrayList<Value>();
+				if (this.skipSpace().type == 0) return new FEMValue[0];
+				final List<FEMValue> result = new ArrayList<FEMValue>();
 				while (true) {
 					result.add(this.compileNextParamAsValue());
 					switch (this.skipSpace().type) {
 						case 0: {
-							return result.toArray(new Value[result.size()]);
+							return result.toArray(new FEMValue[result.size()]);
 						}
 						case ';': {
 							this.skip();
@@ -1055,11 +1055,11 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public Function compileFunction() throws ScriptException, IllegalStateException {
+		public FEMFunction compileFunction() throws ScriptException, IllegalStateException {
 			this.startCompiling();
 			try {
 				if (this.skipSpace().type == 0) return null;
-				final Function result = this.compileNextParamAsFunction();
+				final FEMFunction result = this.compileNextParamAsFunction();
 				if (this.skipSpace().type == 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
@@ -1076,16 +1076,16 @@ public class Scripts {
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public Function[] compileFunctions() throws ScriptException, IllegalStateException {
+		public FEMFunction[] compileFunctions() throws ScriptException, IllegalStateException {
 			this.startCompiling();
 			try {
-				if (this.skipSpace().type == 0) return new Function[0];
-				final List<Function> result = new ArrayList<Function>();
+				if (this.skipSpace().type == 0) return new FEMFunction[0];
+				final List<FEMFunction> result = new ArrayList<FEMFunction>();
 				while (true) {
 					result.add(this.compileNextParamAsFunction());
 					switch (this.skipSpace().type) {
 						case 0: {
-							return result.toArray(new Function[result.size()]);
+							return result.toArray(new FEMFunction[result.size()]);
 						}
 						case ';': {
 							this.skip();
@@ -1136,7 +1136,7 @@ public class Scripts {
 			}
 
 			@Override
-			public Function compileParam(final ScriptCompiler compiler, final String section) throws ScriptException {
+			public FEMFunction compileParam(final ScriptCompiler compiler, final String section) throws ScriptException {
 				switch (compiler.range().type()) {
 					case '\'': {
 						return new ValueFunction(Values.stringValue(this.content(compiler, section).replaceAll("''", "'")));
@@ -1189,10 +1189,10 @@ public class Scripts {
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
 		 * @param section aktuellen Bereich des Quelltexts ({@link ScriptCompiler#section()}).
-		 * @return Parameter als {@link Function}, Parameterwert als {@link ValueFunction} oder Platzhalter als {@link ProxyFunction}.
+		 * @return Parameter als {@link FEMFunction}, Parameterwert als {@link ValueFunction} oder Platzhalter als {@link ProxyFunction}.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
-		public Function compileParam(ScriptCompiler compiler, String section) throws ScriptException;
+		public FEMFunction compileParam(ScriptCompiler compiler, String section) throws ScriptException;
 
 	}
 
@@ -1503,11 +1503,11 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt die gegebenen Wertliste an und gibt {@code this} zurück.<br>
 		 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
-		 * separiert über {@link #putValue(Value)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der
+		 * separiert über {@link #putValue(FEMValue)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der
 		 * schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
 		 * 
-		 * @see #putValue(Value)
+		 * @see #putValue(FEMValue)
 		 * @see #putBreakInc()
 		 * @see #putBreakDec()
 		 * @see #putBreakSpace()
@@ -1518,12 +1518,12 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putArray(final Iterable<? extends Value> array) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (array == null) throw new NullPointerException("array = null");
 			this.checkFormatting();
-			final Iterator<? extends Value> iter = array.iterator();
+			final Iterator<? extends FEMValue> iter = array.iterator();
 			if (iter.hasNext()) {
-				Value item = iter.next();
+				FEMValue item = iter.next();
 				if (iter.hasNext()) {
 					this.putIndent().put("[").putBreakInc().putValue(item);
 					do {
@@ -1543,17 +1543,17 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.<br>
 		 * Wenn der Wert ein {@link ScriptFormatterInput} ist, wird er über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird er
-		 * über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, Value)} angefügt.
+		 * über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)} angefügt.
 		 * 
 		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
-		 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, Value)
+		 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)
 		 * @param value Wert.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putValue(final Value value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
@@ -1566,12 +1566,12 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt den Quelltext der Liste der gegebenen zugesicherten Parameterwerte eines Ausführungskontexts an und gibt {@code this} zurück.<br>
 		 * Wenn diese Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die nummerierten Parameterwerte in {@code "("} und {@code ")"} eingeschlossen,
-		 * sowie mit {@code ";"} separiert über {@link #putValue(Value)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als
+		 * sowie mit {@code ";"} separiert über {@link #putValue(FEMValue)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als
 		 * {@code "$i: "} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der schließenden Klammer
 		 * {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
 		 * 
-		 * @see #putFunction(Function)
+		 * @see #putFunction(FEMFunction)
 		 * @see #putBreakInc()
 		 * @see #putBreakDec()
 		 * @see #putBreakSpace()
@@ -1582,12 +1582,12 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putScope(final Iterable<? extends Value> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putScope(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
 			this.checkFormatting();
-			final Iterator<? extends Value> iter = params.iterator();
+			final Iterator<? extends FEMValue> iter = params.iterator();
 			if (iter.hasNext()) {
-				Value item = iter.next();
+				FEMValue item = iter.next();
 				if (iter.hasNext()) {
 					this.putIndent().put("(").putBreakInc().put("$1: ").putValue(item);
 					int index = 2;
@@ -1609,12 +1609,12 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt den Quelltext der Liste der gegebenen Parameterfunktionen an und gibt {@code this} zurück.<br>
 		 * Wenn die Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die Parameterfunktionen in {@code "("} und {@code ")"} eingeschlossen sowie mit
-		 * {@code ";"} separiert über {@link #putFunction(Function)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue
+		 * {@code ";"} separiert über {@link #putFunction(FEMFunction)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue
 		 * Hierarchieebene, die vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes
 		 * Leerzeichen} eingefügt.<br>
 		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Funktionsliste mehr als ein Element enthält.
 		 * 
-		 * @see #putFunction(Function)
+		 * @see #putFunction(FEMFunction)
 		 * @see #putBreakInc()
 		 * @see #putBreakDec()
 		 * @see #putBreakSpace()
@@ -1625,12 +1625,12 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putParams(final Iterable<? extends Function> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
 			this.checkFormatting();
-			final Iterator<? extends Function> iter = params.iterator();
+			final Iterator<? extends FEMFunction> iter = params.iterator();
 			if (iter.hasNext()) {
-				Function item = iter.next();
+				FEMFunction item = iter.next();
 				if (iter.hasNext()) {
 					this.putIndent().put("(").putBreakInc().putFunction(item);
 					do {
@@ -1649,16 +1649,16 @@ public class Scripts {
 
 		/**
 		 * Diese Methode fügt die gegebenen, parametrisierte Funktion an und gibt {@code this} zurück.<br>
-		 * Die parametrisierte Funktion wird dabei in <code>"{: "</code> und <code>"}"</code> eingeschlossen und über {@link #putFunction(Function)} angefügt.
+		 * Die parametrisierte Funktion wird dabei in <code>"{: "</code> und <code>"}"</code> eingeschlossen und über {@link #putFunction(FEMFunction)} angefügt.
 		 * 
-		 * @see #putFunction(Function)
+		 * @see #putFunction(FEMFunction)
 		 * @param function parametrisierte Funktion.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putHandler(final Function function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
 			return this.put("{: ").putFunction(function).put("}");
 		}
@@ -1666,17 +1666,17 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
 		 * Wenn die Funktion ein {@link ScriptFormatterInput} ist, wird sie über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
-		 * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)} angefügt.
+		 * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)} angefügt.
 		 * 
 		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
-		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, Function)
+		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)
 		 * @param function Funktion.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putFunction(final Function function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (function instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)function).toScript(this);
@@ -1766,7 +1766,7 @@ public class Scripts {
 		/**
 		 * Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
 		 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
-		 * hierfür {@link #putData(Object)}, {@link #putValue(Value)} bzw. {@link #putFunction(Function)} aufgerufen werden.
+		 * hierfür {@link #putData(Object)}, {@link #putValue(FEMValue)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
 		 * 
 		 * @see #formatData(Iterable)
 		 * @see #formatValue(Iterable)
@@ -1853,28 +1853,28 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
-		public String formatValue(final Value... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public String formatValue(final FEMValue... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
 			return this.formatValue(Arrays.asList(values));
 		}
 
 		/**
 		 * Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Werte werden über {@link #putValue(Value)} angefügt und mit {@code ';'} separiert.
+		 * Die Werte werden über {@link #putValue(FEMValue)} angefügt und mit {@code ';'} separiert.
 		 * 
-		 * @see #putValue(Value)
+		 * @see #putValue(FEMValue)
 		 * @param values Werte.
 		 * @return formatierter Quelltext.
 		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
-		public String formatValue(final Iterable<? extends Value> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public String formatValue(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
-			return this.format(values, new Converter<Value, Object>() {
+			return this.format(values, new Converter<FEMValue, Object>() {
 
 				@Override
-				public Object convert(final Value input) {
+				public Object convert(final FEMValue input) {
 					return ScriptFormatter.this.putValue(input);
 				}
 
@@ -1892,28 +1892,28 @@ public class Scripts {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
-		public String formatFunction(final Function... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public String formatFunction(final FEMFunction... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
 			return this.formatFunction(Arrays.asList(functions));
 		}
 
 		/**
 		 * Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Funktionen werden über {@link #putFunction(Function)} angefügt und mit {@code ';'} separiert.
+		 * Die Funktionen werden über {@link #putFunction(FEMFunction)} angefügt und mit {@code ';'} separiert.
 		 * 
-		 * @see #putFunction(Function)
+		 * @see #putFunction(FEMFunction)
 		 * @param functions Funktionen.
 		 * @return formatierter Quelltext.
 		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
-		public String formatFunction(final Iterable<? extends Function> functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public String formatFunction(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
-			return this.format(functions, new Converter<Function, Object>() {
+			return this.format(functions, new Converter<FEMFunction, Object>() {
 
 				@Override
-				public Object convert(final Function input) {
+				public Object convert(final FEMFunction input) {
 					return ScriptFormatter.this.putFunction(input);
 				}
 
@@ -1937,8 +1937,8 @@ public class Scripts {
 	 * kann.
 	 * 
 	 * @see ScriptFormatter#put(Object)
-	 * @see ScriptFormatter#putValue(Value)
-	 * @see ScriptFormatter#putFunction(Function)
+	 * @see ScriptFormatter#putValue(FEMValue)
+	 * @see ScriptFormatter#putFunction(FEMFunction)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface ScriptFormatterInput {
@@ -1954,8 +1954,8 @@ public class Scripts {
 	}
 
 	/**
-	 * Diese Schnittstelle definiert Formatierungsmethoden, die in den Methoden {@link ScriptFormatter#putValue(Value)} und
-	 * {@link ScriptFormatter#putFunction(Function)} zur Übersetzung von Werten und Funktionen in Quelltexte genutzt werden.
+	 * Diese Schnittstelle definiert Formatierungsmethoden, die in den Methoden {@link ScriptFormatter#putValue(FEMValue)} und
+	 * {@link ScriptFormatter#putFunction(FEMFunction)} zur Übersetzung von Werten und Funktionen in Quelltexte genutzt werden.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1972,12 +1972,12 @@ public class Scripts {
 			}
 
 			@Override
-			public void formatValue(final ScriptFormatter target, final Value value) throws IllegalArgumentException {
+			public void formatValue(final ScriptFormatter target, final FEMValue value) throws IllegalArgumentException {
 				target.put(String.valueOf(value));
 			}
 
 			@Override
-			public void formatFunction(final ScriptFormatter target, final Function function) throws IllegalArgumentException {
+			public void formatFunction(final ScriptFormatter target, final FEMFunction function) throws IllegalArgumentException {
 				target.put(String.valueOf(function));
 			}
 
@@ -2004,7 +2004,7 @@ public class Scripts {
 		 * @param value Wert.
 		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
-		public void formatValue(ScriptFormatter target, Value value) throws IllegalArgumentException;
+		public void formatValue(ScriptFormatter target, FEMValue value) throws IllegalArgumentException;
 
 		/**
 		 * Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
@@ -2013,7 +2013,7 @@ public class Scripts {
 		 * @param function Funktion.
 		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann.
 		 */
-		public void formatFunction(ScriptFormatter target, Function function) throws IllegalArgumentException;
+		public void formatFunction(ScriptFormatter target, FEMFunction function) throws IllegalArgumentException;
 
 	}
 
@@ -2197,20 +2197,20 @@ public class Scripts {
 		 * Dieses Feld speichert den Ausführungskontext der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
 		 * angepasst werden.
 		 */
-		Scope scope;
+		FEMScope scope;
 
 		/**
 		 * Dieses Feld speichert die Function, die nach {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen wird bzw. vor
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} oder {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf angepasst werden.
 		 */
-		Function function;
+		FEMFunction function;
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode
 		 * {@link ScriptTracerHelper#onReturn(ScriptTracer)} angepasst werden.
 		 */
-		Value result;
+		FEMValue result;
 
 		/**
 		 * Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode
@@ -2234,7 +2234,7 @@ public class Scripts {
 		 * 
 		 * @return Ausführungskontext oder {@code null}.
 		 */
-		public Scope getScope() {
+		public FEMScope getScope() {
 			return this.scope;
 		}
 
@@ -2243,7 +2243,7 @@ public class Scripts {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public Function getFunction() {
+		public FEMFunction getFunction() {
 			return this.function;
 		}
 
@@ -2252,7 +2252,7 @@ public class Scripts {
 		 * 
 		 * @return Ergebniswert oder {@code null}.
 		 */
-		public Value getResult() {
+		public FEMValue getResult() {
 			return this.result;
 		}
 
@@ -2286,7 +2286,7 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useScope(final Scope value) throws NullPointerException {
+		public ScriptTracer useScope(final FEMScope value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.scope = value;
 			return this;
@@ -2299,7 +2299,7 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useFunction(final Function value) throws NullPointerException {
+		public ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.function = value;
 			return this;
@@ -2313,7 +2313,7 @@ public class Scripts {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useResult(final Value value) throws NullPointerException {
+		public ScriptTracer useResult(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.result = value;
 			this.exception = null;
@@ -2363,7 +2363,7 @@ public class Scripts {
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
-		public Function trace(final Function function) throws NullPointerException {
+		public FEMFunction trace(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (function instanceof ScriptTracerInput) return ((ScriptTracerInput)function).toTrace(this);
 			return function;
@@ -2399,7 +2399,7 @@ public class Scripts {
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException;
+		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException;
 
 	}
 
@@ -2437,7 +2437,7 @@ public class Scripts {
 		};
 
 		/**
-		 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
+		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#execute(FEMScope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
 		 * {@link ScriptTracer#exception} kann hierbei angepasst werden.
 		 * 
 		 * @see ScriptTracer#exception
@@ -2446,7 +2446,7 @@ public class Scripts {
 		public void onThrow(ScriptTracer event);
 
 		/**
-		 * Diese Methode wird nach dem Verlassen der {@link Function#execute(Scope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
+		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#execute(FEMScope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
 		 * {@link ScriptTracer#result} kann hierbei angepasst werden.
 		 * 
 		 * @see ScriptTracer#result

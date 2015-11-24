@@ -1,10 +1,10 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import bee.creative.function.Scripts.ScriptFormatter;
-import bee.creative.function.Scripts.ScriptFormatterInput;
+import bee.creative.fem.Scripts.ScriptFormatter;
+import bee.creative.fem.Scripts.ScriptFormatterInput;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
@@ -15,7 +15,7 @@ import bee.creative.util.Objects;
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Array implements Items<Value>, Iterable<Value>, ScriptFormatterInput {
+public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, ScriptFormatterInput {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.
@@ -31,7 +31,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 		 * @param value Wert.
 		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll.
 		 */
-		public boolean push(Value value);
+		public boolean push(FEMValue value);
 
 	}
 
@@ -43,7 +43,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	public static final Array EMPTY = new Array() {
 
 		@Override
-		public Value get(final int index) throws IndexOutOfBoundsException {
+		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			throw new IndexOutOfBoundsException();
 		}
 
@@ -79,7 +79,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 		return new Array() {
 
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 				if (index >= length) throw new IndexOutOfBoundsException("index >= length");
 				final Object value = java.lang.reflect.Array.get(values, index);
@@ -102,13 +102,13 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(Value... data) throws NullPointerException {
+	public static Array valueOf(FEMValue... data) throws NullPointerException {
 		if (data.length == 0) return Array.EMPTY;
-		final Value[] values = data = data.clone();
+		final FEMValue[] values = data = data.clone();
 		return new Array() {
 
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				return values[index];
 			}
 
@@ -128,8 +128,8 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(final Iterable<? extends Value> data) throws NullPointerException {
-		final ArrayList<Value> result = new ArrayList<>();
+	public static Array valueOf(final Iterable<? extends FEMValue> data) throws NullPointerException {
+		final ArrayList<FEMValue> result = new ArrayList<>();
 		Iterables.appendAll(result, data);
 		return Array.valueOf(result);
 	}
@@ -138,21 +138,21 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Collection#toArray(Object[])
-	 * @see #valueOf(Value...)
+	 * @see #valueOf(FEMValue...)
 	 * @param data Werte.
 	 * @return {@link Array}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(final Collection<? extends Value> data) throws NullPointerException {
+	public static Array valueOf(final Collection<? extends FEMValue> data) throws NullPointerException {
 		if (data.size() == 0) return Array.EMPTY;
-		return Array.valueOf(data.toArray(new Value[data.size()]));
+		return Array.valueOf(data.toArray(new FEMValue[data.size()]));
 	}
 
 	{}
 
 	/**
 	 * Diese Methode fügt alle Werte im gegebenen Abschnitt geordnet an den gegebenen {@link Collector} an. Das Anfügen wird vorzeitig abgebrochen, wenn
-	 * {@link Collector#push(Value)} {@code false} liefert.
+	 * {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
@@ -171,15 +171,15 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * 
 	 * @return Array mit den Werten dieser Wertliste.
 	 */
-	public Value[] value() {
+	public FEMValue[] value() {
 		final int length = this.length();
-		final Value[] values = new Value[length];
+		final FEMValue[] values = new FEMValue[length];
 		final Collector collector = new Collector() {
 
 			int index = 0;
 
 			@Override
-			public boolean push(final Value value) {
+			public boolean push(final FEMValue value) {
 				values[this.index++] = value;
 				return true;
 			}
@@ -198,7 +198,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 
 	/**
 	 * Diese Methode fügt alle Werte der Wertliste geordnet an den gegebenen {@link Collector} an.<br>
-	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(Value)} {@code false} liefert.
+	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
@@ -233,7 +233,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 			}
 
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				final int index2 = index - Array.this.length();
 				return index2 < 0 ? Array.this.get(index) : array.get(index2);
 			}
@@ -274,7 +274,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 			}
 
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				if ((index < 0) || (index >= length)) throw new IndexOutOfBoundsException();
 				return Array.this.get(index + offset);
 			}
@@ -298,7 +298,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * Diese Methode gibt den {@code index}-ten Wert zurück.
 	 */
 	@Override
-	public abstract Value get(final int index) throws IndexOutOfBoundsException;
+	public abstract FEMValue get(final int index) throws IndexOutOfBoundsException;
 
 	/**
 	 * {@inheritDoc}
@@ -332,7 +332,7 @@ public abstract class Array implements Items<Value>, Iterable<Value>, ScriptForm
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterator<Value> iterator() {
+	public Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 

@@ -1,31 +1,31 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import java.util.Arrays;
-import bee.creative.function.Scripts.ScriptFormatter;
-import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Scripts.ScriptTracer;
-import bee.creative.function.Scripts.ScriptTracerHelper;
-import bee.creative.function.Scripts.ScriptTracerInput;
-import bee.creative.function.Values.VirtualValue;
+import bee.creative.fem.Scripts.ScriptFormatter;
+import bee.creative.fem.Scripts.ScriptFormatterInput;
+import bee.creative.fem.Scripts.ScriptTracer;
+import bee.creative.fem.Scripts.ScriptTracerHelper;
+import bee.creative.fem.Scripts.ScriptTracerInput;
+import bee.creative.fem.Values.VirtualValue;
 
 /**
  * Diese Klasse implementiert Hilfsklassen und Hilfsmethoden zur Erzeugung von Funktionen.
  * 
- * @see Value
- * @see Scope
- * @see Function
+ * @see FEMValue
+ * @see FEMScope
+ * @see FEMFunction
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class Functions {
 
 	/**
 	 * Diese Klasse implementiert eine abstakte Funktion als {@link ScriptFormatterInput}.<br>
-	 * Die {@link #toString() Textdarstellung} der Funktion wird über {@link ScriptFormatter#formatFunction(Function...)} und damit via
+	 * Die {@link #toString() Textdarstellung} der Funktion wird über {@link ScriptFormatter#formatFunction(FEMFunction...)} und damit via
 	 * {@link #toScript(ScriptFormatter)} ermittelt.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class BaseFunction implements Function, ScriptFormatterInput {
+	public static abstract class BaseFunction implements FEMFunction, ScriptFormatterInput {
 
 		/**
 		 * {@inheritDoc}
@@ -46,7 +46,7 @@ public class Functions {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen benannten Platzhalter einer Funktione, dessen {@link #execute(Scope)}-Methoden an eine gegebene Funktion delegiert.
+	 * Diese Klasse implementiert einen benannten Platzhalter einer Funktione, dessen {@link #execute(FEMScope)}-Methoden an eine gegebene Funktion delegiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -60,7 +60,7 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert die Funktion.
 		 */
-		Function function;
+		FEMFunction function;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Namen.
@@ -76,12 +76,12 @@ public class Functions {
 		{}
 
 		/**
-		 * Diese Methode setzt die in {@link #execute(Scope)} aufzurufende Funktion.
+		 * Diese Methode setzt die in {@link #execute(FEMScope)} aufzurufende Funktion.
 		 * 
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public void set(final Function function) throws NullPointerException {
+		public void set(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			this.function = function;
 		}
@@ -96,12 +96,12 @@ public class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt die Funktion zurück, die in {@link #execute(Scope)} aufgerufen wird. Diese ist {@code null}, wenn {@link #set(Function)} noch nicht
+		 * Diese Methode gibt die Funktion zurück, die in {@link #execute(FEMScope)} aufgerufen wird. Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht
 		 * aufgerufen wurde.
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -111,7 +111,7 @@ public class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			return this.function.execute(scope);
 		}
 
@@ -132,7 +132,7 @@ public class Functions {
 
 	/**
 	 * Diese Klasse implementiert eine Funktion zur Verfolgung bzw. Überwachung der Verarbeitung von Funktionen mit Hilfe eines {@link ScriptTracer}. Die genaue
-	 * Beschreibung der Verarbeitung kann bei der Methode {@link #execute(Scope)} nachgelesen werden.
+	 * Beschreibung der Verarbeitung kann bei der Methode {@link #execute(FEMScope)} nachgelesen werden.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see ScriptTracer
@@ -147,7 +147,7 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
-		final Function function;
+		final FEMFunction function;
 
 		/**
 		 * Dieser Konstruktor initialisiert Funktion und {@link ScriptTracer}.
@@ -156,7 +156,7 @@ public class Functions {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
-		public TraceFunction(final ScriptTracer tracer, final Function function) throws NullPointerException {
+		public TraceFunction(final ScriptTracer tracer, final FEMFunction function) throws NullPointerException {
 			if (tracer == null) throw new NullPointerException("tracer = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.tracer = tracer;
@@ -166,7 +166,7 @@ public class Functions {
 		{}
 
 		/**
-		 * Diese Methode gibt den {@link ScriptTracer} zurück, dessen Zustand in {@link #execute(Scope)} modifiziert wird.
+		 * Diese Methode gibt den {@link ScriptTracer} zurück, dessen Zustand in {@link #execute(FEMScope)} modifiziert wird.
 		 * 
 		 * @return {@link ScriptTracer}.
 		 */
@@ -175,11 +175,11 @@ public class Functions {
 		}
 
 		/**
-		 * Diese Methode gibt die aufzurufende {@link Function} zurück.
+		 * Diese Methode gibt die aufzurufende {@link FEMFunction} zurück.
 		 * 
-		 * @return aufzurufende {@link Function}.
+		 * @return aufzurufende {@link FEMFunction}.
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -191,7 +191,7 @@ public class Functions {
 		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Ausführungskontext sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die
 		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
 		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getScope() aktuellen
-		 * Ausführungskontext} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#useResult(Value) gespeichert}.<br>
+		 * Ausführungskontext} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#useResult(FEMValue) gespeichert}.<br>
 		 * Abschließend werden dann {@link ScriptTracerHelper#onReturn(ScriptTracer) tracer().helper().onReturn(tracer())} aufgerufen und der
 		 * {@link ScriptTracer#getResult() aktuelle Ergebniswert} zurück gegeben.<br>
 		 * Wenn eine {@link RuntimeException} auftritt, wird diese im {@link #tracer()} {@link ScriptTracer#useException(RuntimeException) gespeichert}, wird
@@ -201,7 +201,7 @@ public class Functions {
 		 * Der verwendete {@link ScriptTracerHelper} wird nur einmalig zu Beginn der Auswertung über den {@link #tracer()} ermittelt.
 		 */
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			final ScriptTracer tracer = this.tracer;
 			try {
 				final ScriptTracerHelper helper = tracer.getHelper();
@@ -222,7 +222,7 @@ public class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.tracer.equals(tracer)) return this;
 			return tracer.trace(this.function);
 		}
@@ -240,7 +240,7 @@ public class Functions {
 	/**
 	 * Diese Klasse implementiert eine Funktion, welche immer den gleichen gegebenen Ergebniswert liefert.
 	 * 
-	 * @see #execute(Scope)
+	 * @see #execute(FEMScope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ValueFunction extends BaseFunction implements ScriptTracerInput {
@@ -248,7 +248,7 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
 		 */
-		final Value value;
+		final FEMValue value;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Ergebniswert.
@@ -256,7 +256,7 @@ public class Functions {
 		 * @param value Ergebniswert.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ValueFunction(final Value value) throws NullPointerException {
+		public ValueFunction(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.value = value;
 		}
@@ -268,7 +268,7 @@ public class Functions {
 		 * 
 		 * @return Ergebniswert.
 		 */
-		public Value value() {
+		public FEMValue value() {
 			return this.value;
 		}
 
@@ -278,7 +278,7 @@ public class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			return this.value;
 		}
 
@@ -286,7 +286,7 @@ public class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.value instanceof ScriptTracerInput) return ((ScriptTracerInput)this.value).toTrace(tracer);
 			return this;
 		}
@@ -305,7 +305,7 @@ public class Functions {
 	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link VirtualValue}.
 	 * 
 	 * @see VirtualValue
-	 * @see #execute(Scope)
+	 * @see #execute(FEMScope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class VirtualFunction extends BaseFunction {
@@ -318,7 +318,7 @@ public class Functions {
 		 * @return {@link VirtualFunction}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public static VirtualFunction valueOf(final Function function) throws NullPointerException {
+		public static VirtualFunction valueOf(final FEMFunction function) throws NullPointerException {
 			if (function instanceof VirtualFunction) return (VirtualFunction)function;
 			return new VirtualFunction(function);
 		}
@@ -328,15 +328,15 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert die auszuwertende Funktion.
 		 */
-		final Function function;
+		final FEMFunction function;
 
 		/**
-		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #execute(Scope)} zur Erzeugung eines {@link VirtualValue} genutzt wird.
+		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #execute(FEMScope)} zur Erzeugung eines {@link VirtualValue} genutzt wird.
 		 * 
 		 * @param function auszuwertende Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public VirtualFunction(final Function function) throws NullPointerException {
+		public VirtualFunction(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			this.function = function;
 		}
@@ -348,7 +348,7 @@ public class Functions {
 		 * 
 		 * @return auszuwertende Funktion.
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -360,10 +360,10 @@ public class Functions {
 		 * Der Ergebniswert entspricht {@code new LazyValue(scope, this.function())}.
 		 * 
 		 * @see #function()
-		 * @see VirtualValue#VirtualValue(Scope, Function)
+		 * @see VirtualValue#VirtualValue(FEMScope, FEMFunction)
 		 */
 		@Override
-		public VirtualValue execute(final Scope scope) {
+		public VirtualValue execute(final FEMScope scope) {
 			return new VirtualValue(scope, this.function);
 		}
 
@@ -380,7 +380,7 @@ public class Functions {
 	/**
 	 * Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte des Ausführungskontexts entspricht.
 	 * 
-	 * @see #execute(Scope)
+	 * @see #execute(FEMScope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ParamFunction extends BaseFunction {
@@ -430,7 +430,7 @@ public class Functions {
 		 * Diese Methode gibt den Index des Parameterwerts zurück.
 		 * 
 		 * @return Index des Parameterwerts.
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 */
 		public int index() {
 			return this.index;
@@ -446,7 +446,7 @@ public class Functions {
 		 * @see #index()
 		 */
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			return scope.get(this.index);
 		}
 
@@ -463,7 +463,7 @@ public class Functions {
 	/**
 	 * Diese Klasse definiert eine Funktion, die den Aufruf einer gegebenen Funktion mit den Ergebniswerten mehrerer gegebener Parameterfunktionen berechnet.
 	 * 
-	 * @see #execute(Scope)
+	 * @see #execute(FEMScope)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class InvokeFunction extends BaseFunction implements ScriptTracerInput {
@@ -476,12 +476,12 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
-		final Function function;
+		final FEMFunction function;
 
 		/**
 		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden sollen.
 		 */
-		final Function[] params;
+		final FEMFunction[] params;
 
 		/**
 		 * Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verketung und die Parameterfunktionen.
@@ -493,7 +493,7 @@ public class Functions {
 		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist.
 		 */
-		public InvokeFunction(final Function function, final boolean direct, final Function... params) throws NullPointerException {
+		public InvokeFunction(final FEMFunction function, final boolean direct, final FEMFunction... params) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (params == null) throw new NullPointerException("params = null");
 			this.direct = direct;
@@ -505,11 +505,11 @@ public class Functions {
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #function() aufzurufende Funktion} direkt mit den Ergebnissen der {@link #params()
-		 * Parameterfunktionen} aufgerufen wird. Andernfalls wird die {@link #function() aufzurufende Funktion} mit dem in {@link #execute(Scope)} gegebenen
+		 * Parameterfunktionen} aufgerufen wird. Andernfalls wird die {@link #function() aufzurufende Funktion} mit dem in {@link #execute(FEMScope)} gegebenen
 		 * Ausführungskontext zu einer Funktion ausgewertet, welche dann mit den Ergebnissen der {@link #params() Parameterfunktionen} aufgerufen wird.
 		 * 
 		 * @return Verkettung.
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 */
 		public boolean direct() {
 			return this.direct;
@@ -519,9 +519,9 @@ public class Functions {
 		 * Diese Methode gibt eine Kopie der Parameterfunktionen zurück.
 		 * 
 		 * @return Kopie der Parameterfunktionen.
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 */
-		public Function[] params() {
+		public FEMFunction[] params() {
 			return this.params.clone();
 		}
 
@@ -529,9 +529,9 @@ public class Functions {
 		 * Diese Methode gibt die aufzurufende Funktion zurück.
 		 * 
 		 * @return aufzurufende Funktion.
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -546,19 +546,19 @@ public class Functions {
 		 * @see #direct()
 		 * @see #params()
 		 * @see #function()
-		 * @see Scope#invokeScope(Scope, Function...)
+		 * @see FEMScope#invokeScope(FEMScope, FEMFunction...)
 		 */
 		@Override
-		public Value execute(Scope scope) {
-			final Function function;
+		public FEMValue execute(FEMScope scope) {
+			final FEMFunction function;
 			if (this.direct) {
 				function = this.function;
 			} else {
-				final Value value = this.function.execute(scope);
+				final FEMValue value = this.function.execute(scope);
 				function = scope.context().dataOf(value, Values.FUNCTION_TYPE);
 			}
-			scope = Scope.invokeScope(scope, this.params);
-			final Value result = function.execute(scope);
+			scope = FEMScope.invokeScope(scope, this.params);
+			final FEMValue result = function.execute(scope);
 			return result;
 		}
 
@@ -566,11 +566,11 @@ public class Functions {
 		 * Diese Methode gibt eine zu dieser Funktion gleichwertige {@link InvokeFunction} zurück, bei welcher {@link #function()} und jede Parameterfunktion in
 		 * {@link #params()} in eine {@link VirtualFunction} konvertiert wurde.
 		 * 
-		 * @see VirtualFunction#valueOf(Function)
+		 * @see VirtualFunction#valueOf(FEMFunction)
 		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind.
 		 */
 		public InvokeFunction toLazy() {
-			final Function[] functions = this.params.clone();
+			final FEMFunction[] functions = this.params.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = VirtualFunction.valueOf(functions[i]);
 			}
@@ -581,8 +581,8 @@ public class Functions {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
-			final Function[] params = this.params;
+		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+			final FEMFunction[] params = this.params;
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = tracer.trace(params[i]);
 			}
@@ -601,9 +601,9 @@ public class Functions {
 
 	/**
 	 * Diese Klasse implementiert eine Funktion, welche die zusätzliche Parameterwerte eines Ausführungskontexts an eine gegebene Funktion bindet und diese
-	 * gebundene Funktion anschließend als {@link Values#functionValue(Function)} liefert.
+	 * gebundene Funktion anschließend als {@link Values#functionValue(FEMFunction)} liefert.
 	 * 
-	 * @see #execute(Scope)
+	 * @see #execute(FEMScope)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ClosureFunction extends BaseFunction implements ScriptTracerInput {
@@ -611,38 +611,38 @@ public class Functions {
 		/**
 		 * Dieses Feld speichert den gebundenen Ausführungskontext, dessen zusätzliche Parameterwerte genutzt werden.
 		 */
-		final Scope scope;
+		final FEMScope scope;
 
 		/**
 		 * Dieses Feld speichert die auszuwertende Funktion.
 		 */
-		final Function function;
+		final FEMFunction function;
 
 		/**
-		 * Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #execute(Scope)} die die zusätzliche Parameterwerte des Ausführungskontext gebunden
+		 * Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #execute(FEMScope)} die die zusätzliche Parameterwerte des Ausführungskontext gebunden
 		 * werden.
 		 * 
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 * @param function zu bindende Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public ClosureFunction(final Function function) throws NullPointerException {
+		public ClosureFunction(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = null;
 			this.function = function;
 		}
 
 		/**
-		 * Dieser Konstruktor initialisiert den Ausführungskontext sowie die gebundene Funktion und sollte nur von {@link ClosureFunction#execute(Scope)} genutzt
-		 * werden. Die {@link #execute(Scope)}-Methode delegiert die zugesicherten Parameterwerte des ihr übergebenen Ausführungskontext zusammen mit den
+		 * Dieser Konstruktor initialisiert den Ausführungskontext sowie die gebundene Funktion und sollte nur von {@link ClosureFunction#execute(FEMScope)} genutzt
+		 * werden. Die {@link #execute(FEMScope)}-Methode delegiert die zugesicherten Parameterwerte des ihr übergebenen Ausführungskontext zusammen mit den
 		 * zusätzlichen Parameterwerten des gebundenen Ausführungskontext an die gegebene Funktion und liefert deren Ergebniswert.
 		 * 
-		 * @see #execute(Scope)
+		 * @see #execute(FEMScope)
 		 * @param scope Ausführungskontext mit den zusätzlichen Parameterwerten.
 		 * @param function gebundene Funktion.
 		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
 		 */
-		public ClosureFunction(final Scope scope, final Function function) throws NullPointerException {
+		public ClosureFunction(final FEMScope scope, final FEMFunction function) throws NullPointerException {
 			if (scope == null) throw new NullPointerException("scope = null");
 			if (function == null) throw new NullPointerException("function = null");
 			this.scope = scope;
@@ -653,14 +653,14 @@ public class Functions {
 
 		/**
 		 * Diese Methode gibt den gebundene Ausführungskontext oder {@code null} zurück. Der Ausführungskontext ist {@code null}, wenn diese {@link ClosureFunction}
-		 * über dem Konstruktor {@link #ClosureFunction(Function)} erzeugt wurde.
+		 * über dem Konstruktor {@link #ClosureFunction(FEMFunction)} erzeugt wurde.
 		 * 
-		 * @see #ClosureFunction(Function)
-		 * @see #ClosureFunction(Scope, Function)
-		 * @see #execute(Scope)
+		 * @see #ClosureFunction(FEMFunction)
+		 * @see #ClosureFunction(FEMScope, FEMFunction)
+		 * @see #execute(FEMScope)
 		 * @return gebundener Ausführungskontext oder {@code null}.
 		 */
-		public Scope scope() {
+		public FEMScope scope() {
 			return this.scope;
 		}
 
@@ -669,7 +669,7 @@ public class Functions {
 		 * 
 		 * @return auszuwertende Funktion.
 		 */
-		public Function function() {
+		public FEMFunction function() {
 			return this.function;
 		}
 
@@ -678,27 +678,27 @@ public class Functions {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Wenn diese Funktion über {@link #ClosureFunction(Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
+		 * Wenn diese Funktion über {@link #ClosureFunction(FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code new FunctionValue(new ClosureFunction(scope, this.function()))}. Damit wird der gegebene Ausführungskontext an die Funktion {@link #function()}
-		 * gebunden und als {@link Values#functionValue(Function)} zurück gegeben.
+		 * gebunden und als {@link Values#functionValue(FEMFunction)} zurück gegeben.
 		 * <p>
-		 * Wenn sie dagegen über {@link #ClosureFunction(Scope, Function)} erzeugt wurde, entspricht der Ergebniswert:<br>
+		 * Wenn sie dagegen über {@link #ClosureFunction(FEMScope, FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code this.function().execute(Scope.valueScope(this.scope(), scope.toArray(), false))}. Damit werden die gebundene Funktion mit den zugesicherten
 		 * Parameterwerten des gegebenen sowie den zusätzlichen Parameterwerten des gebundenen Ausführungskontexts ausgewertet und der so ermittelte Ergebniswert
 		 * geliefert.
 		 */
 		@Override
-		public Value execute(final Scope scope) {
-			final Scope scope2 = this.scope;
+		public FEMValue execute(final FEMScope scope) {
+			final FEMScope scope2 = this.scope;
 			if (scope2 == null) return Values.functionValue(new ClosureFunction(scope, this.function));
-			return this.function.execute(Scope.arrayScope(scope2, scope.array(), false));
+			return this.function.execute(FEMScope.arrayScope(scope2, scope.array(), false));
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Function toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.scope == null) return new ClosureFunction(tracer.trace(this.function));
 			return new ClosureFunction(this.scope, tracer.trace(this.function));
 		}
@@ -720,14 +720,14 @@ public class Functions {
 	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameterwerte des Ausführungskontexts gegeben Funktion mit
 	 * den im zweiten Parameterwert gegebenen Parameterwertliste.
 	 */
-	public static final Function CALL_FUNCTION = new BaseFunction() {
+	public static final FEMFunction CALL_FUNCTION = new BaseFunction() {
 
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			if (scope.size() != 2) throw new IllegalArgumentException("scope.size() != 2");
 			final Context context = scope.context();
-			final Function method = context.dataOf(scope.get(0), Values.FUNCTION_TYPE);
-			final Scope params = Scope.arrayScope(scope, context.dataOf(scope.get(1), Values.ARRAY_TYPE));
+			final FEMFunction method = context.dataOf(scope.get(0), Values.FUNCTION_TYPE);
+			final FEMScope params = FEMScope.arrayScope(scope, context.dataOf(scope.get(1), Values.ARRAY_TYPE));
 			return method.execute(params);
 		}
 
@@ -743,15 +743,15 @@ public class Functions {
 	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameterwert des Ausführungskontexts gegeben Funktion mit den
 	 * davor liegenden Parameterwerten.
 	 */
-	public static final Function APPLY_FUNCTION = new BaseFunction() {
+	public static final FEMFunction APPLY_FUNCTION = new BaseFunction() {
 
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			final int index = scope.size() - 1;
 			if (index < 0) throw new IllegalArgumentException("scope.size() < 1");
 			final Context context = scope.context();
-			final Function method = context.dataOf(scope.get(index), Values.FUNCTION_TYPE);
-			final Scope params = Scope.arrayScope(scope, scope.array().section(0, index));
+			final FEMFunction method = context.dataOf(scope.get(index), Values.FUNCTION_TYPE);
+			final FEMScope params = FEMScope.arrayScope(scope, scope.array().section(0, index));
 			return method.execute(params);
 		}
 
@@ -766,13 +766,13 @@ public class Functions {
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte eines gegebenen Ausführungskontexts {@code scope} entspricht, d.h.
 	 * {@code Array.valueOf(scope.toArray().value())}.
 	 * 
-	 * @see Array#valueOf(Value...)
-	 * @see Scope#array()
+	 * @see Array#valueOf(FEMValue...)
+	 * @see FEMScope#array()
 	 */
-	public static final Function ARRAY_COPY_FUNCTION = new BaseFunction() {
+	public static final FEMFunction ARRAY_COPY_FUNCTION = new BaseFunction() {
 
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			return Values.arrayValue(Array.valueOf(scope.array().value()));
 		}
 
@@ -787,12 +787,12 @@ public class Functions {
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte eines gegebenen Ausführungskontexts {@code scope} entspricht,
 	 * d.h. {@code scope#toArray()}.
 	 * 
-	 * @see Scope#array()
+	 * @see FEMScope#array()
 	 */
-	public static final Function ARRAY_VIEW_FUNCTION = new BaseFunction() {
+	public static final FEMFunction ARRAY_VIEW_FUNCTION = new BaseFunction() {
 
 		@Override
-		public Value execute(final Scope scope) {
+		public FEMValue execute(final FEMScope scope) {
 			return Values.arrayValue(scope.array());
 		}
 

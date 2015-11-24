@@ -1,9 +1,9 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import java.util.Iterator;
-import bee.creative.function.Scripts.ScriptFormatter;
-import bee.creative.function.Scripts.ScriptFormatterInput;
-import bee.creative.function.Values.VirtualValue;
+import bee.creative.fem.Scripts.ScriptFormatter;
+import bee.creative.fem.Scripts.ScriptFormatterInput;
+import bee.creative.fem.Values.VirtualValue;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects.UseToString;
@@ -15,16 +15,16 @@ import bee.creative.util.Objects.UseToString;
  * werden. Die Methode {@link #get(int)} muss für einen gegebenen Index immer den gleichen Wert liefern bzw. immer eine Ausnahme auslösen. Analoges gilt für die
  * Methoden {@link #size()} und {@link #context()}.
  * 
- * @see Value
- * @see Function
+ * @see FEMValue
+ * @see FEMFunction
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Scope implements Items<Value>, Iterable<Value>, UseToString, ScriptFormatterInput {
+public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, UseToString, ScriptFormatterInput {
 
 	/**
 	 * Dieses Feld speichert den leeren Ausführungskontext, der keine Parameterwerte bereitstellt und als Kontextobjekt {@link Context#DEFAULT} verwendet.
 	 */
-	public static final Scope EMPTY = new Scope() {
+	public static final FEMScope EMPTY = new FEMScope() {
 
 		@Override
 		public Context context() {
@@ -40,14 +40,14 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * Ausführungskontexts zur Verfügung stellt.<br>
 	 * Sie ist eine Abkürzung für {@code valueScope(scope, values, true)}.
 	 * 
-	 * @see #arrayScope(Scope, Array, boolean)
+	 * @see #arrayScope(FEMScope, Array, boolean)
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param values zugesicherte Parameterwerte des erzeugten Ausführungskontexts.
-	 * @return {@code value}-{@link Scope}.
+	 * @return {@code value}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static Scope arrayScope(final Scope scope, final Array values) throws NullPointerException {
-		return Scope.arrayScope(scope, values, true);
+	public static FEMScope arrayScope(final FEMScope scope, final Array values) throws NullPointerException {
+		return FEMScope.arrayScope(scope, values, true);
 	}
 
 	/**
@@ -64,19 +64,19 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 *        werden sollen und die zusätzlichen Parameterwerte von {@code scope} damit gleich den zusätzlichen Parameterwerten des erzeugten Ausführungskontexts
 	 *        bilden sollen. {@code false}, wenn alle Parameterwerte von {@code scope} die zusätzlichen Parameterwerten des erzeugten Ausführungskontexts bilden
 	 *        sollen.
-	 * @return {@code value}-{@link Scope}.
+	 * @return {@code value}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static Scope arrayScope(final Scope scope, final Array values, boolean replace) throws NullPointerException {
+	public static FEMScope arrayScope(final FEMScope scope, final Array values, boolean replace) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
 		if (values == null) throw new NullPointerException("values = null");
 		final int length = values.length();
 		final int offset = (replace ? scope.size() : 0) - length;
 		replace = false;
-		return new Scope() {
+		return new FEMScope() {
 
 			@Override
-			public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 				return index >= length ? scope.get(index + offset) : values.get(index);
 			}
 
@@ -112,23 +112,23 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * 
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param params Parameterfunktionen, deren Ergebniswerte als zugesicherte Parameterwerte genutzt werden.
-	 * @return {@code invoke}-{@link Scope}.
+	 * @return {@code invoke}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code functions} {@code null} ist.
 	 */
-	public static Scope invokeScope(final Scope scope, final Function... params) throws NullPointerException {
+	public static FEMScope invokeScope(final FEMScope scope, final FEMFunction... params) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
 		if (params == null) throw new NullPointerException("params = null");
-		final Value[] values = new Value[params.length];
-		return new Scope() {
+		final FEMValue[] values = new FEMValue[params.length];
+		return new FEMScope() {
 
 			@Override
-			public Value get(final int index) throws NullPointerException, IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws NullPointerException, IndexOutOfBoundsException {
 				final int length = values.length;
 				if (index >= length) return scope.get(index - length);
 				synchronized (values) {
-					Value result = values[index];
+					FEMValue result = values[index];
 					if (result != null) return result;
-					final Function param = params[index];
+					final FEMFunction param = params[index];
 					if (param == null) throw new NullPointerException("params[index] = null");
 					result = param.execute(scope);
 					if (result == null) throw new NullPointerException("params[index].execute(scope) = null");
@@ -151,12 +151,12 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 				return new Array() {
 
 					@Override
-					public Value get(final int index) throws IndexOutOfBoundsException {
+					public FEMValue get(final int index) throws IndexOutOfBoundsException {
 						if (index < 0) throw new IndexOutOfBoundsException();
 						final int length = values.length;
 						if (index >= length) throw new IndexOutOfBoundsException();
 						synchronized (values) {
-							Value result = values[index];
+							FEMValue result = values[index];
 							if (result != null) return result;
 							result = new VirtualValue(scope, params[index]);
 							return values[index] = result;
@@ -180,16 +180,16 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * 
 	 * @param scope Ausführungskontext.
 	 * @param context Kontextobjekt.
-	 * @return {@code context}-{@link Scope} mit den Parameterwerten von {@code scope} sowie dem Kontextobjekt {@code context}.
+	 * @return {@code context}-{@link FEMScope} mit den Parameterwerten von {@code scope} sowie dem Kontextobjekt {@code context}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code context} {@code null} ist.
 	 */
-	public static Scope contextScope(final Scope scope, final Context context) throws NullPointerException {
+	public static FEMScope contextScope(final FEMScope scope, final Context context) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
 		if (context == null) throw new NullPointerException("context = null");
-		return new Scope() {
+		return new FEMScope() {
 
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				return scope.get(index);
 			}
 
@@ -235,14 +235,14 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 		return new Array() {
 	
 			@Override
-			public Value get(final int index) throws IndexOutOfBoundsException {
-				if ((index < 0) || (index >= Scope.this.size())) throw new IndexOutOfBoundsException();
-				return Scope.this.get(index);
+			public FEMValue get(final int index) throws IndexOutOfBoundsException {
+				if ((index < 0) || (index >= FEMScope.this.size())) throw new IndexOutOfBoundsException();
+				return FEMScope.this.get(index);
 			}
 	
 			@Override
 			public int length() {
-				return Scope.this.size();
+				return FEMScope.this.size();
 			}
 	
 		};
@@ -262,13 +262,13 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * Diese Methode gibt den {@code index}-ten Parameterwert zurück. Über die {@link #size() Anzahl der Parameterwerte} hinaus, können auch zusätzliche
 	 * Parameterwerte bereitgestellt werden.
 	 * 
-	 * @see Value
+	 * @see FEMValue
 	 * @param index Index.
 	 * @return {@code index}-ter Parameterwert.
 	 * @throws IndexOutOfBoundsException Wenn für den gegebenen Index kein Parameterwert existiert.
 	 */
 	@Override
-	public Value get(final int index) throws IndexOutOfBoundsException {
+	public FEMValue get(final int index) throws IndexOutOfBoundsException {
 		throw new IndexOutOfBoundsException();
 	}
 
@@ -276,7 +276,7 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterator<Value> iterator() {
+	public Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this.size());
 	}
 
@@ -294,8 +294,8 @@ public abstract class Scope implements Items<Value>, Iterable<Value>, UseToStrin
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
-		if (!(object instanceof Scope)) return false;
-		final Scope data = (Scope)object;
+		if (!(object instanceof FEMScope)) return false;
+		final FEMScope data = (FEMScope)object;
 		return this.array().equals(data.array());
 	}
 

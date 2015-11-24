@@ -1,4 +1,4 @@
-package bee.creative.function;
+package bee.creative.fem;
 
 import bee.creative.util.Converter;
 import bee.creative.util.Objects;
@@ -7,11 +7,11 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert den abstrakten Datentyp eines Werts, analog zur {@link Class} eines {@link Object}.<br>
  * Ein solcher Datentyp besitzt Methoden zum Konvertieren der Nutzdaten eines gegebenen Werts sowie zur Prüfung der Kompatibilität zu anderen Datentypen.
  * 
- * @see Value#type()
+ * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link #dataOf(Value)} bzw. {@link #dataOf(Value, Context)} gelieferten Nutzdaten.
+ * @param <GData> Typ der von {@link #dataOf(FEMValue)} bzw. {@link #dataOf(FEMValue, Context)} gelieferten Nutzdaten.
  */
-public abstract class Type<GData> {
+public abstract class FEMType<GData> {
 
 	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input)} in siene Ausgabe überführt.
@@ -21,12 +21,12 @@ public abstract class Type<GData> {
 	 * @return {@code dataOf}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
 	 */
-	public static <GData> Converter<Value, GData> dataOf(final Type<? extends GData> type) throws NullPointerException {
+	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
-		return new Converter<Value, GData>() {
+		return new Converter<FEMValue, GData>() {
 
 			@Override
-			public GData convert(final Value input) {
+			public GData convert(final FEMValue input) {
 				return type.dataOf(input);
 			}
 
@@ -47,13 +47,13 @@ public abstract class Type<GData> {
 	 * @return {@code dataOf}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
 	 */
-	public static <GData> Converter<Value, GData> dataOf(final Type<? extends GData> type, final Context context) throws NullPointerException {
+	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type, final Context context) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
 		if (context == null) throw new NullPointerException("context = null");
-		return new Converter<Value, GData>() {
+		return new Converter<FEMValue, GData>() {
 
 			@Override
-			public GData convert(final Value input) {
+			public GData convert(final FEMValue input) {
 				return type.dataOf(input, context);
 			}
 
@@ -71,10 +71,10 @@ public abstract class Type<GData> {
 	 * @see #id()
 	 * @param <GValue> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
-	 * @return {@code simple}-{@link Type}.
+	 * @return {@code simple}-{@link FEMType}.
 	 */
-	public static <GValue> Type<GValue> simpleType(final int id) {
-		return Type.simpleType(id, Objects.toInvokeString("simpleType", id));
+	public static <GValue> FEMType<GValue> simpleType(final int id) {
+		return FEMType.simpleType(id, Objects.toInvokeString("simpleType", id));
 	}
 
 	/**
@@ -84,11 +84,11 @@ public abstract class Type<GData> {
 	 * @param <GValue> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
 	 * @param toString Textdarstellung für {@link #toString()}.
-	 * @return {@code simple}-{@link Type}.
+	 * @return {@code simple}-{@link FEMType}.
 	 */
-	public static <GValue> Type<GValue> simpleType(final int id, final String toString) {
+	public static <GValue> FEMType<GValue> simpleType(final int id, final String toString) {
 		if (toString == null) throw new NullPointerException("toString = null");
-		return new Type<GValue>() {
+		return new FEMType<GValue>() {
 
 			@Override
 			public int id() {
@@ -121,7 +121,7 @@ public abstract class Type<GData> {
 	 * @param type Datentyp.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist.
 	 */
-	public boolean is(final Type<?> type) {
+	public boolean is(final FEMType<?> type) {
 		return (type == this) || ((type != null) && (type.id() == this.id()));
 	}
 
@@ -130,14 +130,14 @@ public abstract class Type<GData> {
 	 * Der Rückgabewert entspricht {@code Context.DEFAULT.cast(value, this)}.
 	 * 
 	 * @see Context#DEFAULT
-	 * @see Context#dataOf(Value, Type)
+	 * @see Context#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code Context.DEFAUL} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GData dataOf(final Value value) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public final GData dataOf(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return Context.DEFAULT.dataOf(value, this);
 	}
 
@@ -145,7 +145,7 @@ public abstract class Type<GData> {
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
 	 * 
-	 * @see Context#dataOf(Value, Type)
+	 * @see Context#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
 	 * @return Nutzdaten.
@@ -153,7 +153,7 @@ public abstract class Type<GData> {
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GData dataOf(final Value value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public final GData dataOf(final FEMValue value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return context.dataOf(value, this);
 	}
 
@@ -177,8 +177,8 @@ public abstract class Type<GData> {
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
-		if (!(object instanceof Type<?>)) return false;
-		final Type<?> data = (Type<?>)object;
+		if (!(object instanceof FEMType<?>)) return false;
+		final FEMType<?> data = (FEMType<?>)object;
 		return this.id() == data.id();
 	}
 
