@@ -78,7 +78,7 @@ import java.util.GregorianCalendar;
  * 
  * @author Sebastian Rostock 2011.
  */
-public class FEMDatetime {
+public final class FEMDatetime {
 
 	/**
 	 * Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -180,11 +180,6 @@ public class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkYear(final int year) throws IllegalArgumentException {
-		if ((year < 1582) || (year > 9999)) throw new IllegalArgumentException();
-	}
-
-	@SuppressWarnings ("javadoc")
 	private static final void checkDate(final int calendarday) throws IllegalArgumentException {
 		if ((calendarday < 0) || (calendarday > 3074323)) throw new IllegalArgumentException();
 	}
@@ -214,6 +209,11 @@ public class FEMDatetime {
 			if ((second < 0) || (second >= 59)) throw new IllegalArgumentException();
 			if ((millisecond < 0) || (millisecond > 999)) throw new IllegalArgumentException();
 		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	private static final void checkYear(final int year) throws IllegalArgumentException {
+		if ((year < 1582) || (year > 9999)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -395,25 +395,15 @@ public class FEMDatetime {
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;
 	}
 
-	{}
-
-	{}
-
-	{}
-
-	{}
-
-	{}
-
 	public static void main(final String[] args) throws Exception {
 
 		final FEMDatetime MIN = FEMDatetime.EMPTY.withDate(0).withTime(0).withZone(+840);
-
+		System.out.println(MIN);
 		final FEMDatetime MAX = FEMDatetime.EMPTY.withDate(3074323).withTime(86400000).withZone(-840);
+		System.out.println(MAX);
 
 		final Calendar s = new GregorianCalendar();
-		s.clear();
-		System.out.println(s);
+		System.out.println(FEMDatetime.from(FEMDatetime.from(s).withZone(2, 0).toCalendar()));
 		System.out.println(s.get(Calendar.DATE));
 		System.out.println(s.get(Calendar.MONTH));
 		System.out.println(s.get(Calendar.YEAR));
@@ -433,25 +423,6 @@ public class FEMDatetime {
 		// }
 		// }
 		// System.out.println(FEMDatetime.calendardayOf__(1200, 1, 1));
-	}
-
-	{}
-
-	{}
-
-	/**
-	 * Diese Methode gibt die Anzahl an Sekunden zurück, um die der Bis-Zeitpunkt später als der Von-Zeitpunkt ist. Wenn bei genau einem der Zeitpunkte eine
-	 * Zeitzonenverschiebung angegeben ist, wird {@code null} geliefert.
-	 * 
-	 * @param this Von-Zeitpunkt.
-	 * @param datetime Bis-Zeitpunkt.
-	 * @return Anzahl an Sekunden mit Vorzeichen oder {@code null}.
-	 */
-	public long millisecondsUntil(final FEMDatetime datetime) throws IllegalArgumentException {
-
-		if (this.hasZone() != datetime.hasZone()) return null;
-
-		return new Long((datetime.toDate().totalSeconds() - this.toDate().totalSeconds()) + (datetime.toTime().totalSeconds() - this.toTime().totalSeconds()));
 	}
 
 	{}
@@ -671,6 +642,26 @@ public class FEMDatetime {
 	}
 
 	/**
+	 * Diese Methode gibt die Anzahl an Sekunden zurück, um die der Bis-Zeitpunkt später als der Von-Zeitpunkt ist. Wenn bei genau einem der Zeitpunkte eine
+	 * Zeitzonenverschiebung angegeben ist, wird {@code null} geliefert.
+	 * 
+	 * @param this Von-Zeitpunkt.
+	 * @param datetime Bis-Zeitpunkt.
+	 * @return Anzahl an Sekunden mit Vorzeichen oder {@code null}.
+	 */
+	public long millisecondsUntil(final FEMDatetime datetime) throws IllegalArgumentException {
+
+		final int daymillis = 0;
+		if (this.hasTime()) {
+			if (!datetime.hasZone()) throw new IllegalArgumentException();
+		}
+
+		if (this.hasZone() != datetime.hasZone()) return null;
+
+		return new Long((datetime.toDate().totalSeconds() - this.toDate().totalSeconds()) + (datetime.toTime().totalSeconds() - this.toTime().totalSeconds()));
+	}
+
+	/**
 	 * Diese Methode gibt die Zeitzonenverschiebung in Minuten zurück.
 	 * 
 	 * @return Zeitzonenverschiebung in Minuten ({@code -840..840}).
@@ -847,10 +838,7 @@ public class FEMDatetime {
 	 */
 	public final FEMDatetime withTime(final int daymillis) throws IllegalArgumentException {
 		if ((daymillis < 0) || (daymillis > 86400000)) throw new IllegalArgumentException();
-		final int hour = daymillis / 3600000, hourmillis = daymillis % 3600000;
-		final int minute = hourmillis / 60000, minutemillis = hourmillis % 60000;
-		final int second = minutemillis / 1000, millisecond = minutemillis % 1000;
-		return this.withTime__(hour, minute, second, millisecond);
+		return this.withTime__(daymillis);
 	}
 
 	/**
@@ -871,7 +859,7 @@ public class FEMDatetime {
 
 	/**
 	 * Diese Methode gibt diese Zeitangabe mit der Uhrzeit des gegebenen {@link Calendar} zurück.<br>
-	 * Die gelieferte Zeitangabe {@link #hasTime() besitzt} nur dann eine Uhrzeit, wenn am gegebenen {@link Calendar} die Felder {@link Calendar#HOUR},
+	 * Die gelieferte Zeitangabe {@link #hasTime() besitzt} nur dann eine Uhrzeit, wenn am gegebenen {@link Calendar} die Felder {@link Calendar#HOUR_OF_DAY},
 	 * {@link Calendar#MINUTE} und {@link Calendar#SECOND} definiert sind. Andernfalls hat die gelieferte Zeitangabe keine Uhrzeit.
 	 * 
 	 * @see #withoutTime()
@@ -883,7 +871,7 @@ public class FEMDatetime {
 	public final FEMDatetime withTime(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		if (calendar == null) throw new NullPointerException("calendar = null");
 		if (!calendar.isSet(Calendar.HOUR) || !calendar.isSet(Calendar.MINUTE) || !calendar.isSet(Calendar.SECOND)) return this.withoutTime();
-		return this.withTime(calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), calendar.get(Calendar.MILLISECOND));
+		return this.withTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), calendar.get(Calendar.MILLISECOND));
 	}
 
 	/**
@@ -902,14 +890,24 @@ public class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
+	private final FEMDatetime withTime__(final int daymillis) {
+		final int hour = daymillis / 3600000, hourmillis = daymillis % 3600000;
+		final int minute = hourmillis / 60000, minutemillis = hourmillis % 60000;
+		final int second = minutemillis / 1000, millisecond = minutemillis % 1000;
+		return this.withTime__(hour, minute, second, millisecond);
+	}
+
+	@SuppressWarnings ("javadoc")
 	private final FEMDatetime withTime__(final int hour, final int minute, final int second, final int millisecond) {
 		return new FEMDatetime((this.valueH & 0xFFFFC002) | (minute << 8) | (second << 2) | (1 << 0), //
 			(this.valueL & 0xFFFF8000) | (hour << 10) | (millisecond << 0));
 	}
 
 	/**
-	 * Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.
+	 * Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
+	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
 	 * 
+	 * @see #moveZone(int, int)
 	 * @see #withoutZone()
 	 * @param zone Zeitzone ({@code -840..840})
 	 * @return Zeitangabe mit Zeitzone.
@@ -917,11 +915,13 @@ public class FEMDatetime {
 	 */
 	public final FEMDatetime withZone(final int zone) throws IllegalArgumentException {
 		FEMDatetime.checkZone(zone);
-		return this.withZone__(zone);
+		if (!this.hasZone()) return this.withZone__(zone);
+		return this.moveZone(0, zone - this.zoneValue__());
 	}
 
 	/**
-	 * Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.
+	 * Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
+	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
 	 * 
 	 * @see #withoutZone()
 	 * @param zoneHour Stunde der Zeitzone ({@code -14..14}).
@@ -936,13 +936,15 @@ public class FEMDatetime {
 			if ((zoneHour < -14) || (zoneHour > 14)) throw new IllegalArgumentException();
 			if ((zoneMinute < 0) || (zoneMinute > 59)) throw new IllegalArgumentException();
 		}
-		return this.withZone__((zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute));
+		final int zone = (zoneHour * 60) + (zoneHour < 0 ? -zoneMinute : zoneMinute);
+		if (!this.hasZone()) return this.withZone__(zone);
+		return this.moveZone__(zone - this.zoneValue__());
 	}
 
 	/**
 	 * Diese Methode gibt diese Zeitangabe mit der Zeitzone des gegebenen {@link Calendar} zurück.<br>
-	 * Die gelieferte Zeitangabe {@link #hasZone() besitzt} nur dann eine Zeitzone, wenn am gegebenen {@link Calendar} das Feld {@link Calendar#ZONE_OFFSET}
-	 * definiert ist. Andernfalls hat die gelieferte Zeitangabe keine Zeitzone.
+	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.<br>
+	 * Wenn am gegebenen {@link Calendar} das Feld {@link Calendar#ZONE_OFFSET} undefiniert ist, hat die gelieferte Zeitangabe keine Zeitzone.
 	 * 
 	 * @see #withoutZone()
 	 * @param calendar Zeitzone.
@@ -950,14 +952,17 @@ public class FEMDatetime {
 	 * @throws NullPointerException Wenn {@code calendar} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeitzone ungültig ist.
 	 */
-	public FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
+	public final FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		if (calendar == null) throw new NullPointerException("calendar = null");
 		if (!calendar.isSet(Calendar.ZONE_OFFSET)) return this.withoutZone();
-		return this.withZone(calendar.get(Calendar.ZONE_OFFSET) / 60000);
+		final int zone = calendar.get(Calendar.ZONE_OFFSET) / 60000;
+		if (!this.hasZone()) return this.withZone__(zone);
+		return this.moveZone__(zone - this.zoneValue__());
 	}
 
 	/**
 	 * Diese Methode gibt diese Zeitangabe mit der Zeitzone der gegebenen Zeitangabe zurück.<br>
+	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.<br>
 	 * Wenn die gegebene Zeitangabe keine Zeitzone {@link #hasZone() besitzt}, hat die gelieferte Zeitangabe auch keine Zeitzone.
 	 * 
 	 * @see #withoutZone()
@@ -968,7 +973,9 @@ public class FEMDatetime {
 	public final FEMDatetime withZone(final FEMDatetime datetime) throws NullPointerException {
 		if (datetime == null) throw new NullPointerException("datetime = null");
 		if (!datetime.hasZone()) return this.withoutZone();
-		return this.withZone__(datetime.zoneValue__());
+		final int zone = datetime.zoneValue__();
+		if (!this.hasZone()) return this.withZone__(zone);
+		return this.moveZone__(zone - this.zoneValue__());
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -1018,20 +1025,6 @@ public class FEMDatetime {
 		return new FEMDatetime(this.valueH, this.valueL & 0xFFFFF);
 	}
 
-	public FEMDatetime moveZone(final int hours, final int minutes) {
-		if (this.hasTime()) {
-			if (this.hasDate()) {
-
-			} else {
-
-			}
-		} else {
-
-		}
-		if ((zone < -840) || (zone > 840)) throw FEMDatetime.illegalZone(zone);
-		return this.withZone__(zone);
-	}
-
 	/**
 	 * Diese Methode gibt einen Zeitpunkt zurück, der diesem um die gegebene Zeitspanne verschoben entspricht.
 	 * 
@@ -1041,89 +1034,127 @@ public class FEMDatetime {
 	public FEMDatetime move(final FEMDuration value) {
 		final int sign = value.signValue();
 		if (sign == 0) return this;
-		return this.move(value.yearsValue() * sign, value.monthsValue() * sign, value.daysValue() * sign, value.hoursValue() * sign, value.minutesValue() * sign,
-			value.secondsValue() * sign);
+		final FEMDatetime v = this.hasDate() ? this.moveDate(value.yearsValue() * sign, value.monthsValue() * sign, value.daysValue() * sign) : this;
+		return this.hasTime() ? this.moveTime(value.hoursValue() * sign, value.minutesValue() * sign, value.secondsValue() * sign, value.millisValue() * sign)
+			: this;
+
 	}
 
 	/**
-	 * Diese Methode gibt diesen Zeitpunkt um die gegebenen Zeitspannen verschoben zurück.
-	 * <p>
-	 * Algorithmus gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding durations to
-	 * dateTimes</a>.
+	 * Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.<br>
+	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
+	 * durations to dateTimes</a>. Die Schritte des Algorithmus sind:
+	 * <ol>
+	 * <li>{@link #yearValue() Jahr} und {@link #monthValue() Monat} gemäß der gegebenen Anzahl an Jahren ({@code years}) und Monaten ({@code months})
+	 * verschieben.</li>
+	 * <li>{@link #dateValue() Tags} gemäß dem ermittelten Jahr und Monat korrigieren, sodass der Tag nicht größer als die {@link #lengthOf(int, int) Anzahl der
+	 * Tage im Monat} ist.</li>
+	 * <li>{@link #dateValue() Tag} gemäß der gegebenen Anzahl an Tagen ({@code days}) verschieben.</li>
+	 * </ol>
 	 * 
-	 * @see #move(FEMDuration)
-	 * @param years Verschiebung der Jahre.
-	 * @param months Verschiebung der Monate.
-	 * @param days Verschiebung der Tage.
-	 * @param hours Verschiebung der Stunden.
-	 * @param minutes Verschiebung der Minuten.
-	 * @param seconds Verschiebung der Sekunden.
-	 * @return verschobener Zeitpunkt.
+	 * @param years Anzahl der Jahre ({@code -8417..8417}).
+	 * @param months Anzahl der Monate ({@code -101015..101015}).
+	 * @param days Anzahl der Tage ({@code -3074323..3074323}).
+	 * @return Zeitangabe mit verschobenem Datum.
+	 * @throws IllegalStateException Wenn diese Zeitangabe kein Datum besitzt.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
 	 */
-	public FEMDatetime move(final int years, final int months, final int days, final int hours, final int minutes, final int seconds) {
-		if ((years == 0) && (months == 0) && (days == 0) && (hours == 0) && (minutes == 0) && (seconds == 0)) return this;
-		// Monat und Jahr verschieben und normalisieren
-		int value = (this.monthValue() + months + (12 * (this.yearValue__() + years))) - 1;
-		if (value < 0) throw new IllegalArgumentException();
-		int yearValue = value / 12;
-		int monthValue = (value % 12) + 1;
-		int dateValue = this.dateValue();
-		// Eigenschaften von Monat und Jahr
-		boolean isLeapYear = FEMDatetime.leapOf(yearValue);
-		int daysInMonth = FEMDatetime.lengthOf(monthValue, isLeapYear);
-		// Tag im Monat einfangen und danach verschieben
-		dateValue = (dateValue > daysInMonth ? daysInMonth : dateValue) + days;
-		// Uhrzeit verschieben und normalisieren
-		value = this.secondValue() + seconds + (60 * (this.minuteValue() + minutes)) + (3600 * (this.hourValue() + hours));
-		if (value < 0) {
-			// übertragen von 24855 Tage in Sekunden als größter positiver Integer
-			value = value + 2147472000;
-			dateValue = dateValue - 24855;
-		}
-		final int secondValue = value % 60;
-		value = value / 60;
-		final int minuteValue = value % 60;
-		value = value / 60;
-		final int hourValue = value % 24;
-		value = value / 24;
-		dateValue = dateValue + value;
-		// abschätzen der Anzahl der Jahren in den verschobenen Tagen
+	public final FEMDatetime moveDate(final int years, final int months, final int days) throws IllegalStateException, IllegalArgumentException {
+		if (!this.hasDate()) throw new IllegalStateException();
+		if ((years == 0) && (months == 0) && (days == 0)) return this;
+		if ((years < -8417) || (years > 8417)) throw new IllegalArgumentException();
+		if ((months < -101015) || (months > 101015)) throw new IllegalArgumentException();
+		if ((days < -3074323) || (days > 3074323)) throw new IllegalArgumentException();
+		return this.moveDate__((years * 12) + months, days);
+	}
 
-		// dateOf__(days)
+	@SuppressWarnings ("javadoc")
+	private final FEMDatetime moveDate__(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
+		int value = ((12 * this.yearValue__()) + this.monthValue__() + monthsAdd) - 1;
+		final int year = value / 12, month = (value % 12) + 1;
+		FEMDatetime.checkYear(year);
+		value = this.dateValue__();
+		final int length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
+		value = FEMDatetime.calendardayOf__(year, month, date) + daysAdd;
+		return this.withDate(value);
+	}
 
-		value = (dateValue * 400) / 146097;
-		if (value != 0) {
-			// übertragen der Verschiebung in Jahren und Tagen
-			dateValue += FEMDatetime.calendardayOf(yearValue, monthValue, 1);
-			yearValue += value;
-			dateValue -= FEMDatetime.calendardayOf(yearValue, monthValue, 1);
-			isLeapYear = FEMDatetime.leapOf(yearValue);
-		}
-		// iterativ Monat und Jahr verschieben
-		while (dateValue > daysInMonth) {
-			dateValue -= daysInMonth;
-			if (monthValue == 12) {
-				monthValue = 1;
-				yearValue++;
-				isLeapYear = FEMDatetime.leapOf(yearValue);
-			} else {
-				monthValue++;
-			}
-			daysInMonth = FEMDatetime.lengthOf(monthValue, isLeapYear);
-		}
-		while (dateValue < 1) {
-			if (monthValue == 1) {
-				monthValue = 12;
-				yearValue--;
-				isLeapYear = FEMDatetime.leapOf(yearValue);
-			} else {
-				monthValue--;
-			}
-			daysInMonth = FEMDatetime.lengthOf(monthValue, isLeapYear);
-			dateValue += daysInMonth;
-		}
-		return new FEMDatetime(FEMDatetime.compileDate(yearValue, monthValue, dateValue), this.hasZone() ? FEMDatetime.compileTime(hourValue, minuteValue,
-			secondValue, this.zoneValue()) : FEMDatetime.compileTime(hourValue, minuteValue, secondValue));
+	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
+	 * Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig ebenfalls verschoben.
+	 * 
+	 * @see #moveDate(int, int, int)
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
+	 * @param minutes Anzahl der Minuten.
+	 * @param seconds Anzahl der Sekunden.
+	 * @param milliseconds Anzahl der Millisekunden.
+	 * @return Zeitangabe mit verschobener Uhrzeit.
+	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime moveTime(final int hours, final int minutes, final int seconds, final int milliseconds) throws IllegalStateException,
+		IllegalArgumentException {
+		if (!this.hasTime()) throw new IllegalStateException();
+		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
+		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
+		return this.moveTime__((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
+	}
+
+	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
+	 * Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig ebenfalls verschoben.
+	 * 
+	 * @see #moveDate(int, int, int)
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
+	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026559}).
+	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593599}).
+	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593599999}).
+	 * @return Zeitangabe mit verschobener Uhrzeit.
+	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime moveTime(final int hours, final long minutes, final long seconds, final long milliseconds) throws IllegalStateException,
+		IllegalArgumentException {
+		if (!this.hasTime()) throw new IllegalStateException();
+		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
+		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
+		if ((minutes < -4427026560L) || (minutes > 4427026559L)) throw new IllegalArgumentException();
+		if ((seconds < -265621593600L) || (seconds > 265621593599L)) throw new IllegalArgumentException();
+		if ((milliseconds < -265621593600000L) || (milliseconds > 265621593599999L)) throw new IllegalArgumentException();
+		return this.moveTime__((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
+	}
+
+	@SuppressWarnings ("javadoc")
+	private final FEMDatetime moveTime__(final long millisecondsAdd) {
+		final long value = this.daymillisValue__() + millisecondsAdd;
+		final int daysAdd = (int)(value / 86400000), daymillis = (int)(value % 86400000);
+		return ((daysAdd != 0) && this.hasDate() ? this.moveDate__(0, daysAdd) : this).withTime__(daymillis);
+	}
+
+	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobener Zeitzone zurück.<br>
+	 * Wenn die Zeitangabe eine Uhrzeit {@link #hasTime() besitzt}, wird diese falls nötig ebenfalls verschoben.
+	 * 
+	 * @see #moveTime(int, int, int, int)
+	 * @param hours Anzahl der Stunden ({@code -28..28}).
+	 * @param minutes Anzahl der Minuten ({@code -1680..1680}).
+	 * @return Zeitangabe mit verschobener Zeitzone.
+	 * @throws IllegalStateException Wenn diese Zeitangabe keine Zeitzone besitzt.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime moveZone(final int hours, final int minutes) throws IllegalStateException, IllegalArgumentException {
+		if (!this.hasZone()) throw new IllegalStateException();
+		if ((hours == 0) && (minutes == 0)) return this;
+		if ((hours < -28) || (hours > 28)) throw new IllegalArgumentException();
+		if ((minutes < -1680) || (minutes > 1680)) throw new IllegalArgumentException();
+		return this.moveZone__((hours * 60) + minutes);
+	}
+
+	@SuppressWarnings ("javadoc")
+	private final FEMDatetime moveZone__(final int zoneAdd) {
+		final int zoneOld = this.zoneValue__(), zoneNew = zoneAdd + zoneOld;
+		FEMDatetime.checkZone(zoneNew);
+		return ((zoneAdd != 0) && this.hasTime() ? this.moveTime__(zoneAdd * -60000) : this).withZone__(zoneNew);
 	}
 
 	/**
