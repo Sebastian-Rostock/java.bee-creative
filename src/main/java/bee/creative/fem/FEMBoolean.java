@@ -5,7 +5,7 @@ package bee.creative.fem;
  * 
  * @author Sebastian Rostock 2015.
  */
-public final class FEMBoolean implements Comparable<FEMBoolean> {
+public  class FEMBoolean implements Comparable<FEMBoolean> {
 
 	/**
 	 * Dieses Feld speichert den Wahrheitswert {@code true}.
@@ -52,34 +52,34 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * 
 	 * @return interne Darstellung des Wahrheitswerts.
 	 */
-	public boolean value() {
+	public final boolean value() {
 		return this.value;
 	}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wahrheitswert gleich dem gegebenen ist.
 	 * 
-	 * @param value Wahrheitswert.
+	 * @param that Wahrheitswert.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public boolean equals(final FEMBoolean value) throws NullPointerException {
-		return this.value == value.value;
+	public final boolean equals(final FEMBoolean that) throws NullPointerException {
+		return this.value == that.value;
 	}
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn dieser Wahrheitswert gleiner, gleich oder größer als der
 	 * gegebene Wahrheitswert ist.
 	 * 
-	 * @param value Wahrheitswert.
+	 * @param that Wahrheitswert.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public int compare(final FEMBoolean value) throws NullPointerException {
-		return Boolean.compare(this.value, value.value);
+	public final int compare(final FEMBoolean that) throws NullPointerException {
+		return Boolean.compare(this.value, that.value);
 	}
 
-	public Boolean asBoolean() {
+	public final Boolean toBoolean() {
 		return Boolean.valueOf(this.value);
 	}
 
@@ -89,7 +89,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return this.value ? 1231 : 1237;
 	}
 
@@ -97,7 +97,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMBoolean)) return false;
 		return this.equals((FEMBoolean)object);
@@ -107,7 +107,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int compareTo(final FEMBoolean value) {
+	public final int compareTo(final FEMBoolean value) {
 		return this.compare(value);
 	}
 
@@ -115,7 +115,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatBoolean(this);
 	}
 

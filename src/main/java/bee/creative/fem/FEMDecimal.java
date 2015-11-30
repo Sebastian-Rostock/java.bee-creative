@@ -80,7 +80,7 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 		return Comparators.compare(this.value, value.value);
 	}
 
-	public Number asNumber() {
+	public Number tNumber() {
 		return Double.valueOf(this.value);
 	}
 

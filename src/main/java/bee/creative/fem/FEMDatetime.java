@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
- * Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzonenverschiebung im Gregorianischen Kalender.<br>
+ * Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein 64 Bit Zahlenwert dargestellt.
  * <p>
  * Das <u>Datum</u> kann unspezifiziert sein oder aus Jahr, Monat sowie Tag bestehen und im Bereich {@code 15.10.1582..31.12.9999} liegen. Die <u>Uhrzeit</u>
@@ -78,7 +78,7 @@ import java.util.GregorianCalendar;
  * 
  * @author Sebastian Rostock 2011.
  */
-public final class FEMDatetime {
+public class FEMDatetime {
 
 	/**
 	 * Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -180,14 +180,14 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkDate(final int calendarday) throws IllegalArgumentException {
+	static final void checkDate__(final int calendarday) throws IllegalArgumentException {
 		if ((calendarday < 0) || (calendarday > 3074323)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkDate(final int year, final int month, final int date) throws IllegalArgumentException {
+	static final void checkDate__(final int year, final int month, final int date) throws IllegalArgumentException {
 		if (year != 1582) {
-			FEMDatetime.checkYear(year);
+			FEMDatetime.checkYear__(year);
 			if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
 			if (date < 1) throw new IllegalArgumentException();
 		} else if (month != 10) {
@@ -198,7 +198,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
+	static final void checkTime__(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
 		if (hour == 24) {
 			if (minute != 0) throw new IllegalArgumentException();
 			if (second != 0) throw new IllegalArgumentException();
@@ -206,23 +206,23 @@ public final class FEMDatetime {
 		} else {
 			if ((hour < 0) || (hour > 23)) throw new IllegalArgumentException();
 			if ((minute < 0) || (minute > 59)) throw new IllegalArgumentException();
-			if ((second < 0) || (second >= 59)) throw new IllegalArgumentException();
+			if ((second < 0) || (second > 59)) throw new IllegalArgumentException();
 			if ((millisecond < 0) || (millisecond > 999)) throw new IllegalArgumentException();
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkYear(final int year) throws IllegalArgumentException {
+	static final void checkYear__(final int year) throws IllegalArgumentException {
 		if ((year < 1582) || (year > 9999)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkZero(final int data, final int valid) {
+	static final void checkZero__(final int data, final int valid) {
 		if ((data & ~valid) != 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final void checkZone(final int zone) throws IllegalArgumentException {
+	static final void checkZone__(final int zone) throws IllegalArgumentException {
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
 	}
 
@@ -235,12 +235,12 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn {@code year} ungültig ist.
 	 */
 	public static final boolean leapOf(final int year) throws IllegalArgumentException {
-		FEMDatetime.checkYear(year);
+		FEMDatetime.checkYear__(year);
 		return FEMDatetime.leapOf__(year);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final boolean leapOf__(final int year) {
+	static final boolean leapOf__(final int year) {
 		final int div = year / 100, mod = year % 100;
 		return ((mod != 0 ? mod : div) & 3) == 0;
 	}
@@ -258,7 +258,7 @@ public final class FEMDatetime {
 	 * @param calendarday Kalendertag.
 	 * @return Jahr, Monat und Tag.
 	 */
-	private static final int dateOf__(final int calendarday) {
+	static final int dateOf__(final int calendarday) {
 		final int months = (int)(((calendarday + 139824) * 400 * 12L) / 146097);
 		final int div = months / 12, mod = months % 12;
 		int year = div + 1200, month = mod + 1, date = (calendarday - FEMDatetime.calendardayOf__(year, month, 1)) + 1;
@@ -291,7 +291,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int lengthOf__(final int month, final int year) {
+	static final int lengthOf__(final int month, final int year) {
 		return FEMDatetime.lengthOf__(month, FEMDatetime.leapOf__(year));
 	}
 
@@ -310,7 +310,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int lengthOf__(final int month, final boolean isLeap) {
+	static final int lengthOf__(final int month, final boolean isLeap) {
 		return 28 + (((isLeap ? 62648028 : 62648012) >> (month << 1)) & 3);
 	}
 
@@ -323,12 +323,12 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist.
 	 */
 	public static final int yeardayOf(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime.checkDate(calendarday);
+		FEMDatetime.checkDate__(calendarday);
 		return FEMDatetime.yeardayOf__(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int yeardayOf__(final int calendarday) {
+	static final int yeardayOf__(final int calendarday) {
 		final int year = (((calendarday + 139810) * 400) / 146097) + 1200;
 		final int result = (calendarday - FEMDatetime.calendardayOf__(year, 1, 1)) + 1;
 		if (result == 0) return FEMDatetime.leapOf__(year - 1) ? 366 : 365;
@@ -345,12 +345,12 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist.
 	 */
 	public static final int weekdayOf(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime.checkDate(calendarday);
+		FEMDatetime.checkDate__(calendarday);
 		return FEMDatetime.weekdayOf__(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int weekdayOf__(final int calendarday) {
+	static final int weekdayOf__(final int calendarday) {
 		return ((calendarday + 5) % 7) + 1;
 	}
 
@@ -365,12 +365,12 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn die gegebene Uhrzeit ungültig ist.
 	 */
 	public static final int daymillisOf(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		FEMDatetime.checkTime(hour, minute, second, millisecond);
+		FEMDatetime.checkTime__(hour, minute, second, millisecond);
 		return FEMDatetime.daymillisOf__(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int daymillisOf__(final int hour, final int minute, final int second, final int millisecond) {
+	static final int daymillisOf__(final int hour, final int minute, final int second, final int millisecond) {
 		return (hour * 3600000) + (minute * 60000) + (second * 1000) + millisecond;
 	}
 
@@ -384,45 +384,15 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn das gegebene Datum ungültig ist.
 	 */
 	public static final int calendardayOf(final int year, final int month, final int date) throws IllegalArgumentException {
-		FEMDatetime.checkDate(year, month, date);
+		FEMDatetime.checkDate__(year, month, date);
 		return FEMDatetime.calendardayOf__(year, month, date);
 	}
 
 	@SuppressWarnings ("javadoc")
-	private static final int calendardayOf__(final int year, final int month, final int date) {
+	static final int calendardayOf__(final int year, final int month, final int date) {
 		final int year2 = (year - ((7 >> month) & 1)) >> 2, year3 = year2 / 25, month2 = month << 1;
 		final int month3 = (month * 29) + ((59630432 >> month2) & 3) + ((266948608 >> month2) & 12);
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;
-	}
-
-	public static void main(final String[] args) throws Exception {
-
-		final FEMDatetime MIN = FEMDatetime.EMPTY.withDate(0).withTime(0).withZone(+840);
-		System.out.println(MIN);
-		final FEMDatetime MAX = FEMDatetime.EMPTY.withDate(3074323).withTime(86400000).withZone(-840);
-		System.out.println(MAX);
-
-		final Calendar s = new GregorianCalendar();
-		System.out.println(FEMDatetime.from(FEMDatetime.from(s).withZone(2, 0).toCalendar()));
-		System.out.println(s.get(Calendar.DATE));
-		System.out.println(s.get(Calendar.MONTH));
-		System.out.println(s.get(Calendar.YEAR));
-
-		// System.out.println(FEMDatetime.calendardayOf__(1600, 1, 1));
-		//
-		// System.out.println("dad");
-		// for (int i = 0; i < 3074324; i++) {
-		// // System.out.println(Integer.toHexString(
-		// final int x = FEMDatetime.dateOf__(i)
-		// // ))
-		//
-		// ;
-		// final int y = FEMDatetime.yeardayOf__(i);
-		// if ((y < 3) || (y > 363)) {
-		// System.out.println(String.format("%d,%d,%d  %d", x & 31, (x >> 5) & 31, x >> 10, y));
-		// }
-		// }
-		// System.out.println(FEMDatetime.calendardayOf__(1200, 1, 1));
 	}
 
 	{}
@@ -430,7 +400,7 @@ public final class FEMDatetime {
 	/**
 	 * Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone.
 	 */
-	public static final FEMDatetime EMPTY = new FEMDatetime(0, 0);
+	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
 
 	{}
 
@@ -473,31 +443,25 @@ public final class FEMDatetime {
 	public FEMDatetime(final long value) throws IllegalArgumentException {
 		this((int)(value >> 32), (int)(value >> 0));
 		if (this.hasDate()) {
-			FEMDatetime.checkDate(this.yearValue__(), this.monthValue__(), this.dateValue__());
+			FEMDatetime.checkDate__(this.yearValue__(), this.monthValue__(), this.dateValue__());
 		} else {
-			FEMDatetime.checkZero(this.valueH, 0x3FFD);
-			FEMDatetime.checkZero(this.valueL, 0xFFF07FFF);
+			FEMDatetime.checkZero__(this.valueH, 0x3FFD);
+			FEMDatetime.checkZero__(this.valueL, 0xFFF07FFF);
 		}
 		if (this.hasTime()) {
-			FEMDatetime.checkTime(this.hourValue__(), this.minuteValue__(), this.secondValue__(), this.millisecondValue__());
+			FEMDatetime.checkTime__(this.hourValue__(), this.minuteValue__(), this.secondValue__(), this.millisecondValue__());
 		} else {
-			FEMDatetime.checkZero(this.valueH, 0xFFFFC002);
-			FEMDatetime.checkZero(this.valueL, 0xFFFF8000);
+			FEMDatetime.checkZero__(this.valueH, 0xFFFFC002);
+			FEMDatetime.checkZero__(this.valueL, 0xFFFF8000);
 		}
 		if (this.hasZone()) {
-			FEMDatetime.checkZone(this.zoneValue__());
+			FEMDatetime.checkZone__(this.zoneValue__());
 		} else {
-			FEMDatetime.checkZero(this.valueL, 0xFFFFF);
+			FEMDatetime.checkZero__(this.zoneValue__(), 0);
 		}
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die internen Darstellungen.
-	 * 
-	 * @see #value()
-	 * @param valueH 32 MSB der interne Darstellung.
-	 * @param valueL 32 LBB der interne Darstellung.
-	 */
+	@SuppressWarnings ("javadoc")
 	FEMDatetime(final int valueH, final int valueL) {
 		this.valueH = valueH;
 		this.valueL = valueL;
@@ -541,7 +505,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int yearValue__() {
+	final int yearValue__() {
 		return (this.valueH >> 18) & 0x3FFF;
 	}
 
@@ -557,7 +521,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int dateValue__() {
+	final int dateValue__() {
 		return (this.valueL >> 15) & 0x1F;
 	}
 
@@ -573,7 +537,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int monthValue__() {
+	final int monthValue__() {
 		return (this.valueH >> 14) & 0x0F;
 	}
 
@@ -589,7 +553,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int hourValue__() {
+	final int hourValue__() {
 		return (this.valueL >> 10) & 0x1F;
 	}
 
@@ -605,7 +569,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int minuteValue__() {
+	final int minuteValue__() {
 		return (this.valueH >> 8) & 0x3F;
 	}
 
@@ -621,7 +585,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int secondValue__() {
+	final int secondValue__() {
 		return (this.valueH >> 2) & 0x3F;
 	}
 
@@ -637,28 +601,8 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int millisecondValue__() {
+	final int millisecondValue__() {
 		return (this.valueL >> 0) & 0x03FF;
-	}
-
-	/**
-	 * Diese Methode gibt die Anzahl an Sekunden zurück, um die der Bis-Zeitpunkt später als der Von-Zeitpunkt ist. Wenn bei genau einem der Zeitpunkte eine
-	 * Zeitzonenverschiebung angegeben ist, wird {@code null} geliefert.
-	 * 
-	 * @param this Von-Zeitpunkt.
-	 * @param datetime Bis-Zeitpunkt.
-	 * @return Anzahl an Sekunden mit Vorzeichen oder {@code null}.
-	 */
-	public long millisecondsUntil(final FEMDatetime datetime) throws IllegalArgumentException {
-
-		final int daymillis = 0;
-		if (this.hasTime()) {
-			if (!datetime.hasZone()) throw new IllegalArgumentException();
-		}
-
-		if (this.hasZone() != datetime.hasZone()) return null;
-
-		return new Long((datetime.toDate().totalSeconds() - this.toDate().totalSeconds()) + (datetime.toTime().totalSeconds() - this.toTime().totalSeconds()));
 	}
 
 	/**
@@ -673,7 +617,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int zoneValue__() {
+	final int zoneValue__() {
 		return ((this.valueL >> 20) & 0x07FF) - 1024;
 	}
 
@@ -683,7 +627,7 @@ public final class FEMDatetime {
 	 * @return {@code true}, wenn diese Zeitangabe ein Datum besitzt.
 	 */
 	public final boolean hasDate() {
-		return ((this.valueH >> 1) & 0x01) != 0;
+		return (this.valueH & 0x02) != 0;
 	}
 
 	/**
@@ -692,7 +636,7 @@ public final class FEMDatetime {
 	 * @return {@code true}, wenn diese Zeitangabe eine Uhrzeit besitzt.
 	 */
 	public final boolean hasTime() {
-		return ((this.valueH >> 0) & 0x01) != 0;
+		return (this.valueH & 0x01) != 0;
 	}
 
 	/**
@@ -701,7 +645,7 @@ public final class FEMDatetime {
 	 * @return {@code true}, wenn diese Zeitangabe eine Zeitzone besitzt.
 	 */
 	public final boolean hasZone() {
-		return ((this.valueL >> 31) & 0x01) != 0;
+		return (this.valueL & 0x80000000) != 0;
 	}
 
 	/**
@@ -739,7 +683,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int daymillisValue__() {
+	final int daymillisValue__() {
 		return FEMDatetime.daymillisOf__(this.hourValue__(), this.minuteValue__(), this.secondValue__(), this.millisecondValue__());
 	}
 
@@ -756,7 +700,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final int calendardayValue__() {
+	final int calendardayValue__() {
 		return FEMDatetime.calendardayOf__(this.yearValue__(), this.monthValue__(), this.dateValue__());
 	}
 
@@ -770,7 +714,7 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist.
 	 */
 	public final FEMDatetime withDate(final int calendarday) throws IllegalArgumentException {
-		FEMDatetime.checkDate(calendarday);
+		FEMDatetime.checkDate__(calendarday);
 		final int date = FEMDatetime.dateOf__(calendarday);
 		return this.withDate__((date >> 10) & 0x3FFF, (date >> 5) & 0x1F, (date >> 0) & 0x1F);
 	}
@@ -786,7 +730,7 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn das gegebene Datum ungültig ist.
 	 */
 	public final FEMDatetime withDate(final int year, final int month, final int date) throws IllegalArgumentException {
-		FEMDatetime.checkDate(year, month, date);
+		FEMDatetime.checkDate__(year, month, date);
 		return this.withDate__(year, month, date);
 	}
 
@@ -823,8 +767,10 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime withDate__(final int year, final int month, final int date) {
-		return new FEMDatetime((this.valueH & 0x3FFD) | (year << 18) | (month << 14) | (1 << 1), (this.valueL & 0xFFF07FFF) | (date << 15));
+	final FEMDatetime withDate__(final int year, final int month, final int date) {
+		return new FEMDatetime( //
+			(this.valueH & 0x3FFD) | (year << 18) | (month << 14) | (1 << 1), //
+			(this.valueL & 0xFFF07FFF) | (date << 15));
 	}
 
 	/**
@@ -853,7 +799,7 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn die gegebenen Uhrzei ungültig ist.
 	 */
 	public final FEMDatetime withTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		FEMDatetime.checkTime(hour, minute, second, millisecond);
+		FEMDatetime.checkTime__(hour, minute, second, millisecond);
 		return this.withTime__(hour, minute, second, millisecond);
 	}
 
@@ -890,7 +836,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime withTime__(final int daymillis) {
+	final FEMDatetime withTime__(final int daymillis) {
 		final int hour = daymillis / 3600000, hourmillis = daymillis % 3600000;
 		final int minute = hourmillis / 60000, minutemillis = hourmillis % 60000;
 		final int second = minutemillis / 1000, millisecond = minutemillis % 1000;
@@ -898,8 +844,9 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime withTime__(final int hour, final int minute, final int second, final int millisecond) {
-		return new FEMDatetime((this.valueH & 0xFFFFC002) | (minute << 8) | (second << 2) | (1 << 0), //
+	final FEMDatetime withTime__(final int hour, final int minute, final int second, final int millisecond) {
+		return new FEMDatetime( //
+			(this.valueH & 0xFFFFC002) | (minute << 8) | (second << 2) | (1 << 0), //
 			(this.valueL & 0xFFFF8000) | (hour << 10) | (millisecond << 0));
 	}
 
@@ -914,7 +861,7 @@ public final class FEMDatetime {
 	 * @throws IllegalArgumentException Wenn die gegebenen Zeitzone ungültig ist.
 	 */
 	public final FEMDatetime withZone(final int zone) throws IllegalArgumentException {
-		FEMDatetime.checkZone(zone);
+		FEMDatetime.checkZone__(zone);
 		if (!this.hasZone()) return this.withZone__(zone);
 		return this.moveZone(0, zone - this.zoneValue__());
 	}
@@ -979,7 +926,7 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime withZone__(final int zone) {
+	final FEMDatetime withZone__(final int zone) {
 		return new FEMDatetime(this.valueH, (this.valueL & 0xFFFFF) | (1 << 31) | ((zone + 1024) << 20));
 	}
 
@@ -1022,35 +969,22 @@ public final class FEMDatetime {
 	 */
 	public final FEMDatetime withoutZone() {
 		if (!this.hasZone()) return this;
-		return new FEMDatetime(this.valueH, this.valueL & 0xFFFFF);
+		return new FEMDatetime(this.valueH, (this.valueL & 0xFFFFF) | (1024 << 20));
 	}
 
 	/**
-	 * Diese Methode gibt einen Zeitpunkt zurück, der diesem um die gegebene Zeitspanne verschoben entspricht.
-	 * 
-	 * @param value Zeitspanne.
-	 * @return verschobener Zeitpunkt.
-	 */
-	public FEMDatetime move(final FEMDuration value) {
-		final int sign = value.signValue();
-		if (sign == 0) return this;
-		final FEMDatetime v = this.hasDate() ? this.moveDate(value.yearsValue() * sign, value.monthsValue() * sign, value.daysValue() * sign) : this;
-		return this.hasTime() ? this.moveTime(value.hoursValue() * sign, value.minutesValue() * sign, value.secondsValue() * sign, value.millisValue() * sign)
-			: this;
-
-	}
-
-	/**
-	 * Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.<br>
+	 * Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
+	 * <p>
 	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
-	 * durations to dateTimes</a>. Die Schritte des Algorithmus sind:
-	 * <ol>
-	 * <li>{@link #yearValue() Jahr} und {@link #monthValue() Monat} gemäß der gegebenen Anzahl an Jahren ({@code years}) und Monaten ({@code months})
-	 * verschieben.</li>
-	 * <li>{@link #dateValue() Tags} gemäß dem ermittelten Jahr und Monat korrigieren, sodass der Tag nicht größer als die {@link #lengthOf(int, int) Anzahl der
-	 * Tage im Monat} ist.</li>
-	 * <li>{@link #dateValue() Tag} gemäß der gegebenen Anzahl an Tagen ({@code days}) verschieben.</li>
-	 * </ol>
+	 * durations to dateTimes</a>:
+	 * <ul>
+	 * <li>{@link #yearValue() Jahr} und {@link #monthValue() Monat} werden gemäß der gegebenen Anzahl an Jahren ({@code years}) und Monaten ({@code months})
+	 * verschoben.</li>
+	 * <li>Der {@link #dateValue() Tag} wird gemäß dem ermittelten Jahr und Monat korrigiert, sodass der Tag nicht größer als die {@link #lengthOf(int, int)
+	 * Anzahl der Tage im Monat} ist.</li>
+	 * <li>Der Tag wird gemäß der gegebenen Anzahl an Tagen ({@code days}) verschoben. Dadurch können sich Jahr und Monat nochmals ändern.</li>
+	 * </ul>
+	 * </p>
 	 * 
 	 * @param years Anzahl der Jahre ({@code -8417..8417}).
 	 * @param months Anzahl der Monate ({@code -101015..101015}).
@@ -1068,11 +1002,28 @@ public final class FEMDatetime {
 		return this.moveDate__((years * 12) + months, days);
 	}
 
+	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
+	 * 
+	 * @see #moveDate(int, int, int)
+	 * @param duration Zeitspanne.
+	 * @return verschobener Zeitpunkt.
+	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime moveDate(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
+		if (duration == null) throw new NullPointerException("duration = null");
+		final int sign = duration.signValue();
+		if (sign < 0) return this.moveDate(-duration.yearsValue(), -duration.monthsValue(), -duration.daysValue());
+		if (sign > 0) return this.moveDate(+duration.yearsValue(), +duration.monthsValue(), +duration.daysValue());
+		return this;
+	}
+
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime moveDate__(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
+	final FEMDatetime moveDate__(final int monthsAdd, final int daysAdd) throws IllegalArgumentException {
 		int value = ((12 * this.yearValue__()) + this.monthValue__() + monthsAdd) - 1;
 		final int year = value / 12, month = (value % 12) + 1;
-		FEMDatetime.checkYear(year);
+		FEMDatetime.checkYear__(year);
 		value = this.dateValue__();
 		final int length = FEMDatetime.lengthOf(month, year), date = value > length ? length : value;
 		value = FEMDatetime.calendardayOf__(year, month, date) + daysAdd;
@@ -1080,8 +1031,12 @@ public final class FEMDatetime {
 	}
 
 	/**
-	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
-	 * Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig ebenfalls verschoben.
+	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück. Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig
+	 * ebenfalls verschoben.
+	 * <p>
+	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
+	 * durations to dateTimes</a>.
+	 * </p>
 	 * 
 	 * @see #moveDate(int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
@@ -1103,6 +1058,10 @@ public final class FEMDatetime {
 	/**
 	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.<br>
 	 * Wenn die Zeitangabe ein Datum {@link #hasDate() besitzt}, wird dieses falls nötig ebenfalls verschoben.
+	 * <p>
+	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
+	 * durations to dateTimes</a>.
+	 * </p>
 	 * 
 	 * @see #moveDate(int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
@@ -1124,10 +1083,31 @@ public final class FEMDatetime {
 		return this.moveTime__((hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds);
 	}
 
+	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.
+	 * 
+	 * @see #moveTime(int, int, int, int)
+	 * @param duration Zeitspanne.
+	 * @return verschobener Zeitpunkt.
+	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime moveTime(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
+		if (duration == null) throw new NullPointerException("duration = null");
+		final int sign = duration.signValue();
+		if (sign < 0) return this.moveTime(-duration.hoursValue(), -duration.minutesValue(), -duration.secondsValue(), -duration.millisecondsValue());
+		if (sign > 0) return this.moveTime(+duration.hoursValue(), +duration.minutesValue(), +duration.secondsValue(), +duration.millisecondsValue());
+		return this;
+	}
+
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime moveTime__(final long millisecondsAdd) {
+	final FEMDatetime moveTime__(final long millisecondsAdd) {
 		final long value = this.daymillisValue__() + millisecondsAdd;
-		final int daysAdd = (int)(value / 86400000), daymillis = (int)(value % 86400000);
+		int daysAdd = (int)(value / 86400000), daymillis = (int)(value % 86400000);
+		if (daymillis < 0) {
+			daysAdd--;
+			daymillis += 86400000;
+		}
 		return ((daysAdd != 0) && this.hasDate() ? this.moveDate__(0, daysAdd) : this).withTime__(daymillis);
 	}
 
@@ -1151,60 +1131,107 @@ public final class FEMDatetime {
 	}
 
 	@SuppressWarnings ("javadoc")
-	private final FEMDatetime moveZone__(final int zoneAdd) {
+	final FEMDatetime moveZone__(final int zoneAdd) {
 		final int zoneOld = this.zoneValue__(), zoneNew = zoneAdd + zoneOld;
-		FEMDatetime.checkZone(zoneNew);
+		FEMDatetime.checkZone__(zoneNew);
 		return ((zoneAdd != 0) && this.hasTime() ? this.moveTime__(zoneAdd * -60000) : this).withZone__(zoneNew);
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn dieser Zeitpunkt gleich dem gegebenen ist.
-	 * 
-	 * @param value Zeitpunkt.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public boolean equals(final FEMDatetime value) throws NullPointerException {
-		return this.compare(value, Integer.MAX_VALUE) == 0;
-	}
-
-	/**
-	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn dieser Zeitpunkt früger, gleich bzw. später als der gegebene Zeitpunkt
-	 * ist. Wenn die Zeitpunkte nicht vergleichbar sind, wird {@code undefined} geliefert.
+	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitangabe früger, gleich bzw. später als die gegebene Zeitangabe
+	 * ist. Wenn die Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * <p>
-	 * Algorithmus gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime-order">XML Schema Part 2: 3.2.7.3 Order relation on dateTime</a>.
+	 * Der Vergleich erfolgt für Zeitangaben mit Datum und/oder Uhrzeit gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime-order">XML
+	 * Schema Part 2: 3.2.7.3 Order relation on dateTime</a>:
+	 * <ul>
+	 * <li>Verscheiben beider Zeitangaben auf Zeitzone {@code 00:00}. Zeitangaben mit Datum und ohne Uhrzeit werden hierbei so behandelt, als hätten sie die
+	 * Uhrzeit {@code 00:00:00}. Damit sinkt der {@link #calendardayValue()} nur dann um {@code 1}, wenn der {@link #zoneValue()} größer als {@code 0} ist.</li>
+	 * <li>Wenn nur eine der Zeitangaben ein Datum besitzt, wird {@code undefined} geliefert.</li>
+	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird diese Differenz (oder ihr Vorzeichen)
+	 * geliefert.</li>
+	 * <li>Wenn nur eine der Zeitangaben eine Uhrzeit besitzt, wird {@code undefined} geliefert.</li>
+	 * <li>Wenn beide eine Uhrzeit besitzen, wird die Differenz von {@link #daymillisValue()} (oder ihr Vorzeichen) geliefert.</li>
+	 * <li>Andernfalls wird {@code 0} geliefert.</li>
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * Der Vergleich für Zeitangaben ohne Datum und ohne Uhrzeit erfolgt über folgende Schritte:
+	 * <ul>
+	 * <li>Wenn nur eine der Zeitangaben eine Zeitzone besitzt, wird {@code undefined} geliefert.</li>
+	 * <li>Wenn beide eine Zeitzone besitzen, wird die Differenz von {@link #zoneValue()} (oder ihr Vorzeichen) geliefert.</li>
+	 * <li>Andernfalls wird {@code 0} geliefert.</li>
+	 * </ul>
+	 * </p>
 	 * 
-	 * @param value Zeitpunkt.
-	 * @param undefined Rückgabewert für nicht vergleichbare Zeitpunkte.
+	 * @param that Zeitangabe.
+	 * @param undefined Rückgabewert für nicht vergleichbare Zeitangaben.
 	 * @return Vergleichswert oder {@code undefined}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
-	public int compare(FEMDatetime value, final int undefined) throws NullPointerException {
-		if (this.hasZone() == value.hasZone()) {
-			value = value.move(0, 0, 0, 0, this.zoneValue__() - value.zoneValue__(), 0);
-			final int result = this.dateValue - value.dateValue;
-			if (result != 0) return result;
-			return (this.timeValue >> 12) - (value.timeValue >> 12);
-		}
-		// genäherte Differenz in achtel Tagen
-		int result = this.dateValue - value.dateValue;
-		if ((result < -50) || (result > 50)) return result;
-		// exakte Differenz in Sekunden
-		result = (this.secondValue() - value.secondValue()) //
-			+ (60 * ((this.minuteValue() + value.zoneValue()) - this.zoneValue() - value.minuteValue())) //
-			+ (3600 * (this.hourValue() - value.hourValue())) + (86400 * (FEMDatetime.calendardayOf(this.yearValue__(), this.monthValue(), this.dateValue()) //
-			- FEMDatetime.calendardayOf(value.yearValue__(), value.monthValue(), value.dateValue())));
-		// 50400 Sekunden = 14 Stunden
-		if (this.hasZone()) {
-			if (value.hasZone()) return result;
-			if (result < -50400) return -1;
-			if (result > +50400) return +1;
+	public final int compare(final FEMDatetime that, final int undefined) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
+		int result;
+		if (this.hasDate()) {
+			if (!that.hasDate()) return undefined;
+			result = this.calendardayValue__() - that.calendardayValue__();
+			if ((result < -2) || (result > 2)) return result;
+			if (this.hasTime()) {
+				if (that.hasTime()) {
+					result *= 86400000;
+					result += (this.daymillisValue__() - that.daymillisValue__());
+					result += (this.zoneValue__() - that.zoneValue__()) * -60000;
+					return result;
+				} else {
+					if (that.zoneValue__() > 0) {
+						result++;
+					}
+					result *= 86400000;
+					result += this.daymillisValue__();
+					result += this.zoneValue__() * -60000;
+					if (result < 0) return -1;
+					if (result >= 86400000) return +1;
+					return undefined;
+				}
+			} else {
+				if (that.hasTime()) {
+					if (this.zoneValue__() > 0) {
+						result--;
+					}
+					result *= 86400000;
+					result -= that.daymillisValue__();
+					result -= that.zoneValue__() * -60000;
+					if (result > 0) return +1;
+					if (result <= -86400000) return -1;
+					return undefined;
+				} else {
+					if (this.zoneValue__() > 0) {
+						result--;
+					}
+					if (that.zoneValue__() > 0) {
+						result++;
+					}
+					return result;
+				}
+			}
 		} else {
-			if (!value.hasZone()) return result;
-			if (result < +50400) return -1;
-			if (result > -50400) return +1;
+			if (that.hasDate()) return undefined;
+			if (this.hasTime()) {
+				if (!that.hasTime()) return undefined;
+				result = this.daymillisValue__() - that.daymillisValue__();
+				result += (this.zoneValue__() - that.zoneValue__()) * -60000;
+				return result;
+			} else {
+				if (that.hasTime()) return undefined;
+				if (this.hasZone()) {
+					if (!that.hasZone()) return undefined;
+					result = that.zoneValue__() - this.zoneValue__();
+					return result;
+				} else {
+					if (that.hasZone()) return undefined;
+					return 0;
+				}
+			}
 		}
-		return undefined;
 	}
 
 	/**
@@ -1212,24 +1239,24 @@ public final class FEMDatetime {
 	 * 
 	 * @return {@link Calendar}.
 	 */
-	public GregorianCalendar toCalendar() {
-		final GregorianCalendar calendar = new GregorianCalendar();
-		calendar.clear();
+	public final GregorianCalendar toCalendar() {
+		final GregorianCalendar result = new GregorianCalendar();
+		result.clear();
 		if (this.hasDate()) {
-			calendar.set(Calendar.YEAR, this.yearValue__());
-			calendar.set(Calendar.MONTH, (this.monthValue__() - 1));
-			calendar.set(Calendar.DATE, this.dateValue__());
+			result.set(Calendar.YEAR, this.yearValue__());
+			result.set(Calendar.MONTH, (this.monthValue__() - 1));
+			result.set(Calendar.DATE, this.dateValue__());
 		}
 		if (this.hasTime()) {
-			calendar.set(Calendar.HOUR_OF_DAY, this.hourValue__());
-			calendar.set(Calendar.MINUTE, this.minuteValue__());
-			calendar.set(Calendar.SECOND, this.secondValue__());
-			calendar.set(Calendar.MILLISECOND, this.millisecondValue__());
+			result.set(Calendar.HOUR_OF_DAY, this.hourValue__());
+			result.set(Calendar.MINUTE, this.minuteValue__());
+			result.set(Calendar.SECOND, this.secondValue__());
+			result.set(Calendar.MILLISECOND, this.millisecondValue__());
 		}
 		if (this.hasZone()) {
-			calendar.set(Calendar.ZONE_OFFSET, this.zoneValue__() * 60000);
+			result.set(Calendar.ZONE_OFFSET, this.zoneValue__() * 60000);
 		}
-		return calendar;
+		return result;
 	}
 
 	{}
@@ -1249,7 +1276,8 @@ public final class FEMDatetime {
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMDatetime)) return false;
-		return this.equals((FEMDatetime)object);
+		final FEMDatetime that = (FEMDatetime)object;
+		return (this.valueL == that.valueL) && (this.valueH == that.valueH);
 	}
 
 	/**

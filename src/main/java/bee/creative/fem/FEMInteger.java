@@ -7,7 +7,7 @@ import bee.creative.util.Comparators;
  * 
  * @author Sebastian Rostock 2015.
  */
-public final class FEMInteger implements Comparable<FEMInteger> {
+public class FEMInteger implements Comparable<FEMInteger> {
 
 	/**
 	 * Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
@@ -15,7 +15,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 */
-	public static final FEMInteger valueOf(final long value) {
+	public static final FEMInteger from(final long value) {
 		return new FEMInteger(value);
 	}
 
@@ -26,7 +26,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMInteger valueOf(final Number value) throws NullPointerException {
+	public static final FEMInteger from(final Number value) throws NullPointerException {
 		return new FEMInteger(value.longValue());
 	}
 
@@ -53,34 +53,36 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * 
 	 * @return interne Darstellung der Dezimalzahl.
 	 */
-	public long value() {
+	public final long value() {
 		return this.value;
 	}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Dezimalzahl gleich der gegebenen ist.
 	 * 
-	 * @param value Dezimalzahl.
+	 * @param that Dezimalzahl.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public boolean equals(final FEMInteger value) throws NullPointerException {
-		return this.value == value.value;
+	public boolean equals(final FEMInteger that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
+		return this.value == that.value;
 	}
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn diese Dezimalzahl gleiner, gleich oder größer als die gegebene
 	 * Dezimalzahl ist.
 	 * 
-	 * @param value Dezimalzahl.
+	 * @param that Dezimalzahl.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public int compare(final FEMInteger value) throws NullPointerException {
-		return Comparators.compare(this.value, value.value);
+	public final int compare(final FEMInteger that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
+		return Comparators.compare(this.value, that.value);
 	}
 
-	public Number asNumber() {
+	public final Number toNumber() {
 		return Long.valueOf(this.value);
 	}
 
@@ -90,7 +92,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		final long value = this.value;
 		return (int)(value ^ (value >>> 32));
 	}
@@ -99,7 +101,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMInteger)) return false;
 		return this.equals((FEMInteger)object);
@@ -109,7 +111,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int compareTo(final FEMInteger value) {
+	public final int compareTo(final FEMInteger value) {
 		return this.compare(value);
 	}
 
@@ -117,7 +119,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatInteger(this);
 	}
 

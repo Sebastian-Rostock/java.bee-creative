@@ -1,84 +1,438 @@
 package bee.creative.fem;
 
+import java.util.Arrays;
 import bee.creative.util.Comparators;
-import de.fhg.ivi.fee.core.FEE;
-import de.fhg.ivi.fee.core.FEE_Values;
 
 /**
- * Diese Klasse implementiert eine Zeitspanne aus Jahre, Monate, Tage, Stunden, Minuten und Sekunden zur Verschiebung von Daten und Zeitpunkten.
+ * Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
+ * Intern wird die Zeitspanne als ein 64 Bit Zahlenwert dargestellt.
+ * <p>
+ * *
  * 
  * @author Sebastian Rostock 2014.
  */
-public final class FEMDuration {
+public class FEMDuration {
 
-	/**
-	 * Diese Methode erzeugt eine neue Zeitspanne der gegebenen Anzahl an Sekunden zurück.
-	 * 
-	 * @param seconds Sekunden ({@code -7549743600..7549743600}).
-	 * @return Zeitspanne.
-	 * @throws IllegalArgumentException Wenn {@code seconds} ungültig ist.
-	 */
-	public static FEMDuration valueOf(final long seconds) throws IllegalArgumentException {
-		if (seconds == 0) return new FEMDuration(0);
-		if (seconds < 0) return FEMDuration.valueOf(-1, 0, 0, 0, 0, 0, -seconds);
-		return FEMDuration.valueOf(+1, 0, 0, 0, 0, 0, +seconds);
+	public static void main(final String[] args) throws Exception {
+
+		final int[] maxs = new int[4800];
+		final int[] mins = new int[4800];
+
+		for (int i = 0; i < 4800; i++) {
+			mins[i] = FEMDuration.minLengthOf(i);
+			maxs[i] = FEMDuration.maxLengthOf(i);
+		}
+
+		System.out.println(Arrays.toString(mins));
+		System.out.println(Arrays.toString(maxs));
+		// System.out.println(Arrays.toString(avgs));
+
+		System.out.println(FEMDuration.from(5, 0).compare(FEMDuration.from(4, 0), 0));
+
 	}
 
 	/**
-	 * Diese Methode erzeugt eine neue Zeitspanne mit den gegebenen Komponenten und gibt diese zurück.
+	 * Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
 	 * 
-	 * @param sign Vorzeichen.
-	 * @param years Jahre ({@code 0..255}).
-	 * @param months Monate ({@code 0..3060}).
-	 * @param days Tage ({@code 0..131071}).
-	 * @param hours Stunden ({@code 0..4194303}).
-	 * @param minutes Minuten ({@code 0..251658180}).
-	 * @param seconds Sekunden ({@code 0..7549743600}).
-	 * @return Zeitspanne.
-	 * @throws IllegalArgumentException Wenn einer der Parameter ungültig ist.
+	 * @param durationmonths Gesamtanzahl der Monate ({@code -101006..101006}).
+	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @return Zeitapanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
 	 */
-	public static FEMDuration valueOf(final int sign, final int years, final int months, final int days, final int hours, final int minutes, final long seconds,
-		final long millis) throws IllegalArgumentException {
-		if ((years < 0) || (years > 255)) throw FEMDatetime.illegalYear(years);
-		if ((months < 0) || (months > 3060)) throw FEMDatetime.illegalMonth(months);
-		if ((days < 0) || (days > 131071)) throw FEMDatetime.illegalDate(days);
-		if ((hours < 0) || (hours > 4194303)) throw FEMDatetime.illegalHour(hours);
-		if ((minutes < 0) || (minutes > 251658180)) throw FEMDatetime.illegalMinute(minutes);
-		if ((seconds < 0) || (seconds > 7549743600L)) throw FEMDatetime.illegalSecond(seconds);
-		final long totalMonths = months + (years * 12);
-		if (totalMonths > 3060) throw FEMDuration.illegalTotalMonth(totalMonths);
-		final long totalSeconds = seconds + ((long)minutes * 60) + ((long)hours * 3600);
-		if (totalSeconds > 7549743600L) throw FEMDuration.illegalTotalSecond(totalSeconds);
-		if ((days == 0) && (totalMonths == 0) && (totalSeconds == 0)) return new FEMDuration(0);
-		final long totalSign = sign < 0 ? 4611686018427387904L : 0L;
-		// TODO nicht normalisieren, wenn nur eine komponente nicht 0 ist
-		final FEMDuration result = new FEMDuration(totalSign | ((long)days << 33) | //
-			((totalMonths / 12) << 54) | ((totalMonths % 12) << 50) | //
-			((totalSeconds / 3600) << 12) | (((totalSeconds / 60) % 60) << 6) | ((totalSeconds % 60) << 0));
+	public static final FEMDuration from(int durationmonths, long durationmillis) throws IllegalArgumentException {
+		FEMDuration.checkMonths__(+durationmonths);
+		FEMDuration.checkMonths__(-durationmonths);
+		FEMDuration.checkMilliseconds__(+durationmillis);
+		FEMDuration.checkMilliseconds__(-durationmillis);
+		int negate, years, months, days, hours, minutes, seconds, milliseconds;
+		if ((durationmonths < 0) || (durationmillis < 0)) {
+			if ((durationmonths > 0) || (durationmillis > 0)) throw new IllegalArgumentException();
+			negate = 1;
+			durationmonths = -durationmonths;
+			durationmillis = -durationmillis;
+		} else {
+			negate = 0;
+		}
+		days = (int)(durationmillis / 86400000);
+		milliseconds = (int)(durationmillis % 86400000);
+		hours = milliseconds / 3600000;
+		milliseconds = milliseconds % 3600000;
+		minutes = milliseconds / 60000;
+		milliseconds = milliseconds % 60000;
+		seconds = milliseconds / 1000;
+		milliseconds = milliseconds % 1000;
+		months = durationmonths % 12;
+		years = (durationmonths / 12) + ((days / 146097) * 400);
+		days = days % 146097;
+		FEMDuration.checkYears__(years);
+		return new FEMDuration( //
+			(years << 18) | (negate << 17) | (hours << 12) | (minutes << 6) | (seconds << 0), //
+			(days << 14) | (months << 10) | (milliseconds << 0));
+	}
+
+	/**
+	 * Diese Methode gibt eine Zeitapanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 * 
+	 * @see #from(int, long)
+	 * @see #durationmonthsOf(int, int)
+	 * @see #durationmillisOf(int, int, long, long, long)
+	 * @param years Anzahl der Jahre ({@code -8417..8417}).
+	 * @param months Anzahl der Monate ({@code -101006..101006}).
+	 * @param days Anzahl der Tage ({@code -3074324..3074324}).
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783776}).
+	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026560}).
+	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
+	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @return Zeitapanne.
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
+	 */
+	public static FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
+		final long milliseconds) throws IllegalArgumentException {
+		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkDays__(final int days) throws IllegalArgumentException {
+		if (days > 3074324) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkYears__(final int years) throws IllegalArgumentException {
+		if (years > 8417) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkMonths__(final int months) throws IllegalArgumentException {
+		if (months > 101006) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkHours__(final int hours) throws IllegalArgumentException {
+		if (hours > 73783776) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkMinutes__(final long minutes) throws IllegalArgumentException {
+		if (minutes > 4427026560L) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkSeconds__(final long seconds) throws IllegalArgumentException {
+		if (seconds > 265621593600L) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkMilliseconds__(final long milliseconds) throws IllegalArgumentException {
+		if (milliseconds > 265621593600000L) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void checkPositive__(final int value) throws IllegalArgumentException {
+		if (value < 0) throw new IllegalArgumentException();
+	}
+
+	/**
+	 * Diese Methode gibt die Zeitspanne zwischen den gegebenen Zeitangaben in Zeitzone {@code 00:00} zurück.
+	 * 
+	 * @see FEMDatetime#withZone(int)
+	 * @param datetime1 erste Zeitangabe.
+	 * @param datetime2 zweite Zeitangabe.
+	 * @return Zeitspanne von der ersten zur zweiten Zeitangabe.
+	 * @throws NullPointerException Wenn {@code datetime1} bzw. {@code datetime2} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn nur eine der Zeitangaben ein Datum bzw eine Uhrzeit besitzt.
+	 */
+	public static final FEMDuration between(final FEMDatetime datetime1, final FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
+		if (datetime1.hasDate()) {
+			if (!datetime2.hasDate()) throw new IllegalArgumentException();
+			if (datetime1.hasTime()) {
+				if (!datetime2.hasTime()) throw new IllegalArgumentException();
+				return FEMDuration.from(0, 0, datetime1.calendardayValue__() - datetime2.calendardayValue__(), //
+					0, datetime2.zoneValue__() - datetime1.zoneValue__(), 0, datetime1.daymillisValue__() - datetime2.daymillisValue__());
+			} else {
+				if (datetime2.hasTime()) throw new IllegalArgumentException();
+				return FEMDuration.from(0, 0, datetime1.calendardayValue__() - datetime2.calendardayValue__(), //
+					0, datetime2.zoneValue__() - datetime1.zoneValue__(), 0, 0);
+			}
+		} else {
+			if (datetime2.hasDate()) throw new IllegalArgumentException();
+			if (datetime1.hasTime()) {
+				if (!datetime2.hasTime()) throw new IllegalArgumentException();
+				return FEMDuration.from(0, 0, 0, 0, datetime2.zoneValue__() - datetime1.zoneValue__(), 0, datetime1.daymillisValue__() - datetime2.daymillisValue__());
+			} else {
+				if (datetime2.hasTime()) throw new IllegalArgumentException();
+				return FEMDuration.from(0, 0, 0, 0, datetime2.zoneValue__() - datetime1.zoneValue__(), 0, 0);
+			}
+		}
+	}
+
+	/**
+	 * Diese Methode gibt die minnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	 * 
+	 * @see FEMDatetime#moveDate(int, int, int)
+	 * @param months Anzahl der Monate ({@code 0..101015}).
+	 * @return minimale Anzahl an Tagen in den gegebenen Monaten.
+	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist.
+	 */
+	public static final int minLengthOf(final int months) throws IllegalArgumentException {
+		FEMDuration.checkMonths__(months);
+		FEMDuration.checkPositive__(months);
+		return FEMDuration.lengthOf__(months) - ((FEMDuration.rangeOf__(months) >> 0) & 0x0F);
+	}
+
+	/**
+	 * Diese Methode gibt die maxnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	 * 
+	 * @see FEMDatetime#moveDate(int, int, int)
+	 * @param months Anzahl der Monate ({@code 0..101006}).
+	 * @return maximale Anzahl an Tagen in den gegebenen Monaten.
+	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist.
+	 */
+	public static final int maxLengthOf(final int months) throws IllegalArgumentException {
+		FEMDuration.checkMonths__(months);
+		FEMDuration.checkPositive__(months);
+		return FEMDuration.lengthOf__(months) + ((FEMDuration.rangeOf__(months) >> 4) & 0x0F);
+	}
+
+	/**
+	 * Diese Methode gibt das Paar aus Min und Max zur Ergänzung von {@link #lengthOf__(int)} zu {@link #minLengthOf(int)} und {@link #maxLengthOf(int)} zurück.<br>
+	 * {@link #minLengthOf(int)} = {@link #lengthOf__(int)} - MIN.<br>
+	 * {@link #maxLengthOf(int)} = {@link #lengthOf__(int)} + MAX.
+	 * 
+	 * @param months Anzahl an Monaten ({@code 0..101015}).
+	 * @return Min-Max-Paar (MIN << 0 | MAX << 4).
+	 */
+	static final int rangeOf__(final int months) {
+		return FEMDuration.ranges[months % 4800];
+	}
+
+	/**
+	 * Diese Methode gibt die mittlere Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	 * 
+	 * @param months Anzahl der Monate ({@code 0..101006}).
+	 * @return mittlere Anzahl an Tagen in den gegebenen Monaten.
+	 */
+	static final int lengthOf__(final int months) {
+		return (months * 146097) / 4800;
+	}
+
+	/**
+	 * Diese Methode gibt die Gesamtanzahl der Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 * 
+	 * @param days Anzahl der Tage ({@code -3074324..3074324}).
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783776}).
+	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026560}).
+	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
+	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @return die Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde.
+	 */
+	public static final long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+		throws IllegalArgumentException {
+		FEMDuration.checkDays__(-days);
+		FEMDuration.checkDays__(+days);
+		FEMDuration.checkHours__(+hours);
+		FEMDuration.checkHours__(-hours);
+		FEMDuration.checkMinutes__(+minutes);
+		FEMDuration.checkMinutes__(-minutes);
+		FEMDuration.checkSeconds__(+seconds);
+		FEMDuration.checkSeconds__(-seconds);
+		final long result = FEMDuration.durationmillisOf__(days, hours, minutes, seconds, milliseconds);
+		FEMDuration.checkMilliseconds__(+result);
+		FEMDuration.checkMilliseconds__(-result);
 		return result;
 	}
 
-	{}
-
 	@SuppressWarnings ("javadoc")
-	static IllegalArgumentException illegalTotalMonth(final long totalMonth) {
-		return FEE_Values.illegal(null, "Die Gesamtanzahl der Monate '%s' ist ungültig.", totalMonth);
+	static final long durationmillisOf__(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+		throws IllegalArgumentException {
+		return (days * 86400000L) + (hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds;
+	}
+
+	/**
+	 * Diese Methode gibt die Gesamtanzahl der Monate zurück, die sich aus den gegebenen Anzahlen ergeben.
+	 * 
+	 * @param years Anzahl der Jahre ({@code -8417..8417}).
+	 * @param months Anzahl der Monate ({@code -101006..101006}).
+	 * @return Gesamtanzahl der Monate ({@code -101006..101006}).
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde.
+	 */
+	public static final int durationmonthsOf(final int years, final int months) throws IllegalArgumentException {
+		FEMDuration.checkYears__(+years);
+		FEMDuration.checkYears__(-years);
+		FEMDuration.checkMonths__(-months);
+		FEMDuration.checkMonths__(+months);
+		final int result = FEMDuration.durationmonthsOf__(years, months);
+		FEMDuration.checkMonths__(+result);
+		FEMDuration.checkMonths__(-result);
+		return result;
 	}
 
 	@SuppressWarnings ("javadoc")
-	static IllegalArgumentException illegalTotalSecond(final long totalSecond) {
-		return FEE_Values.illegal(null, "Die Gesamtanzahl der Sekunden '%s' ist ungültig.", totalSecond);
+	static final int durationmonthsOf__(final int years, final int months) {
+		return (years * 12) + months;
 	}
 
 	{}
 
 	/**
-	 * Dieses Feld speichert interne Darstellung der Zeitspanne.
-	 * 
-	 * @see #value()
+	 * Dieses Feld speichert die Ergebnisse von {@link #rangeOf__(int)}.
+	 */
+	static final byte[] ranges = {0, 18, 33, 18, 33, 18, 33, 33, 33, 48, 33, 48, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49,
+		49, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 16, 19, 34, 19, 34, 19, 34, 34, 34, 49, 34, 49, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50,
+		50, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 17, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 16, 19, 34, 19, 34, 19, 34, 49, 34, 49, 34, 49, 17, 35,
+		35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 17, 19, 34, 34, 34, 34, 34, 49, 34, 49, 34, 49, 16, 19, 34, 19, 34,
+		19, 34, 49, 34, 49, 34, 49, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 17, 19, 34, 34, 34, 34, 34, 49,
+		34, 49, 34, 49, 16, 19, 34, 19, 34, 19, 34, 49, 34, 49, 34, 49, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50,
+		50, 17, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 19, 34, 19, 34, 19, 34, 49, 34, 49, 34, 49, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35,
+		35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 17, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 19, 34, 19, 34, 19, 34, 49, 34, 49, 34, 49, 17, 35, 50, 35, 50,
+		35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49,
+		34, 49, 34, 49, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49,
+		49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 17, 34,
+		34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50,
+		35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 50,
+		50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 34,
+		49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19,
+		34, 34, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34,
+		34, 49, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50,
+		50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50,
+		65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35,
+		50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34,
+		34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49,
+		49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50,
+		65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35,
+		50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50,
+		50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 34, 49,
+		49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49,
+		64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34,
+		49, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50,
+		35, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 50, 50, 50, 50, 50, 50, 65,
+		50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49,
+		49, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34,
+		34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 32, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50,
+		35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 36, 51, 51, 51, 66,
+		51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66,
+		66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51,
+		51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50,
+		35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 35, 50, 65,
+		50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66,
+		66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 51,
+		51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 51,
+		51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50,
+		50, 65, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50,
+		65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35,
+		50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51,
+		51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66,
+		66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50,
+		65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35,
+		50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 66, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50,
+		50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 66, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66,
+		66, 66, 66, 66, 33, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 33, 51, 66, 51, 66, 51, 66, 66, 66, 81, 66,
+		81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 33, 51,
+		66, 51, 66, 51, 66, 66, 66, 81, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 35, 50,
+		50, 50, 65, 50, 65, 50, 65, 48, 51, 66, 51, 66, 51, 66, 66, 66, 81, 66, 81, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 66, 33, 50, 50, 50, 50, 50, 50, 65,
+		65, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 48, 51, 66, 51, 66, 51, 66, 66, 66, 81, 66, 81, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66,
+		66, 33, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 48, 51, 66, 51, 66, 51, 66, 81, 66, 81, 66, 81, 33, 51,
+		51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 48, 51, 66, 51, 66,
+		51, 66, 81, 66, 81, 66, 81, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65,
+		50, 65, 65, 65, 48, 51, 66, 51, 66, 51, 66, 81, 66, 81, 66, 81, 33, 51, 66, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65,
+		65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 48, 51, 66, 51, 66, 51, 66, 81, 66, 81, 66, 81, 33, 51, 66, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 50,
+		50, 50, 50, 50, 65, 65, 65, 65, 65, 65, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 48, 51, 66, 51, 66, 66, 66, 81, 66, 81, 66, 81, 33, 51, 66, 51, 66,
+		51, 66, 66, 66, 81, 66, 81, 33, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 65, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65,
+		50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49,
+		49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 17, 35,
+		35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 33, 36, 51, 36, 51, 51, 51, 66, 51, 66, 51, 66, 33, 36, 51, 36, 51, 36, 51, 51, 51, 66, 51, 66, 18, 35, 35, 35, 50,
+		35, 50, 50, 50, 50, 50, 50, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 51, 66, 33, 36, 51, 36, 51, 36, 51, 66,
+		51, 66, 51, 66, 18, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 51,
+		66, 33, 36, 51, 36, 51, 36, 51, 66, 51, 66, 51, 66, 18, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 33, 36,
+		51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 36, 51, 36, 51, 36, 51, 66, 51, 66, 51, 66, 18, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 35, 35, 35, 35,
+		35, 50, 50, 50, 50, 50, 50, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 36, 51, 36, 51, 36, 51, 66, 51, 66, 51, 66, 18, 35, 50, 35, 50, 35, 50, 50,
+		50, 50, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 33, 51, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 36, 51, 36, 51, 51, 51, 66, 51, 66, 51,
+		66, 18, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 33, 51, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 36,
+		51, 36, 51, 51, 51, 66, 51, 66, 51, 66, 18, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 33, 51, 51, 51, 51,
+		51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 36, 51, 51, 51, 66, 51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50,
+		50, 50, 50, 50, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 36, 51, 51, 51, 66, 51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50,
+		65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 51, 66, 33, 35,
+		50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51,
+		51, 51, 66, 51, 66, 51, 66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 51, 66,
+		66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50,
+		65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35,
+		50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 36, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50,
+		50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66,
+		51, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66,
+		66, 33, 51, 51, 51, 51, 51, 51, 66, 51, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 33, 51,
+		51, 51, 66, 51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50,
+		35, 50, 50, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 66, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65,
+		50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 51, 66, 66, 66, 66,
+		66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 51, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51,
+		51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 33, 51, 66, 51, 66,
+		51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 35, 50, 65,
+		50, 65, 50, 65, 33, 51, 66, 51, 66, 51, 66, 66, 66, 66, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65,
+		65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 33, 51, 66, 51, 66, 51, 66, 66, 66, 81, 66, 81, 33, 51, 51, 51, 51, 51, 66, 66, 66, 66, 66, 66, 33, 50,
+		50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 35,
+		35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 50,
+		50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34,
+		49, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 50, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19,
+		34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34,
+		34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 34, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 35, 35, 50, 35, 50, 50,
+		50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50,
+		65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35,
+		50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 50, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 19, 34, 34, 34,
+		34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 34, 34, 49, 49,
+		49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50,
+		65, 17, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35,
+		50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 35, 50,
+		50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 50, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49,
+		49, 49, 49, 49, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49,
+		64, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34,
+		34, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 35, 50, 35, 50,
+		35, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 35, 50, 50, 50, 50, 50, 65,
+		50, 65, 65, 65, 32, 35, 50, 35, 50, 35, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 49, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49,
+		49, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34,
+		34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 17, 34, 49, 34, 49,
+		34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65,
+		50, 65, 50, 65, 32, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 32, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65,
+		65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 32, 50,
+		50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 35, 50, 50, 50, 65, 50, 65, 50, 65, 32, 34, 49, 34, 49, 34, 49, 64, 49, 64, 49, 64, 16, 34, 34, 34, 49,
+		34, 49, 49, 49, 49, 49, 64, 32, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50, 65, 32, 34, 49, 34, 49, 34, 49, 64,
+		49, 64, 49, 64, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 64, 32, 50, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 50,
+		65, 32, 34, 49, 34, 49, 34, 49, 64, 49, 64, 49, 64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 49, 49, 64, 32, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 65, 32, 35,
+		50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 34, 49, 34, 49, 34, 49, 64, 49, 64, 49, 64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 49, 49, 64, 32, 50, 50, 50, 50,
+		50, 65, 65, 65, 65, 65, 65, 32, 35, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 34, 49, 34, 49, 34, 49, 64, 49, 64, 49, 64, 16, 34, 49, 34, 49, 34, 49, 49,
+		49, 64, 49, 64, 32, 50, 50, 50, 50, 50, 65, 65, 65, 65, 65, 65, 32, 50, 50, 50, 50, 50, 50, 65, 50, 65, 65, 65, 32, 34, 49, 34, 49, 49, 49, 64, 49, 64, 49,
+		64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 18,
+		33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
+
+	/**
+	 * Dieses Feld speichert die leere Zeitspanne.
+	 */
+	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
+
+	{}
+
+	/**
+	 * Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitspanne.
+	 * <p>
+	 * Die 32 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>daysValue - 18 Bit</li>
+	 * <li>monthsValue - 4 Bit</li>
+	 * <li>millisecondsValue - 10 Bit</li>
+	 * </ul>
 	 */
 	final int valueL;
 
+	/**
+	 * Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitspanne.
+	 * <p>
+	 * Die 32 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>yearsValue - 14 Bit</li>
+	 * <li>signValue - 1 Bit</li>
+	 * <li>hoursValue - 5 Bit</li>
+	 * <li>minutesValue - 6 Bit</li>
+	 * <li>secondsValue - 6 Bit</li>
+	 * </ul>
+	 */
 	final int valueH;
 
 	/**
@@ -86,104 +440,94 @@ public final class FEMDuration {
 	 * 
 	 * @see #value()
 	 * @param value interne Darstellung der Zeitspanne.
+	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist.
 	 */
-	public FEMDuration(final long value) {
-		this.value = value;
+	public FEMDuration(final long value) throws IllegalArgumentException {
+		this((int)(value >> 32), (int)(value >> 0));
+		if (value == 0) return;
+		FEMDuration.checkYears__(this.yearsValue());
+		if (this.monthsValue() > 11) throw new IllegalArgumentException();
+		if (this.daysValue() > 146096) throw new IllegalArgumentException();
+		if (this.hoursValue() > 23) throw new IllegalArgumentException();
+		if (this.minutesValue() > 59) throw new IllegalArgumentException();
+		if (this.secondsValue() > 59) throw new IllegalArgumentException();
+		if (this.millisecondsValue() > 999) throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	private FEMDuration(final int valueH, final int valueL) {
+		this.valueH = valueH;
+		this.valueL = valueL;
 	}
 
 	{}
 
 	/**
-	 * Diese Methode gibt die Gesamtanzahl der Monate zurück.
-	 * 
-	 * @return Zusammenfassung von {@link #yearsValue()} und {@link #monthsValue()}.
-	 */
-	final int totalMonths() {
-		return this.monthsValue() + (this.yearsValue() * 12);
-	}
-
-	/**
-	 * Diese Methode gibt die Gesamtanzahl der Millisekunden zurück.
-	 * 
-	 * @return Zusammenfassung von {@link #daysValue()}, {@link #hoursValue()}, {@link #minutesValue()}, {@link #secondsValue()} und {@link #millisValue()}.
-	 */
-	long _totalSeconds() {
-		long result = this.daysValue();
-		result = (result * 24) + this.hoursValue();
-		result = (result * 60) + this.minutesValue();
-		result = (result * 60) + this.secondsValue();
-		result = (result * 1000) + this.millisValue();
-		return result;
-	}
-
-	{}
-
-	// Y[14]z[10]M[4]h[5]N[1]
-	// D[18]m[6]s[6]
-	// jahre bei modulo 400 jahre übertragen
-
-	/**
-	 * Diese Methode gibt die interne Darstellung der Zeitspanne zurück.<br>
-	 * Diese ist ein {@code long} im Format {@code 0[1]:N[1]:Y[8]:M[4]:D[17]:h[21]:m[6]:s[6]} mit<br>
-	 * <code>N = {@link #signValue()}</code>, <br>
-	 * <code>Y = {@link #yearsValue()}</code>, <br>
-	 * <code>M = {@link #monthsValue()}</code>, <br>
-	 * <code>D = {@link #daysValue()}</code>, <br>
-	 * <code>h = {@link #hoursValue()}</code>, <br>
-	 * <code>m = {@link #minutesValue()}</code> und<br>
-	 * <code>s = {@link #secondsValue()}</code>.
+	 * Diese Methode gibt die interne Darstellung der Zeitspanne zurück.
+	 * <p>
+	 * Die 64 Bit von MBS zum LSB sind:
+	 * <ul>
+	 * <li>yearsValue - 14 Bit</li>
+	 * <li>signValue - 1 Bit</li>
+	 * <li>hoursValue - 5 Bit</li>
+	 * <li>minutesValue - 6 Bit</li>
+	 * <li>secondsValue - 6 Bit</li>
+	 * <li>daysValue - 18 Bit</li>
+	 * <li>monthsValue - 4 Bit</li>
+	 * <li>millisecondsValue - 10 Bit</li>
+	 * </ul>
 	 * 
 	 * @return interne Darstellung der Zeitspanne.
 	 */
 	public final long value() {
-		return ((long)this.valueH << 32) | ((long)valueL << 0);
+		return (((long)this.valueH) << 32) | (((long)this.valueL) << 0);
 	}
 
 	/**
-	 * Diese Methode gibt das Vorzeichen der Zeitspanne zurück.<br>
-	 * Dieses ist {@code -1}, {@code 0} oder {@code 1}, wenn alle Komponenten der Zeitspanne kleiner, gleich bzw. größer {@code 0} sind.
+	 * Diese Methode gibt das Vorzeichen dieser Zeitspanne zurück.<br>
+	 * Das Vorzeichen ist {@code -1}, {@code 0} oder {@code +1}, wenn alle Komponenten der Zeitspanne kleiner als, gleich bzw. größer als {@code 0} sind.
 	 * 
 	 * @return Vorzeichen.
 	 */
 	public final int signValue() {
-		final long value = this.value;
-		return (value & (1L << 62)) != 0 ? -1 : value != 0 ? +1 : 0;
+		if ((this.valueH | this.valueL) == 0) return 0;
+		return (this.valueH & 0x020000) != 0 ? -1 : +1;
 	}
 
 	/**
 	 * Diese Methode gibt die Anzahl der Jahre zurück.
 	 * 
-	 * @return Anzahl der Jahre (0..255).
+	 * @return Anzahl der Jahre ({@code 0..8417}).
 	 */
 	public final int yearsValue() {
-		return (int)(this.value >> 54) & 255;
+		return (this.valueH >> 18) & 0x3FFF;
 	}
 
 	/**
 	 * Diese Methode gibt die Anzahl der Monate zurück.
 	 * 
-	 * @return Anzahl der Monate (0..11).
+	 * @return Anzahl der Monate ({@code 0..11}).
 	 */
 	public final int monthsValue() {
-		return (int)(this.value >> 50) & 15;
+		return (this.valueL >> 10) & 0x0F;
 	}
 
 	/**
 	 * Diese Methode gibt die Anzahl der Tage zurück.
 	 * 
-	 * @return Anzahl der Tage ({@code 0..131071}).
+	 * @return Anzahl der Tage ({@code 0..146096}).
 	 */
 	public final int daysValue() {
-		return (int)(this.value >> 33) & 131071;
+		return (this.valueL >> 14) & 0x03FFFF;
 	}
 
 	/**
 	 * Diese Methode gibt die Anzahl der Stunden zurück.
 	 * 
-	 * @return Anzahl der Stunde ({@code 0..2097151}).
+	 * @return Anzahl der Stunde ({@code 0..23}).
 	 */
 	public final int hoursValue() {
-		return (int)(this.value >> 12) & 2097151;
+		return (this.valueH >> 12) & 0x1F;
 	}
 
 	/**
@@ -192,7 +536,7 @@ public final class FEMDuration {
 	 * @return Anzahl der Minuten ({@code 0..59}).
 	 */
 	public final int minutesValue() {
-		return (int)(this.value >> 6) & 63;
+		return (this.valueH >> 6) & 0x3F;
 	}
 
 	/**
@@ -201,11 +545,35 @@ public final class FEMDuration {
 	 * @return Anzahl der Sekunden ({@code 0..59}).
 	 */
 	public final int secondsValue() {
-		return (int)(this.value >> 0) & 63;
+		return (this.valueH >> 0) & 0x3F;
 	}
 
-	public final int millisValue() {
-		return (int)(this.value >> 0) & 63;
+	/**
+	 * Diese Methode gibt die Anzahl der Millisekunden zurück.
+	 * 
+	 * @return Anzahl der Millisekunden ({@code 0..999}).
+	 */
+	public final int millisecondsValue() {
+		return (this.valueL >> 0) & 0x03FF;
+	}
+
+	/**
+	 * Diese Methode gibt die Gesamtanzahl der Millisekunden zurück.<br>
+	 * Diese fassen {@link #daysValue()}, {@link #hoursValue()}, {@link #minutesValue()}, {@link #secondsValue()} und {@link #millisecondsValue()} zusammen.
+	 * 
+	 * @return Gesamtanzahl der Millisekunden ({@code 0..265621593600000}).
+	 */
+	public final long durationmillisValue() {
+		return FEMDuration.durationmillisOf__(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
+	}
+
+	/**
+	 * Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
+	 * 
+	 * @return Gesamtanzahl der Monate ({@code 0..101006}).
+	 */
+	public final int durationmonthsValue() {
+		return FEMDuration.durationmonthsOf__(this.yearsValue(), this.monthsValue());
 	}
 
 	/**
@@ -214,40 +582,89 @@ public final class FEMDuration {
 	 * @see #signValue()
 	 * @return Zeitspanne in entgegen gesetzter Richtung.
 	 */
-	public FEMDuration negate() {
-		if (this.value == 0) return this;
-		return new FEMDuration(this.value ^ (1L << 62));
+	public final FEMDuration negate() {
+		if (this.signValue() == 0) return this;
+		return new FEMDuration(this.valueH ^ 0x020000, this.valueL);
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspanne gleich der gegebenen ist.
+	 * Diese Methode gibt das zurück.
 	 * 
-	 * @param value Zeitspanne.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @param durationmonths Anzahl der Monate ({@code -101006..101006}).
+	 * @param durationmillis Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @return
+	 * @throws IllegalArgumentException
 	 */
-	public boolean equals(final FEMDuration value) {
-		return (this.signValue() == value.signValue()) && (this.totalMonths() == value.totalMonths()) && (this.totalSeconds() == value.totalSeconds());
+	public final FEMDuration move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+		FEMDuration.checkMonths__(-durationmonths);
+		FEMDuration.checkMonths__(+durationmonths);
+		FEMDuration.checkMilliseconds__(+durationmillis);
+		FEMDuration.checkMilliseconds__(-durationmillis);
+		return this.move__(durationmonths, durationmillis);
+	}
+
+	/**
+	 * Diese Methode gibt das zurück.
+	 * 
+	 * @see #move(int, long)
+	 * @see #durationmonthsOf(int, int)
+	 * @see #durationmillisOf(int, int, long, long, long)
+	 * @param years Anzahl der Jahre ({@code -8417..8417}).
+	 * @param months Anzahl der Monate ({@code -101006..101006}).
+	 * @param days Anzahl der Tage ({@code -3074324..3074324}).
+	 * @param hours Anzahl der Stunden ({@code -73783776..73783776}).
+	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026560}).
+	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
+	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+		throws IllegalArgumentException {
+		return this.move__(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, months, seconds, milliseconds));
+	}
+
+	public final FEMDuration move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
+		if (duration == null) throw new NullPointerException("duration = null");
+		if (duration.signValue() < 0) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
+		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
+	}
+
+	@SuppressWarnings ("javadoc")
+	FEMDuration move__(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
+		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
 	}
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne
 	 * ist. Wenn die Zeitspannen nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * 
-	 * @param value Zeitspanne.
+	 * @param that Zeitspanne.
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitspannen.
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public int compare(final FEMDuration value, final int undefined) {
-		final int result = this.signValue() - value.signValue();
+	public final int compare(final FEMDuration that, final int undefined) {
+		final int sign = this.signValue(), result = sign - that.signValue();
 		if (result != 0) return result;
-		// 28 Tage = 2419200 Sekunden
-		final int totalMonths1 = this.totalMonths(), totalMonths2 = value.totalMonths();
-		final long totalSeconds1 = this.totalSeconds(), totalSeconds2 = value.totalSeconds();
-		if (totalMonths1 == totalMonths2) return Comparators.compare(totalSeconds1, totalSeconds2);
-		if ((totalSeconds1 < 2419200L) && (totalSeconds2 < 2419200L)) //
-			return Comparators.compare((totalMonths1 * 2419200L) + totalSeconds1, (totalMonths2 * 2419200L) + totalSeconds2);
+		return sign < 0 ? -this.compare__(that, -undefined) : +this.compare__(that, +undefined);
+	}
+
+	@SuppressWarnings ("javadoc")
+	final int compare__(final FEMDuration that, final int undefined) {
+		final int thisMonths = this.durationmonthsValue(), thatMonths = that.durationmonthsValue();
+		final long thisMillis = this.durationmillisValue(), thatMillis = that.durationmillisValue();
+		if (thisMonths == thatMonths) return Comparators.compare(thisMillis, thatMillis);
+		final int thisLength = FEMDuration.lengthOf__(thisMonths), thisRange = FEMDuration.rangeOf__(thisMonths);
+		final int thatLength = FEMDuration.lengthOf__(thatMonths), thatRange = FEMDuration.rangeOf__(thatMonths);
+		final int length = thisLength - thatLength;
+		final long millis = thisMillis - thatMillis;
+		long result;
+		result = millis + ((length + ((thisRange >> 4) & 0xF) + ((thatRange >> 4) & 0xF)) * 86400000L);
+		if (result < 0) return -1;
+		result = millis + (((length - ((thisRange >> 0) & 0xF)) + ((thatRange >> 0) & 0xF)) * 86400000L);
+		if (result > 0) return +1;
 		return undefined;
 	}
 
@@ -257,19 +674,19 @@ public final class FEMDuration {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode() {
-		final long value = this.value;
-		return (int)((value >> 32) ^ value);
+	public final int hashCode() {
+		return this.valueH ^ this.valueL;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMDuration)) return false;
-		return this.equals((FEMDuration)object);
+		final FEMDuration that = (FEMDuration)object;
+		return (this.valueL == that.valueL) && (this.valueH == that.valueH);
 	}
 
 	/**
@@ -277,7 +694,7 @@ public final class FEMDuration {
 	 */
 	@Override
 	public String toString() {
-		return FEE.formatDuration(this);
+		return FEM.formatDuration(this);
 	}
 
 }
