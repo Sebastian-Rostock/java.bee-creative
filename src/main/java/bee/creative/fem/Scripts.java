@@ -272,8 +272,8 @@ public class Scripts {
 	 * Die Bereichestypen eines Quelltexts haben folgende Bedeutung:
 	 * <ul>
 	 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) sind bedeutungslos, dürfen an jeder Position vorkommen und werden ignoriert.</li>
-	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link Array}s an, dessen Elemente mit Bereichen vom Typ
-	 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente nur dann zulässig, wenn das {@link Array} als Funktion bzw. Parameterwert
+	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link FEMArray}s an, dessen Elemente mit Bereichen vom Typ
+	 * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente nur dann zulässig, wenn das {@link FEMArray} als Funktion bzw. Parameterwert
 	 * kompiliert wird.</li>
 	 * <li>Bereiche mit den Typen {@code '('} und {@code ')'} zeigen den Beginn bzw. das Ende der Parameterliste eines Funktionsaufrufs an, deren Parameter mit
 	 * Bereichen vom Typ {@code ';'} separiert werden müssen und als Funktionen kompiliert werden.</li>
@@ -295,9 +295,9 @@ public class Scripts {
 	public static class ScriptCompiler {
 
 		/**
-		 * Dieses Feld speichert den {@link FEMValue} zu {@link Array#EMPTY}.
+		 * Dieses Feld speichert den {@link FEMValue} zu {@link FEMArray#EMPTY}.
 		 */
-		static final FEMValue EMPTY_ARRAY_VALUE = Values.arrayValue(Array.EMPTY);
+		static final FEMValue EMPTY_ARRAY_VALUE = Values.arrayValue(FEMArray.EMPTY);
 
 		/**
 		 * Dieses Feld speichert die {@link FEMFunction} zu {@link #EMPTY_ARRAY_VALUE}.
@@ -428,7 +428,7 @@ public class Scripts {
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMValue} und gibt diesen zurück.
 		 * 
-		 * @see Values#arrayValue(Array)
+		 * @see Values#arrayValue(FEMArray)
 		 * @return Wertliste als {@link FEMValue}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
@@ -451,7 +451,7 @@ public class Scripts {
 					}
 					case ']': {
 						this.skip();
-						return Values.arrayValue(Array.valueOf(result));
+						return Values.arrayValue(FEMArray.valueOf(result));
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -465,7 +465,7 @@ public class Scripts {
 		 * 
 		 * @see ValueFunction
 		 * @see InvokeFunction
-		 * @see Values#arrayValue(Array)
+		 * @see Values#arrayValue(FEMArray)
 		 * @see Functions#ARRAY_VIEW_FUNCTION
 		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
@@ -498,9 +498,9 @@ public class Scripts {
 						}
 						final FEMValue[] values = new FEMValue[size];
 						for (int i = 0; i < size; i++) {
-							values[i] = list.get(i).execute(FEMScope.EMPTY);
+							values[i] = list.get(i).invoke(FEMScope.EMPTY);
 						}
-						return new ValueFunction(Values.arrayValue(Array.valueOf(values)));
+						return new ValueFunction(Values.arrayValue(FEMArray.valueOf(values)));
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -559,7 +559,7 @@ public class Scripts {
 				default: {
 					final FEMFunction param = this.compileNextParam();
 					if (!(param instanceof ValueFunction)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
-					final FEMValue result = param.execute(FEMScope.EMPTY);
+					final FEMValue result = param.invoke(FEMScope.EMPTY);
 					return result;
 				}
 			}
@@ -843,7 +843,7 @@ public class Scripts {
 		 * 
 		 * @see #compileFunction()
 		 * @see InvokeFunction#direct()
-		 * @see InvokeFunction#execute(FEMScope)
+		 * @see InvokeFunction#invoke(FEMScope)
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
 		public final boolean isChainingEnabled() {
@@ -2437,7 +2437,7 @@ public class Scripts {
 		};
 
 		/**
-		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#execute(FEMScope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
+		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMScope) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
 		 * {@link ScriptTracer#exception} kann hierbei angepasst werden.
 		 * 
 		 * @see ScriptTracer#exception
@@ -2446,7 +2446,7 @@ public class Scripts {
 		public void onThrow(ScriptTracer event);
 
 		/**
-		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#execute(FEMScope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
+		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMScope) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
 		 * {@link ScriptTracer#result} kann hierbei angepasst werden.
 		 * 
 		 * @see ScriptTracer#result

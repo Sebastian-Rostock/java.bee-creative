@@ -15,16 +15,16 @@ public abstract class Context {
 	/**
 	 * Dieses Feld speichert den leeren {@link Context}.
 	 * <p>
-	 * Die {@link #dataOf(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück gibt, wenn
-	 * sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn {@code value.type().is(type)}. Andernfalls löst sie
-	 * eine {@link IllegalArgumentException} aus.
+	 * Die {@link #dataOf(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück gibt,
+	 * wenn sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn {@code value.type().is(type)}. Andernfalls löst
+	 * sie eine {@link IllegalArgumentException} aus.
 	 * <p>
 	 * Die {@link #valueOf(Object)}-Methode dieses Kontextobjekts liefert {@link Values#NULL}, wenn die ihr übergebenen Nutzdaten {@code null} sind. Sie liefer
-	 * die Nutzdaten unverändert, wenn diese selbst ein {@link FEMValue} sind. Wenn die Nutzdaten ein {@link Class#isArray() natives Array sind}, wird der Wert über
-	 * {@link Array#from(Object)} und {@link Values#arrayValue(Array)} ermittelt. Andernfalls liefert sie abhängig vom Datentyp der Nutzdaten einen mit
-	 * {@link Values#stringValue(String)}, {@link Values#numberValue(Number)}, {@link Values#booleanValue(Boolean)}, {@link Values#arrayValue(Array)},
-	 * {@link Values#arrayValue(Collection)}, {@link Values#arrayValue(Iterable)}, {@link Values#functionValue(FEMFunction)} oder {@link Values#objectValue(Object)}
-	 * erzeugten wert.
+	 * die Nutzdaten unverändert, wenn diese selbst ein {@link FEMValue} sind. Wenn die Nutzdaten ein {@link Class#isArray() natives Array sind}, wird der Wert
+	 * über {@link FEMArray#from(Object)} und {@link Values#arrayValue(FEMArray)} ermittelt. Andernfalls liefert sie abhängig vom Datentyp der Nutzdaten einen mit
+	 * {@link Values#stringValue(String)}, {@link Values#numberValue(Number)}, {@link Values#booleanValue(Boolean)}, {@link Values#arrayValue(FEMArray)},
+	 * {@link Values#arrayValue(Collection)}, {@link Values#arrayValue(Iterable)}, {@link Values#functionValue(FEMFunction)} oder
+	 * {@link Values#objectValue(Object)} erzeugten wert.
 	 */
 	public static final Context EMPTY = new Context() {
 
@@ -42,11 +42,11 @@ public abstract class Context {
 			if (data instanceof String) return Values.stringValue((String)data);
 			if (data instanceof Number) return Values.numberValue((Number)data);
 			if (data instanceof Boolean) return Values.booleanValue((Boolean)data);
-			if (data instanceof Array) return Values.arrayValue((Array)data);
+			if (data instanceof FEMArray) return Values.arrayValue((FEMArray)data);
 			if (data instanceof Collection<?>) return Values.arrayValue((Collection<?>)data);
 			if (data instanceof Iterable<?>) return Values.arrayValue((Iterable<?>)data);
 			if (data instanceof FEMFunction) return Values.functionValue((FEMFunction)data);
-			if (data.getClass().isArray()) return Values.arrayValue(Array.from(data));
+			if (data.getClass().isArray()) return Values.arrayValue(FEMArray.from(data));
 			return Values.objectValue(data);
 		}
 
@@ -54,8 +54,8 @@ public abstract class Context {
 
 	/**
 	 * Dieses Feld speichert den {@code default}-{@link Context}, der in den Methoden {@link FEMScope#context()} von {@link FEMScope#EMPTY},
-	 * {@link Values#valueOf(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataOf(FEMValue)} zur kontextfreien Umwandlung der Nutzdaten von Werten verwendet
-	 * wird. Wenn dieser {@code null} ist, lösen diese Methoden eine {@link NullPointerException} aus.
+	 * {@link Values#valueOf(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataOf(FEMValue)} zur kontextfreien Umwandlung der Nutzdaten von Werten
+	 * verwendet wird. Wenn dieser {@code null} ist, lösen diese Methoden eine {@link NullPointerException} aus.
 	 */
 	public static Context DEFAULT = Context.EMPTY;
 
@@ -76,7 +76,7 @@ public abstract class Context {
 	public abstract <GData> GData dataOf(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 	/**
-	 * Diese Methode gibt einen Wert mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
+	 * Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
 	 * Welcher Wert- und Datentyp hierfür verwendet wird, ist der Implementation überlassen.
 	 * 
 	 * @param data Nutzdaten.

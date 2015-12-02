@@ -40,13 +40,13 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * Ausführungskontexts zur Verfügung stellt.<br>
 	 * Sie ist eine Abkürzung für {@code valueScope(scope, values, true)}.
 	 * 
-	 * @see #arrayScope(FEMScope, Array, boolean)
+	 * @see #arrayScope(FEMScope, FEMArray, boolean)
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
 	 * @param values zugesicherte Parameterwerte des erzeugten Ausführungskontexts.
 	 * @return {@code value}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static FEMScope arrayScope(final FEMScope scope, final Array values) throws NullPointerException {
+	public static FEMScope arrayScope(final FEMScope scope, final FEMArray values) throws NullPointerException {
 		return FEMScope.arrayScope(scope, values, true);
 	}
 
@@ -67,7 +67,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return {@code value}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static FEMScope arrayScope(final FEMScope scope, final Array values, boolean replace) throws NullPointerException {
+	public static FEMScope arrayScope(final FEMScope scope, final FEMArray values, boolean replace) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
 		if (values == null) throw new NullPointerException("values = null");
 		final int length = values.length();
@@ -91,7 +91,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 			}
 
 			@Override
-			public Array array() {
+			public FEMArray array() {
 				return values;
 			}
 
@@ -130,7 +130,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 					if (result != null) return result;
 					final FEMFunction param = params[index];
 					if (param == null) throw new NullPointerException("params[index] = null");
-					result = param.execute(scope);
+					result = param.invoke(scope);
 					if (result == null) throw new NullPointerException("params[index].execute(scope) = null");
 					return values[index] = result;
 				}
@@ -147,8 +147,8 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 			}
 
 			@Override
-			public Array array() {
-				return new Array() {
+			public FEMArray array() {
+				return new FEMArray() {
 
 					@Override
 					public FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -204,7 +204,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 			}
 
 			@Override
-			public Array array() {
+			public FEMArray array() {
 				return scope.array();
 			}
 
@@ -228,23 +228,23 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * 
 	 * @see #get(int)
 	 * @see #size()
-	 * @return {@link Array} der Parameterwerte.
+	 * @return {@link FEMArray} der Parameterwerte.
 	 */
-	public Array array() {
-		if (this.size() == 0) return Array.EMPTY;
-		return new Array() {
-	
+	public FEMArray array() {
+		if (this.size() == 0) return FEMArray.EMPTY;
+		return new FEMArray() {
+
 			@Override
 			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				if ((index < 0) || (index >= FEMScope.this.size())) throw new IndexOutOfBoundsException();
 				return FEMScope.this.get(index);
 			}
-	
+
 			@Override
 			public int length() {
 				return FEMScope.this.size();
 			}
-	
+
 		};
 	}
 

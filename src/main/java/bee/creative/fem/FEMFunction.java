@@ -1,9 +1,10 @@
 package bee.creative.fem;
 
 /**
- * Diese Schnittstelle definiert eine Funktion, deren {@link FEMFunction#execute(FEMScope) Berechnungsmethode} mit einem Ausführungskontext aufgerufen wird und einen
- * Ergebniswert zurück gibt. Aus dem {@link FEMScope#context() Kontextobjekt} des Ausführungskontexts können hierbei Informationen für die Berechnungen extrahiert
- * oder auch der Zustand dieses Objekts modifiziert werden.
+ * Diese Schnittstelle definiert eine Funktion, deren {@link FEMFunction#invoke(FEMScope) Berechnungsmethode} mit einem {@link FEMScope Ausführungskontext}
+ * aufgerufen wird und einen Ergebniswert liefert.<br>
+ * Aus dem {@link FEMScope#context() Kontextobjekt} des Ausführungskontexts können hierbei Informationen für die Berechnungen extrahiert oder auch der Zustand
+ * dieses Objekts modifiziert werden.
  * 
  * @see FEMValue
  * @see FEMScope
@@ -18,6 +19,6 @@ public interface FEMFunction {
 	 * @param scope Ausführungskontext.
 	 * @return Ergebniswert.
 	 */
-	public FEMValue execute(FEMScope scope);
+	public FEMValue invoke(FEMScope scope);
 
 }

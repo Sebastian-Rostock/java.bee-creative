@@ -1,11 +1,9 @@
-package de.fhg.ivi.fee.core.data;
+package bee.creative.fem;
 
 import java.nio.charset.Charset;
-
 import bee.creative.array.CompactByteArray;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
-import de.fhg.ivi.fee.core.FEE;
 
 /**
  * Diese Klasse implementiert eine Zeichenkette.

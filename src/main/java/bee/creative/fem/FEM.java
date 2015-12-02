@@ -1,11 +1,14 @@
 package bee.creative.fem;
 
+import javax.xml.datatype.Duration;
+
 /**
  * FEM - Function Evaluation Model
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEM {
+
 
 	public static String formatBinary(final byte[] binary) throws NullPointerException {
 		return null;
@@ -60,6 +63,10 @@ public class FEM {
 	}
 
 	public static String formatDuration(FEMDuration femDuration) {
+		return null;
+	}
+
+	public static String formatVoid(FEMVoid femVoid) {
 		return null;
 	}
 

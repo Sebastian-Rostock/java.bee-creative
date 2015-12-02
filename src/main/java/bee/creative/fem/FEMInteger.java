@@ -10,6 +10,13 @@ import bee.creative.util.Comparators;
 public class FEMInteger implements Comparable<FEMInteger> {
 
 	/**
+	 * Dieses Feld speichert die Dezimalzahl {@code 0}.
+	 */
+	public static final FEMInteger EMPTY = new FEMInteger(0);
+
+	{}
+
+	/**
 	 * Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 * 
 	 * @param value Wert.
@@ -22,12 +29,13 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	/**
 	 * Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 * 
-	 * @param value Wert.
+	 * @param number Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMInteger from(final Number value) throws NullPointerException {
-		return new FEMInteger(value.longValue());
+	public static final FEMInteger from(final Number number) throws NullPointerException {
+		if (number == null) throw new NullPointerException("number = null");
+		return new FEMInteger(number.longValue());
 	}
 
 	{}
@@ -64,7 +72,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public boolean equals(final FEMInteger that) throws NullPointerException {
+	public final boolean equals(final FEMInteger that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
 		return this.value == that.value;
 	}
@@ -82,6 +90,11 @@ public class FEMInteger implements Comparable<FEMInteger> {
 		return Comparators.compare(this.value, that.value);
 	}
 
+	/**
+	 * Diese Methode gibt diese Dezimalzahl als {@link Number} zurück.
+	 * 
+	 * @return {@link Number}.
+	 */
 	public final Number toNumber() {
 		return Long.valueOf(this.value);
 	}
@@ -94,7 +107,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	@Override
 	public final int hashCode() {
 		final long value = this.value;
-		return (int)(value ^ (value >>> 32));
+		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
 	/**
@@ -119,7 +132,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return FEM.formatInteger(this);
 	}
 

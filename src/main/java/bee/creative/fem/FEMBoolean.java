@@ -5,7 +5,7 @@ package bee.creative.fem;
  * 
  * @author Sebastian Rostock 2015.
  */
-public  class FEMBoolean implements Comparable<FEMBoolean> {
+public class FEMBoolean implements Comparable<FEMBoolean> {
 
 	/**
 	 * Dieses Feld speichert den Wahrheitswert {@code true}.
@@ -25,7 +25,7 @@ public  class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @param value Wert.
 	 * @return Wahrheitswert.
 	 */
-	public static final FEMBoolean valueOf(final boolean value) {
+	public static final FEMBoolean from(final boolean value) {
 		return value ? FEMBoolean.TRUE : FEMBoolean.FALSE;
 	}
 
@@ -41,7 +41,7 @@ public  class FEMBoolean implements Comparable<FEMBoolean> {
 	 * 
 	 * @param value interne Darstellung des Wahrheitswerts.
 	 */
-	FEMBoolean(final boolean value) {
+	public FEMBoolean(final boolean value) {
 		this.value = value;
 	}
 
@@ -61,9 +61,10 @@ public  class FEMBoolean implements Comparable<FEMBoolean> {
 	 * 
 	 * @param that Wahrheitswert.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMBoolean that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
 		return this.value == that.value;
 	}
 
@@ -76,9 +77,15 @@ public  class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
 		return Boolean.compare(this.value, that.value);
 	}
 
+	/**
+	 * Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
+	 * 
+	 * @return {@link Boolean}.
+	 */
 	public final Boolean toBoolean() {
 		return Boolean.valueOf(this.value);
 	}
@@ -115,7 +122,7 @@ public  class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final String toString() {
+	public String toString() {
 		return FEM.formatBoolean(this);
 	}
 

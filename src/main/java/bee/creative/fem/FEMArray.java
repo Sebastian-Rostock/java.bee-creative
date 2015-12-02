@@ -15,12 +15,12 @@ import bee.creative.util.Objects;
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, ScriptFormatterInput {
+public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, ScriptFormatterInput {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste.
 	 * 
-	 * @see Array#collect(Collector)
+	 * @see FEMArray#collect(Collector)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static interface Collector {
@@ -40,7 +40,7 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	/**
 	 * Dieses Feld speichert eine leere Wertliste.
 	 */
-	public static final Array EMPTY = new Array() {
+	public static final FEMArray EMPTY = new FEMArray() {
 
 		@Override
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -65,18 +65,18 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * @see java.lang.reflect.Array#getLength(Object)
 	 * @see java.lang.reflect.Array#newInstance(Class, int)
 	 * @param data nativee Array.
-	 * @return {@link Array}.
+	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code data} {@link Class#isArray() kein Array ist}.
 	 */
-	public static Array from(Object data) throws NullPointerException, IllegalArgumentException {
+	public static FEMArray from(Object data) throws NullPointerException, IllegalArgumentException {
 		if (data == null) throw new NullPointerException("data = null");
 		final int length = java.lang.reflect.Array.getLength(data);
-		if (length == 0) return Array.EMPTY;
+		if (length == 0) return FEMArray.EMPTY;
 		final Object values = java.lang.reflect.Array.newInstance(data.getClass().getComponentType(), length);
 		System.arraycopy(data, 0, values, 0, length);
 		data = null;
-		return new Array() {
+		return new FEMArray() {
 
 			@Override
 			public FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -99,13 +99,13 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
 	 * 
 	 * @param data Werte.
-	 * @return {@link Array}.
+	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(FEMValue... data) throws NullPointerException {
-		if (data.length == 0) return Array.EMPTY;
+	public static FEMArray valueOf(FEMValue... data) throws NullPointerException {
+		if (data.length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = data = data.clone();
-		return new Array() {
+		return new FEMArray() {
 
 			@Override
 			public FEMValue get(final int index) throws IndexOutOfBoundsException {
@@ -125,13 +125,13 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * 
 	 * @see #valueOf(Collection)
 	 * @param data Werte.
-	 * @return {@link Array}.
+	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(final Iterable<? extends FEMValue> data) throws NullPointerException {
+	public static FEMArray valueOf(final Iterable<? extends FEMValue> data) throws NullPointerException {
 		final ArrayList<FEMValue> result = new ArrayList<>();
 		Iterables.appendAll(result, data);
-		return Array.valueOf(result);
+		return FEMArray.valueOf(result);
 	}
 
 	/**
@@ -140,12 +140,12 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * @see Collection#toArray(Object[])
 	 * @see #valueOf(FEMValue...)
 	 * @param data Werte.
-	 * @return {@link Array}.
+	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static Array valueOf(final Collection<? extends FEMValue> data) throws NullPointerException {
-		if (data.size() == 0) return Array.EMPTY;
-		return Array.valueOf(data.toArray(new FEMValue[data.size()]));
+	public static FEMArray valueOf(final Collection<? extends FEMValue> data) throws NullPointerException {
+		if (data.size() == 0) return FEMArray.EMPTY;
+		return FEMArray.valueOf(data.toArray(new FEMValue[data.size()]));
 	}
 
 	{}
@@ -213,34 +213,34 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
 	 * 
 	 * @param array Wertliste.
-	 * @return {@link Array}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
+	 * @return {@link FEMArray}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public Array concat(final Array array) throws NullPointerException {
+	public FEMArray concat(final FEMArray array) throws NullPointerException {
 		if (array.length() == 0) return this;
 		if (this.length() == 0) return array;
-		return new Array() {
+		return new FEMArray() {
 
 			@Override
 			protected boolean collect(final Collector target, final int offset, final int length) {
-				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
+				final int offset2 = offset - FEMArray.this.length(), length2 = offset2 + length;
 				if (offset2 >= 0) return array.collect(target, offset2, length);
-				else if (length2 <= 0) return Array.this.collect(target, offset, length);
+				else if (length2 <= 0) return FEMArray.this.collect(target, offset, length);
 				else {
-					if (!Array.this.collect(target, offset, -offset2)) return false;
+					if (!FEMArray.this.collect(target, offset, -offset2)) return false;
 					return array.collect(target, 0, length2);
 				}
 			}
 
 			@Override
 			public FEMValue get(final int index) throws IndexOutOfBoundsException {
-				final int index2 = index - Array.this.length();
-				return index2 < 0 ? Array.this.get(index) : array.get(index2);
+				final int index2 = index - FEMArray.this.length();
+				return index2 < 0 ? FEMArray.this.get(index) : array.get(index2);
 			}
 
 			@Override
-			public Array section(final int offset, final int length) throws IllegalArgumentException {
-				final int offset2 = offset - Array.this.length(), length2 = offset2 + length;
+			public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+				final int offset2 = offset - FEMArray.this.length(), length2 = offset2 + length;
 				if (offset2 >= 0) return array.section(offset2, length);
 				if (length2 <= 0) return super.section(offset, length);
 				return super.section(offset, -offset2).concat(array.section(0, length2));
@@ -248,7 +248,7 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 
 			@Override
 			public int length() {
-				return Array.this.length() + array.length();
+				return FEMArray.this.length() + array.length();
 			}
 
 		};
@@ -259,24 +259,24 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	 * 
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
-	 * @return {@link Array}-Sicht auf einen Abschnitt dieser Wertliste.
+	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
 	 */
-	public Array section(final int offset, final int length) throws IllegalArgumentException {
+	public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this.length())) return this;
 		if ((offset < 0) || (length < 0) || ((offset + length) > this.length())) throw new IllegalArgumentException();
-		if (length == 0) return Array.EMPTY;
-		return new Array() {
+		if (length == 0) return FEMArray.EMPTY;
+		return new FEMArray() {
 
 			@Override
 			protected boolean collect(final Collector target, final int offset2, final int length2) {
-				return Array.this.collect(target, offset + offset2, length2);
+				return FEMArray.this.collect(target, offset + offset2, length2);
 			}
 
 			@Override
 			public FEMValue get(final int index) throws IndexOutOfBoundsException {
 				if ((index < 0) || (index >= length)) throw new IndexOutOfBoundsException();
-				return Array.this.get(index + offset);
+				return FEMArray.this.get(index + offset);
 			}
 
 			@Override
@@ -285,8 +285,8 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 			}
 
 			@Override
-			public Array section(final int offset2, final int length2) throws IllegalArgumentException {
-				return Array.this.section(offset + offset2, length2);
+			public FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
+				return FEMArray.this.section(offset + offset2, length2);
 			}
 
 		};
@@ -318,8 +318,8 @@ public abstract class Array implements Items<FEMValue>, Iterable<FEMValue>, Scri
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;
-		if (!(object instanceof Array)) return false;
-		final Array data = (Array)object;
+		if (!(object instanceof FEMArray)) return false;
+		final FEMArray data = (FEMArray)object;
 		final int length = this.length();
 		if (data.length() != length) return false;
 		for (int i = 0; i < length; i++) {

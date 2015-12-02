@@ -1,13 +1,18 @@
 package bee.creative.fem;
 
-import bee.creative.util.Comparators;
-
 /**
  * Diese Klasse implementiert einen Dezimalbruch.
  * 
  * @author Sebastian Rostock 2015.
  */
-public final class FEMDecimal implements Comparable<FEMDecimal> {
+public class FEMDecimal implements Comparable<FEMDecimal> {
+
+	/**
+	 * Dieses Feld speichert den Dezimalbruch {@code NaN}.
+	 */
+	public static final FEMDecimal EMPTY = new FEMDecimal(Double.NaN);
+
+	{}
 
 	/**
 	 * Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
@@ -15,19 +20,20 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	 * @param value Wert.
 	 * @return Dezimalbruch.
 	 */
-	public static final FEMDecimal valueOf(final double value) {
+	public static final FEMDecimal from(final double value) {
 		return new FEMDecimal(value);
 	}
 
 	/**
 	 * Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
 	 * 
-	 * @param value Wert.
+	 * @param number Wert.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMDecimal valueOf(final Number value) throws NullPointerException {
-		return new FEMDecimal(value.doubleValue());
+	public static final FEMDecimal from(final Number number) throws NullPointerException {
+		if (number == null) throw new NullPointerException("number = null");
+		return new FEMDecimal(number.doubleValue());
 	}
 
 	{}
@@ -53,34 +59,44 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	 * 
 	 * @return interne Darstellung des Dezimalbruchs.
 	 */
-	public double value() {
+	public final double value() {
 		return this.value;
 	}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn dieser Dezimalbruch gleich dem gegebenen ist.
 	 * 
-	 * @param value Dezimalbruch.
+	 * @param that Dezimalbruch.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
-	public boolean equals(final FEMDecimal value) throws NullPointerException {
-		return this.value == value.value;
+	public final boolean equals(final FEMDecimal that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
+		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
 	}
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn diesr Dezimalbruch gleiner, gleich oder größer als der gegebene
-	 * Dezimalbruch ist.
+	 * Dezimalbruch ist. Wenn die Dezimalbrüche nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * 
-	 * @param value Dezimalbruch.
-	 * @return Vergleichswert.
+	 * @param that Dezimalbruch.
+	 * @param undefined Rückgabewert für nicht vergleichbare Dezimalbrüche.
+	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public int compare(final FEMDecimal value) throws NullPointerException {
-		return Comparators.compare(this.value, value.value);
+	public final int compare(final FEMDecimal that, final int undefined) throws NullPointerException {
+		if (this.equals(that)) return 0;
+		if (this.value < that.value) return -1;
+		if (this.value > that.value) return +1;
+		return undefined;
 	}
 
-	public Number tNumber() {
+	/**
+	 * Diese Methode gibt diesen Dezimalbruch als {@link Number} zurück.
+	 * 
+	 * @return {@link Number}.
+	 */
+	public final Number toNumber() {
 		return Double.valueOf(this.value);
 	}
 
@@ -90,16 +106,16 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		final long value = Double.doubleToLongBits(this.value);
-		return (int)(value ^ (value >>> 32));
+		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMDecimal)) return false;
 		return this.equals((FEMDecimal)object);
@@ -109,8 +125,8 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int compareTo(final FEMDecimal value) {
-		return this.compare(value);
+	public final int compareTo(final FEMDecimal value) {
+		return this.compare(value, 0);
 	}
 
 	/**

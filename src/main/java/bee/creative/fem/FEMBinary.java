@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
-import java.util.AbstractList;
 import java.util.Iterator;
+import bee.creative.fem.FEMBinary.CompactBinary;
 import bee.creative.mmf.MMFArray;
 
 /**
@@ -68,6 +68,70 @@ public abstract class FEMBinary implements Iterable<Byte> {
 
 	}
 
+	@SuppressWarnings ("javadoc")
+	static final class UniformBinary extends FEMBinary {
+
+		final byte value;
+
+		UniformBinary(final int length, final byte value) throws IllegalArgumentException {
+			super(length);
+			this.value = value;
+		}
+
+		@Override
+		protected boolean export(final Collector target, final int offset, int length, final boolean foreward) {
+			while (length > 0) {
+				if (!target.push(this.value)) return false;
+				length--;
+			}
+			return true;
+		}
+
+		@Override
+		public byte get(final int index) throws IndexOutOfBoundsException {
+			if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
+			return this.value;
+		}
+
+		@Override
+		public FEMBinary reverse() {
+			return this;
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class CompactBinary extends FEMBinary {
+
+		final byte[] values;
+
+		CompactBinary(final byte[] values) throws IllegalArgumentException {
+			super(values.length);
+			this.values = values;
+		}
+
+		@Override
+		public byte[] value() {
+			return this.values.clone();
+		}
+
+		@Override
+		public byte get(final int index) throws IndexOutOfBoundsException {
+			return this.values[index];
+		}
+
+		@Override
+		public FEMBinary compact() {
+			return this;
+		}
+		
+	}
+
 	{}
 
 	/**
@@ -105,7 +169,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	public static FEMBinary valueOf(final byte[] data) throws NullPointerException {
 		if (data.length == 0) return FEMBinary.EMPTY;
 		if (data.length == 1) return FEMBinary.valueOf(data[0], 1);
-		return compactBinary(data.clone());
+		return new CompactBinary(data.clone());
 	}
 
 	/**
@@ -118,34 +182,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 */
 	public static FEMBinary valueOf(final byte value, final int length) throws IllegalArgumentException {
 		if (length == 0) return FEMBinary.EMPTY;
-		return new FEMBinary(length) {
-
-			@Override
-			protected boolean export(final Collector target, final int offset, int length, final boolean foreward) {
-				while (length > 0) {
-					if (!target.push(value)) return false;
-					length--;
-				}
-				return true;
-			}
-
-			@Override
-			public byte get(final int index) throws IndexOutOfBoundsException {
-				if ((index < 0) || (index >= this.length)) throw new IndexOutOfBoundsException();
-				return value;
-			}
-
-			@Override
-			public FEMBinary reverse() {
-				return this;
-			}
-
-			@Override
-			public FEMBinary compact() {
-				return this;
-			}
-
-		};
+		return new UniformBinary(length, value);
 	}
 
 	/**
@@ -157,7 +194,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 */
 	public static FEMBinary valueOf(final MMFArray data) throws NullPointerException {
 		if (data.length() == 0) return FEMBinary.EMPTY;
-		return arrayBinary(data.toINT8());
+		return FEMBinary.arrayBinary(data.toINT8());
 	}
 
 	public static FEMBinary valueOf(final String data) {
@@ -180,28 +217,6 @@ public abstract class FEMBinary implements Iterable<Byte> {
 			}
 
 		};
-	}
-
-	static FEMBinary compactBinary(final byte[] values) throws IllegalArgumentException {
-		return new FEMBinary(values.length) {
-
-			@Override
-			public byte[] value() {
-				return values.clone();
-			}
-
-			@Override
-			public byte get(final int index) throws IndexOutOfBoundsException {
-				return values[index];
-			}
-
-			@Override
-			public FEMBinary compact() {
-				return this;
-			}
-
-		};
-
 	}
 
 	{}
@@ -345,7 +360,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge.
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Bytefolge liegt oder eine negative Länge hätte.
 	 */
-	public FEMBinary section(final int offset, int length) throws IllegalArgumentException {
+	public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this.length)) return this;
 		if ((offset < 0) || ((offset + length) > this.length)) throw new IllegalArgumentException();
 		if (length == 0) return FEMBinary.EMPTY;
@@ -423,7 +438,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 
 	public FEMBinary compact() {
 		if (this.length == 1) return FEMBinary.valueOf(this.get(0), 1);
-		return compactBinary(this.value());
+		return new CompactBinary(this.value());
 	}
 
 	public int find(final FEMBinary binary, final int offset) throws NullPointerException {

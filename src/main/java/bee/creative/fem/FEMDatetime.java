@@ -13,14 +13,14 @@ import java.util.GregorianCalendar;
  * </p>
  * <h5><a name="year">Jahr</a></h5>
  * <p>
- * Der Zahlenwert für das Jahr entspricht der Anzahl der Jahre seit dem beginn des Gregorianischen Kalenders erhöht um {@code 1582}. Unterstützte Zahlenwerte
- * für das Jahr sind {@code 1582..9999}.<br>
+ * Der Zahlenwert für das {@link #yearValue() Jahr} entspricht der Anzahl der Jahre seit dem beginn des Gregorianischen Kalenders erhöht um {@code 1582}.
+ * Unterstützte Zahlenwerte für das Jahr sind {@code 1582..9999}.<br>
  * Ein reguläres Jahr hat 365 Tage, ein {@link #leapOf(int) Schaltjahr} hat 366 Tage.
  * </p>
  * <h5><a name="month">Monat</a></h5>
  * <p>
- * Der Zahlenwert für den Monat entspricht der Anzahl der Monate seit beginn des Jahres erhöht um {@code 1}. Unterstützte Zahlenwerte für den Monat sind
- * {@code 1..12}.
+ * Der Zahlenwert für den {@link #monthValue() Monat} entspricht der Anzahl der Monate seit beginn des Jahres erhöht um {@code 1}. Unterstützte Zahlenwerte für
+ * den Monat sind {@code 1..12}.
  * <ol>
  * <li>Januar = {@link Calendar#JANUARY} + 1</li>
  * <li>Februar = {@link Calendar#FEBRUARY} + 1</li>
@@ -38,17 +38,17 @@ import java.util.GregorianCalendar;
  * </p>
  * <h5><a name="date">Tag (Tag in einem Monat)</a></h5>
  * <p>
- * Der Zahlenwert für den Tag entspricht der Anzahl der Tage seit beginn des Monats erhöht um {@code 1}. Unterstützte Zahlenwerte für den Monat sind
- * {@code 1..31}, wobei einige Monate auch abhängig von Schaltjahren geringere {@link #lengthOf(int, boolean) Obergrenzen} besitzen.
+ * Der Zahlenwert für den {@link #dateValue() Tag} entspricht der Anzahl der Tage seit beginn des Monats erhöht um {@code 1}. Unterstützte Zahlenwerte für den
+ * Monat sind {@code 1..31}, wobei einige Monate auch abhängig von Schaltjahren geringere {@link #lengthOf(int, boolean) Obergrenzen} besitzen.
  * </p>
  * <h5><a name="yearday">Jahrestag (Tag in einem Jahr)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #yeardayOf(int) Jahrestag} entspricht der Anzahl der Tages seit dem Beginn des Jahres erhöht um {@code 1}. Unterstützte
+ * Der Zahlenwert für den {@link #yeardayValue() Jahrestag} entspricht der Anzahl der Tages seit dem Beginn des Jahres erhöht um {@code 1}. Unterstützte
  * Zahlenwerte für den Jahrestag sind {@code 1..366}.
  * </p>
  * <h5><a name="weekday">Wochentag (Tag in einer Woche)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #weekdayOf(int) Wochentag} entspricht der Anzahl der Tage seit beginn der Woche erhöht um {@code 1}. Unterstützte Zahlenwerte
+ * Der Zahlenwert für den {@link #weekdayValue() Wochentag} entspricht der Anzahl der Tage seit beginn der Woche erhöht um {@code 1}. Unterstützte Zahlenwerte
  * für den Wochentag sind {@code 1..12}.
  * <ol>
  * <li>Sonntag = {@link Calendar#SUNDAY}</li>
@@ -62,23 +62,30 @@ import java.util.GregorianCalendar;
  * </p>
  * <h5><a name="calendarday">Kalendertag (Tag im Kalender)</a></h5>
  * <p>
- * Der Zahlenwert für den Kalendertag entspricht der Anzahl der Tages seit dem Beginn des Gregorianischen Kalenders am Freitag dem {@code 15.10.1582}.
- * Unterstützte Zahlenwerte für den Kalendertag sind {@code 0..3074323}.
+ * Der Zahlenwert für den {@link #calendardayValue() Kalendertag} entspricht der Anzahl der Tages seit dem Beginn des Gregorianischen Kalenders am Freitag dem
+ * {@code 15.10.1582}. Unterstützte Zahlenwerte für den Kalendertag sind {@code 0..3074323}.
  * </p>
  * <h5><a name="daymillis">Tagesmillis (Millisekunden am Tag)</a></h5>
  * <p>
- * Der Zahlenwert für die {@link #daymillisOf(int, int, int, int) Tagesmillis} entspricht der Anzahl der Millisekunden seit {@code 00:00:00.000}. Unterstützte
- * Zahlenwerte für die Tagesmillis sind {@code 0..86400000}.
+ * Der Zahlenwert für die {@link #daymillisValue() Tagesmillis} entspricht der Anzahl der Millisekunden seit {@code 00:00:00.000}. Unterstützte Zahlenwerte für
+ * die Tagesmillis sind {@code 0..86400000}.
  * </p>
  * <h5><a name="zone">Zeitzone (Zeitzonenverschiebung)</a></h5>
  * <p>
- * Der Zahlenwert für die {@link #zoneValue() Zeitzone} entspricht der Zeitzonenverschiebung in Minuten. Unterstützte Zahlenwerte für die Zeitzone sind
- * {@code -840..840}.
+ * Der Zahlenwert für die {@link #zoneValue() Zeitzone} entspricht der Zeitzonenverschiebung gegenüber UTC in Minuten. Unterstützte Zahlenwerte für die Zeitzone
+ * sind {@code -840..840}.
  * </p>
  * 
  * @author Sebastian Rostock 2011.
  */
-public class FEMDatetime {
+public class FEMDatetime implements Comparable<FEMDatetime> {
+
+	/**
+	 * Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone.
+	 */
+	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
+
+	{}
 
 	/**
 	 * Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -123,20 +130,6 @@ public class FEMDatetime {
 	}
 
 	/**
-	 * Diese Methode gibt eine Zeitangabe mit dem Datum des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
-	 * {@code FEE_Datetime.EMPTY.withDate(calendar)}.
-	 * 
-	 * @see #withDate(Calendar)
-	 * @see #calendardayOf(int, int, int)
-	 * @param calendar Kalendertag ({@code 0..3074323}).
-	 * @return Zeitangabe mit oder ohne Datum.
-	 * @throws IllegalArgumentException Wenn {@link #withDate(Calendar)} eine entsprechende Ausnahme auslöst.
-	 */
-	public static final FEMDatetime fromDate(final Calendar calendar) throws IllegalArgumentException {
-		return FEMDatetime.EMPTY.withDate(calendar);
-	}
-
-	/**
 	 * Diese Methode gibt eine Zeitangabe mit der Uhrzeit zu den gegebenen Tagesmillis zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withTime(daymillis)}.
 	 * 
@@ -164,19 +157,6 @@ public class FEMDatetime {
 	 */
 	public static final FEMDatetime fromTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withTime(hour, minute, second, millisecond);
-	}
-
-	/**
-	 * Diese Methode gibt eine Zeitangabe mit der Uhrzeit des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
-	 * {@code FEE_Datetime.EMPTY.withTime(calendar)}.
-	 * 
-	 * @see #withTime(Calendar)
-	 * @param calendar {@link Calendar}.
-	 * @return Zeitangabe mit oder ohne Uhrzeit.
-	 * @throws IllegalArgumentException Wenn {@link #withTime(Calendar)} eine entsprechende Ausnahme auslöst.
-	 */
-	public static final FEMDatetime fromTime(final Calendar calendar) throws IllegalArgumentException {
-		return FEMDatetime.EMPTY.withTime(calendar);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -398,13 +378,6 @@ public class FEMDatetime {
 	{}
 
 	/**
-	 * Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone.
-	 */
-	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
-
-	{}
-
-	/**
 	 * Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitangabe.
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
@@ -606,7 +579,7 @@ public class FEMDatetime {
 	}
 
 	/**
-	 * Diese Methode gibt die Zeitzonenverschiebung in Minuten zurück.
+	 * Diese Methode gibt die Zeitzonenverschiebung zur UTC in Minuten zurück.
 	 * 
 	 * @return Zeitzonenverschiebung in Minuten ({@code -840..840}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() keine Zeitzone} besitzt.
@@ -1138,6 +1111,19 @@ public class FEMDatetime {
 	}
 
 	/**
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe effektiv gleich der gegebenen ist.
+	 * 
+	 * @see #compare(FEMDatetime, int)
+	 * @param that Zeitangabe.
+	 * @return Gleichheit.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
+	 */
+	public final boolean equals(final FEMDatetime that) throws NullPointerException {
+		if (that == null) throw new NullPointerException("that = null");
+		return this.compare(that, 1) == 0;
+	}
+
+	/**
 	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitangabe früger, gleich bzw. später als die gegebene Zeitangabe
 	 * ist. Wenn die Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * <p>
@@ -1278,6 +1264,14 @@ public class FEMDatetime {
 		if (!(object instanceof FEMDatetime)) return false;
 		final FEMDatetime that = (FEMDatetime)object;
 		return (this.valueL == that.valueL) && (this.valueH == that.valueH);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int compareTo(final FEMDatetime that) {
+		return this.compare(that, 0);
 	}
 
 	/**

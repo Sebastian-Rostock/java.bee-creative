@@ -11,7 +11,7 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link Array Wertlisten}, {@link Object Objekte}, {@link FEMFunction Funktionen}, {@link String
+ * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link FEMArray Wertlisten}, {@link Object Objekte}, {@link FEMFunction Funktionen}, {@link String
  * Zeichenketten}, {@link Number Zahlen} und {@link Boolean Wahrheitswerte}.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -196,21 +196,21 @@ public class Values {
 		/**
 		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
 		 * 
-		 * @see FEMFunction#execute(FEMScope)
+		 * @see FEMFunction#invoke(FEMScope)
 		 */
 		FEMValue value;
 
 		/**
 		 * Dieses Feld speichert den Ausführungskontext zum Aufruf der Funktion oder {@code null}.
 		 * 
-		 * @see FEMFunction#execute(FEMScope)
+		 * @see FEMFunction#invoke(FEMScope)
 		 */
 		FEMScope scope;
 
 		/**
 		 * Dieses Feld speichert die Funktion oder {@code null}.
 		 * 
-		 * @see FEMFunction#execute(FEMScope)
+		 * @see FEMFunction#invoke(FEMScope)
 		 */
 		FEMFunction function;
 
@@ -233,14 +233,14 @@ public class Values {
 		/**
 		 * Diese Methode gibt den Ergebniswert der Ausführung der Funktion mit dem Ausführungskontext zurück.
 		 * 
-		 * @see FEMFunction#execute(FEMScope)
+		 * @see FEMFunction#invoke(FEMScope)
 		 * @return Ergebniswert.
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
 		public synchronized FEMValue value() throws NullPointerException {
 			FEMValue result = this.value;
 			if (result != null) return result;
-			result = this.function.execute(this.scope);
+			result = this.function.invoke(this.scope);
 			if (result == null) throw new NullPointerException("this.function().execute(this.scope()) = null");
 			this.value = result;
 			this.scope = null;
@@ -352,9 +352,9 @@ public class Values {
 	public static final int ARRAY_ID = 1;
 
 	/**
-	 * Dieses Feld speichert den Datentyp von {@link #arrayValue(Array)}.
+	 * Dieses Feld speichert den Datentyp von {@link #arrayValue(FEMArray)}.
 	 */
-	public static final FEMType<Array> ARRAY_TYPE = FEMType.simpleType(Values.ARRAY_ID, "ARRAY");
+	public static final FEMType<FEMArray> ARRAY_TYPE = FEMType.simpleType(Values.ARRAY_ID, "ARRAY");
 
 	/**
 	 * Dieses Feld speichert den Identifikator von {@link #OBJECT_TYPE}.
@@ -437,13 +437,13 @@ public class Values {
 	 * 
 	 * @param data Wertliste.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 * @return {@link Array}-{@link FEMValue}.
+	 * @return {@link FEMArray}-{@link FEMValue}.
 	 */
-	public static DataValue<Array> arrayValue(final Array data) throws NullPointerException {
-		return new DataValue<Array>(data) {
+	public static DataValue<FEMArray> arrayValue(final FEMArray data) throws NullPointerException {
+		return new DataValue<FEMArray>(data) {
 
 			@Override
-			public FEMType<Array> type() {
+			public FEMType<FEMArray> type() {
 				return Values.ARRAY_TYPE;
 			}
 
@@ -460,10 +460,10 @@ public class Values {
 	 * 
 	 * @see #arrayValue(Collection)
 	 * @param data Wertliste.
-	 * @return {@link Array}-{@link FEMValue}.
+	 * @return {@link FEMArray}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static DataValue<Array> arrayValue(final Iterable<?> data) throws NullPointerException {
+	public static DataValue<FEMArray> arrayValue(final Iterable<?> data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
 		final Collection<Object> result = new ArrayList<>();
 		Iterables.appendAll(result, data);
@@ -473,17 +473,17 @@ public class Values {
 	/**
 	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
-	 * @see #arrayValue(Array)
-	 * @see Array#from(Object)
+	 * @see #arrayValue(FEMArray)
+	 * @see FEMArray#from(Object)
 	 * @see Collection#toArray()
 	 * @param data Wertliste.
-	 * @return {@link Array}-{@link FEMValue}.
+	 * @return {@link FEMArray}-{@link FEMValue}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
-	public static DataValue<Array> arrayValue(final Collection<?> data) throws NullPointerException {
+	public static DataValue<FEMArray> arrayValue(final Collection<?> data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		if (data.size() == 0) return Values.arrayValue(Array.EMPTY);
-		return Values.arrayValue(Array.from(data.toArray()));
+		if (data.size() == 0) return Values.arrayValue(FEMArray.EMPTY);
+		return Values.arrayValue(FEMArray.from(data.toArray()));
 	}
 
 	/**
