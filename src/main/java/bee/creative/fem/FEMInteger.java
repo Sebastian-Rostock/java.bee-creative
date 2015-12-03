@@ -3,9 +3,10 @@ package bee.creative.fem;
 import bee.creative.util.Comparators;
 
 /**
- * Diese Klasse implementiert eine Dezimalzahl.
+ * Diese Klasse implementiert eine Dezimalzahl.<br>
+ * Intern wird die Dezimalzahl als {@code long} dargestellt.
  * 
- * @author Sebastian Rostock 2015.
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEMInteger implements Comparable<FEMInteger> {
 

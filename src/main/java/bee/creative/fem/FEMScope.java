@@ -59,7 +59,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * stets {@code values.get(index)}.
 	 * 
 	 * @param scope übergeordneter Ausführungskontext, dessen Kontextobjekt und Parameterwerte genutzt werden.
-	 * @param values zugesicherte Parameterwerte des erzeugten Ausführungskontexts.
+	 * @param array zugesicherte Parameterwerte des erzeugten Ausführungskontexts.
 	 * @param replace {@code true}, wenn die zugesicherten Parameterwerte von {@code scope} virtuell durch die gegebenen Parameterwerte in {@code values} ersetzt
 	 *        werden sollen und die zusätzlichen Parameterwerte von {@code scope} damit gleich den zusätzlichen Parameterwerten des erzeugten Ausführungskontexts
 	 *        bilden sollen. {@code false}, wenn alle Parameterwerte von {@code scope} die zusätzlichen Parameterwerten des erzeugten Ausführungskontexts bilden
@@ -67,17 +67,17 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return {@code value}-{@link FEMScope}.
 	 * @throws NullPointerException Wenn {@code scope} bzw. {@code values} {@code null} ist.
 	 */
-	public static FEMScope arrayScope(final FEMScope scope, final FEMArray values, boolean replace) throws NullPointerException {
+	public static FEMScope arrayScope(final FEMScope scope, final FEMArray array, boolean replace) throws NullPointerException {
 		if (scope == null) throw new NullPointerException("scope = null");
-		if (values == null) throw new NullPointerException("values = null");
-		final int length = values.length();
+		if (array == null) throw new NullPointerException("values = null");
+		final int length = array.length();
 		final int offset = (replace ? scope.size() : 0) - length;
 		replace = false;
 		return new FEMScope() {
 
 			@Override
 			public FEMValue get(final int index) throws NullPointerException, IndexOutOfBoundsException {
-				return index >= length ? scope.get(index + offset) : values.get(index);
+				return index >= length ? scope.get(index + offset) : array.get(index);
 			}
 
 			@Override
@@ -92,7 +92,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 
 			@Override
 			public FEMArray array() {
-				return values;
+				return array;
 			}
 
 		};
@@ -231,21 +231,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return {@link FEMArray} der Parameterwerte.
 	 */
 	public FEMArray array() {
-		if (this.size() == 0) return FEMArray.EMPTY;
-		return new FEMArray() {
-
-			@Override
-			public FEMValue get(final int index) throws IndexOutOfBoundsException {
-				if ((index < 0) || (index >= FEMScope.this.size())) throw new IndexOutOfBoundsException();
-				return FEMScope.this.get(index);
-			}
-
-			@Override
-			public int length() {
-				return FEMScope.this.size();
-			}
-
-		};
+		return FEMArray.from(this);
 	}
 
 	/**
@@ -276,15 +262,15 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterator<FEMValue> iterator() {
-		return Iterators.itemsIterator(this, 0, this.size());
+	public final Iterator<FEMValue> iterator() {
+		return array().iterator();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return this.array().hashCode();
 	}
 
@@ -292,18 +278,18 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMScope)) return false;
-		final FEMScope data = (FEMScope)object;
-		return this.array().equals(data.array());
+		final FEMScope that = (FEMScope)object;
+		return this.array().equals(that.array());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 		target.putScope(this.array());
 	}
 
@@ -312,7 +298,7 @@ public abstract class FEMScope implements Items<FEMValue>, Iterable<FEMValue>, U
 	 */
 	@Override
 	public String toString() {
-		return new ScriptFormatter().formatData((Object)this);
+		return FEM.formatScope(this);
 	}
 
 }

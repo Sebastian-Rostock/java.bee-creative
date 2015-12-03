@@ -1,9 +1,10 @@
 package bee.creative.fem;
 
 /**
- * Diese Klasse implementiert einen Dezimalbruch.
+ * Diese Klasse implementiert einen Dezimalbruch.<br>
+ * Intern wird der Dezimalbruch als {@code double} dargestellt.
  * 
- * @author Sebastian Rostock 2015.
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEMDecimal implements Comparable<FEMDecimal> {
 

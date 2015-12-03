@@ -1487,10 +1487,12 @@ public class Scripts {
 		 * @see ScriptFormatterHelper#formatData(ScriptFormatter, Object)
 		 * @param data Objekt.
 		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putData(final Object data) throws IllegalStateException, IllegalArgumentException {
+		public ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			if (data == null) throw new NullPointerException("function = null");
 			this.checkFormatting();
 			if (data instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)data).toScript(this);
@@ -1503,8 +1505,8 @@ public class Scripts {
 		/**
 		 * Diese Methode fügt die gegebenen Wertliste an und gibt {@code this} zurück.<br>
 		 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
-		 * separiert über {@link #putValue(FEMValue)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der
-		 * schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
+		 * separiert über {@link #putValue(FEMValue)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor
+		 * der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
 		 * 
 		 * @see #putValue(FEMValue)
@@ -1555,6 +1557,7 @@ public class Scripts {
 		 */
 		public ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
+			this.checkFormatting();
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
 			} else {
@@ -1678,6 +1681,7 @@ public class Scripts {
 		 */
 		public ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
+			this.checkFormatting();
 			if (function instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)function).toScript(this);
 			} else {
@@ -1944,7 +1948,14 @@ public class Scripts {
 	public static interface ScriptFormatterInput {
 
 		/**
-		 * Diese Methode formatiert dieses Objekt in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
+		 * Diese Methode formatiert dieses Objekt in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.<br>
+		 * Sie wird vom {@link ScriptFormatter} im Rahmen folgender Methoden aufgerufen:
+		 * <ul>
+		 * <li>{@link ScriptFormatter#put(Object)}</li>
+		 * <li>{@link ScriptFormatter#putData(Object)}</li>
+		 * <li>{@link ScriptFormatter#putValue(FEMValue)}</li>
+		 * <li>{@link ScriptFormatter#putFunction(FEMFunction)}</li>
+		 * </ul>
 		 * 
 		 * @param target {@link ScriptFormatter}.
 		 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann.

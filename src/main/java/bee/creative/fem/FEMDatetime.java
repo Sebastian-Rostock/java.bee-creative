@@ -5,7 +5,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
- * Intern wird die Zeitangabe als ein 64 Bit Zahlenwert dargestellt.
+ * Intern wird die Zeitangabe als ein {@code long} dargestellt.
  * <p>
  * Das <u>Datum</u> kann unspezifiziert sein oder aus Jahr, Monat sowie Tag bestehen und im Bereich {@code 15.10.1582..31.12.9999} liegen. Die <u>Uhrzeit</u>
  * kann unspezifiziert sein oder aus Stunde, Minute, Sekunde sowie Millisekunde bestehen und im Bereich {@code 00:00:00.000..24:00:00.000} liegen. Die
@@ -76,7 +76,7 @@ import java.util.GregorianCalendar;
  * sind {@code -840..840}.
  * </p>
  * 
- * @author Sebastian Rostock 2011.
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEMDatetime implements Comparable<FEMDatetime> {
 

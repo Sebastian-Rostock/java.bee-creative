@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import bee.creative.fem.Values.BaseValue;
 
@@ -12,21 +13,7 @@ import bee.creative.fem.Values.BaseValue;
  */
 public abstract class Context {
 
-	/**
-	 * Dieses Feld speichert den leeren {@link Context}.
-	 * <p>
-	 * Die {@link #dataOf(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück gibt,
-	 * wenn sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn {@code value.type().is(type)}. Andernfalls löst
-	 * sie eine {@link IllegalArgumentException} aus.
-	 * <p>
-	 * Die {@link #valueOf(Object)}-Methode dieses Kontextobjekts liefert {@link Values#NULL}, wenn die ihr übergebenen Nutzdaten {@code null} sind. Sie liefer
-	 * die Nutzdaten unverändert, wenn diese selbst ein {@link FEMValue} sind. Wenn die Nutzdaten ein {@link Class#isArray() natives Array sind}, wird der Wert
-	 * über {@link FEMArray#from(Object)} und {@link Values#arrayValue(FEMArray)} ermittelt. Andernfalls liefert sie abhängig vom Datentyp der Nutzdaten einen mit
-	 * {@link Values#stringValue(String)}, {@link Values#numberValue(Number)}, {@link Values#booleanValue(Boolean)}, {@link Values#arrayValue(FEMArray)},
-	 * {@link Values#arrayValue(Collection)}, {@link Values#arrayValue(Iterable)}, {@link Values#functionValue(FEMFunction)} oder
-	 * {@link Values#objectValue(Object)} erzeugten wert.
-	 */
-	public static final Context EMPTY = new Context() {
+	static final class EmptyContext extends Context {
 
 		@Override
 		@SuppressWarnings ("unchecked")
@@ -46,11 +33,64 @@ public abstract class Context {
 			if (data instanceof Collection<?>) return Values.arrayValue((Collection<?>)data);
 			if (data instanceof Iterable<?>) return Values.arrayValue((Iterable<?>)data);
 			if (data instanceof FEMFunction) return Values.functionValue((FEMFunction)data);
-			if (data.getClass().isArray()) return Values.arrayValue(FEMArray.from(data));
+			if (data.getClass().isArray()) return Values.arrayValue(EmptyContext.from(data));
 			return Values.objectValue(data);
 		}
 
-	};
+		/**
+		 * Diese Methode konvertiert das gegebene native Array in eine Wertliste und gibt diese zurück.<br>
+		 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden. Die Elemente des
+		 * kopierten Arrays werden üver {@link Values#valueOf(Object)} bei jedem Zugriff via {@link #get(int)} in Werte überführt.
+		 * 
+		 * @see java.lang.reflect.Array#get(Object, int)
+		 * @see java.lang.reflect.Array#getLength(Object)
+		 * @see java.lang.reflect.Array#newInstance(Class, int)
+		 * @param data nativee Array.
+		 * @return {@link FEMArray}.
+		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn {@code data} {@link Class#isArray() kein Array ist}.
+		 */
+		public static FEMArray from(Object data) throws NullPointerException, IllegalArgumentException {
+			if (data == null) throw new NullPointerException("data = null");
+			final int length = java.lang.reflect.Array.getLength(data);
+			if (length == 0) return FEMArray.EMPTY;
+			final Object values = java.lang.reflect.Array.newInstance(data.getClass().getComponentType(), length);
+			System.arraycopy(data, 0, values, 0, length);
+			data = null;
+			return new FEMArray() {
+		
+				@Override
+				public FEMValue get(final int index) throws IndexOutOfBoundsException {
+					if (index < 0) throw new IndexOutOfBoundsException("index < 0");
+					if (index >= this.length) throw new IndexOutOfBoundsException("index >= length");
+					final Object value = java.lang.reflect.Array.get(values, index);
+					return Values.valueOf(value);
+				}
+		
+				@Override
+				public int length() {
+					return this.length;
+				}
+		
+			};
+		}
+	}
+
+	/**
+	 * Dieses Feld speichert den leeren {@link Context}.
+	 * <p>
+	 * Die {@link #dataOf(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück gibt,
+	 * wenn sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} ist, d.h. wenn {@code value.type().is(type)}. Andernfalls löst
+	 * sie eine {@link IllegalArgumentException} aus.
+	 * <p>
+	 * Die {@link #valueOf(Object)}-Methode dieses Kontextobjekts liefert {@link Values#NULL}, wenn die ihr übergebenen Nutzdaten {@code null} sind. Sie liefer
+	 * die Nutzdaten unverändert, wenn diese selbst ein {@link FEMValue} sind. Wenn die Nutzdaten ein {@link Class#isArray() natives Array sind}, wird der Wert
+	 * über {@link EmptyContext#from(Object)} und {@link Values#arrayValue(FEMArray)} ermittelt. Andernfalls liefert sie abhängig vom Datentyp der Nutzdaten einen mit
+	 * {@link Values#stringValue(String)}, {@link Values#numberValue(Number)}, {@link Values#booleanValue(Boolean)}, {@link Values#arrayValue(FEMArray)},
+	 * {@link Values#arrayValue(Collection)}, {@link Values#arrayValue(Iterable)}, {@link Values#functionValue(FEMFunction)} oder
+	 * {@link Values#objectValue(Object)} erzeugten wert.
+	 */
+	public static final Context EMPTY = new EmptyContext();
 
 	/**
 	 * Dieses Feld speichert den {@code default}-{@link Context}, der in den Methoden {@link FEMScope#context()} von {@link FEMScope#EMPTY},

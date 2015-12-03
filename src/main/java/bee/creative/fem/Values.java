@@ -2,6 +2,7 @@ package bee.creative.fem;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import bee.creative.fem.Context.EmptyContext;
 import bee.creative.fem.Functions.ValueFunction;
 import bee.creative.fem.Scripts.ScriptFormatter;
 import bee.creative.fem.Scripts.ScriptFormatterInput;
@@ -474,7 +475,7 @@ public class Values {
 	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
 	 * @see #arrayValue(FEMArray)
-	 * @see FEMArray#from(Object)
+	 * @see EmptyContext#from(Object)
 	 * @see Collection#toArray()
 	 * @param data Wertliste.
 	 * @return {@link FEMArray}-{@link FEMValue}.
@@ -483,7 +484,7 @@ public class Values {
 	public static DataValue<FEMArray> arrayValue(final Collection<?> data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
 		if (data.size() == 0) return Values.arrayValue(FEMArray.EMPTY);
-		return Values.arrayValue(FEMArray.from(data.toArray()));
+		return Values.arrayValue(EmptyContext.from(data.toArray()));
 	}
 
 	/**

@@ -1,9 +1,10 @@
 package bee.creative.fem;
 
 /**
- * Diese Klasse implementiert einen Wahrheitswert.
+ * Diese Klasse implementiert einen Wahrheitswert.<br>
+ * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  * 
- * @author Sebastian Rostock 2015.
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEMBoolean implements Comparable<FEMBoolean> {
 

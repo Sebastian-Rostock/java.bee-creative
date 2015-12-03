@@ -4,11 +4,9 @@ import bee.creative.util.Comparators;
 
 /**
  * Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
- * Intern wird die Zeitspanne als ein 64 Bit Zahlenwert dargestellt.
- * <p>
- * *
+ * Intern wird die Zeitspanne als ein {@code long} dargestellt.
  * 
- * @author Sebastian Rostock 2014.
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEMDuration implements Comparable<FEMDuration> {
 
@@ -616,7 +614,7 @@ public class FEMDuration implements Comparable<FEMDuration> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	FEMDuration move__(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
+	final FEMDuration move__(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		if (this.signValue() < 0) return FEMDuration.from(durationmonths - this.durationmonthsValue(), durationmillis - this.durationmillisValue());
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
 	}
@@ -691,7 +689,7 @@ public class FEMDuration implements Comparable<FEMDuration> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int compareTo(final FEMDuration that) {
+	public final int compareTo(final FEMDuration that) {
 		return this.compare(that, 0);
 	}
 
