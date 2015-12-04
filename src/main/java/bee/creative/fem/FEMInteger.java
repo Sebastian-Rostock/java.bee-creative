@@ -8,7 +8,7 @@ import bee.creative.util.Comparators;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class FEMInteger implements Comparable<FEMInteger> {
+public final class FEMInteger implements Comparable<FEMInteger> {
 
 	/**
 	 * Dieses Feld speichert die Dezimalzahl {@code 0}.
@@ -44,7 +44,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	/**
 	 * Dieses Feld speichert die interne Darstellung der Dezimalzahl.
 	 */
-	final long value;
+	final long __value;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung der Dezimalzahl.
@@ -52,7 +52,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * @param value interne Darstellung der Dezimalzahl.
 	 */
 	public FEMInteger(final long value) {
-		this.value = value;
+		this.__value = value;
 	}
 
 	{}
@@ -63,7 +63,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * @return interne Darstellung der Dezimalzahl.
 	 */
 	public final long value() {
-		return this.value;
+		return this.__value;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 */
 	public final boolean equals(final FEMInteger that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return this.value == that.value;
+		return this.__value == that.__value;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 */
 	public final int compare(final FEMInteger that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return Comparators.compare(this.value, that.value);
+		return Comparators.compare(this.__value, that.__value);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * @return {@link Number}.
 	 */
 	public final Number toNumber() {
-		return Long.valueOf(this.value);
+		return Long.valueOf(this.__value);
 	}
 
 	{}
@@ -107,7 +107,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 */
 	@Override
 	public final int hashCode() {
-		final long value = this.value;
+		final long value = this.__value;
 		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
@@ -133,7 +133,7 @@ public class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatInteger(this);
 	}
 

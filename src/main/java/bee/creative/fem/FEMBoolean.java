@@ -6,7 +6,7 @@ package bee.creative.fem;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class FEMBoolean implements Comparable<FEMBoolean> {
+public final class FEMBoolean implements Comparable<FEMBoolean> {
 
 	/**
 	 * Dieses Feld speichert den Wahrheitswert {@code true}.
@@ -35,7 +35,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	/**
 	 * Dieses Feld speichert die interne Darstellung des Wahrheitswerts.
 	 */
-	final boolean value;
+	final boolean __value;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
@@ -43,7 +43,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @param value interne Darstellung des Wahrheitswerts.
 	 */
 	public FEMBoolean(final boolean value) {
-		this.value = value;
+		this.__value = value;
 	}
 
 	{}
@@ -54,7 +54,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @return interne Darstellung des Wahrheitswerts.
 	 */
 	public final boolean value() {
-		return this.value;
+		return this.__value;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 */
 	public final boolean equals(final FEMBoolean that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return this.value == that.value;
+		return this.__value == that.__value;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return Boolean.compare(this.value, that.value);
+		return Boolean.compare(this.__value, that.__value);
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @return {@link Boolean}.
 	 */
 	public final Boolean toBoolean() {
-		return Boolean.valueOf(this.value);
+		return Boolean.valueOf(this.__value);
 	}
 
 	{}
@@ -98,7 +98,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 */
 	@Override
 	public final int hashCode() {
-		return this.value ? 1231 : 1237;
+		return this.__value ? 1231 : 1237;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatBoolean(this);
 	}
 

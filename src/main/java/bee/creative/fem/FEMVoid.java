@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-
 /**
  * Diese Klasse implementiert einen Leerwert.
  * 

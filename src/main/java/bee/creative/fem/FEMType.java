@@ -9,9 +9,48 @@ import bee.creative.util.Objects;
  * 
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link #dataOf(FEMValue)} bzw. {@link #dataOf(FEMValue, Context)} gelieferten Nutzdaten.
+ * @param <GData> Typ der von {@link #dataOf(FEMValue)} bzw. {@link #dataOf(FEMValue, FEMContext)} gelieferten Nutzdaten.
  */
 public abstract class FEMType<GData> {
+
+	/**
+	 * Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
+	 * 
+	 * @see #id()
+	 * @param <GValue> Typ des Werts.
+	 * @param id Identifikator für {@link #id()}.
+	 * @return {@code simple}-{@link FEMType}.
+	 */
+	public static <GValue> FEMType<GValue> from(final int id) {
+		return FEMType.from(id, Objects.toInvokeString("simpleType", id));
+	}
+
+	/**
+	 * Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator und der gegebenen Textdarstellung zurück.
+	 * 
+	 * @see #id()
+	 * @param <GValue> Typ des Werts.
+	 * @param id Identifikator für {@link #id()}.
+	 * @param toString Textdarstellung für {@link #toString()}.
+	 * @return {@code simple}-{@link FEMType}.
+	 * @throws NullPointerException Wenn {@code toString} {@code null} ist.
+	 */
+	public static <GValue> FEMType<GValue> from(final int id, final String toString) throws NullPointerException {
+		if (toString == null) throw new NullPointerException("toString = null");
+		return new FEMType<GValue>() {
+
+			@Override
+			public int id() {
+				return id;
+			}
+
+			@Override
+			public String toString() {
+				return toString;
+			}
+
+		};
+	}
 
 	/**
 	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input)} in siene Ausgabe überführt.
@@ -47,7 +86,7 @@ public abstract class FEMType<GData> {
 	 * @return {@code dataOf}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
 	 */
-	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type, final Context context) throws NullPointerException {
+	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type, final FEMContext context) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
 		if (context == null) throw new NullPointerException("context = null");
 		return new Converter<FEMValue, GData>() {
@@ -60,44 +99,6 @@ public abstract class FEMType<GData> {
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("dataOf", type, context);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
-	 * 
-	 * @see #id()
-	 * @param <GValue> Typ des Werts.
-	 * @param id Identifikator für {@link #id()}.
-	 * @return {@code simple}-{@link FEMType}.
-	 */
-	public static <GValue> FEMType<GValue> simpleType(final int id) {
-		return FEMType.simpleType(id, Objects.toInvokeString("simpleType", id));
-	}
-
-	/**
-	 * Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator und der gegebenen Textdarstellung zurück.
-	 * 
-	 * @see #id()
-	 * @param <GValue> Typ des Werts.
-	 * @param id Identifikator für {@link #id()}.
-	 * @param toString Textdarstellung für {@link #toString()}.
-	 * @return {@code simple}-{@link FEMType}.
-	 */
-	public static <GValue> FEMType<GValue> simpleType(final int id, final String toString) {
-		if (toString == null) throw new NullPointerException("toString = null");
-		return new FEMType<GValue>() {
-
-			@Override
-			public int id() {
-				return id;
-			}
-
-			@Override
-			public String toString() {
-				return toString;
 			}
 
 		};
@@ -127,10 +128,10 @@ public abstract class FEMType<GData> {
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code Context.DEFAULT.cast(value, this)}.
+	 * Der Rückgabewert entspricht {@code Context.DEFAULT().cast(value, this)}.
 	 * 
-	 * @see Context#DEFAULT
-	 * @see Context#dataOf(FEMValue, FEMType)
+	 * @see FEMContext#DEFAULT()
+	 * @see FEMContext#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code Context.DEFAUL} {@code null} ist.
@@ -138,14 +139,14 @@ public abstract class FEMType<GData> {
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
 	public final GData dataOf(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return Context.DEFAULT.dataOf(value, this);
+		return FEMContext.__default.dataOf(value, this);
 	}
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
 	 * 
-	 * @see Context#dataOf(FEMValue, FEMType)
+	 * @see FEMContext#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
 	 * @return Nutzdaten.
@@ -153,7 +154,7 @@ public abstract class FEMType<GData> {
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GData dataOf(final FEMValue value, final Context context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+	public final GData dataOf(final FEMValue value, final FEMContext context) throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return context.dataOf(value, this);
 	}
 
@@ -165,7 +166,7 @@ public abstract class FEMType<GData> {
 	 * @see #id()
 	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return this.id();
 	}
 
@@ -175,7 +176,7 @@ public abstract class FEMType<GData> {
 	 * @see #id()
 	 */
 	@Override
-	public boolean equals(final Object object) {
+	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMType<?>)) return false;
 		final FEMType<?> data = (FEMType<?>)object;

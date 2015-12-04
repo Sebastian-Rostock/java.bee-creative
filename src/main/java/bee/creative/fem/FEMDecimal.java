@@ -6,7 +6,7 @@ package bee.creative.fem;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class FEMDecimal implements Comparable<FEMDecimal> {
+public final class FEMDecimal implements Comparable<FEMDecimal> {
 
 	/**
 	 * Dieses Feld speichert den Dezimalbruch {@code NaN}.
@@ -42,7 +42,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	/**
 	 * Dieses Feld speichert die interne Darstellung des Dezimalbruchs.
 	 */
-	final double value;
+	final double __value;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung des Dezimalbruchs.
@@ -50,7 +50,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 * @param value interne Darstellung des Dezimalbruchs.
 	 */
 	public FEMDecimal(final double value) {
-		this.value = value;
+		this.__value = value;
 	}
 
 	{}
@@ -61,7 +61,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 * @return interne Darstellung des Dezimalbruchs.
 	 */
 	public final double value() {
-		return this.value;
+		return this.__value;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 */
 	public final boolean equals(final FEMDecimal that) throws NullPointerException {
 		if (that == null) throw new NullPointerException("that = null");
-		return (this.value == that.value) || (Double.isNaN(this.value) && Double.isNaN(that.value));
+		return (this.__value == that.__value) || (Double.isNaN(this.__value) && Double.isNaN(that.__value));
 	}
 
 	/**
@@ -87,8 +87,8 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 */
 	public final int compare(final FEMDecimal that, final int undefined) throws NullPointerException {
 		if (this.equals(that)) return 0;
-		if (this.value < that.value) return -1;
-		if (this.value > that.value) return +1;
+		if (this.__value < that.__value) return -1;
+		if (this.__value > that.__value) return +1;
 		return undefined;
 	}
 
@@ -98,7 +98,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 * @return {@link Number}.
 	 */
 	public final Number toNumber() {
-		return Double.valueOf(this.value);
+		return Double.valueOf(this.__value);
 	}
 
 	{}
@@ -108,7 +108,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 */
 	@Override
 	public final int hashCode() {
-		final long value = Double.doubleToLongBits(this.value);
+		final long value = Double.doubleToLongBits(this.__value);
 		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
@@ -134,7 +134,7 @@ public class FEMDecimal implements Comparable<FEMDecimal> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatDecimal(this);
 	}
 
