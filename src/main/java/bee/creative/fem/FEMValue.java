@@ -1,8 +1,8 @@
 package bee.creative.fem;
 
 /**
- * Diese Schnittstelle definiert einen Wert, der als Ergebnis einer {@link FEMFunction Funktion} oder als Parameter in den {@link FEMFrame Rahmendaten} zur
- * Auswertung einer Funktion verwendet werden kann. Ein solcher Wert besitzt dazu {@link FEMValue#data() Nutzdaten} mit einem bestimmeten
+ * Diese Schnittstelle definiert einen Wert, der als Ergebnis der Auswertung einer {@link FEMFunction Funktion} oder als Parameter in einem {@link FEMFrame
+ * Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann. Ein solcher Wert besitzt dazu {@link FEMValue#data() Nutzdaten} mit einem bestimmeten
  * {@link FEMValue#type() Datentyp}.<br>
  * Die Konvertierung der Nutzdaten in einen gegebenen Datentyp {@code type} kann im Rahmen eines gegebenen {@link FEMContext Kontextobjekts} {@code context}
  * über den Befehl {@code context.dataOf(this, type)} erfolgen.

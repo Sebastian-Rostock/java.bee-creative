@@ -5,10 +5,10 @@ package bee.creative.fem;
  * 
  * @author Sebastian Rostock 2015.
  */
-public class FEMVoid {
+public final class FEMVoid {
 
 	/**
-	 * Dieses Feld speichert den Wahrheitswert {@code true}.
+	 * Dieses Feld speichert den Leerwert.
 	 */
 	public static final FEMVoid INSTANCE = new FEMVoid();
 
@@ -36,7 +36,7 @@ public class FEMVoid {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return FEM.formatVoid(this);
 	}
 

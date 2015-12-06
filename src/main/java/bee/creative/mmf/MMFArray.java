@@ -170,6 +170,17 @@ public class MMFArray extends IAMBaseArray {
 		return new MMFUINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
 	}
 
+	/**
+	 * Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
+	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation {@code 0}, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
+	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
+	 * 
+	 * @return Anzahl der Byte je Zahl der Folge (0..4).
+	 */
+	public int mode() {
+		return 0;
+	}
+
 	{}
 
 	/**

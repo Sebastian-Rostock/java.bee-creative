@@ -38,6 +38,14 @@ class MMFINT32Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int mode() {
+		return 4;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int length() {
 		return this.byteLength >> 2;
 	}

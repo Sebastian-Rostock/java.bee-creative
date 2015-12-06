@@ -1,10 +1,10 @@
 package bee.creative.fem;
 
 /**
- * Diese Schnittstelle definiert eine Funktion, deren {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} mit {@link FEMFrame Rahmendaten} aufgerufen wird
- * und einen Ergebniswert liefert.<br>
- * Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der Rahmendaten können hierbei Informationen für die
- * Berechnungen extrahiert werden. Des Weiteren kann auch der Zustand des Kontextobjekts modifiziert werden.
+ * Diese Schnittstelle definiert eine Funktion, deren {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
+ * wird und einen Ergebniswert liefert.<br>
+ * Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der Stapelrahmens können hierbei Informationen für die
+ * Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * 
  * @see FEMValue
  * @see FEMFrame
@@ -13,9 +13,9 @@ package bee.creative.fem;
 public interface FEMFunction {
 
 	/**
-	 * Diese Methode führt Berechnungen mit den gegebenen Rahmendaten durch und gibt den ermittelten deren Ergebniswert zurück.
+	 * Diese Methode führt Berechnungen im gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 * 
-	 * @param frame Rahmendaten.
+	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert.
 	 */
 	public FEMValue invoke(FEMFrame frame);

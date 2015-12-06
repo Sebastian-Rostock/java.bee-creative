@@ -12,7 +12,7 @@ import bee.creative.util.Iterators;
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, Script.ScriptFormatterInput {
+public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, FEM.ScriptFormatterInput {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#export(Collector)}.
@@ -34,6 +34,8 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 
 		public int hash = 0x811C9DC5;
 
+		{}
+
 		@Override
 		public boolean push(final FEMValue value) {
 			this.hash = (this.hash * 0x01000193) ^ value.hashCode();
@@ -45,19 +47,19 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	@SuppressWarnings ("javadoc")
 	static final class ValueCollector implements Collector {
 
+		public final FEMValue[] array;
+
 		public int index;
 
-		public final FEMValue[] value;
-
 		ValueCollector(final int length) {
-			this.value = new FEMValue[length];
+			this.array = new FEMValue[length];
 		}
 
 		{}
 
 		@Override
 		public boolean push(final FEMValue value) {
-			this.value[this.index++] = value;
+			this.array[this.index++] = value;
 			return true;
 		}
 
@@ -123,7 +125,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this.__array1.__length, length2 = offset2 + length;
 			if (offset2 >= 0) return this.__array2.section(offset2, length);
-			if (length2 <= 0) return super.section(offset, length);
+			if (length2 <= 0) return this.__array1.section(offset, length);
 			return super.section(offset, -offset2).concat(this.__array2.section(0, length2));
 		}
 	}
@@ -179,7 +181,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 
 		@Override
 		protected boolean __export(final Collector target, final int offset, final int length, final boolean foreward) {
-			return super.__export(target, offset, length, !foreward);
+			return this.__array.__export(target, offset, length, !foreward);
 		}
 
 		@Override
@@ -189,7 +191,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 
 		@Override
 		public FEMArray section(final int offset, final int length2) throws IllegalArgumentException {
-			return this.__array.section(this.__length - offset - 1, length2).reverse();
+			return this.__array.section(this.__length - offset - length2, length2).reverse();
 		}
 
 		@Override
@@ -283,14 +285,14 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
 	 */
-	public static FEMArray from(final FEMValue... values) throws NullPointerException {
+	public static final FEMArray from(final FEMValue... values) throws NullPointerException {
 		if (values.length == 0) return FEMArray.EMPTY;
 		if (values.length == 1) return FEMArray.from(values[0], 1);
 		return new CompactArray(values.clone());
 	}
 
 	/**
-	 * Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen Wert sind.
+	 * Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 * 
 	 * @param value Wert.
 	 * @param length Länge.
@@ -298,7 +300,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
 	 */
-	public static FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
+	public static final FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
 		if (length == 0) return FEMArray.EMPTY;
 		if (value == null) throw new NullPointerException("value = null");
 		return new UniformArray(length, value);
@@ -312,7 +314,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
 	 */
-	public static FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
+	public static final FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
 		final ArrayList<FEMValue> result = new ArrayList<>();
 		Iterables.appendAll(result, values);
 		return FEMArray.from(result);
@@ -327,7 +329,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * @return {@link FEMArray}.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
 	 */
-	public static FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
+	public static final FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
 		if (values.size() == 0) return FEMArray.EMPTY;
 		return FEMArray.from(values.toArray(new FEMValue[values.size()]));
 	}
@@ -396,10 +398,9 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * @return Array mit den Werten dieser Wertliste.
 	 */
 	public FEMValue[] value() {
-		final int length = this.__length;
-		final ValueCollector collector = new ValueCollector(length);
-		this.__export(collector, 0, length, true);
-		return collector.value;
+		final ValueCollector target = new ValueCollector(this.__length);
+		this.export(target);
+		return target.array;
 	}
 
 	/**
@@ -480,7 +481,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 		FIND: for (int i = offset; i < length; i++) {
 			if (value.equals(this.__get(i))) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (this.__get(offset + i2) != that.__get(i2)) {
+					if (this.__get(i + i2) != that.__get(i2)) {
 						continue FIND;
 					}
 				}
@@ -494,12 +495,14 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen , wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
-	 * @param collector {@link Collector}, an den die Werte geordnet angefügt werden.
+	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 	 */
-	public final boolean export(final Collector collector) throws NullPointerException {
-		return this.__export(collector, 0, this.__length, true);
+	public final boolean export(final Collector target) throws NullPointerException {
+		if (target == null) throw new NullPointerException("target = null");
+		if (this.__length == 0) return true;
+		return this.__export(target, 0, this.__length, true);
 	}
 
 	/**
@@ -566,7 +569,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, S
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final void toScript(final Script.ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
 		target.putArray(this);
 	}
 

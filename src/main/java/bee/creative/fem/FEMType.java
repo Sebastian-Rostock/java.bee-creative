@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import bee.creative.util.Converter;
 import bee.creative.util.Objects;
 
 /**
@@ -47,58 +46,6 @@ public abstract class FEMType<GData> {
 			@Override
 			public String toString() {
 				return toString;
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input)} in siene Ausgabe überführt.
-	 * 
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
-	 * @param type Datentyp.
-	 * @return {@code dataOf}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
-	 */
-	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
-		if (type == null) throw new NullPointerException("type = null");
-		return new Converter<FEMValue, GData>() {
-
-			@Override
-			public GData convert(final FEMValue input) {
-				return type.dataOf(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("dataOf", type);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input, context)} in siene Ausgabe überführt.
-	 * 
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
-	 * @param type Datentyp.
-	 * @param context Kontextobjekt.
-	 * @return {@code dataOf}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
-	 */
-	public static <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type, final FEMContext context) throws NullPointerException {
-		if (type == null) throw new NullPointerException("type = null");
-		if (context == null) throw new NullPointerException("context = null");
-		return new Converter<FEMValue, GData>() {
-
-			@Override
-			public GData convert(final FEMValue input) {
-				return type.dataOf(input, context);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("dataOf", type, context);
 			}
 
 		};

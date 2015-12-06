@@ -38,6 +38,14 @@ class MMFINT16Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int mode() {
+		return 2;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int length() {
 		return this.byteLength >> 1;
 	}
