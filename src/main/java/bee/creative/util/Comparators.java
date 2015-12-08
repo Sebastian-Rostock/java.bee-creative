@@ -206,17 +206,17 @@ public class Comparators {
 	 * @see Comparators#compare(double, double)
 	 */
 	public static final Comparator<Number> DOUBLE_COMPARATOR = new Comparator<Number>() {
-	
+
 		@Override
 		public int compare(final Number item1, final Number item2) {
 			return Comparators.compare(item1.doubleValue(), item2.doubleValue());
 		}
-	
+
 		@Override
 		public String toString() {
 			return "DOUBLE_COMPARATOR";
 		}
-	
+
 	};
 
 	/**
@@ -250,7 +250,7 @@ public class Comparators {
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert.
 	 */
-	public static int compare(final int item1, final int item2) {
+	public static final int compare(final int item1, final int item2) {
 		return (item1 < item2 ? -1 : (item1 == item2 ? 0 : 1));
 	}
 
@@ -264,7 +264,7 @@ public class Comparators {
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert.
 	 */
-	public static int compare(final long item1, final long item2) {
+	public static final int compare(final long item1, final long item2) {
 		return (item1 < item2 ? -1 : (item1 == item2 ? 0 : 1));
 	}
 
@@ -278,7 +278,7 @@ public class Comparators {
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert.
 	 */
-	public static int compare(final float item1, final float item2) {
+	public static final int compare(final float item1, final float item2) {
 		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
@@ -292,7 +292,7 @@ public class Comparators {
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert.
 	 */
-	public static int compare(final double item1, final double item2) {
+	public static final int compare(final double item1, final double item2) {
 		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
@@ -307,7 +307,7 @@ public class Comparators {
 	 * @param item2 zweites Objekt.
 	 * @return Vergleichswert.
 	 */
-	public static <GItem extends Comparable<? super GItem>> int compare(final GItem item1, final GItem item2) {
+	public static final <GItem extends Comparable<? super GItem>> int compare(final GItem item1, final GItem item2) {
 		return Comparators.compare(item1, item2, Comparators.<GItem>naturalComparator());
 	}
 
@@ -326,7 +326,7 @@ public class Comparators {
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> int compare(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static final <GItem> int compare(final GItem item1, final GItem item2, final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		return ((item1 == null) ? ((item2 == null) ? 0 : -1) : ((item2 == null) ? 1 : comparator.compare(item1, item2)));
 	}
@@ -342,7 +342,7 @@ public class Comparators {
 	 * @param item2 zweiter {@link Iterable}.
 	 * @return Vergleichswert.
 	 */
-	public static <GItem extends Comparable<? super GItem>> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
+	public static final <GItem extends Comparable<? super GItem>> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2) {
 		return Comparators.compare(item1, item2, Comparators.<GItem>naturalComparator());
 	}
 
@@ -361,8 +361,8 @@ public class Comparators {
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2, final Comparator<? super GItem> comparator)
-		throws NullPointerException {
+	public static final <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2,
+		final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		final Iterator<? extends GItem> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
 		while (true) {
@@ -383,7 +383,7 @@ public class Comparators {
 	 * @return {@code null}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> Comparator<GItem> nullComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static final <GItem> Comparator<GItem> nullComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		return new Comparator<GItem>() {
 
@@ -408,7 +408,7 @@ public class Comparators {
 	 * @return {@link #NATURAL_COMPARATOR}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GEntry extends Comparable<? super GEntry>> Comparator<GEntry> naturalComparator() {
+	public static final <GEntry extends Comparable<? super GEntry>> Comparator<GEntry> naturalComparator() {
 		return (Comparator<GEntry>)Comparators.NATURAL_COMPARATOR;
 	}
 
@@ -420,7 +420,7 @@ public class Comparators {
 	 * @return {@code reverse}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> Comparator<GItem> reverseComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static final <GItem> Comparator<GItem> reverseComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		return new Comparator<GItem>() {
 
@@ -447,7 +447,7 @@ public class Comparators {
 	 * @return {@link Iterable}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> Comparator<Iterable<? extends GItem>> iterableComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static final <GItem> Comparator<Iterable<? extends GItem>> iterableComparator(final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		return new Comparator<Iterable<? extends GItem>>() {
 
@@ -474,7 +474,7 @@ public class Comparators {
 	 * @return {@code chained}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code comparator1} bzw. {@code comparator2} {@code null} ist.
 	 */
-	public static <GItem> Comparator<GItem> chainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2)
+	public static final <GItem> Comparator<GItem> chainedComparator(final Comparator<? super GItem> comparator1, final Comparator<? super GItem> comparator2)
 		throws NullPointerException {
 		if (comparator1 == null) throw new NullPointerException("comparator1 = null");
 		if (comparator2 == null) throw new NullPointerException("comparator2 = null");
@@ -508,7 +508,7 @@ public class Comparators {
 	 * @return {@code navigated}-{@link Comparator}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparator} {@code null} ist.
 	 */
-	public static <GItem, GItem2> Comparator<GItem> navigatedComparator(final Converter<? super GItem, ? extends GItem2> converter,
+	public static final <GItem, GItem2> Comparator<GItem> navigatedComparator(final Converter<? super GItem, ? extends GItem2> converter,
 		final Comparator<? super GItem2> comparator) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (comparator == null) throw new NullPointerException("comparator = null");

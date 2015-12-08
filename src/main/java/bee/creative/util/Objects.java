@@ -36,7 +36,7 @@ public class Objects {
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug.
 	 */
-	static String indent(final String value) {
+	static final String __indent(final String value) {
 		if (value == null) return "null";
 		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
@@ -49,38 +49,6 @@ public class Objects {
 	}
 
 	/**
-	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}, native Arrays,
-	 * {@link CharSequence} und {@link Iterable} je eine eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren
-	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
-	 * der {@link Object#toString()}-Methode geliefert.
-	 * 
-	 * @param object Objekt oder {@code null}.
-	 * @param format Aktivierung der hierarchische Formatierung.
-	 * @param indent Aktivierung der Erhöhung des Einzugs.
-	 * @return {@link Object#toString() Textdarstelung}.
-	 */
-	static String toString(final boolean format, final boolean indent, final Object object) {
-		if (object == null) return "null";
-		final String result;
-		if (object.getClass().isArray()) {
-			result = Objects.arrayToString(format, object);
-		} else if (object instanceof Character) {
-			result = Objects.charToString((Character)object);
-		} else if (object instanceof UseToString) {
-			result = String.valueOf(object);
-		} else if (object instanceof CharSequence) {
-			result = Objects.stringToString(format, (CharSequence)object);
-		} else if (object instanceof Map<?, ?>) {
-			result = Objects.mapToString(format, (Map<?, ?>)object);
-		} else if (object instanceof Iterable<?>) {
-			result = Objects.iterableToString(format, (Iterable<?>)object);
-		} else {
-			result = String.valueOf(object);
-		}
-		return (indent ? Objects.indent(result) : result);
-	}
-
-	/**
 	 * Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
 	 * hierarchische Formatierung aktiviert werden.
 	 * 
@@ -88,14 +56,15 @@ public class Objects {
 	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static String mapToString(final boolean format, final Map<?, ?> object) {
+	static final String __mapToString(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
 		String space = (format ? "{\n  " : "{");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects.toString(format, format, entry.getKey())).append(": ").append(Objects.toString(format, format, entry.getValue()));
+			result.append(space).append(Objects.__objectToString(format, format, entry.getKey())).append(": ")
+				.append(Objects.__objectToString(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
@@ -107,7 +76,7 @@ public class Objects {
 	 * @param object {@link Character} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static String charToString(final Character object) {
+	static final String __charToString(final Character object) {
 		if (object == null) return "null";
 		final StringBuilder result = new StringBuilder(4).append('\'');
 		switch (object.charValue()) {
@@ -138,7 +107,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist.
 	 */
-	static String arrayToString(final boolean format, final Object object) throws IllegalArgumentException {
+	static final String __arrayToString(final boolean format, final Object object) throws IllegalArgumentException {
 		if (object == null) return "null";
 		final int size = Array.getLength(object);
 		if (size == 0) return "[]";
@@ -146,7 +115,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < size; i++) {
-			result.append(space).append(Objects.toString(format, format, Array.get(object, i)));
+			result.append(space).append(Objects.__objectToString(format, format, Array.get(object, i)));
 			space = comma;
 		}
 		return result.append((format ? "\n]" : "]")).toString();
@@ -160,7 +129,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static String stringToString(final boolean format, final CharSequence object) {
+	static final String __stringToString(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
 		final StringBuilder result = new StringBuilder("\"");
@@ -187,6 +156,38 @@ public class Objects {
 	}
 
 	/**
+	 * Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Hierbei wird für {@link Map}, native Arrays,
+	 * {@link CharSequence} und {@link Iterable} je eine eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren
+	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
+	 * der {@link Object#toString()}-Methode geliefert.
+	 * 
+	 * @param object Objekt oder {@code null}.
+	 * @param format Aktivierung der hierarchische Formatierung.
+	 * @param indent Aktivierung der Erhöhung des Einzugs.
+	 * @return {@link Object#toString() Textdarstelung}.
+	 */
+	static final String __objectToString(final boolean format, final boolean indent, final Object object) {
+		if (object == null) return "null";
+		final String result;
+		if (object.getClass().isArray()) {
+			result = Objects.__arrayToString(format, object);
+		} else if (object instanceof Character) {
+			result = Objects.__charToString((Character)object);
+		} else if (object instanceof UseToString) {
+			result = String.valueOf(object);
+		} else if (object instanceof CharSequence) {
+			result = Objects.__stringToString(format, (CharSequence)object);
+		} else if (object instanceof Map<?, ?>) {
+			result = Objects.__mapToString(format, (Map<?, ?>)object);
+		} else if (object instanceof Iterable<?>) {
+			result = Objects.__iterableToString(format, (Iterable<?>)object);
+		} else {
+			result = String.valueOf(object);
+		}
+		return (indent ? Objects.__indent(result) : result);
+	}
+
+	/**
 	 * Diese Methode gibt das gegebene {@link Iterable} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann
 	 * deren hierarchische Formatierung aktiviert werden.
 	 * 
@@ -194,7 +195,7 @@ public class Objects {
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static String iterableToString(final boolean format, final Iterable<?> object) {
+	static final String __iterableToString(final boolean format, final Iterable<?> object) {
 		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
@@ -202,7 +203,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		do {
-			result.append(space).append(Objects.toString(format, format, iter.next()));
+			result.append(space).append(Objects.__objectToString(format, format, iter.next()));
 			space = comma;
 		} while (iter.hasNext());
 		return result.append((format ? "\n]" : "]")).toString();
@@ -214,7 +215,7 @@ public class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object object) {
+	public static final int hash(final Object object) {
 		return ((object == null) ? 0 : object.hashCode());
 	}
 
@@ -225,7 +226,7 @@ public class Objects {
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object... objects) {
+	public static final int hash(final Object... objects) {
 		if (objects == null) return 0;
 		int result = 0x811C9DC5;
 		for (final Object object: objects) {
@@ -243,7 +244,7 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object object1, final Object object2) {
+	public static final int hash(final Object object1, final Object object2) {
 		return ((0x50C5D1F ^ Objects.hash(object1)) * 0x01000193) ^ Objects.hash(object2);
 	}
 
@@ -257,7 +258,7 @@ public class Objects {
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int hash(final Object object1, final Object object2, final Object object3) {
+	public static final int hash(final Object object1, final Object object2, final Object object3) {
 		return (Objects.hash(object1, object2) * 0x01000193) ^ Objects.hash(object3);
 	}
 
@@ -270,7 +271,7 @@ public class Objects {
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean equals(final Object... objects) {
+	public static final boolean equals(final Object... objects) {
 		if (objects == null) return true;
 		for (int i = 0, size = objects.length; i < size; i += 2) {
 			if (!Objects.equals(objects[i], objects[i + 1])) return false;
@@ -290,7 +291,7 @@ public class Objects {
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean equals(final Object object1, final Object object2) {
+	public static final boolean equals(final Object object1, final Object object2) {
 		return (object1 == object2) || ((object1 != null) && (object2 != null) && object1.equals(object2));
 	}
 
@@ -303,7 +304,7 @@ public class Objects {
 	 * @param objects2 Array 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean equals(final Object[] objects1, final Object[] objects2) {
+	public static final boolean equals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
@@ -330,7 +331,7 @@ public class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int deepHash(final Object object) {
+	public static final int deepHash(final Object object) {
 		if (object == null) return 0;
 		final Class<?> clazz = object.getClass();
 		if (!clazz.isArray()) return object.hashCode();
@@ -353,7 +354,7 @@ public class Objects {
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int deepHash(final Object... objects) {
+	public static final int deepHash(final Object... objects) {
 		if (objects == null) return 0;
 		int result = 0x811C9DC5;
 		for (final Object object: objects) {
@@ -372,7 +373,7 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int deepHash(final Object object1, final Object object2) {
+	public static final int deepHash(final Object object1, final Object object2) {
 		return ((0x50C5D1F ^ Objects.deepHash(object1)) * 0x01000193) ^ Objects.deepHash(object2);
 	}
 
@@ -387,7 +388,7 @@ public class Objects {
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}.
 	 */
-	public static int deepHash(final Object object1, final Object object2, final Object object3) {
+	public static final int deepHash(final Object object1, final Object object2, final Object object3) {
 		return (Objects.deepHash(object1, object2) * 0x01000193) ^ Objects.deepHash(object3);
 	}
 
@@ -400,7 +401,7 @@ public class Objects {
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte.
 	 */
-	public static boolean deepEquals(final Object... objects) {
+	public static final boolean deepEquals(final Object... objects) {
 		if (objects == null) return true;
 		for (int i = 0, size = objects.length; i < size; i += 2) {
 			if (!Objects.deepEquals(objects[i], objects[i + 1])) return false;
@@ -430,7 +431,7 @@ public class Objects {
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean deepEquals(final Object object1, final Object object2) {
+	public static final boolean deepEquals(final Object object1, final Object object2) {
 		if (object1 == object2) return true;
 		if ((object1 == null) || (object2 == null)) return false;
 		final Class<?> c1 = object1.getClass();
@@ -458,7 +459,7 @@ public class Objects {
 	 * @param objects2 Array 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte.
 	 */
-	public static boolean deepEquals(final Object[] objects1, final Object[] objects2) {
+	public static final boolean deepEquals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
@@ -477,7 +478,7 @@ public class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	public static String toString(final Object object) {
+	public static final String toString(final Object object) {
 		return Objects.toString(false, object);
 	}
 
@@ -488,13 +489,13 @@ public class Objects {
 	 * <p>
 	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode geliefert.
 	 * 
-	 * @see Objects#toString(boolean, boolean, Object)
+	 * @see Objects#__objectToString(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	public static String toString(final boolean format, final Object object) {
-		return Objects.toString(format, false, object);
+	public static final String toString(final boolean format, final Object object) {
+		return Objects.__objectToString(format, false, object);
 	}
 
 	/**
@@ -506,7 +507,7 @@ public class Objects {
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt.
 	 */
-	public static Object toStringObject(final boolean format, final Object object) {
+	public static final Object toStringObject(final boolean format, final Object object) {
 		if (object == null) return "null";
 		return new Object() {
 
@@ -528,7 +529,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
+	public static final String toInvokeString(final String name, final Object... args) throws NullPointerException {
 		return Objects.toFormatString(false, false, name, args);
 	}
 
@@ -542,7 +543,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
+	public static final String toInvokeString(final Object object, final Object... args) throws NullPointerException {
 		if (object == null) throw new NullPointerException("object = null");
 		return Objects.toFormatString(false, false, object.getClass().getSimpleName(), args);
 	}
@@ -560,7 +561,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist.
 	 */
-	public static String toFormatString(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+	public static final String toFormatString(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
 		if (name == null) throw new NullPointerException("name = null");
 		if (args == null) throw new NullPointerException("args = null");
 		final StringBuilder result = new StringBuilder(name);
@@ -569,12 +570,13 @@ public class Objects {
 			final String comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects.toString(format, format, args[i])).append(": ").append(Objects.toString(format, format, args[i + 1]));
+					result.append(join).append(Objects.__objectToString(format, format, args[i])).append(": ")
+						.append(Objects.__objectToString(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
 				for (int i = 0, size = args.length; i < size; i++) {
-					result.append(join).append(Objects.toString(format, format, args[i]));
+					result.append(join).append(Objects.__objectToString(format, format, args[i]));
 					join = comma;
 				}
 			}
@@ -597,7 +599,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+	public static final String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		if (object == null) throw new NullPointerException("object = null");
 		return Objects.toFormatString(format, label, object.getClass().getSimpleName(), args);
 	}

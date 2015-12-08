@@ -24,7 +24,7 @@ import bee.creative.util.Pointers.SoftPointer;
  *     
  *   }));
  *   
- *   public static Helper get() {
+ *   public static final Helper get() {
  *     return Helper.CACHE.convert(Thread.currentThread());
  *   }
  *   
@@ -73,7 +73,7 @@ public class Converters {
 	 * @return {@link Field}-Adapter.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Converter<GInput, GValue> fieldAdapter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
+	public static final <GInput, GValue> Converter<GInput, GValue> fieldAdapter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Converter<GInput, GValue>() {
 
@@ -99,7 +99,7 @@ public class Converters {
 	 * @return {@link Filter}-Adapter.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> Converter<GInput, Boolean> filterAdapter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static final <GInput> Converter<GInput, Boolean> filterAdapter(final Filter<? super GInput> filter) throws NullPointerException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Converter<GInput, Boolean>() {
 
@@ -126,7 +126,7 @@ public class Converters {
 	 * @return {@code native}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final java.lang.reflect.Method method) throws NullPointerException {
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final java.lang.reflect.Method method) throws NullPointerException {
 		if (method == null) throw new NullPointerException("method = null");
 		return new Converter<GInput, GOutput>() {
 
@@ -164,7 +164,7 @@ public class Converters {
 	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code staticType}, {@code inputType} bzw. {@code methodName} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final Class<?> staticType, final Class<? super GInput> inputType,
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final Class<?> staticType, final Class<? super GInput> inputType,
 		final String methodName) throws SecurityException, NoSuchMethodException, NullPointerException {
 		if (staticType == null) throw new NullPointerException("staticType = null");
 		if (inputType == null) throw new NullPointerException("inputType = null");
@@ -184,7 +184,7 @@ public class Converters {
 	 * @return {@code native}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code methodName} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final String methodName) throws NullPointerException {
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final String methodName) throws NullPointerException {
 		if (methodName == null) throw new NullPointerException("methodName = null");
 		return new Converter<GInput, GOutput>() {
 
@@ -223,7 +223,7 @@ public class Converters {
 	 * @return {@code native}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final java.lang.reflect.Method method) throws NullPointerException {
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final java.lang.reflect.Method method) throws NullPointerException {
 		if (method == null) throw new NullPointerException("method = null");
 		return new Converter<GInput, GOutput>() {
 
@@ -261,7 +261,7 @@ public class Converters {
 	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final Class<? super GInput> inputType, final String methodName)
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final Class<? super GInput> inputType, final String methodName)
 		throws SecurityException, NoSuchMethodException, NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (methodName == null) throw new NullPointerException("methodName = null");
@@ -275,7 +275,7 @@ public class Converters {
 	 * @param value Ausgabe.
 	 * @return {@code value}-{@link Converter}.
 	 */
-	public static <GValue> Converter<Object, GValue> valueConverter(final GValue value) {
+	public static final <GValue> Converter<Object, GValue> valueConverter(final GValue value) {
 		return new Converter<Object, GValue>() {
 
 			@Override
@@ -298,7 +298,7 @@ public class Converters {
 	 * @return {@link #NEUTRAL_CONVERTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Converter<GInput, GInput> neutralConverter() {
+	public static final <GInput> Converter<GInput, GInput> neutralConverter() {
 		return (Converter<GInput, GInput>)Converters.NEUTRAL_CONVERTER;
 	}
 
@@ -314,7 +314,7 @@ public class Converters {
 	 * @return {@code chained}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code converter1} bzw. {@code converter2} {@code null} ist.
 	 */
-	public static <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
+	public static final <GInput, GValue, GOutput> Converter<GInput, GOutput> chainedConverter(final Converter<? super GInput, ? extends GValue> converter1,
 		final Converter<? super GValue, ? extends GOutput> converter2) throws NullPointerException {
 		if (converter1 == null) throw new NullPointerException("converter1 = null");
 		if (converter2 == null) throw new NullPointerException("converter2 = null");
@@ -345,7 +345,7 @@ public class Converters {
 	 * @return {@code buffered}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final Converter<? super GInput, ? extends GOutput> converter)
+	public static final <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final Converter<? super GInput, ? extends GOutput> converter)
 		throws NullPointerException {
 		return Converters.bufferedConverter(-1, Pointers.SOFT, Pointers.SOFT, converter);
 	}
@@ -368,7 +368,7 @@ public class Converters {
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Pointers#pointer(int, Object)} eine entsprechende Ausnahme auslöst.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final int limit, final int inputMode, final int outputMode,
+	public static final <GInput, GOutput> Converter<GInput, GOutput> bufferedConverter(final int limit, final int inputMode, final int outputMode,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException, IllegalArgumentException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		Pointers.pointer(inputMode, null);
@@ -438,7 +438,7 @@ public class Converters {
 	 * @return {@code conditional}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code condition}, {@code acceptConverter} bzw. {@code rejectConverter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> conditionalConverter(final Filter<? super GInput> condition,
+	public static final <GInput, GOutput> Converter<GInput, GOutput> conditionalConverter(final Filter<? super GInput> condition,
 		final Converter<? super GInput, ? extends GOutput> acceptConverter, final Converter<? super GInput, ? extends GOutput> rejectConverter)
 		throws NullPointerException {
 		return new Converter<GInput, GOutput>() {
@@ -466,7 +466,7 @@ public class Converters {
 	 * @return {@code synchronized}-{@link Converter}.
 	 * @throws NullPointerException Wenn der gegebene {@link Converter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Converter<GInput, GOutput> synchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter)
+	public static final <GInput, GOutput> Converter<GInput, GOutput> synchronizedConverter(final Converter<? super GInput, ? extends GOutput> converter)
 		throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Converter<GInput, GOutput>() {

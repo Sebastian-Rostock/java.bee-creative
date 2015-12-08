@@ -277,11 +277,11 @@ public class BEXEncoder {
 		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
 		 * 
 		 * @see #items
-		 * @see #entryMap
+		 * @see #__entryMap
 		 */
 		public void clear() {
 			this.items.clear();
-			this.entryMap.clear();
+			this.__entryMap.clear();
 		}
 
 		{}

@@ -45,14 +45,14 @@ public class Tester {
 		/**
 		 * Dieses Feld speichert das Interval in Millisekunden, in dem die Messung erfolgt. Es ist {@code 0}, wenn die Messung beendet werden soll.
 		 */
-		int millis;
+		int __millis;
 
 		/**
 		 * Dieses Feld speichert die Rechenzeit in Nanosekunden, die zur Messung benötigt wurde.
 		 * 
 		 * @see System#nanoTime()
 		 */
-		long usedTime = 0;
+		long __usedTime = 0;
 
 		/**
 		 * Dieses Feld speichert die maximale Speicherbelegung in Byte, die während der Messung ermittelt wurde.
@@ -60,7 +60,7 @@ public class Tester {
 		 * @see Runtime#freeMemory()
 		 * @see Runtime#totalMemory()
 		 */
-		long usedMemory = 0;
+		long __usedMemory = 0;
 
 		/**
 		 * Dieser Konstruktor initialisiert das Interval in Millisekunden.
@@ -71,7 +71,7 @@ public class Tester {
 		public Sampler(final int millis) throws IllegalArgumentException {
 			super(Sampler.class.getSimpleName());
 			if (millis <= 0) throw new IllegalArgumentException("millis <= 0");
-			this.millis = millis;
+			this.__millis = millis;
 			this.setPriority(Math.min(Thread.currentThread().getPriority() + 1, Thread.MAX_PRIORITY));
 		}
 
@@ -82,7 +82,7 @@ public class Tester {
 		 * 
 		 * @see #start()
 		 */
-		public void activate() {
+		public final void activate() {
 			this.start();
 		}
 
@@ -91,8 +91,8 @@ public class Tester {
 		 * 
 		 * @see #join()
 		 */
-		public void deactivate() {
-			this.millis = 0;
+		public final void deactivate() {
+			this.__millis = 0;
 			try {
 				this.join();
 			} catch (final InterruptedException e) {}
@@ -104,24 +104,24 @@ public class Tester {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void run() {
+		public final void run() {
 			final Runtime runtime = Runtime.getRuntime();
 			long enterTime = 0;
 			long leaveTime = 0;
 			do {
 				final long enterTime2 = System.nanoTime();
-				this.usedTime += leaveTime - enterTime;
+				this.__usedTime += leaveTime - enterTime;
 				runtime.gc();
-				this.usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.usedMemory);
+				this.__usedMemory = Math.max(runtime.totalMemory() - runtime.freeMemory(), this.__usedMemory);
 				enterTime = enterTime2;
 				leaveTime = System.nanoTime();
 				try {
-					Thread.sleep(this.millis);
+					Thread.sleep(this.__millis);
 				} catch (final InterruptedException e) {
 					break;
 				}
-			} while (this.millis != 0);
-			this.usedTime += leaveTime - enterTime;
+			} while (this.__millis != 0);
+			this.__usedTime += leaveTime - enterTime;
 		}
 
 	}
@@ -220,8 +220,8 @@ public class Tester {
 			}
 			runtime.gc();
 			leaveMemory = runtime.totalMemory() - runtime.freeMemory();
-			this.usedTime = leaveTime - enterTime - sampler.usedTime;
-			this.usedMemory = Math.max(sampler.usedMemory, leaveMemory) - enterMemory;
+			this.usedTime = leaveTime - enterTime - sampler.__usedTime;
+			this.usedMemory = Math.max(sampler.__usedMemory, leaveMemory) - enterMemory;
 		} else {
 			runtime.gc();
 			enterMemory = runtime.totalMemory() - runtime.freeMemory();
@@ -250,7 +250,7 @@ public class Tester {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return String.format("usedTime: %4.3f ms  usedMemory:  %+4.3f MB  cause: %s", this.usedTime / 1000000f, this.usedMemory / 1048576f, this.cause);
 	}
 

@@ -10,32 +10,32 @@ public class Parser {
 	/**
 	 * Dieses Feld speichert die aktuelle Position.
 	 */
-	private int index;
+	private int __index;
 
 	/**
 	 * Dieses Feld speichert die Zeichen der Eingabe.
 	 */
-	private char[] chars;
+	private char[] __chars;
 
 	/**
 	 * Dieses Feld speichert die Ausgabe.
 	 */
-	private final StringBuffer target = new StringBuffer();
+	private final StringBuffer __target = new StringBuffer();
 
 	/**
 	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
 	 */
-	private int symbol;
+	private int __symbol;
 
 	/**
 	 * Dieses Feld speichert die Eingabe.
 	 */
-	private String source;
+	private String __source;
 
 	/**
 	 * Dieses Feld speichert die Anzahl der Zeichen in der Eingabe.
 	 */
-	private int length;
+	private int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die leere Eingabe.
@@ -67,9 +67,9 @@ public class Parser {
 	 */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException();
-		if (index < this.length) return this.symbol = this.chars[this.index = index];
-		this.index = this.length;
-		return this.symbol = -1;
+		if (index < this.__length) return this.__symbol = this.__chars[this.__index = index];
+		this.__index = this.__length;
+		return this.__symbol = -1;
 	}
 
 	/**
@@ -82,9 +82,9 @@ public class Parser {
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int skip() {
-		final int index = this.index + 1, symbol = index < this.length ? this.chars[index] : -1;
-		this.index = index;
-		this.symbol = symbol;
+		final int index = this.__index + 1, symbol = index < this.__length ? this.__chars[index] : -1;
+		this.__index = index;
+		this.__symbol = symbol;
 		return symbol;
 	}
 
@@ -106,7 +106,7 @@ public class Parser {
 	 * @return aktuelle Position.
 	 */
 	public final int index() {
-		return this.index;
+		return this.__index;
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class Parser {
 	 * @return aktuelles Zeichen oder {@code -1}.
 	 */
 	public final int symbol() {
-		return this.symbol;
+		return this.__symbol;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class Parser {
 	 * @return {@code true}, wenn die aktuelle Position minimal ist.
 	 */
 	public final boolean isReset() {
-		return this.index == 0;
+		return this.__index == 0;
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class Parser {
 	 * @return {@code true}, wenn die aktuelle Position maximal ist.
 	 */
 	public final boolean isParsed() {
-		return this.symbol < 0;
+		return this.__symbol < 0;
 	}
 
 	{}
@@ -163,7 +163,7 @@ public class Parser {
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
 	 */
 	public final int take() {
-		this.take(this.symbol);
+		this.take(this.__symbol);
 		return this.skip();
 	}
 
@@ -176,7 +176,7 @@ public class Parser {
 	 */
 	public final void take(final int symbol) {
 		if (symbol < 0) return;
-		this.target.append((char)symbol);
+		this.__target.append((char)symbol);
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class Parser {
 	 */
 	public final void take(final String symbols) throws NullPointerException {
 		if (symbols == null) throw new NullPointerException("symbols = null");
-		this.target.append(symbols.toString());
+		this.__target.append(symbols.toString());
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class Parser {
 	 * @see #target()
 	 */
 	public final void clear() {
-		this.target.setLength(0);
+		this.__target.setLength(0);
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class Parser {
 	 * @return Ausgabe.
 	 */
 	public final String target() {
-		return this.target.toString();
+		return this.__target.toString();
 	}
 
 	/**
@@ -227,8 +227,8 @@ public class Parser {
 	 */
 	protected void string(final String value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
-		this.target.setLength(0);
-		this.target.append(value);
+		this.__target.setLength(0);
+		this.__target.append(value);
 	}
 
 	{}
@@ -242,7 +242,7 @@ public class Parser {
 	 * @return Länge der Eingabe.
 	 */
 	public final int length() {
-		return this.length;
+		return this.__length;
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class Parser {
 	 * @return Eingabe.
 	 */
 	public final String source() {
-		return this.source;
+		return this.__source;
 	}
 
 	/**
@@ -262,7 +262,7 @@ public class Parser {
 	 */
 	protected void source(final String source) throws NullPointerException {
 		if (source == null) throw new NullPointerException("source = null");
-		this.length = (this.chars = (this.source = source).toCharArray()).length;
+		this.__length = (this.__chars = (this.__source = source).toCharArray()).length;
 		this.reset();
 	}
 
@@ -273,7 +273,7 @@ public class Parser {
 	 */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this.source);
+		return Objects.toInvokeString(this, this.__source);
 	}
 
 }

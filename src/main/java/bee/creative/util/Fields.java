@@ -227,7 +227,7 @@ public final class Fields {
 		 * @return {@link SetField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static <GInput, GItem> SetField<GInput, GItem> wrap(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
+		public static final <GInput, GItem> SetField<GInput, GItem> wrap(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseSetField<GInput, GItem>() {
 
@@ -334,7 +334,7 @@ public final class Fields {
 		 * @return {@link ListField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static <GInput, GItem> ListField<GInput, GItem> wrap(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
+		public static final <GInput, GItem> ListField<GInput, GItem> wrap(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseListField<GInput, GItem>() {
 
@@ -473,7 +473,8 @@ public final class Fields {
 		 * @return {@link MapField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static <GInput, GKey, GValue> MapField<GInput, GKey, GValue> wrap(final Field<? super GInput, Map<GKey, GValue>> field) throws NullPointerException {
+		public static final <GInput, GKey, GValue> MapField<GInput, GKey, GValue> wrap(final Field<? super GInput, Map<GKey, GValue>> field)
+			throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseMapField<GInput, GKey, GValue>() {
 
@@ -580,8 +581,8 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeStaticField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
-		throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> nativeStaticField(final java.lang.reflect.Method getMethod,
+		final java.lang.reflect.Method setMethod) throws NullPointerException {
 		if (getMethod == null) throw new NullPointerException("getMethod = null");
 		if (setMethod == null) throw new NullPointerException("setMethod = null");
 		return new Field<GInput, GValue>() {
@@ -621,19 +622,19 @@ public final class Fields {
 	 * @see Class#getMethod(String, Class...)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param staticType {@link Class}, an der die {@code static}-Methoden definiert sind.
+	 * @param staticType {@link Class}, an der die {@code static final }-Methoden definiert sind.
 	 * @param inputType {@link Class} der Eingabe.
 	 * @param valueType {@link Class} des Werts der Eigenschaft.
-	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, d.h. {@code staticType.getMethod(input)}.
-	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, d.h. {@code staticType.setMethod(input, value)}.
+	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, d.h. {@code static final Type.getMethod(input)}.
+	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, d.h. {@code static final Type.setMethod(input, value)}.
 	 * @return {@code native}-{@link Field}.
 	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code staticType},{@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code static final Type},{@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeStaticField(final Class<?> staticType, final Class<? super GInput> inputType,
+	public static final <GInput, GValue> Field<GInput, GValue> nativeStaticField(final Class<?> staticType, final Class<? super GInput> inputType,
 		final Class<? super GValue> valueType, final String getName, final String setName) throws SecurityException, NoSuchMethodException, NullPointerException {
-		if (staticType == null) throw new NullPointerException("staticType = null");
+		if (staticType == null) throw new NullPointerException("static final Type = null");
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (valueType == null) throw new NullPointerException("valueType = null");
 		if (getName == null) throw new NullPointerException("getName = null");
@@ -653,7 +654,7 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Field field) throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Field field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
 
@@ -696,7 +697,7 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final String fieldName) throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final String fieldName) throws NullPointerException {
 		if (fieldName == null) throw new NullPointerException("fieldName = null");
 		return new Field<GInput, GValue>() {
 
@@ -753,8 +754,8 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
-		throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Method getMethod,
+		final java.lang.reflect.Method setMethod) throws NullPointerException {
 		if (getMethod == null) throw new NullPointerException("getMethod = null");
 		if (setMethod == null) throw new NullPointerException("setMethod = null");
 		return new Field<GInput, GValue>() {
@@ -800,7 +801,7 @@ public final class Fields {
 	 * @throws NoSuchFieldException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code fieldName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final String fieldName)
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final String fieldName)
 		throws SecurityException, NoSuchFieldException, NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (fieldName == null) throw new NullPointerException("fieldName = null");
@@ -819,7 +820,7 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GValue> valueType, final String getName, final String setName)
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GValue> valueType, final String getName, final String setName)
 		throws NullPointerException {
 		if (valueType == null) throw new NullPointerException("valueType = null");
 		if (getName == null) throw new NullPointerException("getName = null");
@@ -881,7 +882,7 @@ public final class Fields {
 	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final Class<? super GValue> valueType,
+	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final Class<? super GValue> valueType,
 		final String getName, final String setName) throws SecurityException, NoSuchMethodException, NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		if (valueType == null) throw new NullPointerException("valueType = null");
@@ -897,7 +898,7 @@ public final class Fields {
 	 * @param value Wert.
 	 * @return {@code value}-{@link Field}.
 	 */
-	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
+	public static final <GValue> Field<Object, GValue> valueField(final GValue value) {
 		return new BaseField<Object, GValue>() {
 
 			@Override
@@ -926,7 +927,7 @@ public final class Fields {
 	 * @return {@code navigated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code field} {@code null} ist.
 	 */
-	public static <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GOutput> converter,
+	public static final <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GOutput> converter,
 		final Field<? super GOutput, GValue> field) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (field == null) throw new NullPointerException("field = null");
@@ -967,7 +968,7 @@ public final class Fields {
 	 * @return {@code converted}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
+	public static final <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
@@ -1002,7 +1003,7 @@ public final class Fields {
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
+	public static final <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
 		throws NullPointerException {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), null, null);
 	}
@@ -1019,8 +1020,8 @@ public final class Fields {
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyValue,
-		final GValue mixedValue) throws NullPointerException {
+	public static final <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field,
+		final GValue emptyValue, final GValue mixedValue) throws NullPointerException {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
 	}
 
@@ -1039,7 +1040,7 @@ public final class Fields {
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+	public static final <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
 		return Fields.aggregatedField(field, parser, formatter, null, null);
 	}
@@ -1075,7 +1076,7 @@ public final class Fields {
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+	public static final <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
 		final GValue mixedValue) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
@@ -1126,8 +1127,8 @@ public final class Fields {
 	 * @return {@code conditional}-{@link Field}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> accept,
-		final Field<? super GInput, GValue> reject) throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition,
+		final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject) throws NullPointerException {
 		if (condition == null) throw new NullPointerException("condition = null");
 		if (accept == null) throw new NullPointerException("accept = null");
 		if (reject == null) throw new NullPointerException("reject = null");
@@ -1164,7 +1165,7 @@ public final class Fields {
 	 * @return {@code synchronized}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 	 */
-	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
 

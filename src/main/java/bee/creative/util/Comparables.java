@@ -59,44 +59,42 @@ public class Comparables {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static void check(final Comparable<?> comparable) throws NullPointerException {
-		if (comparable == null) throw new NullPointerException("comparable = null");
-	}
-
-	@SuppressWarnings ("javadoc")
-	static void check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
+	static final void __check(final int fromIndex, final int toIndex) throws IllegalArgumentException {
 		if (fromIndex > toIndex) throw new IllegalArgumentException("fromIndex > toIndex");
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(fromIndex, toIndex);
+	static final void __check(final int length, final int fromIndex, final int toIndex) throws IllegalArgumentException, IndexOutOfBoundsException {
+		Comparables.__check(fromIndex, toIndex);
 		if (fromIndex < 0) throw new IndexOutOfBoundsException("fromIndex < 0");
 		if (toIndex > length) throw new IndexOutOfBoundsException("toIndex > length");
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void check(final Items<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
+	static final void __check(final Comparable<?> comparable) throws NullPointerException {
+		if (comparable == null) throw new NullPointerException("comparable = null");
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final void __check(final Items<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
-		Comparables.check(comparable);
-		Comparables.check(fromIndex, toIndex);
+		Comparables.__check(comparable);
+		Comparables.__check(fromIndex, toIndex);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void check(final List<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
+	static final void __check(final List<?> items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException, IndexOutOfBoundsException {
-		if (items == null) throw new NullPointerException("items = null");
-		Comparables.check(comparable);
-		Comparables.check(items.size(), fromIndex, toIndex);
+		Comparables.__check(comparable);
+		Comparables.__check(items.size(), fromIndex, toIndex);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static void check(final Object[] items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
+	static final void __check(final Object[] items, final Comparable<?> comparable, final int fromIndex, final int toIndex) throws NullPointerException,
 		IllegalArgumentException, IndexOutOfBoundsException {
-		if (items == null) throw new NullPointerException("items = null");
-		Comparables.check(comparable);
-		Comparables.check(items.length, fromIndex, toIndex);
+		Comparables.__check(comparable);
+		Comparables.__check(items.length, fromIndex, toIndex);
 	}
 
 	/**
@@ -107,7 +105,7 @@ public class Comparables {
 	 * @param items Elemente.
 	 * @return Element mit der kleinsten Ordnung oder {@code null}.
 	 */
-	public static <GItem extends Comparable<? super GItem>> GItem minItem(final Iterable<? extends GItem> items) {
+	public static final <GItem extends Comparable<? super GItem>> GItem minItem(final Iterable<? extends GItem> items) {
 		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
@@ -128,7 +126,7 @@ public class Comparables {
 	 * @param items Elemente.
 	 * @return Element mit der größten Ordnung oder {@code null}.
 	 */
-	public static <GItem extends Comparable<? super GItem>> GItem maxItem(final Iterable<? extends GItem> items) {
+	public static final <GItem extends Comparable<? super GItem>> GItem maxItem(final Iterable<? extends GItem> items) {
 		final Iterator<? extends GItem> iterator = Iterators.iterator(items);
 		if (!iterator.hasNext()) return null;
 		GItem result = iterator.next();
@@ -151,7 +149,7 @@ public class Comparables {
 	 * @return Auswahl der Elemente.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code indices} {@code null} ist.
 	 */
-	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
+	public static final <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int[] indices) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
 		if (indices == null) throw new NullPointerException("indices = null");
 		return new Items<GItem>() {
@@ -181,10 +179,10 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 */
-	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException,
-		IllegalArgumentException {
+	public static final <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
-		Comparables.check(fromIndex, toIndex);
+		Comparables.__check(fromIndex, toIndex);
 		return new Items<GItem>() {
 
 			@Override
@@ -212,7 +210,7 @@ public class Comparables {
 	 * @return {@code null}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GItem> Comparable<GItem> nullComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static final <GItem> Comparable<GItem> nullComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
 		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Comparable<GItem>() {
 
@@ -240,7 +238,7 @@ public class Comparables {
 	 * @return {@code entry}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist.
 	 */
-	public static <GItem> Comparable<GItem> itemComparable(final GItem item, final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static final <GItem> Comparable<GItem> itemComparable(final GItem item, final Comparator<? super GItem> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		return new Comparable<GItem>() {
 
@@ -266,7 +264,7 @@ public class Comparables {
 	 * @return {@code reverse}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
+	public static final <GItem> Comparable<GItem> reverseComparable(final Comparable<? super GItem> comparable) throws NullPointerException {
 		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Comparable<GItem>() {
 
@@ -294,7 +292,7 @@ public class Comparables {
 	 * @return {@code chained}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code comparable1} bzw. {@code comparable2} {@code null} ist.
 	 */
-	public static <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
+	public static final <GItem> Comparable<GItem> chainedComparable(final Comparable<? super GItem> comparable1, final Comparable<? super GItem> comparable2)
 		throws NullPointerException {
 		if (comparable1 == null) throw new NullPointerException("comparable1 = null");
 		if (comparable2 == null) throw new NullPointerException("comparable2 = null");
@@ -327,7 +325,7 @@ public class Comparables {
 	 * @return {@code navigated}-{@link Comparable}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code comparable} {@code null} ist.
 	 */
-	public static <GItem, GItem2> Comparable<GItem> navigatedComparable(final Converter<? super GItem, ? extends GItem2> converter,
+	public static final <GItem, GItem2> Comparable<GItem> navigatedComparable(final Converter<? super GItem, ? extends GItem2> converter,
 		final Comparable<? super GItem2> comparable) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (comparable == null) throw new NullPointerException("comparable = null");
@@ -359,7 +357,7 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 */
-	public static <GItem> int binarySearch(final GItem[] items, final Comparable<? super GItem> comparable) throws ClassCastException, NullPointerException {
+	public static final <GItem> int binarySearch(final GItem[] items, final Comparable<? super GItem> comparable) throws ClassCastException, NullPointerException {
 		return Comparables.binarySearch(items, comparable, 0, items.length);
 	}
 
@@ -379,9 +377,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
-	public static <GItem> int binarySearch(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static final <GItem> int binarySearch(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
@@ -407,7 +405,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 */
-	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
+	public static final <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
 		ClassCastException {
 		return Comparables.binarySearch(items, comparable, 0, items.size());
 	}
@@ -428,9 +426,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
-	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
-		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+	public static final <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
@@ -459,9 +457,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Items} eine {@link IndexOutOfBoundsException} auslöst.
 	 */
-	public static <GItem> int binarySearch(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
-		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+	public static final <GItem> int binarySearch(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
@@ -487,7 +485,8 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 */
-	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
+	public static final <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException,
+		ClassCastException {
 		return Comparables.binarySearchFirst(items, comparable, 0, items.length);
 	}
 
@@ -507,9 +506,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
-	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static final <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
@@ -536,7 +535,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 */
-	public static <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
+	public static final <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
 		ClassCastException {
 		return Comparables.binarySearchFirst(items, comparable, 0, items.size());
 	}
@@ -557,9 +556,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
-	public static <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+	public static final <GItem> int binarySearchFirst(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
 		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
@@ -589,9 +588,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Items} eine {@link IndexOutOfBoundsException} auslöst.
 	 */
-	public static <GItem> int binarySearchFirst(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+	public static final <GItem> int binarySearchFirst(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
 		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
@@ -618,7 +617,8 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist.
 	 */
-	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
+	public static final <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException,
+		ClassCastException {
 		return Comparables.binarySearchLast(items, comparable, 0, items.length);
 	}
 
@@ -638,9 +638,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.length}.
 	 */
-	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+	public static final <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
 		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items[next]);
@@ -668,7 +668,7 @@ public class Comparables {
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 */
-	public static <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
+	public static final <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable) throws NullPointerException,
 		ClassCastException {
 		return Comparables.binarySearchLast(items, comparable, 0, items.size());
 	}
@@ -689,9 +689,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}.
 	 */
-	public static <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+	public static final <GItem> int binarySearchLast(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
 		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));
@@ -722,9 +722,9 @@ public class Comparables {
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Items} eine {@link IndexOutOfBoundsException} auslöst.
 	 */
-	public static <GItem> int binarySearchLast(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
+	public static final <GItem> int binarySearchLast(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
 		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
-		Comparables.check(items, comparable, fromIndex, toIndex);
+		Comparables.__check(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
 			final int next = (from + last) >>> 1, comp = comparable.compareTo(items.get(next));

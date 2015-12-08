@@ -11,11 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import bee.creative.util.Comparables;
-import bee.creative.util.Comparables.Items;
-import bee.creative.util.Comparators;
+import bee.creative.fem.FEMScript.Range;
 import bee.creative.util.Converter;
-import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
 
@@ -80,7 +77,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int hashCode() {
+		public final int hashCode() {
 			return Objects.hash(this.data());
 		}
 
@@ -88,7 +85,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean equals(final Object object) {
+		public final boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof FEMValue)) return false;
 			final FEMValue data = (FEMValue)object;
@@ -230,14 +227,14 @@ public class FEM {
 		/**
 		 * Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
 		 * 
-		 * @param scope Stapelrahmen.
+		 * @param frame Stapelrahmen.
 		 * @param function Funktion.
-		 * @throws NullPointerException Wenn {@code scope} bzw. {@code function} {@code null} ist.
+		 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist.
 		 */
-		public VirtualValue(final FEMFrame scope, final FEMFunction function) throws NullPointerException {
-			if (scope == null) throw new NullPointerException("scope = null");
+		public VirtualValue(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
+			if (frame == null) throw new NullPointerException("frame = null");
 			if (function == null) throw new NullPointerException("function = null");
-			this.__frame = scope;
+			this.__frame = frame;
 			this.__function = function;
 		}
 
@@ -251,7 +248,7 @@ public class FEM {
 		 * @return Ergebniswert.
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
-		public synchronized FEMValue value() throws NullPointerException {
+		public final synchronized FEMValue value() throws NullPointerException {
 			FEMValue result = this.__value;
 			if (result != null) return result;
 			result = this.__function.invoke(this.__frame);
@@ -268,7 +265,7 @@ public class FEM {
 		 * 
 		 * @return Stapelrahmen oder {@code null}.
 		 */
-		public FEMFrame frame() {
+		public final FEMFrame frame() {
 			return this.__frame;
 		}
 
@@ -278,7 +275,7 @@ public class FEM {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -288,7 +285,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMType<?> type() {
+		public final FEMType<?> type() {
 			return this.value().type();
 		}
 
@@ -296,7 +293,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object data() {
+		public final Object data() {
 			return this.value().data();
 		}
 
@@ -304,7 +301,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public synchronized void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final synchronized void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			if (this.__value != null) {
 				target.putValue(this.__value);
 			} else {
@@ -327,7 +324,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMVoid> type() {
+		public final FEMType<FEMVoid> type() {
 			return FEM.VOID_TYPE;
 		}
 
@@ -346,12 +343,12 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMArray> type() {
+		public final FEMType<FEMArray> type() {
 			return FEM.ARRAY_TYPE;
 		}
 
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putArray(this.__data);
 		}
 
@@ -370,7 +367,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMString> type() {
+		public final FEMType<FEMString> type() {
 			return FEM.STRING_TYPE;
 		}
 
@@ -389,7 +386,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMBinary> type() {
+		public final FEMType<FEMBinary> type() {
 			return FEM.BINARY_TYPE;
 		}
 
@@ -408,7 +405,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMInteger> type() {
+		public final FEMType<FEMInteger> type() {
 			return FEM.INTEGER_TYPE;
 		}
 
@@ -427,7 +424,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMDecimal> type() {
+		public final FEMType<FEMDecimal> type() {
 			return FEM.DECIMAL_TYPE;
 		}
 
@@ -446,7 +443,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMBoolean> type() {
+		public final FEMType<FEMBoolean> type() {
 			return FEM.BOOLEAN_TYPE;
 		}
 
@@ -465,7 +462,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMDuration> type() {
+		public final FEMType<FEMDuration> type() {
 			return FEM.DURATION_TYPE;
 		}
 
@@ -484,7 +481,7 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMDatetime> type() {
+		public final FEMType<FEMDatetime> type() {
 			return FEM.DATETIME_TYPE;
 		}
 
@@ -503,17 +500,17 @@ public class FEM {
 		{}
 
 		@Override
-		public FEMType<FEMFunction> type() {
+		public final FEMType<FEMFunction> type() {
 			return FEM.FUNCTION_TYPE;
 		}
 
 		@Override
-		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			return new ValueFunction(FEM.functionValue(tracer.trace(this.__data)));
 		}
 
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.__data);
 		}
 
@@ -540,7 +537,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return FEM.scriptFormatter().formatFunction(this);
 		}
 
@@ -582,7 +579,7 @@ public class FEM {
 		 * @param function Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public void set(final FEMFunction function) throws NullPointerException {
+		public final void set(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			this.__function = function;
 		}
@@ -592,7 +589,7 @@ public class FEM {
 		 * 
 		 * @return Name.
 		 */
-		public String name() {
+		public final String name() {
 			return this.__name;
 		}
 
@@ -602,7 +599,7 @@ public class FEM {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -612,7 +609,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			return this.__function.invoke(frame);
 		}
 
@@ -620,7 +617,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.put(FEM.formatName(this.__name));
 		}
 
@@ -666,7 +663,7 @@ public class FEM {
 		 * 
 		 * @return {@link ScriptTracer}.
 		 */
-		public ScriptTracer tracer() {
+		public final ScriptTracer tracer() {
 			return this.__tracer;
 		}
 
@@ -675,7 +672,7 @@ public class FEM {
 		 * 
 		 * @return aufzurufende {@link FEMFunction}.
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -686,7 +683,7 @@ public class FEM {
 		 * <p>
 		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Stapelrahmen sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die
 		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
-		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getScope() aktuellen
+		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getFrame() aktuellen
 		 * Stapelrahmen} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#useResult(FEMValue) gespeichert}.<br>
 		 * Abschließend werden dann {@link ScriptTracerHelper#onReturn(ScriptTracer) tracer().helper().onReturn(tracer())} aufgerufen und der
 		 * {@link ScriptTracer#getResult() aktuelle Ergebniswert} zurück gegeben.<br>
@@ -697,13 +694,13 @@ public class FEM {
 		 * Der verwendete {@link ScriptTracerHelper} wird nur einmalig zu Beginn der Auswertung über den {@link #tracer()} ermittelt.
 		 */
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			final ScriptTracer tracer = this.__tracer;
 			try {
 				final ScriptTracerHelper helper = tracer.getHelper();
-				helper.onExecute(tracer.useScope(frame).useFunction(this.__function));
+				helper.onExecute(tracer.useFrame(frame).useFunction(this.__function));
 				try {
-					helper.onReturn(tracer.useResult(tracer.getFunction().invoke(tracer.getScope())));
+					helper.onReturn(tracer.useResult(tracer.getFunction().invoke(tracer.getFrame())));
 					return tracer.getResult();
 				} catch (final RuntimeException exception) {
 					helper.onThrow(tracer.useException(exception));
@@ -718,7 +715,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.__tracer.equals(tracer)) return this;
 			return tracer.trace(this.__function);
 		}
@@ -727,7 +724,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.__function);
 		}
 
@@ -764,7 +761,7 @@ public class FEM {
 		 * 
 		 * @return Ergebniswert.
 		 */
-		public FEMValue value() {
+		public final FEMValue value() {
 			return this.__value;
 		}
 
@@ -774,7 +771,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			return this.__value;
 		}
 
@@ -782,7 +779,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.__value instanceof ScriptTracerInput) return ((ScriptTracerInput)this.__value).toTrace(tracer);
 			return this;
 		}
@@ -791,7 +788,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putValue(this.__value);
 		}
 
@@ -814,7 +811,7 @@ public class FEM {
 		 * @return {@link VirtualFunction}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 */
-		public static VirtualFunction from(final FEMFunction function) throws NullPointerException {
+		public static final VirtualFunction from(final FEMFunction function) throws NullPointerException {
 			if (function instanceof VirtualFunction) return (VirtualFunction)function;
 			return new VirtualFunction(function);
 		}
@@ -844,7 +841,7 @@ public class FEM {
 		 * 
 		 * @return auszuwertende Funktion.
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -859,7 +856,7 @@ public class FEM {
 		 * @see VirtualValue#VirtualValue(FEMFrame, FEMFunction)
 		 */
 		@Override
-		public VirtualValue invoke(final FEMFrame frame) {
+		public final VirtualValue invoke(final FEMFrame frame) {
 			return new VirtualValue(frame, this.__function);
 		}
 
@@ -867,7 +864,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.__function);
 		}
 
@@ -896,7 +893,7 @@ public class FEM {
 		 * @return {@link ParamFunction}.
 		 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist.
 		 */
-		public static ParamFunction from(final int index) throws IndexOutOfBoundsException {
+		public static final ParamFunction from(final int index) throws IndexOutOfBoundsException {
 			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if (index < ParamFunction.__cache.length) return ParamFunction.__cache[index];
 			return new ParamFunction(index);
@@ -928,7 +925,7 @@ public class FEM {
 		 * @return Index des Parameterwerts.
 		 * @see #invoke(FEMFrame)
 		 */
-		public int index() {
+		public final int index() {
 			return this.__index;
 		}
 
@@ -942,7 +939,7 @@ public class FEM {
 		 * @see #index()
 		 */
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			return frame.get(this.__index);
 		}
 
@@ -950,8 +947,8 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("$").put(this.__index + 1);
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("$").put(new Integer(this.__index + 1));
 		}
 
 	}
@@ -1007,7 +1004,7 @@ public class FEM {
 		 * @return Verkettung.
 		 * @see #invoke(FEMFrame)
 		 */
-		public boolean direct() {
+		public final boolean direct() {
 			return this.__direct;
 		}
 
@@ -1017,7 +1014,7 @@ public class FEM {
 		 * @return Kopie der Parameterfunktionen.
 		 * @see #invoke(FEMFrame)
 		 */
-		public FEMFunction[] params() {
+		public final FEMFunction[] params() {
 			return this.__params.clone();
 		}
 
@@ -1027,7 +1024,7 @@ public class FEM {
 		 * @return aufzurufende Funktion.
 		 * @see #invoke(FEMFrame)
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -1038,7 +1035,7 @@ public class FEM {
 		 * @see VirtualFunction#from(FEMFunction)
 		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind.
 		 */
-		public InvokeFunction toLazy() {
+		public final InvokeFunction toLazy() {
 			final FEMFunction[] functions = this.__params.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = VirtualFunction.from(functions[i]);
@@ -1060,7 +1057,7 @@ public class FEM {
 		 * @see FEMFrame#newFrame(FEMFunction...)
 		 */
 		@Override
-		public FEMValue invoke(FEMFrame frame) {
+		public final FEMValue invoke(FEMFrame frame) {
 			final FEMFunction function;
 			if (this.__direct) {
 				function = this.__function;
@@ -1079,7 +1076,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this.__params;
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = tracer.trace(params[i]);
@@ -1091,7 +1088,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putFunction(this.__function).putParams(Arrays.asList(this.__params));
 		}
 
@@ -1159,7 +1156,7 @@ public class FEM {
 		 * @see #invoke(FEMFrame)
 		 * @return gebundene Stapelrahmen oder {@code null}.
 		 */
-		public FEMFrame frame() {
+		public final FEMFrame frame() {
 			return this.__frame;
 		}
 
@@ -1168,7 +1165,7 @@ public class FEM {
 		 * 
 		 * @return auszuwertende Funktion.
 		 */
-		public FEMFunction function() {
+		public final FEMFunction function() {
 			return this.__function;
 		}
 
@@ -1186,7 +1183,7 @@ public class FEM {
 		 * gegebenen sowie den zusätzlichen Parameterwerten der gebundenen Stapelrahmen ausgewertet und der so ermittelte Ergebniswert geliefert.
 		 */
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			if (this.__frame == null) return FEM.functionValue(new ClosureFunction(frame, this.__function));
 			return this.__function.invoke(this.__frame.withParams(frame.params()));
 		}
@@ -1195,7 +1192,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
 			if (this.__frame == null) return new ClosureFunction(tracer.trace(this.__function));
 			return new ClosureFunction(this.__frame, tracer.trace(this.__function));
 		}
@@ -1204,191 +1201,8 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putHandler(this.__function);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
-	 * <p>
-	 * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Verarbeitung von aufbereiteten Quelltexten.
-	 * 
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class Script implements Items<Range>, Iterable<Range> {
-
-		{}
-
-		/**
-		 * Dieses Feld speichert den leeren Quelltext ohne Bereiche.
-		 */
-		public static final Script EMPTY = new Script("", new Range[0]);
-
-		{}
-
-		/**
-		 * Dieses Feld speichert die Zeichenkette.
-		 */
-		final String __source;
-
-		/**
-		 * Dieses Feld speichert die Bereiche.
-		 */
-		final Range[] __ranges;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-		 * 
-		 * @see Range
-		 * @param source Zeichenkette.
-		 * @param ranges Bereiche.
-		 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-		 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
-		 *         gehen.
-		 */
-		public Script(final String source, final Range[] ranges) throws NullPointerException, IllegalArgumentException {
-			int offset = 0;
-			final int length = source.length();
-			for (final Range range: ranges) {
-				final int start = range.__start;
-				if (start < offset) throw new IllegalArgumentException("ranges overlapping");
-				offset = start + range.__length;
-			}
-			if (offset > length) throw new IllegalArgumentException("ranges exceeding");
-			this.__source = source;
-			this.__ranges = ranges.clone();
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-		 * 
-		 * @see Range
-		 * @param source Zeichenkette.
-		 * @param ranges Bereiche.
-		 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-		 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
-		 *         gehen.
-		 */
-		public Script(final String source, final Collection<? extends Range> ranges) throws NullPointerException, IllegalArgumentException {
-			this(source, ranges.toArray(new Range[ranges.size()]));
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt die Zeichenkette zurück.
-		 * 
-		 * @return Zeichenkette.
-		 */
-		public final String source() {
-			return this.__source;
-		}
-
-		/**
-		 * Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} das Zeichenkette zurück.
-		 * 
-		 * @see Range#type()
-		 * @see #ranges()
-		 * @return Bereichstypen als Zeichenkette.
-		 */
-		public final char[] types() {
-			final Range[] ranges = this.__ranges;
-			final int length = ranges.length;
-			final char[] types = new char[length];
-			for (int i = 0; i < length; i++) {
-				types[i] = ranges[i].__type;
-			}
-			return types;
-		}
-
-		/**
-		 * Diese Methode gibt eine Koppie der Bereiche zurück.
-		 * 
-		 * @see #get(int)
-		 * @see #length()
-		 * @see #iterator()
-		 * @return Bereiche.
-		 */
-		public final Range[] ranges() {
-			return this.__ranges.clone();
-		}
-
-		/**
-		 * Diese Methode gibt die Anzahl der Bereiche zurück.
-		 * 
-		 * @see #get(int)
-		 * @see #ranges()
-		 * @see #iterator()
-		 * @return Anzahl der Bereiche.
-		 */
-		public final int length() {
-			return this.__ranges.length;
-		}
-
-		/**
-		 * Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
-		 * einem der {@link #ranges() Bereiche} enthalten ist.
-		 * 
-		 * @return normalisierter Quelltext.
-		 */
-		public final Script normalize() {
-			final List<Range> normalRanges = new ArrayList<>(this.__ranges.length);
-			final StringBuilder normalSource = new StringBuilder();
-			int start = 0;
-			for (final Range range: this.__ranges) {
-				final int length = range.__length;
-				normalSource.append(range.extract(this.__source));
-				normalRanges.add(new Range(range.__type, start, length));
-				start += length;
-			}
-			return new Script(normalSource.toString(), normalRanges);
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt den {@code index}-ten Bereich zurück.
-		 */
-		@Override
-		public final Range get(final int index) throws IndexOutOfBoundsException {
-			return this.__ranges[index];
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final Iterator<Range> iterator() {
-			return Iterators.itemsIterator(this, 0, this.length());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final int hashCode() {
-			return Objects.hash(this.__source) ^ Objects.hash((Object[])this.__ranges);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof Script)) return false;
-			final Script data = (Script)object;
-			return Objects.equals(this.__source, data.__source) && Objects.equals(this.__ranges, data.__ranges);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final String toString() {
-			return this.source();
 		}
 
 	}
@@ -1457,19 +1271,19 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode fügt eine neue {@link Range} mit den gegebenen Parametern hinzu, die bei {@link #index()} endet.
+		 * Diese Methode fügt eine neue Bereich mit den gegebenen Parametern hinzu, der bei {@link #index()} endet.
 		 * 
-		 * @param type Typ.
-		 * @param start Startposition.
+		 * @param type Typ des Bereichs.
+		 * @param start Start des Bereichs.
 		 */
 		protected final void range(final int type, final int start) {
 			this.__ranges.add(new Range((char)type, start, this.index() - start));
 		}
 
 		/**
-		 * Diese Methode beendet das einlesen des Wertbereichs.
+		 * Diese Methode beendet das einlesen des Wertbereichs mit dem Bereichstyp {@code '.'}.
 		 */
-		protected void closeValue() {
+		protected final void closeValue() {
 			final int start = this.__value;
 			if (start < 0) return;
 			this.__value = -1;
@@ -1478,9 +1292,9 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode beginnt das parsen eines Wertbereichs, welches mit {@link #closeValue()} beendet werden muss.
+		 * Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #closeValue()} beendet werden muss.
 		 */
-		protected void parseValue() {
+		protected final void parseValue() {
 			if (this.__value >= 0) return;
 			this.__value = this.index();
 		}
@@ -1491,7 +1305,7 @@ public class FEM {
 		 * 
 		 * @param type Zeichen als Bereichstyp.
 		 */
-		protected void parseMask(final int type) {
+		protected final void parseMask(final int type) {
 			final int start = this.index();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
@@ -1509,7 +1323,7 @@ public class FEM {
 		 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
 		 * Bereichstyp {@code '?'}.
 		 */
-		protected void parseName() {
+		protected final void parseName() {
 			final int start = this.index();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == '>') {
@@ -1529,7 +1343,7 @@ public class FEM {
 		/**
 		 * Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind.
 		 */
-		protected void parseSpace() {
+		protected final void parseSpace() {
 			final int start = this.index();
 			for (int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()) {}
 			this.range('_', start);
@@ -1538,9 +1352,11 @@ public class FEM {
 		/**
 		 * Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
 		 * 
+		 * @see #skip()
+		 * @see #range(int, int)
 		 * @param type Zeichen als Bereichstyp.
 		 */
-		protected void parseSymbol(final int type) {
+		protected final void parseSymbol(final int type) {
 			final int start = this.index();
 			this.skip();
 			this.range(type, start);
@@ -1563,13 +1379,13 @@ public class FEM {
 		/**
 		 * Diese Methode parst die {@link #source() Eingabe} in einen aufbereiteten Quelltext und gibt diesen zurück.
 		 * 
-		 * @see Script
+		 * @see FEMScript
 		 * @see #parseRanges()
 		 * @return aufbereiteter Quelltext.
 		 * @throws IllegalStateException Wenn aktuell geparst wird.
 		 */
-		public Script parseScript() throws IllegalStateException {
-			return new Script(this.source(), this.parseRanges());
+		public FEMScript parseScript() throws IllegalStateException {
+			return new FEMScript(this.source(), this.parseRanges());
 		}
 
 		/**
@@ -1650,7 +1466,7 @@ public class FEM {
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
 	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link PARAMS_VIEW_FUNCTION}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
-	 * als {@link functionValue}s angegeben.</li>
+	 * als {@link FunctionValue} angegeben.</li>
 	 * </ul>
 	 * 
 	 * @see #compileValue()
@@ -1658,18 +1474,6 @@ public class FEM {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static class ScriptCompiler {
-
-		/**
-		 * Dieses Feld speichert den {@link FEMValue} zu {@link FEMArray#EMPTY}.
-		 */
-		static final FEMValue EMPTY_ARRAY_VALUE = FEM.arrayValue(FEMArray.EMPTY);
-
-		/**
-		 * Dieses Feld speichert die {@link FEMFunction} zu {@link #EMPTY_ARRAY_VALUE}.
-		 */
-		static final FEMFunction EMPTY_ARRAY_FUNCTION = new ValueFunction(ScriptCompiler.EMPTY_ARRAY_VALUE);
-
-		{}
 
 		/**
 		 * Dieses Feld speichert den aktuellen Bereich.
@@ -1689,7 +1493,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		private Script script = Script.EMPTY;
+		private FEMScript script = FEMScript.EMPTY;
 
 		/**
 		 * Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter.
@@ -1803,7 +1607,7 @@ public class FEM {
 			this.skip();
 			if (this.skipSpace().__type == ']') {
 				this.skip();
-				return ScriptCompiler.EMPTY_ARRAY_VALUE;
+				return __emptyArray;
 			}
 			while (true) {
 				final FEMValue value = this.compileNextParamAsValue();
@@ -1840,7 +1644,7 @@ public class FEM {
 			this.skip();
 			if (this.skipSpace().__type == ']') {
 				this.skip();
-				return ScriptCompiler.EMPTY_ARRAY_FUNCTION;
+				return new ValueFunction(__emptyArray);
 			}
 			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
@@ -2129,7 +1933,7 @@ public class FEM {
 		 * 
 		 * @return Quelltext.
 		 */
-		public final Script script() {
+		public final FEMScript script() {
 			return this.script;
 		}
 
@@ -2222,7 +2026,7 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useScript(final Script value) throws NullPointerException, IllegalStateException {
+		public ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.checkIdling();
 			this.script = value;
@@ -2517,7 +2321,7 @@ public class FEM {
 						if (section.equalsIgnoreCase("TRUE")) return new ValueFunction(FEM.__true);
 						if (section.equalsIgnoreCase("FALSE")) return new ValueFunction(FEM.__false);
 						try {
-							return new ValueFunction(numberValue(new BigDecimal(section)));
+							return new ValueFunction(FEM.decimalValue(new BigDecimal(section)));
 						} catch (final NumberFormatException cause) {
 							return compiler.proxy(section);
 						}
@@ -3415,7 +3219,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		Script script = Script.EMPTY;
+		FEMScript script = FEMScript.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
@@ -3464,7 +3268,7 @@ public class FEM {
 		 * 
 		 * @return Quelltext.
 		 */
-		public Script getScript() {
+		public FEMScript getScript() {
 			return this.script;
 		}
 
@@ -3518,7 +3322,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 		 */
-		public ScriptException useScript(final Script script) throws NullPointerException {
+		public ScriptException useScript(final FEMScript script) throws NullPointerException {
 			if (script == null) throw new NullPointerException("script = null");
 			this.script = script;
 			return this;
@@ -3527,7 +3331,7 @@ public class FEM {
 		/**
 		 * Diese Methode setzt Quelltext sowie Bereich und gibt {@code this} zurück.
 		 * 
-		 * @see #useScript(Script)
+		 * @see #useScript(FEMScript)
 		 * @see #useRange(Range)
 		 * @param sender {@link ScriptCompiler}.
 		 * @return {@code this}.
@@ -3566,32 +3370,32 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
 		 */
-		ScriptTracerHelper helper = ScriptTracerHelper.DEFAULT;
+		ScriptTracerHelper __helper = ScriptTracerHelper.DEFAULT;
 
 		/**
 		 * Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
 		 * angepasst werden.
 		 */
-		FEMFrame scope;
+		FEMFrame __frame;
 
 		/**
 		 * Dieses Feld speichert die Function, die nach {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen wird bzw. vor
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} oder {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf angepasst werden.
 		 */
-		FEMFunction function;
+		FEMFunction __function;
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode
 		 * {@link ScriptTracerHelper#onReturn(ScriptTracer)} angepasst werden.
 		 */
-		FEMValue result;
+		FEMValue __result;
 
 		/**
 		 * Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} angepasst werden.
 		 */
-		RuntimeException exception;
+		RuntimeException __exception;
 
 		{}
 
@@ -3601,25 +3405,7 @@ public class FEM {
 		 * @return {@link ScriptTracerHelper}.
 		 */
 		public ScriptTracerHelper getHelper() {
-			return this.helper;
-		}
-
-		/**
-		 * Diese Methode gibt den aktuellen Stapelrahmen zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
-		 * 
-		 * @return Stapelrahmen oder {@code null}.
-		 */
-		public FEMFrame getScope() {
-			return this.scope;
-		}
-
-		/**
-		 * Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getScope() aktuellen Stapelrahmen} ausgewertet wird.
-		 * 
-		 * @return Funktion oder {@code null}.
-		 */
-		public FEMFunction getFunction() {
-			return this.function;
+			return this.__helper;
 		}
 
 		/**
@@ -3628,7 +3414,25 @@ public class FEM {
 		 * @return Ergebniswert oder {@code null}.
 		 */
 		public FEMValue getResult() {
-			return this.result;
+			return this.__result;
+		}
+
+		/**
+		 * Diese Methode gibt den aktuellen Stapelrahmen zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
+		 * 
+		 * @return Stapelrahmen oder {@code null}.
+		 */
+		public FEMFrame getFrame() {
+			return this.__frame;
+		}
+
+		/**
+		 * Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet wird.
+		 * 
+		 * @return Funktion oder {@code null}.
+		 */
+		public FEMFunction getFunction() {
+			return this.__function;
 		}
 
 		/**
@@ -3637,7 +3441,7 @@ public class FEM {
 		 * @return Ausnahme oder {@code null}.
 		 */
 		public RuntimeException getException() {
-			return this.exception;
+			return this.__exception;
 		}
 
 		/**
@@ -3649,34 +3453,7 @@ public class FEM {
 		 */
 		public ScriptTracer useHelper(final ScriptTracerHelper value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.helper = value;
-			return this;
-		}
-
-		/**
-		 * Diese Methode setzt den aktuellen Stapelrahmen und gibt {@code this} zurück. Dieser wird zur Auswertung der {@link #getFunction() aktuellen Funktion}
-		 * verwendet.
-		 * 
-		 * @param value Stapelrahmen.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 */
-		public ScriptTracer useScope(final FEMFrame value) throws NullPointerException {
-			if (value == null) throw new NullPointerException("value = null");
-			this.scope = value;
-			return this;
-		}
-
-		/**
-		 * Diese Methode setzt die aktuelle Funktion und gibt {@code this} zurück. Diese wird mit dem {@link #getScope() aktuellen Stapelrahmen} ausgewertet.
-		 * 
-		 * @param value Funktion.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 */
-		public ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
-			if (value == null) throw new NullPointerException("value = null");
-			this.function = value;
+			this.__helper = value;
 			return this;
 		}
 
@@ -3690,8 +3467,35 @@ public class FEM {
 		 */
 		public ScriptTracer useResult(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.result = value;
-			this.exception = null;
+			this.__result = value;
+			this.__exception = null;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt den aktuellen Stapelrahmen und gibt {@code this} zurück. Dieser wird zur Auswertung der {@link #getFunction() aktuellen Funktion}
+		 * verwendet.
+		 * 
+		 * @param value Stapelrahmen.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useFrame(final FEMFrame value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.__frame = value;
+			return this;
+		}
+
+		/**
+		 * Diese Methode setzt die aktuelle Funktion und gibt {@code this} zurück. Diese wird mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet.
+		 * 
+		 * @param value Funktion.
+		 * @return {@code this}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
+			if (value == null) throw new NullPointerException("value = null");
+			this.__function = value;
 			return this;
 		}
 
@@ -3705,32 +3509,32 @@ public class FEM {
 		 */
 		public ScriptTracer useException(final RuntimeException value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.result = null;
-			this.exception = value;
+			this.__result = null;
+			this.__exception = value;
 			return this;
 		}
 
 		/**
 		 * Diese Methode setzt alle aktuellen Einstellungen auf {@code null} und gibt {@code this} zurück.
 		 * 
-		 * @see #getScope()
+		 * @see #getFrame()
 		 * @see #getFunction()
 		 * @see #getResult()
 		 * @see #getException()
 		 * @return {@code this}.
 		 */
 		public ScriptTracer clear() {
-			this.scope = null;
-			this.function = null;
-			this.result = null;
-			this.exception = null;
+			this.__frame = null;
+			this.__function = null;
+			this.__result = null;
+			this.__exception = null;
 			return this;
 		}
 
 		/**
 		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} oder unverändert zurück.<br>
 		 * Sie sollte zur rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von
-		 * {@link ScriptTracer#function} verwendet werden.
+		 * {@link ScriptTracer#__function} verwendet werden.
 		 * <p>
 		 * Wenn die Funktion ein {@link ScriptTracerInput} ist, wird das Ergebnis von {@link ScriptTracerInput#toTrace(ScriptTracer)} zurück gegeben. Andernfalls
 		 * wird die gegebene Funktion zurück gegeben.
@@ -3752,8 +3556,8 @@ public class FEM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toFormatString(true, true, this, "helper", this.helper, "scope", this.scope, "function", this.function, "result", this.result,
-				"exception", this.exception);
+			return Objects.toFormatString(true, true, this, "helper", this.__helper, "frame", this.__frame, "function", this.__function, "result", this.__result,
+				"exception", this.__exception);
 		}
 
 	}
@@ -3814,238 +3618,31 @@ public class FEM {
 
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
-		 * {@link ScriptTracer#exception} kann hierbei angepasst werden.
+		 * {@link ScriptTracer#__exception} kann hierbei angepasst werden.
 		 * 
-		 * @see ScriptTracer#exception
+		 * @see ScriptTracer#__exception
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onThrow(ScriptTracer event);
 
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
-		 * {@link ScriptTracer#result} kann hierbei angepasst werden.
+		 * {@link ScriptTracer#__result} kann hierbei angepasst werden.
 		 * 
-		 * @see ScriptTracer#result
+		 * @see ScriptTracer#__result
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onReturn(ScriptTracer event);
 
 		/**
-		 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link ScriptTracer#scope} und {@link ScriptTracer#function} können hierbei
+		 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link ScriptTracer#__frame} und {@link ScriptTracer#__function} können hierbei
 		 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Stapelrahmen durchzuführen.
 		 * 
-		 * @see ScriptTracer#scope
-		 * @see ScriptTracer#function
+		 * @see ScriptTracer#__frame
+		 * @see ScriptTracer#__function
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onExecute(ScriptTracer event);
-
-	}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt, dass einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
-	 * erfolgt gemäß ihrer Startposition.
-	 * 
-	 * @see Script
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class Range implements Comparable<Range> {
-
-		/**
-		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind.
-		 */
-		public static final Range EMPTY = new Range((char)0, 0, 0);
-
-		{}
-
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
-		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
-		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
-		 * 
-		 * @see Range#end()
-		 * @see Range#start()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
-		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen.
-		 */
-		public static final Comparable<Range> contains(final int index) {
-			return new Comparable<Range>() {
-
-				@Override
-				public int compareTo(final Range value) {
-					final int start = value.__start;
-					return index < start ? -1 : index > (value.__length + start) ? +1 : 0;
-				}
-
-			};
-		}
-
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht. Der
-		 * Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position kleiner,
-		 * gleich bzw. größer der {@link Range#end() Endposition} eines gegebenen Bereichs ist.
-		 * 
-		 * @see Range#end()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
-		 * @param index Position.
-		 * @return {@link Comparable} für das Ende von {@link Range}s.
-		 */
-		public static final Comparable<Range> endingAt(final int index) {
-			return new Comparable<Range>() {
-
-				@Override
-				public int compareTo(final Range value) {
-					return Comparators.compare(index, value.__start + value.__length);
-				}
-
-			};
-		}
-
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position vergleicht.
-		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
-		 * kleiner, gleich bzw. größer der {@link Range#start() Startposition} eines gegebenen Bereichs ist.
-		 * 
-		 * @see Range#start()
-		 * @see Comparables
-		 * @see Comparators#compare(int, int)
-		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen.
-		 */
-		public static final Comparable<Range> startingAt(final int index) {
-			return new Comparable<Range>() {
-
-				@Override
-				public int compareTo(final Range value) {
-					return Comparators.compare(index, value.__start);
-				}
-
-			};
-		}
-
-		{}
-
-		/**
-		 * Dieses Feld speichert den Typ des Bereichs.
-		 */
-		final char __type;
-
-		/**
-		 * Dieses Feld speichert die Startposition.
-		 */
-		final int __start;
-
-		/**
-		 * Dieses Feld speichert die Länge.
-		 */
-		final int __length;
-
-		/**
-		 * Dieser Konstruktor initialisiert Typ, Startposition und Länge.
-		 * 
-		 * @param type Typ.
-		 * @param start Startposition.
-		 * @param length Länge.
-		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind.
-		 */
-		public Range(final char type, final int start, final int length) throws IllegalArgumentException {
-			if (start < 0) throw new IllegalArgumentException("start < 0");
-			if (length < 0) throw new IllegalArgumentException("length < 0");
-			this.__type = type;
-			this.__start = start;
-			this.__length = length;
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt den Typ des Bereichs zurück.
-		 * 
-		 * @see Script
-		 * @return Bereichstyp.
-		 */
-		public final char type() {
-			return this.__type;
-		}
-
-		/**
-		 * Diese Methode gibt die Position zurück, vord der die {@link Range} endet.
-		 * 
-		 * @return Endposition.
-		 */
-		public final int end() {
-			return this.__start + this.__length;
-		}
-
-		/**
-		 * Diese Methode gibt die Position zurück, an der die {@link Range} beginnt.
-		 * 
-		 * @return Startposition.
-		 */
-		public final int start() {
-			return this.__start;
-		}
-
-		/**
-		 * Diese Methode gibt die Länge des die Position zurück, an der die {@link Range} beginnt.
-		 * 
-		 * @return Startposition.
-		 */
-		public final int length() {
-			return this.__length;
-		}
-
-		/**
-		 * Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.
-		 * 
-		 * @param source Zeichenkette.
-		 * @return Abschnitt.
-		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-		 */
-		public final String extract(final String source) throws NullPointerException {
-			final int start = this.__start;
-			return source.substring(start, start + this.__length);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final int compareTo(final Range value) {
-			return Comparators.compare(this.__start, value.__start);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final int hashCode() {
-			return this.__type ^ this.__start ^ this.__length;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final boolean equals(final Object object) {
-			if (object == this) return true;
-			if (!(object instanceof Range)) return false;
-			final Range data = (Range)object;
-			return (this.__start == data.__start) && (this.__length == data.__length) && (this.__type == data.__type);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final String toString() {
-			return "'" + this.__type + "'@" + this.__start + "/" + this.__length;
-		}
 
 	}
 

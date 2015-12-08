@@ -77,7 +77,7 @@ public class Filters {
 	 * @return {@link Converter}-Adapter.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> converterAdapter(final Converter<? super GInput, Boolean> converter) throws NullPointerException {
+	public static final <GInput> Filter<GInput> converterAdapter(final Converter<? super GInput, Boolean> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Filter<GInput>() {
 
@@ -103,7 +103,7 @@ public class Filters {
 	 * @return {@link #NULL_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> nullFilter() {
+	public static final <GInput> Filter<GInput> nullFilter() {
 		return (Filter<GInput>)Filters.NULL_FILTER;
 	}
 
@@ -116,7 +116,7 @@ public class Filters {
 	 * @return {@code type}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code inputType} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> typeFilter(final Class<?> inputType) throws NullPointerException {
+	public static final <GInput> Filter<GInput> typeFilter(final Class<?> inputType) throws NullPointerException {
 		if (inputType == null) throw new NullPointerException("inputType = null");
 		return new Filter<GInput>() {
 
@@ -141,7 +141,7 @@ public class Filters {
 	 * @return {@link #REJECT_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> rejectFilter() {
+	public static final <GInput> Filter<GInput> rejectFilter() {
 		return (Filter<GInput>)Filters.REJECT_FILTER;
 	}
 
@@ -153,7 +153,7 @@ public class Filters {
 	 * @return {@link #ACCEPT_FILTER}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GInput> Filter<GInput> acceptFilter() {
+	public static final <GInput> Filter<GInput> acceptFilter() {
 		return (Filter<GInput>)Filters.ACCEPT_FILTER;
 	}
 
@@ -167,7 +167,7 @@ public class Filters {
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> bufferedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static final <GInput> Filter<GInput> bufferedFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		return Filters.bufferedFilter(Integer.MAX_VALUE, Pointers.SOFT, filter);
 	}
 
@@ -187,7 +187,7 @@ public class Filters {
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Converters#bufferedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst.
 	 */
-	public static <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
+	public static final <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
 		IllegalArgumentException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return Filters.converterAdapter(Converters.bufferedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
@@ -202,7 +202,7 @@ public class Filters {
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
+	public static final <GInput> Filter<GInput> containsFilter(final Object... items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
 		if (items.length == 0) return Filters.rejectFilter();
 		if (items.length == 1) return Filters.containsFilter(Collections.singleton(items[0]));
@@ -218,7 +218,7 @@ public class Filters {
 	 * @return {@code contains}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code collection} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
+	public static final <GInput> Filter<GInput> containsFilter(final Collection<?> collection) throws NullPointerException {
 		if (collection == null) throw new NullPointerException("collection = null");
 		if (collection.isEmpty()) return Filters.rejectFilter();
 		return new Filter<GInput>() {
@@ -245,7 +245,7 @@ public class Filters {
 	 * @return {@code equal}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> equalFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+	public static final <GInput> Filter<GInput> equalFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
 		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Filter<GInput>() {
 
@@ -271,7 +271,7 @@ public class Filters {
 	 * @return {@code lower}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> lowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+	public static final <GInput> Filter<GInput> lowerFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
 		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Filter<GInput>() {
 
@@ -297,7 +297,7 @@ public class Filters {
 	 * @return {@code higher}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code comparable} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> higherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
+	public static final <GInput> Filter<GInput> higherFilter(final Comparable<? super GInput> comparable) throws NullPointerException {
 		if (comparable == null) throw new NullPointerException("comparable = null");
 		return new Filter<GInput>() {
 
@@ -326,8 +326,8 @@ public class Filters {
 	 * @return {@code navigated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code field} bzw. {@code filter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
-		throws NullPointerException {
+	public static final <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field,
+		final Filter<? super GOutput> filter) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
@@ -357,7 +357,7 @@ public class Filters {
 	 * @return {@code navigated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code filter} {@code null} ist.
 	 */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Converter<? super GInput, ? extends GOutput> converter,
+	public static final <GInput, GOutput> Filter<GInput> navigatedFilter(final Converter<? super GInput, ? extends GOutput> converter,
 		final Filter<? super GOutput> filter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (filter == null) throw new NullPointerException("filter = null");
@@ -385,7 +385,7 @@ public class Filters {
 	 * @return {@code negation}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static final <GInput> Filter<GInput> negationFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
 
@@ -412,7 +412,7 @@ public class Filters {
 	 * @return {@code disjunction}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static final <GInput> Filter<GInput> disjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
 		if (filter1 == null) throw new NullPointerException("filter1 = null");
 		if (filter2 == null) throw new NullPointerException("filter2 = null");
@@ -441,7 +441,7 @@ public class Filters {
 	 * @return {@code conjunction}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static final <GInput> Filter<GInput> conjunctionFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
 		if (filter1 == null) throw new NullPointerException("filter1 = null");
 		if (filter2 == null) throw new NullPointerException("filter2 = null");
@@ -471,7 +471,7 @@ public class Filters {
 	 * @return {@code equivalence}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter1} bzw. {@code filter2} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
+	public static final <GInput> Filter<GInput> equivalenceFilter(final Filter<? super GInput> filter1, final Filter<? super GInput> filter2)
 		throws NullPointerException {
 		if (filter1 == null) throw new NullPointerException("filter1 = null");
 		if (filter2 == null) throw new NullPointerException("filter2 = null");
@@ -498,7 +498,7 @@ public class Filters {
 	 * @return {@code synchronized}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 */
-	public static <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
+	public static final <GInput> Filter<GInput> synchronizedFilter(final Filter<? super GInput> filter) throws NullPointerException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {
 

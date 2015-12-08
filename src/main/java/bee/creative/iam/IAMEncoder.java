@@ -276,11 +276,11 @@ public class IAMEncoder {
 		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
 		 * 
 		 * @see #datas
-		 * @see #entryMap
+		 * @see #__entryMap
 		 */
 		public void clear() {
 			this.datas.clear();
-			this.entryMap.clear();
+			this.__entryMap.clear();
 		}
 
 		{}

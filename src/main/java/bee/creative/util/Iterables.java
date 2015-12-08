@@ -70,7 +70,7 @@ public class Iterables {
 	 * @return Anzahl der gelieferten Elemente.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
-	public static int size(final Iterable<?> iterable) throws NullPointerException {
+	public static final int size(final Iterable<?> iterable) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return -Iterators.skip(iterable.iterator(), -1) - 1;
 	}
@@ -85,7 +85,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static boolean retainAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
+	public static final boolean retainAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		if (collection == null) throw new NullPointerException("collection = null");
 		return Iterators.retainAll(iterable.iterator(), collection);
@@ -101,7 +101,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static boolean retainAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
+	public static final boolean retainAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
 		if (collection == null) throw new NullPointerException("collection = null");
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.retainAll(collection, iterable.iterator());
@@ -118,7 +118,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GItem> boolean appendAll(final Collection<GItem> collection, final Iterable<? extends GItem> iterable) throws NullPointerException {
+	public static final <GItem> boolean appendAll(final Collection<GItem> collection, final Iterable<? extends GItem> iterable) throws NullPointerException {
 		if (collection == null) throw new NullPointerException("collection = null");
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.appendAll(collection, iterable.iterator());
@@ -132,7 +132,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} {@code null} ist.
 	 */
-	public static boolean removeAll(final Iterable<?> iterable) throws NullPointerException {
+	public static final boolean removeAll(final Iterable<?> iterable) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.removeAll(iterable.iterator());
 	}
@@ -147,7 +147,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen am {@link Iterable}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static boolean removeAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
+	public static final boolean removeAll(final Iterable<?> iterable, final Collection<?> collection) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		if (collection == null) throw new NullPointerException("collection = null");
 		return Iterators.removeAll(iterable.iterator(), collection);
@@ -163,7 +163,7 @@ public class Iterables {
 	 * @return {@code true} bei Veränderungen an der {@link Collection}.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static boolean removeAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
+	public static final boolean removeAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
 		if (collection == null) throw new NullPointerException("collection = null");
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.removeAll(collection, iterable.iterator());
@@ -178,7 +178,7 @@ public class Iterables {
 	 * @return {@code true} bei vollständiger Inklusion.
 	 * @throws NullPointerException Wenn der gegebene {@link Iterable} bzw. die gegebene {@link Collection} {@code null} ist.
 	 */
-	public static boolean containsAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
+	public static final boolean containsAll(final Collection<?> collection, final Iterable<?> iterable) throws NullPointerException {
 		if (collection == null) throw new NullPointerException("collection = null");
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return Iterators.containsAll(collection, iterable.iterator());
@@ -193,7 +193,7 @@ public class Iterables {
 	 * @return {@link Iterable} oder {@link #EMPTY_ITERABLE}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable<GItem> iterable(final Iterable<? extends GItem> iterable) {
+	public static final <GItem> Iterable<GItem> iterable(final Iterable<? extends GItem> iterable) {
 		if (iterable == null) return Iterables.emptyIterable();
 		return (Iterable<GItem>)iterable;
 	}
@@ -206,7 +206,7 @@ public class Iterables {
 	 * @param item Element.
 	 * @return {@code item}-{@link Iterable}.
 	 */
-	public static <GItem> Iterable<GItem> itemIterator(final GItem item) {
+	public static final <GItem> Iterable<GItem> itemIterator(final GItem item) {
 		return Iterables.itemIterable(item, 1);
 	}
 
@@ -220,7 +220,7 @@ public class Iterables {
 	 * @return {@code item}-{@link Iterable}
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
 	 */
-	public static <GItem> Iterable<GItem> itemIterable(final GItem item, final int count) throws IllegalArgumentException {
+	public static final <GItem> Iterable<GItem> itemIterable(final GItem item, final int count) throws IllegalArgumentException {
 		if (count == 0) return Iterables.emptyIterable();
 		if (count < 0) throw new IllegalArgumentException("count < 0");
 		return new BaseIterable<GItem>() {
@@ -246,7 +246,7 @@ public class Iterables {
 	 * @return {@link #EMPTY_ITERABLE}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable<GItem> emptyIterable() {
+	public static final <GItem> Iterable<GItem> emptyIterable() {
 		return (Iterable<GItem>)Iterables.EMPTY_ITERABLE;
 	}
 
@@ -259,7 +259,7 @@ public class Iterables {
 	 * @return {@link Integer}-{@link Iterable}.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
 	 */
-	public static Iterable<Integer> integerIterable(final int count) throws IllegalArgumentException {
+	public static final Iterable<Integer> integerIterable(final int count) throws IllegalArgumentException {
 		if (count < 0) throw new IllegalArgumentException("count < 0");
 		return new BaseIterable<Integer>() {
 
@@ -284,7 +284,7 @@ public class Iterables {
 	 * @return {@link #ITERABLE_ITERATOR}.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Converter<Iterable<? extends GItem>, Iterator<GItem>> iterableIterator() {
+	public static final <GItem> Converter<Iterable<? extends GItem>, Iterator<GItem>> iterableIterator() {
 		return (Converter<Iterable<? extends GItem>, Iterator<GItem>>)Iterables.ITERABLE_ITERATOR;
 	}
 
@@ -299,7 +299,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist.
 	 */
-	public static <GItem> Iterable<GItem> limitedIterable(final int count, final Iterable<? extends GItem> iterable) throws NullPointerException,
+	public static final <GItem> Iterable<GItem> limitedIterable(final int count, final Iterable<? extends GItem> iterable) throws NullPointerException,
 		IllegalArgumentException {
 		if (count < 0) throw new IllegalArgumentException("count < 0");
 		if (iterable == null) throw new NullPointerException("iterable = null");
@@ -330,7 +330,7 @@ public class Iterables {
 	 * @return {@code filtered}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code filter} bzw. {@code iterable} {@code null} ist.
 	 */
-	public static <GItem> Iterable<GItem> filteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable)
+	public static final <GItem> Iterable<GItem> filteredIterable(final Filter<? super GItem> filter, final Iterable<? extends GItem> iterable)
 		throws NullPointerException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		if (iterable == null) throw new NullPointerException("iterable = null");
@@ -358,7 +358,7 @@ public class Iterables {
 	 * @return {@code unique}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
-	public static <GItem> Iterable<GItem> uniqueIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
+	public static final <GItem> Iterable<GItem> uniqueIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return new BaseIterable<GItem>() {
 
@@ -384,7 +384,7 @@ public class Iterables {
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist.
 	 */
-	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) throws NullPointerException {
+	public static final <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends Iterable<? extends GItem>> iterables) throws NullPointerException {
 		if (iterables == null) throw new NullPointerException("iterables = null");
 		return new BaseIterable<GItem>() {
 
@@ -412,7 +412,7 @@ public class Iterables {
 	 * @throws NullPointerException Wenn {@code iterables} {@code null} ist.
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
+	public static final <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem>... iterables) throws NullPointerException {
 		if (iterables == null) throw new NullPointerException("iterables = null");
 		return Iterables.chainedIterable(Arrays.asList(iterables));
 	}
@@ -428,7 +428,7 @@ public class Iterables {
 	 * @return {@code chained}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable1} bzw. {@code iterable2} {@code null} ist.
 	 */
-	public static <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2)
+	public static final <GItem> Iterable<GItem> chainedIterable(final Iterable<? extends GItem> iterable1, final Iterable<? extends GItem> iterable2)
 		throws NullPointerException {
 		if (iterable1 == null) throw new NullPointerException("iterable1 = null");
 		if (iterable2 == null) throw new NullPointerException("iterable2 = null");
@@ -447,7 +447,7 @@ public class Iterables {
 	 * @return {@code converted}-{@link Iterable}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
 	 */
-	public static <GInput, GOutput> Iterable<GOutput> convertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
+	public static final <GInput, GOutput> Iterable<GOutput> convertedIterable(final Converter<? super GInput, ? extends GOutput> converter,
 		final Iterable<? extends GInput> iterable) throws NullPointerException {
 		return new BaseIterable<GOutput>() {
 
@@ -473,7 +473,7 @@ public class Iterables {
 	 * @return {@code unmodifiable}-{@link Iterable}.
 	 * @throws NullPointerException Wenn {@code iterable} {@code null} ist.
 	 */
-	public static <GItem> Iterable<GItem> unmodifiableIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
+	public static final <GItem> Iterable<GItem> unmodifiableIterable(final Iterable<? extends GItem> iterable) throws NullPointerException {
 		if (iterable == null) throw new NullPointerException("iterable = null");
 		return new BaseIterable<GItem>() {
 

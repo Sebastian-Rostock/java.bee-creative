@@ -18,7 +18,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 1 byte}-Wert als {@code int}.
 	 */
-	public static int getInt1(final byte[] array, final int index) {
+	public static final int getInt1(final byte[] array, final int index) {
 		return array[index] & 0xFF;
 	}
 
@@ -30,7 +30,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 2 byte}-Wert als {@code int}.
 	 */
-	public static int getInt2BE(final byte[] array, final int index) {
+	public static final int getInt2BE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 0] & 0xFF) << 8) //
 			| ((array[index + 1] & 0xFF) << 0);
@@ -44,7 +44,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 2 byte}-Wert als {@code int}.
 	 */
-	public static int getInt2LE(final byte[] array, final int index) {
+	public static final int getInt2LE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 1] & 0xFF) << 8) //
 			| ((array[index + 0] & 0xFF) << 0);
@@ -58,7 +58,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 3 byte}-Wert als {@code int}.
 	 */
-	public static int getInt3BE(final byte[] array, final int index) {
+	public static final int getInt3BE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 0] & 0xFF) << 16) //
 			| ((array[index + 1] & 0xFF) << 8) //
@@ -73,7 +73,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 3 byte}-Wert als {@code int}.
 	 */
-	public static int getInt3LE(final byte[] array, final int index) {
+	public static final int getInt3LE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 2] & 0xFF) << 16) //
 			| ((array[index + 1] & 0xFF) << 8) //
@@ -88,7 +88,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 4 byte}-Wert als {@code int}.
 	 */
-	public static int getInt4BE(final byte[] array, final int index) {
+	public static final int getInt4BE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 0] & 0xFF) << 24) //
 			| ((array[index + 1] & 0xFF) << 16) //
@@ -104,7 +104,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 4 byte}-Wert als {@code int}.
 	 */
-	public static int getInt4LE(final byte[] array, final int index) {
+	public static final int getInt4LE(final byte[] array, final int index) {
 		return 0 //
 			| ((array[index + 3] & 0xFF) << 24) //
 			| ((array[index + 2] & 0xFF) << 16) //
@@ -122,7 +122,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..4).
 	 * @return {@code byte}s als {@code int}.
 	 */
-	public static int getIntBE(final byte[] array, final int index, final int size) {
+	public static final int getIntBE(final byte[] array, final int index, final int size) {
 		switch (size) {
 			case 0:
 				return 0;
@@ -149,7 +149,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..4).
 	 * @return {@code byte}s als {@code int}.
 	 */
-	public static int getIntLE(final byte[] array, final int index, final int size) {
+	public static final int getIntLE(final byte[] array, final int index, final int size) {
 		switch (size) {
 			case 0:
 				return 0;
@@ -174,7 +174,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 5 byte}-Wert als {@code long}.
 	 */
-	public static long getLong5BE(final byte[] array, final int index) {
+	public static final long getLong5BE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt1(array, index + 0) << 32) //
 			| ((long)Bytes.getInt4BE(array, index + 1) << 0);
@@ -189,7 +189,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 5 byte}-Wert als {@code long}.
 	 */
-	public static long getLong5LE(final byte[] array, final int index) {
+	public static final long getLong5LE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt1(array, index + 4) << 32) //
 			| ((long)Bytes.getInt4LE(array, index + 0) << 0);
@@ -203,7 +203,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 6 byte}-Wert als {@code long}.
 	 */
-	public static long getLong6BE(final byte[] array, final int index) {
+	public static final long getLong6BE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt2BE(array, index + 0) << 32) //
 			| ((long)Bytes.getInt4BE(array, index + 2) << 0);
@@ -218,7 +218,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 6 byte}-Wert als {@code long}.
 	 */
-	public static long getLong6LE(final byte[] array, final int index) {
+	public static final long getLong6LE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt2LE(array, index + 4) << 32) //
 			| ((long)Bytes.getInt4LE(array, index + 0) << 0);
@@ -232,7 +232,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 7 byte}-Wert als {@code long}.
 	 */
-	public static long getLong7BE(final byte[] array, final int index) {
+	public static final long getLong7BE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt3BE(array, index + 0) << 32) //
 			| ((long)Bytes.getInt4BE(array, index + 3) << 0);
@@ -247,7 +247,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 7 byte}-Wert als {@code long}.
 	 */
-	public static long getLong7LE(final byte[] array, final int index) {
+	public static final long getLong7LE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt3LE(array, index + 4) << 32) //
 			| ((long)Bytes.getInt4LE(array, index + 0) << 0);
@@ -261,7 +261,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 8 byte}-Wert als {@code long}.
 	 */
-	public static long getLong8BE(final byte[] array, final int index) {
+	public static final long getLong8BE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt4BE(array, index + 0) << 32) //
 			| ((long)Bytes.getInt4BE(array, index + 4) << 0);
@@ -276,7 +276,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @return {@code 8 byte}-Wert als {@code long}.
 	 */
-	public static long getLong8LE(final byte[] array, final int index) {
+	public static final long getLong8LE(final byte[] array, final int index) {
 		return 0 //
 			| ((long)Bytes.getInt4LE(array, index + 4) << 32) //
 			| ((long)Bytes.getInt4LE(array, index + 0) << 0);
@@ -292,7 +292,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..8).
 	 * @return {@code byte}s als {@code long}.
 	 */
-	public static long getLongBE(final byte[] array, final int index, final int size) {
+	public static final long getLongBE(final byte[] array, final int index, final int size) {
 		switch (size) {
 			case 0:
 				return 0;
@@ -327,7 +327,7 @@ public final class Bytes {
 	 * @param size Anzahl an {@code byte}s (0..8).
 	 * @return {@code byte}s als {@code long}.
 	 */
-	public static long getLongLE(final byte[] array, final int index, final int size) {
+	public static final long getLongLE(final byte[] array, final int index, final int size) {
 		switch (size) {
 			case 0:
 				return 0;
@@ -360,7 +360,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 1 byte}-Wert.
 	 */
-	public static void setInt1(final byte[] array, final int index, final int value) {
+	public static final void setInt1(final byte[] array, final int index, final int value) {
 		array[index + 0] = (byte)(value >>> 0);
 	}
 
@@ -372,7 +372,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 2 byte}-Wert.
 	 */
-	public static void setInt2BE(final byte[] array, final int index, final int value) {
+	public static final void setInt2BE(final byte[] array, final int index, final int value) {
 		array[index + 0] = (byte)(value >>> 8);
 		array[index + 1] = (byte)(value >>> 0);
 	}
@@ -385,7 +385,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 2 byte}-Wert.
 	 */
-	public static void setInt2LE(final byte[] array, final int index, final int value) {
+	public static final void setInt2LE(final byte[] array, final int index, final int value) {
 		array[index + 1] = (byte)(value >>> 8);
 		array[index + 0] = (byte)(value >>> 0);
 	}
@@ -398,7 +398,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 3 byte}-Wert.
 	 */
-	public static void setInt3BE(final byte[] array, final int index, final int value) {
+	public static final void setInt3BE(final byte[] array, final int index, final int value) {
 		array[index + 0] = (byte)(value >>> 16);
 		array[index + 1] = (byte)(value >>> 8);
 		array[index + 2] = (byte)(value >>> 0);
@@ -412,7 +412,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 3 byte}-Wert.
 	 */
-	public static void setInt3LE(final byte[] array, final int index, final int value) {
+	public static final void setInt3LE(final byte[] array, final int index, final int value) {
 		array[index + 2] = (byte)(value >>> 16);
 		array[index + 1] = (byte)(value >>> 8);
 		array[index + 0] = (byte)(value >>> 0);
@@ -426,7 +426,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 4 byte}-Wert.
 	 */
-	public static void setInt4BE(final byte[] array, final int index, final int value) {
+	public static final void setInt4BE(final byte[] array, final int index, final int value) {
 		array[index + 0] = (byte)(value >>> 24);
 		array[index + 1] = (byte)(value >>> 16);
 		array[index + 2] = (byte)(value >>> 8);
@@ -441,7 +441,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code int} mit {@code 4 byte}-Wert.
 	 */
-	public static void setInt4LE(final byte[] array, final int index, final int value) {
+	public static final void setInt4LE(final byte[] array, final int index, final int value) {
 		array[index + 3] = (byte)(value >>> 24);
 		array[index + 2] = (byte)(value >>> 16);
 		array[index + 1] = (byte)(value >>> 8);
@@ -457,7 +457,7 @@ public final class Bytes {
 	 * @param value {@code int}.
 	 * @param size Anzahl an {@code byte}s (0..4).
 	 */
-	public static void setIntBE(final byte[] array, final int index, final int value, final int size) {
+	public static final void setIntBE(final byte[] array, final int index, final int value, final int size) {
 		switch (size) {
 			case 0:
 				return;
@@ -487,7 +487,7 @@ public final class Bytes {
 	 * @param value {@code int}.
 	 * @param size Anzahl an {@code byte}s (0..4).
 	 */
-	public static void setIntLE(final byte[] array, final int index, final int value, final int size) {
+	public static final void setIntLE(final byte[] array, final int index, final int value, final int size) {
 		switch (size) {
 			case 0:
 				return;
@@ -516,7 +516,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 5 byte}-Wert.
 	 */
-	public static void setLong5BE(final byte[] array, final int index, final long value) {
+	public static final void setLong5BE(final byte[] array, final int index, final long value) {
 		Bytes.setInt1(array, index + 0, (int)(value >>> 32));
 		Bytes.setInt4BE(array, index + 1, (int)(value >>> 0));
 	}
@@ -529,7 +529,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 5 byte}-Wert.
 	 */
-	public static void setLong5LE(final byte[] array, final int index, final long value) {
+	public static final void setLong5LE(final byte[] array, final int index, final long value) {
 		Bytes.setInt1(array, index + 4, (int)(value >>> 32));
 		Bytes.setInt4LE(array, index + 0, (int)(value >>> 0));
 	}
@@ -542,7 +542,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 6 byte}-Wert.
 	 */
-	public static void setLong6BE(final byte[] array, final int index, final long value) {
+	public static final void setLong6BE(final byte[] array, final int index, final long value) {
 		Bytes.setInt2BE(array, index + 0, (int)(value >>> 32));
 		Bytes.setInt4BE(array, index + 2, (int)(value >>> 0));
 	}
@@ -555,7 +555,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 6 byte}-Wert.
 	 */
-	public static void setLong6LE(final byte[] array, final int index, final long value) {
+	public static final void setLong6LE(final byte[] array, final int index, final long value) {
 		Bytes.setInt2LE(array, index + 4, (int)(value >>> 32));
 		Bytes.setInt4LE(array, index + 0, (int)(value >>> 0));
 	}
@@ -568,7 +568,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 7 byte}-Wert.
 	 */
-	public static void setLong7BE(final byte[] array, final int index, final long value) {
+	public static final void setLong7BE(final byte[] array, final int index, final long value) {
 		Bytes.setInt3BE(array, index + 0, (int)(value >>> 32));
 		Bytes.setInt4BE(array, index + 3, (int)(value >>> 0));
 	}
@@ -581,7 +581,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 7 byte}-Wert.
 	 */
-	public static void setLong7LE(final byte[] array, final int index, final long value) {
+	public static final void setLong7LE(final byte[] array, final int index, final long value) {
 		Bytes.setInt3LE(array, index + 4, (int)(value >>> 32));
 		Bytes.setInt4LE(array, index + 0, (int)(value >>> 0));
 	}
@@ -594,7 +594,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 8 byte}-Wert.
 	 */
-	public static void setLong8BE(final byte[] array, final int index, final long value) {
+	public static final void setLong8BE(final byte[] array, final int index, final long value) {
 		Bytes.setInt4BE(array, index + 0, (int)(value >>> 32));
 		Bytes.setInt4BE(array, index + 4, (int)(value >>> 0));
 	}
@@ -607,7 +607,7 @@ public final class Bytes {
 	 * @param index Index.
 	 * @param value {@code long} mit {@code 8 byte}-Wert.
 	 */
-	public static void setLong8LE(final byte[] array, final int index, final long value) {
+	public static final void setLong8LE(final byte[] array, final int index, final long value) {
 		Bytes.setInt4LE(array, index + 4, (int)(value >>> 32));
 		Bytes.setInt4LE(array, index + 0, (int)(value >>> 0));
 	}
@@ -621,7 +621,7 @@ public final class Bytes {
 	 * @param value {@code long}.
 	 * @param size Anzahl an {@code byte}s (0..8).
 	 */
-	public static void setLongBE(final byte[] array, final int index, final long value, final int size) {
+	public static final void setLongBE(final byte[] array, final int index, final long value, final int size) {
 		switch (size) {
 			case 0:
 				return;
@@ -663,7 +663,7 @@ public final class Bytes {
 	 * @param value {@code long}.
 	 * @param size Anzahl an {@code byte}s (0..8).
 	 */
-	public static void setLongLE(final byte[] array, final int index, final long value, final int size) {
+	public static final void setLongLE(final byte[] array, final int index, final long value, final int size) {
 		switch (size) {
 			case 0:
 				return;
@@ -702,7 +702,7 @@ public final class Bytes {
 	 * @param value positiver Wert.
 	 * @return Länge (0..4).
 	 */
-	public static int lengthOf(final int value) {
+	public static final int lengthOf(final int value) {
 		return (value > 0xFFFF) ? (value > 0xFFFFFF ? 4 : 3) : (value > 0xFF ? 2 : value > 0x00 ? 1 : 0);
 	}
 
@@ -712,7 +712,7 @@ public final class Bytes {
 	 * @param value positiver Wert.
 	 * @return Länge (0..8).
 	 */
-	public static int lengthOf(final long value) {
+	public static final int lengthOf(final long value) {
 		return value > 0xFFFFFFFFL ? Bytes.lengthOf((int)(value >> 32)) + 4 : Bytes.lengthOf((int)value);
 	}
 
