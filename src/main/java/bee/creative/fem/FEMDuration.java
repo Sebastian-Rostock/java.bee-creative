@@ -1,6 +1,11 @@
 package bee.creative.fem;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import bee.creative.fem.FEM.ScriptFormatter;
+import bee.creative.fem.FEM.ScriptFormatterInput;
 import bee.creative.util.Comparators;
+import bee.creative.util.Strings;
 
 /**
  * Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
@@ -8,7 +13,7 @@ import bee.creative.util.Comparators;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class FEMDuration implements Comparable<FEMDuration> {
+public final class FEMDuration implements Comparable<FEMDuration>, ScriptFormatterInput {
 
 	/** Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind. */
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
@@ -139,7 +144,40 @@ public final class FEMDuration implements Comparable<FEMDuration> {
 		49, 64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16,
 		18, 33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
 
+	@SuppressWarnings ("javadoc")
+	static final Pattern __pattern = Pattern.compile("^(\\-)?P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(T)?(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)(?:\\.(\\d{0,3}))S)?$");
+
 	{}
+
+	/**
+	 * Diese Methode gibt eine neue Zeitapanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #toString()
+	 * @param string Zeichenkette.
+	 * @return Zeitapanne.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
+		System.out.println(Strings.matchAll(FEMDuration.__pattern, string));
+		final Matcher matcher = FEMDuration.__pattern.matcher(string);
+		if (!matcher.find()) throw new IllegalArgumentException();
+		if (((matcher.start(6) > 0) || (matcher.start(8) > 0)) && (matcher.start(5) < 0)) throw new IllegalArgumentException();
+		FEMDuration result = FEMDuration.EMPTY;
+
+		final int years = matcher.start(2) > 0 ? Integer.parseInt(matcher.group(2)) : 0;
+		final int months = matcher.start(3) > 0 ? Integer.parseInt(matcher.group(3)) : 0;
+		final int days = matcher.start(4) > 0 ? Integer.parseInt(matcher.group(4)) : 0;
+		final int hours = matcher.start(6) > 0 ? Integer.parseInt(matcher.group(6)) : 0;
+		final long minutes = matcher.start(7) > 0 ? Long.parseLong(matcher.group(7)) : 0;
+		final long seconds = matcher.start(8) > 0 ? Long.parseLong(matcher.group(8)) : 0;
+		final long milliseconds = matcher.start(9) > 0 ? Long.parseLong(matcher.group(9)) : 0;
+		result = result.move(years, months, days, hours, minutes, seconds, milliseconds);
+		if (matcher.start(1) < 0) return result;
+		result = result.negate();
+		return result;
+	}
 
 	/**
 	 * Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
@@ -596,7 +634,7 @@ public final class FEMDuration implements Comparable<FEMDuration> {
 	 */
 	public final FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
-		return this.__move(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, months, seconds, milliseconds));
+		return this.__move(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
 	/**
@@ -628,7 +666,6 @@ public final class FEMDuration implements Comparable<FEMDuration> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMDuration that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return this.compare(that, 1) == 0;
 	}
 
@@ -697,8 +734,50 @@ public final class FEMDuration implements Comparable<FEMDuration> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		target.put(FEM.formatValue(this.toString()));
+	}
+
+	/**
+	 * Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
+	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus <a
+	 * href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
+	 * 
+	 * @return Textdarstellung.
+	 */
+	@Override
 	public final String toString() {
-		return FEM.formatDuration(this);
+		final int sing = this.signValue();
+		if (sing == 0) return "P0Y";
+		final StringBuilder result = new StringBuilder();
+		result.append(sing < 0 ? "-P" : "P");
+		final int years = this.yearsValue(), months = this.monthsValue();
+		if (years != 0) {
+			result.append(years).append('Y');
+		}
+		if (months != 0) {
+			result.append(months).append('M');
+		}
+		final int days = this.daysValue();
+		if (days != 0) {
+			result.append(days).append('D');
+		}
+		final int hours = this.hoursValue(), minutes = this.minutesValue(), seconds = this.secondsValue(), milliseconds = this.millisecondsValue();
+		if ((hours | minutes | seconds | milliseconds) != 0) {
+			result.append('T');
+		}
+		if (hours != 0) {
+			result.append(hours).append('H');
+		}
+		if (minutes != 0) {
+			result.append(minutes).append('M');
+		}
+		if (milliseconds != 0) {
+			result.append(String.format("%d.%03dS", seconds, milliseconds));
+		} else if (seconds != 0) {
+			result.append(seconds).append('S');
+		}
+		return result.toString();
 	}
 
 }

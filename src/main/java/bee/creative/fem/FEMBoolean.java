@@ -30,6 +30,33 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 		return value ? FEMBoolean.TRUE : FEMBoolean.FALSE;
 	}
 
+	/**
+	 * Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
+	 * 
+	 * @see #from(boolean)
+	 * @see Boolean#booleanValue()
+	 * @param value Wert.
+	 * @return Wahrheitswert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMBoolean from(final Boolean value) throws NullPointerException {
+		return FEMBoolean.from(value.booleanValue());
+	}
+
+	/**
+	 * Diese Methode gibt einen neuen Wahrheitswert mit dem in der gegebenen Zeichenkette kodierten Wert zurück.
+	 * 
+	 * @param value Zeichenkette ({@code "true"} oder {@code "false"}).
+	 * @return Wahrheitswert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMBoolean from(final String value) throws NullPointerException, IllegalArgumentException {
+		if (value.equals("true")) return FEMBoolean.TRUE;
+		if (value.equals("false")) return FEMBoolean.FALSE;
+		throw new IllegalArgumentException();
+	}
+
 	{}
 
 	/**
@@ -120,11 +147,14 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Diese Methode gibt die Textdarstellung dieses Wahrheitswert zurück.<br>
+	 * Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen {@code "true"} und {@code "false"}.
+	 * 
+	 * @return Textdarstellung.
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatBoolean(this);
+		return this.__value ? "true" : "false";
 	}
 
 }

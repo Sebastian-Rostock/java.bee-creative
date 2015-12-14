@@ -1245,7 +1245,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 */
 	@Override
 	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatString(this));
+		target.put(FEM.formatString(this.toString()));
 	}
 
 	/**

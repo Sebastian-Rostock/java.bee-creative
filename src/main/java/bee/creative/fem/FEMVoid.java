@@ -15,6 +15,21 @@ public final class FEMVoid {
 	{}
 
 	/**
+	 * Diese Methode gibt den Leerwert nur dann zurück, wenn die gegebenen Zeichenkette gleich {@code "void"} ist.
+	 * 
+	 * @param value Zeichenkette.
+	 * @return Leerwert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMVoid from(final String value) throws NullPointerException, IllegalArgumentException {
+		if (value.equals("void")) return FEMVoid.INSTANCE;
+		throw new IllegalArgumentException();
+	}
+
+	{}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -37,7 +52,7 @@ public final class FEMVoid {
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatVoid(this);
+		return "void";
 	}
 
 }

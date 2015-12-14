@@ -261,8 +261,8 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	protected void source(final String source) throws NullPointerException {
-		if (source == null) throw new NullPointerException("source = null");
-		this.__length = (this.__chars = (this.__source = source).toCharArray()).length;
+		this.__length = (this.__chars = source.toCharArray()).length;
+		this.__source = source;
 		this.reset();
 	}
 

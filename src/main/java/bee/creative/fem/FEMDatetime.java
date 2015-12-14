@@ -2,6 +2,11 @@ package bee.creative.fem;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import bee.creative.fem.FEM.ScriptFormatter;
+import bee.creative.fem.FEM.ScriptFormatterInput;
+import bee.creative.util.Strings;
 
 /**
  * Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
@@ -78,14 +83,64 @@ import java.util.GregorianCalendar;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class FEMDatetime implements Comparable<FEMDatetime> {
+public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatterInput {
 
 	/**
 	 * Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone.
 	 */
 	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
 
+	@SuppressWarnings ("javadoc")
+	static final Pattern __pattern = Pattern
+		.compile("^(?:(\\d{4})-(\\d{2})-(\\d{2}))?(T)?(?:(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{3}))?)?(?:(Z)|(?:([\\+\\-]\\d{2}):(\\d{2})))?$");
+
 	{}
+
+	/**
+	 * Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #withDate(int, int, int)
+	 * @see #withTime(int, int, int, int)
+	 * @see #withZone(int, int)
+	 * @see #toString()
+	 * @param string Zeichenkette.
+	 * @return Zeitangabe.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
+		System.out.println(Strings.matchAll(FEMDatetime.__pattern, string));
+		final Matcher matcher = FEMDatetime.__pattern.matcher(string);
+		if (!matcher.find()) throw new IllegalArgumentException();
+		FEMDatetime result = FEMDatetime.EMPTY;
+		if (matcher.start(1) >= 0) {
+			result = result.withDate( //
+				Integer.parseInt(matcher.group(1)), //
+				Integer.parseInt(matcher.group(2)), //
+				Integer.parseInt(matcher.group(3)));
+		}
+		if (matcher.start(5) >= 0) {
+			result = result.withTime( //
+				Integer.parseInt(matcher.group(5)), //
+				Integer.parseInt(matcher.group(6)), //
+				Integer.parseInt(matcher.group(7)), //
+				matcher.start(8) >= 0 ? Integer.parseInt(matcher.group(8)) : 0);
+		}
+		if (matcher.start(4) >= 0) {
+			if (!result.hasDate() || !result.hasTime()) throw new IllegalArgumentException();
+		} else {
+			if (result.hasDate() && result.hasTime()) throw new IllegalArgumentException();
+		}
+		if (matcher.start(9) >= 0) {
+			result = result.withZone(0);
+		} else if (matcher.start(10) >= 0) {
+			result = result.withZone( //
+				Integer.parseInt(matcher.group(10)), //
+				Integer.parseInt(matcher.group(11)));
+		}
+		return result;
+	}
 
 	/**
 	 * Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -96,9 +151,11 @@ public final class FEMDatetime implements Comparable<FEMDatetime> {
 	 * @see #withZone(Calendar)
 	 * @param calendar {@link Calendar}.
 	 * @return Zeitangabe.
-	 * @throws IllegalArgumentException Wenn {@link #withDate(Calendar)} eine entsprechende Ausnahme auslöst.
+	 * @throws NullPointerException Wenn {@code calendar} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@link #withDate(Calendar)}, {@link #withTime(Calendar)} bzw. {@link #withZone(Calendar)} eine entsprechende Ausnahme
+	 *         auslöst.
 	 */
-	public static final FEMDatetime from(final Calendar calendar) throws IllegalArgumentException {
+	public static final FEMDatetime from(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		return FEMDatetime.EMPTY.withDate(calendar).withTime(calendar).withZone(calendar);
 	}
 
@@ -1278,8 +1335,44 @@ public final class FEMDatetime implements Comparable<FEMDatetime> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+		target.put(FEM.formatValue(this.toString()));
+	}
+
+	/**
+	 * Diese Methode gibt die Textdarstellung dieser Zeitangabe zurück.<br>
+	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#dateTime-lexical-representation">xsd:dateTime</a> aus <a
+	 * href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
+	 * 
+	 * @return Textdarstellung.
+	 */
+	@Override
 	public final String toString() {
-		return FEM.formatDatetime(this);
+		final StringBuilder result = new StringBuilder();
+		final boolean hasDate = this.hasDate();
+		if (hasDate) {
+			result.append(String.format("%04d-%02d-%02d", this.__yearValue(), this.__monthValue(), this.__dateValue()));
+		}
+		if (this.hasTime()) {
+			if (hasDate) {
+				result.append('T');
+			}
+			result.append(String.format("%02d:%02d:%02d", this.__hourValue(), this.__minuteValue(), this.__secondValue()));
+			final int millisecond = this.__millisecondValue();
+			if (millisecond != 0) {
+				result.append(String.format(".%03d", millisecond));
+			}
+		}
+		if (this.hasZone()) {
+			final int zone = this.__zoneValue();
+			if (zone == 0) {
+				result.append('Z');
+			} else {
+				final int zoneAbs = Math.abs(zone);
+				result.append(zone < 0 ? '-' : '+').append(String.format("%02d:%02d", zoneAbs / 60, zoneAbs % 60));
+			}
+		}
+		return result.toString();
 	}
 
 }

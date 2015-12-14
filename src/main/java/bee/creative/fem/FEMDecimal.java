@@ -28,13 +28,27 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	/**
 	 * Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
 	 * 
-	 * @param number Wert.
+	 * @param value Wert.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMDecimal from(final Number number) throws NullPointerException {
-		if (number == null) throw new NullPointerException("number = null");
-		return new FEMDecimal(number.doubleValue());
+	public static final FEMDecimal from(final Number value) throws NullPointerException {
+		return FEMDecimal.from(value.doubleValue());
+	}
+
+	/**
+	 * Diese Methode gibt einen neuen Dezimalbruch mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #toString()
+	 * @see Double#parseDouble(String)
+	 * @param value Zeichenkette.
+	 * @return Dezimalbruch.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMDecimal from(final String value) throws NullPointerException, IllegalArgumentException {
+		return FEMDecimal.from(Double.parseDouble(value));
 	}
 
 	{}
@@ -131,11 +145,14 @@ public final class FEMDecimal implements Comparable<FEMDecimal> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Diese Methode gibt die Textdarstellung dieses Dezimalbruchs zurück.
+	 * 
+	 * @see Double#toString(double)
+	 * @return Textdarstellung.
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatDecimal(this);
+		return Double.toString(this.__value);
 	}
 
 }

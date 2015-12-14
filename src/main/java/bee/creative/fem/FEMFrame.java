@@ -411,7 +411,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 */
 	@Override
 	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
-		target.putScope(this.params());
+		target.putFrame(this.params());
 	}
 
 	/**
@@ -419,7 +419,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatScope(this);
+		return FEM.scriptFormatter().formatData((Object)this);
 	}
 
 }

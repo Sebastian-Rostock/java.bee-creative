@@ -578,7 +578,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, F
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatArray(this);
+		return FEM.scriptFormatter().formatData((Object)this);
 	}
 
 }

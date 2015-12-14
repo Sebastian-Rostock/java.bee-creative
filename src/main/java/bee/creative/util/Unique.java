@@ -937,7 +937,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	 * @return Ausgabe.
 	 * @throws RuntimeException Wenn die gegebene Eingabe bzw. die erzeugte Ausgabe ungültig ist.
 	 */
-	public final GOutput get(final GInput input) throws RuntimeException {
+	public GOutput get(final GInput input) throws RuntimeException {
 		final Data<GInput, GOutput> data = this.__data;
 		data.forInput(input);
 		if (data.hasOutput()) {

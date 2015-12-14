@@ -30,13 +30,27 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	/**
 	 * Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
 	 * 
-	 * @param number Wert.
+	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMInteger from(final Number number) throws NullPointerException {
-		if (number == null) throw new NullPointerException("number = null");
-		return new FEMInteger(number.longValue());
+	public static final FEMInteger from(final Number value) throws NullPointerException {
+		return new FEMInteger(value.longValue());
+	}
+
+	/**
+	 * Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #toString()
+	 * @see Long#parseLong(String)
+	 * @param value Zeichenkette.
+	 * @return Dezimalzahl.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMInteger from(final String value) throws NullPointerException, IllegalArgumentException {
+		return FEMInteger.from(Long.parseLong(value));
 	}
 
 	{}
@@ -130,11 +144,14 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Diese Methode gibt die Textdarstellung dieser Dezimalzahl zurück.
+	 * 
+	 * @see Long#toString()
+	 * @return Textdarstellung.
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatInteger(this);
+		return Long.toString(this.__value);
 	}
 
 }

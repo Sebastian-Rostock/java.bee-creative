@@ -302,14 +302,14 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
 	 * Das gegebene Array wird hierbei kopiert.
 	 * 
-	 * @param data Bytes.
+	 * @param value Bytes.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static final FEMBinary from(final byte[] data) throws NullPointerException {
-		if (data.length == 0) return FEMBinary.EMPTY;
-		if (data.length == 1) return FEMBinary.from(data[0], 1);
-		return new CompactBinary(data.clone());
+	public static final FEMBinary from(final byte[] value) throws NullPointerException {
+		if (value.length == 0) return FEMBinary.EMPTY;
+		if (value.length == 1) return FEMBinary.from(value[0], 1);
+		return new CompactBinary(value.clone());
 	}
 
 	/**
@@ -326,17 +326,56 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	}
 
 	/**
+	 * Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #toString()
+	 * @param value Zeichenkette.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
+	 */
+	public static final FEMBinary from(final String value) throws NullPointerException, IllegalArgumentException {
+		final int length = value.length();
+		if ((length < 2) || ((length & 1) != 0) || (value.charAt(0) != '0') || (value.charAt(1) != 'x')) throw new IllegalArgumentException();
+		final int count = (length >> 1) - 1;
+		final byte[] bytes = new byte[count];
+		for (int i = 0; i < count; i++) {
+			bytes[i] = (byte)( //
+				(FEMBinary.__toByte(value.charAt((i << 1) + 0)) << 4) | //
+				(FEMBinary.__toByte(value.charAt((i << 1) + 1)) << 0));
+		}
+		return new CompactBinary(bytes);
+	}
+
+	/**
 	 * Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
 	 * 
-	 * @param data Zahlenfolge.
+	 * @param value Zahlenfolge.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link MMFArray#mode() UNI8/UINT8} vorliegt.
 	 */
-	public static final FEMBinary from(final MMFArray data) throws NullPointerException, IllegalArgumentException {
-		if (data.length() == 0) return FEMBinary.EMPTY;
-		if (data.mode() == 1) return new ArrayBinary(data);
+	public static final FEMBinary from(final MMFArray value) throws NullPointerException, IllegalArgumentException {
+		if (value.length() == 0) return FEMBinary.EMPTY;
+		if (value.mode() == 1) return new ArrayBinary(value);
 		throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final int __toByte(final int value) throws IllegalArgumentException {
+		int value2 = value - '0';
+		if ((value2 >= 0) && (value <= 9)) return value2;
+		value2 = value - 'A';
+		if ((value2 >= 0) && (value <= 5)) return value2 + 10;
+		throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final char __toChar(final int value) {
+		final int value2 = value - 10;
+		if (value2 < 0) return (char)('0' + value);
+		return (char)('A' + value2);
 	}
 
 	{}
@@ -609,11 +648,21 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
+	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern <shy>
+	 * ({@code 0123456789ABCDEF}).
+	 * 
+	 * @return Textdarstellung.
 	 */
 	@Override
 	public final String toString() {
-		return FEM.formatBinary(this);
+		final StringBuilder result = new StringBuilder();
+		result.append("0x");
+		for (int i = 0, length = this.__length; i < length; i++) {
+			final int value = this.__get(i);
+			result.append(FEMBinary.__toChar((value >> 4) & 0xF)).append(FEMBinary.__toChar((value >> 0) & 0xF));
+		}
+		return result.toString();
 	}
 
 }
