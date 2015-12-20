@@ -1104,6 +1104,21 @@ public class FEM {
 	public static final class ClosureFunction extends BaseFunction implements ScriptTracerInput {
 
 		/**
+		 * Diese Methode gibt die gegebene Funktion als {@link ClosureFunction} zurück.<br>
+		 * Wenn diese bereits eine {@link ClosureFunction} ist, wird sie unverändert zurück gegeben.
+		 * 
+		 * @param function Funktion.
+		 * @return {@link ClosureFunction}.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
+		 */
+		public static final ClosureFunction from(final FEMFunction function) throws NullPointerException {
+			if (function instanceof ClosureFunction) return (ClosureFunction)function;
+			return new ClosureFunction(function);
+		}
+
+		{}
+
+		/**
 		 * Dieses Feld speichert die gebundenen Stapelrahmen, deren zusätzliche Parameterwerte genutzt werden.
 		 */
 		final FEMFrame __frame;
@@ -1193,7 +1208,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			if (this.__frame == null) return new ClosureFunction(tracer.trace(this.__function));
+			if (this.__frame == null) return ClosureFunction.from(tracer.trace(this.__function));
 			return new ClosureFunction(this.__frame, tracer.trace(this.__function));
 		}
 
@@ -1224,50 +1239,49 @@ public class FEM {
 	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
 	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
 	 * </ul>
+	 * <p>
+	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * 
 	 * @see #parseRanges()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class ScriptParser extends Parser {
+	public static final class ScriptParser extends Parser {
 
 		/**
 		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
 		 */
-		int __value = Integer.MIN_VALUE;
+		int __value;
 
 		/**
 		 * Dieses Feld speichert die bisher ermittelten Bereiche.
 		 */
-		final List<Range> __ranges = new ArrayList<Range>();
+		final List<Range> __ranges = new ArrayList<>();
+
+		@SuppressWarnings ("javadoc")
+		boolean __active;
 
 		{}
 
 		/**
-		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #stopParsing()} verwendet werden.
+		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #__stop()} verwendet werden.
 		 * 
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		protected final void startParsing() throws IllegalStateException {
-			this.checkIdling();
+		synchronized final void __start() throws IllegalStateException {
+			this.__check();
+			this.__active = true;
 			this.__value = -1;
-			this.__ranges.clear();
-		}
-
-		/**
-		 * Diese Methode beendet das Parsen und sollte nur in Verbindung mit {@link #startParsing()} verwendet werden.
-		 */
-		protected final void stopParsing() {
-			this.__value = Integer.MIN_VALUE;
 			this.reset();
 		}
 
-		/**
-		 * Diese Methode prüft den Parsestatus.
-		 * 
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
-		 */
-		protected final void checkIdling() throws IllegalStateException {
-			if (this.__value != Integer.MIN_VALUE) throw new IllegalStateException();
+		@SuppressWarnings ("javadoc")
+		final void __stop() {
+			this.__active = false;
+		}
+
+		@SuppressWarnings ("javadoc")
+		final void __check() throws IllegalStateException {
+			if (this.__active) throw new IllegalStateException();
 		}
 
 		/**
@@ -1276,14 +1290,14 @@ public class FEM {
 		 * @param type Typ des Bereichs.
 		 * @param start Start des Bereichs.
 		 */
-		protected final void range(final int type, final int start) {
+		final void __put(final int type, final int start) {
 			this.__ranges.add(new Range((char)type, start, this.index() - start));
 		}
 
 		/**
-		 * Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #closeValue()} beendet werden muss.
+		 * Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #__closeValue()} beendet werden muss.
 		 */
-		protected final void openValue() {
+		final void __openValue() {
 			if (this.__value >= 0) return;
 			this.__value = this.index();
 		}
@@ -1291,34 +1305,97 @@ public class FEM {
 		/**
 		 * Diese Methode beendet das einlesen des Wertbereichs mit dem Bereichstyp {@code '.'}.
 		 */
-		protected final void closeValue() {
+		final void __closeValue() {
 			final int start = this.__value;
 			if (start < 0) return;
 			this.__value = -1;
 			if (this.index() <= start) return;
-			this.range('.', start);
+			this.__put('.', start);
+		}
+
+		/**
+		 * Diese Methode parst einen Bereich, der mit dem gegebenen Zeichen beginnt, endet, in dem das Zeichen durch Verdopplung maskiert werden kann und welcher
+		 * das Zeichen als Typ verwendet.
+		 * 
+		 * @param type Zeichen als Bereichstyp.
+		 */
+		final void __parseMask(final int type) {
+			final int start = this.index();
+			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
+				if (symbol == type) {
+					if (this.skip() != type) {
+						this.__put(type, start);
+						return;
+					}
+				}
+			}
+			this.__put('?', start);
+		}
+
+		/**
+		 * Diese Methode parst einen Bereich, der mit dem Zeichen <code>'&lt;'</code> beginnt, mit dem Zeichen <code>'&gt;'</code> ende und in dem diese Zeichen nur
+		 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
+		 * Bereichstyp {@code '?'}.
+		 */
+		final void __parseName() {
+			final int start = this.index();
+			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
+				if (symbol == '>') {
+					if (this.skip() != '>') {
+						this.__put('!', start);
+						return;
+					}
+				} else if (symbol == '<') {
+					if (this.skip() != '<') {
+						break;
+					}
+				}
+			}
+			this.__put('?', start);
+		}
+
+		/**
+		 * Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind.
+		 */
+		final void __parseSpace() {
+			final int start = this.index();
+			for (int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()) {}
+			this.__put('_', start);
+		}
+
+		/**
+		 * Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
+		 * 
+		 * @see #skip()
+		 * @see #__put(int, int)
+		 * @param type Zeichen als Bereichstyp.
+		 */
+		final void __parseSymbol(final int type) {
+			final int start = this.index();
+			this.skip();
+			this.__put(type, start);
 		}
 
 		/**
 		 * Diese Methode parst die {@link #source() Eingabe}.
 		 */
-		protected void parse() {
+		final void __parseSource() {
 			for (int symbol; true;) {
 				switch (symbol = this.symbol()) {
 					case -1: {
-						this.closeValue();
+						this.__closeValue();
 						return;
 					}
 					case '\'':
 					case '\"':
 					case '/': {
-						this.closeValue();
-						this.parseMask(symbol);
+						this.__closeValue();
+						this.__parseMask(symbol);
 						break;
 					}
 					case '<': {
-						this.closeValue();
-						this.parseName();
+						this.__closeValue();
+						this.__parseName();
 						break;
 					}
 					case '$':
@@ -1330,16 +1407,16 @@ public class FEM {
 					case ']':
 					case '{':
 					case '}': {
-						this.closeValue();
-						this.parseSymbol(symbol);
+						this.__closeValue();
+						this.__parseSymbol(symbol);
 						break;
 					}
 					default: {
 						if (symbol <= ' ') {
-							this.closeValue();
-							this.parseSpace();
+							this.__closeValue();
+							this.__parseSpace();
 						} else {
-							this.openValue();
+							this.__openValue();
 							this.skip();
 						}
 					}
@@ -1347,7 +1424,14 @@ public class FEM {
 			}
 		}
 
-		protected boolean isClean() {
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #source() Eingabe} keines der in {@link #__parseSource()} erkannten Zeichen enthält,
+		 * d.h. wenn das Parsen der Eingabe via {@link #parseRanges()} genau einen Bereich mit dem Typ {@code '.'} ergibt, welcher über {@link #__openValue()} und
+		 * {@link #__closeValue()} entstand.
+		 * 
+		 * @return {@code true}, wenn die Eingabe nur einen Wert enthält.
+		 */
+		final boolean __checkSource() {
 			if (this.isParsed()) return false;
 			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 				switch (symbol) {
@@ -1375,13 +1459,13 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt die in Anführungszeichen eingeschlossenen und mit entsprechenden Maskierungen {@link #source() Eingabe} zurück.<br>
+		 * Diese Methode gibt die in Anführungszeichen eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 		 * 
-		 * @see #parseMask(int)
+		 * @see #__parseMask(int)
 		 * @param type Anführungszeichen.
 		 * @return Eingabe mit Maskierung.
 		 */
-		protected final String encodeMask(final int type) {
+		final String __encodeMask(final int type) {
 			this.take(type);
 			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
@@ -1393,7 +1477,32 @@ public class FEM {
 			return this.target();
 		}
 
-		protected final String decodeMask(final int type) throws IllegalArgumentException {
+		/**
+		 * Diese Methode gibt die in spitze Klammern eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
+		 * 
+		 * @see #__parseName()
+		 * @return Eingabe mit Maskierung.
+		 */
+		final String __encodeValue() {
+			this.take('<');
+			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
+				if ((symbol == '<') || (symbol == '>')) {
+					this.take(symbol);
+				}
+				this.take(symbol);
+			}
+			this.take('>');
+			return this.target();
+		}
+
+		/**
+		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Anführungszeichen und deren Maskierungen zurück.
+		 * 
+		 * @param type Anführungszeichen.
+		 * @return Eingabe ohne Maskierung.
+		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+		 */
+		final String __decodeMask(final int type) throws IllegalArgumentException {
 			if (this.symbol() != type) throw new IllegalArgumentException();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
@@ -1408,31 +1517,13 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen {@link #source() Eingabe} zurück.<br>
+		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.
 		 * 
-		 * @see #parseName()
-		 * @return Eingabe mit Maskierung.
-		 */
-		protected final String encodeValue() {
-			this.take('<');
-			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
-				if ((symbol == '<') || (symbol == '>')) {
-					this.take(symbol);
-				}
-				this.take(symbol);
-			}
-			this.take('>');
-			return this.target();
-		}
-
-		/**
-		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.<br>
-		 * 
-		 * @see #parseName()
+		 * @see #__parseName()
 		 * @return Eingabe ohne Maskierung.
-		 * @throws IllegalArgumentException
+		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
-		protected final String decodeValue() throws IllegalArgumentException {
+		final String __decodeValue() throws IllegalArgumentException {
 			if (this.symbol() != '<') throw new IllegalArgumentException();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == '<') {
@@ -1449,79 +1540,15 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode parst einen Bereich, der mit dem gegebenen Zeichen beginnt, endet, in dem das Zeichen durch Verdopplung maskiert werden kann und welcher
-		 * das Zeichen als Typ verwendet.
-		 * 
-		 * @param type Zeichen als Bereichstyp.
-		 */
-		protected final void parseMask(final int type) {
-			final int start = this.index();
-			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
-				if (symbol == type) {
-					if (this.skip() != type) {
-						this.range(type, start);
-						return;
-					}
-				}
-			}
-			this.range('?', start);
-		}
-
-		/**
-		 * Diese Methode parst einen Bereich, der mit dem Zeichen <code>'&lt;'</code> beginnt, mit dem Zeichen <code>'&gt;'</code> ende und in dem diese Zeichen nur
-		 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
-		 * Bereichstyp {@code '?'}.
-		 */
-		protected final void parseName() {
-			final int start = this.index();
-			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
-				if (symbol == '>') {
-					if (this.skip() != '>') {
-						this.range('!', start);
-						return;
-					}
-				} else if (symbol == '<') {
-					if (this.skip() != '<') {
-						break;
-					}
-				}
-			}
-			this.range('?', start);
-		}
-
-		/**
-		 * Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind.
-		 */
-		protected final void parseSpace() {
-			final int start = this.index();
-			for (int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()) {}
-			this.range('_', start);
-		}
-
-		/**
-		 * Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
-		 * 
-		 * @see #skip()
-		 * @see #range(int, int)
-		 * @param type Zeichen als Bereichstyp.
-		 */
-		protected final void parseSymbol(final int type) {
-			final int start = this.index();
-			this.skip();
-			this.range(type, start);
-		}
-
-		/**
 		 * Diese Methode setzt die Eingabe, ruft {@link #reset()} auf und gibt {@code this} zurück.
 		 * 
 		 * @param value Eingabe.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public final ScriptParser useSource(final String value) throws NullPointerException, IllegalStateException {
-			this.checkIdling();
-			this.__ranges.clear();
+		public synchronized final ScriptParser useSource(final String value) throws NullPointerException, IllegalStateException {
+			this.__check();
 			super.source(value);
 			return this;
 		}
@@ -1543,47 +1570,127 @@ public class FEM {
 		 * 
 		 * @see Range
 		 * @return Bereiche.
-		 * @throws IllegalStateException Wenn aktuell geparst wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final Range[] parseRanges() throws IllegalStateException {
-			this.startParsing();
+			this.__start();
 			try {
-				this.parse();
-				return this.__ranges.toArray(new Range[this.__ranges.size()]);
+				this.__ranges.clear();
+				this.__parseSource();
+				final Range[] result = this.__ranges.toArray(new Range[this.__ranges.size()]);
+				return result;
 			} finally {
-				this.stopParsing();
+				this.__stop();
 			}
 		}
 
-		public String parseString() {
-			if (this.symbol() == '\'') return this.decodeMask('\'');
-			if (this.symbol() == '\"') return this.decodeMask('\"');
-			throw new IllegalArgumentException();
+		/**
+		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Anführungszeichen und deren Maskierungen zurück.<br>
+		 * Die Eingabe beginnt und endet hierbei mit einem der Anführungszeichen {@code '\''} oder {@code '\"'} und enthält dieses Zeichen nur gedoppelt.
+		 * 
+		 * @see #formatString()
+		 * @return Eingabe ohne Maskierung mit {@code '\''} bzw. {@code '\"'}.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+		 */
+		public final String parseString() throws IllegalStateException, IllegalArgumentException {
+			this.__start();
+			try {
+				if (this.symbol() == '\'') return this.__decodeMask('\'');
+				if (this.symbol() == '\"') return this.__decodeMask('\"');
+				throw new IllegalArgumentException();
+			} finally {
+				this.__stop();
+			}
 		}
 
-		public String parseComment() {
-			if (this.symbol() == '/') return this.decodeMask('/');
-			throw new IllegalArgumentException();
+		/**
+		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Schrägstrichen und deren Maskierungen zurück.<br>
+		 * Die Eingabe beginnt und endet hierbei mit {@code '/'} und enthält dieses Zeichen nur gedoppelt.
+		 * 
+		 * @see #formatComment()
+		 * @return Eingabe ohne Maskierung mit {@code '/'}.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+		 */
+		public final String parseComment() throws IllegalStateException, IllegalArgumentException {
+			this.__start();
+			try {
+				if (this.symbol() == '/') return this.__decodeMask('/');
+				throw new IllegalArgumentException();
+			} finally {
+				this.__stop();
+			}
 		}
 
-		public String parseValue() {
-			if (this.symbol() == '<') return this.decodeValue();
-			return this.source();
+		/**
+		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.<br>
+		 * Die Eingabe beginnt und endet hierbei mit <code>'&lt;'</code> bzw. <code>'&gt;'</code> und enthält diese Zeichen nur gedoppelt. Wenn die Eingabe nicht
+		 * derart beginnt, wird sie unverändert zurück gegeben.
+		 * 
+		 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+		 */
+		public final String parseValue() throws IllegalStateException, IllegalArgumentException {
+			this.__start();
+			try {
+				if (this.symbol() == '<') return this.__decodeValue();
+				return this.source();
+			} finally {
+				this.__stop();
+			}
 		}
 
-		public String formatValue() throws IllegalArgumentException {
-			if (this.isClean()) return this.source();
-			this.reset();
-			this.clear();
-			return this.encodeValue();
+		/**
+		 * Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.<br>
+		 * Wenn die Eingabe keine von diesem Parser besonders behandelten Zeichen enthält, wird sie unverändert zurück gegeben.
+		 * 
+		 * @see #parseValue()
+		 * @return Eingabe mit Maskierung.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 */
+		public final String formatValue() throws IllegalStateException {
+			this.__start();
+			try {
+				if (this.__checkSource()) return this.source();
+				this.reset();
+				return this.__encodeValue();
+			} finally {
+				this.__stop();
+			}
 		}
 
-		public String formatString() throws IllegalArgumentException {
-			return encodeMask('\'');
+		/**
+		 * Diese Methode gibt die in {@code '\''} eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
+		 * 
+		 * @see #parseString()
+		 * @return Eingabe mit Maskierung.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 */
+		public final String formatString() throws IllegalStateException {
+			this.__start();
+			try {
+				return this.__encodeMask('\'');
+			} finally {
+				this.__stop();
+			}
 		}
 
-		public String formatComment() throws IllegalArgumentException {
-			return encodeMask('/');
+		/**
+		 * Diese Methode gibt die in {@code '/'} eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
+		 * 
+		 * @see #parseComment()
+		 * @return Eingabe mit Maskierung.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 */
+		public final String formatComment() throws IllegalStateException {
+			this.__start();
+			try {
+				return this.__encodeMask('/');
+			} finally {
+				this.__stop();
+			}
 		}
 
 	}
@@ -1609,27 +1716,19 @@ public class FEM {
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
 	 * als {@link FunctionValue} angegeben.</li>
 	 * </ul>
+	 * <p>
+	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * 
 	 * @see #compileValue()
 	 * @see #compileFunction()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class ScriptCompiler {
-
-		/**
-		 * Dieses Feld speichert den aktuellen Bereich.
-		 */
-		Range __range = Range.EMPTY;
+	public static final class ScriptCompiler extends Parser {
 
 		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
 		 */
 		ScriptCompilerHelper __helper = ScriptCompilerHelper.DEFAULT;
-
-		/**
-		 * Dieses Feld speichert den {@link Iterator} über die Bereiche von {@link #script()}.
-		 */
-		Iterator<Range> __iterator;
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
@@ -1666,56 +1765,47 @@ public class FEM {
 		 */
 		boolean __chainingEnabled = true;
 
+		ScriptFormatter __formatter;
+
+		@SuppressWarnings ("javadoc")
+		boolean __active;
+
 		{}
 
 		/**
-		 * Diese Methode beginnt die Kompilation und sollte nur in Verbindung mit {@link #stopCompiling()} verwendet werden.
+		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #__stop()} verwendet werden.
 		 * 
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		protected final synchronized void startCompiling() throws IllegalStateException {
-			this.checkIdling();
-			this.__iterator = this.__script.iterator();
-			this.skip();
+		final synchronized void __start() throws IllegalStateException {
+			this.__check();
+			this.__active = true;
+			this.reset();
+		}
+
+		@SuppressWarnings ("javadoc")
+		final void __stop() {
+			this.__active = false;
+		}
+
+		@SuppressWarnings ("javadoc")
+		final void __check() throws IllegalStateException {
+			if (this.__active) throw new IllegalStateException();
 		}
 
 		/**
-		 * Diese Methode beendet die Kompilation und sollte nur in Verbindung mit {@link #startCompiling()} verwendet werden.
-		 */
-		protected final synchronized void stopCompiling() {
-			this.__iterator = null;
-		}
-
-		/**
-		 * Diese Methode prüft den Kompilationsstatus.
-		 * 
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
-		 */
-		protected final void checkIdling() throws IllegalStateException {
-			if (this.__iterator != null) throw new IllegalStateException();
-		}
-
-		/**
-		 * Diese Methode überspringt den aktuellen Bereich und gibt den nächsten oder {@link Range#EMPTY} zurück.<br>
-		 * Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
-		 * 
-		 * @return aktueller Bereich oder {@link Range#EMPTY}.
-		 */
-		protected final Range skip() {
-			if (!this.__iterator.hasNext()) return this.__range = Range.EMPTY;
-			return this.__range = this.__iterator.next();
-		}
-
-		/**
-		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den ersten bedeutsamen Bereich oder {@link Range#EMPTY}
+		 * Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den Typ des ersten bedeutsamen Bereichs oder {@code -1}
 		 * zurück. Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
 		 * 
 		 * @see #skip()
-		 * @return aktueller Bereich oder {@link Range#EMPTY}.
+		 * @return aktueller Bereichstyp.
 		 */
-		protected Range skipSpace() {
-			for (int type = this.__range.__type; (type == '_') || (type == '/'); type = this.skip().__type) {}
-			return this.__range;
+		final int __compileType() {
+			int symbol = this.symbol();
+			while ((symbol == '_') || (symbol == '/')) {
+				symbol = this.skip();
+			}
+			return symbol;
 		}
 
 		/**
@@ -1724,7 +1814,7 @@ public class FEM {
 		 * @param string Zeichenkette.
 		 * @return Zahl.
 		 */
-		protected int parseIndex(final String string) {
+		final int __compileIndex(final String string) {
 			if ((string == null) || string.isEmpty()) return -1;
 			final char symbol = string.charAt(0);
 			if ((symbol < '0') || (symbol > '9')) return -1;
@@ -1742,21 +1832,21 @@ public class FEM {
 		 * @return Wertliste als {@link FEMValue}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected FEMValue compileNextArrayAsValue() throws ScriptException {
+		final FEMValue __compileArrayAsValue() throws ScriptException {
 			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			final List<FEMValue> result = new ArrayList<>();
 			this.skip();
-			if (this.skipSpace().__type == ']') {
+			if (this.__compileType() == ']') {
 				this.skip();
 				return FEM.__emptyArray;
 			}
 			while (true) {
-				final FEMValue value = this.compileNextParamAsValue();
+				final FEMValue value = this.__compileParamAsValue();
 				result.add(value);
-				switch (this.skipSpace().__type) {
+				switch (this.__compileType()) {
 					case ';': {
 						this.skip();
-						this.skipSpace();
+						this.__compileType();
 						break;
 					}
 					case ']': {
@@ -1780,23 +1870,23 @@ public class FEM {
 		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected FEMFunction compileNextArrayAsFunction() throws ScriptException {
+		final FEMFunction __compileArrayAsFunction() throws ScriptException {
 			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
-			if (this.skipSpace().__type == ']') {
+			if (this.__compileType() == ']') {
 				this.skip();
 				return new ValueFunction(FEM.__emptyArray);
 			}
 			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
 			while (true) {
-				final FEMFunction item = this.compileNextParamAsFunction();
+				final FEMFunction item = this.__compileParamAsFunction();
 				list.add(item);
 				value = value && (item instanceof ValueFunction);
-				switch (this.skipSpace().__type) {
+				switch (this.__compileType()) {
 					case ';': {
 						this.skip();
-						this.skipSpace();
+						this.__compileType();
 						break;
 					}
 					case ']': {
@@ -1810,7 +1900,7 @@ public class FEM {
 						for (int i = 0; i < size; i++) {
 							values[i] = list.get(i).invoke(FEMFrame.EMPTY);
 						}
-						return new ValueFunction(FEM.arrayValue(FEMArray.from(values)));
+						return new ValueFunction(FEM.arrayValue(values));
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -1827,7 +1917,7 @@ public class FEM {
 		 * @return Parameter.
 		 * @throws ScriptException Wenn {@link #section()} ungültig ist.
 		 */
-		protected FEMFunction compileNextParam() throws ScriptException {
+		final FEMFunction __compileParam() throws ScriptException {
 			try {
 				final FEMFunction result = this.__helper.compileParam(this, this.section());
 				if (result == null) throw new ScriptException().useSender(this).useHint(" Parameter erwartet.");
@@ -1846,9 +1936,9 @@ public class FEM {
 		 * @return Wert.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected FEMValue compileNextParamAsValue() throws ScriptException {
-			switch (this.skipSpace().__type) {
-				case 0:
+		final FEMValue __compileParamAsValue() throws ScriptException {
+			switch (this.__compileType()) {
+				case -1:
 				case '$':
 				case ';':
 				case ':':
@@ -1859,15 +1949,15 @@ public class FEM {
 					throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 				}
 				case '[': {
-					return this.compileNextArrayAsValue();
+					return this.__compileArrayAsValue();
 				}
 				case '{': {
 					if (this.__closureEnabled) throw new ScriptException().useSender(this).useHint(" Ungebundene Funktion unzulässig.");
-					final FEMFunction retult = this.compileNextScope();
+					final FEMFunction retult = this.__compileFrame();
 					return FEM.functionValue(retult);
 				}
 				default: {
-					final FEMFunction param = this.compileNextParam();
+					final FEMFunction param = this.__compileParam();
 					if (!(param instanceof ValueFunction)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 					final FEMValue result = param.invoke(FEMFrame.EMPTY);
 					return result;
@@ -1881,11 +1971,11 @@ public class FEM {
 		 * @return Funktion.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected FEMFunction compileNextParamAsFunction() throws ScriptException {
+		final FEMFunction __compileParamAsFunction() throws ScriptException {
 			FEMFunction result;
 			boolean indirect = false;
-			switch (this.skipSpace().__type) {
-				case 0:
+			switch (this.__compileType()) {
+				case -1:
 				case ';':
 				case ':':
 				case '(':
@@ -1896,9 +1986,9 @@ public class FEM {
 				}
 				case '$': {
 					this.skip();
-					final String name = this.compileNextName();
+					final String name = this.__compileName();
 					if (name == null) return FEM.PARAMS_VIEW_FUNCTION;
-					int index = this.parseIndex(name);
+					int index = this.__compileIndex(name);
 					if (index < 0) {
 						index = this.__params.indexOf(name);
 						if (index < 0) throw new ScriptException().useSender(this).useHint(" Parametername «%s» ist unbekannt.", name);
@@ -1908,20 +1998,20 @@ public class FEM {
 					return ParamFunction.from(index);
 				}
 				case '{': {
-					result = this.compileNextScope();
-					if (this.skipSpace().__type != '(') {
-						if (this.__closureEnabled) return new ClosureFunction(result);
+					result = this.__compileFrame();
+					if (this.__compileType() != '(') {
+						if (this.__closureEnabled) return ClosureFunction.from(result);
 						return new ValueFunction(FEM.functionValue(result));
 					}
 					if (!this.__chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
 				}
 				case '[': {
-					return this.compileNextArrayAsFunction();
+					return this.__compileArrayAsFunction();
 				}
 				default: {
-					result = this.compileNextParam();
-					if (this.skipSpace().__type != '(') {
+					result = this.__compileParam();
+					if (this.__compileType() != '(') {
 						if (this.__handlerEnabled) return new ValueFunction(FEM.functionValue(result));
 						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
 					}
@@ -1930,17 +2020,16 @@ public class FEM {
 			do {
 				if (indirect && !this.__chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
-				this.skipSpace();
 				final List<FEMFunction> list = new ArrayList<>();
 				while (true) {
-					if (this.__range.__type == ')') {
+					if (this.__compileType() == ')') {
 						this.skip();
 						result = new InvokeFunction(result, !indirect, list.toArray(new FEMFunction[list.size()]));
 						break;
 					}
-					final FEMFunction item = this.compileNextParamAsFunction();
+					final FEMFunction item = this.__compileParamAsFunction();
 					list.add(item);
-					switch (this.skipSpace().__type) {
+					switch (this.__compileType()) {
 						default:
 							throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «)» erwartet.");
 						case ';':
@@ -1949,7 +2038,7 @@ public class FEM {
 					}
 				}
 				indirect = true;
-			} while (this.skipSpace().__type == '(');
+			} while (this.__compileType() == '(');
 			return result;
 		}
 
@@ -1959,12 +2048,12 @@ public class FEM {
 		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected ProxyFunction compileNextProxy() throws ScriptException {
-			final String name = this.compileNextName();
-			if ((name == null) || (this.parseIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
+		final ProxyFunction __compileProxy() throws ScriptException {
+			final String name = this.__compileName();
+			if ((name == null) || (this.__compileIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
 			final ProxyFunction result = this.proxy(name);
-			if (this.skipSpace().__type != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			final FEMFunction target = this.compileNextScope();
+			if (this.__compileType() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
+			final FEMFunction target = this.__compileFrame();
 			result.set(target);
 			return result;
 		}
@@ -1976,16 +2065,16 @@ public class FEM {
 		 * @return Funktions- oder Parametername oder {@code null}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected String compileNextName() throws ScriptException {
+		final String __compileName() throws ScriptException {
 			try {
-				switch (this.skipSpace().__type) {
+				switch (this.__compileType()) {
 					case '$':
 					case '(':
 					case '[':
 					case '{': {
 						throw new IllegalStateException();
 					}
-					case 0:
+					case -1:
 					case ':':
 					case ';':
 					case ')':
@@ -2012,17 +2101,17 @@ public class FEM {
 		 * @return Funktion als {@link FunctionValue}.
 		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
 		 */
-		protected FEMFunction compileNextScope() throws ScriptException {
+		final FEMFunction __compileFrame() throws ScriptException {
 			this.skip();
 			int count = 0;
 			while (true) {
-				if (this.skipSpace().__type == 0) throw new ScriptException().useSender(this);
-				final String name = this.compileNextName();
+				if (this.__compileType() < 0) throw new ScriptException().useSender(this);
+				final String name = this.__compileName();
 				if (name != null) {
-					if (this.parseIndex(name) >= 0) throw new ScriptException().useSender(this).useHint(" Parametername erwartet.");
+					if (this.__compileIndex(name) >= 0) throw new ScriptException().useSender(this).useHint(" Parametername erwartet.");
 					this.__params.add(count++, name);
 				}
-				switch (this.skipSpace().__type) {
+				switch (this.__compileType()) {
 					case ';': {
 						if (name == null) throw new ScriptException().useSender(this).useHint(" Parametername oder Zeichen «:» erwartet.");
 						this.skip();
@@ -2030,14 +2119,123 @@ public class FEM {
 					}
 					case ':': {
 						this.skip();
-						final FEMFunction result = this.compileNextParamAsFunction();
-						if (this.skipSpace().__type != '}') throw new ScriptException().useSender(this).useHint(" Zeichen «}» erwartet.");
+						final FEMFunction result = this.__compileParamAsFunction();
+						if (this.__compileType() != '}') throw new ScriptException().useSender(this).useHint(" Zeichen «}» erwartet.");
 						this.skip();
 						this.__params.subList(0, count).clear();
 						return result;
 					}
 					default: {
 						throw new ScriptException().useSender(this);
+					}
+				}
+			}
+		}
+
+		void __format() {
+			while (true) {
+				this.__formatSequence(false);
+				if (this.symbol() < 0) return;
+				this.__formatter.put(this.section()).putBreakSpace();
+				this.skip();
+			}
+		}
+
+		void __formatArray() {
+			this.__formatter.put("[").putBreakInc();
+			this.skip();
+			this.__formatSequence(false);
+			if (this.symbol() == ']') {
+				this.__formatter.putBreakDec().put("]");
+				this.skip();
+			}
+		}
+
+		void __formatParam() {
+			this.__formatter.put("(").putBreakInc();
+			this.skip();
+			this.__formatSequence(false);
+			if (this.symbol() == ')') {
+				this.__formatter.putBreakDec().put(")");
+				this.skip();
+			}
+		}
+
+		final void __formatFrame() {
+			this.__formatter.put("{");// .putBreakInc();
+			this.skip();
+			this.__formatSequence(true);
+			if (this.symbol() == ':') {
+				this.__formatter.put(": ");
+				this.skip();
+				this.__formatSequence(false);
+			}
+			if (this.symbol() == '}') {
+				this.__formatter// .putBreakDec()
+					.put("}");
+				this.skip();
+			}
+		}
+
+		/**
+		 * Diese Methode gibt das zurück. <br>
+		 * die Sequenz endet an jeder Klammer sowie dem Doppelpunkt.
+		 */
+		void __formatSequence(final boolean space) {
+			int count = 0;
+			while (true) {
+				switch (this.symbol()) {
+					case '_': {
+						this.skip();
+						break;
+					}
+					case '/': {
+						this.__formatter.put(this.section());
+						if (space) {
+							this.__formatter.put(" ");
+						} else {
+							this.__formatter.putBreakSpace();
+						}
+						this.skip();
+						count++;
+						break;
+					}
+					case ';': {
+						this.__formatter.put(";");
+						if (space) {
+							this.__formatter.put(" ");
+						} else {
+							this.__formatter.putBreakSpace();
+						}
+						this.skip();
+						count++;
+						break;
+					}
+					case '(': {
+						this.__formatParam();
+						break;
+					}
+					case '[': {
+						this.__formatArray();
+						break;
+					}
+					case '{': {
+						this.__formatFrame();
+						break;
+					}
+					default: {
+						this.__formatter.put(this.section());
+						this.skip();
+						break;
+					}
+					case ':':
+					case ']':
+					case '}':
+					case ')':
+					case -1: {
+						if (count < 2) return;
+						this.__formatter.putIndent();
+						return;
 					}
 				}
 			}
@@ -2065,7 +2263,7 @@ public class FEM {
 		 * @return aktueller Bereich.
 		 */
 		public final Range range() {
-			return this.__range;
+			return this.isParsed() ? Range.EMPTY : this.__script.get(this.index());
 		}
 
 		/**
@@ -2111,7 +2309,7 @@ public class FEM {
 		 * @return Aktuelle Zeichenkette.
 		 */
 		public final String section() {
-			return this.__range.extract(this.__script.source());
+			return this.range().extract(this.__script.source());
 		}
 
 		/**
@@ -2158,6 +2356,10 @@ public class FEM {
 			return this.__chainingEnabled;
 		}
 
+		public final ScriptFormatter formatter() {
+			return this.__formatter;
+		}
+
 		/**
 		 * Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
 		 * 
@@ -2166,9 +2368,9 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
-			if (value == null) throw new NullPointerException("value = null");
-			this.checkIdling();
+		public synchronized ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
+			this.__check();
+			this.source(value.types());
 			this.__script = value;
 			return this;
 		}
@@ -2181,9 +2383,9 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
+		public synchronized ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.checkIdling();
+			this.__check();
 			this.__helper = value;
 			return this;
 		}
@@ -2208,9 +2410,9 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
+		public synchronized ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
 			if (value.contains(null)) throw new NullPointerException("value.contains(null)");
-			this.checkIdling();
+			this.__check();
 			this.__params.clear();
 			this.__params.addAll(value);
 			return this;
@@ -2224,8 +2426,8 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
-			this.checkIdling();
+		public synchronized ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
+			this.__check();
 			this.__arrayEnabled = value;
 			return this;
 		}
@@ -2238,8 +2440,8 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
-			this.checkIdling();
+		public synchronized ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
+			this.__check();
 			this.__handlerEnabled = value;
 			return this;
 		}
@@ -2252,8 +2454,8 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
-			this.checkIdling();
+		public synchronized ScriptCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
+			this.__check();
 			this.__closureEnabled = value;
 			return this;
 		}
@@ -2266,10 +2468,26 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
-		public ScriptCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
-			this.checkIdling();
+		public synchronized ScriptCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
+			this.__check();
 			this.__chainingEnabled = value;
 			return this;
+		}
+
+		public synchronized ScriptCompiler useFormatter(final ScriptFormatter value) throws NullPointerException, IllegalStateException {
+			this.__check();
+			if (value == null) throw new NullPointerException("value = null");
+			this.__formatter = value;
+			return this;
+		}
+
+		public final void formatScript() throws IllegalStateException {
+			this.__start();
+			try {
+				this.__format();
+			} finally {
+				this.__stop();
+			}
 		}
 
 		/**
@@ -2281,14 +2499,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public FEMValue compileValue() throws ScriptException, IllegalStateException {
-			this.startCompiling();
+			this.__start();
 			try {
-				if (this.skipSpace().__type == 0) return null;
-				final FEMValue result = this.compileNextParamAsValue();
-				if (this.skipSpace().__type == 0) return result;
+				if (this.__compileType() < 0) return null;
+				final FEMValue result = this.__compileParamAsValue();
+				if (this.__compileType() < 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
-				this.stopCompiling();
+				this.__stop();
 			}
 		}
 
@@ -2302,14 +2520,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public FEMValue[] compileValues() throws ScriptException, IllegalStateException {
-			this.startCompiling();
+			this.__start();
 			try {
-				if (this.skipSpace().__type == 0) return new FEMValue[0];
+				if (this.__compileType() < 0) return new FEMValue[0];
 				final List<FEMValue> result = new ArrayList<FEMValue>();
 				while (true) {
-					result.add(this.compileNextParamAsValue());
-					switch (this.skipSpace().__type) {
-						case 0: {
+					result.add(this.__compileParamAsValue());
+					switch (this.__compileType()) {
+						case -1: {
 							return result.toArray(new FEMValue[result.size()]);
 						}
 						case ';': {
@@ -2318,7 +2536,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.stopCompiling();
+				this.__stop();
 			}
 		}
 
@@ -2333,14 +2551,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public ProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
-			this.startCompiling();
+			this.__start();
 			try {
 				final List<ProxyFunction> result = new ArrayList<ProxyFunction>();
-				if (this.skipSpace().__type == 0) return new ProxyFunction[0];
+				if (this.__compileType() < 0) return new ProxyFunction[0];
 				while (true) {
-					result.add(this.compileNextProxy());
-					switch (this.skipSpace().__type) {
-						case 0: {
+					result.add(this.__compileProxy());
+					switch (this.__compileType()) {
+						case -1: {
 							return result.toArray(new ProxyFunction[result.size()]);
 						}
 						case ';': {
@@ -2349,7 +2567,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.stopCompiling();
+				this.__stop();
 			}
 		}
 
@@ -2362,14 +2580,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public FEMFunction compileFunction() throws ScriptException, IllegalStateException {
-			this.startCompiling();
+			this.__start();
 			try {
-				if (this.skipSpace().__type == 0) return null;
-				final FEMFunction result = this.compileNextParamAsFunction();
-				if (this.skipSpace().__type == 0) return result;
+				if (this.__compileType() < 0) return null;
+				final FEMFunction result = this.__compileParamAsFunction();
+				if (this.__compileType() < 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
-				this.stopCompiling();
+				this.__stop();
 			}
 		}
 
@@ -2383,14 +2601,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
 		 */
 		public FEMFunction[] compileFunctions() throws ScriptException, IllegalStateException {
-			this.startCompiling();
+			this.__start();
 			try {
-				if (this.skipSpace().__type == 0) return new FEMFunction[0];
+				if (this.__compileType() < 0) return new FEMFunction[0];
 				final List<FEMFunction> result = new ArrayList<FEMFunction>();
 				while (true) {
-					result.add(this.compileNextParamAsFunction());
-					switch (this.skipSpace().__type) {
-						case 0: {
+					result.add(this.__compileParamAsFunction());
+					switch (this.__compileType()) {
+						case -1: {
 							return result.toArray(new FEMFunction[result.size()]);
 						}
 						case ';': {
@@ -2399,7 +2617,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.stopCompiling();
+				this.__stop();
 			}
 		}
 
@@ -2441,13 +2659,13 @@ public class FEM {
 				switch (compiler.range().type()) {
 					case '"':
 					case '\'': {
-						return new ValueFunction(FEM.stringValue(parseString(section)));
+						return new ValueFunction(FEM.stringValue(FEM.parseString(section)));
 					}
 					case '?': {
-						return compiler.proxy(parseValue(section));
+						return compiler.proxy(FEM.parseValue(section));
 					}
 					default: {
-						section = parseValue(section);
+						section = FEM.parseValue(section);
 						if (section.equalsIgnoreCase("NULL")) return new ValueFunction(FEM.__void);
 						if (section.equalsIgnoreCase("TRUE")) return new ValueFunction(FEM.__true);
 						if (section.equalsIgnoreCase("FALSE")) return new ValueFunction(FEM.__false);
@@ -2473,7 +2691,7 @@ public class FEM {
 		 * @see ScriptCompiler#range()
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
-		 * @param section aktuellen Bereich des Quelltexts ({@link ScriptCompiler#section()}).
+		 * @param section aktueller Bereich des Quelltexts ({@link ScriptCompiler#section()}).
 		 * @return Funktions- bzw. Parametername.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Namen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
@@ -2487,7 +2705,7 @@ public class FEM {
 		 * @see ScriptCompiler#range()
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
-		 * @param section aktuellen Bereich des Quelltexts ({@link ScriptCompiler#section()}).
+		 * @param section aktueller Bereich des Quelltexts ({@link ScriptCompiler#section()}).
 		 * @return Parameter als {@link FEMFunction}, Parameterwert als {@link ValueFunction} oder Platzhalter als {@link ProxyFunction}.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
@@ -2511,7 +2729,7 @@ public class FEM {
 		private static final class Mark {
 
 			/**
-			 * Dieses Feld speichert das Objekt, dass in {@link #items} vor jeder Markierung eingefügt wird.
+			 * Dieses Feld speichert das Objekt, dass in {@link #__items} vor jeder Markierung eingefügt wird.
 			 */
 			public static final Mark DEFAULT = new ScriptFormatter.Mark(0, false, false, false);
 
@@ -2520,7 +2738,7 @@ public class FEM {
 			/**
 			 * Dieses Feld speichert die Eigenschaften dieser Markierung.
 			 */
-			protected int data;
+			int __data;
 
 			/**
 			 * Dieser Konstruktor initialisiert die Markierung.
@@ -2531,7 +2749,7 @@ public class FEM {
 			 * @param enabled Aktivierung ({@link #isEnabled()}).
 			 */
 			public Mark(final int level, final boolean last, final boolean space, final boolean enabled) {
-				this.data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
+				this.__data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
 			}
 
 			{}
@@ -2542,14 +2760,14 @@ public class FEM {
 			 * @return Tiefe der Einrückung.
 			 */
 			public int level() {
-				return this.data >> 3;
+				return this.__data >> 3;
 			}
 
 			/**
 			 * Diese Methode aktiviert die Einrückung.
 			 */
 			public void enable() {
-				this.data |= 2;
+				this.__data |= 2;
 			}
 
 			/**
@@ -2558,7 +2776,7 @@ public class FEM {
 			 * @return {@code true} bei einer Endmarkierung.
 			 */
 			public boolean isLast() {
-				return (this.data & 1) != 0;
+				return (this.__data & 1) != 0;
 			}
 
 			/**
@@ -2567,7 +2785,7 @@ public class FEM {
 			 * @return {@code true} bei einem bedingten Leerzeichen.
 			 */
 			public boolean isSpace() {
-				return (this.data & 4) != 0;
+				return (this.__data & 4) != 0;
 			}
 
 			/**
@@ -2576,7 +2794,7 @@ public class FEM {
 			 * @return Aktivierung.
 			 */
 			public boolean isEnabled() {
-				return (this.data & 2) != 0;
+				return (this.__data & 2) != 0;
 			}
 
 			{}
@@ -2596,27 +2814,27 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen.
 		 */
-		private final List<Object> items = new ArrayList<Object>();
+		final List<Object> __items = new ArrayList<Object>();
 
 		/**
 		 * Dieses Feld speichert den Puffer für {@link #format()}.
 		 */
-		private final StringBuilder string = new StringBuilder();
+		final StringBuilder __string = new StringBuilder();
 
 		/**
 		 * Dieses Feld speichert den Stack der Hierarchieebenen.
 		 */
-		private final LinkedList<Boolean> indents = new LinkedList<Boolean>();
+		final LinkedList<Boolean> __indents = new LinkedList<Boolean>();
 
 		/**
 		 * Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}.
 		 */
-		private String indent = "\t";
+		String __indent = "\t";
 
 		/**
 		 * Dieses Feld speichert die Formatierungsmethoden.
 		 */
-		private ScriptFormatterHelper helper = ScriptFormatterHelper.DEFAULT;
+		ScriptFormatterHelper __helper = ScriptFormatterHelper.DEFAULT;
 
 		{}
 
@@ -2627,16 +2845,16 @@ public class FEM {
 		 */
 		protected final void startFormatting() throws IllegalStateException {
 			this.checkIdling();
-			this.indents.addLast(Boolean.FALSE);
+			this.__indents.addLast(Boolean.FALSE);
 		}
 
 		/**
 		 * Diese Methode beendet das Parsen und sollte nur in Verbindung mit {@link #startFormatting()} verwendet werden.
 		 */
 		protected final void stopFormatting() {
-			this.items.clear();
-			this.string.setLength(0);
-			this.indents.clear();
+			this.__items.clear();
+			this.__string.setLength(0);
+			this.__indents.clear();
 		}
 
 		/**
@@ -2645,7 +2863,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		protected final void checkIdling() throws IllegalStateException {
-			if (this.indents.size() != 0) throw new IllegalStateException();
+			if (this.__indents.size() != 0) throw new IllegalStateException();
 		}
 
 		/**
@@ -2654,7 +2872,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		protected final void checkFormatting() throws IllegalStateException {
-			if (this.indents.size() == 0) throw new IllegalStateException();
+			if (this.__indents.size() == 0) throw new IllegalStateException();
 		}
 
 		/**
@@ -2664,7 +2882,7 @@ public class FEM {
 		 * @return {@code this}.
 		 */
 		private ScriptFormatter putMark(final Mark object) {
-			this.items.add(object);
+			this.__items.add(object);
 			return this;
 		}
 
@@ -2681,7 +2899,7 @@ public class FEM {
 		 */
 		public ScriptFormatter putBreakInc() throws IllegalStateException {
 			this.checkFormatting();
-			final LinkedList<Boolean> indents = this.indents;
+			final LinkedList<Boolean> indents = this.__indents;
 			indents.addLast(Boolean.FALSE);
 			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, false, false));
 		}
@@ -2699,7 +2917,7 @@ public class FEM {
 		 */
 		public ScriptFormatter putBreakDec() throws IllegalStateException {
 			this.checkFormatting();
-			final LinkedList<Boolean> indents = this.indents;
+			final LinkedList<Boolean> indents = this.__indents;
 			final int value = indents.size();
 			if (value <= 1) throw new IllegalStateException();
 			return this.putMark(Mark.DEFAULT).putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
@@ -2717,7 +2935,7 @@ public class FEM {
 		 */
 		public ScriptFormatter putBreakSpace() throws IllegalStateException {
 			this.checkFormatting();
-			final LinkedList<Boolean> indents = this.indents;
+			final LinkedList<Boolean> indents = this.__indents;
 			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
 		}
 
@@ -2733,21 +2951,21 @@ public class FEM {
 		 */
 		public ScriptFormatter putIndent() throws IllegalStateException {
 			this.checkFormatting();
-			final LinkedList<Boolean> indents = this.indents;
-			if (this.indents.getLast().booleanValue()) return this;
+			final LinkedList<Boolean> indents = this.__indents;
+			if (this.__indents.getLast().booleanValue()) return this;
 			final int value = indents.size();
 			for (int i = 0; i < value; i++) {
 				indents.set(i, Boolean.TRUE);
 			}
-			final List<Object> items = this.items;
+			final List<Object> items = this.__items;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
 				if (item == Mark.DEFAULT) {
 					final Mark token = (Mark)items.get(i + 1);
-					if (token.level() == value) {
+					if (token.level() <= value) {
 						if (token.isEnabled()) return this;
 						token.enable();
-					} else if (token.level() < value) return this;
+					} // else if (token.level() < value) return this;
 					i--;
 				}
 			}
@@ -2772,7 +2990,7 @@ public class FEM {
 			if (part instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)part).toScript(this);
 			} else {
-				this.items.add(part.toString());
+				this.__items.add(part.toString());
 			}
 			return this;
 		}
@@ -2796,7 +3014,7 @@ public class FEM {
 			if (data instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)data).toScript(this);
 			} else {
-				this.helper.formatData(this, data);
+				this.__helper.formatData(this, data);
 			}
 			return this;
 		}
@@ -2860,7 +3078,7 @@ public class FEM {
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
 			} else {
-				this.helper.formatValue(this, value);
+				this.__helper.formatValue(this, value);
 			}
 			return this;
 		}
@@ -2984,7 +3202,7 @@ public class FEM {
 			if (function instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)function).toScript(this);
 			} else {
-				this.helper.formatFunction(this, function);
+				this.__helper.formatFunction(this, function);
 			}
 			return this;
 		}
@@ -2995,7 +3213,7 @@ public class FEM {
 		 * @return Zeichenkette zur Einrückung oder {@code null}.
 		 */
 		public String getIndent() {
-			return this.indent;
+			return this.__indent;
 		}
 
 		/**
@@ -3004,7 +3222,7 @@ public class FEM {
 		 * @return Formatierungsmethoden.
 		 */
 		public ScriptFormatterHelper getHelper() {
-			return this.helper;
+			return this.__helper;
 		}
 
 		/**
@@ -3017,7 +3235,7 @@ public class FEM {
 		 */
 		public ScriptFormatter useIndent(final String indent) throws IllegalStateException {
 			this.checkIdling();
-			this.indent = indent;
+			this.__indent = indent;
 			return this;
 		}
 
@@ -3032,7 +3250,7 @@ public class FEM {
 		public ScriptFormatter useHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
 			if (helper == null) throw new NullPointerException("helper = null");
 			this.checkIdling();
-			this.helper = helper;
+			this.__helper = helper;
 			return this;
 		}
 
@@ -3043,9 +3261,9 @@ public class FEM {
 		 * @return Quelltext.
 		 */
 		private String format() {
-			final String indent = this.indent;
-			final List<Object> items = this.items;
-			final StringBuilder string = this.string;
+			final String indent = this.__indent;
+			final List<Object> items = this.__items;
+			final StringBuilder string = this.__string;
 			final int size = items.size();
 			for (int i = 0; i < size;) {
 				final Object item = items.get(i++);
@@ -3230,7 +3448,7 @@ public class FEM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.helper, this.indent, this.items);
+			return Objects.toInvokeString(this, this.__helper, this.__indent, this.__items);
 		}
 
 	}
@@ -3272,13 +3490,19 @@ public class FEM {
 	public interface ScriptFormatterHelper {
 
 		/**
-		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
+		 * {@link FEMScript Aufbereitete Quelltexte} wirden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
+		 * formatiert.
 		 */
 		static ScriptFormatterHelper DEFAULT = new ScriptFormatterHelper() {
 
 			@Override
 			public void formatData(final ScriptFormatter target, final Object data) throws IllegalArgumentException {
-				target.put(String.valueOf(data));
+				if (data instanceof FEMScript) {
+					FEM.scriptCompiler().useScript((FEMScript)data).useFormatter(target).formatScript();
+				} else {
+					target.put(String.valueOf(data));
+				}
 			}
 
 			@Override
@@ -3345,17 +3569,17 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Hinweis zum erwarteten Inhalt des Bereichs.
 		 */
-		String hint = "";
+		String __hint = "";
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		FEMScript script = FEMScript.EMPTY;
+		FEMScript __script = FEMScript.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
 		 */
-		Range range = Range.EMPTY;
+		Range __range = Range.EMPTY;
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link ScriptException} ohne Ursache.
@@ -3382,7 +3606,7 @@ public class FEM {
 		 * @return Hinweis oder {@code null}.
 		 */
 		public String getHint() {
-			return this.hint;
+			return this.__hint;
 		}
 
 		/**
@@ -3391,7 +3615,7 @@ public class FEM {
 		 * @return Bereich.
 		 */
 		public Range getRange() {
-			return this.range;
+			return this.__range;
 		}
 
 		/**
@@ -3400,7 +3624,7 @@ public class FEM {
 		 * @return Quelltext.
 		 */
 		public FEMScript getScript() {
-			return this.script;
+			return this.__script;
 		}
 
 		/**
@@ -3412,8 +3636,7 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code hint} {@code null} ist.
 		 */
 		public ScriptException useHint(final String hint) throws NullPointerException {
-			if (hint == null) throw new NullPointerException("hint = null");
-			this.hint = hint;
+			this.__hint = hint.toString();
 			return this;
 		}
 
@@ -3441,7 +3664,7 @@ public class FEM {
 		 */
 		public ScriptException useRange(final Range range) throws NullPointerException {
 			if (range == null) throw new NullPointerException("range = null");
-			this.range = range;
+			this.__range = range;
 			return this;
 		}
 
@@ -3455,7 +3678,7 @@ public class FEM {
 		 */
 		public ScriptException useScript(final FEMScript script) throws NullPointerException {
 			if (script == null) throw new NullPointerException("script = null");
-			this.script = script;
+			this.__script = script;
 			return this;
 		}
 
@@ -3480,10 +3703,10 @@ public class FEM {
 		 */
 		@Override
 		public String getMessage() {
-			return (this.range == Range.EMPTY //
+			return (this.__range == Range.EMPTY //
 				? "Unerwartetes Ende der Zeichenkette." //
-				: "Unerwartete Zeichenkette «" + this.range.extract(this.script.__source) + "» an Position " + this.range.__start + ".") //
-				+ this.hint;
+				: "Unerwartete Zeichenkette «" + this.__range.extract(this.__script.__source) + "» an Position " + this.__range.__start + ".") //
+				+ this.__hint;
 		}
 	}
 
@@ -4306,37 +4529,35 @@ public class FEM {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		System.out.println(scriptCompiler().useScript(scriptParser().useSource(
-"lala{:and(or(1;false;<a123<<;:DS<<E>>R>); 'dada''sdasd')}"
-			
-			
-			
-			).parseScript()).compileProxies()[0].function());
+		final FEMScript script = FEM.scriptParser().useSource("lala{ /r/   A /24/ ; /234/  B   ; /asdasd/ /234/   C:and(or(1;false;/er/<a123<<;:DS<<E>>R>); 'dada''sdasd')}").parseScript();
+		System.out.println(script);
+		System.out.println(FEM.scriptFormatter().formatData((Object)script));
+		// System.out.println(FEM.scriptCompiler().useScript(script).compileProxies()[0].function());
 
 	}
 
 	public static String parseValue(final String source) {
-		return scriptParser().useSource(source).parseValue();
+		return FEM.scriptParser().useSource(source).parseValue();
 	}
 
 	public static String parseString(final String source) {
-		return scriptParser().useSource(source).parseString();
+		return FEM.scriptParser().useSource(source).parseString();
 	}
 
 	public static String parseComment(final String source) {
-		return scriptParser().useSource(source).parseComment();
+		return FEM.scriptParser().useSource(source).parseComment();
 	}
 
 	public static String formatValue(final String source) {
-		return scriptParser().useSource(source).formatValue();
+		return FEM.scriptParser().useSource(source).formatValue();
 	}
 
 	public static String formatString(final String source) {
-		return scriptParser().useSource(source).formatString();
+		return FEM.scriptParser().useSource(source).formatString();
 	}
 
 	public static String formatComment(final String source) {
-		return scriptParser().useSource(source).formatComment();
+		return FEM.scriptParser().useSource(source).formatComment();
 	}
 
 }

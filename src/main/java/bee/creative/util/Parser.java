@@ -47,10 +47,22 @@ public class Parser {
 	/**
 	 * Dieser Konstruktor initialisiert die Eingabe.
 	 * 
+	 * @see #source(String)
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	public Parser(final String source) throws NullPointerException {
+		this.source(source);
+	}
+
+	/**
+	 * Dieser Konstruktor initialisiert die Eingabe.
+	 * 
+	 * @see #source(char[])
+	 * @param source Eingabe.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	public Parser(final char[] source) throws NullPointerException {
 		this.source(source);
 	}
 
@@ -225,7 +237,7 @@ public class Parser {
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
-	protected void string(final String value) throws NullPointerException {
+	protected void target(final String value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
 		this.__target.setLength(0);
 		this.__target.append(value);
@@ -261,9 +273,20 @@ public class Parser {
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 */
 	protected void source(final String source) throws NullPointerException {
-		this.__length = (this.__chars = source.toCharArray()).length;
+		this.__chars = source.toCharArray();
+		this.__length = source.length();
 		this.__source = source;
 		this.reset();
+	}
+
+	/**
+	 * Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
+	 * 
+	 * @param source Eingabe.
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
+	 */
+	protected void source(final char[] source) throws NullPointerException {
+		this.source(new String(source));
 	}
 
 	{}

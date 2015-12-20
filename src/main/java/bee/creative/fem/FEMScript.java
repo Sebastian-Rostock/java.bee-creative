@@ -212,8 +212,8 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		public final boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof FEMScript.Range)) return false;
-			final FEMScript.Range data = (FEMScript.Range)object;
-			return (this.__start == data.__start) && (this.__length == data.__length) && (this.__type == data.__type);
+			final FEMScript.Range that = (FEMScript.Range)object;
+			return (this.__start == that.__start) && (this.__length == that.__length) && (this.__type == that.__type);
 		}
 
 		/**
@@ -299,11 +299,10 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 	 * @return Bereichstypen als Zeichenkette.
 	 */
 	public final char[] types() {
-		final FEMScript.Range[] ranges = this.__ranges;
-		final int length = ranges.length;
+		final int length = this.__ranges.length;
 		final char[] types = new char[length];
 		for (int i = 0; i < length; i++) {
-			types[i] = ranges[i].__type;
+			types[i] = this.__ranges[i].__type;
 		}
 		return types;
 	}
@@ -384,8 +383,8 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMScript)) return false;
-		final FEMScript data = (FEMScript)object;
-		return this.__source.equals(data.__source) && this.__ranges.equals(data.__ranges);
+		final FEMScript that = (FEMScript)object;
+		return this.__source.equals(that.__source) && Objects.equals(this.__ranges, that.__ranges);
 	}
 
 	/**
