@@ -33,7 +33,7 @@ public class FEM {
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static abstract class BaseValue implements FEMValue, ScriptFormatterInput {
+	public static abstract class BaseValue implements FEMValue, FEMFunction, ScriptFormatterInput {
 
 		/**
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
@@ -96,6 +96,14 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public final FEMValue invoke(FEMFrame frame) {
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putData(this.data());
 		}
@@ -121,7 +129,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die Nutzdaten.
 		 */
-		protected GData __data;
+		GData __data;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
@@ -506,7 +514,7 @@ public class FEM {
 
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			return new ValueFunction(FEM.functionValue(tracer.trace(this.__data)));
+			return FEM.functionValue(tracer.trace(this.__data));
 		}
 
 		@Override
@@ -737,6 +745,21 @@ public class FEM {
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ValueFunction extends BaseFunction implements ScriptTracerInput {
+
+		/**
+		 * Diese Methode gibt den gegebenen Wert als {@link ValueFunction} zurück.<br>
+		 * Wenn dieser bereits eine {@link FEMFunction} ist, wird der unverändert zurück gegeben.
+		 * 
+		 * @param value Wert.
+		 * @return {@link FEMFunction}.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+		 */
+		public static final FEMFunction from(final FEMValue value) throws NullPointerException {
+			if (value instanceof FEMFunction) return (FEMFunction)value;
+			return new ValueFunction(value);
+		}
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
@@ -1247,6 +1270,9 @@ public class FEM {
 	 */
 	public static final class ScriptParser extends Parser {
 
+		@SuppressWarnings ("javadoc")
+		boolean __active;
+
 		/**
 		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
 		 */
@@ -1256,9 +1282,6 @@ public class FEM {
 		 * Dieses Feld speichert die bisher ermittelten Bereiche.
 		 */
 		final List<Range> __ranges = new ArrayList<>();
-
-		@SuppressWarnings ("javadoc")
-		boolean __active;
 
 		{}
 
@@ -1275,7 +1298,7 @@ public class FEM {
 		}
 
 		@SuppressWarnings ("javadoc")
-		final void __stop() {
+		synchronized final void __stop() {
 			this.__active = false;
 		}
 
@@ -1696,9 +1719,10 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen Kompiler für {@link FEMValue Werte} und {@link FEMFunction Funktionen}.
+	 * Diese Klasse implementiert einen Kompiler, der {@link FEMScript aufbereitete Quelltexte} in {@link FEMValue Werte} sowie {@link FEMFunction Funktionen}
+	 * überführen und diese im Rahmen eines {@link ScriptFormatter} auch formatieren kann.
 	 * <p>
-	 * Die Bereichestypen eines Quelltexts haben folgende Bedeutung:
+	 * Die Bereichestypen der Quelltexte haben folgende Bedeutung:
 	 * <ul>
 	 * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) sind bedeutungslos, dürfen an jeder Position vorkommen und werden ignoriert.</li>
 	 * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link FEMArray}s an, dessen Elemente mit Bereichen vom Typ
@@ -1718,12 +1742,17 @@ public class FEM {
 	 * </ul>
 	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
+	 * <p>
 	 * 
+	 * @see #formatScript(ScriptFormatter)
 	 * @see #compileValue()
 	 * @see #compileFunction()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ScriptCompiler extends Parser {
+
+		@SuppressWarnings ("javadoc")
+		boolean __active;
 
 		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
@@ -1765,17 +1794,17 @@ public class FEM {
 		 */
 		boolean __chainingEnabled = true;
 
+		/**
+		 * Dieses Feld speichert den Formatierer.
+		 */
 		ScriptFormatter __formatter;
-
-		@SuppressWarnings ("javadoc")
-		boolean __active;
 
 		{}
 
 		/**
 		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #__stop()} verwendet werden.
 		 * 
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		final synchronized void __start() throws IllegalStateException {
 			this.__check();
@@ -1784,13 +1813,139 @@ public class FEM {
 		}
 
 		@SuppressWarnings ("javadoc")
-		final void __stop() {
+		synchronized final void __stop() {
 			this.__active = false;
 		}
 
 		@SuppressWarnings ("javadoc")
 		final void __check() throws IllegalStateException {
 			if (this.__active) throw new IllegalStateException();
+		}
+
+		/**
+		 * Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen.
+		 */
+		final void __format() {
+			final ScriptFormatter formatter = this.__formatter;
+			while (true) {
+				this.__formatSequence(false);
+				if (this.symbol() < 0) return;
+				formatter.put(this.section()).putBreakSpace();
+				this.skip();
+			}
+		}
+
+		/**
+		 * Diese Methode formatiert die aktuelle Wertliste.
+		 */
+		final void __formatArray() {
+			final ScriptFormatter formatter = this.__formatter;
+			formatter.put("[").putBreakInc();
+			this.skip();
+			this.__formatSequence(false);
+			if (this.symbol() == ']') {
+				formatter.putBreakDec().put("]");
+				this.skip();
+			}
+		}
+
+		/**
+		 * Diese Methode formatiert die aktuelle Parameterliste.
+		 */
+		final void __formatParam() {
+			final ScriptFormatter formatter = this.__formatter;
+			formatter.put("(").putBreakInc();
+			this.skip();
+			this.__formatSequence(false);
+			if (this.symbol() == ')') {
+				formatter.putBreakDec().put(")");
+				this.skip();
+			}
+		}
+
+		/**
+		 * Diese Methode formatiert die aktuelle parametrisierte Funktion.
+		 */
+		final void __formatFrame() {
+			final ScriptFormatter formatter = this.__formatter;
+			formatter.put("{");
+			this.skip();
+			this.__formatSequence(true);
+			if (this.symbol() == ':') {
+				formatter.put(": ");
+				this.skip();
+				this.__formatSequence(false);
+			}
+			if (this.symbol() == '}') {
+				formatter.put("}");
+				this.skip();
+			}
+		}
+
+		/**
+		 * Diese Methode formatiert die aktuelle Wertsequenz, die bei einer schließenden Klammer oder Doppelpunkt endet.
+		 * 
+		 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll.
+		 */
+		final void __formatSequence(final boolean space) {
+			final ScriptFormatter formatter = this.__formatter;
+			int count = 0;
+			while (true) {
+				switch (this.symbol()) {
+					case '_': {
+						this.skip();
+						break;
+					}
+					case '/': {
+						formatter.put(this.section());
+						if (space) {
+							formatter.put(" ");
+						} else {
+							formatter.putBreakSpace();
+						}
+						this.skip();
+						count++;
+						break;
+					}
+					case ';': {
+						formatter.put(";");
+						if (space) {
+							formatter.put(" ");
+						} else {
+							formatter.putBreakSpace();
+						}
+						this.skip();
+						count++;
+						break;
+					}
+					case '(': {
+						this.__formatParam();
+						break;
+					}
+					case '[': {
+						this.__formatArray();
+						break;
+					}
+					case '{': {
+						this.__formatFrame();
+						break;
+					}
+					default: {
+						formatter.put(this.section());
+						this.skip();
+						break;
+					}
+					case ':':
+					case ']':
+					case '}':
+					case ')':
+					case -1: {
+						if (count < 2) return;
+						formatter.putIndent();
+						return;
+					}
+				}
+			}
 		}
 
 		/**
@@ -1830,7 +1985,7 @@ public class FEM {
 		 * 
 		 * @see ArrayValue
 		 * @return Wertliste als {@link FEMValue}.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMValue __compileArrayAsValue() throws ScriptException {
 			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
@@ -1868,14 +2023,14 @@ public class FEM {
 		 * @see InvokeFunction
 		 * @see FEM#PARAMS_VIEW_FUNCTION
 		 * @return Wertliste als {@link FEMFunction}.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction __compileArrayAsFunction() throws ScriptException {
 			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
 			if (this.__compileType() == ']') {
 				this.skip();
-				return new ValueFunction(FEM.__emptyArray);
+				return FEM.__emptyArray;
 			}
 			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
@@ -1900,7 +2055,7 @@ public class FEM {
 						for (int i = 0; i < size; i++) {
 							values[i] = list.get(i).invoke(FEMFrame.EMPTY);
 						}
-						return new ValueFunction(FEM.arrayValue(values));
+						return FEM.arrayValue(values);
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -1915,7 +2070,7 @@ public class FEM {
 		 * 
 		 * @see ScriptCompilerHelper#compileParam(ScriptCompiler, String)
 		 * @return Parameter.
-		 * @throws ScriptException Wenn {@link #section()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction __compileParam() throws ScriptException {
 			try {
@@ -1934,7 +2089,7 @@ public class FEM {
 		 * Diese Methode kompiliert denF beim aktuellen Bereich beginnende Wert und gibt diese zurück.
 		 * 
 		 * @return Wert.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMValue __compileParamAsValue() throws ScriptException {
 			switch (this.__compileType()) {
@@ -1969,7 +2124,7 @@ public class FEM {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diese zurück.
 		 * 
 		 * @return Funktion.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction __compileParamAsFunction() throws ScriptException {
 			FEMFunction result;
@@ -2001,7 +2156,7 @@ public class FEM {
 					result = this.__compileFrame();
 					if (this.__compileType() != '(') {
 						if (this.__closureEnabled) return ClosureFunction.from(result);
-						return new ValueFunction(FEM.functionValue(result));
+						return FEM.functionValue(result);
 					}
 					if (!this.__chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
@@ -2012,7 +2167,7 @@ public class FEM {
 				default: {
 					result = this.__compileParam();
 					if (this.__compileType() != '(') {
-						if (this.__handlerEnabled) return new ValueFunction(FEM.functionValue(result));
+						if (this.__handlerEnabled) return FEM.functionValue(result);
 						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
 					}
 				}
@@ -2046,7 +2201,7 @@ public class FEM {
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
 		 * 
 		 * @return Parameterfunktion.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final ProxyFunction __compileProxy() throws ScriptException {
 			final String name = this.__compileName();
@@ -2063,7 +2218,7 @@ public class FEM {
 		 * Der Rückgabewert ist {@code null}, wenn der Bereich vom Typ {@code ':'}, {@code ';'}, {@code ')'}, <code>'}'</code>, {@code ']'} oder {@code 0} ist.
 		 * 
 		 * @return Funktions- oder Parametername oder {@code null}.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final String __compileName() throws ScriptException {
 			try {
@@ -2099,7 +2254,7 @@ public class FEM {
 		 * diesen zurück.
 		 * 
 		 * @return Funktion als {@link FunctionValue}.
-		 * @throws ScriptException Wenn {@link #script()} ungültig ist.
+		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction __compileFrame() throws ScriptException {
 			this.skip();
@@ -2127,115 +2282,6 @@ public class FEM {
 					}
 					default: {
 						throw new ScriptException().useSender(this);
-					}
-				}
-			}
-		}
-
-		void __format() {
-			while (true) {
-				this.__formatSequence(false);
-				if (this.symbol() < 0) return;
-				this.__formatter.put(this.section()).putBreakSpace();
-				this.skip();
-			}
-		}
-
-		void __formatArray() {
-			this.__formatter.put("[").putBreakInc();
-			this.skip();
-			this.__formatSequence(false);
-			if (this.symbol() == ']') {
-				this.__formatter.putBreakDec().put("]");
-				this.skip();
-			}
-		}
-
-		void __formatParam() {
-			this.__formatter.put("(").putBreakInc();
-			this.skip();
-			this.__formatSequence(false);
-			if (this.symbol() == ')') {
-				this.__formatter.putBreakDec().put(")");
-				this.skip();
-			}
-		}
-
-		final void __formatFrame() {
-			this.__formatter.put("{");// .putBreakInc();
-			this.skip();
-			this.__formatSequence(true);
-			if (this.symbol() == ':') {
-				this.__formatter.put(": ");
-				this.skip();
-				this.__formatSequence(false);
-			}
-			if (this.symbol() == '}') {
-				this.__formatter// .putBreakDec()
-					.put("}");
-				this.skip();
-			}
-		}
-
-		/**
-		 * Diese Methode gibt das zurück. <br>
-		 * die Sequenz endet an jeder Klammer sowie dem Doppelpunkt.
-		 */
-		void __formatSequence(final boolean space) {
-			int count = 0;
-			while (true) {
-				switch (this.symbol()) {
-					case '_': {
-						this.skip();
-						break;
-					}
-					case '/': {
-						this.__formatter.put(this.section());
-						if (space) {
-							this.__formatter.put(" ");
-						} else {
-							this.__formatter.putBreakSpace();
-						}
-						this.skip();
-						count++;
-						break;
-					}
-					case ';': {
-						this.__formatter.put(";");
-						if (space) {
-							this.__formatter.put(" ");
-						} else {
-							this.__formatter.putBreakSpace();
-						}
-						this.skip();
-						count++;
-						break;
-					}
-					case '(': {
-						this.__formatParam();
-						break;
-					}
-					case '[': {
-						this.__formatArray();
-						break;
-					}
-					case '{': {
-						this.__formatFrame();
-						break;
-					}
-					default: {
-						this.__formatter.put(this.section());
-						this.skip();
-						break;
-					}
-					case ':':
-					case ']':
-					case '}':
-					case ')':
-					case -1: {
-						if (count < 2) return;
-						this.__formatter.putIndent();
-						return;
 					}
 				}
 			}
@@ -2356,19 +2402,15 @@ public class FEM {
 			return this.__chainingEnabled;
 		}
 
-		public final ScriptFormatter formatter() {
-			return this.__formatter;
-		}
-
 		/**
 		 * Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
 		 * 
 		 * @param value Quelltext.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
+		public synchronized final ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
 			this.__check();
 			this.source(value.types());
 			this.__script = value;
@@ -2381,9 +2423,9 @@ public class FEM {
 		 * @param value Kompilationsmethoden.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
+		public synchronized final ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__check();
 			this.__helper = value;
@@ -2396,9 +2438,9 @@ public class FEM {
 		 * @param value Parameternamen.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public ScriptCompiler useParams(final String... value) throws NullPointerException, IllegalStateException {
+		public final ScriptCompiler useParams(final String... value) throws NullPointerException, IllegalStateException {
 			return this.useParams(Arrays.asList(value));
 		}
 
@@ -2408,9 +2450,9 @@ public class FEM {
 		 * @param value Parameternamen.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
+		public synchronized final ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
 			if (value.contains(null)) throw new NullPointerException("value.contains(null)");
 			this.__check();
 			this.__params.clear();
@@ -2424,9 +2466,9 @@ public class FEM {
 		 * @see #isArrayEnabled()
 		 * @param value Zulässigkeit von Wertlisten.
 		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
+		public synchronized final ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
 			this.__check();
 			this.__arrayEnabled = value;
 			return this;
@@ -2438,9 +2480,9 @@ public class FEM {
 		 * @see #isHandlerEnabled()
 		 * @param value Zulässigkeit von Funktionszeigern.
 		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
+		public synchronized final ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
 			this.__check();
 			this.__handlerEnabled = value;
 			return this;
@@ -2452,9 +2494,9 @@ public class FEM {
 		 * @see #isClosureEnabled()
 		 * @param value Zulässigkeit der Bindung des Stapelrahmens.
 		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
+		public synchronized final ScriptCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
 			this.__check();
 			this.__closureEnabled = value;
 			return this;
@@ -2466,26 +2508,29 @@ public class FEM {
 		 * @see #isChainingEnabled()
 		 * @param value Zulässigkeit der Verkettung von Funktionen.
 		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public synchronized ScriptCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
+		public synchronized final ScriptCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
 			this.__check();
 			this.__chainingEnabled = value;
 			return this;
 		}
 
-		public synchronized ScriptCompiler useFormatter(final ScriptFormatter value) throws NullPointerException, IllegalStateException {
-			this.__check();
-			if (value == null) throw new NullPointerException("value = null");
-			this.__formatter = value;
-			return this;
-		}
-
-		public final void formatScript() throws IllegalStateException {
+		/**
+		 * Diese Methode formatiert den Quelltext im Rahmen des gegebenen Formatierers.
+		 * 
+		 * @param target Formatierer.
+		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
+		 */
+		public final void formatScript(final ScriptFormatter target) throws NullPointerException, IllegalStateException {
 			this.__start();
+			if (target == null) throw new NullPointerException("target = null");
+			this.__formatter = target;
 			try {
 				this.__format();
 			} finally {
+				this.__formatter = null;
 				this.__stop();
 			}
 		}
@@ -2496,9 +2541,9 @@ public class FEM {
 		 * 
 		 * @return Wert oder {@code null}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public FEMValue compileValue() throws ScriptException, IllegalStateException {
+		public final FEMValue compileValue() throws ScriptException, IllegalStateException {
 			this.__start();
 			try {
 				if (this.__compileType() < 0) return null;
@@ -2517,9 +2562,9 @@ public class FEM {
 		 * 
 		 * @return Werte.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public FEMValue[] compileValues() throws ScriptException, IllegalStateException {
+		public final FEMValue[] compileValues() throws ScriptException, IllegalStateException {
 			this.__start();
 			try {
 				if (this.__compileType() < 0) return new FEMValue[0];
@@ -2548,9 +2593,9 @@ public class FEM {
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public ProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
+		public final ProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
 			this.__start();
 			try {
 				final List<ProxyFunction> result = new ArrayList<ProxyFunction>();
@@ -2577,9 +2622,9 @@ public class FEM {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public FEMFunction compileFunction() throws ScriptException, IllegalStateException {
+		public final FEMFunction compileFunction() throws ScriptException, IllegalStateException {
 			this.__start();
 			try {
 				if (this.__compileType() < 0) return null;
@@ -2598,9 +2643,9 @@ public class FEM {
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
-		 * @throws IllegalStateException Wenn aktuell kompiliert wird.
+		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		public FEMFunction[] compileFunctions() throws ScriptException, IllegalStateException {
+		public final FEMFunction[] compileFunctions() throws ScriptException, IllegalStateException {
 			this.__start();
 			try {
 				if (this.__compileType() < 0) return new FEMFunction[0];
@@ -2646,9 +2691,6 @@ public class FEM {
 		 */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
 
-			// TODO
-			{}
-
 			@Override
 			public String compileName(final ScriptCompiler compiler, final String section) throws ScriptException {
 				return section;
@@ -2656,21 +2698,21 @@ public class FEM {
 
 			@Override
 			public FEMFunction compileParam(final ScriptCompiler compiler, String section) throws ScriptException {
-				switch (compiler.range().type()) {
+				switch (compiler.symbol()) {
 					case '"':
 					case '\'': {
-						return new ValueFunction(FEM.stringValue(FEM.parseString(section)));
+						return FEM.stringValue(FEM.parseString(section));
 					}
 					case '?': {
 						return compiler.proxy(FEM.parseValue(section));
 					}
 					default: {
 						section = FEM.parseValue(section);
-						if (section.equalsIgnoreCase("NULL")) return new ValueFunction(FEM.__void);
-						if (section.equalsIgnoreCase("TRUE")) return new ValueFunction(FEM.__true);
-						if (section.equalsIgnoreCase("FALSE")) return new ValueFunction(FEM.__false);
+						if (section.equalsIgnoreCase("NULL")) return FEM.__void;
+						if (section.equalsIgnoreCase("TRUE")) return FEM.__true;
+						if (section.equalsIgnoreCase("FALSE")) return FEM.__false;
 						try {
-							return new ValueFunction(FEM.decimalValue(new BigDecimal(section)));
+							return FEM.decimalValue(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {
 							return compiler.proxy(section);
 						}
@@ -2714,24 +2756,24 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen Formatter, der Werten und Funktionen in eine Zeichenkette überführen kann. Dieser realisiert damit die entgegen gesetzte
-	 * Operation zur Kombination von {@link ScriptParser} und {@link ScriptCompiler}.
+	 * Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann.<br>
+	 * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link ScriptParser} und {@link ScriptCompiler}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class ScriptFormatter {
+	public static final class ScriptFormatter {
 
 		/**
 		 * Diese Klasse implementiert eine Markierung, mit welcher die Tiefe und Aktivierung der Einrückung definiert werden kann.
 		 * 
 		 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 */
-		private static final class Mark {
+		static final class Mark {
 
 			/**
 			 * Dieses Feld speichert das Objekt, dass in {@link #__items} vor jeder Markierung eingefügt wird.
 			 */
-			public static final Mark DEFAULT = new ScriptFormatter.Mark(0, false, false, false);
+			static final Mark EMPTY = new ScriptFormatter.Mark(0, false, false, false);
 
 			{}
 
@@ -2759,14 +2801,14 @@ public class FEM {
 			 * 
 			 * @return Tiefe der Einrückung.
 			 */
-			public int level() {
+			public final int level() {
 				return this.__data >> 3;
 			}
 
 			/**
 			 * Diese Methode aktiviert die Einrückung.
 			 */
-			public void enable() {
+			public final void enable() {
 				this.__data |= 2;
 			}
 
@@ -2775,7 +2817,7 @@ public class FEM {
 			 * 
 			 * @return {@code true} bei einer Endmarkierung.
 			 */
-			public boolean isLast() {
+			public final boolean isLast() {
 				return (this.__data & 1) != 0;
 			}
 
@@ -2784,7 +2826,7 @@ public class FEM {
 			 * 
 			 * @return {@code true} bei einem bedingten Leerzeichen.
 			 */
-			public boolean isSpace() {
+			public final boolean isSpace() {
 				return (this.__data & 4) != 0;
 			}
 
@@ -2793,7 +2835,7 @@ public class FEM {
 			 * 
 			 * @return Aktivierung.
 			 */
-			public boolean isEnabled() {
+			public final boolean isEnabled() {
 				return (this.__data & 2) != 0;
 			}
 
@@ -2803,7 +2845,7 @@ public class FEM {
 			 * {@inheritDoc}
 			 */
 			@Override
-			public String toString() {
+			public final String toString() {
 				return "M" + (this.level() == 0 ? "" : (this.isLast() ? "D" : this.isSpace() ? "S" : "I") + (this.isEnabled() ? "E" : ""));
 			}
 
@@ -2817,7 +2859,7 @@ public class FEM {
 		final List<Object> __items = new ArrayList<Object>();
 
 		/**
-		 * Dieses Feld speichert den Puffer für {@link #format()}.
+		 * Dieses Feld speichert den Puffer für {@link #__format()}.
 		 */
 		final StringBuilder __string = new StringBuilder();
 
@@ -2834,45 +2876,30 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die Formatierungsmethoden.
 		 */
-		ScriptFormatterHelper __helper = ScriptFormatterHelper.DEFAULT;
+		ScriptFormatterHelper __helper = ScriptFormatterHelper.EMPTY;
 
 		{}
 
 		/**
-		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #stopFormatting()} verwendet werden.
+		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #__stop()} verwendet werden.
 		 * 
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		protected final void startFormatting() throws IllegalStateException {
-			this.checkIdling();
+		synchronized final void __start() throws IllegalStateException {
+			this.__check(true);
 			this.__indents.addLast(Boolean.FALSE);
 		}
 
-		/**
-		 * Diese Methode beendet das Parsen und sollte nur in Verbindung mit {@link #startFormatting()} verwendet werden.
-		 */
-		protected final void stopFormatting() {
+		@SuppressWarnings ("javadoc")
+		synchronized final void __stop() {
 			this.__items.clear();
 			this.__string.setLength(0);
 			this.__indents.clear();
 		}
 
-		/**
-		 * Diese Methode prüft den Parsestatus.
-		 * 
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 */
-		protected final void checkIdling() throws IllegalStateException {
-			if (this.__indents.size() != 0) throw new IllegalStateException();
-		}
-
-		/**
-		 * Diese Methode prüft den Parsestatus.
-		 * 
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 */
-		protected final void checkFormatting() throws IllegalStateException {
-			if (this.__indents.size() == 0) throw new IllegalStateException();
+		@SuppressWarnings ("javadoc")
+		final void __check(final boolean idling) throws IllegalStateException {
+			if (this.__indents.isEmpty() != idling) throw new IllegalStateException();
 		}
 
 		/**
@@ -2881,7 +2908,7 @@ public class FEM {
 		 * @param object Markierung.
 		 * @return {@code this}.
 		 */
-		private ScriptFormatter putMark(final Mark object) {
+		final ScriptFormatter __putMark(final Mark object) {
 			this.__items.add(object);
 			return this;
 		}
@@ -2897,11 +2924,11 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
-		public ScriptFormatter putBreakInc() throws IllegalStateException {
-			this.checkFormatting();
+		public final ScriptFormatter putBreakInc() throws IllegalStateException {
+			this.__check(false);
 			final LinkedList<Boolean> indents = this.__indents;
 			indents.addLast(Boolean.FALSE);
-			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, false, false));
+			return this.__putMark(Mark.EMPTY).__putMark(new Mark(indents.size(), false, false, false));
 		}
 
 		/**
@@ -2915,12 +2942,12 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde oder aktuell nicht formatiert wird.
 		 */
-		public ScriptFormatter putBreakDec() throws IllegalStateException {
-			this.checkFormatting();
+		public final ScriptFormatter putBreakDec() throws IllegalStateException {
+			this.__check(false);
 			final LinkedList<Boolean> indents = this.__indents;
 			final int value = indents.size();
 			if (value <= 1) throw new IllegalStateException();
-			return this.putMark(Mark.DEFAULT).putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
+			return this.__putMark(Mark.EMPTY).__putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
 		}
 
 		/**
@@ -2933,10 +2960,10 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
-		public ScriptFormatter putBreakSpace() throws IllegalStateException {
-			this.checkFormatting();
+		public final ScriptFormatter putBreakSpace() throws IllegalStateException {
+			this.__check(false);
 			final LinkedList<Boolean> indents = this.__indents;
-			return this.putMark(Mark.DEFAULT).putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
+			return this.__putMark(Mark.EMPTY).__putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
 		}
 
 		/**
@@ -2949,8 +2976,8 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
-		public ScriptFormatter putIndent() throws IllegalStateException {
-			this.checkFormatting();
+		public final ScriptFormatter putIndent() throws IllegalStateException {
+			this.__check(false);
 			final LinkedList<Boolean> indents = this.__indents;
 			if (this.__indents.getLast().booleanValue()) return this;
 			final int value = indents.size();
@@ -2960,12 +2987,12 @@ public class FEM {
 			final List<Object> items = this.__items;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
-				if (item == Mark.DEFAULT) {
+				if (item == Mark.EMPTY) {
 					final Mark token = (Mark)items.get(i + 1);
 					if (token.level() <= value) {
 						if (token.isEnabled()) return this;
 						token.enable();
-					} // else if (token.level() < value) return this;
+					} // ALTERNATIV: else if (token.level() < value) return this;
 					i--;
 				}
 			}
@@ -2984,9 +3011,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code part} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
 			if (part == null) throw new NullPointerException("part = null");
-			this.checkFormatting();
+			this.__check(false);
 			if (part instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)part).toScript(this);
 			} else {
@@ -3008,9 +3035,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (data == null) throw new NullPointerException("function = null");
-			this.checkFormatting();
+			this.__check(false);
 			if (data instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)data).toScript(this);
 			} else {
@@ -3037,9 +3064,10 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
 			if (array == null) throw new NullPointerException("array = null");
-			this.checkFormatting();
+			this.__check(false);
 			final Iterator<? extends FEMValue> iter = array.iterator();
 			if (iter.hasNext()) {
 				FEMValue item = iter.next();
@@ -3072,9 +3100,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.checkFormatting();
+			this.__check(false);
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
 			} else {
@@ -3102,9 +3130,10 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
-			this.checkFormatting();
+			this.__check(false);
 			final Iterator<? extends FEMValue> iter = params.iterator();
 			if (iter.hasNext()) {
 				FEMValue item = iter.next();
@@ -3113,7 +3142,7 @@ public class FEM {
 					int index = 2;
 					do {
 						item = iter.next();
-						this.put(";").putBreakSpace().put("$").put(index).put(": ").putValue(item);
+						this.put(";").putBreakSpace().put("$").put(new Integer(index)).put(": ").putValue(item);
 						index++;
 					} while (iter.hasNext());
 					this.putBreakDec().put(")");
@@ -3145,9 +3174,10 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
-			this.checkFormatting();
+			this.__check(false);
 			final Iterator<? extends FEMFunction> iter = params.iterator();
 			if (iter.hasNext()) {
 				FEMFunction item = iter.next();
@@ -3178,7 +3208,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
 			return this.put("{: ").putFunction(function).put("}");
 		}
@@ -3196,9 +3226,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann.
 		 */
-		public ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
-			this.checkFormatting();
+			this.__check(false);
 			if (function instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)function).toScript(this);
 			} else {
@@ -3212,7 +3242,7 @@ public class FEM {
 		 * 
 		 * @return Zeichenkette zur Einrückung oder {@code null}.
 		 */
-		public String getIndent() {
+		public final String getIndent() {
 			return this.__indent;
 		}
 
@@ -3221,7 +3251,7 @@ public class FEM {
 		 * 
 		 * @return Formatierungsmethoden.
 		 */
-		public ScriptFormatterHelper getHelper() {
+		public final ScriptFormatterHelper getHelper() {
 			return this.__helper;
 		}
 
@@ -3233,8 +3263,8 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		public ScriptFormatter useIndent(final String indent) throws IllegalStateException {
-			this.checkIdling();
+		public synchronized final ScriptFormatter useIndent(final String indent) throws IllegalStateException {
+			this.__check(true);
 			this.__indent = indent;
 			return this;
 		}
@@ -3247,9 +3277,9 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		public ScriptFormatter useHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
+		public synchronized final ScriptFormatter useHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
 			if (helper == null) throw new NullPointerException("helper = null");
-			this.checkIdling();
+			this.__check(true);
 			this.__helper = helper;
 			return this;
 		}
@@ -3260,14 +3290,14 @@ public class FEM {
 		 * @see #put(Object)
 		 * @return Quelltext.
 		 */
-		private String format() {
+		final String __format() {
 			final String indent = this.__indent;
 			final List<Object> items = this.__items;
 			final StringBuilder string = this.__string;
 			final int size = items.size();
 			for (int i = 0; i < size;) {
 				final Object item = items.get(i++);
-				if (item == Mark.DEFAULT) {
+				if (item == Mark.EMPTY) {
 					final Mark token = (Mark)items.get(i++);
 					if (token.isEnabled() && (indent != null)) {
 						string.append('\n');
@@ -3300,9 +3330,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann.
 		 */
-		private <GItem> String format(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
+		final <GItem> String __format(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
 			IllegalStateException, IllegalArgumentException {
-			this.startFormatting();
+			this.__start();
 			try {
 				final Iterator<? extends GItem> iter = items.iterator();
 				if (!iter.hasNext()) return "";
@@ -3318,9 +3348,9 @@ public class FEM {
 				} else {
 					formatter.convert(item);
 				}
-				return this.format();
+				return this.__format();
 			} finally {
-				this.stopFormatting();
+				this.__stop();
 			}
 		}
 
@@ -3335,7 +3365,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
-		public String formatData(final Object... datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatData(final Object... datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (datas == null) throw new NullPointerException("datas = null");
 			return this.formatData(Arrays.asList(datas));
 		}
@@ -3351,9 +3381,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann.
 		 */
-		public String formatData(final Iterable<?> datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatData(final Iterable<?> datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (datas == null) throw new NullPointerException("values = null");
-			return this.format(datas, new Converter<Object, Object>() {
+			return this.__format(datas, new Converter<Object, Object>() {
 
 				@Override
 				public Object convert(final Object input) {
@@ -3374,7 +3404,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
-		public String formatValue(final FEMValue... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatValue(final FEMValue... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
 			return this.formatValue(Arrays.asList(values));
 		}
@@ -3390,9 +3420,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann.
 		 */
-		public String formatValue(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatValue(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
-			return this.format(values, new Converter<FEMValue, Object>() {
+			return this.__format(values, new Converter<FEMValue, Object>() {
 
 				@Override
 				public Object convert(final FEMValue input) {
@@ -3413,7 +3443,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
-		public String formatFunction(final FEMFunction... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatFunction(final FEMFunction... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
 			return this.formatFunction(Arrays.asList(functions));
 		}
@@ -3429,9 +3459,10 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann.
 		 */
-		public String formatFunction(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+		public final String formatFunction(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
+			IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
-			return this.format(functions, new Converter<FEMFunction, Object>() {
+			return this.__format(functions, new Converter<FEMFunction, Object>() {
 
 				@Override
 				public Object convert(final FEMFunction input) {
@@ -3447,7 +3478,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toInvokeString(this, this.__helper, this.__indent, this.__items);
 		}
 
@@ -3494,12 +3525,12 @@ public class FEM {
 		 * {@link FEMScript Aufbereitete Quelltexte} wirden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
 		 * formatiert.
 		 */
-		static ScriptFormatterHelper DEFAULT = new ScriptFormatterHelper() {
+		static ScriptFormatterHelper EMPTY = new ScriptFormatterHelper() {
 
 			@Override
 			public void formatData(final ScriptFormatter target, final Object data) throws IllegalArgumentException {
 				if (data instanceof FEMScript) {
-					FEM.scriptCompiler().useScript((FEMScript)data).useFormatter(target).formatScript();
+					FEM.scriptCompiler().useScript((FEMScript)data).formatScript(target);
 				} else {
 					target.put(String.valueOf(data));
 				}
@@ -3517,7 +3548,7 @@ public class FEM {
 
 			@Override
 			public String toString() {
-				return "DEFAULT";
+				return "EMPTY";
 			}
 
 		};
@@ -3557,7 +3588,7 @@ public class FEM {
 	 * 
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static class ScriptException extends IllegalArgumentException {
+	public static final class ScriptException extends IllegalArgumentException {
 
 		/**
 		 * Dieses Feld speichert die Serial-Version-UID.
@@ -3605,7 +3636,7 @@ public class FEM {
 		 * @see #getRange()
 		 * @return Hinweis oder {@code null}.
 		 */
-		public String getHint() {
+		public final String getHint() {
 			return this.__hint;
 		}
 
@@ -3614,7 +3645,7 @@ public class FEM {
 		 * 
 		 * @return Bereich.
 		 */
-		public Range getRange() {
+		public final Range getRange() {
 			return this.__range;
 		}
 
@@ -3623,7 +3654,7 @@ public class FEM {
 		 * 
 		 * @return Quelltext.
 		 */
-		public FEMScript getScript() {
+		public final FEMScript getScript() {
 			return this.__script;
 		}
 
@@ -3635,7 +3666,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code hint} {@code null} ist.
 		 */
-		public ScriptException useHint(final String hint) throws NullPointerException {
+		public final ScriptException useHint(final String hint) throws NullPointerException {
 			this.__hint = hint.toString();
 			return this;
 		}
@@ -3650,7 +3681,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code format} bzw. {@code args} {@code null} ist.
 		 */
-		public ScriptException useHint(final String format, final Object... args) throws NullPointerException {
+		public final ScriptException useHint(final String format, final Object... args) throws NullPointerException {
 			return this.useHint(String.format(format, args));
 		}
 
@@ -3662,7 +3693,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code range} {@code null} ist.
 		 */
-		public ScriptException useRange(final Range range) throws NullPointerException {
+		public final ScriptException useRange(final Range range) throws NullPointerException {
 			if (range == null) throw new NullPointerException("range = null");
 			this.__range = range;
 			return this;
@@ -3676,7 +3707,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code script} {@code null} ist.
 		 */
-		public ScriptException useScript(final FEMScript script) throws NullPointerException {
+		public final ScriptException useScript(final FEMScript script) throws NullPointerException {
 			if (script == null) throw new NullPointerException("script = null");
 			this.__script = script;
 			return this;
@@ -3691,8 +3722,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code sender} {@code null} ist.
 		 */
-		public ScriptException useSender(final ScriptCompiler sender) throws NullPointerException {
-			if (sender == null) throw new NullPointerException("sender = null");
+		public final ScriptException useSender(final ScriptCompiler sender) throws NullPointerException {
 			return this.useRange(sender.range()).useScript(sender.script());
 		}
 
@@ -3702,7 +3732,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String getMessage() {
+		public final String getMessage() {
 			return (this.__range == Range.EMPTY //
 				? "Unerwartetes Ende der Zeichenkette." //
 				: "Unerwartete Zeichenkette «" + this.__range.extract(this.__script.__source) + "» an Position " + this.__range.__start + ".") //
@@ -3724,7 +3754,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
 		 */
-		ScriptTracerHelper __helper = ScriptTracerHelper.DEFAULT;
+		ScriptTracerHelper __helper = ScriptTracerHelper.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
@@ -3758,7 +3788,7 @@ public class FEM {
 		 * 
 		 * @return {@link ScriptTracerHelper}.
 		 */
-		public ScriptTracerHelper getHelper() {
+		public final ScriptTracerHelper getHelper() {
 			return this.__helper;
 		}
 
@@ -3767,7 +3797,7 @@ public class FEM {
 		 * 
 		 * @return Ergebniswert oder {@code null}.
 		 */
-		public FEMValue getResult() {
+		public final FEMValue getResult() {
 			return this.__result;
 		}
 
@@ -3776,7 +3806,7 @@ public class FEM {
 		 * 
 		 * @return Stapelrahmen oder {@code null}.
 		 */
-		public FEMFrame getFrame() {
+		public final FEMFrame getFrame() {
 			return this.__frame;
 		}
 
@@ -3785,7 +3815,7 @@ public class FEM {
 		 * 
 		 * @return Funktion oder {@code null}.
 		 */
-		public FEMFunction getFunction() {
+		public final FEMFunction getFunction() {
 			return this.__function;
 		}
 
@@ -3794,7 +3824,7 @@ public class FEM {
 		 * 
 		 * @return Ausnahme oder {@code null}.
 		 */
-		public RuntimeException getException() {
+		public final RuntimeException getException() {
 			return this.__exception;
 		}
 
@@ -3805,7 +3835,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useHelper(final ScriptTracerHelper value) throws NullPointerException {
+		public final ScriptTracer useHelper(final ScriptTracerHelper value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__helper = value;
 			return this;
@@ -3819,7 +3849,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useResult(final FEMValue value) throws NullPointerException {
+		public final ScriptTracer useResult(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__result = value;
 			this.__exception = null;
@@ -3834,7 +3864,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useFrame(final FEMFrame value) throws NullPointerException {
+		public final ScriptTracer useFrame(final FEMFrame value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__frame = value;
 			return this;
@@ -3847,7 +3877,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
+		public final ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__function = value;
 			return this;
@@ -3861,7 +3891,7 @@ public class FEM {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
-		public ScriptTracer useException(final RuntimeException value) throws NullPointerException {
+		public final ScriptTracer useException(final RuntimeException value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
 			this.__result = null;
 			this.__exception = value;
@@ -3877,7 +3907,7 @@ public class FEM {
 		 * @see #getException()
 		 * @return {@code this}.
 		 */
-		public ScriptTracer clear() {
+		public final ScriptTracer clear() {
 			this.__frame = null;
 			this.__function = null;
 			this.__result = null;
@@ -3897,7 +3927,7 @@ public class FEM {
 		 * @return Funktion.
 		 * @throws NullPointerException Wenn {@code handler} bzw. {@code function} {@code null} ist.
 		 */
-		public FEMFunction trace(final FEMFunction function) throws NullPointerException {
+		public final FEMFunction trace(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (function instanceof ScriptTracerInput) return ((ScriptTracerInput)function).toTrace(this);
 			return function;
@@ -3909,7 +3939,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toFormatString(true, true, this, "helper", this.__helper, "frame", this.__frame, "function", this.__function, "result", this.__result,
 				"exception", this.__exception);
 		}
@@ -3949,7 +3979,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den {@code default}-{@link ScriptTracerHelper}, dessen Methoden den {@link ScriptTracer} nicht modifizieren.
 		 */
-		public static final ScriptTracerHelper DEFAULT = new ScriptTracerHelper() {
+		public static final ScriptTracerHelper EMPTY = new ScriptTracerHelper() {
 
 			@Override
 			public void onThrow(final ScriptTracer event) {
@@ -3965,35 +3995,35 @@ public class FEM {
 
 			@Override
 			public String toString() {
-				return "DEFAULT";
+				return "EMPTY";
 			}
 
 		};
 
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
-		 * {@link ScriptTracer#__exception} kann hierbei angepasst werden.
+		 * {@link ScriptTracer#getException()} kann hierbei angepasst werden.
 		 * 
-		 * @see ScriptTracer#__exception
+		 * @see ScriptTracer#useException(RuntimeException)
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onThrow(ScriptTracer event);
 
 		/**
 		 * Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
-		 * {@link ScriptTracer#__result} kann hierbei angepasst werden.
+		 * {@link ScriptTracer#getResult()} kann hierbei angepasst werden.
 		 * 
-		 * @see ScriptTracer#__result
+		 * @see ScriptTracer#useResult(FEMValue)
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onReturn(ScriptTracer event);
 
 		/**
-		 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link ScriptTracer#__frame} und {@link ScriptTracer#__function} können hierbei
-		 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Stapelrahmen durchzuführen.
+		 * Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link ScriptTracer#getFrame()} und {@link ScriptTracer#getFunction()} können
+		 * hierbei angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Stapelrahmen durchzuführen.
 		 * 
-		 * @see ScriptTracer#__frame
-		 * @see ScriptTracer#__function
+		 * @see ScriptTracer#useFrame(FEMFrame)
+		 * @see ScriptTracer#useFunction(FEMFunction)
 		 * @param event {@link ScriptTracer}.
 		 */
 		public void onExecute(ScriptTracer event);
@@ -4529,10 +4559,10 @@ public class FEM {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		final FEMScript script = FEM.scriptParser().useSource("lala{ /r/   A /24/ ; /234/  B   ; /asdasd/ /234/   C:and(or(1;false;/er/<a123<<;:DS<<E>>R>); 'dada''sdasd')}").parseScript();
+		final FEMScript script = FEM.scriptParser().useSource("MyFun{A; B; C: länge( [$A; $B; 123; true; void; 'text'])}").parseScript();
 		System.out.println(script);
 		System.out.println(FEM.scriptFormatter().formatData((Object)script));
-		// System.out.println(FEM.scriptCompiler().useScript(script).compileProxies()[0].function());
+		System.out.println(FEM.scriptCompiler().useScript(script).compileProxies()[0].function());
 
 	}
 
