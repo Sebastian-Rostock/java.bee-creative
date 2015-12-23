@@ -468,7 +468,7 @@ public final class FEMDuration implements Comparable<FEMDuration>, ScriptFormatt
 	}
 
 	@SuppressWarnings ("javadoc")
-	private FEMDuration(final int valueH, final int valueL) {
+	FEMDuration(final int valueH, final int valueL) {
 		this.__valueH = valueH;
 		this.__valueL = valueL;
 	}

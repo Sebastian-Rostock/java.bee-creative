@@ -382,6 +382,25 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMObject}.
+	 */
+	@SuppressWarnings ("javadoc")
+	public static final class ObjectValue extends DataValue<FEMObject> {
+
+		ObjectValue(final FEMObject data) throws NullPointerException {
+			super(data);
+		}
+
+		{}
+
+		@Override
+		public final FEMType<FEMObject> type() {
+			return FEM.OBJECT_TYPE;
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMBinary}.
 	 */
 	@SuppressWarnings ("javadoc")
@@ -4063,6 +4082,16 @@ public class FEM {
 	public static final FEMType<FEMString> STRING_TYPE = FEMType.from(FEM.STRING_ID, "STRING");
 
 	/**
+	 * Dieses Feld speichert den Identifikator von {@link #OBJECT_TYPE}.
+	 */
+	public static final int OBJECT_ID = 10;
+
+	/**
+	 * Dieses Feld speichert den Datentyp von {@link ObjectValue}.
+	 */
+	public static final FEMType<FEMObject> OBJECT_TYPE = FEMType.from(FEM.OBJECT_ID, "OBJECT");
+
+	/**
 	 * Dieses Feld speichert den Identifikator von {@link #BINARY_TYPE}.
 	 */
 	public static final int BINARY_ID = 5;
@@ -4326,6 +4355,17 @@ public class FEM {
 		return FEM.arrayValue(FEMArray.from(data));
 	}
 
+	/**
+	 * Diese Methode gibt die gegebene Referenz als {@link FEMValue} zurück.
+	 * 
+	 * @param data Referenz.
+	 * @return Wert.
+	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
+	 */
+	public static final ObjectValue objectValue(final FEMObject data) throws NullPointerException {
+		return new ObjectValue(data);
+	}
+	
 	/**
 	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
 	 * 
