@@ -15,7 +15,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	/**
 	 * Dieses Feld speichert die Referenz {@code 0.0:0}.
 	 */
-	public static final FEMObject EMPTY = new FEMObject(2147483647, 0);
+	public static final FEMObject EMPTY = new FEMObject(0, 0);
 
 	{}
 

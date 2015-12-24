@@ -96,7 +96,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final FEMValue invoke(FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			return this;
 		}
 
@@ -4365,7 +4365,7 @@ public class FEM {
 	public static final ObjectValue objectValue(final FEMObject data) throws NullPointerException {
 		return new ObjectValue(data);
 	}
-	
+
 	/**
 	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
 	 * 
@@ -4598,35 +4598,84 @@ public class FEM {
 		return new ScriptFormatter();
 	}
 
-	public static void main(final String[] args) throws Exception {
-		final FEMScript script = FEM.scriptParser().useSource("MyFun{A; B; C: länge( [$A; $B; 123; true; void; 'text'])}").parseScript();
-		System.out.println(script);
-		System.out.println(FEM.scriptFormatter().formatData((Object)script));
-		System.out.println(FEM.scriptCompiler().useScript(script).compileProxies()[0].function());
-
-	}
-
-	public static String parseValue(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseValue()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#parseValue()
+	 * @param source Eingabe.
+	 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+	 */
+	public static final String parseValue(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseValue();
 	}
 
-	public static String parseString(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseString()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#parseString()
+	 * @param source Eingabe.
+	 * @return Eingabe ohne Maskierung mit {@code '\''} bzw. {@code '\"'}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+	 */
+	public static final String parseString(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseString();
 	}
 
-	public static String parseComment(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseComment()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#parseComment()
+	 * @param source Eingabe.
+	 * @return Eingabe ohne Maskierung mit {@code '/'}.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
+	 */
+	public static final String parseComment(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseComment();
 	}
 
-	public static String formatValue(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatValue()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#formatValue()
+	 * @param source Eingabe.
+	 * @return Eingabe mit Maskierung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 */
+	public static final String formatValue(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatValue();
 	}
 
-	public static String formatString(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatString()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#formatString()
+	 * @param source Eingabe.
+	 * @return Eingabe mit Maskierung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 */
+	public static final String formatString(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatString();
 	}
 
-	public static String formatComment(final String source) {
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatComment()}.
+	 * 
+	 * @see #scriptParser()
+	 * @see ScriptParser#formatComment()
+	 * @param source Eingabe.
+	 * @return Eingabe mit Maskierung.
+	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+	 */
+	public static final String formatComment(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatComment();
 	}
 
