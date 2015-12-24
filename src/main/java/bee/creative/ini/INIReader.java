@@ -26,12 +26,12 @@ public final class INIReader implements Closeable {
 	/**
 	 * Dieses Feld speichert den {@link Reader}.
 	 */
-	final Reader reader;
+	final Reader __reader;
 
 	/**
 	 * Dieses Feld speichert den Puffer für die maskierten Texte.
 	 */
-	final StringBuilder builder;
+	final StringBuilder __builder;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link File} mit der {@code INI}-Datenstruktur.
@@ -52,8 +52,8 @@ public final class INIReader implements Closeable {
 	 */
 	public INIReader(final Reader reader) throws NullPointerException {
 		if (reader == null) throw new NullPointerException("reader = null");
-		this.reader = reader;
-		this.builder = new StringBuilder();
+		this.__reader = reader;
+		this.__builder = new StringBuilder();
 	}
 
 	{}
@@ -65,21 +65,21 @@ public final class INIReader implements Closeable {
 	 * @return nächstes Element oder {@code null}.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 */
-	public INIToken read() throws IOException {
+	public final INIToken read() throws IOException {
 		while (true) {
-			final int symbol = this.reader.read();
+			final int symbol = this.__reader.read();
 			switch (symbol) {
 				case -1:
 					return null;
 				case '[':
-					final String section = this.readSection();
+					final String section = this.__readSection();
 					return INIToken.sectionToken(section);
 				case ';':
-					final String comment = this.readComment();
+					final String comment = this.__readComment();
 					return INIToken.commentToken(comment);
 				default:
-					final String key = this.readKey(symbol);
-					final String value = this.readValue();
+					final String key = this.__readKey(symbol);
+					final String value = this.__readValue();
 					return INIToken.propertyToken(key, value);
 				case '\r':
 				case '\n': // skip
@@ -96,9 +96,9 @@ public final class INIReader implements Closeable {
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	String readKey(int symbol) throws IOException, IllegalArgumentException {
-		final Reader source = this.reader;
-		final StringBuilder result = this.builder;
+	final String __readKey(int symbol) throws IOException, IllegalArgumentException {
+		final Reader source = this.__reader;
+		final StringBuilder result = this.__builder;
 		result.setLength(0);
 		while (true) {
 			switch (symbol) {
@@ -109,7 +109,7 @@ public final class INIReader implements Closeable {
 				case '=':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.__readSymbol(source.read());
 			}
 			result.append((char)symbol);
 			symbol = source.read();
@@ -123,9 +123,9 @@ public final class INIReader implements Closeable {
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	String readValue() throws IOException, IllegalArgumentException {
-		final Reader source = this.reader;
-		final StringBuilder result = this.builder;
+	final String __readValue() throws IOException, IllegalArgumentException {
+		final Reader source = this.__reader;
+		final StringBuilder result = this.__builder;
 		result.setLength(0);
 		while (true) {
 			int symbol = source.read();
@@ -135,7 +135,7 @@ public final class INIReader implements Closeable {
 				case '\n':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.__readSymbol(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -148,9 +148,9 @@ public final class INIReader implements Closeable {
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	String readSection() throws IOException, IllegalArgumentException {
-		final Reader source = this.reader;
-		final StringBuilder result = this.builder;
+	final String __readSection() throws IOException, IllegalArgumentException {
+		final Reader source = this.__reader;
+		final StringBuilder result = this.__builder;
 		result.setLength(0);
 		while (true) {
 			int symbol = source.read();
@@ -170,7 +170,7 @@ public final class INIReader implements Closeable {
 					}
 					throw new IllegalArgumentException();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.__readSymbol(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -183,7 +183,7 @@ public final class INIReader implements Closeable {
 	 * @return unmaskiertes Zeichen.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	int readSymbol(final int symbol) throws IllegalArgumentException {
+	final int __readSymbol(final int symbol) throws IllegalArgumentException {
 		switch (symbol) {
 			case '\\':
 			case '=':
@@ -208,9 +208,9 @@ public final class INIReader implements Closeable {
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	String readComment() throws IOException {
-		final Reader source = this.reader;
-		final StringBuilder result = this.builder;
+	final String __readComment() throws IOException {
+		final Reader source = this.__reader;
+		final StringBuilder result = this.__builder;
 		result.setLength(0);
 		while (true) {
 			int symbol = source.read();
@@ -220,7 +220,7 @@ public final class INIReader implements Closeable {
 				case '\n':
 					return result.toString();
 				case '\\':
-					symbol = this.readSymbol(source.read());
+					symbol = this.__readSymbol(source.read());
 			}
 			result.append((char)symbol);
 		}
@@ -232,16 +232,16 @@ public final class INIReader implements Closeable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void close() throws IOException {
-		this.reader.close();
+	public final void close() throws IOException {
+		this.__reader.close();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.reader);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__reader);
 	}
 
 }

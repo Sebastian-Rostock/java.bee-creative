@@ -8,7 +8,7 @@ import bee.creative.util.Objects;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class INIToken {
+public final class INIToken {
 
 	/**
 	 * Dieses Feld speichert die Typkennung eines Abschnitts.
@@ -45,21 +45,9 @@ public abstract class INIToken {
 	 * @return Abschnitt.
 	 * @throws NullPointerException Wenn {@code section} {@code null} ist.
 	 */
-	public static INIToken sectionToken(final String section) throws NullPointerException {
+	public static final INIToken sectionToken(final String section) throws NullPointerException {
 		if (section == null) throw new NullPointerException("section = null");
-		return new INIToken() {
-
-			@Override
-			public int type() {
-				return INIToken.SECTION;
-			}
-
-			@Override
-			public String section() {
-				return section;
-			}
-
-		};
+		return new INIToken(null, null, section, null);
 	}
 
 	/**
@@ -72,27 +60,10 @@ public abstract class INIToken {
 	 * @return Eigenschaft
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist.
 	 */
-	public static INIToken propertyToken(final String key, final String value) throws NullPointerException {
+	public static final INIToken propertyToken(final String key, final String value) throws NullPointerException {
 		if (key == null) throw new NullPointerException("key = null");
 		if (value == null) throw new NullPointerException("value = null");
-		return new INIToken() {
-
-			@Override
-			public int type() {
-				return INIToken.PROPERTY;
-			}
-
-			@Override
-			public String key() {
-				return key;
-			}
-
-			@Override
-			public String value() {
-				return value;
-			}
-
-		};
+		return new INIToken(key, value, null, null);
 	}
 
 	/**
@@ -103,21 +74,39 @@ public abstract class INIToken {
 	 * @return Kommentar.
 	 * @throws NullPointerException Wenn {@code comment} {@code null} ist.
 	 */
-	public static INIToken commentToken(final String comment) throws NullPointerException {
+	public static final INIToken commentToken(final String comment) throws NullPointerException {
 		if (comment == null) throw new NullPointerException("comment = null");
-		return new INIToken() {
+		return new INIToken(null, null, null, comment);
+	}
 
-			@Override
-			public int type() {
-				return INIToken.COMMENT;
-			}
+	{}
 
-			@Override
-			public String comment() {
-				return comment;
-			}
+	/**
+	 * Dieses Feld speichert den Schlüssel der Eigenschaft oder {@code null}.
+	 */
+	final String __key;
 
-		};
+	/**
+	 * Dieses Feld speichert den Wert der Eigenschaft oder {@code null}.
+	 */
+	final String __value;
+
+	/**
+	 * Dieses Feld speichert den Namen des Abschnitts oder {@code null}.
+	 */
+	final String __section;
+
+	/**
+	 * Dieses Feld speichert den Text des Kommentars oder {@code null}.
+	 */
+	final String __comment;
+
+	@SuppressWarnings ("javadoc")
+	INIToken(final String key, final String value, final String section, final String comment) {
+		this.__key = key;
+		this.__value = value;
+		this.__section = section;
+		this.__comment = comment;
 	}
 
 	{}
@@ -130,7 +119,9 @@ public abstract class INIToken {
 	 * @see #COMMENT
 	 * @return Typkennung.
 	 */
-	public abstract int type();
+	public final int type() {
+		return this.__section != null ? INIToken.SECTION : this.__comment != null ? INIToken.COMMENT : INIToken.PROPERTY;
+	}
 
 	/**
 	 * Diese Methode gibt den Schlüssel der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
@@ -138,8 +129,8 @@ public abstract class INIToken {
 	 * @see #propertyToken(String, String)
 	 * @return Schlüssel der Eigenschaft oder {@code null}.
 	 */
-	public String key() {
-		return null;
+	public final String key() {
+		return this.__key;
 	}
 
 	/**
@@ -148,8 +139,8 @@ public abstract class INIToken {
 	 * @see #propertyToken(String, String)
 	 * @return Wert der Eigenschaft oder {@code null}.
 	 */
-	public String value() {
-		return null;
+	public final String value() {
+		return this.__value;
 	}
 
 	/**
@@ -158,8 +149,8 @@ public abstract class INIToken {
 	 * @see #sectionToken(String)
 	 * @return Namen des Abschnitts oder {@code null}.
 	 */
-	public String section() {
-		return null;
+	public final String section() {
+		return this.__section;
 	}
 
 	/**
@@ -168,8 +159,8 @@ public abstract class INIToken {
 	 * @see #commentToken(String)
 	 * @return Text des Kommentars oder {@code null}.
 	 */
-	public String comment() {
-		return null;
+	public final String comment() {
+		return this.__comment;
 	}
 
 	{}
@@ -178,7 +169,27 @@ public abstract class INIToken {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final int hashCode() {
+		return Objects.hash(this.__key, this.__value, this.__section, this.__comment);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(final Object object) {
+		if (object == this) return true;
+		if (!(object instanceof INIToken)) return false;
+		final INIToken that = (INIToken)object;
+		return Objects.equals(this.__key, that.__key) && Objects.equals(this.__value, that.__value) && //
+			Objects.equals(this.__section, that.__section) && Objects.equals(this.__comment, that.__comment);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final String toString() {
 		switch (this.type()) {
 			case SECTION:
 				return "[" + Objects.toString(this.section()) + "]";
