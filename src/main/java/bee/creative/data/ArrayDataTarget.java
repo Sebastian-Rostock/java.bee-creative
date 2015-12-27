@@ -14,12 +14,12 @@ public class ArrayDataTarget extends BaseDataTarget {
 	/**
 	 * Dieses Feld speichert die Nutzdaten.
 	 */
-	final CompactByteArray data;
+	final CompactByteArray __data;
 
 	/**
 	 * Dieses Feld speichert die Schreibeposition.
 	 */
-	int index;
+	int __index;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Nutzdaten mit 128 Byte Größe.
@@ -36,7 +36,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	public ArrayDataTarget(final int size) {
 		this(new CompactByteArray(size));
-		this.data.setAlignment(0);
+		this.__data.setAlignment(0);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.data = data;
+		this.__data = data;
 	}
 
 	{}
@@ -57,7 +57,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public CompactByteArray data() {
-		return this.data;
+		return this.__data;
 	}
 
 	/**
@@ -66,11 +66,11 @@ public class ArrayDataTarget extends BaseDataTarget {
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
-		final CompactByteArray data = this.data;
-		final int size = data.size(), index = this.index, index2 = index + length;
+		final CompactByteArray data = this.__data;
+		final int size = data.size(), index = this.__index, index2 = index + length;
 		data.insert(size, Math.max(index2 - size, 0));
 		System.arraycopy(array, offset, data.array(), data.startIndex() + index, length);
-		this.index = index2;
+		this.__index = index2;
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.index = (int)index;
+		this.__index = (int)index;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public long index() throws IOException {
-		return this.index;
+		return this.__index;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public long length() throws IOException {
-		return this.data.size();
+		return this.__data.size();
 	}
 
 	/**
@@ -102,13 +102,13 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void allocate(final long value) throws IOException {
-		final int size = this.data.size();
+		final int size = this.__data.size();
 		final int count = (int)value - size;
 		if (count < 0) {
-			this.data.remove(size - count, count);
-			this.index = Math.min(this.index, size - count);
+			this.__data.remove(size - count, count);
+			this.__index = Math.min(this.__index, size - count);
 		} else if (count > 0) {
-			this.data.insert(size, count);
+			this.__data.insert(size, count);
 		}
 	}
 

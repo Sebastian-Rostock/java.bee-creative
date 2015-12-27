@@ -16,7 +16,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	/**
 	 * Dieses Feld speichert das {@link Iterable}.
 	 */
-	final Iterable<? extends GItem> items;
+	final Iterable<? extends GItem> __items;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link Iterable}.
@@ -26,7 +26,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	 */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
-		this.items = items;
+		this.__items = items;
 	}
 
 	{}
@@ -50,7 +50,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
-		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.items));
+		return new FilteredSelection<GItem>(Iterables.filteredIterable(Filters.navigatedFilter(field, Filters.containsFilter(value)), this.__items));
 	}
 
 	/**
@@ -59,7 +59,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	@SuppressWarnings ("unchecked")
 	@Override
 	public Iterator<GItem> iterator() {
-		return (Iterator<GItem>)this.items.iterator();
+		return (Iterator<GItem>)this.__items.iterator();
 	}
 
 }

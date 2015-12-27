@@ -13,7 +13,7 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	final GContext context;
+	final GContext __context;
 
 	/**
 	 * Dieser Konstruktor initialisiert Kontextobjekt und Nutzdaten.
@@ -24,7 +24,7 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 	 */
 	public ArrayCodecSource(final GContext context, final byte... data) throws NullPointerException {
 		super(data);
-		this.context = context;
+		this.__context = context;
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 	 */
 	public ArrayCodecSource(final GContext context, final ByteArraySection data) throws NullPointerException {
 		super(data);
-		this.context = context;
+		this.__context = context;
 	}
 
 	{}
@@ -46,7 +46,7 @@ public class ArrayCodecSource<GContext> extends ArrayDataSource implements Codec
 	 */
 	@Override
 	public final GContext context() {
-		return this.context;
+		return this.__context;
 	}
 
 }

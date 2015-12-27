@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
-import bee.creative.iam.IAM.IAMBaseArray;
 import bee.creative.iam.IAMArray;
 
 /**
@@ -18,24 +17,24 @@ import bee.creative.iam.IAMArray;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class MMFArray extends IAMBaseArray {
+public class MMFArray extends IAMArray {
 
 	/**
 	 * Dieses Feld speichert das leere {@link MMFArray}.
 	 */
-	public static final MMFArray EMPTY = new MMFArray(null, 0, 0);
+	public static final MMFArray EMPTY = new MMFArray(0, null, 0, 0);
 
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static ByteOrder order(final ByteOrder order) {
+	static ByteOrder __order(final ByteOrder order) {
 		return order != null ? order : ByteOrder.nativeOrder();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static ByteBuffer buffer(final File file, final ByteOrder order) throws IOException, NullPointerException {
+	static ByteBuffer __buffer(final File file, final ByteOrder order) throws IOException, NullPointerException {
 		try (final RandomAccessFile data = new RandomAccessFile(file, "r")) {
-			return data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(MMFArray.order(order));
+			return data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(MMFArray.__order(order));
 		}
 	}
 
@@ -44,17 +43,17 @@ public class MMFArray extends IAMBaseArray {
 	/**
 	 * Dieses Feld speichert den Speicherbereich.
 	 */
-	protected final ByteBuffer byteBuffer;
+	protected final ByteBuffer __byteBuffer;
 
 	/**
 	 * Dieses Feld speichert die Startposition.
 	 */
-	protected final int byteOffset;
+	protected final int __byteOffset;
 
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int byteLength;
+	protected final int __byteLength;
 
 	/**
 	 * Dieser Konstruktor initialisiert den Speicherbereich.
@@ -63,7 +62,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
 	 */
 	public MMFArray(final ByteBuffer buffer) throws NullPointerException {
-		this(buffer, 0, Math.min(buffer.limit(), 1073741823));
+		this(0, buffer, 0, Math.min(buffer.limit(), 1073741823));
 	}
 
 	/**
@@ -76,7 +75,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @throws NullPointerException Wenn {@code file} {@code null} ist.
 	 */
 	public MMFArray(final File file, final ByteOrder order) throws IOException, NullPointerException {
-		this(MMFArray.buffer(file, order));
+		this(MMFArray.__buffer(file, order));
 	}
 
 	/**
@@ -88,17 +87,29 @@ public class MMFArray extends IAMBaseArray {
 	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
 	 */
 	public MMFArray(final byte[] bytes, final ByteOrder order) throws NullPointerException {
-		this(ByteBuffer.wrap(bytes).order(MMFArray.order(order)));
+		this(ByteBuffer.wrap(bytes).order(MMFArray.__order(order)));
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected MMFArray(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
-		this.byteBuffer = byteBuffer;
-		this.byteOffset = byteOffset;
-		this.byteLength = byteLength;
+	protected MMFArray(int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
+		super(length);
+		this.__byteBuffer = byteBuffer;
+		this.__byteOffset = byteOffset;
+		this.__byteLength = byteLength;
 	}
 
 	{}
+
+	/**
+	 * Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
+	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation {@code 0}, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
+	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
+	 * 
+	 * @return Anzahl der Byte je Zahl der Folge (0..4).
+	 */
+	public int mode() {
+		return 0;
+	}
 
 	/**
 	 * Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
@@ -106,14 +117,14 @@ public class MMFArray extends IAMBaseArray {
 	 * @return Kopie des Speicherbereichs.
 	 */
 	public final byte[] toBytes() {
-		final int length = this.byteLength;
+		final int length = this.__byteLength;
 		final byte[] result = new byte[length];
 		if (length == 0) return result;
-		final ByteBuffer buffer = this.byteBuffer;
+		final ByteBuffer buffer = this.__byteBuffer;
 		final int position = buffer.position();
 		try {
-			buffer.position(position + this.byteOffset);
-			buffer.get(result);
+			buffer.position(position + this.__byteOffset);
+			buffer.get(result, 0, length);
 		} finally {
 			buffer.position(position);
 		}
@@ -127,7 +138,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @return {@link MMFINT8Array}.
 	 */
 	public final MMFArray toINT8() {
-		return new MMFINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
+		return new MMFINT8Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
 	}
 
 	/**
@@ -137,7 +148,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @return {@link MMFINT16Array}.
 	 */
 	public final MMFArray toINT16() {
-		return new MMFINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
+		return new MMFINT16Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
 	}
 
 	/**
@@ -147,7 +158,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @return {@link MMFINT32Array}.
 	 */
 	public final MMFArray toINT32() {
-		return new MMFINT32Array(this.byteBuffer, this.byteOffset, this.byteLength);
+		return new MMFINT32Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
 	}
 
 	/**
@@ -157,7 +168,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @return {@link MMFUINT8Array}.
 	 */
 	public final MMFArray toUINT8() {
-		return new MMFUINT8Array(this.byteBuffer, this.byteOffset, this.byteLength);
+		return new MMFUINT8Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
 	}
 
 	/**
@@ -167,18 +178,7 @@ public class MMFArray extends IAMBaseArray {
 	 * @return {@link MMFUINT16Array}.
 	 */
 	public final MMFArray toUINT16() {
-		return new MMFUINT16Array(this.byteBuffer, this.byteOffset, this.byteLength);
-	}
-
-	/**
-	 * Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
-	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation {@code 0}, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
-	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
-	 * 
-	 * @return Anzahl der Byte je Zahl der Folge (0..4).
-	 */
-	public int mode() {
-		return 0;
+		return new MMFUINT16Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
 	}
 
 	{}
@@ -187,7 +187,7 @@ public class MMFArray extends IAMBaseArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray newSection(final int offset, final int length) {
+	protected MMFArray __section(final int offset, final int length) {
 		return MMFArray.EMPTY;
 	}
 
@@ -196,24 +196,7 @@ public class MMFArray extends IAMBaseArray {
 	 */
 	@Override
 	public final MMFArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.length())) return MMFArray.EMPTY;
-		return this.newSection(offset, length);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int get(final int index) {
-		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int length() {
-		return 0;
+		return (MMFArray)super.section(offset, length);
 	}
 
 }

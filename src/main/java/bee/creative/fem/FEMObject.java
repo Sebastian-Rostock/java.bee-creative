@@ -4,16 +4,19 @@ import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.fem.FEM.ScriptFormatterInput;
 
 /**
- * Diese Klasse implementiert eine Referenz auf ein logisches Objekt.<br>
- * Das Objekt wird im Rahmen seines Besitzers über einen {@link #refValue() Objektschlüssel} identifiziert.<br>
- * Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue() Besitzerkennung} angegeben.
+ * Diese Klasse implementiert eine Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue() Objektschlüssel}
+ * identifiziert wird.<br>
+ * Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue() Besitzerkennung} angegeben. Die Besitzerkennung
+ * kann beispielsweise eine über den {@link FEMContext} erreichbare Objektliste identifizieren, deren Elemente die referenzierten Objekte darstellen. Der
+ * Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur Besitzerkennung könnte hierbei auch die Typkennung
+ * genutzt werden.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterInput {
 
 	/**
-	 * Dieses Feld speichert die Referenz {@code 0.0:0}.
+	 * Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind.
 	 */
 	public static final FEMObject EMPTY = new FEMObject(0, 0);
 

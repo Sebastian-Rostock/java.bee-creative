@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.bex.BEXDecoder.BEXFileDecoder;
 import bee.creative.bex.BEXEncoder.BEXFileEncoder;
-import bee.creative.iam.IAM;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
@@ -157,7 +156,7 @@ public class BEX {
 	 * @param value Zeichenkette.
 	 * @return Zahlenfolge.
 	 */
-	public static int[] toItem(final String value) {
+	public static final int[] toItem(final String value) {
 		final byte[] bytes = value.getBytes(BEX.CHARSET);
 		final int length = bytes.length;
 		final int[] result = new int[length + 1];
@@ -171,13 +170,13 @@ public class BEX {
 	 * Diese Methode kodiert die gegebene Zeichenkette via {@link String#getBytes(Charset)} in eine Bytefolge, wandelt diese in eine nullterminierte Zahlenfolge
 	 * um gibt diese zurück.
 	 * 
-	 * @see IAM#toArray(byte[])
+	 * @see IAMArray#from(byte[])
 	 * @param value Zeichenkette.
 	 * @return Zahlenfolge.
 	 */
-	public static IAMArray toArray(final String value) {
+	public static final IAMArray toArray(final String value) {
 		final byte[] bytes = value.getBytes(BEX.CHARSET);
-		return IAM.toArray(Arrays.copyOf(bytes, bytes.length + 1));
+		return IAMArray.from(Arrays.copyOf(bytes, bytes.length + 1));
 	}
 
 	/**
@@ -189,7 +188,7 @@ public class BEX {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
-	public static String toString(final MMFArray value) {
+	public static final String toString(final MMFArray value) {
 		return new String(value.section(0, value.length() - 1).toBytes(), BEX.CHARSET);
 	}
 
@@ -199,7 +198,7 @@ public class BEX {
 	 * @see BEXFileEncoder#BEXFileEncoder()
 	 * @return neuer {@link BEXFileEncoder}.
 	 */
-	public static BEXFileEncoder encoder() {
+	public static final BEXFileEncoder encoder() {
 		return new BEXFileEncoder();
 	}
 
@@ -211,7 +210,7 @@ public class BEX {
 	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public static BEXFileDecoder decoder(final MMFArray array) throws IAMException, NullPointerException {
+	public static final BEXFileDecoder decoder(final MMFArray array) throws IAMException, NullPointerException {
 		return new BEXFileDecoder(array);
 	}
 

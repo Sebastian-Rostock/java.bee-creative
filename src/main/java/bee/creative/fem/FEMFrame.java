@@ -309,7 +309,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist.
 	 */
-	public final FEMFrame newFrame(final FEMFunction... params) throws NullPointerException {
+	public final FEMFrame newFrame(final FEMFunction[] params) throws NullPointerException {
 		return new InvokeFrame(this, params, this.__context);
 	}
 
@@ -351,7 +351,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @return neuer Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist.
 	 */
-	public final FEMFrame withParams(final FEMFunction... params) throws NullPointerException {
+	public final FEMFrame withParams(final FEMFunction[] params) throws NullPointerException {
 		return new InvokeFrame(this.__parent, params, this.__context);
 	}
 

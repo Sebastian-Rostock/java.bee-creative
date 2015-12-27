@@ -11,7 +11,7 @@ class MMFINT8Array extends MMFArray {
 
 	@SuppressWarnings ("javadoc")
 	public MMFINT8Array(final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
-		super(byteBuffer, byteOffset, byteLength);
+		super(byteLength, byteBuffer, byteOffset, byteLength);
 	}
 
 	{}
@@ -20,17 +20,16 @@ class MMFINT8Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray newSection(final int offset, final int length) {
-		return new MMFINT8Array(this.byteBuffer, this.byteOffset + offset, length);
+	protected MMFArray __section(final int offset, final int length) {
+		return new MMFINT8Array(this.__byteBuffer, this.__byteOffset + offset, length);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int get(final int index) {
-		if ((index < 0) || (index >= this.byteLength)) return 0;
-		return this.byteBuffer.get(this.byteOffset + index);
+	protected int __get(final int index) {
+		return this.__byteBuffer.get(this.__byteOffset + index);
 	}
 
 	/**
@@ -39,14 +38,6 @@ class MMFINT8Array extends MMFArray {
 	@Override
 	public int mode() {
 		return 1;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int length() {
-		return this.byteLength;
 	}
 
 }

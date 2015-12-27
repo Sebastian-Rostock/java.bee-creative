@@ -13,7 +13,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	final GContext context;
+	final GContext __context;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Kontextobjekt sowie die Nutzdaten mit 128 Byte Größe.
@@ -21,7 +21,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 * @param context Kontextobjekt.
 	 */
 	public ArrayCodecTarget(final GContext context) {
-		this.context = context;
+		this.__context = context;
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 */
 	public ArrayCodecTarget(final GContext context, final CompactByteArray data) throws NullPointerException {
 		super(data);
-		this.context = context;
+		this.__context = context;
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 */
 	public ArrayCodecTarget(final GContext context, final int size) {
 		super(size);
-		this.context = context;
+		this.__context = context;
 	}
 
 	{}
@@ -55,7 +55,7 @@ public class ArrayCodecTarget<GContext> extends ArrayDataTarget implements Codec
 	 */
 	@Override
 	public final GContext context() {
-		return this.context;
+		return this.__context;
 	}
 
 }

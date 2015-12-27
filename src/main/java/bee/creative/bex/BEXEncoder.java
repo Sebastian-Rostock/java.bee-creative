@@ -21,7 +21,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 import bee.creative.bex.BEXDecoder.BEXFileDecoder;
 import bee.creative.iam.IAMEncoder;
-import bee.creative.iam.IAMEncoder.IAMBaseEncoder;
 import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.iam.IAMEncoder.IAMListEncoder;
 import bee.creative.util.Comparators;
@@ -462,7 +461,7 @@ public class BEXEncoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class BEXFileEncoder implements IAMBaseEncoder {
+	public static final class BEXFileEncoder implements IAMEncoder.DataEncoder {
 
 		/**
 		 * Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten.

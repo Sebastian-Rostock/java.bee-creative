@@ -18,7 +18,7 @@ public class BufferDataSource extends BaseDataSource {
 	/**
 	 * Dieses Feld speichert die Nutzdaten.
 	 */
-	final ByteBuffer data;
+	final ByteBuffer __data;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -38,7 +38,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	public BufferDataSource(final ByteBuffer data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.data = data.slice().order(ByteOrder.BIG_ENDIAN);
+		this.__data = data.slice().order(ByteOrder.BIG_ENDIAN);
 	}
 
 	{}
@@ -47,8 +47,8 @@ public class BufferDataSource extends BaseDataSource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ByteBuffer data() {
-		return this.data;
+	public final ByteBuffer data() {
+		return this.__data;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class BufferDataSource extends BaseDataSource {
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 		try {
-			this.data.get(array, offset, length);
+			this.__data.get(array, offset, length);
 		} catch (final BufferUnderflowException e) {
 			throw new EOFException();
 		} catch (final IndexOutOfBoundsException e) {
@@ -78,7 +78,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public byte readByte() throws IOException {
-		return this.data.get();
+		return this.__data.get();
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public int readUnsignedByte() throws IOException {
-		return this.data.get() & 0xFF;
+		return this.__data.get() & 0xFF;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public short readShort() throws IOException {
-		return this.data.getShort();
+		return this.__data.getShort();
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public int readUnsignedShort() throws IOException {
-		return this.data.getShort() & 0xFFFF;
+		return this.__data.getShort() & 0xFFFF;
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public char readChar() throws IOException {
-		return this.data.getChar();
+		return this.__data.getChar();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public int readInt() throws IOException {
-		return this.data.getInt();
+		return this.__data.getInt();
 	}
 
 	/**
@@ -130,14 +130,14 @@ public class BufferDataSource extends BaseDataSource {
 			case 0:
 				return 0;
 			case 1:
-				return this.data.get() & 0xFF;
+				return this.__data.get() & 0xFF;
 			case 2:
-				return this.data.getShort() & 0xFFFF;
+				return this.__data.getShort() & 0xFFFF;
 			case 3:
-				this.data.get(this.array, 0, 3);
+				this.__data.get(this.array, 0, 3);
 				return Bytes.getInt3BE(this.array, 0);
 			case 4:
-				return this.data.getInt();
+				return this.__data.getInt();
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -148,7 +148,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long readLong() throws IOException {
-		return this.data.getLong();
+		return this.__data.getLong();
 	}
 
 	/**
@@ -160,25 +160,25 @@ public class BufferDataSource extends BaseDataSource {
 			case 0:
 				return 0;
 			case 1:
-				return this.data.get() & 0xFF;
+				return this.__data.get() & 0xFF;
 			case 2:
-				return this.data.getShort() & 0xFFFF;
+				return this.__data.getShort() & 0xFFFF;
 			case 3:
-				this.data.get(this.array, 0, 3);
+				this.__data.get(this.array, 0, 3);
 				return Bytes.getInt3BE(this.array, 0);
 			case 4:
-				return this.data.getInt();
+				return this.__data.getInt();
 			case 5:
-				this.data.get(this.array, 0, 5);
+				this.__data.get(this.array, 0, 5);
 				return Bytes.getLong5BE(this.array, 0);
 			case 6:
-				this.data.get(this.array, 0, 6);
+				this.__data.get(this.array, 0, 6);
 				return Bytes.getLong6BE(this.array, 0);
 			case 7:
-				this.data.get(this.array, 0, 7);
+				this.__data.get(this.array, 0, 7);
 				return Bytes.getLong7BE(this.array, 0);
 			case 8:
-				return this.data.getLong();
+				return this.__data.getLong();
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -189,7 +189,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public float readFloat() throws IOException {
-		return this.data.getFloat();
+		return this.__data.getFloat();
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public double readDouble() throws IOException {
-		return this.data.getDouble();
+		return this.__data.getDouble();
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.data.position((int)index);
+		this.__data.position((int)index);
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long index() throws IOException {
-		return this.data.position();
+		return this.__data.position();
 	}
 
 	/**
@@ -221,7 +221,7 @@ public class BufferDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long length() throws IOException {
-		return this.data.limit();
+		return this.__data.limit();
 	}
 
 	/**

@@ -5,10 +5,10 @@ package bee.creative.iam;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public class IAMException extends RuntimeException {
+public final class IAMException extends RuntimeException {
 
 	@SuppressWarnings ("javadoc")
-	private static final long serialVersionUID = -5004886777612828963L;
+	private static final long serialVersionUID = -4587723938056298739L;
 
 	/**
 	 * Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer ungültigen Anzahl oder eines ungültigen Werts.
@@ -35,7 +35,7 @@ public class IAMException extends RuntimeException {
 	/**
 	 * Dieses Feld speichert die Kennungen der Fehlerursache.
 	 */
-	protected final int code;
+	final int __code;
 
 	/**
 	 * Dieser Konstrukteur initialisiert die Kennungen der Fehlerursachen.
@@ -47,7 +47,7 @@ public class IAMException extends RuntimeException {
 	 * @param code Kennungen der Fehlerursachen ({@code |}-verknüpft).
 	 */
 	public IAMException(final int code) {
-		this.code = code;
+		this.__code = code;
 	}
 
 	{}
@@ -57,8 +57,8 @@ public class IAMException extends RuntimeException {
 	 * 
 	 * @return Kennungen der Fehlerursachen.
 	 */
-	public int code() {
-		return this.code;
+	public final int code() {
+		return this.__code;
 	}
 
 }

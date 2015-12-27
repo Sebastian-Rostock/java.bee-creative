@@ -16,7 +16,7 @@ public class FileDataTarget extends BaseDataTarget {
 	/**
 	 * Dieses Feld speichert die Nutzdaten.
 	 */
-	final RandomAccessFile data;
+	final RandomAccessFile __data;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen {@link File} im Modus {@code "rw"}.
@@ -48,7 +48,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	public FileDataTarget(final RandomAccessFile file) throws NullPointerException {
 		if (file == null) throw new NullPointerException("file = null");
-		this.data = file;
+		this.__data = file;
 	}
 
 	{}
@@ -57,8 +57,8 @@ public class FileDataTarget extends BaseDataTarget {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public RandomAccessFile data() {
-		return this.data;
+	public final RandomAccessFile data() {
+		return this.__data;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
-		this.data.write(array, offset, length);
+		this.__data.write(array, offset, length);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.data.seek(index);
+		this.__data.seek(index);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public long index() throws IOException {
-		return this.data.getFilePointer();
+		return this.__data.getFilePointer();
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public long length() throws IOException {
-		return this.data.length();
+		return this.__data.length();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void allocate(final long value) throws IOException {
-		this.data.setLength(value);
+		this.__data.setLength(value);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class FileDataTarget extends BaseDataTarget {
 	 */
 	@Override
 	public void close() throws IOException {
-		this.data.close();
+		this.__data.close();
 	}
 
 }

@@ -5,26 +5,126 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import bee.creative.iam.IAM.IAMBaseArray;
-import bee.creative.iam.IAM.IAMBaseIndex;
-import bee.creative.iam.IAM.IAMBaseList;
-import bee.creative.iam.IAM.IAMBaseMap;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Bytes;
 
 /**
- * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link IAM} Datenstrukturen.
+ * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@code Integer Array Model} Datenstrukturen.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class IAMDecoder {
 
 	/**
+	 * Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten von {@code IAM_MAP}, {@code IAM_LIST} oder
+	 * {@code IAM_INDEX}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
+	public static final class IAMHeader {
+
+		/**
+		 * Dieses Feld speichert die Bitmaske.
+		 */
+		final int __mask;
+
+		/**
+		 * Dieses Feld speichert den Vergleichswert.
+		 */
+		final int __value;
+
+		@SuppressWarnings ("javadoc")
+		IAMHeader(final int mask, final int value) {
+			this.__mask = mask;
+			this.__value = value;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Kopfdaten eine gültige Datenstrukturkennung enthalten.
+		 * 
+		 * @param header Kopfdaten.
+		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten.
+		 */
+		public final boolean isValid(final int header) {
+			return (header & this.__mask) == this.__value;
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * geliefert.
+		 * 
+		 * @see #orderOf(byte[])
+		 * @param file Datei mit den Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws IOException Wenn {@link RandomAccessFile#RandomAccessFile(File, String)} bzw. {@link RandomAccessFile#read(byte[])} eine entsprechende Ausnahme
+		 *         auslöst.
+		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public final ByteOrder orderOf(final File file) throws IOException, NullPointerException, IllegalArgumentException {
+			try (RandomAccessFile source = new RandomAccessFile(file.getAbsoluteFile(), "r")) {
+				final byte[] bytes = new byte[4];
+				if (source.read(bytes) < 4) throw new IllegalArgumentException();
+				return this.orderOf(bytes);
+			}
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * geliefert.
+		 * 
+		 * @param bytes Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public final ByteOrder orderOf(final byte[] bytes) throws NullPointerException, IllegalArgumentException {
+			if (bytes.length < 4) throw new IllegalArgumentException();
+			if (this.isValid(Bytes.getInt4BE(bytes, 0))) return ByteOrder.BIG_ENDIAN;
+			if (this.isValid(Bytes.getInt4LE(bytes, 0))) return ByteOrder.LITTLE_ENDIAN;
+			return null;
+		}
+
+		/**
+		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
+		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
+		 * geliefert.
+		 * 
+		 * @see #orderOf(byte[])
+		 * @param buffer Puffer mit den Quelldaten.
+		 * @return Bytereihenfolge oder {@code null}.
+		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
+		 */
+		public final ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException, IllegalArgumentException {
+			if (buffer.remaining() < 4) throw new IllegalArgumentException();
+			final byte[] bytes = new byte[4];
+			buffer.get(bytes);
+			return this.orderOf(bytes);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final String toString() {
+			return Integer.toHexString(this.__value);
+		}
+
+	}
+
+	/**
 	 * Diese Klasse implementiert eine {@link IAMMap}, die ihre Daten aus einem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMMapDecoder extends IAMBaseMap {
+	public static final class IAMMapDecoder extends IAMMap {
 
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMMapDecoder}.
@@ -32,7 +132,7 @@ public class IAMDecoder {
 		public static final IAMMapDecoder EMPTY = new IAMMapDecoder();
 
 		/**
-		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP}.
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP} Datenstruktur.
 		 */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
 
@@ -41,61 +141,61 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Schlüssel.
 		 */
-		protected final MMFArray keyData;
+		final MMFArray __keyData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüssel.
 		 */
-		protected final MMFArray keyOffset;
+		final MMFArray __keyOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Schlüssel.
 		 */
-		protected final int keyLength;
+		final int __keyLength;
 
 		/**
 		 * Dieses Feld speichert die Zahlen der Werte.
 		 */
-		protected final MMFArray valueData;
+		final MMFArray __valueData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Werte.
 		 */
-		protected final MMFArray valueOffset;
+		final MMFArray __valueOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Werte.
 		 */
-		protected final int valueLength;
+		final int __valueLength;
 
 		/**
 		 * Dieses Feld speichert die Bitmaske der Schlüsselbereiche.
 		 */
-		protected final int rangeMask;
+		final int __rangeMask;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüsselbereiche.
 		 */
-		protected final MMFArray rangeOffset;
+		final MMFArray __rangeOffset;
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Einträge.
 		 */
-		protected final int entryCount;
+		final int __entryCount;
 
 		/**
 		 * Dieser Konstruktor initialisiert die leere Abbildung.
 		 */
-		protected IAMMapDecoder() {
-			this.keyData = null;
-			this.keyOffset = null;
-			this.keyLength = 0;
-			this.valueData = null;
-			this.valueOffset = null;
-			this.valueLength = 0;
-			this.rangeMask = 0;
-			this.rangeOffset = null;
-			this.entryCount = 0;
+		IAMMapDecoder() {
+			this.__keyData = null;
+			this.__keyOffset = null;
+			this.__keyLength = 0;
+			this.__valueData = null;
+			this.__valueOffset = null;
+			this.__valueLength = 0;
+			this.__rangeMask = 0;
+			this.__rangeOffset = null;
+			this.__entryCount = 0;
 		}
 
 		/**
@@ -136,12 +236,12 @@ public class IAMDecoder {
 				offset++;
 				if ((rangeMask < 1) || (rangeMask > 0x1FFFFFFF) || (((rangeMask + 1) & rangeMask) != 0)) throw new IAMException(IAMException.INVALID_VALUE);
 
-				rangeValue = IAM.byteAlign((rangeMask + 2) * IAM.byteCount(rangeSizeType));
-				rangeOffset = IAMDecoder.sizeArray(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
+				rangeValue = IAM.__byteAlign((rangeMask + 2) * IAM.__byteCount(rangeSizeType));
+				rangeOffset = IAM.__sizeArray(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
 				offset += rangeValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMDecoder.checkArray(rangeOffset);
+				IAM.__checkArray(rangeOffset);
 				rangeValue = rangeOffset.get(rangeMask + 1);
 				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
 
@@ -159,13 +259,13 @@ public class IAMDecoder {
 			final MMFArray keyOffset;
 			if (keySizeType != 0) {
 
-				keyValue = IAM.byteAlign((entryCount + 1) * IAM.byteCount(keySizeType));
+				keyValue = IAM.__byteAlign((entryCount + 1) * IAM.__byteCount(keySizeType));
 				keyLength = 0;
-				keyOffset = IAMDecoder.sizeArray(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
+				keyOffset = IAM.__sizeArray(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
 				offset += keyValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMDecoder.checkArray(keyOffset);
+				IAM.__checkArray(keyOffset);
 				keyValue = keyOffset.get(entryCount);
 
 			} else {
@@ -181,8 +281,8 @@ public class IAMDecoder {
 			}
 			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			keyValue = IAM.byteAlign(keyValue * IAM.byteCount(keyDataType));
-			final MMFArray keyData = IAMDecoder.dataArray(array.section(offset, keyValue), keyDataType);
+			keyValue = IAM.__byteAlign(keyValue * IAM.__byteCount(keyDataType));
+			final MMFArray keyData = IAM.__dataArray(array.section(offset, keyValue), keyDataType);
 			offset += keyValue;
 			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -191,13 +291,13 @@ public class IAMDecoder {
 			final MMFArray valueOffset;
 			if (valueSizeType != 0) {
 
-				valueValue = IAM.byteAlign((entryCount + 1) * IAM.byteCount(valueSizeType));
+				valueValue = IAM.__byteAlign((entryCount + 1) * IAM.__byteCount(valueSizeType));
 				valueLength = 0;
-				valueOffset = IAMDecoder.sizeArray(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
+				valueOffset = IAM.__sizeArray(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
 				offset += valueValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMDecoder.checkArray(valueOffset);
+				IAM.__checkArray(valueOffset);
 				valueValue = valueOffset.get(entryCount);
 
 			} else {
@@ -213,20 +313,20 @@ public class IAMDecoder {
 			}
 			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			valueValue = IAM.byteAlign(valueValue * IAM.byteCount(valueDataType));
-			final MMFArray valueData = IAMDecoder.dataArray(array.section(offset, valueValue), valueDataType);
+			valueValue = IAM.__byteAlign(valueValue * IAM.__byteCount(valueDataType));
+			final MMFArray valueData = IAM.__dataArray(array.section(offset, valueValue), valueDataType);
 			offset += valueValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.keyData = keyData;
-			this.keyOffset = keyOffset;
-			this.keyLength = keyLength;
-			this.valueData = valueData;
-			this.valueOffset = valueOffset;
-			this.valueLength = valueLength;
-			this.rangeMask = rangeMask;
-			this.rangeOffset = rangeOffset;
-			this.entryCount = entryCount;
+			this.__keyData = keyData;
+			this.__keyOffset = keyOffset;
+			this.__keyLength = keyLength;
+			this.__valueData = valueData;
+			this.__valueOffset = valueOffset;
+			this.__valueLength = valueLength;
+			this.__rangeMask = rangeMask;
+			this.__rangeOffset = rangeOffset;
+			this.__entryCount = entryCount;
 
 		}
 
@@ -236,17 +336,27 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MMFArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this.keyOffset;
+		public final boolean mode() {
+			return this.__rangeMask != 0;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final MMFArray key(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.__entryCount)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this.__keyOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
 				final int length = keyOffset.get(entryIndex + 1) - offset;
-				return this.keyData.section(offset, length);
+				return this.__keyData.section(offset, length);
 			} else {
-				final int length = this.keyLength;
+				final int length = this.__keyLength;
 				final int offset = length * entryIndex;
-				return this.keyData.section(offset, length);
+				return this.__keyData.section(offset, length);
 			}
 		}
 
@@ -254,17 +364,17 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MMFArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.entryCount)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this.valueOffset;
+		public final MMFArray value(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this.__entryCount)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this.__valueOffset;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
 				final int length = keyOffset.get(entryIndex + 1) - offset;
-				return this.valueData.section(offset, length);
+				return this.__valueData.section(offset, length);
 			} else {
-				final int length = this.valueLength;
+				final int length = this.__valueLength;
 				final int offset = length * entryIndex;
-				return this.valueData.section(offset, length);
+				return this.__valueData.section(offset, length);
 			}
 		}
 
@@ -272,28 +382,28 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int entryCount() {
-			return this.entryCount;
+		public final int entryCount() {
+			return this.__entryCount;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int find(final int... key) throws NullPointerException {
-			final IAMArray array = key.length == 0 ? IAMBaseArray.EMPTY : IAM.toArray(key);
-			int i = this.rangeMask;
+		public final int find(final IAMArray key) throws NullPointerException {
+			if (key == null) throw new NullPointerException("key = null");
+			int i = this.__rangeMask;
 			if (i != 0) {
-				final IAMArray range = this.rangeOffset;
-				i = array.hash() & i;
+				final IAMArray range = this.__rangeOffset;
+				i = key.hash() & i;
 				for (int l = range.get(i), r = range.get(i + 1); l < r; l++) {
-					if (this.key(l).equals(array)) return l;
+					if (this.key(l).equals(key)) return l;
 				}
 			} else {
-				int l = 0, r = this.entryCount;
+				int l = 0, r = this.__entryCount;
 				while (l < r) {
 					i = (l + r) >> 1;
-					i = array.compare(this.key(i));
+					i = key.compare(this.key(i));
 					if (i < 0) {
 						r = i;
 					} else if (i > 0) {
@@ -304,18 +414,6 @@ public class IAMDecoder {
 			return -1;
 		}
 
-		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden. Wenn sie {@code false} liefert, werden
-		 * Einträge binär über die Ordnung ihrer Schlüssel gesucht.
-		 * 
-		 * @see #find(int...)
-		 * @return {@code true} bei Nutzung von {@link IAMArray#hash()} und {@code false} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
-		 *         {@link #find(int...)}.
-		 */
-		public boolean mode() {
-			return this.rangeMask != 0;
-		}
-
 	}
 
 	/**
@@ -323,7 +421,7 @@ public class IAMDecoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMListDecoder extends IAMBaseList {
+	public static final class IAMListDecoder extends IAMList {
 
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMListDecoder}.
@@ -331,7 +429,7 @@ public class IAMDecoder {
 		public static final IAMListDecoder EMPTY = new IAMListDecoder();
 
 		/**
-		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST}.
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST} Datenstruktur.
 		 */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
 
@@ -340,31 +438,31 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Elemente.
 		 */
-		protected final MMFArray itemData;
+		final MMFArray __itemData;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Elemente.
 		 */
-		protected final MMFArray itemOffset;
+		final MMFArray __itemOffset;
 
 		/**
 		 * Dieses Feld speichert die Länge der Elemente.
 		 */
-		protected final int itemLength;
+		final int __itemLength;
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Elemente.
 		 */
-		protected final int itemCount;
+		final int __itemCount;
 
 		/**
 		 * Dieser Konstruktor initialisiert die leere Liste.
 		 */
-		protected IAMListDecoder() {
-			this.itemData = null;
-			this.itemOffset = null;
-			this.itemLength = 0;
-			this.itemCount = 0;
+		IAMListDecoder() {
+			this.__itemData = null;
+			this.__itemOffset = null;
+			this.__itemLength = 0;
+			this.__itemCount = 0;
 		}
 
 		/**
@@ -396,13 +494,13 @@ public class IAMDecoder {
 			final MMFArray itemOffset;
 			if (itemSizeType != 0) {
 
-				itemValue = IAM.byteAlign((itemCount + 1) * IAM.byteCount(itemSizeType));
+				itemValue = IAM.__byteAlign((itemCount + 1) * IAM.__byteCount(itemSizeType));
 				itemLength = 0;
-				itemOffset = IAMDecoder.sizeArray(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
+				itemOffset = IAM.__sizeArray(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
 				offset += itemValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAMDecoder.checkArray(itemOffset);
+				IAM.__checkArray(itemOffset);
 				itemValue = itemOffset.get(itemCount);
 
 			} else {
@@ -417,15 +515,15 @@ public class IAMDecoder {
 
 			}
 
-			itemValue = IAM.byteAlign(itemValue * IAM.byteCount(itemDataType));
-			final MMFArray itemData = IAMDecoder.dataArray(array.section(offset, itemValue), itemDataType);
+			itemValue = IAM.__byteAlign(itemValue * IAM.__byteCount(itemDataType));
+			final MMFArray itemData = IAM.__dataArray(array.section(offset, itemValue), itemDataType);
 			offset += itemValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.itemData = itemData;
-			this.itemOffset = itemOffset;
-			this.itemLength = itemLength;
-			this.itemCount = itemCount;
+			this.__itemData = itemData;
+			this.__itemOffset = itemOffset;
+			this.__itemLength = itemLength;
+			this.__itemCount = itemCount;
 
 		}
 
@@ -435,17 +533,17 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public MMFArray item(final int itemIndex) {
-			if ((itemIndex < 0) || (itemIndex >= this.itemCount)) return MMFArray.EMPTY;
-			final IAMArray itemOffset = this.itemOffset;
+		public final MMFArray item(final int itemIndex) {
+			if ((itemIndex < 0) || (itemIndex >= this.__itemCount)) return MMFArray.EMPTY;
+			final IAMArray itemOffset = this.__itemOffset;
 			if (itemOffset != null) {
 				final int offset = itemOffset.get(itemIndex);
 				final int length = itemOffset.get(itemIndex + 1) - offset;
-				return this.itemData.section(offset, length);
+				return this.__itemData.section(offset, length);
 			} else {
-				final int length = this.itemLength;
+				final int length = this.__itemLength;
 				final int offset = length * itemIndex;
-				return this.itemData.section(offset, length);
+				return this.__itemData.section(offset, length);
 			}
 		}
 
@@ -453,8 +551,8 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int itemCount() {
-			return this.itemCount;
+		public final int itemCount() {
+			return this.__itemCount;
 		}
 
 	}
@@ -464,7 +562,7 @@ public class IAMDecoder {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public static final class IAMIndexDecoder extends IAMBaseIndex {
+	public static final class IAMIndexDecoder extends IAMIndex {
 
 		/**
 		 * Dieses Feld speichert den leeren {@link IAMIndexDecoder}.
@@ -472,7 +570,7 @@ public class IAMDecoder {
 		public static final IAMIndexDecoder EMPTY = new IAMIndexDecoder();
 
 		/**
-		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_INDEX}.
+		 * Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_INDEX} Datenstruktur.
 		 */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFFF, 0xF00DBA5E);
 
@@ -481,25 +579,25 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Abbildungen.
 		 */
-		protected final IAMMapDecoder[] maps;
+		final IAMMapDecoder[] __maps;
 
 		/**
 		 * Dieses Feld speichert die Listen.
 		 */
-		protected final IAMListDecoder[] lists;
+		final IAMListDecoder[] __lists;
 
 		/**
 		 * Dieser Konstruktor initialisiert das leere Inhaltsverzeichnis.
 		 */
-		protected IAMIndexDecoder() {
-			this.maps = new IAMMapDecoder[0];
-			this.lists = new IAMListDecoder[0];
+		IAMIndexDecoder() {
+			this.__maps = new IAMMapDecoder[0];
+			this.__lists = new IAMListDecoder[0];
 		}
 
 		/**
 		 * Dieser Kontrukteur initialisiert diesen {@link IAMIndex} als Sicht auf den gegebenen Speicherbereich.
 		 * 
-		 * @param array Speicherbereich mit {@code INT32} Zahlen.
+		 * @param array Speicherbereich.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 		 */
@@ -542,18 +640,18 @@ public class IAMDecoder {
 			offset += listDataLength;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.maps = new IAMMapDecoder[mapCount];
+			this.__maps = new IAMMapDecoder[mapCount];
 			for (int i = 0; i < mapCount; i++) {
 				final int offset2 = mapOffset.get(i);
 				final int length2 = mapOffset.get(i + 1) - offset2;
-				this.maps[i] = new IAMMapDecoder(mapData.section(offset2, length2).toINT32());
+				this.__maps[i] = new IAMMapDecoder(mapData.section(offset2, length2).toINT32());
 			}
 
-			this.lists = new IAMListDecoder[listCount];
+			this.__lists = new IAMListDecoder[listCount];
 			for (int i = 0; i < listCount; i++) {
 				final int offset2 = listOffset.get(i);
 				final int length2 = listOffset.get(i + 1) - offset2;
-				this.lists[i] = new IAMListDecoder(listData.section(offset2, length2).toINT32());
+				this.__lists[i] = new IAMListDecoder(listData.section(offset2, length2).toINT32());
 			}
 
 		}
@@ -564,207 +662,36 @@ public class IAMDecoder {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IAMMapDecoder map(final int index) {
-			if ((index < 0) || (index >= this.maps.length)) return IAMMapDecoder.EMPTY;
-			return this.maps[index];
+		public final IAMMapDecoder map(final int index) {
+			if ((index < 0) || (index >= this.__maps.length)) return IAMMapDecoder.EMPTY;
+			return this.__maps[index];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int mapCount() {
-			return this.maps.length;
+		public final int mapCount() {
+			return this.__maps.length;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public IAMListDecoder list(final int index) {
-			if ((index < 0) || (index >= this.lists.length)) return IAMListDecoder.EMPTY;
-			return this.lists[index];
+		public final IAMListDecoder list(final int index) {
+			if ((index < 0) || (index >= this.__lists.length)) return IAMListDecoder.EMPTY;
+			return this.__lists[index];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public int listCount() {
-			return this.lists.length;
+		public final int listCount() {
+			return this.__lists.length;
 		}
 
-	}
-
-	{}
-
-	/**
-	 * Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten einer {@code IAM_MAP}, {@code IAM_LIST} oder
-	 * {@code IAM_INDEX}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class IAMHeader {
-
-		/**
-		 * Dieses Feld speichert die Bitmaske.
-		 */
-		final int mask;
-
-		/**
-		 * Dieses Feld speichert den Vergleichswert.
-		 */
-		final int value;
-
-		@SuppressWarnings ("javadoc")
-		IAMHeader(final int mask, final int value) {
-			this.mask = mask;
-			this.value = value;
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Kopfdaten eine gültige Datenstrukturkennung enthalten.
-		 * 
-		 * @param header Kopfdaten.
-		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten.
-		 */
-		public boolean isValid(final int header) {
-			return (header & this.mask) == this.value;
-		}
-
-		/**
-		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
-		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
-		 * zurück.
-		 * 
-		 * @see #orderOf(byte[])
-		 * @param file Datei mit den Quelldaten.
-		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws IOException Wenn {@link RandomAccessFile#RandomAccessFile(File, String)} bzw. {@link RandomAccessFile#read(byte[])} eine entsprechende Ausnahme
-		 *         auslöst.
-		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
-		 */
-		public ByteOrder orderOf(final File file) throws IOException, NullPointerException, IllegalArgumentException {
-			if (file == null) throw new NullPointerException("file = null");
-			try (RandomAccessFile source = new RandomAccessFile(file, "r")) {
-				final byte[] bytes = new byte[4];
-				if (source.read(bytes) < 4) throw new IllegalArgumentException();
-				return this.orderOf(bytes);
-			}
-		}
-
-		/**
-		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
-		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
-		 * zurück.
-		 * 
-		 * @param bytes Quelldaten.
-		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
-		 */
-		public ByteOrder orderOf(final byte[] bytes) throws NullPointerException, IllegalArgumentException {
-			if (bytes == null) throw new NullPointerException("bytes = null");
-			if (bytes.length < 4) throw new IllegalArgumentException();
-			if (this.isValid(Bytes.getInt4BE(bytes, 0))) return ByteOrder.BIG_ENDIAN;
-			if (this.isValid(Bytes.getInt4LE(bytes, 0))) return ByteOrder.LITTLE_ENDIAN;
-			return null;
-		}
-
-		/**
-		 * Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
-		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
-		 * zurück.
-		 * 
-		 * @see #orderOf(byte[])
-		 * @param buffer Puffer mit den Quelldaten.
-		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind.
-		 */
-		public ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException, IllegalArgumentException {
-			if (buffer == null) throw new NullPointerException("buffer = null");
-			if (buffer.remaining() < 4) throw new IllegalArgumentException();
-			final byte[] bytes = new byte[4];
-			buffer.get(bytes);
-			return this.orderOf(bytes);
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return Integer.toHexString(this.value);
-		}
-
-	}
-
-	/**
-	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
-	 * 
-	 * @see MMFArray#toUINT8()
-	 * @see MMFArray#toUINT16()
-	 * @see MMFArray#toINT32()
-	 * @param array Zahlenfolge.
-	 * @param sizeType Größentyp ({@code 1..3}).
-	 * @return Folge von {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen.
-	 * @throws IllegalArgumentException Wenn der gegebene Größentyp ungültig ist.
-	 */
-	static MMFArray sizeArray(final MMFArray array, final int sizeType) throws IllegalArgumentException {
-		switch (sizeType) {
-			case 1:
-				return array.toUINT8();
-			case 2:
-				return array.toUINT16();
-			case 3:
-				return array.toINT32();
-		}
-		throw new IllegalArgumentException();
-	}
-
-	/**
-	 * Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen zurück.
-	 * 
-	 * @see MMFArray#toINT8()
-	 * @see MMFArray#toINT16()
-	 * @see MMFArray#toINT32()
-	 * @param array Zahlenfolge.
-	 * @param dataType Datentyp ({@code 1..3}).
-	 * @return Folge von {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen.
-	 * @throws IllegalArgumentException Wenn der gegebene Datentyp ungültig ist.
-	 */
-	static MMFArray dataArray(final MMFArray array, final int dataType) throws IllegalArgumentException {
-		switch (dataType) {
-			case 1:
-				return array.toINT8();
-			case 2:
-				return array.toINT16();
-			case 3:
-				return array.toINT32();
-		}
-		throw new IllegalArgumentException();
-	}
-
-	/**
-	 * Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
-	 * 
-	 * @param array Zahlenfolge.
-	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen.
-	 */
-	static void checkArray(final IAMArray array) throws IAMException {
-		int value = array.get(0);
-		if (value != 0) throw new IAMException(IAMException.INVALID_OFFSET);
-		for (int i = 0, length = array.length(); i < length; i++) {
-			final int value2 = array.get(i);
-			if (value > value2) throw new IAMException(IAMException.INVALID_OFFSET);
-			value = value2;
-		}
 	}
 
 }

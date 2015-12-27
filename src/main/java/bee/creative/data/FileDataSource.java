@@ -16,7 +16,7 @@ public class FileDataSource extends BaseDataSource {
 	/**
 	 * Dieses Feld speichert die Nutzdaten.
 	 */
-	final RandomAccessFile data;
+	final RandomAccessFile __data;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen {@link File} im Modus {@code "r"}.
@@ -48,7 +48,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	public FileDataSource(final RandomAccessFile file) throws NullPointerException {
 		if (file == null) throw new NullPointerException("file = null");
-		this.data = file;
+		this.__data = file;
 	}
 
 	{}
@@ -57,8 +57,8 @@ public class FileDataSource extends BaseDataSource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public RandomAccessFile data() {
-		return this.data;
+	public final RandomAccessFile data() {
+		return this.__data;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-		this.data.readFully(array, offset, length);
+		this.__data.readFully(array, offset, length);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.data.seek(index);
+		this.__data.seek(index);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long index() throws IOException {
-		return this.data.getFilePointer();
+		return this.__data.getFilePointer();
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long length() throws IOException {
-		return this.data.length();
+		return this.__data.length();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class FileDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void close() throws IOException {
-		this.data.close();
+		this.__data.close();
 	}
 
 }

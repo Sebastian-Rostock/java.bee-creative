@@ -18,12 +18,12 @@ public class ArrayDataSource extends BaseDataSource {
 	/**
 	 * Dieses Feld speichert die Nutzdaten.
 	 */
-	final ByteArraySection data;
+	final ByteArraySection __data;
 
 	/**
 	 * Dieses Feld speichert die Leseposition.
 	 */
-	int index;
+	int __index;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Nutzdaten.
@@ -32,7 +32,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
 	 */
 	public ArrayDataSource(final byte... data) throws NullPointerException {
-		this.data = ByteArraySection.from(data);
+		this.__data = ByteArraySection.from(data);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.data = data;
+		this.__data = data;
 	}
 
 	{}
@@ -53,7 +53,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	@Override
 	public ByteArraySection data() {
-		return this.data;
+		return this.__data;
 	}
 
 	/**
@@ -61,11 +61,11 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-		final ByteArraySection data = this.data;
-		final int index = this.index, index2 = index + length;
+		final ByteArraySection data = this.__data;
+		final int index = this.__index, index2 = index + length;
 		if (index2 > data.size()) throw new EOFException();
 		System.arraycopy(data.array(), data.startIndex() + index, array, offset, length);
-		this.index = index2;
+		this.__index = index2;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.index = (int)index;
+		this.__index = (int)index;
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long index() throws IOException {
-		return this.index;
+		return this.__index;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 */
 	@Override
 	public long length() throws IOException {
-		return this.data.size();
+		return this.__data.size();
 	}
 
 	/**
