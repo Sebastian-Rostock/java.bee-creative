@@ -40,7 +40,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -68,7 +68,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ContextData<GOwner> thiz() {
+		protected final ContextData<GOwner> thiz() {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected VariableData<GOwner> thiz() {
+		protected final VariableData<GOwner> thiz() {
 			return this;
 		}
 
@@ -124,7 +124,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FunctionData<GOwner> thiz() {
+		protected final FunctionData<GOwner> thiz() {
 			return this;
 		}
 
@@ -135,15 +135,15 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert die {@link XPath}.
 	 */
-	XPath xpath;
+	XPath __xpath;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFacroryData()}.
 	 */
-	final FactoryData<GThiz> facroryData = new FactoryData<GThiz>() {
+	final FactoryData<GThiz> __facroryData = new FactoryData<GThiz>() {
 
 		@Override
-		public GThiz closeFacroryData() {
+		public final GThiz closeFacroryData() {
 			return BaseXPathData.this.thiz();
 		}
 
@@ -152,10 +152,10 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openContextData()}.
 	 */
-	final ContextData<GThiz> contextData = new ContextData<GThiz>() {
+	final ContextData<GThiz> __contextData = new ContextData<GThiz>() {
 
 		@Override
-		public GThiz closeLanguageData() {
+		public final GThiz closeLanguageData() {
 			return BaseXPathData.this.thiz();
 		}
 
@@ -164,10 +164,10 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openVariableData()}.
 	 */
-	final VariableData<GThiz> variableData = new VariableData<GThiz>() {
+	final VariableData<GThiz> __variableData = new VariableData<GThiz>() {
 
 		@Override
-		public GThiz closeListenerData() {
+		public final GThiz closeListenerData() {
 			return BaseXPathData.this.thiz();
 		}
 
@@ -176,10 +176,10 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}.
 	 */
-	final FunctionData<GThiz> functionData = new FunctionData<GThiz>() {
+	final FunctionData<GThiz> __functionData = new FunctionData<GThiz>() {
 
 		@Override
-		public GThiz closeResolverData() {
+		public final GThiz closeResolverData() {
 			return BaseXPathData.this.thiz();
 		}
 
@@ -193,13 +193,13 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseXPathData<?> data) {
+	public final GThiz use(final BaseXPathData<?> data) {
 		if (data == null) return this.thiz();
-		this.xpath = data.xpath;
-		this.facroryData.use(data.facroryData);
-		this.contextData.use(data.contextData);
-		this.variableData.use(data.variableData);
-		this.functionData.use(data.functionData);
+		this.__xpath = data.__xpath;
+		this.__facroryData.use(data.__facroryData);
+		this.__contextData.use(data.__contextData);
+		this.__variableData.use(data.__variableData);
+		this.__functionData.use(data.__functionData);
 		return this.thiz();
 	}
 
@@ -214,10 +214,10 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @return {@link XPath}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link XPathFactory#newXPath()} eine entsprechende Ausnahme auslöst.
 	 */
-	public XPath getXPath() throws XPathFactoryConfigurationException {
-		XPath result = this.xpath;
+	public final XPath getXPath() throws XPathFactoryConfigurationException {
+		XPath result = this.__xpath;
 		if (result != null) return result;
-		result = this.facroryData.getFactory().newXPath();
+		result = this.__facroryData.getFactory().newXPath();
 		this.useXPath(result);
 		this.updateXPath();
 		return result;
@@ -229,8 +229,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @param factory {@link XPath} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useXPath(final XPath factory) {
-		this.xpath = factory;
+	public final GThiz useXPath(final XPath factory) {
+		this.__xpath = factory;
 		return this.thiz();
 	}
 
@@ -240,7 +240,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see #useXPath(XPath)
 	 * @return {@code this}.
 	 */
-	public GThiz resetXPath() {
+	public final GThiz resetXPath() {
 		return this.useXPath(null);
 	}
 
@@ -252,15 +252,15 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @return {@code this}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link #getXPath()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateXPath() throws XPathFactoryConfigurationException {
+	public final GThiz updateXPath() throws XPathFactoryConfigurationException {
 		final XPath factory = this.getXPath();
-		for (final NamespaceContext value: this.contextData) {
+		for (final NamespaceContext value: this.__contextData) {
 			factory.setNamespaceContext(value);
 		}
-		for (final XPathVariableResolver value: this.variableData) {
+		for (final XPathVariableResolver value: this.__variableData) {
 			factory.setXPathVariableResolver(value);
 		}
-		for (final XPathFunctionResolver value: this.functionData) {
+		for (final XPathFunctionResolver value: this.__functionData) {
 			factory.setXPathFunctionResolver(value);
 		}
 		return this.thiz();
@@ -271,8 +271,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * 
 	 * @return Konfigurator.
 	 */
-	public FactoryData<GThiz> openFacroryData() {
-		return this.facroryData;
+	public final FactoryData<GThiz> openFacroryData() {
+		return this.__facroryData;
 	}
 
 	/**
@@ -281,8 +281,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setNamespaceContext(NamespaceContext)
 	 * @return Konfigurator.
 	 */
-	public ContextData<GThiz> openContextData() {
-		return this.contextData;
+	public final ContextData<GThiz> openContextData() {
+		return this.__contextData;
 	}
 
 	/**
@@ -291,8 +291,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator.
 	 */
-	public VariableData<GThiz> openVariableData() {
-		return this.variableData;
+	public final VariableData<GThiz> openVariableData() {
+		return this.__variableData;
 	}
 
 	/**
@@ -301,8 +301,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see XPath#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator.
 	 */
-	public FunctionData<GThiz> openFunctionData() {
-		return this.functionData;
+	public final FunctionData<GThiz> openFunctionData() {
+		return this.__functionData;
 	}
 
 	{}
@@ -319,7 +319,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @see #getXPath()
 	 */
 	@Override
-	public XPath build() throws IllegalStateException {
+	public final XPath build() throws IllegalStateException {
 		try {
 			return this.getXPath();
 		} catch (final XPathFactoryConfigurationException cause) {
@@ -331,8 +331,8 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.facroryData, this.contextData, this.variableData, this.functionData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__facroryData, this.__contextData, this.__variableData, this.__functionData);
 	}
 
 }

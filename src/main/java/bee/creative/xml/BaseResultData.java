@@ -27,12 +27,12 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	/**
 	 * Dieses Feld speichert das {@link Result}.
 	 */
-	Result result;
+	Result __result;
 
 	/**
 	 * Dieses Feld speichert den System-Identifikator.
 	 */
-	String systemID;
+	String __systemID;
 
 	{}
 
@@ -42,10 +42,10 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseResultData<?> data) {
+	public final GThiz use(final BaseResultData<?> data) {
 		if (data == null) return this.thiz();
-		this.result = data.result;
-		this.systemID = data.systemID;
+		this.__result = data.__result;
+		this.__systemID = data.__systemID;
 		return this.thiz();
 	}
 
@@ -57,7 +57,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param file {@link File}.
 	 * @return {@code this}.
 	 */
-	public GThiz useFile(final File file) {
+	public final GThiz useFile(final File file) {
 		return this.useResult(new StreamResult(file));
 	}
 
@@ -68,7 +68,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @see DOMResult#DOMResult()
 	 * @return {@code this}.
 	 */
-	public GThiz useNode() {
+	public final GThiz useNode() {
 		return this.useResult(new DOMResult());
 	}
 
@@ -80,7 +80,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param node {@link Node}.
 	 * @return {@code this}.
 	 */
-	public GThiz useNode(final Node node) {
+	public final GThiz useNode(final Node node) {
 		return this.useResult(new DOMResult(node));
 	}
 
@@ -92,7 +92,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param writer {@link Writer}.
 	 * @return {@code this}.
 	 */
-	public GThiz useWriter(final Writer writer) {
+	public final GThiz useWriter(final Writer writer) {
 		return this.useResult(new StreamResult(writer));
 	}
 
@@ -104,7 +104,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param stream {@link OutputStream}.
 	 * @return {@code this}.
 	 */
-	public GThiz useStream(final OutputStream stream) {
+	public final GThiz useStream(final OutputStream stream) {
 		return this.useResult(new StreamResult(stream));
 	}
 
@@ -115,10 +115,10 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param systemID System-Identifikator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useSystemID(final String systemID) {
-		this.systemID = systemID;
-		if (this.result == null) return this.thiz();
-		this.result.setSystemId(systemID);
+	public final GThiz useSystemID(final String systemID) {
+		this.__systemID = systemID;
+		if (this.__result == null) return this.thiz();
+		this.__result.setSystemId(systemID);
 		return this.thiz();
 	}
 
@@ -130,10 +130,10 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param result Ergebnisdaten oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useResult(final Result result) {
-		this.result = result;
+	public final GThiz useResult(final Result result) {
+		this.__result = result;
 		if (result == null) return this.thiz();
-		return this.useSystemID(this.systemID != null ? this.systemID : result.getSystemId());
+		return this.useSystemID(this.__systemID != null ? this.__systemID : result.getSystemId());
 	}
 
 	/**
@@ -150,8 +150,8 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @see StreamResult
 	 * @return Quelldaten oder {@code null}.
 	 */
-	public Result getResult() {
-		return this.result;
+	public final Result getResult() {
+		return this.__result;
 	}
 
 	/**
@@ -161,7 +161,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @see #useSystemID(String)
 	 * @return {@code this}.
 	 */
-	public GThiz resetResult() {
+	public final GThiz resetResult() {
 		this.useSystemID(null);
 		return this.useResult(null);
 	}
@@ -172,7 +172,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Result build() throws IllegalStateException {
+	public final Result build() throws IllegalStateException {
 		return this.getResult();
 	}
 
@@ -180,8 +180,8 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.result, this.systemID);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__result, this.__systemID);
 	}
 
 }

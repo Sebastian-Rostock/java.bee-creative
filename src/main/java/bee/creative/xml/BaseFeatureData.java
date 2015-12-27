@@ -24,7 +24,7 @@ public abstract class BaseFeatureData<GThiz> extends BaseMapBuilder<String, Bool
 	 * @see #forKey(Object)
 	 * @return {@code this}.
 	 */
-	public GThiz forFEATURE_SECURE_PROCESSING() {
+	public final GThiz forFEATURE_SECURE_PROCESSING() {
 		return this.forKey(XMLConstants.FEATURE_SECURE_PROCESSING);
 	}
 

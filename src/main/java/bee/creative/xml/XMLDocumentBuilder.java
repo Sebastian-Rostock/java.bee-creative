@@ -14,7 +14,7 @@ public final class XMLDocumentBuilder extends BaseDocumentBuilderData<XMLDocumen
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected XMLDocumentBuilder thiz() {
+	protected final XMLDocumentBuilder thiz() {
 		return this;
 	}
 

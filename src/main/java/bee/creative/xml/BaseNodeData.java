@@ -43,7 +43,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * @return Besitzer.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Attributknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
 		 */
-		public GOwner removeAttr() throws IllegalStateException {
+		public final GOwner removeAttr() throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeAttr();
 				if (!this.hasNode()) return owner;
@@ -62,7 +62,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected AttrData<GOwner> thiz() {
+		protected final AttrData<GOwner> thiz() {
 			return this;
 		}
 
@@ -94,7 +94,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * @return Besitzer.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
 		 */
-		public GOwner insertChld(int index) throws IllegalStateException {
+		public final GOwner insertChld(int index) throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeChld();
 				final NodeList list = owner.getChldList();
@@ -124,7 +124,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * @return Besitzer.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
 		 */
-		public GOwner removeChld() throws IllegalStateException {
+		public final GOwner removeChld() throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeChld();
 				if (!this.hasNode()) return owner;
@@ -142,7 +142,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ChldData<GOwner> thiz() {
+		protected final ChldData<GOwner> thiz() {
 			return this;
 		}
 
@@ -219,7 +219,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	/**
 	 * Dieses Feld speichert den aktuellen Knoten.
 	 */
-	Node node;
+	Node __node;
 
 	{}
 
@@ -228,11 +228,11 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * 
 	 * @return Konfigurator.
 	 */
-	protected AttrData<GThiz> newAttrData() {
+	protected final AttrData<GThiz> newAttrData() {
 		return new AttrData<GThiz>() {
 
 			@Override
-			public GThiz closeAttr() {
+			public final GThiz closeAttr() {
 				return BaseNodeData.this.thiz();
 			}
 
@@ -244,11 +244,11 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * 
 	 * @return Konfigurator.
 	 */
-	protected ChldData<GThiz> newChldData() {
+	protected final ChldData<GThiz> newChldData() {
 		return new ChldData<GThiz>() {
 
 			@Override
-			public GThiz closeChld() {
+			public final GThiz closeChld() {
 				return BaseNodeData.this.thiz();
 			}
 
@@ -263,7 +263,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 */
 	protected GThiz use(final BaseNodeData<?> data) {
 		if (data == null) return this.thiz();
-		this.node = data.node;
+		this.__node = data.__node;
 		return this.thiz();
 	}
 
@@ -274,7 +274,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param nodeType Knotentyp.
 	 * @return {@code true}, wenn der {@link #getNode() aktuelle Knoten} den gegebenen Knotentyp hat.
 	 */
-	public boolean hasType(final int nodeType) {
+	public final boolean hasType(final int nodeType) {
 		return this.getType() == nodeType;
 	}
 
@@ -284,7 +284,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Textknoten.
 	 */
-	public boolean hasType_TEXT() {
+	public final boolean hasType_TEXT() {
 		return this.hasType(Node.TEXT_NODE);
 	}
 
@@ -294,7 +294,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Elementknoten.
 	 */
-	public boolean hasType_ELEM() {
+	public final boolean hasType_ELEM() {
 		return this.hasType(Node.ELEMENT_NODE);
 	}
 
@@ -304,7 +304,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Attributknoten.
 	 */
-	public boolean hasType_ATTR() {
+	public final boolean hasType_ATTR() {
 		return this.hasType(Node.ATTRIBUTE_NODE);
 	}
 
@@ -314,7 +314,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Dokumentknoten.
 	 */
-	public boolean hasType_DOCU() {
+	public final boolean hasType_DOCU() {
 		return this.hasType(Node.DOCUMENT_NODE);
 	}
 
@@ -324,7 +324,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * 
 	 * @return Knotentyp oder {@code 0}.
 	 */
-	public int getType() {
+	public final int getType() {
 		final Node node = this.getNode();
 		if (node == null) return 0;
 		return node.getNodeType();
@@ -336,8 +336,8 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #useNode(Node)
 	 * @return Knoten oder {@code null}.
 	 */
-	public Node getNode() {
-		return this.node;
+	public final Node getNode() {
+		return this.__node;
 	}
 
 	/**
@@ -347,7 +347,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @return {@code this}.
 	 */
 	protected GThiz useNode(final Node node) {
-		this.node = node;
+		this.__node = node;
 		return this.thiz();
 	}
 
@@ -357,7 +357,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #getValue(String)
 	 * @return Wert bzw. Inhalt oder {@code null}.
 	 */
-	public String getValue() {
+	public final String getValue() {
 		return this.getValue(null);
 	}
 
@@ -372,7 +372,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param defaultValue Vorgabewert.
 	 * @return Wert bzw. Inhalt oder Vorgabewert.
 	 */
-	public String getValue(final String defaultValue) {
+	public final String getValue(final String defaultValue) {
 		final Node node = this.getNode();
 		if (node == null) return defaultValue;
 		if (node.getNodeType() == Node.ELEMENT_NODE) return node.getTextContent();
@@ -389,7 +389,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link Node#setNodeValue(String)} bzw. {@link Node#setTextContent(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public GThiz useValue(final String value) throws DOMException, IllegalStateException {
+	public final GThiz useValue(final String value) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
 		if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -408,7 +408,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getParentNode()
 	 * @return Elternknoten oder {@code null}.
 	 */
-	public Node getParent() {
+	public final Node getParent() {
 		final Node node = this.getNode();
 		if (node == null) return null;
 		if (node.getNodeType() == Node.ATTRIBUTE_NODE) return ((Attr)node).getOwnerElement();
@@ -422,7 +422,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getOwnerDocument()
 	 * @return {@link Document} oder {@code null}.
 	 */
-	public Document getDocument() {
+	public final Document getDocument() {
 		final Node node = this.getNode();
 		if (node == null) return null;
 		if (node instanceof Document) return (Document)node;
@@ -436,7 +436,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getAttributes()
 	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}.
 	 */
-	public NamedNodeMap getAttrMap() {
+	public final NamedNodeMap getAttrMap() {
 		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_ATTR_MAP;
 		final NamedNodeMap result = node.getAttributes();
@@ -450,7 +450,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #getAttrMap()
 	 * @return Attributknotenanzahl.
 	 */
-	public int getAttrCount() {
+	public final int getAttrCount() {
 		return this.getAttrMap().getLength();
 	}
 
@@ -461,7 +461,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getChildNodes()
 	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}.
 	 */
-	public NodeList getChldList() {
+	public final NodeList getChldList() {
 		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_CHLD_LIST;
 		final NodeList result = node.getChildNodes();
@@ -475,7 +475,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #getChldList()
 	 * @return Kindknotenanzahl.
 	 */
-	public int getChldCount() {
+	public final int getChldCount() {
 		return this.getChldList().getLength();
 	}
 
@@ -484,7 +484,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * 
 	 * @return {@code true}, wenn {@link #getNode()} nicht {@code null} liefert.
 	 */
-	public boolean hasNode() {
+	public final boolean hasNode() {
 		return this.getNode() != null;
 	}
 
@@ -499,7 +499,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link NamedNodeMap#setNamedItem(Node)} bzw. {@link Document#createAttribute(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
 	 */
-	public AttrData<GThiz> newAttr(final String name) throws DOMException, IllegalStateException {
+	public final AttrData<GThiz> newAttr(final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttribute(name);
 		final NamedNodeMap list = this.getAttrMap();
@@ -520,7 +520,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 *         auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
 	 */
-	public AttrData<GThiz> newAttr(final String uri, final String name) throws DOMException, IllegalStateException {
+	public final AttrData<GThiz> newAttr(final String uri, final String name) throws DOMException, IllegalStateException {
 		if (!this.hasType_ELEM()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttributeNS(uri, name);
 		final NamedNodeMap list = this.getAttrMap();
@@ -535,7 +535,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public ChldData<GThiz> newText() throws DOMException, IllegalStateException {
+	public final ChldData<GThiz> newText() throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
 		final Document docu = this.getDocument();
@@ -554,7 +554,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz newText(final String text) throws DOMException, IllegalStateException {
+	public final GThiz newText(final String text) throws DOMException, IllegalStateException {
 		return this.newText().useValue(text).closeChld();
 	}
 
@@ -568,7 +568,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElement(String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public ChldData<GThiz> newElem(final String name) throws DOMException, IllegalStateException {
+	public final ChldData<GThiz> newElem(final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
 		final Document docu = this.getDocument();
@@ -588,7 +588,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElementNS(String, String)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
 	 */
-	public ChldData<GThiz> newElem(final String uri, final String name) throws DOMException, IllegalStateException {
+	public final ChldData<GThiz> newElem(final String uri, final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
 		final Document docu = this.getDocument();
@@ -605,7 +605,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param index Position.
 	 * @return Konfigurator.
 	 */
-	public AttrData<GThiz> openAttr(final int index) {
+	public final AttrData<GThiz> openAttr(final int index) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newAttrData().useNode(item);
@@ -618,7 +618,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator.
 	 */
-	public AttrData<GThiz> openAttr(final String name) {
+	public final AttrData<GThiz> openAttr(final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItem(name);
 		return this.newAttrData().useNode(item);
@@ -632,7 +632,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator.
 	 */
-	public AttrData<GThiz> openAttr(final String uri, final String name) {
+	public final AttrData<GThiz> openAttr(final String uri, final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItemNS(uri, name);
 		return this.newAttrData().useNode(item);
@@ -646,7 +646,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param index Position.
 	 * @return Konfigurator.
 	 */
-	public ChldData<GThiz> openChld(final int index) {
+	public final ChldData<GThiz> openChld(final int index) {
 		final NodeList list = this.getChldList();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newChldData().useNode(item);
@@ -661,7 +661,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator.
 	 */
-	public ChldData<GThiz> openChld(final String name) {
+	public final ChldData<GThiz> openChld(final String name) {
 		final NodeList list = this.getChldList();
 		for (int i = 0, length = list.getLength(); i < length; i++) {
 			final Node item = list.item(i);
@@ -682,7 +682,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator.
 	 */
-	public ChldData<GThiz> openChld(final String uri, final String name) {
+	public final ChldData<GThiz> openChld(final String uri, final String name) {
 		final NodeList list = this.getChldList();
 		for (int i = 0, length = list.getLength(); i < length; i++) {
 			final Node item = list.item(i);
@@ -706,7 +706,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @see #getNode()
 	 */
 	@Override
-	public Node build() throws IllegalStateException {
+	public final Node build() throws IllegalStateException {
 		return this.getNode();
 	}
 
@@ -714,7 +714,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
+	public final String toString() {
 		return Objects.toInvokeString(this, this.getNode());
 	}
 

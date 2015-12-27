@@ -13,7 +13,7 @@ public final class XMLSchemaFactory extends BaseSchemaFactoryData<XMLSchemaFacto
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected XMLSchemaFactory thiz() {
+	protected final XMLSchemaFactory thiz() {
 		return this;
 	}
 

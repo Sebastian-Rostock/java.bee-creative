@@ -31,7 +31,7 @@ public final class XMLFormatter {
 		 * 
 		 * @return Besitzer.
 		 */
-		public XMLFormatter closeSourceData() {
+		public final XMLFormatter closeSourceData() {
 			return XMLFormatter.this;
 		}
 
@@ -41,7 +41,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SourceData thiz() {
+		protected final SourceData thiz() {
 			return this;
 		}
 
@@ -60,7 +60,7 @@ public final class XMLFormatter {
 		 * 
 		 * @return Besitzer.
 		 */
-		public XMLFormatter closeResultData() {
+		public final XMLFormatter closeResultData() {
 			return XMLFormatter.this;
 		}
 
@@ -70,7 +70,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResultData thiz() {
+		protected final ResultData thiz() {
 			return this;
 		}
 
@@ -88,7 +88,7 @@ public final class XMLFormatter {
 		 * 
 		 * @return Besitzer.
 		 */
-		public XMLFormatter closeTemplatesData() {
+		public final XMLFormatter closeTemplatesData() {
 			return XMLFormatter.this;
 		}
 
@@ -98,7 +98,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected TransformerData thiz() {
+		protected final TransformerData thiz() {
 			return this;
 		}
 
@@ -109,17 +109,17 @@ public final class XMLFormatter {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData sourceData = new SourceData();
+	final SourceData __sourceData = new SourceData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openResultData()}.
 	 */
-	final ResultData resultData = new ResultData();
+	final ResultData __resultData = new ResultData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openTransformerData()}.
 	 */
-	final TransformerData transformerData = new TransformerData();
+	final TransformerData __transformerData = new TransformerData();
 
 	{}
 
@@ -129,11 +129,11 @@ public final class XMLFormatter {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public XMLFormatter use(final XMLFormatter data) {
+	public final XMLFormatter use(final XMLFormatter data) {
 		if (data == null) return this;
-		this.sourceData.use(data.sourceData);
-		this.resultData.use(data.resultData);
-		this.transformerData.use(data.transformerData);
+		this.__sourceData.use(data.__sourceData);
+		this.__resultData.use(data.__resultData);
+		this.__transformerData.use(data.__transformerData);
 		return this;
 	}
 
@@ -146,11 +146,11 @@ public final class XMLFormatter {
 	 * @return {@code this}.
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst.
 	 */
-	public XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this.transformerData.getTransformer();
+	public final XMLFormatter transform() throws TransformerException {
+		final Transformer transformer = this.__transformerData.getTransformer();
 		synchronized (transformer) {
-			final Source source = this.sourceData.build();
-			final Result result = this.resultData.build();
+			final Source source = this.__sourceData.build();
+			final Result result = this.__resultData.build();
 			transformer.transform(source, result);
 		}
 		return this;
@@ -158,22 +158,22 @@ public final class XMLFormatter {
 
 	/**
 	 * Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.<br>
-	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein temporäres {@link DOMResult} eingesetzt.
+	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
 	 * 
 	 * @see ResultData#useNode()
 	 * @see #openResultData()
 	 * @return Dokumentknoten.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Node transformToNode() throws TransformerException {
+	public final Node transformToNode() throws TransformerException {
 		final DOMResult result = new DOMResult();
-		this.openResultData().useResult(result).closeResultData().transform();
+		this.openResultData().useResult(result).closeResultData().transform().openResultData().resetResult();
 		return result.getNode();
 	}
 
 	/**
 	 * Diese Methode transformiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.<br>
-	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein temporärer {@link StringWriter} eingesetzt.
+	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
 	 * 
 	 * @see StringWriter
 	 * @see ResultData#useWriter(Writer)
@@ -181,7 +181,7 @@ public final class XMLFormatter {
 	 * @return Zeichenkette.
 	 * @throws TransformerException Wenn {@link #transform()} eine entsprechende Ausnahme auslöst.
 	 */
-	public String transformToString() throws TransformerException {
+	public final String transformToString() throws TransformerException {
 		final StringWriter result = new StringWriter();
 		this.openResultData().useWriter(result).closeResultData().transform().openResultData().resetResult();
 		return result.toString();
@@ -193,8 +193,8 @@ public final class XMLFormatter {
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator.
 	 */
-	public SourceData openSourceData() {
-		return this.sourceData;
+	public final SourceData openSourceData() {
+		return this.__sourceData;
 	}
 
 	/**
@@ -203,8 +203,8 @@ public final class XMLFormatter {
 	 * @see Transformer#transform(Source, Result)
 	 * @return Konfigurator.
 	 */
-	public ResultData openResultData() {
-		return this.resultData;
+	public final ResultData openResultData() {
+		return this.__resultData;
 	}
 
 	/**
@@ -212,8 +212,8 @@ public final class XMLFormatter {
 	 * 
 	 * @return Konfigurator.
 	 */
-	public TransformerData openTransformerData() {
-		return this.transformerData;
+	public final TransformerData openTransformerData() {
+		return this.__transformerData;
 	}
 
 	{}
@@ -222,8 +222,8 @@ public final class XMLFormatter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.resultData, this.transformerData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__sourceData, this.__resultData, this.__transformerData);
 	}
 
 }

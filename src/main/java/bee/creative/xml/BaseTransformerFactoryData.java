@@ -46,7 +46,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> thiz() {
 			return this;
 		}
 
@@ -74,7 +74,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected AttributeData<GOwner> thiz() {
+		protected final AttributeData<GOwner> thiz() {
 			return this;
 		}
 
@@ -102,7 +102,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ListenerData<GOwner> thiz() {
+		protected final ListenerData<GOwner> thiz() {
 			return this;
 		}
 
@@ -130,7 +130,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> thiz() {
 			return this;
 		}
 
@@ -141,15 +141,15 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	/**
 	 * Dieses Feld speichert die {@link TransformerFactory}.
 	 */
-	TransformerFactory factory;
+	TransformerFactory __factory;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+	final FeatureData<GThiz> __featureData = new FeatureData<GThiz>() {
 
 		@Override
-		public GThiz closeFeatureData() {
+		public final GThiz closeFeatureData() {
 			return BaseTransformerFactoryData.this.thiz();
 		}
 
@@ -158,10 +158,10 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}.
 	 */
-	final AttributeData<GThiz> attributeData = new AttributeData<GThiz>() {
+	final AttributeData<GThiz> __attributeData = new AttributeData<GThiz>() {
 
 		@Override
-		public GThiz closeAttributeData() {
+		public final GThiz closeAttributeData() {
 			return BaseTransformerFactoryData.this.thiz();
 		}
 
@@ -170,10 +170,10 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openListenerData()}.
 	 */
-	final ListenerData<GThiz> listenerData = new ListenerData<GThiz>() {
+	final ListenerData<GThiz> __listenerData = new ListenerData<GThiz>() {
 
 		@Override
-		public GThiz closeListenerData() {
+		public final GThiz closeListenerData() {
 			return BaseTransformerFactoryData.this.thiz();
 		}
 
@@ -182,10 +182,10 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData<GThiz> resolverData = new ResolverData<GThiz>() {
+	final ResolverData<GThiz> __resolverData = new ResolverData<GThiz>() {
 
 		@Override
-		public GThiz closeResolverData() {
+		public final GThiz closeResolverData() {
 			return BaseTransformerFactoryData.this.thiz();
 		}
 
@@ -199,13 +199,13 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseTransformerFactoryData<?> data) {
+	public final GThiz use(final BaseTransformerFactoryData<?> data) {
 		if (data == null) return this.thiz();
-		this.factory = data.factory;
-		this.featureData.use(data.featureData);
-		this.attributeData.use(data.attributeData);
-		this.listenerData.use(data.listenerData);
-		this.resolverData.use(data.resolverData);
+		this.__factory = data.__factory;
+		this.__featureData.use(data.__featureData);
+		this.__attributeData.use(data.__attributeData);
+		this.__listenerData.use(data.__listenerData);
+		this.__resolverData.use(data.__resolverData);
 		return this.thiz();
 	}
 
@@ -219,8 +219,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @return {@link TransformerFactory}.
 	 * @throws TransformerConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 */
-	public TransformerFactory getFactory() throws TransformerConfigurationException {
-		TransformerFactory result = this.factory;
+	public final TransformerFactory getFactory() throws TransformerConfigurationException {
+		TransformerFactory result = this.__factory;
 		if (result != null) return result;
 		result = TransformerFactory.newInstance();
 		this.useFactory(result);
@@ -234,8 +234,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @param factory {@link TransformerFactory} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useFactory(final TransformerFactory factory) {
-		this.factory = factory;
+	public final GThiz useFactory(final TransformerFactory factory) {
+		this.__factory = factory;
 		return this.thiz();
 	}
 
@@ -245,7 +245,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see #useFactory(TransformerFactory)
 	 * @return {@code this}.
 	 */
-	public GThiz resetFactory() {
+	public final GThiz resetFactory() {
 		return this.useFactory(null);
 	}
 
@@ -257,18 +257,18 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateFactory() throws TransformerConfigurationException {
+	public final GThiz updateFactory() throws TransformerConfigurationException {
 		final TransformerFactory factory = this.getFactory();
-		for (final URIResolver value: this.resolverData) {
+		for (final URIResolver value: this.__resolverData) {
 			factory.setURIResolver(value);
 		}
-		for (final ErrorListener value: this.listenerData) {
+		for (final ErrorListener value: this.__listenerData) {
 			factory.setErrorListener(value);
 		}
-		for (final Entry<String, Boolean> entry: this.featureData) {
+		for (final Entry<String, Boolean> entry: this.__featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue().booleanValue());
 		}
-		for (final Entry<String, String> entry: this.attributeData) {
+		for (final Entry<String, String> entry: this.__attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
 		return this.thiz();
@@ -280,8 +280,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData<GThiz> openFeatureData() {
-		return this.featureData;
+	public final FeatureData<GThiz> openFeatureData() {
+		return this.__featureData;
 	}
 
 	/**
@@ -290,8 +290,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @return Konfigurator.
 	 */
-	public AttributeData<GThiz> openAttributeData() {
-		return this.attributeData;
+	public final AttributeData<GThiz> openAttributeData() {
+		return this.__attributeData;
 	}
 
 	/**
@@ -300,8 +300,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @return Konfigurator.
 	 */
-	public ListenerData<GThiz> openListenerData() {
-		return this.listenerData;
+	public final ListenerData<GThiz> openListenerData() {
+		return this.__listenerData;
 	}
 
 	/**
@@ -310,8 +310,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @return Konfigurator.
 	 */
-	public ResolverData<GThiz> openResolverData() {
-		return this.resolverData;
+	public final ResolverData<GThiz> openResolverData() {
+		return this.__resolverData;
 	}
 
 	{}
@@ -328,7 +328,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @see #getFactory()
 	 */
 	@Override
-	public TransformerFactory build() throws IllegalStateException {
+	public final TransformerFactory build() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final TransformerConfigurationException cause) {
@@ -340,8 +340,8 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.featureData, this.attributeData, this.listenerData, this.resolverData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__featureData, this.__attributeData, this.__listenerData, this.__resolverData);
 	}
 
 }

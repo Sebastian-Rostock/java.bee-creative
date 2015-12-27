@@ -41,7 +41,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> thiz() {
 			return this;
 		}
 
@@ -69,7 +69,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected PropertyData<GOwner> thiz() {
+		protected final PropertyData<GOwner> thiz() {
 			return this;
 		}
 
@@ -97,7 +97,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected HandlerData<GOwner> thiz() {
+		protected final HandlerData<GOwner> thiz() {
 			return this;
 		}
 
@@ -125,7 +125,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> thiz() {
 			return this;
 		}
 
@@ -156,7 +156,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * @see #use(BaseValueBuilder)
 		 * @return {@code this}.
 		 */
-		public LanguageData<GOwner> useRELAXNG_NS_URI() {
+		public final LanguageData<GOwner> useRELAXNG_NS_URI() {
 			return super.use(XMLConstants.RELAXNG_NS_URI);
 		}
 
@@ -166,7 +166,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * @see #use(BaseValueBuilder)
 		 * @return {@code this}.
 		 */
-		public LanguageData<GOwner> useW3C_XML_SCHEMA_NS_URI() {
+		public final LanguageData<GOwner> useW3C_XML_SCHEMA_NS_URI() {
 			return super.use(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		}
 
@@ -183,7 +183,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected LanguageData<GOwner> thiz() {
+		protected final LanguageData<GOwner> thiz() {
 			return this;
 		}
 
@@ -194,15 +194,15 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	/**
 	 * Dieses Feld speichert die {@link SchemaFactory}.
 	 */
-	SchemaFactory factory;
+	SchemaFactory __factory;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+	final FeatureData<GThiz> __featureData = new FeatureData<GThiz>() {
 
 		@Override
-		public GThiz closeFeatureData() {
+		public final GThiz closeFeatureData() {
 			return BaseSchemaFactoryData.this.thiz();
 		}
 
@@ -211,10 +211,10 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}.
 	 */
-	final PropertyData<GThiz> propertyData = new PropertyData<GThiz>() {
+	final PropertyData<GThiz> __propertyData = new PropertyData<GThiz>() {
 
 		@Override
-		public GThiz closePropertyData() {
+		public final GThiz closePropertyData() {
 			return BaseSchemaFactoryData.this.thiz();
 		}
 
@@ -223,10 +223,10 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}.
 	 */
-	final HandlerData<GThiz> handlerData = new HandlerData<GThiz>() {
+	final HandlerData<GThiz> __handlerData = new HandlerData<GThiz>() {
 
 		@Override
-		public GThiz closeListenerData() {
+		public final GThiz closeListenerData() {
 			return BaseSchemaFactoryData.this.thiz();
 		}
 
@@ -235,10 +235,10 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData<GThiz> resolverData = new ResolverData<GThiz>() {
+	final ResolverData<GThiz> __resolverData = new ResolverData<GThiz>() {
 
 		@Override
-		public GThiz closeResolverData() {
+		public final GThiz closeResolverData() {
 			return BaseSchemaFactoryData.this.thiz();
 		}
 
@@ -247,10 +247,10 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openLanguageData()}.
 	 */
-	final LanguageData<GThiz> languageData = new LanguageData<GThiz>() {
+	final LanguageData<GThiz> __languageData = new LanguageData<GThiz>() {
 
 		@Override
-		public GThiz closeLanguageData() {
+		public final GThiz closeLanguageData() {
 			return BaseSchemaFactoryData.this.thiz();
 		}
 
@@ -264,14 +264,14 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseSchemaFactoryData<?> data) {
+	public final GThiz use(final BaseSchemaFactoryData<?> data) {
 		if (data == null) return this.thiz();
-		this.factory = data.factory;
-		this.featureData.use(data.featureData);
-		this.propertyData.use(data.propertyData);
-		this.handlerData.use(data.handlerData);
-		this.resolverData.use(data.resolverData);
-		this.languageData.use(data.languageData);
+		this.__factory = data.__factory;
+		this.__featureData.use(data.__featureData);
+		this.__propertyData.use(data.__propertyData);
+		this.__handlerData.use(data.__handlerData);
+		this.__resolverData.use(data.__resolverData);
+		this.__languageData.use(data.__languageData);
 		return this.thiz();
 	}
 
@@ -286,10 +286,10 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @return {@link SchemaFactory}.
 	 * @throws SAXException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 */
-	public SchemaFactory getFactory() throws SAXException {
-		SchemaFactory result = this.factory;
+	public final SchemaFactory getFactory() throws SAXException {
+		SchemaFactory result = this.__factory;
 		if (result != null) return result;
-		result = SchemaFactory.newInstance(this.languageData.build());
+		result = SchemaFactory.newInstance(this.__languageData.build());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -301,8 +301,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @param factory {@link SchemaFactory} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useFactory(final SchemaFactory factory) {
-		this.factory = factory;
+	public final GThiz useFactory(final SchemaFactory factory) {
+		this.__factory = factory;
 		return this.thiz();
 	}
 
@@ -312,7 +312,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see #useFactory(SchemaFactory)
 	 * @return {@code this}.
 	 */
-	public GThiz resetFactory() {
+	public final GThiz resetFactory() {
 		return this.useFactory(null);
 	}
 
@@ -325,18 +325,18 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @throws SAXException Wenn {@link #getFactory()}, {@link SchemaFactory#setFeature(String, boolean)} bzw. {@link SchemaFactory#setProperty(String, Object)}
 	 *         eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateFactory() throws SAXException {
+	public final GThiz updateFactory() throws SAXException {
 		final SchemaFactory factory = this.getFactory();
-		for (final ErrorHandler value: this.handlerData) {
+		for (final ErrorHandler value: this.__handlerData) {
 			factory.setErrorHandler(value);
 		}
-		for (final LSResourceResolver value: this.resolverData) {
+		for (final LSResourceResolver value: this.__resolverData) {
 			factory.setResourceResolver(value);
 		}
-		for (final Entry<String, Boolean> entry: this.featureData) {
+		for (final Entry<String, Boolean> entry: this.__featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue());
 		}
-		for (final Entry<String, Object> entry: this.propertyData) {
+		for (final Entry<String, Object> entry: this.__propertyData) {
 			factory.setProperty(entry.getKey(), entry.getValue());
 		}
 		return this.thiz();
@@ -348,8 +348,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData<GThiz> openFeatureData() {
-		return this.featureData;
+	public final FeatureData<GThiz> openFeatureData() {
+		return this.__featureData;
 	}
 
 	/**
@@ -358,8 +358,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setProperty(String, Object)
 	 * @return Konfigurator.
 	 */
-	public PropertyData<GThiz> openPropertyData() {
-		return this.propertyData;
+	public final PropertyData<GThiz> openPropertyData() {
+		return this.__propertyData;
 	}
 
 	/**
@@ -368,8 +368,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator.
 	 */
-	public HandlerData<GThiz> openHandlerData() {
-		return this.handlerData;
+	public final HandlerData<GThiz> openHandlerData() {
+		return this.__handlerData;
 	}
 
 	/**
@@ -378,8 +378,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#setResourceResolver(LSResourceResolver)
 	 * @return Konfigurator.
 	 */
-	public ResolverData<GThiz> openResolverData() {
-		return this.resolverData;
+	public final ResolverData<GThiz> openResolverData() {
+		return this.__resolverData;
 	}
 
 	/**
@@ -388,8 +388,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @see SchemaFactory#newInstance(String)
 	 * @return Konfigurator.
 	 */
-	public LanguageData<GThiz> openLanguageData() {
-		return this.languageData;
+	public final LanguageData<GThiz> openLanguageData() {
+		return this.__languageData;
 	}
 
 	{}
@@ -404,7 +404,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SchemaFactory build() throws IllegalStateException {
+	public final SchemaFactory build() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final SAXException cause) {
@@ -416,8 +416,8 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.featureData, this.propertyData, this.handlerData, this.resolverData, this.languageData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__featureData, this.__propertyData, this.__handlerData, this.__resolverData, this.__languageData);
 	}
 
 }

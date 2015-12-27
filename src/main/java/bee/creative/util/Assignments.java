@@ -54,7 +54,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GSource value() {
+		public final GSource value() {
 			return this.__source;
 		}
 
@@ -62,7 +62,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> GObject get(final GObject source) {
+		public final <GObject> GObject get(final GObject source) {
 			return this.__parent.get(source);
 		}
 
@@ -70,7 +70,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void set(final GObject source, final GObject target) {
+		public final <GObject> void set(final GObject source, final GObject target) {
 			this.__parent.set(source, target);
 		}
 
@@ -78,7 +78,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target);
 		}
 
@@ -86,7 +86,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
 			this.__parent.assign(source, target, commit);
 		}
@@ -95,7 +95,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
+		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target, assigner);
 		}
@@ -104,8 +104,8 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner, final boolean commit)
-			throws NullPointerException, IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
+			final boolean commit) throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target, assigner, commit);
 		}
 
@@ -113,7 +113,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void commit() throws IllegalArgumentException {
+		public final void commit() throws IllegalArgumentException {
 			this.__parent.commit();
 		}
 
@@ -121,7 +121,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> Assignment<GObject> assignment(final GObject source) {
+		public final <GObject> Assignment<GObject> assignment(final GObject source) {
 			return this.__parent.assignment(source);
 		}
 
@@ -129,7 +129,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toInvokeString(this, this.__source);
 		}
 
@@ -160,7 +160,7 @@ public class Assignments {
 		 * Diese Methode gibt {@code null} zurück.
 		 */
 		@Override
-		public Object value() {
+		public final Object value() {
 			return null;
 		}
 
@@ -168,7 +168,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> GObject get(final GObject source) {
+		public final <GObject> GObject get(final GObject source) {
 			if (source == null) return null;
 			@SuppressWarnings ("unchecked")
 			final GObject target = (GObject)this.__map.get(source);
@@ -179,7 +179,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
+		public final <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
 			if (source == null) throw new NullPointerException();
 			if (target == null) {
 				this.__map.remove(source);
@@ -192,7 +192,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
 			this.assign(source, target, true);
 		}
 
@@ -200,7 +200,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
 			if ((source == null) || (target == null)) throw new NullPointerException();
 			this.set(source, target);
@@ -215,7 +215,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
+		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
 			this.set(source, target);
 			assigner.assign(target, this.assignment(source));
@@ -225,8 +225,8 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner, final boolean commit)
-			throws NullPointerException, IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
+			final boolean commit) throws NullPointerException, IllegalArgumentException {
 			if ((source == null) || (target == null) || (assigner == null)) throw new NullPointerException();
 			this.set(source, target);
 			if (commit) {
@@ -240,7 +240,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void commit() throws IllegalArgumentException {
+		public final void commit() throws IllegalArgumentException {
 			while (!this.__assignables.isEmpty()) {
 				this.__assignables.remove(0).assign(this);
 			}
@@ -250,7 +250,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public <GObject> Assignment<GObject> assignment(final GObject source) {
+		public final <GObject> Assignment<GObject> assignment(final GObject source) {
 			return new ChildAssignment<GObject>(this, source);
 		}
 
@@ -258,7 +258,7 @@ public class Assignments {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toInvokeString(this, this.__map);
 		}
 
@@ -271,7 +271,7 @@ public class Assignments {
 		return new Assignable<Object>() {
 
 			@Override
-			public void assign(final Assignment<?> assignment) {
+			public final void assign(final Assignment<?> assignment) {
 				target.assign(assignment.assignment(source));
 			}
 
@@ -283,7 +283,7 @@ public class Assignments {
 		return new Assignable<Object>() {
 
 			@Override
-			public void assign(final Assignment<?> assignment) {
+			public final void assign(final Assignment<?> assignment) {
 				assigner.assign(target, assignment.assignment(source));
 			}
 

@@ -13,7 +13,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLNode}.
 	 */
-	public static XMLNode newNode() {
+	public static final XMLNode newNode() {
 		return new XMLNode();
 	}
 
@@ -22,7 +22,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLParser}.
 	 */
-	public static XMLParser newParser() {
+	public static final XMLParser newParser() {
 		return new XMLParser();
 	}
 
@@ -31,7 +31,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLResult}.
 	 */
-	public static XMLResult newResult() {
+	public static final XMLResult newResult() {
 		return new XMLResult();
 	}
 
@@ -40,7 +40,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLSource}.
 	 */
-	public static XMLSource newSource() {
+	public static final XMLSource newSource() {
 		return new XMLSource();
 	}
 
@@ -49,7 +49,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLSchema}.
 	 */
-	public static XMLSchema newSchema() {
+	public static final XMLSchema newSchema() {
 		return new XMLSchema();
 	}
 
@@ -58,7 +58,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLEvaluator}.
 	 */
-	public static XMLEvaluator newEvaluator() {
+	public static final XMLEvaluator newEvaluator() {
 		return new XMLEvaluator();
 	}
 
@@ -67,7 +67,7 @@ public class XML {
 	 * 
 	 * @return {@link XMLFormatter}.
 	 */
-	public static XMLFormatter newFormatter() {
+	public static final XMLFormatter newFormatter() {
 		return new XMLFormatter();
 	}
 

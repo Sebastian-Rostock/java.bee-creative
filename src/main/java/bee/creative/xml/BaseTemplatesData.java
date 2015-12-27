@@ -39,7 +39,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SourceData<GOwner> thiz() {
+		protected final SourceData<GOwner> thiz() {
 			return this;
 		}
 
@@ -66,7 +66,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -77,15 +77,15 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	/**
 	 * Dieses Feld speichert die {@link Templates}.
 	 */
-	Templates templates;
+	Templates __templates;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openScriptData()}.
 	 */
-	final SourceData<GThiz> scriptData = new SourceData<GThiz>() {
+	final SourceData<GThiz> __scriptData = new SourceData<GThiz>() {
 
 		@Override
-		public GThiz closeSourceData() {
+		public final GThiz closeSourceData() {
 			return BaseTemplatesData.this.thiz();
 		}
 
@@ -94,10 +94,10 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+	final FactoryData<GThiz> __factoryData = new FactoryData<GThiz>() {
 
 		@Override
-		public GThiz closeFactoryData() {
+		public final GThiz closeFactoryData() {
 			return BaseTemplatesData.this.thiz();
 		}
 
@@ -111,11 +111,11 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseTemplatesData<?> data) {
+	public final GThiz use(final BaseTemplatesData<?> data) {
 		if (data == null) return this.thiz();
-		this.templates = data.templates;
-		this.scriptData.use(data.scriptData);
-		this.factoryData.use(data.factoryData);
+		this.__templates = data.__templates;
+		this.__scriptData.use(data.__scriptData);
+		this.__factoryData.use(data.__factoryData);
 		return this.thiz();
 	}
 
@@ -130,12 +130,12 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()} bzw. {@link TransformerFactory#newTemplates(Source)} eine entsprechende
 	 *         Ausnahme auslöst.
 	 */
-	public Templates getTemplates() throws TransformerConfigurationException {
-		Templates result = this.templates;
+	public final Templates getTemplates() throws TransformerConfigurationException {
+		Templates result = this.__templates;
 		if (result != null) return result;
-		final Source source = this.scriptData.getSource();
+		final Source source = this.__scriptData.getSource();
 		if (source == null) return null;
-		result = this.factoryData.getFactory().newTemplates(source);
+		result = this.__factoryData.getFactory().newTemplates(source);
 		this.useTemplates(result);
 		return result;
 	}
@@ -146,8 +146,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @param templates {@link Templates} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useTemplates(final Templates templates) {
-		this.templates = templates;
+	public final GThiz useTemplates(final Templates templates) {
+		this.__templates = templates;
 		return this.thiz();
 	}
 
@@ -157,7 +157,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * 
 	 * @return {@code this}.
 	 */
-	public GThiz resetTemplates() {
+	public final GThiz resetTemplates() {
 		return this.useTemplates(null);
 	}
 
@@ -167,8 +167,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator.
 	 */
-	public SourceData<GThiz> openScriptData() {
-		return this.scriptData;
+	public final SourceData<GThiz> openScriptData() {
+		return this.__scriptData;
 	}
 
 	/**
@@ -177,8 +177,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @see TransformerFactory#newTemplates(Source)
 	 * @return Konfigurator.
 	 */
-	public FactoryData<GThiz> openFactoryData() {
-		return this.factoryData;
+	public final FactoryData<GThiz> openFactoryData() {
+		return this.__factoryData;
 	}
 
 	{}
@@ -195,7 +195,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @see #getTemplates()
 	 */
 	@Override
-	public Templates build() throws IllegalStateException {
+	public final Templates build() throws IllegalStateException {
 		try {
 			return this.getTemplates();
 		} catch (final TransformerConfigurationException cause) {
@@ -207,8 +207,8 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.scriptData, this.factoryData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__scriptData, this.__factoryData);
 	}
 
 }

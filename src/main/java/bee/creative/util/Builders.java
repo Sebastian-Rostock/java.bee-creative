@@ -97,7 +97,7 @@ public class Builders {
 		 * @see #use(Object)
 		 * @return Wert.
 		 */
-		public GValue get() {
+		public final GValue get() {
 			return this.__value;
 		}
 
@@ -108,7 +108,7 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}.
 		 */
-		public GThiz use(final GValue value) {
+		public final GThiz use(final GValue value) {
 			this.__value = value;
 			return this.thiz();
 		}
@@ -120,9 +120,9 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz use(final BaseValueBuilder<? extends GValue, ?> data) {
+		public final GThiz use(final BaseValueBuilder<? extends GValue, ?> data) {
 			if (data == null) return this.thiz();
-			return this.use(data.get());
+			return this.use(data.__value);
 		}
 
 		/**
@@ -130,7 +130,7 @@ public class Builders {
 		 * 
 		 * @return {@code this}.
 		 */
-		public GThiz clear() {
+		public final GThiz clear() {
 			this.__value = null;
 			return this.thiz();
 		}
@@ -141,16 +141,16 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GValue build() throws IllegalStateException {
-			return this.get();
+		public final GValue build() throws IllegalStateException {
+			return this.__value;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<GValue> iterator() {
-			final GValue value = this.get();
+		public final Iterator<GValue> iterator() {
+			final GValue value = this.__value;
 			if (value == null) return Iterators.emptyIterator();
 			return Iterators.itemIterator(value);
 		}
@@ -159,7 +159,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toString(true, this.__value);
 		}
 
@@ -201,7 +201,7 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz use(final BaseItemsBuilder<? extends GItem, ?, ?> data) {
+		public final GThiz use(final BaseItemsBuilder<? extends GItem, ?, ?> data) {
 			if (data == null) return this.thiz();
 			this.clearItems();
 			return this.useItems(data);
@@ -213,7 +213,7 @@ public class Builders {
 		 * @param item Element.
 		 * @return {@code this}.
 		 */
-		public GThiz useItem(final GItem item) {
+		public final GThiz useItem(final GItem item) {
 			this.__items.add(item);
 			return this.thiz();
 		}
@@ -224,7 +224,7 @@ public class Builders {
 		 * @param items Elemente oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz useItems(final Iterable<? extends GItem> items) {
+		public final GThiz useItems(final Iterable<? extends GItem> items) {
 			if (items == null) return this.thiz();
 			Iterables.appendAll(this.__items, items);
 			return this.thiz();
@@ -235,7 +235,7 @@ public class Builders {
 		 * 
 		 * @return interne Sammlung.
 		 */
-		public GItems getItems() {
+		public final GItems getItems() {
 			return this.__items;
 		}
 
@@ -244,7 +244,7 @@ public class Builders {
 		 * 
 		 * @return {@code this}.
 		 */
-		public GThiz clearItems() {
+		public final GThiz clearItems() {
 			this.__items.clear();
 			return this.thiz();
 		}
@@ -289,7 +289,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GItems build() throws IllegalStateException {
+		public final GItems build() throws IllegalStateException {
 			return this.__items;
 		}
 
@@ -297,7 +297,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<GItem> iterator() {
+		public final Iterator<GItem> iterator() {
 			return this.__items.iterator();
 		}
 
@@ -305,7 +305,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toString(true, this.__items);
 		}
 
@@ -354,7 +354,7 @@ public class Builders {
 		 * @param data Konfigurator oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz use(final BaseEntriesBuilder<? extends GKey, ? extends GValue, ?, ?> data) {
+		public final GThiz use(final BaseEntriesBuilder<? extends GKey, ? extends GValue, ?, ?> data) {
 			if (data == null) return this.thiz();
 			this.clearEntries();
 			return this.useEntries(data.getEntries());
@@ -367,7 +367,7 @@ public class Builders {
 		 * @param entry Eintrag.
 		 * @return {@code this}.
 		 */
-		public GThiz useEntry(final Entry<? extends GKey, ? extends GValue> entry) {
+		public final GThiz useEntry(final Entry<? extends GKey, ? extends GValue> entry) {
 			if (entry == null) return this.thiz();
 			return this.useEntry(entry.getKey(), entry.getValue());
 		}
@@ -380,7 +380,7 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}.
 		 */
-		public GThiz useEntry(final GKey key, final GValue value) {
+		public final GThiz useEntry(final GKey key, final GValue value) {
 			this.__entries.put(key, value);
 			return this.thiz();
 		}
@@ -392,7 +392,7 @@ public class Builders {
 		 * @param entries Einträge oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz useEntries(final Map<? extends GKey, ? extends GValue> entries) {
+		public final GThiz useEntries(final Map<? extends GKey, ? extends GValue> entries) {
 			if (entries == null) return this.thiz();
 			return this.useEntries(entries.entrySet());
 		}
@@ -404,7 +404,7 @@ public class Builders {
 		 * @param entries Einträge oder {@code null}.
 		 * @return {@code this}.
 		 */
-		public GThiz useEntries(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
+		public final GThiz useEntries(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
 			if (entries == null) return this.thiz();
 			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
 				this.useEntry(entry);
@@ -418,7 +418,7 @@ public class Builders {
 		 * @see BaseEntriesBuilder#BaseEntriesBuilder(Map)
 		 * @return interne Abbildung.
 		 */
-		public GEntries getEntries() {
+		public final GEntries getEntries() {
 			return this.__entries;
 		}
 
@@ -431,7 +431,7 @@ public class Builders {
 		 * @param key Schlüssel.
 		 * @return {@code this}.
 		 */
-		public GThiz forKey(final GKey key) {
+		public final GThiz forKey(final GKey key) {
 			this.__key = key;
 			return this.thiz();
 		}
@@ -443,7 +443,7 @@ public class Builders {
 		 * @see #useValue(Object)
 		 * @return Wert zum gewählten Schlüssel.
 		 */
-		public GValue getValue() {
+		public final GValue getValue() {
 			return this.__entries.get(this.__key);
 		}
 
@@ -455,7 +455,7 @@ public class Builders {
 		 * @param value Wert.
 		 * @return {@code this}.
 		 */
-		public GThiz useValue(final GValue value) {
+		public final GThiz useValue(final GValue value) {
 			this.useEntry(this.__key, value);
 			return this.thiz();
 		}
@@ -465,7 +465,7 @@ public class Builders {
 		 * 
 		 * @return {@code this}.
 		 */
-		public GThiz clearEntries() {
+		public final GThiz clearEntries() {
 			this.__entries.clear();
 			return this.thiz();
 		}
@@ -507,7 +507,7 @@ public class Builders {
 		 * @see #getEntries()
 		 */
 		@Override
-		public GEntries build() throws IllegalStateException {
+		public final GEntries build() throws IllegalStateException {
 			return this.getEntries();
 		}
 
@@ -515,7 +515,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Iterator<Entry<GKey, GValue>> iterator() {
+		public final Iterator<Entry<GKey, GValue>> iterator() {
 			return this.__entries.entrySet().iterator();
 		}
 
@@ -523,7 +523,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String toString() {
+		public final String toString() {
 			return Objects.toString(true, this.__entries);
 		}
 
@@ -561,7 +561,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GItem> clazz) {
+		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedSet(this.__items, clazz);
 			return this.thiz();
 		}
@@ -570,7 +570,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedSet(this.__items);
 			return this.thiz();
 		}
@@ -579,7 +579,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableSet(this.__items);
 			return this.thiz();
 		}
@@ -618,7 +618,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GItem> clazz) {
+		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedList(this.__items, clazz);
 			return this.thiz();
 		}
@@ -627,7 +627,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedList(this.__items);
 			return this.thiz();
 		}
@@ -636,7 +636,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableList(this.__items);
 			return this.thiz();
 		}
@@ -676,7 +676,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+		public final GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			this.__entries = Collections.checkedMap(this.__entries, keyClazz, valueClazz);
 			return this.thiz();
 		}
@@ -685,7 +685,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__entries = Collections.synchronizedMap(this.__entries);
 			return this.thiz();
 		}
@@ -694,7 +694,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__entries = Collections.unmodifiableMap(this.__entries);
 			return this.thiz();
 		}
@@ -726,7 +726,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GItem> clazz) {
+		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedCollection(this.__items, clazz);
 			return this.thiz();
 		}
@@ -735,7 +735,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedCollection(this.__items);
 			return this.thiz();
 		}
@@ -744,7 +744,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableCollection(this.__items);
 			return this.thiz();
 		}
@@ -783,7 +783,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GItem> clazz) {
+		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedSortedSet(this.__items, clazz);
 			return this.thiz();
 		}
@@ -792,7 +792,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedSortedSet(this.__items);
 			return this.thiz();
 		}
@@ -801,7 +801,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableSortedSet(this.__items);
 			return this.thiz();
 		}
@@ -841,7 +841,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+		public final GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			this.__entries = Collections.checkedSortedMap(this.__entries, keyClazz, valueClazz);
 			return this.thiz();
 		}
@@ -850,7 +850,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeSynchronized() {
+		public final GThiz makeSynchronized() {
 			this.__entries = Collections.synchronizedSortedMap(this.__entries);
 			return this.thiz();
 		}
@@ -859,7 +859,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public GThiz makeUnmodifiable() {
+		public final GThiz makeUnmodifiable() {
 			this.__entries = Collections.unmodifiableSortedMap(this.__entries);
 			return this.thiz();
 		}
@@ -878,7 +878,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected TreeSetBuilder<GItem> thiz() {
+		protected final TreeSetBuilder<GItem> thiz() {
 			return this;
 		}
 
@@ -897,7 +897,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected TreeMapBuilder<GKey, GValue> thiz() {
+		protected final TreeMapBuilder<GKey, GValue> thiz() {
 			return this;
 		}
 
@@ -915,7 +915,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected HashSetBuilder<GItem> thiz() {
+		protected final HashSetBuilder<GItem> thiz() {
 			return this;
 		}
 
@@ -934,7 +934,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected HashMapBuilder<GKey, GValue> thiz() {
+		protected final HashMapBuilder<GKey, GValue> thiz() {
 			return this;
 		}
 
@@ -952,7 +952,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ArrayListBuilder<GItem> thiz() {
+		protected final ArrayListBuilder<GItem> thiz() {
 			return this;
 		}
 
@@ -971,12 +971,12 @@ public class Builders {
 		return new Builder<GValue>() {
 
 			@Override
-			public GValue build() throws IllegalStateException {
+			public final GValue build() throws IllegalStateException {
 				return value;
 			}
 
 			@Override
-			public String toString() {
+			public final String toString() {
 				return Objects.toInvokeString("valueBuilder", value);
 			}
 
@@ -1017,7 +1017,7 @@ public class Builders {
 			Pointer<GValue> pointer;
 
 			@Override
-			public GValue build() throws IllegalStateException {
+			public final GValue build() throws IllegalStateException {
 				final Pointer<GValue> pointer = this.pointer;
 				if (pointer != null) {
 					final GValue data = pointer.data();
@@ -1030,7 +1030,7 @@ public class Builders {
 			}
 
 			@Override
-			public String toString() {
+			public final String toString() {
 				return Objects.toInvokeString("bufferedBuilder", mode, builder);
 			}
 
@@ -1055,12 +1055,12 @@ public class Builders {
 		return new Builder<GOutput>() {
 
 			@Override
-			public GOutput build() throws IllegalStateException {
+			public final GOutput build() throws IllegalStateException {
 				return converter.convert(builder.build());
 			}
 
 			@Override
-			public String toString() {
+			public final String toString() {
 				return Objects.toInvokeString("convertedBuilder", converter, builder);
 			}
 
@@ -1080,14 +1080,14 @@ public class Builders {
 		return new Builder<GValue>() {
 
 			@Override
-			public GValue build() throws IllegalStateException {
+			public final GValue build() throws IllegalStateException {
 				synchronized (this) {
 					return builder.build();
 				}
 			}
 
 			@Override
-			public String toString() {
+			public final String toString() {
 				return Objects.toInvokeString("synchronizedBuilder", builder);
 			}
 

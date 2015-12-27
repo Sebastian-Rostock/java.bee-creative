@@ -36,12 +36,12 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	/**
 	 * Dieses Feld speichert die Quelldaten.
 	 */
-	Source source;
+	Source __source;
 
 	/**
 	 * Dieses Feld speichert den System-Identifikator.
 	 */
-	String systemID;
+	String __systemID;
 
 	{}
 
@@ -51,10 +51,10 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseSourceData<?> data) {
+	public final GThiz use(final BaseSourceData<?> data) {
 		if (data == null) return this.thiz();
-		this.source = data.source;
-		this.systemID = data.systemID;
+		this.__source = data.__source;
+		this.__systemID = data.__systemID;
 		return this.thiz();
 	}
 
@@ -67,7 +67,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param url {@link URL}.
 	 * @return {@code this}.
 	 */
-	public GThiz useUrl(final URL url) {
+	public final GThiz useUrl(final URL url) {
 		return this.useSource(new StreamSource(url.toExternalForm()));
 	}
 
@@ -79,7 +79,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param file {@link File}.
 	 * @return {@code this}.
 	 */
-	public GThiz useFile(final File file) {
+	public final GThiz useFile(final File file) {
 		return this.useSource(new StreamSource(file));
 	}
 
@@ -91,7 +91,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param text Text.
 	 * @return {@code this}.
 	 */
-	public GThiz useText(final String text) {
+	public final GThiz useText(final String text) {
 		return this.useReader(new StringReader(text));
 	}
 
@@ -103,7 +103,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param node {@link Node}.
 	 * @return {@code this}.
 	 */
-	public GThiz useNode(final Node node) {
+	public final GThiz useNode(final Node node) {
 		return this.useSource(new DOMSource(node));
 	}
 
@@ -115,7 +115,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param reader {@link Reader}.
 	 * @return {@code this}.
 	 */
-	public GThiz useReader(final Reader reader) {
+	public final GThiz useReader(final Reader reader) {
 		return this.useSource(new StreamSource(reader));
 	}
 
@@ -127,7 +127,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param stream {@link InputStream}.
 	 * @return {@code this}.
 	 */
-	public GThiz useStream(final InputStream stream) {
+	public final GThiz useStream(final InputStream stream) {
 		return this.useSource(new StreamSource(stream));
 	}
 
@@ -138,10 +138,10 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param systemID System-Identifikator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useSystemID(final String systemID) {
-		this.systemID = systemID;
-		if (this.source == null) return this.thiz();
-		this.source.setSystemId(systemID);
+	public final GThiz useSystemID(final String systemID) {
+		this.__systemID = systemID;
+		if (this.__source == null) return this.thiz();
+		this.__source.setSystemId(systemID);
 		return this.thiz();
 	}
 
@@ -153,10 +153,10 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param source Quelldaten oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useSource(final Source source) {
-		this.source = source;
+	public final GThiz useSource(final Source source) {
+		this.__source = source;
 		if (source == null) return this.thiz();
-		return this.useSystemID(this.systemID != null ? this.systemID : source.getSystemId());
+		return this.useSystemID(this.__systemID != null ? this.__systemID : source.getSystemId());
 	}
 
 	/**
@@ -172,16 +172,17 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @see StreamSource
 	 * @return Quelldaten oder {@code null}.
 	 */
-	public Source getSource() {
-		return this.source;
+	public final Source getSource() {
+		return this.__source;
 	}
 
 	/**
-	 * Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.
+	 * Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
+	 * Der Rückgabewert ist {@code null}, wenn die Quelldaten keine {@link StreamSource} sind.
 	 * 
 	 * @return Quelldaten oder {@code null}.
 	 */
-	public InputSource getInputSource() {
+	public final InputSource getInputSource() {
 		final Source source = this.getSource();
 		if (!(source instanceof StreamSource)) return null;
 		final StreamSource stream = (StreamSource)source;
@@ -199,7 +200,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @see #useSystemID(String)
 	 * @return {@code this}.
 	 */
-	public GThiz resetSource() {
+	public final GThiz resetSource() {
 		this.useSystemID(null);
 		return this.useSource(null);
 	}
@@ -212,7 +213,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @see #getSource()
 	 */
 	@Override
-	public Source build() throws IllegalStateException {
+	public final Source build() throws IllegalStateException {
 		return this.getSource();
 	}
 
@@ -220,8 +221,8 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.source, this.systemID);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__source, this.__systemID);
 	}
 
 }

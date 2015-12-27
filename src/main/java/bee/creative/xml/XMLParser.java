@@ -28,7 +28,7 @@ public final class XMLParser {
 		 * 
 		 * @return Besitzer.
 		 */
-		public XMLParser closeSourceData() {
+		public final XMLParser closeSourceData() {
 			return XMLParser.this;
 		}
 
@@ -38,7 +38,7 @@ public final class XMLParser {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SourceData thiz() {
+		protected final SourceData thiz() {
 			return this;
 		}
 
@@ -56,7 +56,7 @@ public final class XMLParser {
 		 * 
 		 * @return Besitzer.
 		 */
-		public XMLParser closeFactoryData() {
+		public final XMLParser closeFactoryData() {
 			return XMLParser.this;
 		}
 
@@ -66,7 +66,7 @@ public final class XMLParser {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected BuilderData thiz() {
+		protected final BuilderData thiz() {
 			return this;
 		}
 
@@ -77,12 +77,12 @@ public final class XMLParser {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData sourceData = new SourceData();
+	final SourceData __sourceData = new SourceData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openBuilderData()}.
 	 */
-	final BuilderData builderData = new BuilderData();
+	final BuilderData __builderData = new BuilderData();
 
 	{}
 
@@ -94,9 +94,9 @@ public final class XMLParser {
 	 * @throws SAXException Wenn {@link DocumentBuilder#parse(InputSource)} bzw. {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Document parse() throws IOException, SAXException, ParserConfigurationException {
-		final InputSource source = this.sourceData.getInputSource();
-		final DocumentBuilder builder = this.builderData.getBuilder();
+	public final Document parse() throws IOException, SAXException, ParserConfigurationException {
+		final InputSource source = this.__sourceData.getInputSource();
+		final DocumentBuilder builder = this.__builderData.getBuilder();
 		final Document result = builder.parse(source);
 		return result;
 	}
@@ -108,8 +108,8 @@ public final class XMLParser {
 	 * @throws SAXException Wenn {@link BuilderData#getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilder#newDocument()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Document create() throws SAXException, ParserConfigurationException {
-		final DocumentBuilder builder = this.builderData.getBuilder();
+	public final Document create() throws SAXException, ParserConfigurationException {
+		final DocumentBuilder builder = this.__builderData.getBuilder();
 		final Document result = builder.newDocument();
 		return result;
 	}
@@ -120,8 +120,8 @@ public final class XMLParser {
 	 * @see DocumentBuilder#parse(InputSource)
 	 * @return Konfigurator.
 	 */
-	public SourceData openSourceData() {
-		return this.sourceData;
+	public final SourceData openSourceData() {
+		return this.__sourceData;
 	}
 
 	/**
@@ -129,8 +129,8 @@ public final class XMLParser {
 	 * 
 	 * @return Konfigurator.
 	 */
-	public BuilderData openBuilderData() {
-		return this.builderData;
+	public final BuilderData openBuilderData() {
+		return this.__builderData;
 	}
 
 	{}
@@ -139,8 +139,8 @@ public final class XMLParser {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.builderData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__sourceData, this.__builderData);
 	}
 
 }

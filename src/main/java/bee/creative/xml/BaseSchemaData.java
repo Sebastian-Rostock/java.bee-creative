@@ -37,7 +37,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected SourceData<GOwner> thiz() {
+		protected final SourceData<GOwner> thiz() {
 			return this;
 		}
 
@@ -65,7 +65,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -76,15 +76,15 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Dieses Feld speichert das {@link Schema}.
 	 */
-	Schema schema;
+	Schema __schema;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+	final FactoryData<GThiz> __factoryData = new FactoryData<GThiz>() {
 
 		@Override
-		public GThiz closeFactoryData() {
+		public final GThiz closeFactoryData() {
 			return BaseSchemaData.this.thiz();
 		}
 
@@ -93,10 +93,10 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData<GThiz> sourceData = new SourceData<GThiz>() {
+	final SourceData<GThiz> __sourceData = new SourceData<GThiz>() {
 
 		@Override
-		public GThiz closeSourceData() {
+		public final GThiz closeSourceData() {
 			return BaseSchemaData.this.thiz();
 		}
 
@@ -110,11 +110,11 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseSchemaData<?> data) {
+	public final GThiz use(final BaseSchemaData<?> data) {
 		if (data == null) return this.thiz();
-		this.schema = data.schema;
-		this.sourceData.use(data.sourceData);
-		this.factoryData.use(data.factoryData);
+		this.__schema = data.__schema;
+		this.__sourceData.use(data.__sourceData);
+		this.__factoryData.use(data.__factoryData);
 		return this.thiz();
 	}
 
@@ -128,12 +128,12 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @return {@link Schema} oder {@code null}.
 	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst.
 	 */
-	public Schema getSchema() throws SAXException {
-		Schema result = this.schema;
+	public final Schema getSchema() throws SAXException {
+		Schema result = this.__schema;
 		if (result != null) return result;
-		final Source source = this.sourceData.getSource();
+		final Source source = this.__sourceData.getSource();
 		if (source == null) return null;
-		result = this.factoryData.getFactory().newSchema(source);
+		result = this.__factoryData.getFactory().newSchema(source);
 		this.useSchema(result);
 		return result;
 	}
@@ -144,8 +144,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @param schema {@link Schema} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useSchema(final Schema schema) {
-		this.schema = schema;
+	public final GThiz useSchema(final Schema schema) {
+		this.__schema = schema;
 		return this.thiz();
 	}
 
@@ -156,7 +156,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see #useSchema(Schema)
 	 * @return {@code this}.
 	 */
-	public GThiz resetSchema() {
+	public final GThiz resetSchema() {
 		return this.useSchema(null);
 	}
 
@@ -166,8 +166,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public SourceData<GThiz> openSourceData() {
-		return this.sourceData;
+	public final SourceData<GThiz> openSourceData() {
+		return this.__sourceData;
 	}
 
 	/**
@@ -176,8 +176,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public FactoryData<GThiz> openFactoryData() {
-		return this.factoryData;
+	public final FactoryData<GThiz> openFactoryData() {
+		return this.__factoryData;
 	}
 
 	{}
@@ -194,7 +194,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see #getSchema()
 	 */
 	@Override
-	public Schema build() throws IllegalStateException {
+	public final Schema build() throws IllegalStateException {
 		try {
 			return this.getSchema();
 		} catch (final SAXException cause) {
@@ -206,8 +206,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.sourceData, this.factoryData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__sourceData, this.__factoryData);
 	}
 
 }

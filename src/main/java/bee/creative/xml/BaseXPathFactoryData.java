@@ -42,7 +42,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * @see #use(BaseValueBuilder)
 		 * @return {@code this}.
 		 */
-		public ModelData<GOwner> useDEFAULT_OBJECT_MODEL_URI() {
+		public final ModelData<GOwner> useDEFAULT_OBJECT_MODEL_URI() {
 			return super.use(XPathFactory.DEFAULT_OBJECT_MODEL_URI);
 		}
 
@@ -59,7 +59,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ModelData<GOwner> thiz() {
+		protected final ModelData<GOwner> thiz() {
 			return this;
 		}
 
@@ -87,7 +87,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> thiz() {
 			return this;
 		}
 
@@ -115,7 +115,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected VariableData<GOwner> thiz() {
+		protected final VariableData<GOwner> thiz() {
 			return this;
 		}
 
@@ -143,7 +143,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FunctionData<GOwner> thiz() {
+		protected final FunctionData<GOwner> thiz() {
 			return this;
 		}
 
@@ -154,15 +154,15 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	/**
 	 * Dieses Feld speichert die {@link XPathFactory}.
 	 */
-	XPathFactory factory;
+	XPathFactory __factory;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openModelData()}.
 	 */
-	final ModelData<GThiz> modelData = new ModelData<GThiz>() {
+	final ModelData<GThiz> __modelData = new ModelData<GThiz>() {
 
 		@Override
-		public GThiz closeLanguageData() {
+		public final GThiz closeLanguageData() {
 			return BaseXPathFactoryData.this.thiz();
 		}
 
@@ -171,10 +171,10 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData<GThiz> featureData = new FeatureData<GThiz>() {
+	final FeatureData<GThiz> __featureData = new FeatureData<GThiz>() {
 
 		@Override
-		public GThiz closeFeatureData() {
+		public final GThiz closeFeatureData() {
 			return BaseXPathFactoryData.this.thiz();
 		}
 
@@ -183,10 +183,10 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openVariableData()}.
 	 */
-	final VariableData<GThiz> variableData = new VariableData<GThiz>() {
+	final VariableData<GThiz> __variableData = new VariableData<GThiz>() {
 
 		@Override
-		public GThiz closeListenerData() {
+		public final GThiz closeListenerData() {
 			return BaseXPathFactoryData.this.thiz();
 		}
 
@@ -195,10 +195,10 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFunctionData()}.
 	 */
-	final FunctionData<GThiz> functionData = new FunctionData<GThiz>() {
+	final FunctionData<GThiz> __functionData = new FunctionData<GThiz>() {
 
 		@Override
-		public GThiz closeResolverData() {
+		public final GThiz closeResolverData() {
 			return BaseXPathFactoryData.this.thiz();
 		}
 
@@ -212,13 +212,13 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseXPathFactoryData<?> data) {
+	public final GThiz use(final BaseXPathFactoryData<?> data) {
 		if (data == null) return this.thiz();
-		this.factory = data.factory;
-		this.modelData.use(data.modelData);
-		this.featureData.use(data.featureData);
-		this.variableData.use(data.variableData);
-		this.functionData.use(data.functionData);
+		this.__factory = data.__factory;
+		this.__modelData.use(data.__modelData);
+		this.__featureData.use(data.__featureData);
+		this.__variableData.use(data.__variableData);
+		this.__functionData.use(data.__functionData);
 		return this.thiz();
 	}
 
@@ -232,10 +232,10 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @return {@link XPathFactory}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#newInstance(String)} bzw. {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 */
-	public XPathFactory getFactory() throws XPathFactoryConfigurationException {
-		XPathFactory result = this.factory;
+	public final XPathFactory getFactory() throws XPathFactoryConfigurationException {
+		XPathFactory result = this.__factory;
 		if (result != null) return result;
-		result = XPathFactory.newInstance(this.modelData.build());
+		result = XPathFactory.newInstance(this.__modelData.build());
 		this.useFactory(result);
 		this.updateFactory();
 		return result;
@@ -247,8 +247,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @param factory {@link XPathFactory} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useFactory(final XPathFactory factory) {
-		this.factory = factory;
+	public final GThiz useFactory(final XPathFactory factory) {
+		this.__factory = factory;
 		return this.thiz();
 	}
 
@@ -258,7 +258,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see #useFactory(XPathFactory)
 	 * @return {@code this}.
 	 */
-	public GThiz resetFactory() {
+	public final GThiz resetFactory() {
 		return this.useFactory(null);
 	}
 
@@ -271,15 +271,15 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#setFeature(String, boolean)} bzw. {@link #getFactory()} eine entsprechende Ausnahme
 	 *         auslöst.
 	 */
-	public GThiz updateFactory() throws XPathFactoryConfigurationException {
+	public final GThiz updateFactory() throws XPathFactoryConfigurationException {
 		final XPathFactory factory = this.getFactory();
-		for (final XPathVariableResolver value: this.variableData) {
+		for (final XPathVariableResolver value: this.__variableData) {
 			factory.setXPathVariableResolver(value);
 		}
-		for (final XPathFunctionResolver value: this.functionData) {
+		for (final XPathFunctionResolver value: this.__functionData) {
 			factory.setXPathFunctionResolver(value);
 		}
-		for (final Entry<String, Boolean> entry: this.featureData) {
+		for (final Entry<String, Boolean> entry: this.__featureData) {
 			factory.setFeature(entry.getKey(), entry.getValue());
 		}
 		return this.thiz();
@@ -291,8 +291,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#newInstance(String)
 	 * @return Konfigurator.
 	 */
-	public ModelData<GThiz> openModelData() {
-		return this.modelData;
+	public final ModelData<GThiz> openModelData() {
+		return this.__modelData;
 	}
 
 	/**
@@ -301,8 +301,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public FeatureData<GThiz> openFeatureData() {
-		return this.featureData;
+	public final FeatureData<GThiz> openFeatureData() {
+		return this.__featureData;
 	}
 
 	/**
@@ -311,8 +311,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator.
 	 */
-	public VariableData<GThiz> openVariableData() {
-		return this.variableData;
+	public final VariableData<GThiz> openVariableData() {
+		return this.__variableData;
 	}
 
 	/**
@@ -321,8 +321,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator.
 	 */
-	public FunctionData<GThiz> openFunctionData() {
-		return this.functionData;
+	public final FunctionData<GThiz> openFunctionData() {
+		return this.__functionData;
 	}
 
 	{}
@@ -339,7 +339,7 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * @see #getFactory()
 	 */
 	@Override
-	public XPathFactory build() throws IllegalStateException {
+	public final XPathFactory build() throws IllegalStateException {
 		try {
 			return this.getFactory();
 		} catch (final XPathFactoryConfigurationException cause) {
@@ -351,8 +351,8 @@ public abstract class BaseXPathFactoryData<GThiz> extends BaseBuilder<XPathFacto
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.modelData, this.featureData, this.variableData, this.functionData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__modelData, this.__featureData, this.__variableData, this.__functionData);
 	}
 
 }

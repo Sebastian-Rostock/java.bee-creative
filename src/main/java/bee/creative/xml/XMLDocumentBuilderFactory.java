@@ -14,7 +14,7 @@ public final class XMLDocumentBuilderFactory extends BaseDocumentBuilderFactoryD
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected XMLDocumentBuilderFactory thiz() {
+	protected final XMLDocumentBuilderFactory thiz() {
 		return this;
 	}
 

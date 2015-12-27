@@ -40,7 +40,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> thiz() {
 			return this;
 		}
 
@@ -68,7 +68,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected HandlerData<GOwner> thiz() {
+		protected final HandlerData<GOwner> thiz() {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> thiz() {
 			return this;
 		}
 
@@ -107,15 +107,15 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den {@link DocumentBuilder}.
 	 */
-	DocumentBuilder builder;
+	DocumentBuilder __builder;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData<GThiz> factoryData = new FactoryData<GThiz>() {
+	final FactoryData<GThiz> __factoryData = new FactoryData<GThiz>() {
 
 		@Override
-		public GThiz closeFactoryData() {
+		public final GThiz closeFactoryData() {
 			return BaseDocumentBuilderData.this.thiz();
 		}
 
@@ -124,10 +124,10 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}.
 	 */
-	final HandlerData<GThiz> handlerData = new HandlerData<GThiz>() {
+	final HandlerData<GThiz> __handlerData = new HandlerData<GThiz>() {
 
 		@Override
-		public GThiz closeListenerData() {
+		public final GThiz closeListenerData() {
 			return BaseDocumentBuilderData.this.thiz();
 		}
 
@@ -136,10 +136,10 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData<GThiz> resolverData = new ResolverData<GThiz>() {
+	final ResolverData<GThiz> __resolverData = new ResolverData<GThiz>() {
 
 		@Override
-		public GThiz closeResolverData() {
+		public final GThiz closeResolverData() {
 			return BaseDocumentBuilderData.this.thiz();
 		}
 
@@ -153,12 +153,12 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseDocumentBuilderData<?> data) {
+	public final GThiz use(final BaseDocumentBuilderData<?> data) {
 		if (data == null) return this.thiz();
-		this.builder = data.builder;
-		this.factoryData.use(data.factoryData);
-		this.handlerData.use(data.handlerData);
-		this.resolverData.use(data.resolverData);
+		this.__builder = data.__builder;
+		this.__factoryData.use(data.__factoryData);
+		this.__handlerData.use(data.__handlerData);
+		this.__resolverData.use(data.__resolverData);
 		return this.thiz();
 	}
 
@@ -174,10 +174,10 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @throws SAXException Wenn {@link FactoryData#getFactory()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
-		DocumentBuilder result = this.builder;
+	public final DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
+		DocumentBuilder result = this.__builder;
 		if (result != null) return result;
-		result = this.factoryData.getFactory().newDocumentBuilder();
+		result = this.__factoryData.getFactory().newDocumentBuilder();
 		this.useBuilder(result);
 		this.updateBuilder();
 		return result;
@@ -189,8 +189,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @param builder {@link DocumentBuilder} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useBuilder(final DocumentBuilder builder) {
-		this.builder = builder;
+	public final GThiz useBuilder(final DocumentBuilder builder) {
+		this.__builder = builder;
 		return this.thiz();
 	}
 
@@ -200,7 +200,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see #useBuilder(DocumentBuilder)
 	 * @return {@code this}.
 	 */
-	public GThiz resetBuilder() {
+	public final GThiz resetBuilder() {
 		return this.useBuilder(null);
 	}
 
@@ -213,12 +213,12 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public GThiz updateBuilder() throws SAXException, ParserConfigurationException {
+	public final GThiz updateBuilder() throws SAXException, ParserConfigurationException {
 		final DocumentBuilder builder = this.getBuilder();
-		for (final ErrorHandler value: this.handlerData) {
+		for (final ErrorHandler value: this.__handlerData) {
 			builder.setErrorHandler(value);
 		}
-		for (final EntityResolver value: this.resolverData) {
+		for (final EntityResolver value: this.__resolverData) {
 			builder.setEntityResolver(value);
 		}
 		return this.thiz();
@@ -230,8 +230,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @return Konfigurator.
 	 */
-	public FactoryData<GThiz> openFactoryData() {
-		return this.factoryData;
+	public final FactoryData<GThiz> openFactoryData() {
+		return this.__factoryData;
 	}
 
 	/**
@@ -240,8 +240,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator.
 	 */
-	public HandlerData<GThiz> openHandlerData() {
-		return this.handlerData;
+	public final HandlerData<GThiz> openHandlerData() {
+		return this.__handlerData;
 	}
 
 	/**
@@ -250,8 +250,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @return Konfigurator.
 	 */
-	public ResolverData<GThiz> openResolverData() {
-		return this.resolverData;
+	public final ResolverData<GThiz> openResolverData() {
+		return this.__resolverData;
 	}
 
 	{}
@@ -268,7 +268,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see #getBuilder()
 	 */
 	@Override
-	public DocumentBuilder build() throws IllegalStateException {
+	public final DocumentBuilder build() throws IllegalStateException {
 		try {
 			return this.getBuilder();
 		} catch (final SAXException | ParserConfigurationException cause) {
@@ -280,8 +280,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.factoryData, this.handlerData, this.resolverData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__factoryData, this.__handlerData, this.__resolverData);
 	}
 
 }

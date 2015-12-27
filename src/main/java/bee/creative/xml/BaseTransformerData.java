@@ -35,7 +35,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forINDENT() {
+		public final PropertyData<GOwner> forINDENT() {
 			return this.forKey(OutputKeys.INDENT);
 		}
 
@@ -45,7 +45,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forVERSION() {
+		public final PropertyData<GOwner> forVERSION() {
 			return this.forKey(OutputKeys.VERSION);
 		}
 
@@ -55,7 +55,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forMETHOD() {
+		public final PropertyData<GOwner> forMETHOD() {
 			return this.forKey(OutputKeys.METHOD);
 		}
 
@@ -65,7 +65,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forENCODING() {
+		public final PropertyData<GOwner> forENCODING() {
 			return this.forKey(OutputKeys.ENCODING);
 		}
 
@@ -75,7 +75,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forMEDIA_TYPE() {
+		public final PropertyData<GOwner> forMEDIA_TYPE() {
 			return this.forKey(OutputKeys.MEDIA_TYPE);
 		}
 
@@ -85,7 +85,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forSTANDALONE() {
+		public final PropertyData<GOwner> forSTANDALONE() {
 			return this.forKey(OutputKeys.STANDALONE);
 		}
 
@@ -95,7 +95,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forOMIT_XML_DECLARATION() {
+		public final PropertyData<GOwner> forOMIT_XML_DECLARATION() {
 			return this.forKey(OutputKeys.OMIT_XML_DECLARATION);
 		}
 
@@ -105,7 +105,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * @see #forKey(Object)
 		 * @return {@code this}.
 		 */
-		public PropertyData<GOwner> forCDATA_SECTION_ELEMENTS() {
+		public final PropertyData<GOwner> forCDATA_SECTION_ELEMENTS() {
 			return this.forKey(OutputKeys.CDATA_SECTION_ELEMENTS);
 		}
 
@@ -122,7 +122,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected PropertyData<GOwner> thiz() {
+		protected final PropertyData<GOwner> thiz() {
 			return this;
 		}
 
@@ -150,7 +150,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected ParameterData<GOwner> thiz() {
+		protected final ParameterData<GOwner> thiz() {
 			return this;
 		}
 
@@ -178,7 +178,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected TemplatesData<GOwner> thiz() {
+		protected final TemplatesData<GOwner> thiz() {
 			return this;
 		}
 
@@ -189,15 +189,15 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	/**
 	 * Dieses Feld speichert den {@link Transformer}.
 	 */
-	Transformer transformer;
+	Transformer __transformer;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openPropertyData()}.
 	 */
-	final PropertyData<GThiz> propertyData = new PropertyData<GThiz>() {
+	final PropertyData<GThiz> __propertyData = new PropertyData<GThiz>() {
 
 		@Override
-		public GThiz closePropertyData() {
+		public final GThiz closePropertyData() {
 			return BaseTransformerData.this.thiz();
 		}
 
@@ -206,10 +206,10 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openParameterData()}.
 	 */
-	final ParameterData<GThiz> parameterData = new ParameterData<GThiz>() {
+	final ParameterData<GThiz> __parameterData = new ParameterData<GThiz>() {
 
 		@Override
-		public GThiz closeParameterData() {
+		public final GThiz closeParameterData() {
 			return BaseTransformerData.this.thiz();
 		}
 
@@ -218,10 +218,10 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openTemplatesData()}.
 	 */
-	final TemplatesData<GThiz> templatesData = new TemplatesData<GThiz>() {
+	final TemplatesData<GThiz> __templatesData = new TemplatesData<GThiz>() {
 
 		@Override
-		public GThiz closeTemplatesData() {
+		public final GThiz closeTemplatesData() {
 			return BaseTransformerData.this.thiz();
 		}
 
@@ -235,12 +235,12 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz use(final BaseTransformerData<?> data) {
+	public final GThiz use(final BaseTransformerData<?> data) {
 		if (data == null) return this.thiz();
-		this.transformer = data.transformer;
-		this.propertyData.use(data.propertyData);
-		this.parameterData.use(data.parameterData);
-		this.templatesData.use(data.templatesData);
+		this.__transformer = data.__transformer;
+		this.__propertyData.use(data.__propertyData);
+		this.__parameterData.use(data.__parameterData);
+		this.__templatesData.use(data.__templatesData);
 		return this.thiz();
 	}
 
@@ -257,11 +257,11 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @throws TransformerConfigurationException Wenn {@link FactoryData#getFactory()}, {@link TemplatesData#getTemplates()}, {@link Templates#newTransformer()}
 	 *         bzw. {@link TransformerFactory#newTransformer()} eine entsprechende Ausnahme auslöst.
 	 */
-	public Transformer getTransformer() throws TransformerConfigurationException {
-		Transformer result = this.transformer;
+	public final Transformer getTransformer() throws TransformerConfigurationException {
+		Transformer result = this.__transformer;
 		if (result != null) return result;
-		final Templates templates = this.templatesData.getTemplates();
-		final TransformerFactory factory = this.templatesData.factoryData.getFactory();
+		final Templates templates = this.__templatesData.getTemplates();
+		final TransformerFactory factory = this.__templatesData.openFactoryData().getFactory();
 		result = templates != null ? templates.newTransformer() : factory.newTransformer();
 		this.useTransformer(result);
 		this.updateTransformer();
@@ -274,8 +274,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @param transformer {@link Transformer} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public GThiz useTransformer(final Transformer transformer) {
-		this.transformer = transformer;
+	public final GThiz useTransformer(final Transformer transformer) {
+		this.__transformer = transformer;
 		return this.thiz();
 	}
 
@@ -284,7 +284,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * 
 	 * @return {@code this}.
 	 */
-	public GThiz resetTemplates() {
+	public final GThiz resetTemplates() {
 		return this.useTransformer(null);
 	}
 
@@ -297,12 +297,12 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @throws TransformerConfigurationException Wenn {@link #getTransformer()} eine entsprechende Ausnahme auslöst.
 	 */
 
-	public GThiz updateTransformer() throws TransformerConfigurationException {
+	public final GThiz updateTransformer() throws TransformerConfigurationException {
 		final Transformer result = this.getTransformer();
-		for (final Entry<String, String> entry: this.propertyData) {
+		for (final Entry<String, String> entry: this.__propertyData) {
 			result.setOutputProperty(entry.getKey(), entry.getValue());
 		}
-		for (final Entry<String, Object> entry: this.parameterData) {
+		for (final Entry<String, Object> entry: this.__parameterData) {
 			result.setParameter(entry.getKey(), entry.getValue());
 		}
 		return this.thiz();
@@ -314,8 +314,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @return Konfigurator.
 	 */
-	public PropertyData<GThiz> openPropertyData() {
-		return this.propertyData;
+	public final PropertyData<GThiz> openPropertyData() {
+		return this.__propertyData;
 	}
 
 	/**
@@ -324,8 +324,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @see Transformer#setParameter(String, Object)
 	 * @return Konfigurator.
 	 */
-	public ParameterData<GThiz> openParameterData() {
-		return this.parameterData;
+	public final ParameterData<GThiz> openParameterData() {
+		return this.__parameterData;
 	}
 
 	/**
@@ -335,8 +335,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @see TransformerFactory#newTransformer()
 	 * @return Konfigurator.
 	 */
-	public TemplatesData<GThiz> openTemplatesData() {
-		return this.templatesData;
+	public final TemplatesData<GThiz> openTemplatesData() {
+		return this.__templatesData;
 	}
 
 	{}
@@ -353,7 +353,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @see #getTransformer()
 	 */
 	@Override
-	public Transformer build() throws IllegalStateException {
+	public final Transformer build() throws IllegalStateException {
 		try {
 			return this.getTransformer();
 		} catch (final TransformerConfigurationException cause) {
@@ -365,8 +365,8 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		return Objects.toInvokeString(this, this.propertyData, this.parameterData, this.templatesData);
+	public final String toString() {
+		return Objects.toInvokeString(this, this.__propertyData, this.__parameterData, this.__templatesData);
 	}
 
 }

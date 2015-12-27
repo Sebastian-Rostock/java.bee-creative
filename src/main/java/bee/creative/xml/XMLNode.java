@@ -17,7 +17,7 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public XMLNode use(final BaseNodeData<?> data) {
+	public final XMLNode use(final BaseNodeData<?> data) {
 		return super.use(data);
 	}
 
@@ -25,7 +25,7 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public XMLNode useNode(final Node node) {
+	public final XMLNode useNode(final Node node) {
 		return super.useNode(node);
 	}
 
@@ -33,7 +33,7 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected XMLNode thiz() {
+	protected final XMLNode thiz() {
 		return this;
 	}
 
