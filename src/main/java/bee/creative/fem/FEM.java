@@ -3537,7 +3537,7 @@ public class FEM {
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
-	public interface ScriptFormatterHelper {
+	public static interface ScriptFormatterHelper {
 
 		/**
 		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
@@ -4566,15 +4566,13 @@ public class FEM {
 		return new FunctionValue(data);
 	}
 
-	{}
-
 	/**
 	 * Diese Methode erzeugt einen neuen {@link ScriptParser} und gibt diesen zurück.
 	 * 
 	 * @see ScriptParser
 	 * @return {@link ScriptParser}.
 	 */
-	public static ScriptParser scriptParser() {
+	public static final ScriptParser scriptParser() {
 		return new ScriptParser();
 	}
 
@@ -4584,7 +4582,7 @@ public class FEM {
 	 * @see ScriptCompiler
 	 * @return {@link ScriptCompiler}.
 	 */
-	public static ScriptCompiler scriptCompiler() {
+	public static final ScriptCompiler scriptCompiler() {
 		return new ScriptCompiler();
 	}
 
@@ -4594,7 +4592,7 @@ public class FEM {
 	 * @see ScriptFormatter
 	 * @return {@link ScriptFormatter}.
 	 */
-	public static ScriptFormatter scriptFormatter() {
+	public static final ScriptFormatter scriptFormatter() {
 		return new ScriptFormatter();
 	}
 

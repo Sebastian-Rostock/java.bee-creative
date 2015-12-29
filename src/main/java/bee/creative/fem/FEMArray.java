@@ -344,7 +344,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, F
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.

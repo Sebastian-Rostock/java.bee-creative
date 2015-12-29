@@ -388,7 +388,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.

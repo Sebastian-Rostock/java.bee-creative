@@ -20,7 +20,7 @@ public abstract class FEMType<GData> {
 	 * @param id Identifikator für {@link #id()}.
 	 * @return {@code simple}-{@link FEMType}.
 	 */
-	public static <GValue> FEMType<GValue> from(final int id) {
+	public static final <GValue> FEMType<GValue> from(final int id) {
 		return FEMType.from(id, Objects.toInvokeString("simpleType", id));
 	}
 
@@ -34,7 +34,7 @@ public abstract class FEMType<GData> {
 	 * @return {@code simple}-{@link FEMType}.
 	 * @throws NullPointerException Wenn {@code toString} {@code null} ist.
 	 */
-	public static <GValue> FEMType<GValue> from(final int id, final String toString) throws NullPointerException {
+	public static final <GValue> FEMType<GValue> from(final int id, final String toString) throws NullPointerException {
 		if (toString == null) throw new NullPointerException("toString = null");
 		return new FEMType<GValue>() {
 

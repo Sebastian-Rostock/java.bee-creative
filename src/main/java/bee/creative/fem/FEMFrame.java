@@ -201,12 +201,12 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/**
 	 * Dieses Feld speichert die übergeordneten Parameterdaten.
 	 */
-	protected final FEMFrame __parent;
+	final FEMFrame __parent;
 
 	/**
 	 * Dieses Feld speichert das Kontextobjekt.
 	 */
-	protected final FEMContext __context;
+	final FEMContext __context;
 
 	@SuppressWarnings ("javadoc")
 	FEMFrame() {

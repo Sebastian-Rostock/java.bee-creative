@@ -160,7 +160,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 		final MMFArray __array;
 
 		UTF8ArrayString(final MMFArray array) {
-			super(array.length());
+			super(__utf8Count(array));
 			this.__array = array;
 		}
 
@@ -223,7 +223,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 		final MMFArray __array;
 
 		UTF16ArrayString(final MMFArray array) {
-			super(array.length());
+			super(__utf16Count(array));
 			this.__array = array;
 		}
 
@@ -957,7 +957,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
