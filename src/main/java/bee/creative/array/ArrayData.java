@@ -84,9 +84,8 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/**
-	 * Diese Methode setzt die Größe des gegebenen Arrays und gibt es zurück. Wenn die Größe des gegebenen Arrays von der gegebenen Größe abweicht, werden ein
-	 * neues Array mit passender Größe erzeugt, die Elemente des gegebenen Arrays werden der Ausrichtung entsprechend in das neue Array kopiert und das neue Array
-	 * zurück gegeben.
+	 * Diese Methode setzt die Größe des internen Arrays. Wenn die Größe des Arrays von der gegebenen Größe abweicht, werden ein neues Array mit passender Größe
+	 * erzeugt, die Elemente der Ausrichtung entsprechend in das neue Array kopiert und das neue Array als internes genutzt.
 	 * 
 	 * @see ArrayData#defaultAlignment(int)
 	 * @param length neue Größe.
