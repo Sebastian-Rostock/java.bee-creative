@@ -957,7 +957,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	final int __length;
+	protected final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -965,7 +965,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
 	 */
-	FEMString(final int length) throws IllegalArgumentException {
+	protected FEMString(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.__length = length;
 	}

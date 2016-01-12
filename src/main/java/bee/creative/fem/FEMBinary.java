@@ -388,7 +388,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	final int __length;
+	protected final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -396,7 +396,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
 	 */
-	FEMBinary(final int length) throws IllegalArgumentException {
+	protected FEMBinary(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.__length = length;
 	}

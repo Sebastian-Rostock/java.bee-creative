@@ -344,7 +344,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, F
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	final int __length;
+	protected final int __length;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -352,7 +352,7 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, F
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
 	 */
-	FEMArray(final int length) throws IllegalArgumentException {
+	protected FEMArray(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this.__length = length;
 	}
