@@ -56,7 +56,7 @@ public final class XMLParser {
 		 * 
 		 * @return Besitzer.
 		 */
-		public final XMLParser closeFactoryData() {
+		public final XMLParser closeBuilderData() {
 			return XMLParser.this;
 		}
 
