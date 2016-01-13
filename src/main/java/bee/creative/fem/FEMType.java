@@ -75,13 +75,13 @@ public abstract class FEMType<GData> {
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code Context.DEFAULT().cast(value, this)}.
+	 * Der Rückgabewert entspricht {@code Context.DEFAULT().dataOf(value, this)}.
 	 * 
 	 * @see FEMContext#DEFAULT()
 	 * @see FEMContext#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @return Nutzdaten.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code Context.DEFAUL} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
@@ -91,7 +91,7 @@ public abstract class FEMType<GData> {
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code context.cast(value, this)}.
+	 * Der Rückgabewert entspricht {@code context.dataOf(value, this)}.
 	 * 
 	 * @see FEMContext#dataOf(FEMValue, FEMType)
 	 * @param value gegebener Wert.

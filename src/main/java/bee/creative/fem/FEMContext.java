@@ -87,17 +87,17 @@ public abstract class FEMContext {
 	public static final <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
 		return new Converter<FEMValue, GData>() {
-	
+
 			@Override
 			public GData convert(final FEMValue input) {
 				return FEMContext.__default.dataOf(input, type);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("dataOf", type);
 			}
-	
+
 		};
 	}
 
@@ -114,17 +114,17 @@ public abstract class FEMContext {
 		if (type == null) throw new NullPointerException("type = null");
 		if (context == null) throw new NullPointerException("context = null");
 		return new Converter<FEMValue, GData>() {
-	
+
 			@Override
 			public GData convert(final FEMValue input) {
 				return context.dataOf(input, type);
 			}
-	
+
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("dataOf", type, context);
 			}
-	
+
 		};
 	}
 
@@ -141,7 +141,7 @@ public abstract class FEMContext {
 
 	/**
 	 * Diese Methode setzt den {@link #DEFAULT() Rückfallkontextobjekt}.<br>
-	 * Wenn das gegebene Kontextobjekt {@code null} ist
+	 * Wenn das gegebene Kontextobjekt {@code null} ist, wird {@link #EMPTY} verwendet.
 	 * 
 	 * @param context Rückfallkontextobjekt oder {@code null}.
 	 */

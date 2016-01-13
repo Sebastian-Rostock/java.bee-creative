@@ -37,7 +37,7 @@ public class FEM {
 
 		/**
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
-		 * Der Rückgabewert entspricht
+		 * Der Rückgabewert entspricht {@code FEMContext.DEFAULT().dataOf(this, type)}.
 		 * 
 		 * @see FEMContext#DEFAULT()
 		 * @see FEMContext#dataOf(FEMValue, FEMType)
@@ -4321,6 +4321,29 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.ARRAY_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMArray}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMArray arrayData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.ARRAY_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.ARRAY_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMArray}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMArray arrayData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.ARRAY_TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
 	 * 
 	 * @param data Wertliste.
@@ -4356,6 +4379,29 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.OBJECT_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMObject}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMObject objectData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.OBJECT_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.OBJECT_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMObject}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMObject objectData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.OBJECT_TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt die gegebene Referenz als {@link FEMValue} zurück.
 	 * 
 	 * @param data Referenz.
@@ -4364,6 +4410,29 @@ public class FEM {
 	 */
 	public static final ObjectValue objectValue(final FEMObject data) throws NullPointerException {
 		return new ObjectValue(data);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.STRING_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMString}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMString stringData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.STRING_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.STRING_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMString}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMString stringData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.STRING_TYPE);
 	}
 
 	/**
@@ -4403,6 +4472,29 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.BINARY_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMBinary}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMBinary binaryData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.BINARY_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.BINARY_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMBinary}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMBinary binaryData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.BINARY_TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt die gegebene Bytefolge als {@link FEMValue} zurück.
 	 * 
 	 * @param data Bytefolge.
@@ -4424,6 +4516,29 @@ public class FEM {
 	public static final BinaryValue binaryValue(final FEMBinary data) throws NullPointerException {
 		if (data.__length == 0) return FEM.__emptyBinary;
 		return new BinaryValue(data);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.INTEGER_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMInteger}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMInteger integerData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.INTEGER_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.INTEGER_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMInteger}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMInteger integerData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.INTEGER_TYPE);
 	}
 
 	/**
@@ -4459,6 +4574,29 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DECIMAL_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMDecimal}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMDecimal decimalData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.DECIMAL_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DECIMAL_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMDecimal}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMDecimal decimalData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.DECIMAL_TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt den gegebenen Dezimalbruch als {@link FEMValue} zurück.
 	 * 
 	 * @param data Dezimalbruch.
@@ -4488,6 +4626,29 @@ public class FEM {
 	 */
 	public static final DecimalValue decimalValue(final FEMDecimal data) throws NullPointerException {
 		return new DecimalValue(data);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.BOOLEAN_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMBoolean}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMBoolean booleanData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.BOOLEAN_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.BOOLEAN_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMBoolean}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMBoolean booleanData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.BOOLEAN_TYPE);
 	}
 
 	/**
@@ -4523,6 +4684,29 @@ public class FEM {
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DURATION_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMDuration}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMDuration durationData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.DURATION_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DURATION_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMDuration}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMDuration durationData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.DURATION_TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt die gegebenen Zeitspanne als {@link FEMValue} zurück.
 	 * 
 	 * @param data Zeitspanne.
@@ -4531,6 +4715,29 @@ public class FEM {
 	 */
 	public static final DurationValue durationValue(final FEMDuration data) throws NullPointerException {
 		return new DurationValue(data);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DATETIME_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMDatetime}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMDatetime datetimeData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.DATETIME_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DATETIME_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMDatetime}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMDatetime datetimeData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.DATETIME_TYPE);
 	}
 
 	/**
@@ -4553,6 +4760,29 @@ public class FEM {
 	 */
 	public static final DatetimeValue datetimeValue(final FEMDatetime data) throws NullPointerException {
 		return new DatetimeValue(data);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.FUNCTION_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return {@link FEMFunction}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMFunction functionData(final FEMValue value) throws NullPointerException {
+		return FEMContext.__default.dataOf(value, FEM.FUNCTION_TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.FUNCTION_TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return {@link FEMFunction}.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMFunction functionData(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataOf(value, FEM.FUNCTION_TYPE);
 	}
 
 	/**
