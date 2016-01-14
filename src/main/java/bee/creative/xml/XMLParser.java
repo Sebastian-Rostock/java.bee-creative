@@ -38,7 +38,7 @@ public final class XMLParser {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData thiz() {
+		protected final SourceData __this() {
 			return this;
 		}
 
@@ -66,7 +66,7 @@ public final class XMLParser {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final BuilderData thiz() {
+		protected final BuilderData __this() {
 			return this;
 		}
 

@@ -88,7 +88,6 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final boolean equals(final FEMInteger that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return this.__value == that.__value;
 	}
 
@@ -101,7 +100,6 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final int compare(final FEMInteger that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return Comparators.compare(this.__value, that.__value);
 	}
 

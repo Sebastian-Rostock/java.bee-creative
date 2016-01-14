@@ -92,7 +92,6 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMBoolean that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return this.__value == that.__value;
 	}
 
@@ -105,7 +104,6 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return Boolean.compare(this.__value, that.__value);
 	}
 

@@ -52,10 +52,10 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseSourceData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__source = data.__source;
 		this.__systemID = data.__systemID;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -140,9 +140,9 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 */
 	public final GThiz useSystemID(final String systemID) {
 		this.__systemID = systemID;
-		if (this.__source == null) return this.thiz();
+		if (this.__source == null) return this.__this();
 		this.__source.setSystemId(systemID);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -155,7 +155,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 */
 	public final GThiz useSource(final Source source) {
 		this.__source = source;
-		if (source == null) return this.thiz();
+		if (source == null) return this.__this();
 		return this.useSystemID(this.__systemID != null ? this.__systemID : source.getSystemId());
 	}
 

@@ -40,7 +40,7 @@ public final class XMLEvaluator {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final XPathData thiz() {
+		protected final XPathData __this() {
 			return this;
 		}
 

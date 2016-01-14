@@ -13,7 +13,7 @@ public final class XMLResult extends BaseResultData<XMLResult> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLResult thiz() {
+	protected final XMLResult __this() {
 		return this;
 	}
 

@@ -41,7 +41,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData thiz() {
+		protected final SourceData __this() {
 			return this;
 		}
 
@@ -70,7 +70,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResultData thiz() {
+		protected final ResultData __this() {
 			return this;
 		}
 
@@ -98,7 +98,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final TransformerData thiz() {
+		protected final TransformerData __this() {
 			return this;
 		}
 

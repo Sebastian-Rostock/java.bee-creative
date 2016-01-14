@@ -40,7 +40,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> __this() {
 			return this;
 		}
 
@@ -68,7 +68,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final HandlerData<GOwner> thiz() {
+		protected final HandlerData<GOwner> __this() {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> __this() {
 			return this;
 		}
 
@@ -116,7 +116,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 
 		@Override
 		public final GThiz closeFactoryData() {
-			return BaseDocumentBuilderData.this.thiz();
+			return BaseDocumentBuilderData.this.__this();
 		}
 
 	};
@@ -128,7 +128,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 
 		@Override
 		public final GThiz closeListenerData() {
-			return BaseDocumentBuilderData.this.thiz();
+			return BaseDocumentBuilderData.this.__this();
 		}
 
 	};
@@ -140,7 +140,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 
 		@Override
 		public final GThiz closeResolverData() {
-			return BaseDocumentBuilderData.this.thiz();
+			return BaseDocumentBuilderData.this.__this();
 		}
 
 	};
@@ -154,12 +154,12 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseDocumentBuilderData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__builder = data.__builder;
 		this.__factoryData.use(data.__factoryData);
 		this.__handlerData.use(data.__handlerData);
 		this.__resolverData.use(data.__resolverData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -191,7 +191,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 */
 	public final GThiz useBuilder(final DocumentBuilder builder) {
 		this.__builder = builder;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -221,7 +221,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		for (final EntityResolver value: this.__resolverData) {
 			builder.setEntityResolver(value);
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -260,7 +260,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

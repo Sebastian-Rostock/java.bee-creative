@@ -646,7 +646,6 @@ public final class FEMDuration implements Comparable<FEMDuration>, ScriptFormatt
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
 	 */
 	public final FEMDuration move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		if (duration == null) throw new NullPointerException("duration = null");
 		if (duration.signValue() < 0) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
 	}

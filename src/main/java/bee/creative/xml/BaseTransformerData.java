@@ -122,7 +122,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final PropertyData<GOwner> thiz() {
+		protected final PropertyData<GOwner> __this() {
 			return this;
 		}
 
@@ -150,7 +150,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ParameterData<GOwner> thiz() {
+		protected final ParameterData<GOwner> __this() {
 			return this;
 		}
 
@@ -178,7 +178,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final TemplatesData<GOwner> thiz() {
+		protected final TemplatesData<GOwner> __this() {
 			return this;
 		}
 
@@ -198,7 +198,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThiz closePropertyData() {
-			return BaseTransformerData.this.thiz();
+			return BaseTransformerData.this.__this();
 		}
 
 	};
@@ -210,7 +210,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThiz closeParameterData() {
-			return BaseTransformerData.this.thiz();
+			return BaseTransformerData.this.__this();
 		}
 
 	};
@@ -222,7 +222,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 
 		@Override
 		public final GThiz closeTemplatesData() {
-			return BaseTransformerData.this.thiz();
+			return BaseTransformerData.this.__this();
 		}
 
 	};
@@ -236,12 +236,12 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseTransformerData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__transformer = data.__transformer;
 		this.__propertyData.use(data.__propertyData);
 		this.__parameterData.use(data.__parameterData);
 		this.__templatesData.use(data.__templatesData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -276,7 +276,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 */
 	public final GThiz useTransformer(final Transformer transformer) {
 		this.__transformer = transformer;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -305,7 +305,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 		for (final Entry<String, Object> entry: this.__parameterData) {
 			result.setParameter(entry.getKey(), entry.getValue());
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -345,7 +345,7 @@ public abstract class BaseTransformerData<GThiz> extends BaseBuilder<Transformer
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

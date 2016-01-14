@@ -40,7 +40,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> __this() {
 			return this;
 		}
 
@@ -68,7 +68,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ContextData<GOwner> thiz() {
+		protected final ContextData<GOwner> __this() {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final VariableData<GOwner> thiz() {
+		protected final VariableData<GOwner> __this() {
 			return this;
 		}
 
@@ -124,7 +124,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FunctionData<GOwner> thiz() {
+		protected final FunctionData<GOwner> __this() {
 			return this;
 		}
 
@@ -144,7 +144,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 		@Override
 		public final GThiz closeFacroryData() {
-			return BaseXPathData.this.thiz();
+			return BaseXPathData.this.__this();
 		}
 
 	};
@@ -156,7 +156,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 		@Override
 		public final GThiz closeLanguageData() {
-			return BaseXPathData.this.thiz();
+			return BaseXPathData.this.__this();
 		}
 
 	};
@@ -168,7 +168,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 		@Override
 		public final GThiz closeListenerData() {
-			return BaseXPathData.this.thiz();
+			return BaseXPathData.this.__this();
 		}
 
 	};
@@ -180,7 +180,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 
 		@Override
 		public final GThiz closeResolverData() {
-			return BaseXPathData.this.thiz();
+			return BaseXPathData.this.__this();
 		}
 
 	};
@@ -194,13 +194,13 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseXPathData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__xpath = data.__xpath;
 		this.__facroryData.use(data.__facroryData);
 		this.__contextData.use(data.__contextData);
 		this.__variableData.use(data.__variableData);
 		this.__functionData.use(data.__functionData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -231,7 +231,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 */
 	public final GThiz useXPath(final XPath factory) {
 		this.__xpath = factory;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -263,7 +263,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 		for (final XPathFunctionResolver value: this.__functionData) {
 			factory.setXPathFunctionResolver(value);
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -311,7 +311,7 @@ public abstract class BaseXPathData<GThiz> extends BaseBuilder<XPath, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

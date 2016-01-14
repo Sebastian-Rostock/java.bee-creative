@@ -62,7 +62,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final AttrData<GOwner> thiz() {
+		protected final AttrData<GOwner> __this() {
 			return this;
 		}
 
@@ -142,7 +142,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ChldData<GOwner> thiz() {
+		protected final ChldData<GOwner> __this() {
 			return this;
 		}
 
@@ -233,7 +233,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 
 			@Override
 			public final GThiz closeAttr() {
-				return BaseNodeData.this.thiz();
+				return BaseNodeData.this.__this();
 			}
 
 		};
@@ -249,7 +249,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 
 			@Override
 			public final GThiz closeChld() {
-				return BaseNodeData.this.thiz();
+				return BaseNodeData.this.__this();
 			}
 
 		};
@@ -262,9 +262,9 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * @return {@code this}.
 	 */
 	protected GThiz use(final BaseNodeData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__node = data.__node;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -348,7 +348,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 */
 	protected GThiz useNode(final Node node) {
 		this.__node = node;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -397,7 +397,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 		} else {
 			node.setNodeValue(value);
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -698,7 +698,7 @@ public abstract class BaseNodeData<GThiz extends BaseNodeData<?>> extends BaseBu
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

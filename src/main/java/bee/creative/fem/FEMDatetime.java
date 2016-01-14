@@ -97,6 +97,30 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	{}
 
 	/**
+	 * Diese Methode gibt den aktuellen Zeitpunkt zurück.
+	 * 
+	 * @return aktueller Zeitpunkt.
+	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst.
+	 */
+	public static final FEMDatetime now() throws IllegalArgumentException {
+		return FEMDatetime.from(new GregorianCalendar());
+	}
+
+	/**
+	 * Diese Methode gibt einen Zeitpunkt zurück, der die gegebene Anzahl an Millisekunden nach dem Zeitpunkt {@code 1970-01-01T00:00:00Z} liegt.
+	 * 
+	 * @see Calendar#setTimeInMillis(long)
+	 * @param millis Anzahl der Millisekunden.
+	 * @return Zeitpunkt.
+	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst.
+	 */
+	public static final FEMDatetime from(final long millis) throws IllegalArgumentException {
+		final GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTimeInMillis(millis);
+		return FEMDatetime.from(calendar);
+	}
+
+	/**
 	 * Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 * 
@@ -776,7 +800,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws IllegalArgumentException Wenn das Datum ungültig ist.
 	 */
 	public final FEMDatetime withDate(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
-		if (calendar == null) throw new NullPointerException("calendar = null");
 		if (!calendar.isSet(Calendar.YEAR) || !calendar.isSet(Calendar.MONTH) || !calendar.isSet(Calendar.DATE)) return this.withoutDate();
 		return this.withDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
 	}
@@ -791,7 +814,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist.
 	 */
 	public final FEMDatetime withDate(final FEMDatetime datetime) throws NullPointerException {
-		if (datetime == null) throw new NullPointerException("datetime = null");
 		if (!datetime.hasDate()) return this.withoutDate();
 		return this.__withDate(this.__yearValue(), this.__monthValue(), this.__dateValue());
 	}
@@ -845,7 +867,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws IllegalArgumentException Wenn die Uhrzeit ungültig ist.
 	 */
 	public final FEMDatetime withTime(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
-		if (calendar == null) throw new NullPointerException("calendar = null");
 		if (!calendar.isSet(Calendar.HOUR) || !calendar.isSet(Calendar.MINUTE) || !calendar.isSet(Calendar.SECOND)) return this.withoutTime();
 		return this.withTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), calendar.get(Calendar.MILLISECOND));
 	}
@@ -860,7 +881,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist.
 	 */
 	public final FEMDatetime withTime(final FEMDatetime datetime) throws NullPointerException {
-		if (datetime == null) throw new NullPointerException("datetime = null");
 		if (!datetime.hasTime()) return this.withoutTime();
 		return this.__withTime(datetime.__hourValue(), datetime.__minuteValue(), datetime.__secondValue(), datetime.__millisecondValue());
 	}
@@ -930,7 +950,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws IllegalArgumentException Wenn die Zeitzone ungültig ist.
 	 */
 	public final FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
-		if (calendar == null) throw new NullPointerException("calendar = null");
 		if (!calendar.isSet(Calendar.ZONE_OFFSET)) return this.withoutZone();
 		final int zone = calendar.get(Calendar.ZONE_OFFSET) / 60000;
 		if (!this.hasZone()) return this.__withZone(zone);
@@ -948,7 +967,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist.
 	 */
 	public final FEMDatetime withZone(final FEMDatetime datetime) throws NullPointerException {
-		if (datetime == null) throw new NullPointerException("datetime = null");
 		if (!datetime.hasZone()) return this.withoutZone();
 		final int zone = datetime.__zoneValue();
 		if (!this.hasZone()) return this.__withZone(zone);
@@ -1003,6 +1021,21 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	}
 
 	/**
+	 * Diese Methode gibt diese Zeitangabe mit verschobenem Zeitpunkt zurück.<br>
+	 * Sie ist eine Abkürzung für {@code this.moveDate(duration).moveTime(duration)}.
+	 * 
+	 * @see #moveDate(FEMDuration)
+	 * @see #moveTime(FEMDuration)
+	 * @param duration Zeitspanne.
+	 * @return verschobene Zeitangabe.
+	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
+	 */
+	public final FEMDatetime move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
+		return this.moveDate(duration).moveTime(duration);
+	}
+
+	/**
 	 * Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
 	 * <p>
 	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
@@ -1037,12 +1070,11 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * 
 	 * @see #moveDate(int, int, int)
 	 * @param duration Zeitspanne.
-	 * @return verschobener Zeitpunkt.
+	 * @return Zeitangabe mit verschobenem Datum.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
 	 */
 	public final FEMDatetime moveDate(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		if (duration == null) throw new NullPointerException("duration = null");
 		final int sign = duration.signValue();
 		if (sign < 0) return this.moveDate(-duration.yearsValue(), -duration.monthsValue(), -duration.daysValue());
 		if (sign > 0) return this.moveDate(+duration.yearsValue(), +duration.monthsValue(), +duration.daysValue());
@@ -1123,7 +1155,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde.
 	 */
 	public final FEMDatetime moveTime(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
-		if (duration == null) throw new NullPointerException("duration = null");
 		final int sign = duration.signValue();
 		if (sign < 0) return this.moveTime(-duration.hoursValue(), -duration.minutesValue(), -duration.secondsValue(), -duration.millisecondsValue());
 		if (sign > 0) return this.moveTime(+duration.hoursValue(), +duration.minutesValue(), +duration.secondsValue(), +duration.millisecondsValue());
@@ -1176,7 +1207,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMDatetime that) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		return this.compare(that, 1) == 0;
 	}
 
@@ -1212,7 +1242,6 @@ public final class FEMDatetime implements Comparable<FEMDatetime>, ScriptFormatt
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final int compare(final FEMDatetime that, final int undefined) throws NullPointerException {
-		if (that == null) throw new NullPointerException("that = null");
 		int result;
 		if (this.hasDate()) {
 			if (!that.hasDate()) return undefined;

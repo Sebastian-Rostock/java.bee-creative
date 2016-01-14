@@ -41,7 +41,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> __this() {
 			return this;
 		}
 
@@ -69,7 +69,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final PropertyData<GOwner> thiz() {
+		protected final PropertyData<GOwner> __this() {
 			return this;
 		}
 
@@ -97,7 +97,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final HandlerData<GOwner> thiz() {
+		protected final HandlerData<GOwner> __this() {
 			return this;
 		}
 
@@ -125,7 +125,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> __this() {
 			return this;
 		}
 
@@ -183,7 +183,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final LanguageData<GOwner> thiz() {
+		protected final LanguageData<GOwner> __this() {
 			return this;
 		}
 
@@ -203,7 +203,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 
 		@Override
 		public final GThiz closeFeatureData() {
-			return BaseSchemaFactoryData.this.thiz();
+			return BaseSchemaFactoryData.this.__this();
 		}
 
 	};
@@ -215,7 +215,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 
 		@Override
 		public final GThiz closePropertyData() {
-			return BaseSchemaFactoryData.this.thiz();
+			return BaseSchemaFactoryData.this.__this();
 		}
 
 	};
@@ -227,7 +227,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 
 		@Override
 		public final GThiz closeListenerData() {
-			return BaseSchemaFactoryData.this.thiz();
+			return BaseSchemaFactoryData.this.__this();
 		}
 
 	};
@@ -239,7 +239,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 
 		@Override
 		public final GThiz closeResolverData() {
-			return BaseSchemaFactoryData.this.thiz();
+			return BaseSchemaFactoryData.this.__this();
 		}
 
 	};
@@ -251,7 +251,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 
 		@Override
 		public final GThiz closeLanguageData() {
-			return BaseSchemaFactoryData.this.thiz();
+			return BaseSchemaFactoryData.this.__this();
 		}
 
 	};
@@ -265,14 +265,14 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseSchemaFactoryData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__factory = data.__factory;
 		this.__featureData.use(data.__featureData);
 		this.__propertyData.use(data.__propertyData);
 		this.__handlerData.use(data.__handlerData);
 		this.__resolverData.use(data.__resolverData);
 		this.__languageData.use(data.__languageData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -303,7 +303,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 */
 	public final GThiz useFactory(final SchemaFactory factory) {
 		this.__factory = factory;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -339,7 +339,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 		for (final Entry<String, Object> entry: this.__propertyData) {
 			factory.setProperty(entry.getKey(), entry.getValue());
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -398,7 +398,7 @@ public abstract class BaseSchemaFactoryData<GThiz> extends BaseBuilder<SchemaFac
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

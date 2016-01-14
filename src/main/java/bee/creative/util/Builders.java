@@ -65,7 +65,7 @@ public class Builders {
 		 * 
 		 * @return {@code this}.
 		 */
-		protected abstract GThiz thiz();
+		protected abstract GThiz __this();
 
 	}
 
@@ -110,7 +110,7 @@ public class Builders {
 		 */
 		public final GThiz use(final GValue value) {
 			this.__value = value;
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -121,7 +121,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz use(final BaseValueBuilder<? extends GValue, ?> data) {
-			if (data == null) return this.thiz();
+			if (data == null) return this.__this();
 			return this.use(data.__value);
 		}
 
@@ -132,7 +132,7 @@ public class Builders {
 		 */
 		public final GThiz clear() {
 			this.__value = null;
-			return this.thiz();
+			return this.__this();
 		}
 
 		{}
@@ -202,7 +202,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz use(final BaseItemsBuilder<? extends GItem, ?, ?> data) {
-			if (data == null) return this.thiz();
+			if (data == null) return this.__this();
 			this.clearItems();
 			return this.useItems(data);
 		}
@@ -215,7 +215,7 @@ public class Builders {
 		 */
 		public final GThiz useItem(final GItem item) {
 			this.__items.add(item);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -225,9 +225,9 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz useItems(final Iterable<? extends GItem> items) {
-			if (items == null) return this.thiz();
+			if (items == null) return this.__this();
 			Iterables.appendAll(this.__items, items);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -246,7 +246,7 @@ public class Builders {
 		 */
 		public final GThiz clearItems() {
 			this.__items.clear();
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -355,7 +355,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz use(final BaseEntriesBuilder<? extends GKey, ? extends GValue, ?, ?> data) {
-			if (data == null) return this.thiz();
+			if (data == null) return this.__this();
 			this.clearEntries();
 			return this.useEntries(data.getEntries());
 		}
@@ -368,7 +368,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz useEntry(final Entry<? extends GKey, ? extends GValue> entry) {
-			if (entry == null) return this.thiz();
+			if (entry == null) return this.__this();
 			return this.useEntry(entry.getKey(), entry.getValue());
 		}
 
@@ -382,7 +382,7 @@ public class Builders {
 		 */
 		public final GThiz useEntry(final GKey key, final GValue value) {
 			this.__entries.put(key, value);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -393,7 +393,7 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz useEntries(final Map<? extends GKey, ? extends GValue> entries) {
-			if (entries == null) return this.thiz();
+			if (entries == null) return this.__this();
 			return this.useEntries(entries.entrySet());
 		}
 
@@ -405,11 +405,11 @@ public class Builders {
 		 * @return {@code this}.
 		 */
 		public final GThiz useEntries(final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries) {
-			if (entries == null) return this.thiz();
+			if (entries == null) return this.__this();
 			for (final Entry<? extends GKey, ? extends GValue> entry: entries) {
 				this.useEntry(entry);
 			}
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -433,7 +433,7 @@ public class Builders {
 		 */
 		public final GThiz forKey(final GKey key) {
 			this.__key = key;
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -457,7 +457,7 @@ public class Builders {
 		 */
 		public final GThiz useValue(final GValue value) {
 			this.useEntry(this.__key, value);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -467,7 +467,7 @@ public class Builders {
 		 */
 		public final GThiz clearEntries() {
 			this.__entries.clear();
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -563,7 +563,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedSet(this.__items, clazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -572,7 +572,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedSet(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -581,7 +581,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableSet(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -620,7 +620,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedList(this.__items, clazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -629,7 +629,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedList(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -638,7 +638,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableList(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -678,7 +678,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			this.__entries = Collections.checkedMap(this.__entries, keyClazz, valueClazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -687,7 +687,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__entries = Collections.synchronizedMap(this.__entries);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -696,7 +696,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__entries = Collections.unmodifiableMap(this.__entries);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -728,7 +728,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedCollection(this.__items, clazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -737,7 +737,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedCollection(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -746,7 +746,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableCollection(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -785,7 +785,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GItem> clazz) {
 			this.__items = Collections.checkedSortedSet(this.__items, clazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -794,7 +794,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__items = Collections.synchronizedSortedSet(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -803,7 +803,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__items = Collections.unmodifiableSortedSet(this.__items);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -843,7 +843,7 @@ public class Builders {
 		@Override
 		public final GThiz makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			this.__entries = Collections.checkedSortedMap(this.__entries, keyClazz, valueClazz);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -852,7 +852,7 @@ public class Builders {
 		@Override
 		public final GThiz makeSynchronized() {
 			this.__entries = Collections.synchronizedSortedMap(this.__entries);
-			return this.thiz();
+			return this.__this();
 		}
 
 		/**
@@ -861,7 +861,7 @@ public class Builders {
 		@Override
 		public final GThiz makeUnmodifiable() {
 			this.__entries = Collections.unmodifiableSortedMap(this.__entries);
-			return this.thiz();
+			return this.__this();
 		}
 
 	}
@@ -878,7 +878,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final TreeSetBuilder<GItem> thiz() {
+		protected final TreeSetBuilder<GItem> __this() {
 			return this;
 		}
 
@@ -897,7 +897,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final TreeMapBuilder<GKey, GValue> thiz() {
+		protected final TreeMapBuilder<GKey, GValue> __this() {
 			return this;
 		}
 
@@ -915,7 +915,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final HashSetBuilder<GItem> thiz() {
+		protected final HashSetBuilder<GItem> __this() {
 			return this;
 		}
 
@@ -934,7 +934,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final HashMapBuilder<GKey, GValue> thiz() {
+		protected final HashMapBuilder<GKey, GValue> __this() {
 			return this;
 		}
 
@@ -952,7 +952,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ArrayListBuilder<GItem> thiz() {
+		protected final ArrayListBuilder<GItem> __this() {
 			return this;
 		}
 

@@ -33,7 +33,7 @@ public final class XMLNode extends BaseNodeData<XMLNode> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLNode thiz() {
+	protected final XMLNode __this() {
 		return this;
 	}
 

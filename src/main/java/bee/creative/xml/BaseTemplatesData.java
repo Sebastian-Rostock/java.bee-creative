@@ -39,7 +39,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData<GOwner> thiz() {
+		protected final SourceData<GOwner> __this() {
 			return this;
 		}
 
@@ -66,7 +66,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> __this() {
 			return this;
 		}
 
@@ -86,7 +86,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 
 		@Override
 		public final GThiz closeSourceData() {
-			return BaseTemplatesData.this.thiz();
+			return BaseTemplatesData.this.__this();
 		}
 
 	};
@@ -98,7 +98,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 
 		@Override
 		public final GThiz closeFactoryData() {
-			return BaseTemplatesData.this.thiz();
+			return BaseTemplatesData.this.__this();
 		}
 
 	};
@@ -112,11 +112,11 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseTemplatesData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__templates = data.__templates;
 		this.__scriptData.use(data.__scriptData);
 		this.__factoryData.use(data.__factoryData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -148,7 +148,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 */
 	public final GThiz useTemplates(final Templates templates) {
 		this.__templates = templates;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -187,7 +187,7 @@ public abstract class BaseTemplatesData<GThiz> extends BaseBuilder<Templates, GT
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

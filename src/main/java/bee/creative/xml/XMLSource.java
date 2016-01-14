@@ -13,7 +13,7 @@ public final class XMLSource extends BaseSourceData<XMLSource> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLSource thiz() {
+	protected final XMLSource __this() {
 		return this;
 	}
 

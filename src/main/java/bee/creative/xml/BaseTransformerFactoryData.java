@@ -46,7 +46,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> __this() {
 			return this;
 		}
 
@@ -74,7 +74,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final AttributeData<GOwner> thiz() {
+		protected final AttributeData<GOwner> __this() {
 			return this;
 		}
 
@@ -102,7 +102,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ListenerData<GOwner> thiz() {
+		protected final ListenerData<GOwner> __this() {
 			return this;
 		}
 
@@ -130,7 +130,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResolverData<GOwner> thiz() {
+		protected final ResolverData<GOwner> __this() {
 			return this;
 		}
 
@@ -150,7 +150,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 
 		@Override
 		public final GThiz closeFeatureData() {
-			return BaseTransformerFactoryData.this.thiz();
+			return BaseTransformerFactoryData.this.__this();
 		}
 
 	};
@@ -162,7 +162,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 
 		@Override
 		public final GThiz closeAttributeData() {
-			return BaseTransformerFactoryData.this.thiz();
+			return BaseTransformerFactoryData.this.__this();
 		}
 
 	};
@@ -174,7 +174,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 
 		@Override
 		public final GThiz closeListenerData() {
-			return BaseTransformerFactoryData.this.thiz();
+			return BaseTransformerFactoryData.this.__this();
 		}
 
 	};
@@ -186,7 +186,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 
 		@Override
 		public final GThiz closeResolverData() {
-			return BaseTransformerFactoryData.this.thiz();
+			return BaseTransformerFactoryData.this.__this();
 		}
 
 	};
@@ -200,13 +200,13 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseTransformerFactoryData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__factory = data.__factory;
 		this.__featureData.use(data.__featureData);
 		this.__attributeData.use(data.__attributeData);
 		this.__listenerData.use(data.__listenerData);
 		this.__resolverData.use(data.__resolverData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -236,7 +236,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 */
 	public final GThiz useFactory(final TransformerFactory factory) {
 		this.__factory = factory;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -271,7 +271,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 		for (final Entry<String, String> entry: this.__attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -320,7 +320,7 @@ public abstract class BaseTransformerFactoryData<GThiz> extends BaseBuilder<Tran
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

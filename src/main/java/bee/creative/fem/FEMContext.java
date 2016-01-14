@@ -77,58 +77,6 @@ public abstract class FEMContext {
 	{}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input)} in siene Ausgabe überführt.
-	 * 
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
-	 * @param type Datentyp.
-	 * @return {@code dataOf}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
-	 */
-	public static final <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
-		if (type == null) throw new NullPointerException("type = null");
-		return new Converter<FEMValue, GData>() {
-
-			@Override
-			public GData convert(final FEMValue input) {
-				return FEMContext.__default.dataOf(input, type);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("dataOf", type);
-			}
-
-		};
-	}
-
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code type.dataOf(input, context)} in siene Ausgabe überführt.
-	 * 
-	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
-	 * @param type Datentyp.
-	 * @param context Kontextobjekt.
-	 * @return {@code dataOf}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code type} bzw. {@code context} {@code null} ist.
-	 */
-	public static final <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type, final FEMContext context) throws NullPointerException {
-		if (type == null) throw new NullPointerException("type = null");
-		if (context == null) throw new NullPointerException("context = null");
-		return new Converter<FEMValue, GData>() {
-
-			@Override
-			public GData convert(final FEMValue input) {
-				return context.dataOf(input, type);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("dataOf", type, context);
-			}
-
-		};
-	}
-
-	/**
 	 * Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataOf(FEMValue) Datentypumwandlungen} genutzt wird.<br>
 	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueOf(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataOf(FEMValue)}
 	 * verwendet.
@@ -150,6 +98,31 @@ public abstract class FEMContext {
 	}
 
 	{}
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code this.dataOf(input)} in siene Ausgabe überführt.
+	 * 
+	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
+	 * @param type Datentyp.
+	 * @return {@code dataOf}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
+	 */
+	public final <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
+		if (type == null) throw new NullPointerException("type = null");
+		return new Converter<FEMValue, GData>() {
+
+			@Override
+			public GData convert(final FEMValue input) {
+				return FEMContext.this.dataOf(input, type);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("dataOf", type);
+			}
+
+		};
+	}
 
 	/**
 	 * Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück.<br>

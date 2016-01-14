@@ -37,7 +37,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData<GOwner> thiz() {
+		protected final SourceData<GOwner> __this() {
 			return this;
 		}
 
@@ -65,7 +65,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> thiz() {
+		protected final FactoryData<GOwner> __this() {
 			return this;
 		}
 
@@ -85,7 +85,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 
 		@Override
 		public final GThiz closeFactoryData() {
-			return BaseSchemaData.this.thiz();
+			return BaseSchemaData.this.__this();
 		}
 
 	};
@@ -97,7 +97,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 
 		@Override
 		public final GThiz closeSourceData() {
-			return BaseSchemaData.this.thiz();
+			return BaseSchemaData.this.__this();
 		}
 
 	};
@@ -111,11 +111,11 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseSchemaData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__schema = data.__schema;
 		this.__sourceData.use(data.__sourceData);
 		this.__factoryData.use(data.__factoryData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -146,7 +146,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 */
 	public final GThiz useSchema(final Schema schema) {
 		this.__schema = schema;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -186,7 +186,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

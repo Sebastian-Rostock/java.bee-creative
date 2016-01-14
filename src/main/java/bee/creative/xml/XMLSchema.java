@@ -13,7 +13,7 @@ public final class XMLSchema extends BaseSchemaData<XMLSchema> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLSchema thiz() {
+	protected final XMLSchema __this() {
 		return this;
 	}
 

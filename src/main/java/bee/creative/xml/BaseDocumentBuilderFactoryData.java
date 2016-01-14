@@ -39,7 +39,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FeatureData<GOwner> thiz() {
+		protected final FeatureData<GOwner> __this() {
 			return this;
 		}
 
@@ -67,7 +67,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SchemaData<GOwner> thiz() {
+		protected final SchemaData<GOwner> __this() {
 			return this;
 		}
 
@@ -181,7 +181,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final PropertyData<GOwner> thiz() {
+		protected final PropertyData<GOwner> __this() {
 			return this;
 		}
 
@@ -209,7 +209,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final AttributeData<GOwner> thiz() {
+		protected final AttributeData<GOwner> __this() {
 			return this;
 		}
 
@@ -229,7 +229,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 
 		@Override
 		public final GThiz closeFeatureData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
+			return BaseDocumentBuilderFactoryData.this.__this();
 		}
 
 	};
@@ -241,7 +241,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 
 		@Override
 		public final GThiz closeSchemaData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
+			return BaseDocumentBuilderFactoryData.this.__this();
 		}
 
 	};
@@ -253,7 +253,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 
 		@Override
 		public final GThiz closePropertyData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
+			return BaseDocumentBuilderFactoryData.this.__this();
 		}
 
 	};
@@ -265,7 +265,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 
 		@Override
 		public final GThiz closeAttributeData() {
-			return BaseDocumentBuilderFactoryData.this.thiz();
+			return BaseDocumentBuilderFactoryData.this.__this();
 		}
 
 	};
@@ -279,12 +279,12 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseDocumentBuilderFactoryData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__factory = data.__factory;
 		this.__featureData.use(data.__featureData);
 		this.__propertyData.use(data.__propertyData);
 		this.__attributeData.use(data.__attributeData);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -316,7 +316,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 */
 	public final GThiz useFactory(final DocumentBuilderFactory factory) {
 		this.__factory = factory;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -355,7 +355,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		for (final Entry<String, Object> entry: this.__attributeData) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -410,7 +410,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz thiz();
+	protected abstract GThiz __this();
 
 	/**
 	 * {@inheritDoc}

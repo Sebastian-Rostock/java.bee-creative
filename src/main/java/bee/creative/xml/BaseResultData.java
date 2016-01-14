@@ -43,10 +43,10 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @return {@code this}.
 	 */
 	public final GThiz use(final BaseResultData<?> data) {
-		if (data == null) return this.thiz();
+		if (data == null) return this.__this();
 		this.__result = data.__result;
 		this.__systemID = data.__systemID;
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -117,9 +117,9 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 */
 	public final GThiz useSystemID(final String systemID) {
 		this.__systemID = systemID;
-		if (this.__result == null) return this.thiz();
+		if (this.__result == null) return this.__this();
 		this.__result.setSystemId(systemID);
-		return this.thiz();
+		return this.__this();
 	}
 
 	/**
@@ -132,7 +132,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 */
 	public final GThiz useResult(final Result result) {
 		this.__result = result;
-		if (result == null) return this.thiz();
+		if (result == null) return this.__this();
 		return this.useSystemID(this.__systemID != null ? this.__systemID : result.getSystemId());
 	}
 

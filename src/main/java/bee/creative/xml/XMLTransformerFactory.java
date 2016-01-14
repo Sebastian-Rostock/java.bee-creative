@@ -13,7 +13,7 @@ public final class XMLTransformerFactory extends BaseTransformerFactoryData<XMLT
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLTransformerFactory thiz() {
+	protected final XMLTransformerFactory __this() {
 		return this;
 	}
 

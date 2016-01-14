@@ -1,8 +1,10 @@
 package bee.creative.fem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
@@ -520,6 +522,16 @@ public abstract class FEMArray implements Items<FEMValue>, Iterable<FEMValue>, F
 			if (this.__get(i).equals(that.__get(i))) return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Diese Methode gibt diese Wertliste als {@link List} zurück.
+	 * 
+	 * @see Arrays#asList(Object...)
+	 * @return {@link List}.
+	 */
+	public final List<FEMValue> toList() {
+		return Arrays.asList(this.value());
 	}
 
 	{}
