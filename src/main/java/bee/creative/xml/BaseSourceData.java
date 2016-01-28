@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Result;
@@ -29,19 +31,19 @@ import bee.creative.util.Objects;
  * @see Transformer#transform(Source, Result)
  * @see TransformerFactory#newTemplates(Source)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
  */
-public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
+public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
 	/**
 	 * Dieses Feld speichert die Quelldaten.
 	 */
-	Source __source;
+	Source _source_;
 
 	/**
 	 * Dieses Feld speichert den System-Identifikator.
 	 */
-	String __systemID;
+	String _systemID_;
 
 	{}
 
@@ -51,11 +53,24 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz use(final BaseSourceData<?> data) {
-		if (data == null) return this.__this();
-		this.__source = data.__source;
-		this.__systemID = data.__systemID;
-		return this.__this();
+	public final GThis use(final BaseSourceData<?> data) {
+		if (data == null) return this._this_();
+		this._source_ = data._source_;
+		this._systemID_ = data._systemID_;
+		return this._this_();
+	}
+
+	/**
+	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URI} und gibt {@code this} zurück.
+	 * 
+	 * @see #useUrl(URL)
+	 * @see URI#toURL()
+	 * @param uri {@link URI}.
+	 * @return {@code this}.
+	 * @throws MalformedURLException Wenn {@link URI#toURL()} eine entsprechende Ausnahme auslöst.
+	 */
+	public final GThis useUri(final URI uri) throws MalformedURLException {
+		return this.useUrl(uri.toURL());
 	}
 
 	/**
@@ -67,7 +82,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param url {@link URL}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useUrl(final URL url) {
+	public final GThis useUrl(final URL url) {
 		return this.useSource(new StreamSource(url.toExternalForm()));
 	}
 
@@ -79,7 +94,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param file {@link File}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useFile(final File file) {
+	public final GThis useFile(final File file) {
 		return this.useSource(new StreamSource(file));
 	}
 
@@ -91,7 +106,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param text Text.
 	 * @return {@code this}.
 	 */
-	public final GThiz useText(final String text) {
+	public final GThis useText(final String text) {
 		return this.useReader(new StringReader(text));
 	}
 
@@ -103,7 +118,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param node {@link Node}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useNode(final Node node) {
+	public final GThis useNode(final Node node) {
 		return this.useSource(new DOMSource(node));
 	}
 
@@ -115,7 +130,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param reader {@link Reader}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useReader(final Reader reader) {
+	public final GThis useReader(final Reader reader) {
 		return this.useSource(new StreamSource(reader));
 	}
 
@@ -127,7 +142,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param stream {@link InputStream}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useStream(final InputStream stream) {
+	public final GThis useStream(final InputStream stream) {
 		return this.useSource(new StreamSource(stream));
 	}
 
@@ -138,11 +153,11 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param systemID System-Identifikator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useSystemID(final String systemID) {
-		this.__systemID = systemID;
-		if (this.__source == null) return this.__this();
-		this.__source.setSystemId(systemID);
-		return this.__this();
+	public final GThis useSystemID(final String systemID) {
+		this._systemID_ = systemID;
+		if (this._source_ == null) return this._this_();
+		this._source_.setSystemId(systemID);
+		return this._this_();
 	}
 
 	/**
@@ -153,10 +168,10 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @param source Quelldaten oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useSource(final Source source) {
-		this.__source = source;
-		if (source == null) return this.__this();
-		return this.useSystemID(this.__systemID != null ? this.__systemID : source.getSystemId());
+	public final GThis useSource(final Source source) {
+		this._source_ = source;
+		if (source == null) return this._this_();
+		return this.useSystemID(this._systemID_ != null ? this._systemID_ : source.getSystemId());
 	}
 
 	/**
@@ -173,7 +188,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @return Quelldaten oder {@code null}.
 	 */
 	public final Source getSource() {
-		return this.__source;
+		return this._source_;
 	}
 
 	/**
@@ -200,7 +215,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 * @see #useSystemID(String)
 	 * @return {@code this}.
 	 */
-	public final GThiz resetSource() {
+	public final GThis resetSource() {
 		this.useSystemID(null);
 		return this.useSource(null);
 	}
@@ -222,7 +237,7 @@ public abstract class BaseSourceData<GThiz> extends BaseBuilder<Source, GThiz> {
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__source, this.__systemID);
+		return Objects.toInvokeString(this, this._source_, this._systemID_);
 	}
 
 }

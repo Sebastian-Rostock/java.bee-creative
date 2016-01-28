@@ -11,9 +11,9 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Schema}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
  */
-public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
+public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 	/**
 	 * Diese Klasse implementiert den Konfigurator für die Schemadaten eines {@link Schema}.
@@ -37,7 +37,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData<GOwner> __this() {
+		protected final SourceData<GOwner> _this_() {
 			return this;
 		}
 
@@ -65,7 +65,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> __this() {
+		protected final FactoryData<GOwner> _this_() {
 			return this;
 		}
 
@@ -76,16 +76,16 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Dieses Feld speichert das {@link Schema}.
 	 */
-	Schema __schema;
+	Schema _schema_;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData<GThiz> __factoryData = new FactoryData<GThiz>() {
+	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
 
 		@Override
-		public final GThiz closeFactoryData() {
-			return BaseSchemaData.this.__this();
+		public final GThis closeFactoryData() {
+			return BaseSchemaData.this._this_();
 		}
 
 	};
@@ -93,11 +93,11 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData<GThiz> __sourceData = new SourceData<GThiz>() {
+	final SourceData<GThis> _sourceData_ = new SourceData<GThis>() {
 
 		@Override
-		public final GThiz closeSourceData() {
-			return BaseSchemaData.this.__this();
+		public final GThis closeSourceData() {
+			return BaseSchemaData.this._this_();
 		}
 
 	};
@@ -110,18 +110,18 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz use(final BaseSchemaData<?> data) {
-		if (data == null) return this.__this();
-		this.__schema = data.__schema;
-		this.__sourceData.use(data.__sourceData);
-		this.__factoryData.use(data.__factoryData);
-		return this.__this();
+	public final GThis use(final BaseSchemaData<?> data) {
+		if (data == null) return this._this_();
+		this._schema_ = data._schema_;
+		this._sourceData_.use(data._sourceData_);
+		this._factoryData_.use(data._factoryData_);
+		return this._this_();
 	}
 
 	/**
 	 * Diese Methode gibt das {@link Schema} zurück.<br>
 	 * Wenn über {@link #useSchema(Schema)} noch kein {@link Schema} gesetzt wurden, werden über {@link SchemaFactory#newSchema(Source)} ein neues erstellt und
-	 * über {@link #useSchema(Schema)} gesetzt. Die zur erstellung verwendeten Quelldaten können über {@link #openSourceData()} konfiguriert werden. Wenn diese
+	 * über {@link #useSchema(Schema)} gesetzt. Die zur Erstellung verwendeten Quelldaten können über {@link #openSourceData()} konfiguriert werden. Wenn diese
 	 * {@code null} sind, wird {@code null} geliefert.
 	 * 
 	 * @see #useSchema(Schema)
@@ -129,11 +129,11 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst.
 	 */
 	public final Schema getSchema() throws SAXException {
-		Schema result = this.__schema;
+		Schema result = this._schema_;
 		if (result != null) return result;
-		final Source source = this.__sourceData.getSource();
+		final Source source = this._sourceData_.getSource();
 		if (source == null) return null;
-		result = this.__factoryData.getFactory().newSchema(source);
+		result = this._factoryData_.getFactory().newSchema(source);
 		this.useSchema(result);
 		return result;
 	}
@@ -144,9 +144,9 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @param schema {@link Schema} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useSchema(final Schema schema) {
-		this.__schema = schema;
-		return this.__this();
+	public final GThis useSchema(final Schema schema) {
+		this._schema_ = schema;
+		return this._this_();
 	}
 
 	/**
@@ -156,7 +156,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see #useSchema(Schema)
 	 * @return {@code this}.
 	 */
-	public final GThiz resetSchema() {
+	public final GThis resetSchema() {
 		return this.useSchema(null);
 	}
 
@@ -166,8 +166,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public final SourceData<GThiz> openSourceData() {
-		return this.__sourceData;
+	public final SourceData<GThis> openSourceData() {
+		return this._sourceData_;
 	}
 
 	/**
@@ -176,8 +176,8 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * @see SchemaFactory#newSchema(Source)
 	 * @return Konfigurator.
 	 */
-	public final FactoryData<GThiz> openFactoryData() {
-		return this.__factoryData;
+	public final FactoryData<GThis> openFactoryData() {
+		return this._factoryData_;
 	}
 
 	{}
@@ -186,7 +186,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz __this();
+	protected abstract GThis _this_();
 
 	/**
 	 * {@inheritDoc}
@@ -207,7 +207,7 @@ public abstract class BaseSchemaData<GThiz> extends BaseBuilder<Schema, GThiz> {
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__sourceData, this.__factoryData);
+		return Objects.toInvokeString(this, this._sourceData_, this._factoryData_);
 	}
 
 }

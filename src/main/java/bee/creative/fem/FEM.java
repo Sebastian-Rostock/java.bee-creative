@@ -129,13 +129,13 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die Nutzdaten.
 		 */
-		GData __data;
+		GData _data_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
 		 */
 		public DataValue() {
-			this.__data = null;
+			this._data_ = null;
 		}
 
 		/**
@@ -146,7 +146,7 @@ public class FEM {
 		 */
 		public DataValue(final GData data) throws NullPointerException {
 			if (data == null) throw new NullPointerException("data = null");
-			this.__data = data;
+			this._data_ = data;
 		}
 
 		{}
@@ -156,7 +156,7 @@ public class FEM {
 		 */
 		@Override
 		public final GData data() {
-			return this.__data;
+			return this._data_;
 		}
 
 		/**
@@ -170,7 +170,7 @@ public class FEM {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putData(this.__data);
+			target.putData(this._data_);
 		}
 
 	}
@@ -216,21 +216,21 @@ public class FEM {
 		 * 
 		 * @see FEMFunction#invoke(FEMFrame)
 		 */
-		FEMValue __value;
+		FEMValue _value_;
 
 		/**
 		 * Dieses Feld speichert die Stapelrahmen zur Auswertung der Funktion oder {@code null}.
 		 * 
 		 * @see FEMFunction#invoke(FEMFrame)
 		 */
-		FEMFrame __frame;
+		FEMFrame _frame_;
 
 		/**
 		 * Dieses Feld speichert die Funktion oder {@code null}.
 		 * 
 		 * @see FEMFunction#invoke(FEMFrame)
 		 */
-		FEMFunction __function;
+		FEMFunction _function_;
 
 		/**
 		 * Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
@@ -242,8 +242,8 @@ public class FEM {
 		public VirtualValue(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 			if (frame == null) throw new NullPointerException("frame = null");
 			if (function == null) throw new NullPointerException("function = null");
-			this.__frame = frame;
-			this.__function = function;
+			this._frame_ = frame;
+			this._function_ = function;
 		}
 
 		{}
@@ -257,13 +257,13 @@ public class FEM {
 		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
 		 */
 		public final synchronized FEMValue value() throws NullPointerException {
-			FEMValue result = this.__value;
+			FEMValue result = this._value_;
 			if (result != null) return result;
-			result = this.__function.invoke(this.__frame);
+			result = this._function_.invoke(this._frame_);
 			if (result == null) throw new NullPointerException("this.function().invoke(this.frame()) = null");
-			this.__value = result;
-			this.__frame = null;
-			this.__function = null;
+			this._value_ = result;
+			this._frame_ = null;
+			this._function_ = null;
 			return result;
 		}
 
@@ -274,7 +274,7 @@ public class FEM {
 		 * @return Stapelrahmen oder {@code null}.
 		 */
 		public final FEMFrame frame() {
-			return this.__frame;
+			return this._frame_;
 		}
 
 		/**
@@ -284,7 +284,7 @@ public class FEM {
 		 * @return Funktion oder {@code null}.
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		{}
@@ -310,10 +310,10 @@ public class FEM {
 		 */
 		@Override
 		public final synchronized void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			if (this.__value != null) {
-				target.putValue(this.__value);
+			if (this._value_ != null) {
+				target.putValue(this._value_);
 			} else {
-				target.putHandler(this.__function).put(this.__frame);
+				target.putHandler(this._function_).put(this._frame_);
 			}
 		}
 
@@ -357,7 +357,7 @@ public class FEM {
 
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putArray(this.__data);
+			target.putArray(this._data_);
 		}
 
 	}
@@ -533,12 +533,12 @@ public class FEM {
 
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			return FEM.functionValue(tracer.trace(this.__data));
+			return FEM.functionValue(tracer.trace(this._data_));
 		}
 
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.__data);
+			target.putFunction(this._data_);
 		}
 
 	}
@@ -580,12 +580,12 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Namen.
 		 */
-		final String __name;
+		final String _name_;
 
 		/**
 		 * Dieses Feld speichert die Funktion.
 		 */
-		FEMFunction __function;
+		FEMFunction _function_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Namen.
@@ -595,7 +595,7 @@ public class FEM {
 		 */
 		public ProxyFunction(final String name) throws NullPointerException {
 			if (name == null) throw new NullPointerException("name = null");
-			this.__name = name;
+			this._name_ = name;
 		}
 
 		{}
@@ -608,7 +608,7 @@ public class FEM {
 		 */
 		public final void set(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
-			this.__function = function;
+			this._function_ = function;
 		}
 
 		/**
@@ -617,7 +617,7 @@ public class FEM {
 		 * @return Name.
 		 */
 		public final String name() {
-			return this.__name;
+			return this._name_;
 		}
 
 		/**
@@ -627,7 +627,7 @@ public class FEM {
 		 * @return Funktion oder {@code null}.
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		{}
@@ -637,7 +637,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return this.__function.invoke(frame);
+			return this._function_.invoke(frame);
 		}
 
 		/**
@@ -645,7 +645,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put(FEM.formatValue(this.__name));
+			target.put(FEM.formatValue(this._name_));
 		}
 
 	}
@@ -662,12 +662,12 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracer}.
 		 */
-		final ScriptTracer __tracer;
+		final ScriptTracer _tracer_;
 
 		/**
 		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
-		final FEMFunction __function;
+		final FEMFunction _function_;
 
 		/**
 		 * Dieser Konstruktor initialisiert Funktion und {@link ScriptTracer}.
@@ -679,8 +679,8 @@ public class FEM {
 		public TraceFunction(final ScriptTracer tracer, final FEMFunction function) throws NullPointerException {
 			if (tracer == null) throw new NullPointerException("tracer = null");
 			if (function == null) throw new NullPointerException("function = null");
-			this.__tracer = tracer;
-			this.__function = function;
+			this._tracer_ = tracer;
+			this._function_ = function;
 		}
 
 		{}
@@ -691,7 +691,7 @@ public class FEM {
 		 * @return {@link ScriptTracer}.
 		 */
 		public final ScriptTracer tracer() {
-			return this.__tracer;
+			return this._tracer_;
 		}
 
 		/**
@@ -700,7 +700,7 @@ public class FEM {
 		 * @return aufzurufende {@link FEMFunction}.
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		{}
@@ -722,10 +722,10 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			final ScriptTracer tracer = this.__tracer;
+			final ScriptTracer tracer = this._tracer_;
 			try {
 				final ScriptTracerHelper helper = tracer.getHelper();
-				helper.onExecute(tracer.useFrame(frame).useFunction(this.__function));
+				helper.onExecute(tracer.useFrame(frame).useFunction(this._function_));
 				try {
 					helper.onReturn(tracer.useResult(tracer.getFunction().invoke(tracer.getFrame())));
 					return tracer.getResult();
@@ -743,8 +743,8 @@ public class FEM {
 		 */
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			if (this.__tracer.equals(tracer)) return this;
-			return tracer.trace(this.__function);
+			if (this._tracer_.equals(tracer)) return this;
+			return tracer.trace(this._function_);
 		}
 
 		/**
@@ -752,7 +752,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.__function);
+			target.putFunction(this._function_);
 		}
 
 	}
@@ -783,7 +783,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Ergebniswert.
 		 */
-		final FEMValue __value;
+		final FEMValue _value_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Ergebniswert.
@@ -793,7 +793,7 @@ public class FEM {
 		 */
 		public ValueFunction(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__value = value;
+			this._value_ = value;
 		}
 
 		{}
@@ -804,7 +804,7 @@ public class FEM {
 		 * @return Ergebniswert.
 		 */
 		public final FEMValue value() {
-			return this.__value;
+			return this._value_;
 		}
 
 		{}
@@ -814,7 +814,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return this.__value;
+			return this._value_;
 		}
 
 		/**
@@ -822,7 +822,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			if (this.__value instanceof ScriptTracerInput) return ((ScriptTracerInput)this.__value).toTrace(tracer);
+			if (this._value_ instanceof ScriptTracerInput) return ((ScriptTracerInput)this._value_).toTrace(tracer);
 			return this;
 		}
 
@@ -831,7 +831,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putValue(this.__value);
+			target.putValue(this._value_);
 		}
 
 	}
@@ -863,7 +863,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die auszuwertende Funktion.
 		 */
-		final FEMFunction __function;
+		final FEMFunction _function_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #invoke(FEMFrame)} zur Erzeugung eines {@link VirtualValue} genutzt wird.
@@ -873,7 +873,7 @@ public class FEM {
 		 */
 		public VirtualFunction(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
-			this.__function = function;
+			this._function_ = function;
 		}
 
 		{}
@@ -884,7 +884,7 @@ public class FEM {
 		 * @return auszuwertende Funktion.
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		{}
@@ -899,7 +899,7 @@ public class FEM {
 		 */
 		@Override
 		public final VirtualValue invoke(final FEMFrame frame) {
-			return new VirtualValue(frame, this.__function);
+			return new VirtualValue(frame, this._function_);
 		}
 
 		/**
@@ -907,7 +907,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.__function);
+			target.putFunction(this._function_);
 		}
 
 	}
@@ -923,7 +923,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..9}.
 		 */
-		static final ParamFunction[] __cache = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
+		static final ParamFunction[] _cache_ = {new ParamFunction(0), new ParamFunction(1), new ParamFunction(2), new ParamFunction(3), new ParamFunction(4),
 			new ParamFunction(5), new ParamFunction(6), new ParamFunction(7), new ParamFunction(8), new ParamFunction(9)};
 
 		{}
@@ -937,7 +937,7 @@ public class FEM {
 		 */
 		public static final ParamFunction from(final int index) throws IndexOutOfBoundsException {
 			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
-			if (index < ParamFunction.__cache.length) return ParamFunction.__cache[index];
+			if (index < ParamFunction._cache_.length) return ParamFunction._cache_[index];
 			return new ParamFunction(index);
 		}
 
@@ -946,7 +946,7 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Index des Parameterwerts.
 		 */
-		final int __index;
+		final int _index_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Index des Parameterwerts.
@@ -956,7 +956,7 @@ public class FEM {
 		 */
 		public ParamFunction(final int index) throws IndexOutOfBoundsException {
 			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
-			this.__index = index;
+			this._index_ = index;
 		}
 
 		{}
@@ -968,7 +968,7 @@ public class FEM {
 		 * @see #invoke(FEMFrame)
 		 */
 		public final int index() {
-			return this.__index;
+			return this._index_;
 		}
 
 		{}
@@ -982,7 +982,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return frame.get(this.__index);
+			return frame.get(this._index_);
 		}
 
 		/**
@@ -990,7 +990,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("$").put(new Integer(this.__index + 1));
+			target.put("$").put(new Integer(this._index_ + 1));
 		}
 
 	}
@@ -1006,17 +1006,17 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert {@code true}, wenn die Verkettung aktiviert ist.
 		 */
-		final boolean __direct;
+		final boolean _direct_;
 
 		/**
 		 * Dieses Feld speichert die aufzurufende Funktion.
 		 */
-		final FEMFunction __function;
+		final FEMFunction _function_;
 
 		/**
 		 * Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden sollen.
 		 */
-		final FEMFunction[] __params;
+		final FEMFunction[] _params_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verketung und die Parameterfunktionen.
@@ -1031,9 +1031,9 @@ public class FEM {
 		public InvokeFunction(final FEMFunction function, final boolean direct, final FEMFunction... params) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			if (params == null) throw new NullPointerException("params = null");
-			this.__direct = direct;
-			this.__function = function;
-			this.__params = params;
+			this._direct_ = direct;
+			this._function_ = function;
+			this._params_ = params;
 		}
 
 		{}
@@ -1047,7 +1047,7 @@ public class FEM {
 		 * @see #invoke(FEMFrame)
 		 */
 		public final boolean direct() {
-			return this.__direct;
+			return this._direct_;
 		}
 
 		/**
@@ -1057,7 +1057,7 @@ public class FEM {
 		 * @see #invoke(FEMFrame)
 		 */
 		public final FEMFunction[] params() {
-			return this.__params.clone();
+			return this._params_.clone();
 		}
 
 		/**
@@ -1067,7 +1067,7 @@ public class FEM {
 		 * @see #invoke(FEMFrame)
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		/**
@@ -1078,11 +1078,11 @@ public class FEM {
 		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind.
 		 */
 		public final InvokeFunction toLazy() {
-			final FEMFunction[] functions = this.__params.clone();
+			final FEMFunction[] functions = this._params_.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = VirtualFunction.from(functions[i]);
 			}
-			return new InvokeFunction(VirtualFunction.from(this.__function), this.__direct, functions);
+			return new InvokeFunction(VirtualFunction.from(this._function_), this._direct_, functions);
 		}
 
 		{}
@@ -1101,14 +1101,14 @@ public class FEM {
 		@Override
 		public final FEMValue invoke(FEMFrame frame) {
 			final FEMFunction function;
-			if (this.__direct) {
-				function = this.__function;
+			if (this._direct_) {
+				function = this._function_;
 			} else {
-				final FEMValue value = this.__function.invoke(frame);
+				final FEMValue value = this._function_.invoke(frame);
 				if (value == null) throw new NullPointerException("this.function().invoke(frame) = null");
 				function = frame.__context.dataOf(value, FEM.FUNCTION_TYPE);
 			}
-			frame = frame.newFrame(this.__params);
+			frame = frame.newFrame(this._params_);
 			final FEMValue result = function.invoke(frame);
 			if (result == null) throw new NullPointerException("function.invoke(frame.newFrame(this.params()) = null");
 			return result;
@@ -1119,11 +1119,11 @@ public class FEM {
 		 */
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			final FEMFunction[] params = this.__params;
+			final FEMFunction[] params = this._params_;
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = tracer.trace(params[i]);
 			}
-			return new InvokeFunction(tracer.trace(this.__function), this.__direct, params);
+			return new InvokeFunction(tracer.trace(this._function_), this._direct_, params);
 		}
 
 		/**
@@ -1131,7 +1131,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this.__function).putParams(Arrays.asList(this.__params));
+			target.putFunction(this._function_).putParams(Arrays.asList(this._params_));
 		}
 
 	}
@@ -1163,12 +1163,12 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die gebundenen Stapelrahmen, deren zusätzliche Parameterwerte genutzt werden.
 		 */
-		final FEMFrame __frame;
+		final FEMFrame _frame_;
 
 		/**
 		 * Dieses Feld speichert die auszuwertende Funktion.
 		 */
-		final FEMFunction __function;
+		final FEMFunction _function_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #invoke(FEMFrame)} die die zusätzlichen Parameterwerte der Stapelrahmen gebunden
@@ -1180,8 +1180,8 @@ public class FEM {
 		 */
 		public ClosureFunction(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
-			this.__frame = null;
-			this.__function = function;
+			this._frame_ = null;
+			this._function_ = function;
 		}
 
 		/**
@@ -1198,8 +1198,8 @@ public class FEM {
 		public ClosureFunction(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 			if (frame == null) throw new NullPointerException("frame = null");
 			if (function == null) throw new NullPointerException("function = null");
-			this.__frame = frame;
-			this.__function = function;
+			this._frame_ = frame;
+			this._function_ = function;
 		}
 
 		{}
@@ -1214,7 +1214,7 @@ public class FEM {
 		 * @return gebundene Stapelrahmen oder {@code null}.
 		 */
 		public final FEMFrame frame() {
-			return this.__frame;
+			return this._frame_;
 		}
 
 		/**
@@ -1223,7 +1223,7 @@ public class FEM {
 		 * @return auszuwertende Funktion.
 		 */
 		public final FEMFunction function() {
-			return this.__function;
+			return this._function_;
 		}
 
 		{}
@@ -1241,8 +1241,8 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			if (this.__frame == null) return FEM.functionValue(new ClosureFunction(frame, this.__function));
-			return this.__function.invoke(this.__frame.withParams(frame.params()));
+			if (this._frame_ == null) return FEM.functionValue(new ClosureFunction(frame, this._function_));
+			return this._function_.invoke(this._frame_.withParams(frame.params()));
 		}
 
 		/**
@@ -1250,8 +1250,8 @@ public class FEM {
 		 */
 		@Override
 		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			if (this.__frame == null) return ClosureFunction.from(tracer.trace(this.__function));
-			return new ClosureFunction(this.__frame, tracer.trace(this.__function));
+			if (this._frame_ == null) return ClosureFunction.from(tracer.trace(this._function_));
+			return new ClosureFunction(this._frame_, tracer.trace(this._function_));
 		}
 
 		/**
@@ -1259,7 +1259,7 @@ public class FEM {
 		 */
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putHandler(this.__function);
+			target.putHandler(this._function_);
 		}
 
 	}
@@ -1290,40 +1290,40 @@ public class FEM {
 	public static final class ScriptParser extends Parser {
 
 		@SuppressWarnings ("javadoc")
-		boolean __active;
+		boolean _active_;
 
 		/**
 		 * Dieses Feld speichert die Startposition des aktuell geparsten Wertbereichs oder {@code -1}.
 		 */
-		int __value;
+		int _value_;
 
 		/**
 		 * Dieses Feld speichert die bisher ermittelten Bereiche.
 		 */
-		final List<Range> __ranges = new ArrayList<>();
+		final List<Range> _ranges_ = new ArrayList<>();
 
 		{}
 
 		/**
-		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #__stop()} verwendet werden.
+		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
 		 * 
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		synchronized final void __start() throws IllegalStateException {
-			this.__check();
-			this.__active = true;
-			this.__value = -1;
+		synchronized final void _start_() throws IllegalStateException {
+			this._check_();
+			this._active_ = true;
+			this._value_ = -1;
 			this.reset();
 		}
 
 		@SuppressWarnings ("javadoc")
-		synchronized final void __stop() {
-			this.__active = false;
+		synchronized final void _stop_() {
+			this._active_ = false;
 		}
 
 		@SuppressWarnings ("javadoc")
-		final void __check() throws IllegalStateException {
-			if (this.__active) throw new IllegalStateException();
+		final void _check_() throws IllegalStateException {
+			if (this._active_) throw new IllegalStateException();
 		}
 
 		/**
@@ -1332,27 +1332,27 @@ public class FEM {
 		 * @param type Typ des Bereichs.
 		 * @param start Start des Bereichs.
 		 */
-		final void __put(final int type, final int start) {
-			this.__ranges.add(new Range((char)type, start, this.index() - start));
+		final void _put_(final int type, final int start) {
+			this._ranges_.add(new Range((char)type, start, this.index() - start));
 		}
 
 		/**
-		 * Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #__closeValue()} beendet werden muss.
+		 * Diese Methode beginnt das parsen eines Wertbereichs mit dem Bereichstyp {@code '.'}, welches mit {@link #_closeValue_()} beendet werden muss.
 		 */
-		final void __openValue() {
-			if (this.__value >= 0) return;
-			this.__value = this.index();
+		final void _openValue_() {
+			if (this._value_ >= 0) return;
+			this._value_ = this.index();
 		}
 
 		/**
 		 * Diese Methode beendet das einlesen des Wertbereichs mit dem Bereichstyp {@code '.'}.
 		 */
-		final void __closeValue() {
-			final int start = this.__value;
+		final void _closeValue_() {
+			final int start = this._value_;
 			if (start < 0) return;
-			this.__value = -1;
+			this._value_ = -1;
 			if (this.index() <= start) return;
-			this.__put('.', start);
+			this._put_('.', start);
 		}
 
 		/**
@@ -1361,17 +1361,17 @@ public class FEM {
 		 * 
 		 * @param type Zeichen als Bereichstyp.
 		 */
-		final void __parseMask(final int type) {
+		final void _parseMask_(final int type) {
 			final int start = this.index();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
 					if (this.skip() != type) {
-						this.__put(type, start);
+						this._put_(type, start);
 						return;
 					}
 				}
 			}
-			this.__put('?', start);
+			this._put_('?', start);
 		}
 
 		/**
@@ -1379,12 +1379,12 @@ public class FEM {
 		 * paarweise vorkommen dürfen. ein solcher Bereich geparst werden konnte, ist dessen Bereichstyp {@code '!'}. Wenn eine dieser Regeln verletzt wird, ist der
 		 * Bereichstyp {@code '?'}.
 		 */
-		final void __parseName() {
+		final void _parseName_() {
 			final int start = this.index();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == '>') {
 					if (this.skip() != '>') {
-						this.__put('!', start);
+						this._put_('!', start);
 						return;
 					}
 				} else if (symbol == '<') {
@@ -1393,51 +1393,51 @@ public class FEM {
 					}
 				}
 			}
-			this.__put('?', start);
+			this._put_('?', start);
 		}
 
 		/**
 		 * Diese Methode überspringt alle Zeichen, die kleiner oder gleich dem eerzeichen sind.
 		 */
-		final void __parseSpace() {
+		final void _parseSpace_() {
 			final int start = this.index();
 			for (int symbol = this.skip(); (symbol >= 0) && (symbol <= ' '); symbol = this.skip()) {}
-			this.__put('_', start);
+			this._put_('_', start);
 		}
 
 		/**
 		 * Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
 		 * 
 		 * @see #skip()
-		 * @see #__put(int, int)
+		 * @see #_put_(int, int)
 		 * @param type Zeichen als Bereichstyp.
 		 */
-		final void __parseSymbol(final int type) {
+		final void _parseSymbol_(final int type) {
 			final int start = this.index();
 			this.skip();
-			this.__put(type, start);
+			this._put_(type, start);
 		}
 
 		/**
 		 * Diese Methode parst die {@link #source() Eingabe}.
 		 */
-		final void __parseSource() {
+		final void _parseSource_() {
 			for (int symbol; true;) {
 				switch (symbol = this.symbol()) {
 					case -1: {
-						this.__closeValue();
+						this._closeValue_();
 						return;
 					}
 					case '\'':
 					case '\"':
 					case '/': {
-						this.__closeValue();
-						this.__parseMask(symbol);
+						this._closeValue_();
+						this._parseMask_(symbol);
 						break;
 					}
 					case '<': {
-						this.__closeValue();
-						this.__parseName();
+						this._closeValue_();
+						this._parseName_();
 						break;
 					}
 					case '$':
@@ -1449,16 +1449,16 @@ public class FEM {
 					case ']':
 					case '{':
 					case '}': {
-						this.__closeValue();
-						this.__parseSymbol(symbol);
+						this._closeValue_();
+						this._parseSymbol_(symbol);
 						break;
 					}
 					default: {
 						if (symbol <= ' ') {
-							this.__closeValue();
-							this.__parseSpace();
+							this._closeValue_();
+							this._parseSpace_();
 						} else {
-							this.__openValue();
+							this._openValue_();
 							this.skip();
 						}
 					}
@@ -1467,13 +1467,13 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #source() Eingabe} keines der in {@link #__parseSource()} erkannten Zeichen enthält,
-		 * d.h. wenn das Parsen der Eingabe via {@link #parseRanges()} genau einen Bereich mit dem Typ {@code '.'} ergibt, welcher über {@link #__openValue()} und
-		 * {@link #__closeValue()} entstand.
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #source() Eingabe} keines der in {@link #_parseSource_()} erkannten Zeichen enthält,
+		 * d.h. wenn das Parsen der Eingabe via {@link #parseRanges()} genau einen Bereich mit dem Typ {@code '.'} ergibt, welcher über {@link #_openValue_()} und
+		 * {@link #_closeValue_()} entstand.
 		 * 
 		 * @return {@code true}, wenn die Eingabe nur einen Wert enthält.
 		 */
-		final boolean __checkSource() {
+		final boolean _checkSource_() {
 			if (this.isParsed()) return false;
 			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 				switch (symbol) {
@@ -1503,11 +1503,11 @@ public class FEM {
 		/**
 		 * Diese Methode gibt die in Anführungszeichen eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 		 * 
-		 * @see #__parseMask(int)
+		 * @see #_parseMask_(int)
 		 * @param type Anführungszeichen.
 		 * @return Eingabe mit Maskierung.
 		 */
-		final String __encodeMask(final int type) {
+		final String _encodeMask_(final int type) {
 			this.take(type);
 			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
@@ -1522,10 +1522,10 @@ public class FEM {
 		/**
 		 * Diese Methode gibt die in spitze Klammern eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 		 * 
-		 * @see #__parseName()
+		 * @see #_parseName_()
 		 * @return Eingabe mit Maskierung.
 		 */
-		final String __encodeValue() {
+		final String _encodeValue_() {
 			this.take('<');
 			for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
 				if ((symbol == '<') || (symbol == '>')) {
@@ -1544,7 +1544,7 @@ public class FEM {
 		 * @return Eingabe ohne Maskierung.
 		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
-		final String __decodeMask(final int type) throws IllegalArgumentException {
+		final String _decodeMask_(final int type) throws IllegalArgumentException {
 			if (this.symbol() != type) throw new IllegalArgumentException();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == type) {
@@ -1561,11 +1561,11 @@ public class FEM {
 		/**
 		 * Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.
 		 * 
-		 * @see #__parseName()
+		 * @see #_parseName_()
 		 * @return Eingabe ohne Maskierung.
 		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
-		final String __decodeValue() throws IllegalArgumentException {
+		final String _decodeValue_() throws IllegalArgumentException {
 			if (this.symbol() != '<') throw new IllegalArgumentException();
 			for (int symbol = this.skip(); symbol >= 0; symbol = this.skip()) {
 				if (symbol == '<') {
@@ -1590,7 +1590,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptParser useSource(final String value) throws NullPointerException, IllegalStateException {
-			this.__check();
+			this._check_();
 			super.source(value);
 			return this;
 		}
@@ -1615,14 +1615,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final Range[] parseRanges() throws IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				this.__ranges.clear();
-				this.__parseSource();
-				final Range[] result = this.__ranges.toArray(new Range[this.__ranges.size()]);
+				this._ranges_.clear();
+				this._parseSource_();
+				final Range[] result = this._ranges_.toArray(new Range[this._ranges_.size()]);
 				return result;
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1636,13 +1636,13 @@ public class FEM {
 		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
 		public final String parseString() throws IllegalStateException, IllegalArgumentException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.symbol() == '\'') return this.__decodeMask('\'');
-				if (this.symbol() == '\"') return this.__decodeMask('\"');
+				if (this.symbol() == '\'') return this._decodeMask_('\'');
+				if (this.symbol() == '\"') return this._decodeMask_('\"');
 				throw new IllegalArgumentException();
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1656,12 +1656,12 @@ public class FEM {
 		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
 		public final String parseComment() throws IllegalStateException, IllegalArgumentException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.symbol() == '/') return this.__decodeMask('/');
+				if (this.symbol() == '/') return this._decodeMask_('/');
 				throw new IllegalArgumentException();
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1675,12 +1675,12 @@ public class FEM {
 		 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist.
 		 */
 		public final String parseValue() throws IllegalStateException, IllegalArgumentException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.symbol() == '<') return this.__decodeValue();
+				if (this.symbol() == '<') return this._decodeValue_();
 				return this.source();
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1693,13 +1693,13 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final String formatValue() throws IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.__checkSource()) return this.source();
+				if (this._checkSource_()) return this.source();
 				this.reset();
-				return this.__encodeValue();
+				return this._encodeValue_();
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1711,11 +1711,11 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final String formatString() throws IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				return this.__encodeMask('\'');
+				return this._encodeMask_('\'');
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1727,11 +1727,11 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final String formatComment() throws IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				return this.__encodeMask('/');
+				return this._encodeMask_('/');
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -1771,83 +1771,83 @@ public class FEM {
 	public static final class ScriptCompiler extends Parser {
 
 		@SuppressWarnings ("javadoc")
-		boolean __active;
+		boolean _active_;
 
 		/**
 		 * Dieses Feld speichert die Kompilationsmethoden.
 		 */
-		ScriptCompilerHelper __helper = ScriptCompilerHelper.DEFAULT;
+		ScriptCompilerHelper _helper_ = ScriptCompilerHelper.DEFAULT;
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		FEMScript __script = FEMScript.EMPTY;
+		FEMScript _script_ = FEMScript.EMPTY;
 
 		/**
 		 * Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter.
 		 */
-		final Map<String, ProxyFunction> __proxies = Collections.synchronizedMap(new LinkedHashMap<String, ProxyFunction>());
+		final Map<String, ProxyFunction> _proxies_ = Collections.synchronizedMap(new LinkedHashMap<String, ProxyFunction>());
 
 		/**
 		 * Dieses Feld speichert die Parameternamen.
 		 */
-		final List<String> __params = Collections.synchronizedList(new LinkedList<String>());
+		final List<String> _params_ = Collections.synchronizedList(new LinkedList<String>());
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Wertlisten.
 		 */
-		boolean __arrayEnabled = true;
+		boolean _arrayEnabled_ = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit von Funktionszeigern.
 		 */
-		boolean __handlerEnabled = true;
+		boolean _handlerEnabled_ = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Bindung des Stapelrahmens.
 		 */
-		boolean __closureEnabled = true;
+		boolean _closureEnabled_ = true;
 
 		/**
 		 * Dieses Feld speichert die Zulässigkeit der Verkettung von Funktionen.
 		 */
-		boolean __chainingEnabled = true;
+		boolean _chainingEnabled_ = true;
 
 		/**
 		 * Dieses Feld speichert den Formatierer.
 		 */
-		ScriptFormatter __formatter;
+		ScriptFormatter _formatter_;
 
 		{}
 
 		/**
-		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #__stop()} verwendet werden.
+		 * Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
 		 * 
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
-		final synchronized void __start() throws IllegalStateException {
-			this.__check();
-			this.__active = true;
+		final synchronized void _start_() throws IllegalStateException {
+			this._check_();
+			this._active_ = true;
 			this.reset();
 		}
 
 		@SuppressWarnings ("javadoc")
-		synchronized final void __stop() {
-			this.__active = false;
+		synchronized final void _stop_() {
+			this._active_ = false;
 		}
 
 		@SuppressWarnings ("javadoc")
-		final void __check() throws IllegalStateException {
-			if (this.__active) throw new IllegalStateException();
+		final void _check_() throws IllegalStateException {
+			if (this._active_) throw new IllegalStateException();
 		}
 
 		/**
 		 * Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen.
 		 */
-		final void __format() {
-			final ScriptFormatter formatter = this.__formatter;
+		final void _format_() {
+			final ScriptFormatter formatter = this._formatter_;
 			while (true) {
-				this.__formatSequence(false);
+				this._formatSequence_(false);
 				if (this.symbol() < 0) return;
 				formatter.put(this.section()).putBreakSpace();
 				this.skip();
@@ -1857,11 +1857,11 @@ public class FEM {
 		/**
 		 * Diese Methode formatiert die aktuelle Wertliste.
 		 */
-		final void __formatArray() {
-			final ScriptFormatter formatter = this.__formatter;
+		final void _formatArray_() {
+			final ScriptFormatter formatter = this._formatter_;
 			formatter.put("[").putBreakInc();
 			this.skip();
-			this.__formatSequence(false);
+			this._formatSequence_(false);
 			if (this.symbol() == ']') {
 				formatter.putBreakDec().put("]");
 				this.skip();
@@ -1871,11 +1871,11 @@ public class FEM {
 		/**
 		 * Diese Methode formatiert die aktuelle Parameterliste.
 		 */
-		final void __formatParam() {
-			final ScriptFormatter formatter = this.__formatter;
+		final void _formatParam_() {
+			final ScriptFormatter formatter = this._formatter_;
 			formatter.put("(").putBreakInc();
 			this.skip();
-			this.__formatSequence(false);
+			this._formatSequence_(false);
 			if (this.symbol() == ')') {
 				formatter.putBreakDec().put(")");
 				this.skip();
@@ -1885,15 +1885,15 @@ public class FEM {
 		/**
 		 * Diese Methode formatiert die aktuelle parametrisierte Funktion.
 		 */
-		final void __formatFrame() {
-			final ScriptFormatter formatter = this.__formatter;
+		final void _formatFrame_() {
+			final ScriptFormatter formatter = this._formatter_;
 			formatter.put("{");
 			this.skip();
-			this.__formatSequence(true);
+			this._formatSequence_(true);
 			if (this.symbol() == ':') {
 				formatter.put(": ");
 				this.skip();
-				this.__formatSequence(false);
+				this._formatSequence_(false);
 			}
 			if (this.symbol() == '}') {
 				formatter.put("}");
@@ -1906,8 +1906,8 @@ public class FEM {
 		 * 
 		 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll.
 		 */
-		final void __formatSequence(final boolean space) {
-			final ScriptFormatter formatter = this.__formatter;
+		final void _formatSequence_(final boolean space) {
+			final ScriptFormatter formatter = this._formatter_;
 			int count = 0;
 			while (true) {
 				switch (this.symbol()) {
@@ -1938,15 +1938,15 @@ public class FEM {
 						break;
 					}
 					case '(': {
-						this.__formatParam();
+						this._formatParam_();
 						break;
 					}
 					case '[': {
-						this.__formatArray();
+						this._formatArray_();
 						break;
 					}
 					case '{': {
-						this.__formatFrame();
+						this._formatFrame_();
 						break;
 					}
 					default: {
@@ -1974,7 +1974,7 @@ public class FEM {
 		 * @see #skip()
 		 * @return aktueller Bereichstyp.
 		 */
-		final int __compileType() {
+		final int _compileType_() {
 			int symbol = this.symbol();
 			while ((symbol == '_') || (symbol == '/')) {
 				symbol = this.skip();
@@ -1988,7 +1988,7 @@ public class FEM {
 		 * @param string Zeichenkette.
 		 * @return Zahl.
 		 */
-		final int __compileIndex(final String string) {
+		final int _compileIndex_(final String string) {
 			if ((string == null) || string.isEmpty()) return -1;
 			final char symbol = string.charAt(0);
 			if ((symbol < '0') || (symbol > '9')) return -1;
@@ -2006,21 +2006,21 @@ public class FEM {
 		 * @return Wertliste als {@link FEMValue}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMValue __compileArrayAsValue() throws ScriptException {
-			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
+		final FEMValue _compileArrayAsValue_() throws ScriptException {
+			if (!this._arrayEnabled_) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			final List<FEMValue> result = new ArrayList<>();
 			this.skip();
-			if (this.__compileType() == ']') {
+			if (this._compileType_() == ']') {
 				this.skip();
-				return FEM.__emptyArray;
+				return FEM._emptyArray_;
 			}
 			while (true) {
-				final FEMValue value = this.__compileParamAsValue();
+				final FEMValue value = this._compileParamAsValue_();
 				result.add(value);
-				switch (this.__compileType()) {
+				switch (this._compileType_()) {
 					case ';': {
 						this.skip();
-						this.__compileType();
+						this._compileType_();
 						break;
 					}
 					case ']': {
@@ -2044,23 +2044,23 @@ public class FEM {
 		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMFunction __compileArrayAsFunction() throws ScriptException {
-			if (!this.__arrayEnabled) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
+		final FEMFunction _compileArrayAsFunction_() throws ScriptException {
+			if (!this._arrayEnabled_) throw new ScriptException().useSender(this).useHint(" Wertlisten sind nicht zulässig.");
 			this.skip();
-			if (this.__compileType() == ']') {
+			if (this._compileType_() == ']') {
 				this.skip();
-				return FEM.__emptyArray;
+				return FEM._emptyArray_;
 			}
 			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
 			while (true) {
-				final FEMFunction item = this.__compileParamAsFunction();
+				final FEMFunction item = this._compileParamAsFunction_();
 				list.add(item);
 				value = value && (item instanceof ValueFunction);
-				switch (this.__compileType()) {
+				switch (this._compileType_()) {
 					case ';': {
 						this.skip();
-						this.__compileType();
+						this._compileType_();
 						break;
 					}
 					case ']': {
@@ -2091,9 +2091,9 @@ public class FEM {
 		 * @return Parameter.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMFunction __compileParam() throws ScriptException {
+		final FEMFunction _compileParam_() throws ScriptException {
 			try {
-				final FEMFunction result = this.__helper.compileParam(this, this.section());
+				final FEMFunction result = this._helper_.compileParam(this, this.section());
 				if (result == null) throw new ScriptException().useSender(this).useHint(" Parameter erwartet.");
 				this.skip();
 				return result;
@@ -2110,8 +2110,8 @@ public class FEM {
 		 * @return Wert.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMValue __compileParamAsValue() throws ScriptException {
-			switch (this.__compileType()) {
+		final FEMValue _compileParamAsValue_() throws ScriptException {
+			switch (this._compileType_()) {
 				case -1:
 				case '$':
 				case ';':
@@ -2123,15 +2123,15 @@ public class FEM {
 					throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 				}
 				case '[': {
-					return this.__compileArrayAsValue();
+					return this._compileArrayAsValue_();
 				}
 				case '{': {
-					if (this.__closureEnabled) throw new ScriptException().useSender(this).useHint(" Ungebundene Funktion unzulässig.");
-					final FEMFunction retult = this.__compileFrame();
+					if (this._closureEnabled_) throw new ScriptException().useSender(this).useHint(" Ungebundene Funktion unzulässig.");
+					final FEMFunction retult = this._compileFrame_();
 					return FEM.functionValue(retult);
 				}
 				default: {
-					final FEMFunction param = this.__compileParam();
+					final FEMFunction param = this._compileParam_();
 					if (!(param instanceof ValueFunction)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 					final FEMValue result = param.invoke(FEMFrame.EMPTY);
 					return result;
@@ -2145,10 +2145,10 @@ public class FEM {
 		 * @return Funktion.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMFunction __compileParamAsFunction() throws ScriptException {
+		final FEMFunction _compileParamAsFunction_() throws ScriptException {
 			FEMFunction result;
 			boolean indirect = false;
-			switch (this.__compileType()) {
+			switch (this._compileType_()) {
 				case -1:
 				case ';':
 				case ':':
@@ -2160,11 +2160,11 @@ public class FEM {
 				}
 				case '$': {
 					this.skip();
-					final String name = this.__compileName();
+					final String name = this._compileName_();
 					if (name == null) return FEM.PARAMS_VIEW_FUNCTION;
-					int index = this.__compileIndex(name);
+					int index = this._compileIndex_(name);
 					if (index < 0) {
-						index = this.__params.indexOf(name);
+						index = this._params_.indexOf(name);
 						if (index < 0) throw new ScriptException().useSender(this).useHint(" Parametername «%s» ist unbekannt.", name);
 					} else if (index > 0) {
 						index--;
@@ -2172,38 +2172,38 @@ public class FEM {
 					return ParamFunction.from(index);
 				}
 				case '{': {
-					result = this.__compileFrame();
-					if (this.__compileType() != '(') {
-						if (this.__closureEnabled) return ClosureFunction.from(result);
+					result = this._compileFrame_();
+					if (this._compileType_() != '(') {
+						if (this._closureEnabled_) return ClosureFunction.from(result);
 						return FEM.functionValue(result);
 					}
-					if (!this.__chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
+					if (!this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
 				}
 				case '[': {
-					return this.__compileArrayAsFunction();
+					return this._compileArrayAsFunction_();
 				}
 				default: {
-					result = this.__compileParam();
-					if (this.__compileType() != '(') {
-						if (this.__handlerEnabled) return FEM.functionValue(result);
+					result = this._compileParam_();
+					if (this._compileType_() != '(') {
+						if (this._handlerEnabled_) return FEM.functionValue(result);
 						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
 					}
 				}
 			}
 			do {
-				if (indirect && !this.__chainingEnabled) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
+				if (indirect && !this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				final List<FEMFunction> list = new ArrayList<>();
 				while (true) {
-					if (this.__compileType() == ')') {
+					if (this._compileType_() == ')') {
 						this.skip();
 						result = new InvokeFunction(result, !indirect, list.toArray(new FEMFunction[list.size()]));
 						break;
 					}
-					final FEMFunction item = this.__compileParamAsFunction();
+					final FEMFunction item = this._compileParamAsFunction_();
 					list.add(item);
-					switch (this.__compileType()) {
+					switch (this._compileType_()) {
 						default:
 							throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «)» erwartet.");
 						case ';':
@@ -2212,7 +2212,7 @@ public class FEM {
 					}
 				}
 				indirect = true;
-			} while (this.__compileType() == '(');
+			} while (this._compileType_() == '(');
 			return result;
 		}
 
@@ -2222,12 +2222,12 @@ public class FEM {
 		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final ProxyFunction __compileProxy() throws ScriptException {
-			final String name = this.__compileName();
-			if ((name == null) || (this.__compileIndex(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
+		final ProxyFunction _compileProxy_() throws ScriptException {
+			final String name = this._compileName_();
+			if ((name == null) || (this._compileIndex_(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
 			final ProxyFunction result = this.proxy(name);
-			if (this.__compileType() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			final FEMFunction target = this.__compileFrame();
+			if (this._compileType_() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
+			final FEMFunction target = this._compileFrame_();
 			result.set(target);
 			return result;
 		}
@@ -2239,9 +2239,9 @@ public class FEM {
 		 * @return Funktions- oder Parametername oder {@code null}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final String __compileName() throws ScriptException {
+		final String _compileName_() throws ScriptException {
 			try {
-				switch (this.__compileType()) {
+				switch (this._compileType_()) {
 					case '$':
 					case '(':
 					case '[':
@@ -2257,7 +2257,7 @@ public class FEM {
 						return null;
 					}
 				}
-				final String result = this.__helper.compileName(this, this.section());
+				final String result = this._helper_.compileName(this, this.section());
 				if (result.isEmpty()) throw new IllegalArgumentException();
 				this.skip();
 				return result;
@@ -2275,17 +2275,17 @@ public class FEM {
 		 * @return Funktion als {@link FunctionValue}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
-		final FEMFunction __compileFrame() throws ScriptException {
+		final FEMFunction _compileFrame_() throws ScriptException {
 			this.skip();
 			int count = 0;
 			while (true) {
-				if (this.__compileType() < 0) throw new ScriptException().useSender(this);
-				final String name = this.__compileName();
+				if (this._compileType_() < 0) throw new ScriptException().useSender(this);
+				final String name = this._compileName_();
 				if (name != null) {
-					if (this.__compileIndex(name) >= 0) throw new ScriptException().useSender(this).useHint(" Parametername erwartet.");
-					this.__params.add(count++, name);
+					if (this._compileIndex_(name) >= 0) throw new ScriptException().useSender(this).useHint(" Parametername erwartet.");
+					this._params_.add(count++, name);
 				}
-				switch (this.__compileType()) {
+				switch (this._compileType_()) {
 					case ';': {
 						if (name == null) throw new ScriptException().useSender(this).useHint(" Parametername oder Zeichen «:» erwartet.");
 						this.skip();
@@ -2293,10 +2293,10 @@ public class FEM {
 					}
 					case ':': {
 						this.skip();
-						final FEMFunction result = this.__compileParamAsFunction();
-						if (this.__compileType() != '}') throw new ScriptException().useSender(this).useHint(" Zeichen «}» erwartet.");
+						final FEMFunction result = this._compileParamAsFunction_();
+						if (this._compileType_() != '}') throw new ScriptException().useSender(this).useHint(" Zeichen «}» erwartet.");
 						this.skip();
-						this.__params.subList(0, count).clear();
+						this._params_.subList(0, count).clear();
 						return result;
 					}
 					default: {
@@ -2314,10 +2314,10 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
 		 */
 		public final ProxyFunction proxy(final String name) throws NullPointerException {
-			synchronized (this.__proxies) {
-				ProxyFunction result = this.__proxies.get(name);
+			synchronized (this._proxies_) {
+				ProxyFunction result = this._proxies_.get(name);
 				if (result != null) return result;
-				this.__proxies.put(name, result = new ProxyFunction(name));
+				this._proxies_.put(name, result = new ProxyFunction(name));
 				return result;
 			}
 		}
@@ -2328,7 +2328,7 @@ public class FEM {
 		 * @return aktueller Bereich.
 		 */
 		public final Range range() {
-			return this.isParsed() ? Range.EMPTY : this.__script.get(this.index());
+			return this.isParsed() ? Range.EMPTY : this._script_.get(this.index());
 		}
 
 		/**
@@ -2337,7 +2337,7 @@ public class FEM {
 		 * @return Quelltext.
 		 */
 		public final FEMScript script() {
-			return this.__script;
+			return this._script_;
 		}
 
 		/**
@@ -2346,7 +2346,7 @@ public class FEM {
 		 * @return Kompilationsmethoden.
 		 */
 		public final ScriptCompilerHelper helper() {
-			return this.__helper;
+			return this._helper_;
 		}
 
 		/**
@@ -2355,7 +2355,7 @@ public class FEM {
 		 * @return Abbildung von Namen auf Platzhalter.
 		 */
 		public final Map<String, ProxyFunction> proxies() {
-			return this.__proxies;
+			return this._proxies_;
 		}
 
 		/**
@@ -2364,7 +2364,7 @@ public class FEM {
 		 * @return Parameternamen.
 		 */
 		public final List<String> params() {
-			return Collections.unmodifiableList(this.__params);
+			return Collections.unmodifiableList(this._params_);
 		}
 
 		/**
@@ -2374,7 +2374,7 @@ public class FEM {
 		 * @return Aktuelle Zeichenkette.
 		 */
 		public final String section() {
-			return this.range().extract(this.__script.source());
+			return this.range().extract(this._script_.source());
 		}
 
 		/**
@@ -2384,7 +2384,7 @@ public class FEM {
 		 * @return Zulässigkeit von Wertlisten.
 		 */
 		public final boolean isArrayEnabled() {
-			return this.__arrayEnabled;
+			return this._arrayEnabled_;
 		}
 
 		/**
@@ -2395,7 +2395,7 @@ public class FEM {
 		 * @return Zulässigkeit von Funktionszeigern.
 		 */
 		public final boolean isHandlerEnabled() {
-			return this.__handlerEnabled;
+			return this._handlerEnabled_;
 		}
 
 		/**
@@ -2405,7 +2405,7 @@ public class FEM {
 		 * @return Zulässigkeit der Bindung des Stapelrahmens.
 		 */
 		public final boolean isClosureEnabled() {
-			return this.__closureEnabled;
+			return this._closureEnabled_;
 		}
 
 		/**
@@ -2418,7 +2418,7 @@ public class FEM {
 		 * @return Zulässigkeit der Verkettung von Funktionen.
 		 */
 		public final boolean isChainingEnabled() {
-			return this.__chainingEnabled;
+			return this._chainingEnabled_;
 		}
 
 		/**
@@ -2430,9 +2430,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptCompiler useScript(final FEMScript value) throws NullPointerException, IllegalStateException {
-			this.__check();
+			this._check_();
 			this.source(value.types());
-			this.__script = value;
+			this._script_ = value;
 			return this;
 		}
 
@@ -2446,8 +2446,8 @@ public class FEM {
 		 */
 		public synchronized final ScriptCompiler useHelper(final ScriptCompilerHelper value) throws NullPointerException, IllegalStateException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__check();
-			this.__helper = value;
+			this._check_();
+			this._helper_ = value;
 			return this;
 		}
 
@@ -2473,9 +2473,9 @@ public class FEM {
 		 */
 		public synchronized final ScriptCompiler useParams(final List<String> value) throws NullPointerException, IllegalStateException {
 			if (value.contains(null)) throw new NullPointerException("value.contains(null)");
-			this.__check();
-			this.__params.clear();
-			this.__params.addAll(value);
+			this._check_();
+			this._params_.clear();
+			this._params_.addAll(value);
 			return this;
 		}
 
@@ -2488,8 +2488,8 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
-			this.__check();
-			this.__arrayEnabled = value;
+			this._check_();
+			this._arrayEnabled_ = value;
 			return this;
 		}
 
@@ -2502,8 +2502,8 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
-			this.__check();
-			this.__handlerEnabled = value;
+			this._check_();
+			this._handlerEnabled_ = value;
 			return this;
 		}
 
@@ -2516,8 +2516,8 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptCompiler useClosureEnabled(final boolean value) throws IllegalStateException {
-			this.__check();
-			this.__closureEnabled = value;
+			this._check_();
+			this._closureEnabled_ = value;
 			return this;
 		}
 
@@ -2530,8 +2530,8 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public synchronized final ScriptCompiler useChainingEnabled(final boolean value) throws IllegalStateException {
-			this.__check();
-			this.__chainingEnabled = value;
+			this._check_();
+			this._chainingEnabled_ = value;
 			return this;
 		}
 
@@ -2543,14 +2543,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final void formatScript(final ScriptFormatter target) throws NullPointerException, IllegalStateException {
-			this.__start();
+			this._start_();
 			if (target == null) throw new NullPointerException("target = null");
-			this.__formatter = target;
+			this._formatter_ = target;
 			try {
-				this.__format();
+				this._format_();
 			} finally {
-				this.__formatter = null;
-				this.__stop();
+				this._formatter_ = null;
+				this._stop_();
 			}
 		}
 
@@ -2563,14 +2563,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final FEMValue compileValue() throws ScriptException, IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.__compileType() < 0) return null;
-				final FEMValue result = this.__compileParamAsValue();
-				if (this.__compileType() < 0) return result;
+				if (this._compileType_() < 0) return null;
+				final FEMValue result = this._compileParamAsValue_();
+				if (this._compileType_() < 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -2584,13 +2584,13 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final FEMValue[] compileValues() throws ScriptException, IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.__compileType() < 0) return new FEMValue[0];
+				if (this._compileType_() < 0) return new FEMValue[0];
 				final List<FEMValue> result = new ArrayList<FEMValue>();
 				while (true) {
-					result.add(this.__compileParamAsValue());
-					switch (this.__compileType()) {
+					result.add(this._compileParamAsValue_());
+					switch (this._compileType_()) {
 						case -1: {
 							return result.toArray(new FEMValue[result.size()]);
 						}
@@ -2600,7 +2600,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -2615,13 +2615,13 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final ProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
 				final List<ProxyFunction> result = new ArrayList<ProxyFunction>();
-				if (this.__compileType() < 0) return new ProxyFunction[0];
+				if (this._compileType_() < 0) return new ProxyFunction[0];
 				while (true) {
-					result.add(this.__compileProxy());
-					switch (this.__compileType()) {
+					result.add(this._compileProxy_());
+					switch (this._compileType_()) {
 						case -1: {
 							return result.toArray(new ProxyFunction[result.size()]);
 						}
@@ -2631,7 +2631,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -2644,14 +2644,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final FEMFunction compileFunction() throws ScriptException, IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.__compileType() < 0) return null;
-				final FEMFunction result = this.__compileParamAsFunction();
-				if (this.__compileType() < 0) return result;
+				if (this._compileType_() < 0) return null;
+				final FEMFunction result = this._compileParamAsFunction_();
+				if (this._compileType_() < 0) return result;
 				throw new ScriptException().useSender(this).useHint(" Keine weiteren Definitionen erwartet.");
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -2665,13 +2665,13 @@ public class FEM {
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 		 */
 		public final FEMFunction[] compileFunctions() throws ScriptException, IllegalStateException {
-			this.__start();
+			this._start_();
 			try {
-				if (this.__compileType() < 0) return new FEMFunction[0];
+				if (this._compileType_() < 0) return new FEMFunction[0];
 				final List<FEMFunction> result = new ArrayList<FEMFunction>();
 				while (true) {
-					result.add(this.__compileParamAsFunction());
-					switch (this.__compileType()) {
+					result.add(this._compileParamAsFunction_());
+					switch (this._compileType_()) {
 						case -1: {
 							return result.toArray(new FEMFunction[result.size()]);
 						}
@@ -2681,7 +2681,7 @@ public class FEM {
 					}
 				}
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -2692,7 +2692,7 @@ public class FEM {
 		 */
 		@Override
 		public String toString() {
-			return Objects.toInvokeString(this, this.__helper, this.__params, this.__script, this.__proxies);
+			return Objects.toInvokeString(this, this._helper_, this._params_, this._script_, this._proxies_);
 		}
 
 	}
@@ -2727,9 +2727,9 @@ public class FEM {
 					}
 					default: {
 						section = FEM.parseValue(section);
-						if (section.equalsIgnoreCase("NULL")) return FEM.__void;
-						if (section.equalsIgnoreCase("TRUE")) return FEM.__true;
-						if (section.equalsIgnoreCase("FALSE")) return FEM.__false;
+						if (section.equalsIgnoreCase("NULL")) return FEM._void_;
+						if (section.equalsIgnoreCase("TRUE")) return FEM._true_;
+						if (section.equalsIgnoreCase("FALSE")) return FEM._false_;
 						try {
 							return FEM.decimalValue(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {
@@ -2790,7 +2790,7 @@ public class FEM {
 		static final class Mark {
 
 			/**
-			 * Dieses Feld speichert das Objekt, dass in {@link #__items} vor jeder Markierung eingefügt wird.
+			 * Dieses Feld speichert das Objekt, dass in {@link #_items_} vor jeder Markierung eingefügt wird.
 			 */
 			static final Mark EMPTY = new ScriptFormatter.Mark(0, false, false, false);
 
@@ -2799,7 +2799,7 @@ public class FEM {
 			/**
 			 * Dieses Feld speichert die Eigenschaften dieser Markierung.
 			 */
-			int __data;
+			int _data_;
 
 			/**
 			 * Dieser Konstruktor initialisiert die Markierung.
@@ -2810,7 +2810,7 @@ public class FEM {
 			 * @param enabled Aktivierung ({@link #isEnabled()}).
 			 */
 			public Mark(final int level, final boolean last, final boolean space, final boolean enabled) {
-				this.__data = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
+				this._data_ = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
 			}
 
 			{}
@@ -2821,14 +2821,14 @@ public class FEM {
 			 * @return Tiefe der Einrückung.
 			 */
 			public final int level() {
-				return this.__data >> 3;
+				return this._data_ >> 3;
 			}
 
 			/**
 			 * Diese Methode aktiviert die Einrückung.
 			 */
 			public final void enable() {
-				this.__data |= 2;
+				this._data_ |= 2;
 			}
 
 			/**
@@ -2837,7 +2837,7 @@ public class FEM {
 			 * @return {@code true} bei einer Endmarkierung.
 			 */
 			public final boolean isLast() {
-				return (this.__data & 1) != 0;
+				return (this._data_ & 1) != 0;
 			}
 
 			/**
@@ -2846,7 +2846,7 @@ public class FEM {
 			 * @return {@code true} bei einem bedingten Leerzeichen.
 			 */
 			public final boolean isSpace() {
-				return (this.__data & 4) != 0;
+				return (this._data_ & 4) != 0;
 			}
 
 			/**
@@ -2855,7 +2855,7 @@ public class FEM {
 			 * @return Aktivierung.
 			 */
 			public final boolean isEnabled() {
-				return (this.__data & 2) != 0;
+				return (this._data_ & 2) != 0;
 			}
 
 			{}
@@ -2875,50 +2875,50 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen.
 		 */
-		final List<Object> __items = new ArrayList<Object>();
+		final List<Object> _items_ = new ArrayList<Object>();
 
 		/**
-		 * Dieses Feld speichert den Puffer für {@link #__format()}.
+		 * Dieses Feld speichert den Puffer für {@link #_format_()}.
 		 */
-		final StringBuilder __string = new StringBuilder();
+		final StringBuilder _string_ = new StringBuilder();
 
 		/**
 		 * Dieses Feld speichert den Stack der Hierarchieebenen.
 		 */
-		final LinkedList<Boolean> __indents = new LinkedList<Boolean>();
+		final LinkedList<Boolean> _indents_ = new LinkedList<Boolean>();
 
 		/**
 		 * Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}.
 		 */
-		String __indent = "\t";
+		String _indent_ = "\t";
 
 		/**
 		 * Dieses Feld speichert die Formatierungsmethoden.
 		 */
-		ScriptFormatterHelper __helper = ScriptFormatterHelper.EMPTY;
+		ScriptFormatterHelper _helper_ = ScriptFormatterHelper.EMPTY;
 
 		{}
 
 		/**
-		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #__stop()} verwendet werden.
+		 * Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #_stop_()} verwendet werden.
 		 * 
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
-		synchronized final void __start() throws IllegalStateException {
-			this.__check(true);
-			this.__indents.addLast(Boolean.FALSE);
+		synchronized final void _start_() throws IllegalStateException {
+			this._check_(true);
+			this._indents_.addLast(Boolean.FALSE);
 		}
 
 		@SuppressWarnings ("javadoc")
-		synchronized final void __stop() {
-			this.__items.clear();
-			this.__string.setLength(0);
-			this.__indents.clear();
+		synchronized final void _stop_() {
+			this._items_.clear();
+			this._string_.setLength(0);
+			this._indents_.clear();
 		}
 
 		@SuppressWarnings ("javadoc")
-		final void __check(final boolean idling) throws IllegalStateException {
-			if (this.__indents.isEmpty() != idling) throw new IllegalStateException();
+		final void _check_(final boolean idling) throws IllegalStateException {
+			if (this._indents_.isEmpty() != idling) throw new IllegalStateException();
 		}
 
 		/**
@@ -2927,8 +2927,8 @@ public class FEM {
 		 * @param object Markierung.
 		 * @return {@code this}.
 		 */
-		final ScriptFormatter __putMark(final Mark object) {
-			this.__items.add(object);
+		final ScriptFormatter _putMark_(final Mark object) {
+			this._items_.add(object);
 			return this;
 		}
 
@@ -2944,10 +2944,10 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		public final ScriptFormatter putBreakInc() throws IllegalStateException {
-			this.__check(false);
-			final LinkedList<Boolean> indents = this.__indents;
+			this._check_(false);
+			final LinkedList<Boolean> indents = this._indents_;
 			indents.addLast(Boolean.FALSE);
-			return this.__putMark(Mark.EMPTY).__putMark(new Mark(indents.size(), false, false, false));
+			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, false, false));
 		}
 
 		/**
@@ -2962,11 +2962,11 @@ public class FEM {
 		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde oder aktuell nicht formatiert wird.
 		 */
 		public final ScriptFormatter putBreakDec() throws IllegalStateException {
-			this.__check(false);
-			final LinkedList<Boolean> indents = this.__indents;
+			this._check_(false);
+			final LinkedList<Boolean> indents = this._indents_;
 			final int value = indents.size();
 			if (value <= 1) throw new IllegalStateException();
-			return this.__putMark(Mark.EMPTY).__putMark(new Mark(value, true, false, indents.removeLast().booleanValue()));
+			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(value, true, false, indents.removeLast().booleanValue()));
 		}
 
 		/**
@@ -2980,9 +2980,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		public final ScriptFormatter putBreakSpace() throws IllegalStateException {
-			this.__check(false);
-			final LinkedList<Boolean> indents = this.__indents;
-			return this.__putMark(Mark.EMPTY).__putMark(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
+			this._check_(false);
+			final LinkedList<Boolean> indents = this._indents_;
+			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
 		}
 
 		/**
@@ -2996,14 +2996,14 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 */
 		public final ScriptFormatter putIndent() throws IllegalStateException {
-			this.__check(false);
-			final LinkedList<Boolean> indents = this.__indents;
-			if (this.__indents.getLast().booleanValue()) return this;
+			this._check_(false);
+			final LinkedList<Boolean> indents = this._indents_;
+			if (this._indents_.getLast().booleanValue()) return this;
 			final int value = indents.size();
 			for (int i = 0; i < value; i++) {
 				indents.set(i, Boolean.TRUE);
 			}
-			final List<Object> items = this.__items;
+			final List<Object> items = this._items_;
 			for (int i = items.size() - 2; i >= 0; i--) {
 				final Object item = items.get(i);
 				if (item == Mark.EMPTY) {
@@ -3032,11 +3032,11 @@ public class FEM {
 		 */
 		public final ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
 			if (part == null) throw new NullPointerException("part = null");
-			this.__check(false);
+			this._check_(false);
 			if (part instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)part).toScript(this);
 			} else {
-				this.__items.add(part.toString());
+				this._items_.add(part.toString());
 			}
 			return this;
 		}
@@ -3056,11 +3056,11 @@ public class FEM {
 		 */
 		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (data == null) throw new NullPointerException("function = null");
-			this.__check(false);
+			this._check_(false);
 			if (data instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)data).toScript(this);
 			} else {
-				this.__helper.formatData(this, data);
+				this._helper_.formatData(this, data);
 			}
 			return this;
 		}
@@ -3086,7 +3086,7 @@ public class FEM {
 		public final ScriptFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException,
 			IllegalArgumentException {
 			if (array == null) throw new NullPointerException("array = null");
-			this.__check(false);
+			this._check_(false);
 			final Iterator<? extends FEMValue> iter = array.iterator();
 			if (iter.hasNext()) {
 				FEMValue item = iter.next();
@@ -3121,11 +3121,11 @@ public class FEM {
 		 */
 		public final ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__check(false);
+			this._check_(false);
 			if (value instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)value).toScript(this);
 			} else {
-				this.__helper.formatValue(this, value);
+				this._helper_.formatValue(this, value);
 			}
 			return this;
 		}
@@ -3152,7 +3152,7 @@ public class FEM {
 		public final ScriptFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException,
 			IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
-			this.__check(false);
+			this._check_(false);
 			final Iterator<? extends FEMValue> iter = params.iterator();
 			if (iter.hasNext()) {
 				FEMValue item = iter.next();
@@ -3196,7 +3196,7 @@ public class FEM {
 		public final ScriptFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException,
 			IllegalArgumentException {
 			if (params == null) throw new NullPointerException("params = null");
-			this.__check(false);
+			this._check_(false);
 			final Iterator<? extends FEMFunction> iter = params.iterator();
 			if (iter.hasNext()) {
 				FEMFunction item = iter.next();
@@ -3247,11 +3247,11 @@ public class FEM {
 		 */
 		public final ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
-			this.__check(false);
+			this._check_(false);
 			if (function instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)function).toScript(this);
 			} else {
-				this.__helper.formatFunction(this, function);
+				this._helper_.formatFunction(this, function);
 			}
 			return this;
 		}
@@ -3262,7 +3262,7 @@ public class FEM {
 		 * @return Zeichenkette zur Einrückung oder {@code null}.
 		 */
 		public final String getIndent() {
-			return this.__indent;
+			return this._indent_;
 		}
 
 		/**
@@ -3271,7 +3271,7 @@ public class FEM {
 		 * @return Formatierungsmethoden.
 		 */
 		public final ScriptFormatterHelper getHelper() {
-			return this.__helper;
+			return this._helper_;
 		}
 
 		/**
@@ -3283,8 +3283,8 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 */
 		public synchronized final ScriptFormatter useIndent(final String indent) throws IllegalStateException {
-			this.__check(true);
-			this.__indent = indent;
+			this._check_(true);
+			this._indent_ = indent;
 			return this;
 		}
 
@@ -3298,8 +3298,8 @@ public class FEM {
 		 */
 		public synchronized final ScriptFormatter useHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
 			if (helper == null) throw new NullPointerException("helper = null");
-			this.__check(true);
-			this.__helper = helper;
+			this._check_(true);
+			this._helper_ = helper;
 			return this;
 		}
 
@@ -3309,10 +3309,10 @@ public class FEM {
 		 * @see #put(Object)
 		 * @return Quelltext.
 		 */
-		final String __format() {
-			final String indent = this.__indent;
-			final List<Object> items = this.__items;
-			final StringBuilder string = this.__string;
+		final String _format_() {
+			final String indent = this._indent_;
+			final List<Object> items = this._items_;
+			final StringBuilder string = this._string_;
 			final int size = items.size();
 			for (int i = 0; i < size;) {
 				final Object item = items.get(i++);
@@ -3349,9 +3349,9 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann.
 		 */
-		final <GItem> String __format(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
+		final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
 			IllegalStateException, IllegalArgumentException {
-			this.__start();
+			this._start_();
 			try {
 				final Iterator<? extends GItem> iter = items.iterator();
 				if (!iter.hasNext()) return "";
@@ -3367,9 +3367,9 @@ public class FEM {
 				} else {
 					formatter.convert(item);
 				}
-				return this.__format();
+				return this._format_();
 			} finally {
-				this.__stop();
+				this._stop_();
 			}
 		}
 
@@ -3402,7 +3402,7 @@ public class FEM {
 		 */
 		public final String formatData(final Iterable<?> datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (datas == null) throw new NullPointerException("values = null");
-			return this.__format(datas, new Converter<Object, Object>() {
+			return this._format_(datas, new Converter<Object, Object>() {
 
 				@Override
 				public Object convert(final Object input) {
@@ -3441,7 +3441,7 @@ public class FEM {
 		 */
 		public final String formatValue(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (values == null) throw new NullPointerException("values = null");
-			return this.__format(values, new Converter<FEMValue, Object>() {
+			return this._format_(values, new Converter<FEMValue, Object>() {
 
 				@Override
 				public Object convert(final FEMValue input) {
@@ -3481,7 +3481,7 @@ public class FEM {
 		public final String formatFunction(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
 			IllegalArgumentException {
 			if (functions == null) throw new NullPointerException("functions = null");
-			return this.__format(functions, new Converter<FEMFunction, Object>() {
+			return this._format_(functions, new Converter<FEMFunction, Object>() {
 
 				@Override
 				public Object convert(final FEMFunction input) {
@@ -3498,7 +3498,7 @@ public class FEM {
 		 */
 		@Override
 		public final String toString() {
-			return Objects.toInvokeString(this, this.__helper, this.__indent, this.__items);
+			return Objects.toInvokeString(this, this._helper_, this._indent_, this._items_);
 		}
 
 	}
@@ -3619,17 +3619,17 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den Hinweis zum erwarteten Inhalt des Bereichs.
 		 */
-		String __hint = "";
+		String _hint_ = "";
 
 		/**
 		 * Dieses Feld speichert den Quelltext.
 		 */
-		FEMScript __script = FEMScript.EMPTY;
+		FEMScript _script_ = FEMScript.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Bereich, in dem der Syntaxfehler entdeckt wurde.
 		 */
-		Range __range = Range.EMPTY;
+		Range _range_ = Range.EMPTY;
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link ScriptException} ohne Ursache.
@@ -3656,7 +3656,7 @@ public class FEM {
 		 * @return Hinweis oder {@code null}.
 		 */
 		public final String getHint() {
-			return this.__hint;
+			return this._hint_;
 		}
 
 		/**
@@ -3665,7 +3665,7 @@ public class FEM {
 		 * @return Bereich.
 		 */
 		public final Range getRange() {
-			return this.__range;
+			return this._range_;
 		}
 
 		/**
@@ -3674,7 +3674,7 @@ public class FEM {
 		 * @return Quelltext.
 		 */
 		public final FEMScript getScript() {
-			return this.__script;
+			return this._script_;
 		}
 
 		/**
@@ -3686,7 +3686,7 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code hint} {@code null} ist.
 		 */
 		public final ScriptException useHint(final String hint) throws NullPointerException {
-			this.__hint = hint.toString();
+			this._hint_ = hint.toString();
 			return this;
 		}
 
@@ -3714,7 +3714,7 @@ public class FEM {
 		 */
 		public final ScriptException useRange(final Range range) throws NullPointerException {
 			if (range == null) throw new NullPointerException("range = null");
-			this.__range = range;
+			this._range_ = range;
 			return this;
 		}
 
@@ -3728,7 +3728,7 @@ public class FEM {
 		 */
 		public final ScriptException useScript(final FEMScript script) throws NullPointerException {
 			if (script == null) throw new NullPointerException("script = null");
-			this.__script = script;
+			this._script_ = script;
 			return this;
 		}
 
@@ -3752,10 +3752,10 @@ public class FEM {
 		 */
 		@Override
 		public final String getMessage() {
-			return (this.__range == Range.EMPTY //
+			return (this._range_ == Range.EMPTY //
 				? "Unerwartetes Ende der Zeichenkette." //
-				: "Unerwartete Zeichenkette «" + this.__range.extract(this.__script.__source) + "» an Position " + this.__range.__start + ".") //
-				+ this.__hint;
+				: "Unerwartete Zeichenkette «" + this._range_.extract(this._script_.__source) + "» an Position " + this._range_.__start + ".") //
+				+ this._hint_;
 		}
 	}
 
@@ -3773,32 +3773,32 @@ public class FEM {
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracerHelper}.
 		 */
-		ScriptTracerHelper __helper = ScriptTracerHelper.EMPTY;
+		ScriptTracerHelper _helper_ = ScriptTracerHelper.EMPTY;
 
 		/**
 		 * Dieses Feld speichert den Stapelrahmen der Funktion. Dieser kann in der Methode {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf
 		 * angepasst werden.
 		 */
-		FEMFrame __frame;
+		FEMFrame _frame_;
 
 		/**
 		 * Dieses Feld speichert die Function, die nach {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen wird bzw. vor
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} oder {@link ScriptTracerHelper#onReturn(ScriptTracer)} aufgerufen wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onExecute(ScriptTracer)} für den Aufruf angepasst werden.
 		 */
-		FEMFunction __function;
+		FEMFunction _function_;
 
 		/**
 		 * Dieses Feld speichert den Ergebniswert, der von der Funktion zurück gegeben wurde. Dieser kann in der Methode
 		 * {@link ScriptTracerHelper#onReturn(ScriptTracer)} angepasst werden.
 		 */
-		FEMValue __result;
+		FEMValue _result_;
 
 		/**
 		 * Dieses Feld speichert die {@link RuntimeException}, die von der Funktion ausgelöst wurde. Diese kann in der Methode
 		 * {@link ScriptTracerHelper#onThrow(ScriptTracer)} angepasst werden.
 		 */
-		RuntimeException __exception;
+		RuntimeException _exception_;
 
 		{}
 
@@ -3808,7 +3808,7 @@ public class FEM {
 		 * @return {@link ScriptTracerHelper}.
 		 */
 		public final ScriptTracerHelper getHelper() {
-			return this.__helper;
+			return this._helper_;
 		}
 
 		/**
@@ -3817,7 +3817,7 @@ public class FEM {
 		 * @return Ergebniswert oder {@code null}.
 		 */
 		public final FEMValue getResult() {
-			return this.__result;
+			return this._result_;
 		}
 
 		/**
@@ -3826,7 +3826,7 @@ public class FEM {
 		 * @return Stapelrahmen oder {@code null}.
 		 */
 		public final FEMFrame getFrame() {
-			return this.__frame;
+			return this._frame_;
 		}
 
 		/**
@@ -3835,7 +3835,7 @@ public class FEM {
 		 * @return Funktion oder {@code null}.
 		 */
 		public final FEMFunction getFunction() {
-			return this.__function;
+			return this._function_;
 		}
 
 		/**
@@ -3844,7 +3844,7 @@ public class FEM {
 		 * @return Ausnahme oder {@code null}.
 		 */
 		public final RuntimeException getException() {
-			return this.__exception;
+			return this._exception_;
 		}
 
 		/**
@@ -3856,7 +3856,7 @@ public class FEM {
 		 */
 		public final ScriptTracer useHelper(final ScriptTracerHelper value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__helper = value;
+			this._helper_ = value;
 			return this;
 		}
 
@@ -3870,8 +3870,8 @@ public class FEM {
 		 */
 		public final ScriptTracer useResult(final FEMValue value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__result = value;
-			this.__exception = null;
+			this._result_ = value;
+			this._exception_ = null;
 			return this;
 		}
 
@@ -3885,7 +3885,7 @@ public class FEM {
 		 */
 		public final ScriptTracer useFrame(final FEMFrame value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__frame = value;
+			this._frame_ = value;
 			return this;
 		}
 
@@ -3898,7 +3898,7 @@ public class FEM {
 		 */
 		public final ScriptTracer useFunction(final FEMFunction value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__function = value;
+			this._function_ = value;
 			return this;
 		}
 
@@ -3912,8 +3912,8 @@ public class FEM {
 		 */
 		public final ScriptTracer useException(final RuntimeException value) throws NullPointerException {
 			if (value == null) throw new NullPointerException("value = null");
-			this.__result = null;
-			this.__exception = value;
+			this._result_ = null;
+			this._exception_ = value;
 			return this;
 		}
 
@@ -3927,17 +3927,17 @@ public class FEM {
 		 * @return {@code this}.
 		 */
 		public final ScriptTracer clear() {
-			this.__frame = null;
-			this.__function = null;
-			this.__result = null;
-			this.__exception = null;
+			this._frame_ = null;
+			this._function_ = null;
+			this._result_ = null;
+			this._exception_ = null;
 			return this;
 		}
 
 		/**
 		 * Diese Methode gibt die gegebenen Funktion als {@link TraceFunction} oder unverändert zurück.<br>
 		 * Sie sollte zur rekursiven Weiterverfolgung in {@link ScriptTracerHelper#onExecute(ScriptTracer)} aufgerufen und zur Modifikation von
-		 * {@link ScriptTracer#__function} verwendet werden.
+		 * {@link ScriptTracer#_function_} verwendet werden.
 		 * <p>
 		 * Wenn die Funktion ein {@link ScriptTracerInput} ist, wird das Ergebnis von {@link ScriptTracerInput#toTrace(ScriptTracer)} zurück gegeben. Andernfalls
 		 * wird die gegebene Funktion zurück gegeben.
@@ -3959,8 +3959,8 @@ public class FEM {
 		 */
 		@Override
 		public final String toString() {
-			return Objects.toFormatString(true, true, this, "helper", this.__helper, "frame", this.__frame, "function", this.__function, "result", this.__result,
-				"exception", this.__exception);
+			return Objects.toFormatString(true, true, this, "helper", this._helper_, "frame", this._frame_, "function", this._function_, "result", this._result_,
+				"exception", this._exception_);
 		}
 
 	}
@@ -4250,22 +4250,22 @@ public class FEM {
 	};
 
 	@SuppressWarnings ("javadoc")
-	static final VoidValue __void = new VoidValue();
+	static final VoidValue _void_ = new VoidValue();
 
 	@SuppressWarnings ("javadoc")
-	static final BooleanValue __true = new BooleanValue(FEMBoolean.TRUE);
+	static final BooleanValue _true_ = new BooleanValue(FEMBoolean.TRUE);
 
 	@SuppressWarnings ("javadoc")
-	static final BooleanValue __false = new BooleanValue(FEMBoolean.FALSE);
+	static final BooleanValue _false_ = new BooleanValue(FEMBoolean.FALSE);
 
 	@SuppressWarnings ("javadoc")
-	static final ArrayValue __emptyArray = new ArrayValue(FEMArray.EMPTY);
+	static final ArrayValue _emptyArray_ = new ArrayValue(FEMArray.EMPTY);
 
 	@SuppressWarnings ("javadoc")
-	static final StringValue __emptyString = new StringValue(FEMString.EMPTY);
+	static final StringValue _emptyString_ = new StringValue(FEMString.EMPTY);
 
 	@SuppressWarnings ("javadoc")
-	static final BinaryValue __emptyBinary = new BinaryValue(FEMBinary.EMPTY);
+	static final BinaryValue _emptyBinary_ = new BinaryValue(FEMBinary.EMPTY);
 
 	{}
 
@@ -4299,7 +4299,7 @@ public class FEM {
 	 * @return {@link FEMVoid#INSTANCE}.
 	 */
 	public static final VoidValue voidValue() {
-		return FEM.__void;
+		return FEM._void_;
 	}
 
 	/**
@@ -4308,7 +4308,7 @@ public class FEM {
 	 * @return {@code true}.
 	 */
 	public static final BooleanValue trueValue() {
-		return FEM.__true;
+		return FEM._true_;
 	}
 
 	/**
@@ -4317,7 +4317,7 @@ public class FEM {
 	 * @return {@code false}.
 	 */
 	public static final BooleanValue falseValue() {
-		return FEM.__false;
+		return FEM._false_;
 	}
 
 	/**
@@ -4351,7 +4351,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final ArrayValue arrayValue(final FEMArray data) throws NullPointerException {
-		if (data.__length == 0) return FEM.__emptyArray;
+		if (data.__length == 0) return FEM._emptyArray_;
 		return new ArrayValue(data);
 	}
 
@@ -4363,7 +4363,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final ArrayValue arrayValue(final FEMValue... data) throws NullPointerException {
-		if (data.length == 0) return FEM.__emptyArray;
+		if (data.length == 0) return FEM._emptyArray_;
 		return FEM.arrayValue(FEMArray.from(data));
 	}
 
@@ -4443,7 +4443,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final StringValue stringValue(final char[] data) throws NullPointerException {
-		if (data.length == 0) return FEM.__emptyString;
+		if (data.length == 0) return FEM._emptyString_;
 		return FEM.stringValue(FEMString.from(data));
 	}
 
@@ -4455,7 +4455,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final StringValue stringValue(final String data) throws NullPointerException {
-		if (data.length() == 0) return FEM.__emptyString;
+		if (data.length() == 0) return FEM._emptyString_;
 		return FEM.stringValue(FEMString.from(data));
 	}
 
@@ -4467,7 +4467,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final StringValue stringValue(final FEMString data) throws NullPointerException {
-		if (data.__length == 0) return FEM.__emptyString;
+		if (data.__length == 0) return FEM._emptyString_;
 		return new StringValue(data);
 	}
 
@@ -4502,7 +4502,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final BinaryValue binaryValue(final byte[] data) throws NullPointerException {
-		if (data.length == 0) return FEM.__emptyBinary;
+		if (data.length == 0) return FEM._emptyBinary_;
 		return FEM.binaryValue(FEMBinary.from(data));
 	}
 
@@ -4514,7 +4514,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 */
 	public static final BinaryValue binaryValue(final FEMBinary data) throws NullPointerException {
-		if (data.__length == 0) return FEM.__emptyBinary;
+		if (data.__length == 0) return FEM._emptyBinary_;
 		return new BinaryValue(data);
 	}
 
@@ -4658,7 +4658,7 @@ public class FEM {
 	 * @return Wert.
 	 */
 	public static final BooleanValue booleanValue(final boolean data) {
-		return (data ? FEM.__true : FEM.__false);
+		return (data ? FEM._true_ : FEM._false_);
 	}
 
 	/**

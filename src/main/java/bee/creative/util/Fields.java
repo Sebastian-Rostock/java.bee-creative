@@ -227,7 +227,7 @@ public final class Fields {
 		 * @return {@link SetField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static final <GInput, GItem> SetField<GInput, GItem> wrap(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
+		public static final <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseSetField<GInput, GItem>() {
 
@@ -334,7 +334,7 @@ public final class Fields {
 		 * @return {@link ListField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static final <GInput, GItem> ListField<GInput, GItem> wrap(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
+		public static final <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseListField<GInput, GItem>() {
 
@@ -473,7 +473,7 @@ public final class Fields {
 		 * @return {@link MapField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
 		 */
-		public static final <GInput, GKey, GValue> MapField<GInput, GKey, GValue> wrap(final Field<? super GInput, Map<GKey, GValue>> field)
+		public static final <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
 			throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseMapField<GInput, GKey, GValue>() {

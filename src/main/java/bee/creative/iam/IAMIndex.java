@@ -16,23 +16,23 @@ public abstract class IAMIndex {
 	@SuppressWarnings ("javadoc")
 	static final class ListsView extends AbstractList<IAMList> {
 
-		final IAMIndex __owner;
+		final IAMIndex _owner_;
 
 		ListsView(final IAMIndex owner) {
-			this.__owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
 
 		@Override
 		public IAMList get(final int index) {
-			if ((index < 0) || (index >= this.__owner.listCount())) throw new IndexOutOfBoundsException();
-			return this.__owner.list(index);
+			if ((index < 0) || (index >= this._owner_.listCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.list(index);
 		}
 
 		@Override
 		public int size() {
-			return this.__owner.listCount();
+			return this._owner_.listCount();
 		}
 
 	}
@@ -40,21 +40,21 @@ public abstract class IAMIndex {
 	@SuppressWarnings ("javadoc")
 	static final class MapsView extends AbstractList<IAMMap> {
 
-		final IAMIndex __owner;
+		final IAMIndex _owner_;
 
 		MapsView(final IAMIndex owner) {
-			this.__owner = owner;
+			this._owner_ = owner;
 		}
 
 		@Override
 		public IAMMap get(final int index) {
-			if ((index < 0) || (index >= this.__owner.mapCount())) throw new IndexOutOfBoundsException();
-			return this.__owner.map(index);
+			if ((index < 0) || (index >= this._owner_.mapCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.map(index);
 		}
 
 		@Override
 		public int size() {
-			return this.__owner.mapCount();
+			return this._owner_.mapCount();
 		}
 
 	}

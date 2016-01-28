@@ -71,4 +71,22 @@ public class XML {
 		return new XMLFormatter();
 	}
 
+	/**
+	 * Diese Methode gibt einen neuen {@link XMLMarshaller} zurück.
+	 * 
+	 * @return {@link XMLMarshaller}.
+	 */
+	public static final XMLMarshaller newMarshaller() {
+		return new XMLMarshaller();
+	}
+
+	/**
+	 * Diese Methode gibt einen neuen {@link XMLUnmarshaller} zurück.
+	 * 
+	 * @return {@link XMLUnmarshaller}.
+	 */
+	public static final XMLUnmarshaller newUnmarshaller() {
+		return new XMLUnmarshaller();
+	}
+
 }

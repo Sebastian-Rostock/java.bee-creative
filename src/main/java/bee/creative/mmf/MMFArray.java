@@ -27,14 +27,14 @@ public class MMFArray extends IAMArray {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static ByteOrder __order(final ByteOrder order) {
+	static final ByteOrder _order_(final ByteOrder order) {
 		return order != null ? order : ByteOrder.nativeOrder();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static ByteBuffer __buffer(final File file, final ByteOrder order) throws IOException, NullPointerException {
+	static final ByteBuffer _buffer_(final File file, final ByteOrder order) throws IOException, NullPointerException {
 		try (final RandomAccessFile data = new RandomAccessFile(file, "r")) {
-			return data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(MMFArray.__order(order));
+			return data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(MMFArray._order_(order));
 		}
 	}
 
@@ -43,17 +43,17 @@ public class MMFArray extends IAMArray {
 	/**
 	 * Dieses Feld speichert den Speicherbereich.
 	 */
-	protected final ByteBuffer __byteBuffer;
+	protected final ByteBuffer _byteBuffer_;
 
 	/**
 	 * Dieses Feld speichert die Startposition.
 	 */
-	protected final int __byteOffset;
+	protected final int _byteOffset_;
 
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __byteLength;
+	protected final int _byteLength_;
 
 	/**
 	 * Dieser Konstruktor initialisiert den Speicherbereich.
@@ -75,7 +75,7 @@ public class MMFArray extends IAMArray {
 	 * @throws NullPointerException Wenn {@code file} {@code null} ist.
 	 */
 	public MMFArray(final File file, final ByteOrder order) throws IOException, NullPointerException {
-		this(MMFArray.__buffer(file, order));
+		this(MMFArray._buffer_(file, order));
 	}
 
 	/**
@@ -87,15 +87,15 @@ public class MMFArray extends IAMArray {
 	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
 	 */
 	public MMFArray(final byte[] bytes, final ByteOrder order) throws NullPointerException {
-		this(ByteBuffer.wrap(bytes).order(MMFArray.__order(order)));
+		this(ByteBuffer.wrap(bytes).order(MMFArray._order_(order)));
 	}
 
 	@SuppressWarnings ("javadoc")
 	protected MMFArray(int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
 		super(length);
-		this.__byteBuffer = byteBuffer;
-		this.__byteOffset = byteOffset;
-		this.__byteLength = byteLength;
+		this._byteBuffer_ = byteBuffer;
+		this._byteOffset_ = byteOffset;
+		this._byteLength_ = byteLength;
 	}
 
 	{}
@@ -117,13 +117,13 @@ public class MMFArray extends IAMArray {
 	 * @return Kopie des Speicherbereichs.
 	 */
 	public final byte[] toBytes() {
-		final int length = this.__byteLength;
+		final int length = this._byteLength_;
 		final byte[] result = new byte[length];
 		if (length == 0) return result;
-		final ByteBuffer buffer = this.__byteBuffer;
+		final ByteBuffer buffer = this._byteBuffer_;
 		final int position = buffer.position();
 		try {
-			buffer.position(position + this.__byteOffset);
+			buffer.position(position + this._byteOffset_);
 			buffer.get(result, 0, length);
 		} finally {
 			buffer.position(position);
@@ -138,7 +138,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFINT8Array}.
 	 */
 	public final MMFArray toINT8() {
-		return new MMFINT8Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
+		return new MMFINT8Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFINT16Array}.
 	 */
 	public final MMFArray toINT16() {
-		return new MMFINT16Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
+		return new MMFINT16Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFINT32Array}.
 	 */
 	public final MMFArray toINT32() {
-		return new MMFINT32Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
+		return new MMFINT32Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFUINT8Array}.
 	 */
 	public final MMFArray toUINT8() {
-		return new MMFUINT8Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
+		return new MMFUINT8Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFUINT16Array}.
 	 */
 	public final MMFArray toUINT16() {
-		return new MMFUINT16Array(this.__byteBuffer, this.__byteOffset, this.__byteLength);
+		return new MMFUINT16Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	{}
@@ -187,7 +187,7 @@ public class MMFArray extends IAMArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray __section(final int offset, final int length) {
+	protected MMFArray _section_(final int offset, final int length) {
 		return MMFArray.EMPTY;
 	}
 

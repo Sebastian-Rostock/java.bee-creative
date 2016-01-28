@@ -13,7 +13,7 @@ public final class XMLTemplates extends BaseTemplatesData<XMLTemplates> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLTemplates __this() {
+	protected final XMLTemplates _this_() {
 		return this;
 	}
 

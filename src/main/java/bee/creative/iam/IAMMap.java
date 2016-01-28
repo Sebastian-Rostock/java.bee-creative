@@ -19,23 +19,23 @@ public abstract class IAMMap implements Iterable<IAMEntry> {
 	@SuppressWarnings ("javadoc")
 	static final class ListView extends AbstractList<IAMEntry> {
 
-		final IAMMap __owner;
+		final IAMMap _owner_;
 
 		ListView(final IAMMap owner) {
-			this.__owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
 
 		@Override
 		public final IAMEntry get(final int index) {
-			if ((index < 0) || (index >= this.__owner.entryCount())) throw new IndexOutOfBoundsException();
-			return this.__owner.entry(index);
+			if ((index < 0) || (index >= this._owner_.entryCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.entry(index);
 		}
 
 		@Override
 		public final int size() {
-			return this.__owner.entryCount();
+			return this._owner_.entryCount();
 		}
 
 	}

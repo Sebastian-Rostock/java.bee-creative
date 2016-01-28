@@ -14,7 +14,7 @@ public final class XMLDocumentBuilderFactory extends BaseDocumentBuilderFactoryD
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final XMLDocumentBuilderFactory __this() {
+	protected final XMLDocumentBuilderFactory _this_() {
 		return this;
 	}
 

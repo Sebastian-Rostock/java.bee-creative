@@ -20,16 +20,16 @@ class MMFINT8Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray __section(final int offset, final int length) {
-		return new MMFINT8Array(this.__byteBuffer, this.__byteOffset + offset, length);
+	protected int _get_(final int index) {
+		return this._byteBuffer_.get(this._byteOffset_ + index);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int __get(final int index) {
-		return this.__byteBuffer.get(this.__byteOffset + index);
+	protected MMFArray _section_(final int offset, final int length) {
+		return new MMFINT8Array(this._byteBuffer_, this._byteOffset_ + offset, length);
 	}
 
 	/**

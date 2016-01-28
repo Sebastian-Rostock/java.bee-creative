@@ -26,17 +26,17 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Bitmaske.
 		 */
-		final int __mask;
+		final int _mask_;
 
 		/**
 		 * Dieses Feld speichert den Vergleichswert.
 		 */
-		final int __value;
+		final int _value_;
 
 		@SuppressWarnings ("javadoc")
 		IAMHeader(final int mask, final int value) {
-			this.__mask = mask;
-			this.__value = value;
+			this._mask_ = mask;
+			this._value_ = value;
 		}
 
 		{}
@@ -48,7 +48,7 @@ public class IAMDecoder {
 		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten.
 		 */
 		public final boolean isValid(final int header) {
-			return (header & this.__mask) == this.__value;
+			return (header & this._mask_) == this._value_;
 		}
 
 		/**
@@ -114,7 +114,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final String toString() {
-			return Integer.toHexString(this.__value);
+			return Integer.toHexString(this._value_);
 		}
 
 	}
@@ -141,61 +141,61 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Schlüssel.
 		 */
-		final MMFArray __keyData;
+		final MMFArray _keyData_;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüssel.
 		 */
-		final MMFArray __keyOffset;
+		final MMFArray _keyOffset_;
 
 		/**
 		 * Dieses Feld speichert die Länge der Schlüssel.
 		 */
-		final int __keyLength;
+		final int _keyLength_;
 
 		/**
 		 * Dieses Feld speichert die Zahlen der Werte.
 		 */
-		final MMFArray __valueData;
+		final MMFArray _valueData_;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Werte.
 		 */
-		final MMFArray __valueOffset;
+		final MMFArray _valueOffset_;
 
 		/**
 		 * Dieses Feld speichert die Länge der Werte.
 		 */
-		final int __valueLength;
+		final int _valueLength_;
 
 		/**
 		 * Dieses Feld speichert die Bitmaske der Schlüsselbereiche.
 		 */
-		final int __rangeMask;
+		final int _rangeMask_;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Schlüsselbereiche.
 		 */
-		final MMFArray __rangeOffset;
+		final MMFArray _rangeOffset_;
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Einträge.
 		 */
-		final int __entryCount;
+		final int _entryCount_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die leere Abbildung.
 		 */
 		IAMMapDecoder() {
-			this.__keyData = null;
-			this.__keyOffset = null;
-			this.__keyLength = 0;
-			this.__valueData = null;
-			this.__valueOffset = null;
-			this.__valueLength = 0;
-			this.__rangeMask = 0;
-			this.__rangeOffset = null;
-			this.__entryCount = 0;
+			this._keyData_ = null;
+			this._keyOffset_ = null;
+			this._keyLength_ = 0;
+			this._valueData_ = null;
+			this._valueOffset_ = null;
+			this._valueLength_ = 0;
+			this._rangeMask_ = 0;
+			this._rangeOffset_ = null;
+			this._entryCount_ = 0;
 		}
 
 		/**
@@ -236,12 +236,12 @@ public class IAMDecoder {
 				offset++;
 				if ((rangeMask < 1) || (rangeMask > 0x1FFFFFFF) || (((rangeMask + 1) & rangeMask) != 0)) throw new IAMException(IAMException.INVALID_VALUE);
 
-				rangeValue = IAM.__byteAlign((rangeMask + 2) * IAM.__byteCount(rangeSizeType));
-				rangeOffset = IAM.__sizeArray(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
+				rangeValue = IAM._byteAlign_((rangeMask + 2) * IAM._byteCount_(rangeSizeType));
+				rangeOffset = IAM._sizeArray_(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
 				offset += rangeValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAM.__checkArray(rangeOffset);
+				IAM._checkArray_(rangeOffset);
 				rangeValue = rangeOffset.get(rangeMask + 1);
 				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
 
@@ -259,13 +259,13 @@ public class IAMDecoder {
 			final MMFArray keyOffset;
 			if (keySizeType != 0) {
 
-				keyValue = IAM.__byteAlign((entryCount + 1) * IAM.__byteCount(keySizeType));
+				keyValue = IAM._byteAlign_((entryCount + 1) * IAM._byteCount_(keySizeType));
 				keyLength = 0;
-				keyOffset = IAM.__sizeArray(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
+				keyOffset = IAM._sizeArray_(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
 				offset += keyValue;
 				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAM.__checkArray(keyOffset);
+				IAM._checkArray_(keyOffset);
 				keyValue = keyOffset.get(entryCount);
 
 			} else {
@@ -281,8 +281,8 @@ public class IAMDecoder {
 			}
 			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			keyValue = IAM.__byteAlign(keyValue * IAM.__byteCount(keyDataType));
-			final MMFArray keyData = IAM.__dataArray(array.section(offset, keyValue), keyDataType);
+			keyValue = IAM._byteAlign_(keyValue * IAM._byteCount_(keyDataType));
+			final MMFArray keyData = IAM._dataArray_(array.section(offset, keyValue), keyDataType);
 			offset += keyValue;
 			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -291,13 +291,13 @@ public class IAMDecoder {
 			final MMFArray valueOffset;
 			if (valueSizeType != 0) {
 
-				valueValue = IAM.__byteAlign((entryCount + 1) * IAM.__byteCount(valueSizeType));
+				valueValue = IAM._byteAlign_((entryCount + 1) * IAM._byteCount_(valueSizeType));
 				valueLength = 0;
-				valueOffset = IAM.__sizeArray(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
+				valueOffset = IAM._sizeArray_(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
 				offset += valueValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAM.__checkArray(valueOffset);
+				IAM._checkArray_(valueOffset);
 				valueValue = valueOffset.get(entryCount);
 
 			} else {
@@ -313,20 +313,20 @@ public class IAMDecoder {
 			}
 			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
 
-			valueValue = IAM.__byteAlign(valueValue * IAM.__byteCount(valueDataType));
-			final MMFArray valueData = IAM.__dataArray(array.section(offset, valueValue), valueDataType);
+			valueValue = IAM._byteAlign_(valueValue * IAM._byteCount_(valueDataType));
+			final MMFArray valueData = IAM._dataArray_(array.section(offset, valueValue), valueDataType);
 			offset += valueValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.__keyData = keyData;
-			this.__keyOffset = keyOffset;
-			this.__keyLength = keyLength;
-			this.__valueData = valueData;
-			this.__valueOffset = valueOffset;
-			this.__valueLength = valueLength;
-			this.__rangeMask = rangeMask;
-			this.__rangeOffset = rangeOffset;
-			this.__entryCount = entryCount;
+			this._keyData_ = keyData;
+			this._keyOffset_ = keyOffset;
+			this._keyLength_ = keyLength;
+			this._valueData_ = valueData;
+			this._valueOffset_ = valueOffset;
+			this._valueLength_ = valueLength;
+			this._rangeMask_ = rangeMask;
+			this._rangeOffset_ = rangeOffset;
+			this._entryCount_ = entryCount;
 
 		}
 
@@ -337,7 +337,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final boolean mode() {
-			return this.__rangeMask != 0;
+			return this._rangeMask_ != 0;
 		}
 
 		{}
@@ -347,16 +347,16 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final MMFArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.__entryCount)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this.__keyOffset;
+			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this._keyOffset_;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
 				final int length = keyOffset.get(entryIndex + 1) - offset;
-				return this.__keyData.section(offset, length);
+				return this._keyData_.section(offset, length);
 			} else {
-				final int length = this.__keyLength;
+				final int length = this._keyLength_;
 				final int offset = length * entryIndex;
-				return this.__keyData.section(offset, length);
+				return this._keyData_.section(offset, length);
 			}
 		}
 
@@ -365,16 +365,16 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final MMFArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this.__entryCount)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this.__valueOffset;
+			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this._valueOffset_;
 			if (keyOffset != null) {
 				final int offset = keyOffset.get(entryIndex);
 				final int length = keyOffset.get(entryIndex + 1) - offset;
-				return this.__valueData.section(offset, length);
+				return this._valueData_.section(offset, length);
 			} else {
-				final int length = this.__valueLength;
+				final int length = this._valueLength_;
 				final int offset = length * entryIndex;
-				return this.__valueData.section(offset, length);
+				return this._valueData_.section(offset, length);
 			}
 		}
 
@@ -383,7 +383,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final int entryCount() {
-			return this.__entryCount;
+			return this._entryCount_;
 		}
 
 		/**
@@ -392,15 +392,15 @@ public class IAMDecoder {
 		@Override
 		public final int find(final IAMArray key) throws NullPointerException {
 			if (key == null) throw new NullPointerException("key = null");
-			int i = this.__rangeMask;
+			int i = this._rangeMask_;
 			if (i != 0) {
-				final IAMArray range = this.__rangeOffset;
+				final IAMArray range = this._rangeOffset_;
 				i = key.hash() & i;
 				for (int l = range.get(i), r = range.get(i + 1); l < r; l++) {
 					if (this.key(l).equals(key)) return l;
 				}
 			} else {
-				int l = 0, r = this.__entryCount;
+				int l = 0, r = this._entryCount_;
 				while (l < r) {
 					i = (l + r) >> 1;
 					i = key.compare(this.key(i));
@@ -438,31 +438,31 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Zahlen der Elemente.
 		 */
-		final MMFArray __itemData;
+		final MMFArray _itemData_;
 
 		/**
 		 * Dieses Feld speichert die Startpositionen der Elemente.
 		 */
-		final MMFArray __itemOffset;
+		final MMFArray _itemOffset_;
 
 		/**
 		 * Dieses Feld speichert die Länge der Elemente.
 		 */
-		final int __itemLength;
+		final int _itemLength_;
 
 		/**
 		 * Dieses Feld speichert die Anzahl der Elemente.
 		 */
-		final int __itemCount;
+		final int _itemCount_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die leere Liste.
 		 */
 		IAMListDecoder() {
-			this.__itemData = null;
-			this.__itemOffset = null;
-			this.__itemLength = 0;
-			this.__itemCount = 0;
+			this._itemData_ = null;
+			this._itemOffset_ = null;
+			this._itemLength_ = 0;
+			this._itemCount_ = 0;
 		}
 
 		/**
@@ -494,13 +494,13 @@ public class IAMDecoder {
 			final MMFArray itemOffset;
 			if (itemSizeType != 0) {
 
-				itemValue = IAM.__byteAlign((itemCount + 1) * IAM.__byteCount(itemSizeType));
+				itemValue = IAM._byteAlign_((itemCount + 1) * IAM._byteCount_(itemSizeType));
 				itemLength = 0;
-				itemOffset = IAM.__sizeArray(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
+				itemOffset = IAM._sizeArray_(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
 				offset += itemValue;
 				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-				IAM.__checkArray(itemOffset);
+				IAM._checkArray_(itemOffset);
 				itemValue = itemOffset.get(itemCount);
 
 			} else {
@@ -515,15 +515,15 @@ public class IAMDecoder {
 
 			}
 
-			itemValue = IAM.__byteAlign(itemValue * IAM.__byteCount(itemDataType));
-			final MMFArray itemData = IAM.__dataArray(array.section(offset, itemValue), itemDataType);
+			itemValue = IAM._byteAlign_(itemValue * IAM._byteCount_(itemDataType));
+			final MMFArray itemData = IAM._dataArray_(array.section(offset, itemValue), itemDataType);
 			offset += itemValue;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.__itemData = itemData;
-			this.__itemOffset = itemOffset;
-			this.__itemLength = itemLength;
-			this.__itemCount = itemCount;
+			this._itemData_ = itemData;
+			this._itemOffset_ = itemOffset;
+			this._itemLength_ = itemLength;
+			this._itemCount_ = itemCount;
 
 		}
 
@@ -534,16 +534,16 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final MMFArray item(final int itemIndex) {
-			if ((itemIndex < 0) || (itemIndex >= this.__itemCount)) return MMFArray.EMPTY;
-			final IAMArray itemOffset = this.__itemOffset;
+			if ((itemIndex < 0) || (itemIndex >= this._itemCount_)) return MMFArray.EMPTY;
+			final IAMArray itemOffset = this._itemOffset_;
 			if (itemOffset != null) {
 				final int offset = itemOffset.get(itemIndex);
 				final int length = itemOffset.get(itemIndex + 1) - offset;
-				return this.__itemData.section(offset, length);
+				return this._itemData_.section(offset, length);
 			} else {
-				final int length = this.__itemLength;
+				final int length = this._itemLength_;
 				final int offset = length * itemIndex;
-				return this.__itemData.section(offset, length);
+				return this._itemData_.section(offset, length);
 			}
 		}
 
@@ -552,7 +552,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final int itemCount() {
-			return this.__itemCount;
+			return this._itemCount_;
 		}
 
 	}
@@ -579,19 +579,19 @@ public class IAMDecoder {
 		/**
 		 * Dieses Feld speichert die Abbildungen.
 		 */
-		final IAMMapDecoder[] __maps;
+		final IAMMapDecoder[] _maps_;
 
 		/**
 		 * Dieses Feld speichert die Listen.
 		 */
-		final IAMListDecoder[] __lists;
+		final IAMListDecoder[] _lists_;
 
 		/**
 		 * Dieser Konstruktor initialisiert das leere Inhaltsverzeichnis.
 		 */
 		IAMIndexDecoder() {
-			this.__maps = new IAMMapDecoder[0];
-			this.__lists = new IAMListDecoder[0];
+			this._maps_ = new IAMMapDecoder[0];
+			this._lists_ = new IAMListDecoder[0];
 		}
 
 		/**
@@ -640,18 +640,18 @@ public class IAMDecoder {
 			offset += listDataLength;
 			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
 
-			this.__maps = new IAMMapDecoder[mapCount];
+			this._maps_ = new IAMMapDecoder[mapCount];
 			for (int i = 0; i < mapCount; i++) {
 				final int offset2 = mapOffset.get(i);
 				final int length2 = mapOffset.get(i + 1) - offset2;
-				this.__maps[i] = new IAMMapDecoder(mapData.section(offset2, length2).toINT32());
+				this._maps_[i] = new IAMMapDecoder(mapData.section(offset2, length2).toINT32());
 			}
 
-			this.__lists = new IAMListDecoder[listCount];
+			this._lists_ = new IAMListDecoder[listCount];
 			for (int i = 0; i < listCount; i++) {
 				final int offset2 = listOffset.get(i);
 				final int length2 = listOffset.get(i + 1) - offset2;
-				this.__lists[i] = new IAMListDecoder(listData.section(offset2, length2).toINT32());
+				this._lists_[i] = new IAMListDecoder(listData.section(offset2, length2).toINT32());
 			}
 
 		}
@@ -663,8 +663,8 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final IAMMapDecoder map(final int index) {
-			if ((index < 0) || (index >= this.__maps.length)) return IAMMapDecoder.EMPTY;
-			return this.__maps[index];
+			if ((index < 0) || (index >= this._maps_.length)) return IAMMapDecoder.EMPTY;
+			return this._maps_[index];
 		}
 
 		/**
@@ -672,7 +672,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final int mapCount() {
-			return this.__maps.length;
+			return this._maps_.length;
 		}
 
 		/**
@@ -680,8 +680,8 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final IAMListDecoder list(final int index) {
-			if ((index < 0) || (index >= this.__lists.length)) return IAMListDecoder.EMPTY;
-			return this.__lists[index];
+			if ((index < 0) || (index >= this._lists_.length)) return IAMListDecoder.EMPTY;
+			return this._lists_[index];
 		}
 
 		/**
@@ -689,7 +689,7 @@ public class IAMDecoder {
 		 */
 		@Override
 		public final int listCount() {
-			return this.__lists.length;
+			return this._lists_.length;
 		}
 
 	}

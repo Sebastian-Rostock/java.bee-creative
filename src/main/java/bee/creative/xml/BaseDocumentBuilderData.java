@@ -14,9 +14,9 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
  */
-public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<DocumentBuilder, GThiz> {
+public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<DocumentBuilder, GThis> {
 
 	/**
 	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
@@ -40,7 +40,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FactoryData<GOwner> __this() {
+		protected final FactoryData<GOwner> _this_() {
 			return this;
 		}
 
@@ -60,7 +60,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * 
 		 * @return Besitzer.
 		 */
-		public abstract GOwner closeListenerData();
+		public abstract GOwner closeHandlerData();
 
 		{}
 
@@ -68,7 +68,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final HandlerData<GOwner> __this() {
+		protected final HandlerData<GOwner> _this_() {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResolverData<GOwner> __this() {
+		protected final ResolverData<GOwner> _this_() {
 			return this;
 		}
 
@@ -107,16 +107,16 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den {@link DocumentBuilder}.
 	 */
-	DocumentBuilder __builder;
+	DocumentBuilder _builder_;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
 	 */
-	final FactoryData<GThiz> __factoryData = new FactoryData<GThiz>() {
+	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
 
 		@Override
-		public final GThiz closeFactoryData() {
-			return BaseDocumentBuilderData.this.__this();
+		public final GThis closeFactoryData() {
+			return BaseDocumentBuilderData.this._this_();
 		}
 
 	};
@@ -124,11 +124,11 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}.
 	 */
-	final HandlerData<GThiz> __handlerData = new HandlerData<GThiz>() {
+	final HandlerData<GThis> _handlerData_ = new HandlerData<GThis>() {
 
 		@Override
-		public final GThiz closeListenerData() {
-			return BaseDocumentBuilderData.this.__this();
+		public final GThis closeHandlerData() {
+			return BaseDocumentBuilderData.this._this_();
 		}
 
 	};
@@ -136,11 +136,11 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
 	 */
-	final ResolverData<GThiz> __resolverData = new ResolverData<GThiz>() {
+	final ResolverData<GThis> _resolverData_ = new ResolverData<GThis>() {
 
 		@Override
-		public final GThiz closeResolverData() {
-			return BaseDocumentBuilderData.this.__this();
+		public final GThis closeResolverData() {
+			return BaseDocumentBuilderData.this._this_();
 		}
 
 	};
@@ -153,13 +153,13 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz use(final BaseDocumentBuilderData<?> data) {
-		if (data == null) return this.__this();
-		this.__builder = data.__builder;
-		this.__factoryData.use(data.__factoryData);
-		this.__handlerData.use(data.__handlerData);
-		this.__resolverData.use(data.__resolverData);
-		return this.__this();
+	public final GThis use(final BaseDocumentBuilderData<?> data) {
+		if (data == null) return this._this_();
+		this._builder_ = data._builder_;
+		this._factoryData_.use(data._factoryData_);
+		this._handlerData_.use(data._handlerData_);
+		this._resolverData_.use(data._resolverData_);
+		return this._this_();
 	}
 
 	/**
@@ -175,9 +175,9 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
 	public final DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
-		DocumentBuilder result = this.__builder;
+		DocumentBuilder result = this._builder_;
 		if (result != null) return result;
-		result = this.__factoryData.getFactory().newDocumentBuilder();
+		result = this._factoryData_.getFactory().newDocumentBuilder();
 		this.useBuilder(result);
 		this.updateBuilder();
 		return result;
@@ -189,9 +189,9 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @param builder {@link DocumentBuilder} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useBuilder(final DocumentBuilder builder) {
-		this.__builder = builder;
-		return this.__this();
+	public final GThis useBuilder(final DocumentBuilder builder) {
+		this._builder_ = builder;
+		return this._this_();
 	}
 
 	/**
@@ -200,7 +200,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see #useBuilder(DocumentBuilder)
 	 * @return {@code this}.
 	 */
-	public final GThiz resetBuilder() {
+	public final GThis resetBuilder() {
 		return this.useBuilder(null);
 	}
 
@@ -213,15 +213,15 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
 	 */
-	public final GThiz updateBuilder() throws SAXException, ParserConfigurationException {
+	public final GThis updateBuilder() throws SAXException, ParserConfigurationException {
 		final DocumentBuilder builder = this.getBuilder();
-		for (final ErrorHandler value: this.__handlerData) {
+		for (final ErrorHandler value: this._handlerData_) {
 			builder.setErrorHandler(value);
 		}
-		for (final EntityResolver value: this.__resolverData) {
+		for (final EntityResolver value: this._resolverData_) {
 			builder.setEntityResolver(value);
 		}
-		return this.__this();
+		return this._this_();
 	}
 
 	/**
@@ -230,8 +230,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @return Konfigurator.
 	 */
-	public final FactoryData<GThiz> openFactoryData() {
-		return this.__factoryData;
+	public final FactoryData<GThis> openFactoryData() {
+		return this._factoryData_;
 	}
 
 	/**
@@ -240,8 +240,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @return Konfigurator.
 	 */
-	public final HandlerData<GThiz> openHandlerData() {
-		return this.__handlerData;
+	public final HandlerData<GThis> openHandlerData() {
+		return this._handlerData_;
 	}
 
 	/**
@@ -250,8 +250,8 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @return Konfigurator.
 	 */
-	public final ResolverData<GThiz> openResolverData() {
-		return this.__resolverData;
+	public final ResolverData<GThis> openResolverData() {
+		return this._resolverData_;
 	}
 
 	{}
@@ -260,7 +260,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz __this();
+	protected abstract GThis _this_();
 
 	/**
 	 * {@inheritDoc}
@@ -281,7 +281,7 @@ public abstract class BaseDocumentBuilderData<GThiz> extends BaseBuilder<Documen
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__factoryData, this.__handlerData, this.__resolverData);
+		return Objects.toInvokeString(this, this._factoryData_, this._handlerData_, this._resolverData_);
 	}
 
 }

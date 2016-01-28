@@ -18,23 +18,23 @@ public abstract class IAMList implements Iterable<IAMArray> {
 	@SuppressWarnings ("javadoc")
 	static final class ListView extends AbstractList<IAMArray> {
 
-		final IAMList __owner;
+		final IAMList _owner_;
 
 		ListView(final IAMList owner) {
-			this.__owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
 
 		@Override
 		public final IAMArray get(final int index) {
-			if ((index < 0) || (index >= this.__owner.itemCount())) throw new IndexOutOfBoundsException();
-			return this.__owner.item(index);
+			if ((index < 0) || (index >= this._owner_.itemCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.item(index);
 		}
 
 		@Override
 		public final int size() {
-			return this.__owner.itemCount();
+			return this._owner_.itemCount();
 		}
 
 	}

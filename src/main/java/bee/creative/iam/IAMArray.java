@@ -16,18 +16,18 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class INT8Array extends IAMArray {
 
-		final byte[] __array;
+		final byte[] _array_;
 
 		INT8Array(final byte[] array) {
 			super(array.length);
-			this.__array = array;
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected final int __get(final int index) {
-			return this.__array[index];
+		protected final int _get_(final int index) {
+			return this._array_[index];
 		}
 
 	}
@@ -35,18 +35,18 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class INT16Array extends IAMArray {
 
-		final short[] __array;
+		final short[] _array_;
 
 		INT16Array(final short[] array) {
 			super(array.length);
-			this.__array = array;
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected final int __get(final int index) {
-			return this.__array[index];
+		protected final int _get_(final int index) {
+			return this._array_[index];
 		}
 
 	}
@@ -54,18 +54,18 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class INT32Array extends IAMArray {
 
-		final int[] __array;
+		final int[] _array_;
 
 		INT32Array(final int[] array) {
 			super(array.length);
-			this.__array = array;
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected final int __get(final int index) {
-			return this.__array[index];
+		protected final int _get_(final int index) {
+			return this._array_[index];
 		}
 
 	}
@@ -82,26 +82,26 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	@SuppressWarnings ("javadoc")
 	static final class SectionArray extends IAMArray {
 
-		final IAMArray __array;
+		final IAMArray _array_;
 
-		final int __offset;
+		final int _offset_;
 
 		SectionArray(final IAMArray array, final int offset, final int length) {
 			super(length);
-			this.__array = array;
-			this.__offset = offset;
+			this._array_ = array;
+			this._offset_ = offset;
 		}
 
 		{}
 
 		@Override
-		protected final int __get(final int index) {
-			return this.__array.__get(this.__offset + index);
+		protected final int _get_(final int index) {
+			return this._array_._get_(this._offset_ + index);
 		}
 
 		@Override
-		protected final IAMArray __section(final int offset, final int length) {
-			return this.__array.__section(this.__offset + offset, length);
+		protected final IAMArray _section_(final int offset, final int length) {
+			return this._array_._section_(this._offset_ + offset, length);
 		}
 
 	}
@@ -123,7 +123,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public static IAMArray from(final byte[] array) throws NullPointerException {
+	public static final IAMArray from(final byte[] array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
 		return new INT8Array(array);
 	}
@@ -136,7 +136,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public static IAMArray from(final short[] array) throws NullPointerException {
+	public static final IAMArray from(final short[] array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
 		return new INT16Array(array);
 	}
@@ -149,7 +149,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public static IAMArray from(final int... array) throws NullPointerException {
+	public static final IAMArray from(final int... array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
 		return new INT32Array(array);
 	}
@@ -159,7 +159,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	protected final int _length_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -167,7 +167,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param length Länge.
 	 */
 	protected IAMArray(final int length) {
-		this.__length = length;
+		this._length_ = length;
 	}
 
 	{}
@@ -178,7 +178,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param index Index.
 	 * @return {@code index}-te Zahl.
 	 */
-	protected int __get(final int index) {
+	protected int _get_(final int index) {
 		return 0;
 	}
 
@@ -189,7 +189,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt.
 	 */
-	protected IAMArray __section(final int offset, final int length) {
+	protected IAMArray _section_(final int offset, final int length) {
 		if (length == 0) return IAMArray.EMPTY;
 		return new SectionArray(this, offset, length);
 	}
@@ -202,8 +202,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return {@code index}-te Zahl.
 	 */
 	public final int get(final int index) {
-		if ((index < 0) || (index >= this.__length)) return 0;
-		return this.__get(index);
+		if ((index < 0) || (index >= this._length_)) return 0;
+		return this._get_(index);
 	}
 
 	/**
@@ -213,7 +213,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Länge.
 	 */
 	public final int length() {
-		return this.__length;
+		return this._length_;
 	}
 
 	/**
@@ -230,8 +230,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 */
 	public final int hash() {
 		int hash = 0x811C9DC5;
-		for (int i = 0, size = this.__length; i < size; i++) {
-			hash = (hash * 0x01000193) ^ this.__get(i);
+		for (int i = 0, size = this._length_; i < size; i++) {
+			hash = (hash * 0x01000193) ^ this._get_(i);
 		}
 		return hash;
 	}
@@ -251,10 +251,10 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final IAMArray that) throws NullPointerException {
-		final int length = this.__length;
-		if (length != that.__length) return false;
+		final int length = this._length_;
+		if (length != that._length_) return false;
 		for (int i = 0; i < length; i++)
-			if (this.__get(i) != that.__get(i)) return false;
+			if (this._get_(i) != that._get_(i)) return false;
 		return true;
 	}
 
@@ -273,9 +273,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final int compare(final IAMArray that) throws NullPointerException {
-		final int length1 = this.__length, length2 = that.__length;
+		final int length1 = this._length_, length2 = that._length_;
 		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
-			if ((result = Comparators.compare(this.__get(i), that.__get(i))) != 0) return result;
+			if ((result = Comparators.compare(this._get_(i), that._get_(i))) != 0) return result;
 		return length1 - length2;
 	}
 
@@ -288,8 +288,8 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Abschnitt.
 	 */
 	public IAMArray section(final int offset, final int length) {
-		if ((offset < 0) || (length <= 0) || ((offset + length) > this.__length)) return this.__section(0, 0);
-		return this.__section(offset, length);
+		if ((offset < 0) || (length <= 0) || ((offset + length) > this._length_)) return this._section_(0, 0);
+		return this._section_(offset, length);
 	}
 
 	/**
@@ -300,10 +300,10 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Kopie der Zahlenfolge.
 	 */
 	public final int[] toArray() {
-		final int length = this.__length;
+		final int length = this._length_;
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
-			result[i] = this.__get(i);
+			result[i] = this._get_(i);
 		}
 		return result;
 	}
@@ -317,16 +317,16 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	public final Iterator<Integer> iterator() {
 		return new Iterator<Integer>() {
 
-			int index = 0;
+			int _index_ = 0;
 
 			@Override
 			public boolean hasNext() {
-				return this.index < IAMArray.this.__length;
+				return this._index_ < IAMArray.this._length_;
 			}
 
 			@Override
 			public Integer next() {
-				return new Integer(IAMArray.this.__get(this.index++));
+				return new Integer(IAMArray.this._get_(this._index_++));
 			}
 
 			@Override

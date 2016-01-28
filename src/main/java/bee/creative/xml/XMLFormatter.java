@@ -41,7 +41,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SourceData __this() {
+		protected final SourceData _this_() {
 			return this;
 		}
 
@@ -70,7 +70,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final ResultData __this() {
+		protected final ResultData _this_() {
 			return this;
 		}
 
@@ -88,7 +88,7 @@ public final class XMLFormatter {
 		 * 
 		 * @return Besitzer.
 		 */
-		public final XMLFormatter closeTemplatesData() {
+		public final XMLFormatter closeTransformerData() {
 			return XMLFormatter.this;
 		}
 
@@ -98,7 +98,7 @@ public final class XMLFormatter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final TransformerData __this() {
+		protected final TransformerData _this_() {
 			return this;
 		}
 
@@ -109,17 +109,17 @@ public final class XMLFormatter {
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
 	 */
-	final SourceData __sourceData = new SourceData();
+	final SourceData _sourceData_ = new SourceData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openResultData()}.
 	 */
-	final ResultData __resultData = new ResultData();
+	final ResultData _resultData_ = new ResultData();
 
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openTransformerData()}.
 	 */
-	final TransformerData __transformerData = new TransformerData();
+	final TransformerData _transformerData_ = new TransformerData();
 
 	{}
 
@@ -131,9 +131,9 @@ public final class XMLFormatter {
 	 */
 	public final XMLFormatter use(final XMLFormatter data) {
 		if (data == null) return this;
-		this.__sourceData.use(data.__sourceData);
-		this.__resultData.use(data.__resultData);
-		this.__transformerData.use(data.__transformerData);
+		this._sourceData_.use(data._sourceData_);
+		this._resultData_.use(data._resultData_);
+		this._transformerData_.use(data._transformerData_);
 		return this;
 	}
 
@@ -147,10 +147,10 @@ public final class XMLFormatter {
 	 * @throws TransformerException Wenn {@link Transformer#transform(Source, Result)} eine entsprechende Ausnahme auslöst.
 	 */
 	public final XMLFormatter transform() throws TransformerException {
-		final Transformer transformer = this.__transformerData.getTransformer();
+		final Transformer transformer = this._transformerData_.getTransformer();
 		synchronized (transformer) {
-			final Source source = this.__sourceData.build();
-			final Result result = this.__resultData.build();
+			final Source source = this._sourceData_.getSource();
+			final Result result = this._resultData_.getResult();
 			transformer.transform(source, result);
 		}
 		return this;
@@ -194,7 +194,7 @@ public final class XMLFormatter {
 	 * @return Konfigurator.
 	 */
 	public final SourceData openSourceData() {
-		return this.__sourceData;
+		return this._sourceData_;
 	}
 
 	/**
@@ -204,7 +204,7 @@ public final class XMLFormatter {
 	 * @return Konfigurator.
 	 */
 	public final ResultData openResultData() {
-		return this.__resultData;
+		return this._resultData_;
 	}
 
 	/**
@@ -213,7 +213,7 @@ public final class XMLFormatter {
 	 * @return Konfigurator.
 	 */
 	public final TransformerData openTransformerData() {
-		return this.__transformerData;
+		return this._transformerData_;
 	}
 
 	{}
@@ -223,7 +223,7 @@ public final class XMLFormatter {
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__sourceData, this.__resultData, this.__transformerData);
+		return Objects.toInvokeString(this, this._sourceData_, this._resultData_, this._transformerData_);
 	}
 
 }

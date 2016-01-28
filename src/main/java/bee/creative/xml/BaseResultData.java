@@ -20,19 +20,19 @@ import bee.creative.util.Objects;
  * @see Validator#validate(Source, Result)
  * @see Transformer#transform(Source, Result)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
  */
-public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
+public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 
 	/**
 	 * Dieses Feld speichert das {@link Result}.
 	 */
-	Result __result;
+	Result _result_;
 
 	/**
 	 * Dieses Feld speichert den System-Identifikator.
 	 */
-	String __systemID;
+	String _systemId_;
 
 	{}
 
@@ -42,11 +42,11 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz use(final BaseResultData<?> data) {
-		if (data == null) return this.__this();
-		this.__result = data.__result;
-		this.__systemID = data.__systemID;
-		return this.__this();
+	public final GThis use(final BaseResultData<?> data) {
+		if (data == null) return this._this_();
+		this._result_ = data._result_;
+		this._systemId_ = data._systemId_;
+		return this._this_();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param file {@link File}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useFile(final File file) {
+	public final GThis useFile(final File file) {
 		return this.useResult(new StreamResult(file));
 	}
 
@@ -68,7 +68,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @see DOMResult#DOMResult()
 	 * @return {@code this}.
 	 */
-	public final GThiz useNode() {
+	public final GThis useNode() {
 		return this.useResult(new DOMResult());
 	}
 
@@ -80,7 +80,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param node {@link Node}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useNode(final Node node) {
+	public final GThis useNode(final Node node) {
 		return this.useResult(new DOMResult(node));
 	}
 
@@ -92,7 +92,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param writer {@link Writer}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useWriter(final Writer writer) {
+	public final GThis useWriter(final Writer writer) {
 		return this.useResult(new StreamResult(writer));
 	}
 
@@ -104,7 +104,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @param stream {@link OutputStream}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useStream(final OutputStream stream) {
+	public final GThis useStream(final OutputStream stream) {
 		return this.useResult(new StreamResult(stream));
 	}
 
@@ -112,28 +112,28 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
 	 * 
 	 * @see Result#setSystemId(String)
-	 * @param systemID System-Identifikator oder {@code null}.
+	 * @param systemId System-Identifikator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useSystemID(final String systemID) {
-		this.__systemID = systemID;
-		if (this.__result == null) return this.__this();
-		this.__result.setSystemId(systemID);
-		return this.__this();
+	public final GThis useSystemId(final String systemId) {
+		this._systemId_ = systemId;
+		if (this._result_ == null) return this._this_();
+		this._result_.setSystemId(systemId);
+		return this._this_();
 	}
 
 	/**
 	 * Diese Methode setzt die Ergebnisdaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
 	 * 
 	 * @see #getResult()
-	 * @see #useSystemID(String)
+	 * @see #useSystemId(String)
 	 * @param result Ergebnisdaten oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useResult(final Result result) {
-		this.__result = result;
-		if (result == null) return this.__this();
-		return this.useSystemID(this.__systemID != null ? this.__systemID : result.getSystemId());
+	public final GThis useResult(final Result result) {
+		this._result_ = result;
+		if (result == null) return this._this_();
+		return this.useSystemId(this._systemId_ != null ? this._systemId_ : result.getSystemId());
 	}
 
 	/**
@@ -145,24 +145,24 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 * @see #useWriter(Writer)
 	 * @see #useResult(Result)
 	 * @see #useStream(OutputStream)
-	 * @see #useSystemID(String)
+	 * @see #useSystemId(String)
 	 * @see DOMResult
 	 * @see StreamResult
 	 * @return Quelldaten oder {@code null}.
 	 */
 	public final Result getResult() {
-		return this.__result;
+		return this._result_;
 	}
 
 	/**
 	 * Diese Methode setzt die Ergebnisdaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
 	 * 
 	 * @see #useResult(Result)
-	 * @see #useSystemID(String)
+	 * @see #useSystemId(String)
 	 * @return {@code this}.
 	 */
-	public final GThiz resetResult() {
-		this.useSystemID(null);
+	public final GThis resetResult() {
+		this.useSystemId(null);
 		return this.useResult(null);
 	}
 
@@ -181,7 +181,7 @@ public abstract class BaseResultData<GThiz> extends BaseBuilder<Result, GThiz> {
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__result, this.__systemID);
+		return Objects.toInvokeString(this, this._result_, this._systemId_);
 	}
 
 }

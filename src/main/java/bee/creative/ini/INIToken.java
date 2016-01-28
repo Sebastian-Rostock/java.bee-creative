@@ -84,29 +84,29 @@ public final class INIToken {
 	/**
 	 * Dieses Feld speichert den Schlüssel der Eigenschaft oder {@code null}.
 	 */
-	final String __key;
+	final String _key_;
 
 	/**
 	 * Dieses Feld speichert den Wert der Eigenschaft oder {@code null}.
 	 */
-	final String __value;
+	final String _value_;
 
 	/**
 	 * Dieses Feld speichert den Namen des Abschnitts oder {@code null}.
 	 */
-	final String __section;
+	final String _section_;
 
 	/**
 	 * Dieses Feld speichert den Text des Kommentars oder {@code null}.
 	 */
-	final String __comment;
+	final String _comment_;
 
 	@SuppressWarnings ("javadoc")
 	INIToken(final String key, final String value, final String section, final String comment) {
-		this.__key = key;
-		this.__value = value;
-		this.__section = section;
-		this.__comment = comment;
+		this._key_ = key;
+		this._value_ = value;
+		this._section_ = section;
+		this._comment_ = comment;
 	}
 
 	{}
@@ -120,7 +120,7 @@ public final class INIToken {
 	 * @return Typkennung.
 	 */
 	public final int type() {
-		return this.__section != null ? INIToken.SECTION : this.__comment != null ? INIToken.COMMENT : INIToken.PROPERTY;
+		return this._section_ != null ? INIToken.SECTION : this._comment_ != null ? INIToken.COMMENT : INIToken.PROPERTY;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public final class INIToken {
 	 * @return Schlüssel der Eigenschaft oder {@code null}.
 	 */
 	public final String key() {
-		return this.__key;
+		return this._key_;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public final class INIToken {
 	 * @return Wert der Eigenschaft oder {@code null}.
 	 */
 	public final String value() {
-		return this.__value;
+		return this._value_;
 	}
 
 	/**
@@ -150,7 +150,7 @@ public final class INIToken {
 	 * @return Namen des Abschnitts oder {@code null}.
 	 */
 	public final String section() {
-		return this.__section;
+		return this._section_;
 	}
 
 	/**
@@ -160,7 +160,7 @@ public final class INIToken {
 	 * @return Text des Kommentars oder {@code null}.
 	 */
 	public final String comment() {
-		return this.__comment;
+		return this._comment_;
 	}
 
 	{}
@@ -170,7 +170,7 @@ public final class INIToken {
 	 */
 	@Override
 	public final int hashCode() {
-		return Objects.hash(this.__key, this.__value, this.__section, this.__comment);
+		return Objects.hash(this._key_, this._value_, this._section_, this._comment_);
 	}
 
 	/**
@@ -181,8 +181,8 @@ public final class INIToken {
 		if (object == this) return true;
 		if (!(object instanceof INIToken)) return false;
 		final INIToken that = (INIToken)object;
-		return Objects.equals(this.__key, that.__key) && Objects.equals(this.__value, that.__value) && //
-			Objects.equals(this.__section, that.__section) && Objects.equals(this.__comment, that.__comment);
+		return Objects.equals(this._key_, that._key_) && Objects.equals(this._value_, that._value_) && //
+			Objects.equals(this._section_, that._section_) && Objects.equals(this._comment_, that._comment_);
 	}
 
 	/**

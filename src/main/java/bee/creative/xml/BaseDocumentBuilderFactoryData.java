@@ -13,9 +13,9 @@ import bee.creative.util.Objects;
  * Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThiz> Typ des konkreten Nachfahren dieser Klasse.
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
  */
-public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<DocumentBuilderFactory, GThiz> {
+public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<DocumentBuilderFactory, GThis> {
 
 	/**
 	 * Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link DocumentBuilderFactory}.
@@ -39,7 +39,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final FeatureData<GOwner> __this() {
+		protected final FeatureData<GOwner> _this_() {
 			return this;
 		}
 
@@ -67,7 +67,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final SchemaData<GOwner> __this() {
+		protected final SchemaData<GOwner> _this_() {
 			return this;
 		}
 
@@ -181,7 +181,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final PropertyData<GOwner> __this() {
+		protected final PropertyData<GOwner> _this_() {
 			return this;
 		}
 
@@ -209,7 +209,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected final AttributeData<GOwner> __this() {
+		protected final AttributeData<GOwner> _this_() {
 			return this;
 		}
 
@@ -220,16 +220,16 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	/**
 	 * Dieses Feld speichert die {@link DocumentBuilderFactory}.
 	 */
-	DocumentBuilderFactory __factory;
+	DocumentBuilderFactory _factory_;
 
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openFeatureData()}.
 	 */
-	final FeatureData<GThiz> __featureData = new FeatureData<GThiz>() {
+	final FeatureData<GThis> _featureData_ = new FeatureData<GThis>() {
 
 		@Override
-		public final GThiz closeFeatureData() {
-			return BaseDocumentBuilderFactoryData.this.__this();
+		public final GThis closeFeatureData() {
+			return BaseDocumentBuilderFactoryData.this._this_();
 		}
 
 	};
@@ -237,11 +237,11 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openSchemaData()}.
 	 */
-	final SchemaData<GThiz> __schemaData = new SchemaData<GThiz>() {
+	final SchemaData<GThis> __schemaData = new SchemaData<GThis>() {
 
 		@Override
-		public final GThiz closeSchemaData() {
-			return BaseDocumentBuilderFactoryData.this.__this();
+		public final GThis closeSchemaData() {
+			return BaseDocumentBuilderFactoryData.this._this_();
 		}
 
 	};
@@ -249,11 +249,11 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	/**
 	 * Dieses Feld speichert den Konfigurator {@link #openPropertyData()}.
 	 */
-	final PropertyData<GThiz> __propertyData = new PropertyData<GThiz>() {
+	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
 
 		@Override
-		public final GThiz closePropertyData() {
-			return BaseDocumentBuilderFactoryData.this.__this();
+		public final GThis closePropertyData() {
+			return BaseDocumentBuilderFactoryData.this._this_();
 		}
 
 	};
@@ -261,11 +261,11 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	/**
 	 * Dieses Feld speichert den Konfigurator für {@link #openAttributeData()}.
 	 */
-	final AttributeData<GThiz> __attributeData = new AttributeData<GThiz>() {
+	final AttributeData<GThis> _attributeData_ = new AttributeData<GThis>() {
 
 		@Override
-		public final GThiz closeAttributeData() {
-			return BaseDocumentBuilderFactoryData.this.__this();
+		public final GThis closeAttributeData() {
+			return BaseDocumentBuilderFactoryData.this._this_();
 		}
 
 	};
@@ -278,13 +278,13 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz use(final BaseDocumentBuilderFactoryData<?> data) {
-		if (data == null) return this.__this();
-		this.__factory = data.__factory;
-		this.__featureData.use(data.__featureData);
-		this.__propertyData.use(data.__propertyData);
-		this.__attributeData.use(data.__attributeData);
-		return this.__this();
+	public final GThis use(final BaseDocumentBuilderFactoryData<?> data) {
+		if (data == null) return this._this_();
+		this._factory_ = data._factory_;
+		this._featureData_.use(data._featureData_);
+		this._propertyData_.use(data._propertyData_);
+		this._attributeData_.use(data._attributeData_);
+		return this._this_();
 	}
 
 	/**
@@ -300,7 +300,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @throws ParserConfigurationException Wenn {@link #updateFactory()} eine entsprechende Ausnahme auslöst.
 	 */
 	public final DocumentBuilderFactory getFactory() throws SAXException, ParserConfigurationException {
-		DocumentBuilderFactory result = this.__factory;
+		DocumentBuilderFactory result = this._factory_;
 		if (result != null) return result;
 		result = DocumentBuilderFactory.newInstance();
 		this.useFactory(result);
@@ -314,9 +314,9 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @param factory {@link DocumentBuilderFactory} oder {@code null}.
 	 * @return {@code this}.
 	 */
-	public final GThiz useFactory(final DocumentBuilderFactory factory) {
-		this.__factory = factory;
-		return this.__this();
+	public final GThis useFactory(final DocumentBuilderFactory factory) {
+		this._factory_ = factory;
+		return this._this_();
 	}
 
 	/**
@@ -325,7 +325,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see #useFactory(DocumentBuilderFactory)
 	 * @return {@code this}.
 	 */
-	public final GThiz resetFactory() {
+	public final GThis resetFactory() {
 		return this.useFactory(null);
 	}
 
@@ -338,10 +338,10 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @throws SAXException Wenn {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst.
 	 */
-	public final GThiz updateFactory() throws SAXException, ParserConfigurationException {
+	public final GThis updateFactory() throws SAXException, ParserConfigurationException {
 		final DocumentBuilderFactory factory = this.getFactory();
 		factory.setSchema(this.__schemaData.getSchema());
-		final PropertyData<GThiz> propertyData = this.__propertyData;
+		final PropertyData<GThis> propertyData = this._propertyData_;
 		factory.setCoalescing(propertyData.forCoalescing().getBoolean());
 		factory.setExpandEntityReferences(propertyData.forExpandEntityReferences().getBoolean());
 		factory.setIgnoringComments(propertyData.forIgnoringComments().getBoolean());
@@ -349,13 +349,13 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 		factory.setNamespaceAware(propertyData.forNamespaceAware().getBoolean());
 		factory.setValidating(propertyData.forValidating().getBoolean());
 		factory.setXIncludeAware(propertyData.forXIncludeAware().getBoolean());
-		for (final Entry<String, Boolean> entry: this.__featureData) {
+		for (final Entry<String, Boolean> entry: this._featureData_) {
 			factory.setFeature(entry.getKey(), Boolean.TRUE.equals(entry.getValue()));
 		}
-		for (final Entry<String, Object> entry: this.__attributeData) {
+		for (final Entry<String, Object> entry: this._attributeData_) {
 			factory.setAttribute(entry.getKey(), entry.getValue());
 		}
-		return this.__this();
+		return this._this_();
 	}
 
 	/**
@@ -364,8 +364,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @return Konfigurator.
 	 */
-	public final FeatureData<GThiz> openFeatureData() {
-		return this.__featureData;
+	public final FeatureData<GThis> openFeatureData() {
+		return this._featureData_;
 	}
 
 	/**
@@ -374,7 +374,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @return Konfigurator.
 	 */
-	public final SchemaData<GThiz> openSchemaData() {
+	public final SchemaData<GThis> openSchemaData() {
 		return this.__schemaData;
 	}
 
@@ -390,8 +390,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 	 * @return Konfigurator.
 	 */
-	public final PropertyData<GThiz> openPropertyData() {
-		return this.__propertyData;
+	public final PropertyData<GThis> openPropertyData() {
+		return this._propertyData_;
 	}
 
 	/**
@@ -400,8 +400,8 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @return Konfigurator.
 	 */
-	public final AttributeData<GThiz> openAttributeData() {
-		return this.__attributeData;
+	public final AttributeData<GThis> openAttributeData() {
+		return this._attributeData_;
 	}
 
 	{}
@@ -410,7 +410,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected abstract GThiz __this();
+	protected abstract GThis _this_();
 
 	/**
 	 * {@inheritDoc}
@@ -431,7 +431,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThiz> extends BaseBuilder<
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__featureData, this.__schemaData, this.__propertyData, this.__attributeData);
+		return Objects.toInvokeString(this, this._featureData_, this.__schemaData, this._propertyData_, this._attributeData_);
 	}
 
 }

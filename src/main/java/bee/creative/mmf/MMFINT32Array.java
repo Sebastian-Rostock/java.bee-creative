@@ -20,16 +20,16 @@ class MMFINT32Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray __section(final int offset, final int length) {
-		return new MMFINT32Array(this.__byteBuffer, this.__byteOffset + (offset << 2), length << 2);
+	protected int _get_(int index) {
+		return this._byteBuffer_.getInt(this._byteOffset_ + (index << 2));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int __get(int index) {
-		return this.__byteBuffer.getInt(this.__byteOffset + (index << 2));
+	protected MMFArray _section_(final int offset, final int length) {
+		return new MMFINT32Array(this._byteBuffer_, this._byteOffset_ + (offset << 2), length << 2);
 	}
 
 	/**

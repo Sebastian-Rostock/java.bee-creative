@@ -18,7 +18,7 @@ public final class INIWriter implements Closeable {
 	/**
 	 * Dieses Feld speichert den {@link Writer}.
 	 */
-	final Writer __writer;
+	final Writer _writer_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link File} für die {@code INI}-Datenstruktur.
@@ -39,7 +39,7 @@ public final class INIWriter implements Closeable {
 	 */
 	public INIWriter(final Writer writer) throws NullPointerException {
 		if (writer == null) throw new NullPointerException("writer = null");
-		this.__writer = writer;
+		this._writer_ = writer;
 	}
 
 	{}
@@ -50,8 +50,8 @@ public final class INIWriter implements Closeable {
 	 * @param string Zeichenkette.
 	 * @throws IOException Wenn {@link Writer#write(int)} eine entsprechende Ausnahme auslöst.
 	 */
-	final void __write(final String string) throws IOException {
-		final Writer target = this.__writer;
+	final void _write_(final String string) throws IOException {
+		final Writer target = this._writer_;
 		for (int i = 0, length = string.length(); i < length; i++) {
 			final int symbol = string.charAt(i);
 			switch (symbol) {
@@ -110,9 +110,9 @@ public final class INIWriter implements Closeable {
 	 */
 	public final void writeSection(final String section) throws IOException {
 		if (section == null) throw new NullPointerException("section = null");
-		final Writer target = this.__writer;
+		final Writer target = this._writer_;
 		target.write('[');
-		this.__write(section);
+		this._write_(section);
 		target.write("]\r\n");
 	}
 
@@ -126,10 +126,10 @@ public final class INIWriter implements Closeable {
 	public final void writeProperty(final String key, final String value) throws IOException {
 		if (key == null) throw new NullPointerException("key = null");
 		if (value == null) throw new NullPointerException("value = null");
-		final Writer target = this.__writer;
-		this.__write(key);
+		final Writer target = this._writer_;
+		this._write_(key);
 		target.write('=');
-		this.__write(value);
+		this._write_(value);
 		target.write("\r\n");
 	}
 
@@ -141,9 +141,9 @@ public final class INIWriter implements Closeable {
 	 */
 	public final void writeComment(final String comment) throws IOException {
 		if (comment == null) throw new NullPointerException("comment = null");
-		final Writer target = this.__writer;
+		final Writer target = this._writer_;
 		target.write(';');
-		this.__write(comment);
+		this._write_(comment);
 		target.write("\r\n");
 	}
 
@@ -154,7 +154,7 @@ public final class INIWriter implements Closeable {
 	 */
 	@Override
 	public final void close() throws IOException {
-		this.__writer.close();
+		this._writer_.close();
 	}
 
 	/**
@@ -162,7 +162,7 @@ public final class INIWriter implements Closeable {
 	 */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this.__writer);
+		return Objects.toInvokeString(this, this._writer_);
 	}
 
 }

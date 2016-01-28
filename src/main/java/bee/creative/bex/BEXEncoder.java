@@ -273,14 +273,12 @@ public class BEXEncoder {
 		}
 
 		/**
-		 * Diese Methode entfernt alle bisher zusammengestellten Daten.
-		 * 
-		 * @see #items
-		 * @see #__entryMap
+		 * {@inheritDoc}
 		 */
+		@Override
 		public void clear() {
+			super.clear();
 			this.items.clear();
-			this.__entryMap.clear();
 		}
 
 		{}

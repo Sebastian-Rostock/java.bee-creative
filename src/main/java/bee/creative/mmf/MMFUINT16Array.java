@@ -20,16 +20,16 @@ class MMFUINT16Array extends MMFINT16Array {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected MMFArray __section(final int offset, final int length) {
-		return new MMFUINT16Array(this.__byteBuffer, this.__byteOffset + (offset << 1), length << 1);
+	protected int _get_(final int index) {
+		return super._get_(index) & 65535;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int __get(final int index) {
-		return super.__get(index) & 65535;
+	protected MMFArray _section_(final int offset, final int length) {
+		return new MMFUINT16Array(this._byteBuffer_, this._byteOffset_ + (offset << 1), length << 1);
 	}
 
 }

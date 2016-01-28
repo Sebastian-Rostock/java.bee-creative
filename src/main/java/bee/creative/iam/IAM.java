@@ -39,7 +39,7 @@ public class IAM {
 	 * @return Folge von {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Größentyp ungültig ist.
 	 */
-	static final MMFArray __sizeArray(final MMFArray array, final int sizeType) throws IllegalArgumentException {
+	static final MMFArray _sizeArray_(final MMFArray array, final int sizeType) throws IllegalArgumentException {
 		switch (sizeType) {
 			case 1:
 				return array.toUINT8();
@@ -62,7 +62,7 @@ public class IAM {
 	 * @return Folge von {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Datentyp ungültig ist.
 	 */
-	static final MMFArray __dataArray(final MMFArray array, final int dataType) throws IllegalArgumentException {
+	static final MMFArray _dataArray_(final MMFArray array, final int dataType) throws IllegalArgumentException {
 		switch (dataType) {
 			case 1:
 				return array.toINT8();
@@ -80,7 +80,7 @@ public class IAM {
 	 * @param array Zahlenfolge.
 	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen.
 	 */
-	static final void __checkArray(final IAMArray array) throws IAMException {
+	static final void _checkArray_(final IAMArray array) throws IAMException {
 		int value = array.get(0);
 		if (value != 0) throw new IAMException(IAMException.INVALID_OFFSET);
 		for (int i = 0, length = array.length(); i < length; i++) {
@@ -96,7 +96,7 @@ public class IAM {
 	 * @param byteCount Länge eines {@code INT8} Arrays.
 	 * @return Länge des {@code INT32} Arrays.
 	 */
-	static final int __byteAlign(final int byteCount) {
+	static final int _byteAlign_(final int byteCount) {
 		return (byteCount + 3) >> 2;
 	}
 
@@ -106,7 +106,7 @@ public class IAM {
 	 * @param dataType Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
 	 * @return Byteanzahl ({@code 1}, {@code 2} oder {@code 4}).
 	 */
-	static final int __byteCount(final int dataType) {
+	static final int _byteCount_(final int dataType) {
 		return (1 << dataType) >> 1;
 	}
 
@@ -116,7 +116,7 @@ public class IAM {
 	 * @see IAMIndexEncoder#IAMIndexEncoder()
 	 * @return neuer {@link IAMIndexEncoder}.
 	 */
-	public static final IAMIndexEncoder encoder() {
+	public static final IAMIndexEncoder newEncoder() {
 		return new IAMIndexEncoder();
 	}
 
@@ -129,7 +129,7 @@ public class IAM {
 	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 */
-	public static final IAMIndexDecoder decoder(final MMFArray array) throws IAMException, NullPointerException {
+	public static final IAMIndexDecoder newDecoder(final MMFArray array) throws IAMException, NullPointerException {
 		return new IAMIndexDecoder(array);
 	}
 
