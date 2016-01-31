@@ -36,7 +36,7 @@ public class Objects {
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug.
 	 */
-	static final String __indent(final String value) {
+	static final String _indent_(final String value) {
 		if (value == null) return "null";
 		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
@@ -56,15 +56,15 @@ public class Objects {
 	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static final String __mapToString(final boolean format, final Map<?, ?> object) {
+	static final String _mapToString_(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
 		String space = (format ? "{\n  " : "{");
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (final Entry<?, ?> entry: object.entrySet()) {
-			result.append(space).append(Objects.__objectToString(format, format, entry.getKey())).append(": ")
-				.append(Objects.__objectToString(format, format, entry.getValue()));
+			result.append(space).append(Objects._objectToString_(format, format, entry.getKey())).append(": ")
+				.append(Objects._objectToString_(format, format, entry.getValue()));
 			space = comma;
 		}
 		return result.append((format ? "\n}" : "}")).toString();
@@ -76,7 +76,7 @@ public class Objects {
 	 * @param object {@link Character} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static final String __charToString(final Character object) {
+	static final String _charToString_(final Character object) {
 		if (object == null) return "null";
 		final StringBuilder result = new StringBuilder(4).append('\'');
 		switch (object.charValue()) {
@@ -107,7 +107,7 @@ public class Objects {
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist.
 	 */
-	static final String __arrayToString(final boolean format, final Object object) throws IllegalArgumentException {
+	static final String _arrayToString_(final boolean format, final Object object) throws IllegalArgumentException {
 		if (object == null) return "null";
 		final int size = Array.getLength(object);
 		if (size == 0) return "[]";
@@ -115,7 +115,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < size; i++) {
-			result.append(space).append(Objects.__objectToString(format, format, Array.get(object, i)));
+			result.append(space).append(Objects._objectToString_(format, format, Array.get(object, i)));
 			space = comma;
 		}
 		return result.append((format ? "\n]" : "]")).toString();
@@ -129,7 +129,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static final String __stringToString(final boolean format, final CharSequence object) {
+	static final String _stringToString_(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
 		final StringBuilder result = new StringBuilder("\"");
@@ -166,25 +166,25 @@ public class Objects {
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static final String __objectToString(final boolean format, final boolean indent, final Object object) {
+	static final String _objectToString_(final boolean format, final boolean indent, final Object object) {
 		if (object == null) return "null";
 		final String result;
 		if (object.getClass().isArray()) {
-			result = Objects.__arrayToString(format, object);
+			result = Objects._arrayToString_(format, object);
 		} else if (object instanceof Character) {
-			result = Objects.__charToString((Character)object);
+			result = Objects._charToString_((Character)object);
 		} else if (object instanceof UseToString) {
 			result = String.valueOf(object);
 		} else if (object instanceof CharSequence) {
-			result = Objects.__stringToString(format, (CharSequence)object);
+			result = Objects._stringToString_(format, (CharSequence)object);
 		} else if (object instanceof Map<?, ?>) {
-			result = Objects.__mapToString(format, (Map<?, ?>)object);
+			result = Objects._mapToString_(format, (Map<?, ?>)object);
 		} else if (object instanceof Iterable<?>) {
-			result = Objects.__iterableToString(format, (Iterable<?>)object);
+			result = Objects._iterableToString_(format, (Iterable<?>)object);
 		} else {
 			result = String.valueOf(object);
 		}
-		return (indent ? Objects.__indent(result) : result);
+		return (indent ? Objects._indent_(result) : result);
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class Objects {
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
-	static final String __iterableToString(final boolean format, final Iterable<?> object) {
+	static final String _iterableToString_(final boolean format, final Iterable<?> object) {
 		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
@@ -203,7 +203,7 @@ public class Objects {
 		final String comma = (format ? ",\n  " : ", ");
 		final StringBuilder result = new StringBuilder();
 		do {
-			result.append(space).append(Objects.__objectToString(format, format, iter.next()));
+			result.append(space).append(Objects._objectToString_(format, format, iter.next()));
 			space = comma;
 		} while (iter.hasNext());
 		return result.append((format ? "\n]" : "]")).toString();
@@ -489,13 +489,13 @@ public class Objects {
 	 * <p>
 	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode geliefert.
 	 * 
-	 * @see Objects#__objectToString(boolean, boolean, Object)
+	 * @see Objects#_objectToString_(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 */
 	public static final String toString(final boolean format, final Object object) {
-		return Objects.__objectToString(format, false, object);
+		return Objects._objectToString_(format, false, object);
 	}
 
 	/**
@@ -570,13 +570,13 @@ public class Objects {
 			final String comma = (format ? ",\n  " : ", ");
 			if (label) {
 				for (int i = 0, size = args.length - 1; i < size; i += 2) {
-					result.append(join).append(Objects.__objectToString(format, format, args[i])).append(": ")
-						.append(Objects.__objectToString(format, format, args[i + 1]));
+					result.append(join).append(Objects._objectToString_(format, format, args[i])).append(": ")
+						.append(Objects._objectToString_(format, format, args[i + 1]));
 					join = comma;
 				}
 			} else {
 				for (int i = 0, size = args.length; i < size; i++) {
-					result.append(join).append(Objects.__objectToString(format, format, args[i]));
+					result.append(join).append(Objects._objectToString_(format, format, args[i]));
 					join = comma;
 				}
 			}
