@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import bee.creative.fem.FEMArray;
 
 /**
  * Diese Klasse implementiert eine abstrakte {@link Map}, deren Daten in einem {@link FEMArray} verwaltet werden.

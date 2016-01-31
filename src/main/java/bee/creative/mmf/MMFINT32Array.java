@@ -20,7 +20,7 @@ class MMFINT32Array extends MMFArray {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int _get_(int index) {
+	protected int _get_(final int index) {
 		return this._byteBuffer_.getInt(this._byteOffset_ + (index << 2));
 	}
 

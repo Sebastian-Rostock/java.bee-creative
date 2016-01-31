@@ -339,7 +339,7 @@ public class Iterators {
 	public static final <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
 		throws NullPointerException, IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
-		Comparables.__check(fromIndex, toIndex);
+		Comparables._check_(fromIndex, toIndex);
 		return new BaseIterator<GItem>() {
 
 			int index = fromIndex;

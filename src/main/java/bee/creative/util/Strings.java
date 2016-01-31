@@ -36,12 +36,12 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist.
 	 */
-	static final List<String> __apply(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
+	static final List<String> _apply_(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
 		if (regex == null) throw new NullPointerException("regex = null");
 		if (string == null) throw new NullPointerException("string = null");
 		if (index < 0) throw new IllegalArgumentException("index < 0");
-		return Strings.__apply(Strings.PATTERN_COMPILER.convert(regex), string, index, split, match);
+		return Strings._apply_(Strings.PATTERN_COMPILER.convert(regex), string, index, split, match);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist.
 	 */
-	static final List<String> __apply(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
+	static final List<String> _apply_(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
 		if (pattern == null) throw new NullPointerException("pattern = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -98,11 +98,11 @@ public class Strings {
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
-	static final List<List<String>> __applyAll(final String regex, final CharSequence string, final boolean split, final boolean match)
+	static final List<List<String>> _applyAll_(final String regex, final CharSequence string, final boolean split, final boolean match)
 		throws NullPointerException {
 		if (regex == null) throw new NullPointerException("regex = null");
 		if (string == null) throw new NullPointerException("string = null");
-		return Strings.__applyAll(Strings.PATTERN_COMPILER.convert(regex), string, split, match);
+		return Strings._applyAll_(Strings.PATTERN_COMPILER.convert(regex), string, split, match);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class Strings {
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
-	static final List<List<String>> __applyAll(final Pattern pattern, final CharSequence string, final boolean split, final boolean match)
+	static final List<List<String>> _applyAll_(final Pattern pattern, final CharSequence string, final boolean split, final boolean match)
 		throws NullPointerException {
 		if (pattern == null) throw new NullPointerException("pattern = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -243,7 +243,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> split(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(regex, string, 0, true, false);
+		return Strings._apply_(regex, string, 0, true, false);
 	}
 
 	/**
@@ -264,7 +264,7 @@ public class Strings {
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist.
 	 */
 	public static final List<String> split(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
-		return Strings.__apply(regex, string, index, true, false);
+		return Strings._apply_(regex, string, index, true, false);
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> split(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(pattern, string, 0, true, false);
+		return Strings._apply_(pattern, string, 0, true, false);
 	}
 
 	/**
@@ -299,7 +299,7 @@ public class Strings {
 	 */
 	public static final List<String> split(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
-		return Strings.__apply(pattern, string, index, true, false);
+		return Strings._apply_(pattern, string, index, true, false);
 	}
 
 	/**
@@ -317,7 +317,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> splitAll(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(regex, string, true, false);
+		return Strings._applyAll_(regex, string, true, false);
 	}
 
 	/**
@@ -335,7 +335,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> splitAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(pattern, string, true, false);
+		return Strings._applyAll_(pattern, string, true, false);
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> match(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(regex, string, 0, false, true);
+		return Strings._apply_(regex, string, 0, false, true);
 	}
 
 	/**
@@ -369,7 +369,7 @@ public class Strings {
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist.
 	 */
 	public static final List<String> match(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
-		return Strings.__apply(regex, string, index, false, true);
+		return Strings._apply_(regex, string, index, false, true);
 	}
 
 	/**
@@ -383,7 +383,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> match(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(pattern, string, 0, false, true);
+		return Strings._apply_(pattern, string, 0, false, true);
 	}
 
 	/**
@@ -404,7 +404,7 @@ public class Strings {
 	 */
 	public static final List<String> match(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
-		return Strings.__apply(pattern, string, index, false, true);
+		return Strings._apply_(pattern, string, index, false, true);
 	}
 
 	/**
@@ -422,7 +422,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> matchAll(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(regex, string, false, true);
+		return Strings._applyAll_(regex, string, false, true);
 	}
 
 	/**
@@ -440,7 +440,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> matchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(pattern, string, false, true);
+		return Strings._applyAll_(pattern, string, false, true);
 	}
 
 	/**
@@ -454,7 +454,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> splatch(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(regex, string, 0, true, true);
+		return Strings._apply_(regex, string, 0, true, true);
 	}
 
 	/**
@@ -475,7 +475,7 @@ public class Strings {
 	 */
 	public static final List<String> splatch(final String regex, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
-		return Strings.__apply(regex, string, index, true, true);
+		return Strings._apply_(regex, string, index, true, true);
 	}
 
 	/**
@@ -489,7 +489,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<String> splatch(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__apply(pattern, string, 0, true, true);
+		return Strings._apply_(pattern, string, 0, true, true);
 	}
 
 	/**
@@ -510,7 +510,7 @@ public class Strings {
 	 */
 	public static final List<String> splatch(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
-		return Strings.__apply(pattern, string, index, true, true);
+		return Strings._apply_(pattern, string, index, true, true);
 	}
 
 	/**
@@ -528,7 +528,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> splatchAll(final String regex, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(regex, string, true, true);
+		return Strings._applyAll_(regex, string, true, true);
 	}
 
 	/**
@@ -546,7 +546,7 @@ public class Strings {
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 */
 	public static final List<List<String>> splatchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
-		return Strings.__applyAll(pattern, string, true, true);
+		return Strings._applyAll_(pattern, string, true, true);
 	}
 
 	/**

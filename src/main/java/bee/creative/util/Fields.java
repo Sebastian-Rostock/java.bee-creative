@@ -1157,7 +1157,7 @@ public final class Fields {
 	}
 
 	/**
-	 * Diese Methode gibt ein {@link Field} zurück, welches das gegebene {@link Field} via {@code synchronized(this)} synchronisiert.
+	 * Diese Methode gibt ein {@link Field} zurück, welches das gegebene {@link Field} via {@code synchronized(field)} synchronisiert.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
@@ -1171,14 +1171,14 @@ public final class Fields {
 
 			@Override
 			public GValue get(final GInput input) {
-				synchronized (this) {
+				synchronized (field) {
 					return field.get(input);
 				}
 			}
 
 			@Override
 			public void set(final GInput input, final GValue value) {
-				synchronized (this) {
+				synchronized (field) {
 					field.set(input, value);
 				}
 			}

@@ -91,7 +91,8 @@ public class MMFArray extends IAMArray {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected MMFArray(int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException, IllegalArgumentException {
+	protected MMFArray(final int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
+		IllegalArgumentException {
 		super(length);
 		this._byteBuffer_ = byteBuffer;
 		this._byteOffset_ = byteOffset;

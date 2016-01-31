@@ -491,7 +491,7 @@ public class Filters {
 	}
 
 	/**
-	 * Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(this)} synchronisiert.
+	 * Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert.
 	 * 
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
@@ -504,7 +504,7 @@ public class Filters {
 
 			@Override
 			public boolean accept(final GInput input) {
-				synchronized (this) {
+				synchronized (filter) {
 					return filter.accept(input);
 				}
 			}

@@ -1363,7 +1363,7 @@ public class Builders {
 				if (pointer != null) {
 					final GValue data = pointer.data();
 					if (data != null) return data;
-					if (pointer == Pointers.NULL_POINTER) return null;
+					if (pointer == Pointers._null_) return null;
 				}
 				final GValue data = builder.build();
 				this.pointer = Pointers.pointer(mode, data);
@@ -1409,7 +1409,7 @@ public class Builders {
 	}
 
 	/**
-	 * Diese Methode gibt einen synchronisierten {@link Builder} zurück, der den gegebenen {@link Builder} via {@code synchronized(this)} synchronisiert.
+	 * Diese Methode gibt einen synchronisierten {@link Builder} zurück, der den gegebenen {@link Builder} via {@code synchronized(builder)} synchronisiert.
 	 * 
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param builder {@link Builder}.
@@ -1422,7 +1422,7 @@ public class Builders {
 
 			@Override
 			public final GValue build() throws IllegalStateException {
-				synchronized (this) {
+				synchronized (builder) {
 					return builder.build();
 				}
 			}

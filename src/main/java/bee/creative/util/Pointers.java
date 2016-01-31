@@ -24,7 +24,7 @@ public class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.__hash(this);
+			return Pointers._hash_(this);
 		}
 
 		/**
@@ -32,7 +32,7 @@ public class Pointers {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return Pointers.__equals(this, object);
+			return Pointers._equals_(this, object);
 		}
 
 		/**
@@ -57,7 +57,7 @@ public class Pointers {
 		/**
 		 * Dieses Feld speichert den Datensatz.
 		 */
-		final GData __data;
+		final GData _data_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Datensatz.
@@ -65,7 +65,7 @@ public class Pointers {
 		 * @param data Datensatz.
 		 */
 		public HardPointer(final GData data) {
-			this.__data = data;
+			this._data_ = data;
 		}
 
 		{}
@@ -75,7 +75,7 @@ public class Pointers {
 		 */
 		@Override
 		public GData data() {
-			return this.__data;
+			return this._data_;
 		}
 
 	}
@@ -114,7 +114,7 @@ public class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.__hash(this);
+			return Pointers._hash_(this);
 		}
 
 		/**
@@ -122,7 +122,7 @@ public class Pointers {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return Pointers.__equals(this, object);
+			return Pointers._equals_(this, object);
 		}
 
 		/**
@@ -169,7 +169,7 @@ public class Pointers {
 		 */
 		@Override
 		public int hashCode() {
-			return Pointers.__hash(this);
+			return Pointers._hash_(this);
 		}
 
 		/**
@@ -177,7 +177,7 @@ public class Pointers {
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return Pointers.__equals(this, object);
+			return Pointers._equals_(this, object);
 		}
 
 		/**
@@ -214,7 +214,7 @@ public class Pointers {
 	/**
 	 * Dieses Feld speichert den {@link Pointer} auf {@code null}.
 	 */
-	public static final Pointer<?> NULL_POINTER = new HardPointer<>(null);
+	static final Pointer<?> _null_ = new HardPointer<>(null);
 
 	{}
 
@@ -225,7 +225,7 @@ public class Pointers {
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Object#hashCode() Streuwert}.
 	 */
-	static final int __hash(final Pointer<?> pointer) {
+	static final int _hash_(final Pointer<?> pointer) {
 		return Objects.hash(pointer.data());
 	}
 
@@ -237,7 +237,7 @@ public class Pointers {
 	 * @param object Objekt.
 	 * @return {@link Object#equals(Object) Äquivalenz}.
 	 */
-	static final boolean __equals(final Pointer<?> pointer, final Object object) {
+	static final boolean _equals_(final Pointer<?> pointer, final Object object) {
 		if (object == pointer) return true;
 		if (!(object instanceof Pointer<?>)) return false;
 		final Pointer<?> data = (Pointer<?>)object;
@@ -245,7 +245,7 @@ public class Pointers {
 	}
 
 	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich {@link #NULL_POINTER} oder sein Datensatz nicht {@code null} ist.
+	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich {@link #_null_} oder sein Datensatz nicht {@code null} ist.
 	 * 
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Pointer}-Validität.
@@ -253,16 +253,16 @@ public class Pointers {
 	 */
 	public static final boolean isValid(final Pointer<?> pointer) throws NullPointerException {
 		if (pointer == null) throw new NullPointerException("pointer = null");
-		return (pointer == Pointers.NULL_POINTER) || (pointer.data() != null);
+		return (pointer == Pointers._null_) || (pointer.data() != null);
 	}
 
 	/**
-	 * Diese Methode gibt den gegebenen {@link Pointer} oder {@link #NULL_POINTER} zurück.
+	 * Diese Methode gibt den gegebenen {@link Pointer} oder {@link #_null_} zurück.
 	 * 
 	 * @see #nullPointer()
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer} oder {@code null}.
-	 * @return gegebener {@link Pointer} oder {@link #NULL_POINTER}.
+	 * @return gegebener {@link Pointer} oder {@link #_null_}.
 	 */
 	public static final <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
 		if (pointer == null) return Pointers.nullPointer();
@@ -297,11 +297,11 @@ public class Pointers {
 	 * Diese Methode gibt den {@link Pointer} auf {@code null} zurück.
 	 * 
 	 * @param <GData> Typ des Datensatzes.
-	 * @return {@link #NULL_POINTER}.
+	 * @return {@link #_null_}.
 	 */
 	@SuppressWarnings ("unchecked")
 	public static final <GData> Pointer<GData> nullPointer() {
-		return (Pointer<GData>)Pointers.NULL_POINTER;
+		return (Pointer<GData>)Pointers._null_;
 	}
 
 	/**
@@ -311,7 +311,7 @@ public class Pointers {
 	 * @see HardPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link HardPointer} oder {@link #NULL_POINTER}.
+	 * @return {@link HardPointer} oder {@link #_null_}.
 	 */
 	public static final <GData> Pointer<GData> hardPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
@@ -325,7 +325,7 @@ public class Pointers {
 	 * @see WeakPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link WeakPointer} oder {@link #NULL_POINTER}.
+	 * @return {@link WeakPointer} oder {@link #_null_}.
 	 */
 	public static final <GData> Pointer<GData> weakPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
@@ -339,7 +339,7 @@ public class Pointers {
 	 * @see SoftPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
-	 * @return {@link SoftPointer} oder {@link #NULL_POINTER}.
+	 * @return {@link SoftPointer} oder {@link #_null_}.
 	 */
 	public static final <GData> Pointer<GData> softPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
