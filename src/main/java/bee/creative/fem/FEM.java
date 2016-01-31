@@ -49,7 +49,7 @@ public class FEM {
 		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
 		public final <GData> GData data(final FEMType<GData> type) throws NullPointerException, IllegalArgumentException {
-			return FEMContext.__default.dataOf(this, type);
+			return FEMContext._default_.dataOf(this, type);
 		}
 
 		/**
@@ -4278,7 +4278,7 @@ public class FEM {
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann.
 	 */
 	public static final FEMArray arrayOf(final Object data) throws IllegalArgumentException {
-		return FEMContext.__default.arrayOf(data);
+		return FEMContext._default_.arrayOf(data);
 	}
 
 	/**
@@ -4290,7 +4290,7 @@ public class FEM {
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
 	 */
 	public static final FEMValue valueOf(final Object data) throws IllegalArgumentException {
-		return FEMContext.__default.valueOf(data);
+		return FEMContext._default_.valueOf(data);
 	}
 
 	/**
@@ -4328,7 +4328,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMArray arrayData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.ARRAY_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.ARRAY_TYPE);
 	}
 
 	/**
@@ -4386,7 +4386,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMObject objectData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.OBJECT_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.OBJECT_TYPE);
 	}
 
 	/**
@@ -4420,7 +4420,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMString stringData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.STRING_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.STRING_TYPE);
 	}
 
 	/**
@@ -4479,7 +4479,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMBinary binaryData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.BINARY_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.BINARY_TYPE);
 	}
 
 	/**
@@ -4526,7 +4526,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMInteger integerData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.INTEGER_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.INTEGER_TYPE);
 	}
 
 	/**
@@ -4581,7 +4581,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMDecimal decimalData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.DECIMAL_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.DECIMAL_TYPE);
 	}
 
 	/**
@@ -4636,7 +4636,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMBoolean booleanData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.BOOLEAN_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.BOOLEAN_TYPE);
 	}
 
 	/**
@@ -4691,7 +4691,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMDuration durationData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.DURATION_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.DURATION_TYPE);
 	}
 
 	/**
@@ -4725,7 +4725,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMDatetime datetimeData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.DATETIME_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.DATETIME_TYPE);
 	}
 
 	/**
@@ -4770,7 +4770,7 @@ public class FEM {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public static final FEMFunction functionData(final FEMValue value) throws NullPointerException {
-		return FEMContext.__default.dataOf(value, FEM.FUNCTION_TYPE);
+		return FEMContext._default_.dataOf(value, FEM.FUNCTION_TYPE);
 	}
 
 	/**

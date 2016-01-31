@@ -72,7 +72,7 @@ public abstract class FEMContext {
 	/**
 	 * Dieses Feld speichert das Rückfallkontextobjekt.
 	 */
-	static FEMContext __default = FEMContext.EMPTY;
+	static FEMContext _default_ = FEMContext.EMPTY;
 
 	{}
 
@@ -84,7 +84,7 @@ public abstract class FEMContext {
 	 * @return Rückfallkontextobjekt
 	 */
 	public static final FEMContext DEFAULT() {
-		return FEMContext.__default;
+		return FEMContext._default_;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public abstract class FEMContext {
 	 * @param context Rückfallkontextobjekt oder {@code null}.
 	 */
 	public static final void DEFAULT(final FEMContext context) {
-		FEMContext.__default = context != null ? context : FEMContext.EMPTY;
+		FEMContext._default_ = context != null ? context : FEMContext.EMPTY;
 	}
 
 	{}
@@ -158,9 +158,9 @@ public abstract class FEMContext {
 	 */
 	public final FEMArray arrayOf(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
-		if (data instanceof Object[]) return this.__arrayOf((Object[])data);
-		if (data instanceof Collection<?>) return this.__arrayOf((Collection<?>)data);
-		if (data instanceof Iterable<?>) return this.__arrayOf((Iterable<?>)data);
+		if (data instanceof Object[]) return this._arrayOf_((Object[])data);
+		if (data instanceof Collection<?>) return this._arrayOf_((Collection<?>)data);
+		if (data instanceof Iterable<?>) return this._arrayOf_((Iterable<?>)data);
 		final int length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
@@ -171,7 +171,7 @@ public abstract class FEMContext {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray __arrayOf(final Object[] data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray _arrayOf_(final Object[] data) throws NullPointerException, IllegalArgumentException {
 		final int length = data.length;
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
@@ -182,15 +182,15 @@ public abstract class FEMContext {
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray __arrayOf(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray _arrayOf_(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
 		final List<Object> array = new ArrayList<>();
 		Iterables.appendAll(array, data);
-		return this.__arrayOf(array);
+		return this._arrayOf_(array);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray __arrayOf(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
-		return this.__arrayOf(data.toArray());
+	final FEMArray _arrayOf_(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
+		return this._arrayOf_(data.toArray());
 	}
 
 	/**

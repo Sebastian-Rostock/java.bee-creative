@@ -86,7 +86,7 @@ public abstract class FEMType<GData> {
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
 	public final GData dataOf(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return FEMContext.__default.dataOf(value, this);
+		return FEMContext._default_.dataOf(value, this);
 	}
 
 	/**
