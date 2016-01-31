@@ -330,7 +330,7 @@ public class Builders {
 		protected GKey _key_;
 
 		/**
-		 * Dieses Feld speichert die interne Abbildung.
+		 * Dieses Feld speichert die interne {@link Map}.
 		 */
 		protected GEntries _entries_;
 
@@ -539,6 +539,9 @@ public class Builders {
 	 */
 	public static abstract class BaseSetBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, Set<GItem>, GThis> {
 
+		/**
+		 * Dieser Konstruktor initialisiert das interne {@link HashSet}.
+		 */
 		public BaseSetBuilder() {
 			super(new HashSet<GItem>());
 		}
@@ -742,6 +745,9 @@ public class Builders {
 	 */
 	public static abstract class BaseMapBuilder<GKey, GValue, GThis> extends BaseEntriesBuilder<GKey, GValue, Map<GKey, GValue>, GThis> {
 
+		/**
+		 * Dieser Konstruktor initialisiert die interne {@link HashMap}.
+		 */
 		public BaseMapBuilder() {
 			super(new HashMap<GKey, GValue>());
 		}
@@ -845,7 +851,6 @@ public class Builders {
 	 */
 	public static abstract class BaseCollectionBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, Collection<GItem>, GThis> {
 
-		// TODO 2
 		/**
 		 * Dieser Konstruktor initialisiert die interne {@link Collection}.
 		 * 
@@ -862,7 +867,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
+		protected GThis makeChecked(final Class<GItem> clazz) {
 			this._items_ = Collections.checkedCollection(this._items_, clazz);
 			return this._this_();
 		}
@@ -871,7 +876,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeSynchronized() {
+		protected GThis makeSynchronized() {
 			this._items_ = Collections.synchronizedCollection(this._items_);
 			return this._this_();
 		}
@@ -880,9 +885,57 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeUnmodifiable() {
+		protected GThis makeUnmodifiable() {
 			this._items_ = Collections.unmodifiableCollection(this._items_);
 			return this._this_();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link BaseCollectionBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()}
+	 * und {@link #makeUnmodifiable()}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
+	 */
+	public static abstract class BaseCollectionBuilder2<GItem, GThis> extends BaseCollectionBuilder<GItem, GThis> {
+
+		/**
+		 * Dieser Konstruktor initialisiert die interne {@link Collection}.
+		 * 
+		 * @param items {@link Collection}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public BaseCollectionBuilder2(final Collection<GItem> items) throws NullPointerException {
+			super(items);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeChecked(final Class<GItem> clazz) {
+			return super.makeChecked(clazz);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeSynchronized() {
+			return super.makeSynchronized();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeUnmodifiable() {
+			return super.makeUnmodifiable();
 		}
 
 	}
@@ -896,7 +949,6 @@ public class Builders {
 	 */
 	public static abstract class BaseSortedSetBuilder<GItem, GThis> extends BaseItemsBuilder<GItem, SortedSet<GItem>, GThis> {
 
-		// TODO 2
 		/**
 		 * Dieser Konstruktor initialisiert das interne {@link TreeSet}.
 		 */
@@ -920,7 +972,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeChecked(final Class<GItem> clazz) {
+		protected GThis makeChecked(final Class<GItem> clazz) {
 			this._items_ = Collections.checkedSortedSet(this._items_, clazz);
 			return this._this_();
 		}
@@ -929,7 +981,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeSynchronized() {
+		protected GThis makeSynchronized() {
 			this._items_ = Collections.synchronizedSortedSet(this._items_);
 			return this._this_();
 		}
@@ -938,9 +990,57 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeUnmodifiable() {
+		protected GThis makeUnmodifiable() {
 			this._items_ = Collections.unmodifiableSortedSet(this._items_);
 			return this._this_();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link BaseSortedSetBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class)}, {@link #makeSynchronized()}
+	 * und {@link #makeUnmodifiable()}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
+	 */
+	public static abstract class BaseSortedSetBuilder2<GItem, GThis> extends BaseSortedSetBuilder<GItem, GThis> {
+
+		/**
+		 * Dieser Konstruktor initialisiert das interne {@link SortedSet}.
+		 * 
+		 * @param items {@link SortedSet}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public BaseSortedSetBuilder2(final SortedSet<GItem> items) throws NullPointerException {
+			super(items);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeChecked(final Class<GItem> clazz) {
+			return super.makeChecked(clazz);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeSynchronized() {
+			return super.makeSynchronized();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeUnmodifiable() {
+			return super.makeUnmodifiable();
 		}
 
 	}
@@ -955,12 +1055,11 @@ public class Builders {
 	 */
 	public static abstract class BaseSortedMapBuilder<GKey, GValue, GThis> extends BaseEntriesBuilder<GKey, GValue, SortedMap<GKey, GValue>, GThis> {
 
-		// TODO 2
 		/**
-		 * Dieser Konstruktor initialisiert die interne Abbildung.
+		 * Dieser Konstruktor initialisiert die interne {@link SortedMap}.
 		 * 
-		 * @param entries interne Abbildung.
-		 * @throws NullPointerException Wenn {@code entrySortedMap} {@code null} ist.
+		 * @param entries interne {@link SortedMap}.
+		 * @throws NullPointerException Wenn {@code entries} {@code null} ist.
 		 */
 		public BaseSortedMapBuilder(final SortedMap<GKey, GValue> entries) throws NullPointerException {
 			super(entries);
@@ -972,7 +1071,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+		protected GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
 			this._entries_ = Collections.checkedSortedMap(this._entries_, keyClazz, valueClazz);
 			return this._this_();
 		}
@@ -981,7 +1080,7 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeSynchronized() {
+		protected GThis makeSynchronized() {
 			this._entries_ = Collections.synchronizedSortedMap(this._entries_);
 			return this._this_();
 		}
@@ -990,9 +1089,58 @@ public class Builders {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final GThis makeUnmodifiable() {
+		protected GThis makeUnmodifiable() {
 			this._entries_ = Collections.unmodifiableSortedMap(this._entries_);
 			return this._this_();
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen {@link BaseMapBuilder} mit sichtbaren Umwandlungsmethoden {@link #makeChecked(Class, Class)}, {@link #makeSynchronized()}
+	 * und {@link #makeUnmodifiable()}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel in der Abbildung.
+	 * @param <GValue> Typ der Werte in der Abbildung.
+	 * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
+	 */
+	public static abstract class BaseSortedMapBuilder2<GKey, GValue, GThis> extends BaseSortedMapBuilder<GKey, GValue, GThis> {
+
+		/**
+		 * Dieser Konstruktor initialisiert die interne {@link SortedMap}.
+		 * 
+		 * @param entries interne Abbildung.
+		 * @throws NullPointerException Wenn {@code entries} {@code null} ist.
+		 */
+		public BaseSortedMapBuilder2(final SortedMap<GKey, GValue> entries) throws NullPointerException {
+			super(entries);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeChecked(final Class<GKey> keyClazz, final Class<GValue> valueClazz) {
+			return super.makeChecked(keyClazz, valueClazz);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeSynchronized() {
+			return super.makeSynchronized();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public final GThis makeUnmodifiable() {
+			return super.makeUnmodifiable();
 		}
 
 	}
@@ -1003,7 +1151,7 @@ public class Builders {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente.
 	 */
-	public static final class TreeSetBuilder<GItem> extends BaseSortedSetBuilder<GItem, TreeSetBuilder<GItem>> {
+	public static final class TreeSetBuilder<GItem> extends BaseSortedSetBuilder2<GItem, TreeSetBuilder<GItem>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert das interne {@link TreeSet}.
@@ -1031,7 +1179,7 @@ public class Builders {
 	 * @param <GKey> Typ der Schlüssel in der Abbildung.
 	 * @param <GValue> Typ der Werte in der Abbildung.
 	 */
-	public static final class TreeMapBuilder<GKey, GValue> extends BaseSortedMapBuilder<GKey, GValue, TreeMapBuilder<GKey, GValue>> {
+	public static final class TreeMapBuilder<GKey, GValue> extends BaseSortedMapBuilder2<GKey, GValue, TreeMapBuilder<GKey, GValue>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die interne {@link TreeMap}.
@@ -1086,7 +1234,7 @@ public class Builders {
 	 * @param <GKey> Typ der Schlüssel in der Abbildung.
 	 * @param <GValue> Typ der Werte in der Abbildung.
 	 */
-	public static final class HashMapBuilder<GKey, GValue> extends BaseMapBuilder<GKey, GValue, HashMapBuilder<GKey, GValue>> {
+	public static final class HashMapBuilder<GKey, GValue> extends BaseMapBuilder2<GKey, GValue, HashMapBuilder<GKey, GValue>> {
 
 		/**
 		 * Dieser Konstruktor initialisiert die interne {@link HashMap}.
@@ -1205,8 +1353,6 @@ public class Builders {
 
 	}
 
-	// TODO Simple list, collection, map
-
 	/**
 	 * Diese Klasse implementiert einen Konfigurator für eine {@link List}.
 	 * 
@@ -1251,8 +1397,6 @@ public class Builders {
 
 	}
 
-	// TODO Simple list, collection, map
-
 	/**
 	 * Diese Klasse implementiert einen Konfigurator für ein {@link Map}.
 	 * 
@@ -1294,6 +1438,140 @@ public class Builders {
 		 */
 		@Override
 		protected final SimpleMapBuilder<GKey, GValue> _this_() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen Konfigurator für eine {@link Collection}.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 */
+	public static final class SimpleCollectionBuilder<GItem> extends BaseCollectionBuilder2<GItem, SimpleCollectionBuilder<GItem>> {
+
+		/**
+		 * Diese Methode gibt einen neuen {@link SimpleCollectionBuilder} zur gegebenen {@link Collection} zurück.
+		 * 
+		 * @param <GItem> Typ der Elemente.
+		 * @param items {@link Collection}.
+		 * @return {@link SimpleCollectionBuilder}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public static final <GItem> SimpleCollectionBuilder<GItem> from(final Collection<GItem> items) throws NullPointerException {
+			return new SimpleCollectionBuilder<>(items);
+		}
+
+		{}
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link Collection}.
+		 * 
+		 * @param items {@link Collection}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public SimpleCollectionBuilder(final Collection<GItem> items) throws NullPointerException {
+			super(items);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final SimpleCollectionBuilder<GItem> _this_() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen Konfigurator für ein {@link SortedSet}.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GItem> Typ der Elemente.
+	 */
+	public static final class SimpleSortedSetBuilder<GItem> extends BaseSortedSetBuilder2<GItem, SimpleSortedSetBuilder<GItem>> {
+
+		/**
+		 * Diese Methode gibt einen neuen {@link SimpleSortedSetBuilder} zur gegebenen {@link SortedSet} zurück.
+		 * 
+		 * @param <GItem> Typ der Elemente.
+		 * @param items {@link SortedSet}.
+		 * @return {@link SimpleSortedSetBuilder}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public static final <GItem> SimpleSortedSetBuilder<GItem> from(final SortedSet<GItem> items) throws NullPointerException {
+			return new SimpleSortedSetBuilder<>(items);
+		}
+
+		{}
+
+		/**
+		 * Dieser Konstruktor initialisiert die {@link SortedSet}.
+		 * 
+		 * @param items {@link SortedSet}.
+		 * @throws NullPointerException Wenn {@code items} {@code null} ist.
+		 */
+		public SimpleSortedSetBuilder(final SortedSet<GItem> items) throws NullPointerException {
+			super(items);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final SimpleSortedSetBuilder<GItem> _this_() {
+			return this;
+		}
+
+	}
+
+	/**
+	 * Diese Klasse implementiert einen Konfigurator für ein {@link SortedMap}.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 * @param <GKey> Typ der Schlüssel in der Abbildung.
+	 * @param <GValue> Typ der Werte in der Abbildung.
+	 */
+	public static final class SimpleSortedMapBuilder<GKey, GValue> extends BaseSortedMapBuilder2<GKey, GValue, SimpleSortedMapBuilder<GKey, GValue>> {
+
+		/**
+		 * Diese Methode gibt einen neuen {@link SimpleSortedMapBuilder} zum gegebenen {@link SortedMap} zurück.
+		 * 
+		 * @param <GKey> Typ der Schlüssel in der Abbildung.
+		 * @param <GValue> Typ der Werte in der Abbildung.
+		 * @param entries {@link SortedMap}.
+		 * @return {@link SimpleSortedMapBuilder}.
+		 * @throws NullPointerException Wenn {@code entries} {@code null} ist.
+		 */
+		public static final <GKey, GValue> SimpleSortedMapBuilder<GKey, GValue> from(final SortedMap<GKey, GValue> entries) throws NullPointerException {
+			return new SimpleSortedMapBuilder<>(entries);
+		}
+
+		{}
+
+		/**
+		 * Dieser Konstruktor initialisiert das {@link SortedMap}.
+		 * 
+		 * @param entries {@link SortedMap}.
+		 * @throws NullPointerException Wenn {@code entries} {@code null} ist.
+		 */
+		public SimpleSortedMapBuilder(final SortedMap<GKey, GValue> entries) throws NullPointerException {
+			super(entries);
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected final SimpleSortedMapBuilder<GKey, GValue> _this_() {
 			return this;
 		}
 
