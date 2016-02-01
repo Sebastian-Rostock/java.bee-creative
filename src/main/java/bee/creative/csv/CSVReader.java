@@ -19,7 +19,7 @@ public final class CSVReader implements Closeable {
 
 	@SuppressWarnings ("javadoc")
 	static final void _check_(final char symbol) throws IllegalArgumentException {
-		if ((symbol != '\r') && (symbol != '\n')) throw new IllegalArgumentException();
+		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
 
 	{}
@@ -178,6 +178,7 @@ public final class CSVReader implements Closeable {
 		try {
 			result.add(this._readValue_());
 			final char comma = this._comma_;
+			symbol = this._symbol_;
 			while (symbol == comma) {
 				this._symbol_ = reader.read();
 				result.add(this._readValue_());
