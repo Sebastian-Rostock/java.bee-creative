@@ -97,10 +97,10 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	 */
 	@Override
 	public final boolean add(final GItem item) {
-		int index = this.customItemIndex(item);
+		int index = this._itemIndex_(item);
 		if (index >= 0) return false;
 		index = -index - 1;
-		this.customInsert(index, 1);
+		this._insert_(index, 1);
 		this.setItem(index, item);
 		return true;
 	}

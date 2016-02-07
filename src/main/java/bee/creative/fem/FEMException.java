@@ -33,7 +33,7 @@ public final class FEMException extends RuntimeException implements Iterable<Str
 	 * @param cause Ausnahme.
 	 * @return {@link FEMException}.
 	 */
-	public final FEMException from(final Throwable cause) {
+	public static final FEMException from(final Throwable cause) {
 		if (cause instanceof FEMException) return (FEMException)cause;
 		return new FEMException().useCause(cause);
 	}

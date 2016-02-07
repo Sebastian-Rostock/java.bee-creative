@@ -83,7 +83,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected final GValue getValue(final int index) {
-		return (GValue)this.items.get(index);
+		return (GValue)this._items_.get(index);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@Override
 	protected final void setEntry(final int index, final GKey key, final GValue value) {
 		if (value == null) throw new NullPointerException("value = null");
-		this.items.set(index, value);
+		this._items_.set(index, value);
 		this.setKey(key, value);
 	}
 
@@ -101,7 +101,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	 */
 	@SuppressWarnings ("unchecked")
 	@Override
-	protected int customItemCompare(final Object key, final int hash, final Object item) {
+	protected int _itemCompare_(final Object key, final int hash, final Object item) {
 		return this.comparator.compare((GKey)key, this.getKey((GValue)item));
 	}
 
@@ -120,7 +120,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	@Override
 	public boolean containsValue(final Object value) {
 		if (value == null) return false;
-		return this.items.values().contains(value);
+		return this._items_.values().contains(value);
 	}
 
 }

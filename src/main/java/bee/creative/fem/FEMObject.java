@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
-import bee.creative.fem.FEM.ScriptFormatterInput;
 
 /**
  * Diese Klasse implementiert eine Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue() Objektschlüssel}
@@ -13,7 +13,17 @@ import bee.creative.fem.FEM.ScriptFormatterInput;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterInput {
+public final class FEMObject extends BaseValue implements Comparable<FEMObject> {
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 10;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMObject> TYPE = FEMType.from(FEMObject.ID, "OBJECT");
 
 	/**
 	 * Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind.
@@ -32,29 +42,52 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @throws IllegalArgumentException Wenn {@code ref}, {@code type} bzw. {@code owner} ungültig ist.
 	 */
 	public static final FEMObject from(final int ref, final int type, final int owner) throws IllegalArgumentException {
-		FEMObject.__checkRef(ref);
-		FEMObject.__checkType(type);
-		FEMObject.__checkOwner(owner);
-		return FEMObject.__from(ref, type, owner);
+		FEMObject._checkRef_(ref);
+		FEMObject._checkType_(type);
+		FEMObject._checkOwner_(owner);
+		return FEMObject._from_(ref, type, owner);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMObject.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Referenz.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMObject from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMObject.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Referenz.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMObject from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMObject.TYPE);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final FEMObject __from(final int ref, final int type, final int owner) throws IllegalArgumentException {
+	static final FEMObject _from_(final int ref, final int type, final int owner) throws IllegalArgumentException {
 		return new FEMObject(ref, (type << 16) | (owner << 0));
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void __checkRef(final int ref) throws IllegalArgumentException {
+	static final void _checkRef_(final int ref) throws IllegalArgumentException {
 		if (ref < 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void __checkType(final int type) throws IllegalArgumentException {
+	static final void _checkType_(final int type) throws IllegalArgumentException {
 		if ((type < 0) || (type > 65535)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void __checkOwner(final int owner) throws IllegalArgumentException {
+	static final void _checkOwner_(final int owner) throws IllegalArgumentException {
 		if ((owner < 0) || (owner > 65535)) throw new IllegalArgumentException();
 	}
 
@@ -68,7 +101,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * <li>refValue - 32 Bit</li>
 	 * </ul>
 	 */
-	final int __valueL;
+	final int _valueL_;
 
 	/**
 	 * Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Referenz.
@@ -79,7 +112,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * <li>ownerValue - 16 Bit</li>
 	 * </ul>
 	 */
-	final int __valueH;
+	final int _valueH_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung der Referenz.
@@ -90,15 +123,15 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 */
 	public FEMObject(final long value) throws IllegalArgumentException {
 		this((int)(value >> 32), (int)(value >> 0));
-		FEMObject.__checkRef(this.refValue());
-		FEMObject.__checkType(this.typeValue());
-		FEMObject.__checkOwner(this.ownerValue());
+		FEMObject._checkRef_(this.refValue());
+		FEMObject._checkType_(this.typeValue());
+		FEMObject._checkOwner_(this.ownerValue());
 	}
 
 	@SuppressWarnings ("javadoc")
-	private FEMObject(final int valueH, final int valueL) {
-		this.__valueH = valueH;
-		this.__valueL = valueL;
+	FEMObject(final int valueH, final int valueL) {
+		this._valueH_ = valueH;
+		this._valueL_ = valueL;
 	}
 
 	{}
@@ -116,7 +149,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @return interne Darstellung der Referenz.
 	 */
 	public final long value() {
-		return (((long)this.__valueH) << 32) | (((long)this.__valueL) << 0);
+		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
 	}
 
 	/**
@@ -125,7 +158,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @return Objektschlüssel ({@code 0..2147483647}).
 	 */
 	public final int refValue() {
-		return this.__valueL;
+		return this._valueL_;
 	}
 
 	/**
@@ -135,7 +168,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @return Typkennung ({@code 0..65535}).
 	 */
 	public final int typeValue() {
-		return (this.__valueH >> 16) & 0xFFFF;
+		return (this._valueH_ >> 16) & 0xFFFF;
 	}
 
 	/**
@@ -145,7 +178,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @return Besitzerkennung ({@code 0..65535}).
 	 */
 	public final int ownerValue() {
-		return (this.__valueH >> 0) & 0xFFFF;
+		return (this._valueH_ >> 0) & 0xFFFF;
 	}
 
 	/**
@@ -157,8 +190,8 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist.
 	 */
 	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
-		FEMObject.__checkRef(ref);
-		return FEMObject.__from(ref, this.typeValue(), this.ownerValue());
+		FEMObject._checkRef_(ref);
+		return FEMObject._from_(ref, this.typeValue(), this.ownerValue());
 	}
 
 	/**
@@ -170,8 +203,8 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist.
 	 */
 	public final FEMObject withType(final int type) throws IllegalArgumentException {
-		FEMObject.__checkType(type);
-		return FEMObject.__from(this.refValue(), type, this.ownerValue());
+		FEMObject._checkType_(type);
+		return FEMObject._from_(this.refValue(), type, this.ownerValue());
 	}
 
 	/**
@@ -183,8 +216,17 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist.
 	 */
 	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
-		FEMObject.__checkOwner(owner);
-		return FEMObject.__from(this.refValue(), this.typeValue(), owner);
+		FEMObject._checkOwner_(owner);
+		return FEMObject._from_(this.refValue(), this.typeValue(), owner);
+	}
+
+	/**
+	 * Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert.
+	 */
+	public final int hash() {
+		return this._valueH_ ^ this._valueL_;
 	}
 
 	/**
@@ -195,7 +237,7 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMObject that) throws NullPointerException {
-		return (this.__valueL == that.__valueL) && (this.__valueH == that.__valueH);
+		return (this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_);
 	}
 
 	/**
@@ -220,19 +262,38 @@ public final class FEMObject implements Comparable<FEMObject>, ScriptFormatterIn
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int hashCode() {
-		return this.__valueH ^ this.__valueL;
+	public final FEMObject data() {
+		return this;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final FEMType<FEMObject> type() {
+		return FEMObject.TYPE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMObject)) return false;
-		final FEMObject that = (FEMObject)object;
-		return (this.__valueL == that.__valueL) && (this.__valueH == that.__valueH);
+		if (!(object instanceof FEMObject)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMObject)) return false;
+		}
+		return this.equals((FEMObject)object);
 	}
 
 	/**

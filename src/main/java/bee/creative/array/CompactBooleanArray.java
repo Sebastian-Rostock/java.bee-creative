@@ -44,7 +44,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public boolean get(final int index) {
-			return this.owner.get(this.ownerIndex(index));
+			return this._owner_.get(this._ownerIndex_(index));
 		}
 
 		/**
@@ -60,7 +60,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public void set(final int index, final boolean value) {
-			this.owner.set(this.ownerIndex(index), value);
+			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
 		/**
@@ -109,7 +109,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public BooleanArray subArray(final int fromIndex, final int toIndex) {
-			return (BooleanArray)this.ownerSubArray(fromIndex, toIndex);
+			return (BooleanArray)this._ownerSubArray_(fromIndex, toIndex);
 		}
 
 	}
@@ -124,7 +124,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactBooleanArray owner;
+		protected final CompactBooleanArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -134,7 +134,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		public CompactBooleanArraySection(final CompactBooleanArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -144,7 +144,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int size() {
-			return this.owner.size;
+			return this._owner_._size_;
 		}
 
 		/**
@@ -152,7 +152,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public boolean[] array() {
-			return this.owner.array;
+			return this._owner_._array_;
 		}
 
 		/**
@@ -160,7 +160,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.from;
+			return this._owner_._from_;
 		}
 
 		/**
@@ -168,8 +168,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int finalIndex() {
-			final CompactBooleanArray owner = this.owner;
-			return owner.from + owner.size;
+			final CompactBooleanArray owner = this._owner_;
+			return owner._from_ + owner._size_;
 		}
 
 	}
@@ -184,7 +184,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactBooleanSubArray owner;
+		protected final CompactBooleanSubArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -194,7 +194,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		public CompactBooleanSubArraySection(final CompactBooleanSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -204,7 +204,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int size() {
-			return this.owner.size();
+			return this._owner_.size();
 		}
 
 		/**
@@ -212,7 +212,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public boolean[] array() {
-			return this.owner.owner.array;
+			return this._owner_._owner_._array_;
 		}
 
 		/**
@@ -220,7 +220,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.startIndex;
+			return this._owner_._startIndex_;
 		}
 
 		/**
@@ -228,7 +228,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 		 */
 		@Override
 		public int finalIndex() {
-			return this.owner.finalIndex;
+			return this._owner_._finalIndex_;
 		}
 
 	}
@@ -238,7 +238,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	/**
 	 * Dieses Feld speichert das {@code boolean}-Array.
 	 */
-	protected boolean[] array;
+	protected boolean[] _array_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
@@ -279,23 +279,23 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean[] getArray() {
-		return this.array;
+	protected boolean[] _array_() {
+		return this._array_;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setArray(final boolean[] array) {
-		this.array = array;
+	protected void _array_(final boolean[] array) {
+		this._array_ = array;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean[] newArray(final int length) {
+	protected boolean[] _allocArray_(final int length) {
 		return new boolean[length];
 	}
 
@@ -303,7 +303,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Boolean getValue(final int index) {
+	protected Boolean _value_(final int index) {
 		return Boolean.valueOf(this.get(index));
 	}
 
@@ -311,7 +311,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setValue(final int index, final Boolean value) {
+	protected void _value_(final int index, final Boolean value) {
 		this.set(index, value.booleanValue());
 	}
 
@@ -319,8 +319,8 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getArrayLength() {
-		return this.array.length;
+	protected int _capacity_() {
+		return this._array_.length;
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public boolean get(final int index) {
-		return this.array[this.inclusiveIndex(index)];
+		return this._array_[this._inclusiveIndex_(index)];
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public void set(final int index, final boolean value) {
-		this.array[this.inclusiveIndex(index)] = value;
+		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public void add(final boolean value) {
-		this.add(this.size, value);
+		this.add(this._size_, value);
 	}
 
 	/**
@@ -368,7 +368,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public void add(final boolean[] values) {
-		this.add(this.size, values);
+		this.add(this._size_, values);
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public void add(final int index, final boolean[] values) {
-		this.add(this.size, BooleanArraySection.from(values));
+		this.add(this._size_, BooleanArraySection.from(values));
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class CompactBooleanArray extends CompactArray<boolean[], Boolean> implem
 	 */
 	@Override
 	public boolean[] array() {
-		return this.array;
+		return this._array_;
 	}
 
 	/**

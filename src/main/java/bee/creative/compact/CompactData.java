@@ -35,7 +35,7 @@ public abstract class CompactData {
 		/**
 		 * Dieses Feld speichert das leere Array.
 		 */
-		protected static final Object[] VOID = new Object[0];
+		protected static final Object[] _empty_ = new Object[0];
 
 		{}
 
@@ -51,8 +51,8 @@ public abstract class CompactData {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Object[] newArray(final int length) {
-			if (length == 0) return CompactDataArray.VOID;
+		protected Object[] _allocArray_(final int length) {
+			if (length == 0) return CompactDataArray._empty_;
 			return new Object[length];
 		}
 
@@ -69,7 +69,7 @@ public abstract class CompactData {
 		/**
 		 * Dieses Feld speichert die {@link CompactData}.
 		 */
-		protected final GData data;
+		protected final GData _data_;
 
 		/**
 		 * Dieser Konstruktor initialisiert die {@link CompactData}.
@@ -78,7 +78,7 @@ public abstract class CompactData {
 		 */
 		public CompactDataOwner(final GData data) {
 			if (data == null) throw new NullPointerException("data = null");
-			this.data = data;
+			this._data_ = data;
 		}
 
 	}
@@ -95,17 +95,17 @@ public abstract class CompactData {
 		/**
 		 * Dieses Feld speichert den Index des ersten Elements (inklusiv).
 		 */
-		protected int from;
+		protected int _from_;
 
 		/**
 		 * Dieses Feld speichert den Index des aktuellen Elements.
 		 */
-		protected int item;
+		protected int _item_;
 
 		/**
 		 * Dieses Feld speichert den Index des letztem Elements (exklusiv).
 		 */
-		protected int last;
+		protected int _last_;
 
 		/**
 		 * Dieser Konstruktor initialisiert {@link CompactData} und Indizes.
@@ -116,9 +116,9 @@ public abstract class CompactData {
 		 */
 		public CompactDataIterator(final GData data, final int from, final int last) {
 			super(data);
-			this.from = from;
-			this.item = -1;
-			this.last = last;
+			this._from_ = from;
+			this._item_ = -1;
+			this._last_ = last;
 		}
 
 		{}
@@ -129,14 +129,14 @@ public abstract class CompactData {
 		 * @param index Index.
 		 * @return {@code index}-tes Element.
 		 */
-		protected abstract GItem next(int index);
+		protected abstract GItem _next_(int index);
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public boolean hasNext() {
-			return this.from < this.last;
+			return this._from_ < this._last_;
 		}
 
 		/**
@@ -144,10 +144,10 @@ public abstract class CompactData {
 		 */
 		@Override
 		public void remove() {
-			final int item = this.item;
+			final int item = this._item_;
 			if (item < 0) throw new IllegalStateException();
-			this.data.customRemove(item, 1);
-			this.item = -1;
+			this._data_._remove_(item, 1);
+			this._item_ = -1;
 		}
 
 	}
@@ -179,7 +179,7 @@ public abstract class CompactData {
 		 */
 		@Override
 		public GItem next() {
-			return this.next(this.item = (this.from = this.from + 1));
+			return this._next_(this._item_ = (this._from_ = this._from_ + 1));
 		}
 
 		/**
@@ -188,8 +188,8 @@ public abstract class CompactData {
 		@Override
 		public void remove() {
 			super.remove();
-			this.from--;
-			this.last--;
+			this._from_--;
+			this._last_--;
 		}
 
 	}
@@ -221,7 +221,7 @@ public abstract class CompactData {
 		 */
 		@Override
 		public GItem next() {
-			return this.next(this.item = (this.last = this.last - 1));
+			return this._next_(this._item_ = (this._last_ = this._last_ - 1));
 		}
 
 	}
@@ -238,56 +238,56 @@ public abstract class CompactData {
 		/**
 		 * Dieses Feld speichert das Objekt zur offenen Begrenzung von Teilmengen.
 		 */
-		protected static final Object OPEN = new Object();
+		protected static final Object _open_ = new Object();
 
 		{}
 
 		/**
-		 * Dieses Feld speichert das erste Element oder {@link CompactSubData#OPEN}.
+		 * Dieses Feld speichert das erste Element oder {@link CompactSubData#_open_}.
 		 */
-		protected final Object fromItem;
+		protected final Object _fromItem_;
 
 		/**
 		 * Dieses Feld speichert {@code true}, wenn das erste Element inklusiv ist.
 		 */
-		protected final boolean fromInclusive;
+		protected final boolean _fromInclusive_;
 
 		/**
-		 * Dieses Feld speichert das letzte Element oder {@link CompactSubData#OPEN}.
+		 * Dieses Feld speichert das letzte Element oder {@link CompactSubData#_open_}.
 		 */
-		protected final Object lastItem;
+		protected final Object _lastItem_;
 
 		/**
 		 * Dieses Feld speichert {@code true}, wenn das letzte Element inklusiv ist.
 		 */
-		protected final boolean lastInclusive;
+		protected final boolean _lastInclusive_;
 
 		/**
 		 * Dieser Konstruktor initialisiert das {@link CompactData} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param data {@link CompactData}.
-		 * @param fromItem erstes Element oder {@link CompactSubData#OPEN}.
+		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
-		 * @param lastItem letztes Element oder {@link CompactSubData#OPEN}.
+		 * @param lastItem letztes Element oder {@link CompactSubData#_open_}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
 		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
 		 */
 		public CompactSubData(final GData data, final Object fromItem, final boolean fromInclusive, final Object lastItem, final boolean lastInclusive)
 			throws IllegalArgumentException {
 			super(data);
-			if (fromItem != CompactSubData.OPEN) {
-				if (lastItem != CompactSubData.OPEN) {
-					if (data.customItemCompare(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
+			if (fromItem != CompactSubData._open_) {
+				if (lastItem != CompactSubData._open_) {
+					if (data._itemCompare_(fromItem, 0, lastItem) > 0) throw new IllegalArgumentException("fromItem > lastItem");
 				} else {
-					data.customItemCompare(fromItem, 0, fromItem);
+					data._itemCompare_(fromItem, 0, fromItem);
 				}
-			} else if (lastItem != CompactSubData.OPEN) {
-				data.customItemCompare(lastItem, 0, lastItem);
+			} else if (lastItem != CompactSubData._open_) {
+				data._itemCompare_(lastItem, 0, lastItem);
 			}
-			this.fromItem = fromItem;
-			this.fromInclusive = fromInclusive;
-			this.lastItem = lastItem;
-			this.lastInclusive = lastInclusive;
+			this._fromItem_ = fromItem;
+			this._fromInclusive_ = fromInclusive;
+			this._lastItem_ = lastItem;
+			this._lastInclusive_ = lastInclusive;
 		}
 
 		{}
@@ -296,106 +296,106 @@ public abstract class CompactData {
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu klein
 		 * sind.
 		 * 
-		 * @see CompactSubData#isTooLow(Object)
+		 * @see CompactSubData#_isTooLow_(Object)
 		 * @param index Index.
 		 * @return {@code true}, wenn der gegebene Index zu groß bzw. das {@code index}-te Element zu klein ist.
 		 */
-		protected final boolean isTooLow(final int index) {
-			final CompactObjectArray<Object> array = this.data.items;
+		protected final boolean _isTooLow_(final int index) {
+			final CompactObjectArray<Object> array = this._data_._items_;
 			if (index >= array.size()) return true;
 			if (index < 0) return false;
-			return this.isTooLow(array.get(index));
+			return this._isTooLow_(array.get(index));
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu klein ist. Wenn das erste Element gleich {@link CompactSubData#OPEN} ist,
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu klein ist. Wenn das erste Element gleich {@link CompactSubData#_open_} ist,
 		 * kann das gegebene Element nie zu klein sein. Anderenfalls gilt es als zu klein, wenn es entweder kleiner als das erste Element ist oder wenn das erste
 		 * Element exklusiv ist und das gegebene Element gleich dem ersten Element ist.
 		 * 
-		 * @see CompactData#customItemCompare(Object, int, Object)
-		 * @see CompactSubData#fromItem
-		 * @see CompactSubData#fromInclusive
+		 * @see CompactData#_itemCompare_(Object, int, Object)
+		 * @see CompactSubData#_fromItem_
+		 * @see CompactSubData#_fromInclusive_
 		 * @param key Element.
 		 * @return {@code true}, wenn das gegebene Element zu klein ist.
 		 */
-		protected final boolean isTooLow(final Object key) {
-			final Object fromItem = this.fromItem;
-			if (fromItem == CompactSubData.OPEN) return false;
-			final int comp = this.data.customItemCompare(key, 0, fromItem);
-			return ((comp < 0) || ((comp == 0) && !this.fromInclusive));
+		protected final boolean _isTooLow_(final Object key) {
+			final Object fromItem = this._fromItem_;
+			if (fromItem == CompactSubData._open_) return false;
+			final int comp = this._data_._itemCompare_(key, 0, fromItem);
+			return ((comp < 0) || ((comp == 0) && !this._fromInclusive_));
 		}
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Index zu groß ist oder der Index gültig und das {@code index}-te Element zu groß sind.
 		 * 
-		 * @see CompactSubData#isTooHigh(Object)
+		 * @see CompactSubData#_isTooHigh_(Object)
 		 * @param index Index.
 		 * @return {@code true}, wenn der gegebene Index bzw. das {@code index}-te Element zu groß ist.
 		 */
-		protected final boolean isTooHigh(final int index) {
-			final CompactObjectArray<Object> array = this.data.items;
+		protected final boolean _isTooHigh_(final int index) {
+			final CompactObjectArray<Object> array = this._data_._items_;
 			if (index >= array.size()) return true;
 			if (index < 0) return false;
-			return this.isTooHigh(array.get(index));
+			return this._isTooHigh_(array.get(index));
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu groß ist. Wenn das letzte Element gleich {@link CompactSubData#OPEN} ist,
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element zu groß ist. Wenn das letzte Element gleich {@link CompactSubData#_open_} ist,
 		 * kann das gegebene Element nie zu groß sein. Anderenfalls gilt es als zu groß, wenn es entweder größer als das letzte Element ist oder wenn das letzte
 		 * Element exklusiv ist und das gegebene Element gleich dem letzten Element ist.
 		 * 
-		 * @see CompactData#customItemCompare(Object, int, Object)
-		 * @see CompactSubData#lastItem
-		 * @see CompactSubData#lastInclusive
+		 * @see CompactData#_itemCompare_(Object, int, Object)
+		 * @see CompactSubData#_lastItem_
+		 * @see CompactSubData#_lastInclusive_
 		 * @param key Element.
 		 * @return {@code true}, wenn das gegebene Element zu groß ist.
 		 */
-		protected final boolean isTooHigh(final Object key) {
-			final Object lastItem = this.lastItem;
-			if (lastItem == CompactSubData.OPEN) return false;
-			final int comp = this.data.customItemCompare(key, 0, lastItem);
-			return ((comp > 0) || ((comp == 0) && !this.lastInclusive));
+		protected final boolean _isTooHigh_(final Object key) {
+			final Object lastItem = this._lastItem_;
+			if (lastItem == CompactSubData._open_) return false;
+			final int comp = this._data_._itemCompare_(key, 0, lastItem);
+			return ((comp > 0) || ((comp == 0) && !this._lastInclusive_));
 		}
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich liegt. Die Inklusitivität des ersten bzw. letzten Elements
 		 * wird beachtet.
 		 * 
-		 * @see CompactSubData#isTooLow(int)
-		 * @see CompactSubData#isTooHigh(Object)
+		 * @see CompactSubData#_isTooLow_(int)
+		 * @see CompactSubData#_isTooHigh_(Object)
 		 * @param key Element.
 		 * @return {@code true}, wenn das gegebene Element im gültigen Bereich liegt.
 		 */
-		protected final boolean isInRange(final Object key) {
-			return !this.isTooLow(key) && !this.isTooHigh(key);
+		protected final boolean _isInRange_(final Object key) {
+			return !this._isTooLow_(key) && !this._isTooHigh_(key);
 		}
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich (oder auf dessen Grenzen) liegt.
 		 * 
-		 * @see CompactSubData#isInRange(Object)
-		 * @see CompactSubData#isInClosedRange(Object)
+		 * @see CompactSubData#_isInRange_(Object)
+		 * @see CompactSubData#_isInClosedRange_(Object)
 		 * @param key Element.
 		 * @param inclusive {@code true}, wenn die Inklusitivität des ersten bzw. letzten Elements beachtet werden soll.
 		 * @return {@code true}, wenn das gegebene Element im gültigen Bereich (oder auf dessen Grenzen) liegt.
 		 */
-		protected final boolean isInRange(final Object key, final boolean inclusive) {
-			return (inclusive ? this.isInRange(key) : this.isInClosedRange(key));
+		protected final boolean _isInRange_(final Object key, final boolean inclusive) {
+			return (inclusive ? this._isInRange_(key) : this._isInClosedRange_(key));
 		}
 
 		/**
 		 * Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Element im gültigen Bereich oder auf dessen Grenzen liegt. Die Inklusitivität des
 		 * ersten bzw. letzten Elements ignoriert.
 		 * 
-		 * @see CompactData#customItemCompare(Object, int, Object)
+		 * @see CompactData#_itemCompare_(Object, int, Object)
 		 * @param key Element.
 		 * @return {@code true}, wenn das gegebene Element im gültigen Bereich oder auf dessen Grenzen liegt.
 		 */
-		protected final boolean isInClosedRange(final Object key) {
-			final GData data = this.data;
-			final Object fromItem = this.fromItem, lastItem = this.lastItem;
-			return ((fromItem == CompactSubData.OPEN) || (data.customItemCompare(key, 0, fromItem) >= 0))
-				&& ((lastItem == CompactSubData.OPEN) || (data.customItemCompare(key, 0, lastItem) <= 0));
+		protected final boolean _isInClosedRange_(final Object key) {
+			final GData data = this._data_;
+			final Object fromItem = this._fromItem_, lastItem = this._lastItem_;
+			return ((fromItem == CompactSubData._open_) || (data._itemCompare_(key, 0, fromItem) >= 0))
+				&& ((lastItem == CompactSubData._open_) || (data._itemCompare_(key, 0, lastItem) <= 0));
 		}
 
 		/**
@@ -403,12 +403,12 @@ public abstract class CompactData {
 		 * 
 		 * @return Index des ersten Elements.
 		 */
-		protected final int firstIndex() {
-			final GData data = this.data;
-			final Object fromItem = this.fromItem;
-			if (fromItem == CompactSubData.OPEN) return data.firstIndex();
-			if (this.fromInclusive) return data.ceilingIndex(fromItem);
-			return data.higherIndex(fromItem);
+		protected final int _firstIndex_() {
+			final GData data = this._data_;
+			final Object fromItem = this._fromItem_;
+			if (fromItem == CompactSubData._open_) return data._firstIndex_();
+			if (this._fromInclusive_) return data._ceilingIndex_(fromItem);
+			return data._higherIndex_(fromItem);
 		}
 
 		/**
@@ -416,12 +416,12 @@ public abstract class CompactData {
 		 * 
 		 * @return Index des letzten Elements.
 		 */
-		protected final int lastIndex() {
-			final GData data = this.data;
-			final Object lastItem = this.lastItem;
-			if (lastItem == CompactSubData.OPEN) return data.lastIndex();
-			if (this.lastInclusive) return data.floorIndex(lastItem);
-			return data.lowerIndex(lastItem);
+		protected final int _lastIndex_() {
+			final GData data = this._data_;
+			final Object lastItem = this._lastItem_;
+			if (lastItem == CompactSubData._open_) return data._lastIndex_();
+			if (this._lastInclusive_) return data._floorIndex_(lastItem);
+			return data._lowerIndex_(lastItem);
 		}
 
 		/**
@@ -430,9 +430,9 @@ public abstract class CompactData {
 		 * @see NavigableSet#first()
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int lowestIndex() {
-			final int index = this.firstIndex();
-			if (this.isTooHigh(index)) return -index - 1;
+		protected final int _lowestIndex_() {
+			final int index = this._firstIndex_();
+			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
 
@@ -442,9 +442,9 @@ public abstract class CompactData {
 		 * @see NavigableSet#last()
 		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int highestIndex() {
-			final int index = this.lastIndex();
-			if (this.isTooLow(index)) return -index - 1;
+		protected final int _highestIndex_() {
+			final int index = this._lastIndex_();
+			if (this._isTooLow_(index)) return -index - 1;
 			return index;
 		}
 
@@ -456,10 +456,10 @@ public abstract class CompactData {
 		 * @param item Element.
 		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int lowerIndex(final Object item) {
-			if (this.isTooHigh(item)) return this.highestIndex();
-			final int index = this.data.lowerIndex(item);
-			if (this.isTooLow(index)) return -index - 1;
+		protected final int _lowerIndex_(final Object item) {
+			if (this._isTooHigh_(item)) return this._highestIndex_();
+			final int index = this._data_._lowerIndex_(item);
+			if (this._isTooLow_(index)) return -index - 1;
 			return index;
 		}
 
@@ -471,10 +471,10 @@ public abstract class CompactData {
 		 * @param item Element.
 		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int floorIndex(final Object item) {
-			if (this.isTooHigh(item)) return this.highestIndex();
-			final int index = this.data.floorIndex(item);
-			if (this.isTooLow(index)) return -index - 1;
+		protected final int _floorIndex_(final Object item) {
+			if (this._isTooHigh_(item)) return this._highestIndex_();
+			final int index = this._data_._floorIndex_(item);
+			if (this._isTooLow_(index)) return -index - 1;
 			return index;
 		}
 
@@ -486,10 +486,10 @@ public abstract class CompactData {
 		 * @param item Element.
 		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int ceilingIndex(final Object item) {
-			if (this.isTooLow(item)) return this.lowestIndex();
-			final int index = this.data.ceilingIndex(item);
-			if (this.isTooHigh(index)) return -index - 1;
+		protected final int _ceilingIndex_(final Object item) {
+			if (this._isTooLow_(item)) return this._lowestIndex_();
+			final int index = this._data_._ceilingIndex_(item);
+			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
 
@@ -501,20 +501,20 @@ public abstract class CompactData {
 		 * @param item Element.
 		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 		 */
-		protected final int higherIndex(final Object item) {
-			if (this.isTooLow(item)) return this.lowestIndex();
-			final int index = this.data.higherIndex(item);
-			if (this.isTooHigh(index)) return -index - 1;
+		protected final int _higherIndex_(final Object item) {
+			if (this._isTooLow_(item)) return this._lowestIndex_();
+			final int index = this._data_._higherIndex_(item);
+			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
 
 		/**
 		 * Diese Methode leert die Teilmenge.
 		 */
-		protected final void clearItems() {
-			final int fromIndex = this.firstIndex(), lastIndex = this.lastIndex();
+		protected final void _clearItems_() {
+			final int fromIndex = this._firstIndex_(), lastIndex = this._lastIndex_();
 			if (fromIndex > lastIndex) return;
-			this.data.customRemove(fromIndex, (lastIndex - fromIndex) + 1);
+			this._data_._remove_(fromIndex, (lastIndex - fromIndex) + 1);
 		}
 
 		/**
@@ -522,8 +522,8 @@ public abstract class CompactData {
 		 * 
 		 * @return Anzahl.
 		 */
-		protected final int countItems() {
-			return (this.lastIndex() - this.firstIndex()) + 1;
+		protected final int _countItems_() {
+			return (this._lastIndex_() - this._firstIndex_()) + 1;
 		}
 
 	}
@@ -533,72 +533,16 @@ public abstract class CompactData {
 	/**
 	 * Dieses Feld speichert das {@link Array} der Elemente.
 	 */
-	protected final CompactDataArray items;
+	protected final CompactDataArray _items_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das {@link Array} der Elemente.
 	 */
 	public CompactData() {
-		this.items = new CompactDataArray();
+		this._items_ = new CompactDataArray();
 	}
 
 	{}
-
-	/**
-	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses
-	 * Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
-	 * Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
-	 * 
-	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
-	 * 
-	 * @see CompactData#defaultCompareIndex(Object, int)
-	 * @see CompactData#customItemEquals(Object, int, Object)
-	 * @see CompactData#customItemCompare(Object, int, Object)
-	 * @param key Schlüssel.
-	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 */
-	protected final int defaultEqualsIndex(final Object key, final int hash) {
-		final int index = this.defaultCompareIndex(key, hash);
-		if (index < 0) return index;
-		final CompactDataArray data = this.items;
-		final Object[] array = data.array();
-		final int from = data.startIndex();
-		if (this.customItemEquals(key, hash, array[index + from])) return index;
-		Object item;
-		for (int next = (index + from) - 1; (from <= next) && (this.customItemCompare(key, hash, item = array[next]) == 0); next--) {
-			if (this.customItemEquals(key, hash, item)) return next - from;
-		}
-		for (int next = (index + from) + 1, last = data.finalIndex(); (next < last) && (this.customItemCompare(key, hash, item = array[next]) == 0); next++) {
-			if (this.customItemEquals(key, hash, item)) return next - from;
-		}
-		return -index - 1;
-	}
-
-	/**
-	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen Index oder
-	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
-	 * 
-	 * @see CompactData#customItemCompare(Object, int, Object)
-	 * @param key Schlüssel.
-	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
-	 */
-	protected final int defaultCompareIndex(final Object key, final int hash) {
-		final CompactDataArray data = this.items;
-		final Object[] array = data.array();
-		final int offset = data.startIndex();
-		int from = offset, last = data.finalIndex();
-		while (from < last) {
-			final int index = (from + last) >>> 1, value = this.customItemCompare(key, hash, array[index]);
-			if (value < 0) {
-				last = index;
-			} else if (value > 0) {
-				from = index + 1;
-			} else return index - offset;
-		}
-		return offset - from - 1;
-	}
 
 	/**
 	 * Diese Methode fügt die gegebene Anzahl an Einträgen ab dem gegebenen Index in das Array ein.
@@ -608,8 +552,8 @@ public abstract class CompactData {
 	 * @param count Anzahl.
 	 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 	 */
-	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		this.items.insert(index, count);
+	protected void _insert_(final int index, final int count) throws IllegalArgumentException {
+		this._items_.insert(index, count);
 	}
 
 	/**
@@ -620,8 +564,8 @@ public abstract class CompactData {
 	 * @param count Anzahl.
 	 * @throws IllegalArgumentException Wenn der gegebene Index bzw. die gegebene Anzahl ungültig sind.
 	 */
-	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		this.items.remove(index, count);
+	protected void _remove_(final int index, final int count) throws IllegalArgumentException {
+		this._items_.remove(index, count);
 	}
 
 	/**
@@ -631,8 +575,8 @@ public abstract class CompactData {
 	 * @param capacity Anzahl.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
-	protected void customAllocate(final int capacity) {
-		this.items.allocate(capacity);
+	protected void _allocate_(final int capacity) {
+		this._items_.allocate(capacity);
 	}
 
 	/**
@@ -640,20 +584,76 @@ public abstract class CompactData {
 	 * 
 	 * @see CompactArray#compact()
 	 */
-	protected void customCompact() {
-		this.items.compact();
+	protected void _compact_() {
+		this._items_.compact();
 	}
 
 	/**
 	 * Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i>
 	 * ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
-	 * @see CompactData#defaultEqualsIndex(Object, int)
-	 * @see CompactData#defaultCompareIndex(Object, int)
+	 * @see CompactData#_itemIndexEquals_(Object, int)
+	 * @see CompactData#_itemIndexCompare_(Object, int)
 	 * @param item Objekt oder {@code null}.
 	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
 	 */
-	protected abstract int customItemIndex(final Object item);
+	protected abstract int _itemIndex_(final Object item);
+
+	/**
+	 * Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses
+	 * Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	 * Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
+	 * 
+	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
+	 * 
+	 * @see CompactData#_itemIndexCompare_(Object, int)
+	 * @see CompactData#_itemEquals_(Object, int, Object)
+	 * @see CompactData#_itemCompare_(Object, int, Object)
+	 * @param key Schlüssel.
+	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+	 */
+	protected final int _itemIndexEquals_(final Object key, final int hash) {
+		final int index = this._itemIndexCompare_(key, hash);
+		if (index < 0) return index;
+		final CompactDataArray data = this._items_;
+		final Object[] array = data.array();
+		final int from = data.startIndex();
+		if (this._itemEquals_(key, hash, array[index + from])) return index;
+		Object item;
+		for (int next = (index + from) - 1; (from <= next) && (this._itemCompare_(key, hash, item = array[next]) == 0); next--) {
+			if (this._itemEquals_(key, hash, item)) return next - from;
+		}
+		for (int next = (index + from) + 1, last = data.finalIndex(); (next < last) && (this._itemCompare_(key, hash, item = array[next]) == 0); next++) {
+			if (this._itemEquals_(key, hash, item)) return next - from;
+		}
+		return -index - 1;
+	}
+
+	/**
+	 * Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen Index oder
+	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	 * 
+	 * @see CompactData#_itemCompare_(Object, int, Object)
+	 * @param key Schlüssel.
+	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
+	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>.
+	 */
+	protected final int _itemIndexCompare_(final Object key, final int hash) {
+		final CompactDataArray data = this._items_;
+		final Object[] array = data.array();
+		final int offset = data.startIndex();
+		int from = offset, last = data.finalIndex();
+		while (from < last) {
+			final int index = (from + last) >>> 1, value = this._itemCompare_(key, hash, array[index]);
+			if (value < 0) {
+				last = index;
+			} else if (value > 0) {
+				from = index + 1;
+			} else return index - offset;
+		}
+		return offset - from - 1;
+	}
 
 	/**
 	 * Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Schlüssel {@link Object#equals(Object) äquivalent} dem Schlüssel des gegebenen Elements
@@ -666,7 +666,7 @@ public abstract class CompactData {
 	 * @param item Element.
 	 * @return {@link Object#equals(Object) Äquivalenz} der Schlüssel.
 	 */
-	protected abstract boolean customItemEquals(Object key, int hash, Object item);
+	protected abstract boolean _itemEquals_(Object key, int hash, Object item);
 
 	/**
 	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn der gegebene Schlüssel kleiner, gleich bzw. größer als der Schlüssel
@@ -674,16 +674,16 @@ public abstract class CompactData {
 	 * 
 	 * @see Comparator#compare(Object, Object)
 	 * @see CompactSubData
-	 * @see CompactSubData#isTooLow(Object)
-	 * @see CompactSubData#isTooHigh(Object)
-	 * @see CompactSubData#isInClosedRange(Object)
+	 * @see CompactSubData#_isTooLow_(Object)
+	 * @see CompactSubData#_isTooHigh_(Object)
+	 * @see CompactSubData#_isInClosedRange_(Object)
 	 * @see CompactSubData#CompactSubData(CompactData, Object, boolean, Object, boolean)
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
 	 * @param item Element.
 	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der Schlüssel.
 	 */
-	protected abstract int customItemCompare(Object key, int hash, Object item);
+	protected abstract int _itemCompare_(Object key, int hash, Object item);
 
 	/**
 	 * Diese Methode gibt den Index des ersten Elements zurück. Dieser Index kann den Wert {@code size} annehmen.
@@ -691,7 +691,7 @@ public abstract class CompactData {
 	 * @see NavigableSet#first()
 	 * @return Index des ersten Elements.
 	 */
-	protected final int firstIndex() {
+	protected final int _firstIndex_() {
 		return 0;
 	}
 
@@ -703,8 +703,8 @@ public abstract class CompactData {
 	 * @param item Element.
 	 * @return Index des größten Elements, dass kleiner dem gegebenen ist.
 	 */
-	protected final int lowerIndex(final Object item) {
-		final int index = this.customItemIndex(item);
+	protected final int _lowerIndex_(final Object item) {
+		final int index = this._itemIndex_(item);
 		if (index < 0) return -index - 2;
 		return index - 1;
 	}
@@ -717,8 +717,8 @@ public abstract class CompactData {
 	 * @param item Element.
 	 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist.
 	 */
-	protected final int floorIndex(final Object item) {
-		final int index = this.customItemIndex(item);
+	protected final int _floorIndex_(final Object item) {
+		final int index = this._itemIndex_(item);
 		if (index < 0) return -index - 2;
 		return index;
 	}
@@ -730,8 +730,8 @@ public abstract class CompactData {
 	 * @param item Element.
 	 * @return Index des kleinsten Elements, dass größer oder gleich dem gegebenen ist.
 	 */
-	protected final int ceilingIndex(final Object item) {
-		final int index = this.customItemIndex(item);
+	protected final int _ceilingIndex_(final Object item) {
+		final int index = this._itemIndex_(item);
 		if (index < 0) return -index - 1;
 		return index;
 	}
@@ -743,8 +743,8 @@ public abstract class CompactData {
 	 * @param item Element.
 	 * @return Index des kleinsten Elements, dass größer dem gegebenen ist.
 	 */
-	protected final int higherIndex(final Object item) {
-		final int index = this.customItemIndex(item);
+	protected final int _higherIndex_(final Object item) {
+		final int index = this._itemIndex_(item);
 		if (index < 0) return -index - 1;
 		return index + 1;
 	}
@@ -755,8 +755,8 @@ public abstract class CompactData {
 	 * @see NavigableSet#last()
 	 * @return Index des letzten Elements.
 	 */
-	protected final int lastIndex() {
-		return this.items.size() - 1;
+	protected final int _lastIndex_() {
+		return this._items_.size() - 1;
 	}
 
 	/**
@@ -767,14 +767,14 @@ public abstract class CompactData {
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
 	 */
 	public final void allocate(final int capacity) throws IllegalArgumentException {
-		this.customAllocate(capacity);
+		this._allocate_(capacity);
 	}
 
 	/**
 	 * Diese Methode verkleinert die Kapazität auf das Minimum.
 	 */
 	public final void compact() {
-		this.customCompact();
+		this._compact_();
 	}
 
 }

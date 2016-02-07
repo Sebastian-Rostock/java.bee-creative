@@ -1,11 +1,23 @@
 package bee.creative.fem;
 
+import bee.creative.fem.FEM.BaseValue;
+
 /**
  * Diese Klasse implementiert einen Leerwert.
  * 
  * @author Sebastian Rostock 2015.
  */
-public final class FEMVoid {
+public final class FEMVoid extends BaseValue {
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 0;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMVoid> TYPE = FEMType.from(FEMVoid.ID, "VOID");
 
 	/**
 	 * Dieses Feld speichert den Leerwert.
@@ -27,7 +39,52 @@ public final class FEMVoid {
 		throw new IllegalArgumentException();
 	}
 
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMVoid.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Leerwert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMVoid from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMVoid.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVoid.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Leerwert.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMVoid from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMVoid.TYPE);
+	}
+
 	{}
+
+	@SuppressWarnings ("javadoc")
+	FEMVoid() {
+	}
+
+	{}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final FEMVoid data() {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final FEMType<FEMVoid> type() {
+		return FEMVoid.TYPE;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -41,9 +98,13 @@ public final class FEMVoid {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMVoid)) return false;
+		if (!(object instanceof FEMVoid)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMVoid)) return false;
+		}
 		return true;
 	}
 

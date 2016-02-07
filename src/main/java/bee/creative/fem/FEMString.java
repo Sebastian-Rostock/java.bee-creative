@@ -2,6 +2,7 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import bee.creative.fem.FEM.BaseValue;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 
@@ -10,7 +11,7 @@ import bee.creative.mmf.MMFArray;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatterInput {
+public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#export(Collector)}.
@@ -157,48 +158,48 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF8ArrayString extends FEMString {
 
-		final MMFArray __array;
+		final MMFArray _array_;
 
 		UTF8ArrayString(final MMFArray array) {
-			super(FEMString.__utf8Count(array));
-			this.__array = array;
+			super(FEMString._utf8Count_(array));
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected int __get(int index) throws IndexOutOfBoundsException {
+		protected int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
-				offset += FEMString.__utf8Size(this.__array.get(offset));
+				offset += FEMString._utf8Size_(this._array_.get(offset));
 			}
-			return FEMString.__utf8Value(this.__array, offset);
+			return FEMString._utf8Value_(this._array_, offset);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf8Size(this.__array.get(index));
+					index += FEMString._utf8Size_(this._array_.get(index));
 				}
 				while (length > 0) {
-					if (!target.push(FEMString.__utf8Value(this.__array, index))) return false;
+					if (!target.push(FEMString._utf8Value_(this._array_, index))) return false;
 					length--;
-					index += FEMString.__utf8Size(this.__array.get(index));
+					index += FEMString._utf8Size_(this._array_.get(index));
 				}
 			} else {
 				int index = 0;
 				offset += length;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf8Size(this.__array.get(index));
+					index += FEMString._utf8Size_(this._array_.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString.__utf8Start(this.__array.get(--index))) {}
-					if (!target.push(FEMString.__utf8Value(this.__array, index))) return false;
+					while (!FEMString._utf8Start_(this._array_.get(--index))) {}
+					if (!target.push(FEMString._utf8Value_(this._array_, index))) return false;
 					length--;
 				}
 			}
@@ -212,7 +213,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 
 		@Override
 		public byte[] toBytes() {
-			return this.__array.toBytes();
+			return this._array_.toBytes();
 		}
 
 	}
@@ -220,48 +221,48 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF16ArrayString extends FEMString {
 
-		final MMFArray __array;
+		final MMFArray _array_;
 
 		UTF16ArrayString(final MMFArray array) {
-			super(FEMString.__utf16Count(array));
-			this.__array = array;
+			super(FEMString._utf16Count_(array));
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected int __get(int index) throws IndexOutOfBoundsException {
+		protected int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
-				offset += FEMString.__utf16Size(this.__array.get(offset));
+				offset += FEMString._utf16Size_(this._array_.get(offset));
 			}
-			return FEMString.__utf16Value(this.__array, offset);
+			return FEMString._utf16Value_(this._array_, offset);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf16Size(this.__array.get(index));
+					index += FEMString._utf16Size_(this._array_.get(index));
 				}
 				while (length > 0) {
-					if (!target.push(FEMString.__utf16Value(this.__array, index))) return false;
+					if (!target.push(FEMString._utf16Value_(this._array_, index))) return false;
 					length--;
-					index += FEMString.__utf16Size(this.__array.get(index));
+					index += FEMString._utf16Size_(this._array_.get(index));
 				}
 			} else {
 				int index = 0;
 				offset += length;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf16Size(this.__array.get(index));
+					index += FEMString._utf16Size_(this._array_.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString.__utf16Start(this.__array.get(--index))) {}
-					if (!target.push(FEMString.__utf16Value(this.__array, index))) return false;
+					while (!FEMString._utf16Start_(this._array_.get(--index))) {}
+					if (!target.push(FEMString._utf16Value_(this._array_, index))) return false;
 					length--;
 				}
 			}
@@ -273,23 +274,23 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF32ArrayString extends FEMString {
 
-		final MMFArray __array;
+		final MMFArray _array_;
 
 		UTF32ArrayString(final MMFArray array) {
 			super(array.length());
-			this.__array = array;
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			return this.__array.get(index);
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			return this._array_.get(index);
 		}
 
 		@Override
 		public int[] value() {
-			return this.__array.toArray();
+			return this._array_.toArray();
 		}
 
 	}
@@ -297,48 +298,48 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF8CompactString extends FEMString {
 
-		final byte[] __bytes;
+		final byte[] _bytes_;
 
 		UTF8CompactString(final byte[] bytes) throws IllegalArgumentException {
-			super(FEMString.__utf8Count(bytes));
-			this.__bytes = bytes;
+			super(FEMString._utf8Count_(bytes));
+			this._bytes_ = bytes;
 		}
 
 		{}
 
 		@Override
-		protected int __get(int index) throws IndexOutOfBoundsException {
+		protected int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
-				offset += FEMString.__utf8Size(this.__bytes[offset]);
+				offset += FEMString._utf8Size_(this._bytes_[offset]);
 			}
-			return FEMString.__utf8Value(this.__bytes, offset);
+			return FEMString._utf8Value_(this._bytes_, offset);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf8Size(this.__bytes[index]);
+					index += FEMString._utf8Size_(this._bytes_[index]);
 				}
 				while (length > 0) {
-					if (!target.push(FEMString.__utf8Value(this.__bytes, index))) return false;
+					if (!target.push(FEMString._utf8Value_(this._bytes_, index))) return false;
 					length--;
-					index += FEMString.__utf8Size(this.__bytes[index]);
+					index += FEMString._utf8Size_(this._bytes_[index]);
 				}
 			} else {
 				int index = 0;
 				offset += length;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf8Size(this.__bytes[index]);
+					index += FEMString._utf8Size_(this._bytes_[index]);
 				}
 				while (length > 0) {
-					while (!FEMString.__utf8Start(this.__bytes[--index])) {}
-					if (!target.push(FEMString.__utf8Value(this.__bytes, index))) return false;
+					while (!FEMString._utf8Start_(this._bytes_[--index])) {}
+					if (!target.push(FEMString._utf8Value_(this._bytes_, index))) return false;
 					length--;
 				}
 			}
@@ -352,7 +353,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 
 		@Override
 		public byte[] toBytes() {
-			return this.__bytes.clone();
+			return this._bytes_.clone();
 		}
 
 	}
@@ -360,48 +361,48 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF16CompactString extends FEMString {
 
-		final char[] __chars;
+		final char[] _chars_;
 
 		UTF16CompactString(final char[] chars) throws IllegalArgumentException {
-			super(FEMString.__utf16Count(chars));
-			this.__chars = chars;
+			super(FEMString._utf16Count_(chars));
+			this._chars_ = chars;
 		}
 
 		{}
 
 		@Override
-		protected int __get(int index) throws IndexOutOfBoundsException {
+		protected int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
-				offset += FEMString.__utf16Size(this.__chars[offset]);
+				offset += FEMString._utf16Size_(this._chars_[offset]);
 			}
-			return FEMString.__utf16Value(this.__chars, offset);
+			return FEMString._utf16Value_(this._chars_, offset);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf16Size(this.__chars[index]);
+					index += FEMString._utf16Size_(this._chars_[index]);
 				}
 				while (length > 0) {
-					if (!target.push(FEMString.__utf16Value(this.__chars, index))) return false;
+					if (!target.push(FEMString._utf16Value_(this._chars_, index))) return false;
 					length--;
-					index += FEMString.__utf16Size(this.__chars[index]);
+					index += FEMString._utf16Size_(this._chars_[index]);
 				}
 			} else {
 				int index = 0;
 				offset += length;
 				while (offset > 0) {
 					offset--;
-					index += FEMString.__utf16Size(this.__chars[index]);
+					index += FEMString._utf16Size_(this._chars_[index]);
 				}
 				while (length > 0) {
-					while (!FEMString.__utf16Start(this.__chars[--index])) {}
-					if (!target.push(FEMString.__utf16Value(this.__chars, index))) return false;
+					while (!FEMString._utf16Start_(this._chars_[--index])) {}
+					if (!target.push(FEMString._utf16Value_(this._chars_, index))) return false;
 					length--;
 				}
 			}
@@ -415,7 +416,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 
 		@Override
 		public char[] toChars() {
-			return this.__chars.clone();
+			return this._chars_.clone();
 		}
 
 	}
@@ -423,23 +424,23 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UTF32CompactString extends FEMString {
 
-		final int[] __values;
+		final int[] _values_;
 
 		UTF32CompactString(final int[] values) throws IllegalArgumentException {
 			super(values.length);
-			this.__values = values;
+			this._values_ = values;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			return this.__values[index];
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			return this._values_[index];
 		}
 
 		@Override
 		public int[] value() {
-			return this.__values.clone();
+			return this._values_.clone();
 		}
 
 		@Override
@@ -473,44 +474,44 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class ConcatString extends FEMString {
 
-		final FEMString __string1;
+		final FEMString _string1_;
 
-		final FEMString __string2;
+		final FEMString _string2_;
 
 		ConcatString(final FEMString string1, final FEMString string2) throws IllegalArgumentException {
-			super(string1.__length + string2.__length);
-			this.__string1 = string1;
-			this.__string2 = string2;
+			super(string1._length_ + string2._length_);
+			this._string1_ = string1;
+			this._string2_ = string2;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this.__string1.__length;
-			return index2 < 0 ? this.__string1.__get(index) : this.__string2.__get(index2);
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			final int index2 = index - this._string1_._length_;
+			return index2 < 0 ? this._string1_._get_(index) : this._string2_._get_(index2);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, final int length, final boolean foreward) {
-			final int offset2 = offset - this.__string1.__length, length2 = offset2 + length;
-			if (offset2 >= 0) return this.__string2.__export(target, offset2, length, foreward);
-			if (length2 <= 0) return this.__string1.__export(target, offset, length, foreward);
+		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+			final int offset2 = offset - this._string1_._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this._string2_._export_(target, offset2, length, foreward);
+			if (length2 <= 0) return this._string1_._export_(target, offset, length, foreward);
 			if (foreward) {
-				if (!this.__string1.__export(target, offset, -offset2, foreward)) return false;
-				return this.__string2.__export(target, 0, length2, foreward);
+				if (!this._string1_._export_(target, offset, -offset2, foreward)) return false;
+				return this._string2_._export_(target, 0, length2, foreward);
 			} else {
-				if (!this.__string2.__export(target, 0, length2, foreward)) return false;
-				return this.__string1.__export(target, offset, -offset2, foreward);
+				if (!this._string2_._export_(target, 0, length2, foreward)) return false;
+				return this._string1_._export_(target, offset, -offset2, foreward);
 			}
 		}
 
 		@Override
 		public FEMString section(final int offset, final int length) throws IllegalArgumentException {
-			final int offset2 = offset - this.__string1.__length, length2 = offset2 + length;
-			if (offset2 >= 0) return this.__string2.section(offset2, length);
-			if (length2 <= 0) return this.__string1.section(offset, length);
-			return super.section(offset, -offset2).concat(this.__string2.section(0, length2));
+			final int offset2 = offset - this._string1_._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this._string2_.section(offset2, length);
+			if (length2 <= 0) return this._string1_.section(offset, length);
+			return super.section(offset, -offset2).concat(this._string2_.section(0, length2));
 		}
 
 	}
@@ -518,31 +519,31 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class SectionString extends FEMString {
 
-		final FEMString __string;
+		final FEMString _string_;
 
-		final int __offset;
+		final int _offset_;
 
 		SectionString(final FEMString string, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
-			this.__string = string;
-			this.__offset = offset;
+			this._string_ = string;
+			this._offset_ = offset;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			return this.__string.__get(index + this.__offset);
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			return this._string_._get_(index + this._offset_);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this.__string.__export(target, this.__offset + offset2, length2, foreward);
+		protected boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
+			return this._string_._export_(target, this._offset_ + offset2, length2, foreward);
 		}
 
 		@Override
 		public FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
-			return this.__string.section(this.__offset + offset2, length2);
+			return this._string_.section(this._offset_ + offset2, length2);
 		}
 
 	}
@@ -550,38 +551,38 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class ReverseString extends FEMString {
 
-		final FEMString __string;
+		final FEMString _string_;
 
 		ReverseString(final FEMString string) throws IllegalArgumentException {
-			super(string.__length);
-			this.__string = string;
+			super(string._length_);
+			this._string_ = string;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			return this.__string.__get(this.__length - index - 1);
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			return this._string_._get_(this._length_ - index - 1);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this.__string.__export(target, offset, length, !foreward);
+		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+			return this._string_._export_(target, offset, length, !foreward);
 		}
 
 		@Override
 		public FEMString concat(final FEMString value) throws NullPointerException {
-			return value.reverse().concat(this.__string).reverse();
+			return value.reverse().concat(this._string_).reverse();
 		}
 
 		@Override
 		public FEMString section(final int offset, final int length2) throws IllegalArgumentException {
-			return this.__string.section(this.__length - offset - length2, length2).reverse();
+			return this._string_.section(this._length_ - offset - length2, length2).reverse();
 		}
 
 		@Override
 		public FEMString reverse() {
-			return this.__string;
+			return this._string_;
 		}
 
 	}
@@ -589,24 +590,24 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	@SuppressWarnings ("javadoc")
 	static final class UniformString extends FEMString {
 
-		final int __value;
+		final int _value_;
 
 		UniformString(final int length, final int value) throws IllegalArgumentException {
 			super(length);
-			this.__value = value;
+			this._value_ = value;
 		}
 
 		{}
 
 		@Override
-		protected int __get(final int index) throws IndexOutOfBoundsException {
-			return this.__value;
+		protected int _get_(final int index) throws IndexOutOfBoundsException {
+			return this._value_;
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this.__value)) return false;
+				if (!target.push(this._value_)) return false;
 				length--;
 			}
 			return true;
@@ -625,6 +626,16 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	}
 
 	{}
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 4;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMString> TYPE = FEMType.from(FEMString.ID, "STRING");
 
 	/**
 	 * Dieses Feld speichert die leere Zeichenkette.
@@ -723,13 +734,36 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	}
 
 	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMString.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMString from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMString.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMString.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMString from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMString.TYPE);
+	}
+
+	/**
 	 * Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der am gegebenen Token beginnt.
 	 * 
 	 * @param token Token, an dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist.
 	 */
-	static final int __utf8Size(final int token) throws IllegalArgumentException {
+	static final int _utf8Size_(final int token) throws IllegalArgumentException {
 		switch ((token >> 4) & 15) {
 			case 0:
 			case 1:
@@ -757,7 +791,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt.
 	 */
-	static final boolean __utf8Start(final int token) {
+	static final boolean _utf8Start_(final int token) {
 		return (token & 192) != 128;
 	}
 
@@ -769,7 +803,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf8Value(final byte[] array, final int offset) throws IllegalArgumentException {
+	static final int _utf8Value_(final byte[] array, final int offset) throws IllegalArgumentException {
 		switch ((array[offset] >> 4) & 15) {
 			case 0:
 			case 1:
@@ -799,7 +833,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf8Value(final IAMArray array, final int offset) throws IllegalArgumentException {
+	static final int _utf8Value_(final IAMArray array, final int offset) throws IllegalArgumentException {
 		switch ((array.get(offset) >> 4) & 15) {
 			case 0:
 			case 1:
@@ -828,12 +862,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf8Count(final byte[] array) throws IllegalArgumentException {
+	static final int _utf8Count_(final byte[] array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length;
 		while (index < length) {
 			result++;
-			index += FEMString.__utf8Size(array[index]);
+			index += FEMString._utf8Size_(array[index]);
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;
@@ -846,12 +880,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf8Count(final MMFArray array) throws IllegalArgumentException {
+	static final int _utf8Count_(final MMFArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {
 			result++;
-			index += FEMString.__utf8Size(array.get(index));
+			index += FEMString._utf8Size_(array.get(index));
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;
@@ -864,7 +898,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist.
 	 */
-	static final int __utf16Size(final int token) throws IllegalArgumentException {
+	static final int _utf16Size_(final int token) throws IllegalArgumentException {
 		final int value = token & 64512;
 		if (value == 55296) return 2;
 		if (value != 56320) return 1;
@@ -877,7 +911,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt.
 	 */
-	static final boolean __utf16Start(final int token) {
+	static final boolean _utf16Start_(final int token) {
 		return (token & 64512) != 56320;
 	}
 
@@ -889,7 +923,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf16Value(final char[] array, final int offset) throws IllegalArgumentException {
+	static final int _utf16Value_(final char[] array, final int offset) throws IllegalArgumentException {
 		final int token = array[offset], value = token & 64512;
 		if (value == 55296) return (((token & 1032) << 10) | (array[offset + 1] & 1023)) + 65536;
 		if (value != 56320) return token;
@@ -904,7 +938,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf16Value(final MMFArray array, final int offset) throws IllegalArgumentException {
+	static final int _utf16Value_(final MMFArray array, final int offset) throws IllegalArgumentException {
 		final int token = array.get(offset), value = token & 64512;
 		if (value == 55296) return (((token & 1032) << 10) | (array.get(offset + 1) & 1023)) + 65536;
 		if (value != 56320) return token;
@@ -918,12 +952,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf16Count(final char[] array) throws IllegalArgumentException {
+	static final int _utf16Count_(final char[] array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length;
 		while (index < length) {
 			result++;
-			index += FEMString.__utf16Size(array[index]);
+			index += FEMString._utf16Size_(array[index]);
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;
@@ -936,12 +970,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
 	 */
-	static final int __utf16Count(final MMFArray array) throws IllegalArgumentException {
+	static final int _utf16Count_(final MMFArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {
 			result++;
-			index += FEMString.__utf16Size(array.get(index));
+			index += FEMString._utf16Size_(array.get(index));
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;
@@ -952,12 +986,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	/**
 	 * Dieses Feld speichert den Streuwert.
 	 */
-	int __hash;
+	int _hash_;
 
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	protected final int _length_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -967,7 +1001,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 */
 	protected FEMString(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
-		this.__length = length;
+		this._length_ = length;
 	}
 
 	{}
@@ -978,7 +1012,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @param index Index.
 	 * @return {@code index}-ter Codepoint.
 	 */
-	protected int __get(final int index) {
+	protected int _get_(final int index) {
 		return 0;
 	}
 
@@ -992,14 +1026,14 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 */
-	protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+	protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
-				if (!target.push(this.__get(offset))) return false;
+				if (!target.push(this._get_(offset))) return false;
 			}
 		} else {
 			for (length += offset - 1; offset <= length; length--) {
-				if (!target.push(this.__get(length))) return false;
+				if (!target.push(this._get_(length))) return false;
 			}
 		}
 		return true;
@@ -1011,7 +1045,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Array mit den Codepoints in UTF32-Kodierung.
 	 */
 	public int[] value() {
-		final UTF32Collector target = new UTF32Collector(this.__length);
+		final UTF32Collector target = new UTF32Collector(this._length_);
 		this.export(target);
 		return target.array;
 	}
@@ -1024,8 +1058,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist.
 	 */
 	public final int get(final int index) throws IndexOutOfBoundsException {
-		if ((index < 0) || (index >= this.__length)) throw new IndexOutOfBoundsException();
-		return this.__get(index);
+		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
+		return this._get_(index);
 	}
 
 	/**
@@ -1034,7 +1068,7 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Länge der Zeichenkette.
 	 */
 	public final int length() {
-		return this.__length;
+		return this._length_;
 	}
 
 	/**
@@ -1045,8 +1079,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public FEMString concat(final FEMString that) throws NullPointerException {
-		if (that.__length == 0) return this;
-		if (this.__length == 0) return that;
+		if (that._length_ == 0) return this;
+		if (this._length_ == 0) return that;
 		return new ConcatString(this, that);
 	}
 
@@ -1059,8 +1093,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Zeichenkette liegt oder eine negative Länge hätte.
 	 */
 	public FEMString section(final int offset, final int length) throws IllegalArgumentException {
-		if ((offset == 0) && (length == this.__length)) return this;
-		if ((offset < 0) || ((offset + length) > this.__length)) throw new IllegalArgumentException();
+		if ((offset == 0) && (length == this._length_)) return this;
+		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
 		return new SectionString(this, offset, length);
 	}
@@ -1082,8 +1116,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return performanteren Zeichenkette oder {@code this}.
 	 */
 	public FEMString compact() {
-		final FEMString result = this.__length == 1 ? new UniformString(1, this.__get(0)) : new UTF8CompactString(this.toBytes());
-		result.__hash = this.__hash;
+		final FEMString result = this._length_ == 1 ? new UniformString(1, this._get_(0)) : new UTF8CompactString(this.toBytes());
+		result._hash_ = this._hash_;
 		return result;
 	}
 
@@ -1098,14 +1132,14 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist.
 	 */
 	public final int find(final FEMString that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this.__length)) throw new IllegalArgumentException();
-		final int count = that.__length;
+		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
+		final int count = that._length_;
 		if (count == 0) return offset;
-		final int value = that.__get(0), length = this.__length - count;
+		final int value = that._get_(0), length = this._length_ - count;
 		FIND: for (int i = offset; i < length; i++) {
-			if (value == this.__get(i)) {
+			if (value == this._get_(i)) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (this.__get(i + i2) != that.__get(i2)) {
+					if (this._get_(i + i2) != that._get_(i2)) {
 						continue FIND;
 					}
 				}
@@ -1125,8 +1159,23 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 */
 	public final boolean export(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
-		if (this.__length == 0) return true;
-		return this.__export(target, 0, this.__length, true);
+		if (this._length_ == 0) return true;
+		return this._export_(target, 0, this._length_, true);
+	}
+
+	/**
+	 * Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert.
+	 */
+	public final int hash() {
+		int result = this._hash_;
+		if (result != 0) return result;
+		final int length = this._length_;
+		final HashCollector collector = new HashCollector();
+		this._export_(collector, 0, length, true);
+		this._hash_ = (result = (collector.hash | 1));
+		return result;
 	}
 
 	/**
@@ -1137,11 +1186,11 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMString that) throws NullPointerException {
-		final int length = this.__length;
-		if (length != that.__length) return false;
+		final int length = this._length_;
+		if (length != that._length_) return false;
 		if (this.hashCode() != that.hashCode()) return false;
 		for (int i = 0; i < length; i++) {
-			if (this.__get(i) != that.__get(i)) return false;
+			if (this._get_(i) != that._get_(i)) return false;
 		}
 		return true;
 	}
@@ -1155,12 +1204,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final int compare(final FEMString that) throws NullPointerException {
-		final int length = Math.min(this.__length, that.__length);
+		final int length = Math.min(this._length_, that._length_);
 		for (int i = 0; i < length; i++) {
-			final int result = this.__get(i) - that.__get(i);
+			final int result = this._get_(i) - that._get_(i);
 			if (result != 0) return result;
 		}
-		return this.__length - that.__length;
+		return this._length_ - that._length_;
 	}
 
 	/**
@@ -1169,8 +1218,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Array mit den Codepoints in UTF8-Kodierung.
 	 */
 	public byte[] toBytes() {
-		final UTF8Collector target = new UTF8Collector(this.__length);
-		this.__export(target, 0, this.__length, true);
+		final UTF8Collector target = new UTF8Collector(this._length_);
+		this._export_(target, 0, this._length_, true);
 		if (target.array.length == target.index) return target.array;
 		return Arrays.copyOf(target.array, target.index);
 	}
@@ -1181,8 +1230,8 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * @return Array mit den Codepoints in UTF16-Kodierung.
 	 */
 	public char[] toChars() {
-		final UTF16Collector target = new UTF16Collector(this.__length);
-		this.__export(target, 0, this.__length, true);
+		final UTF16Collector target = new UTF16Collector(this._length_);
+		this._export_(target, 0, this._length_, true);
 		if (target.array.length == target.index) return target.array;
 		return Arrays.copyOf(target.array, target.index);
 	}
@@ -1193,23 +1242,37 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int hashCode() {
-		int result = this.__hash;
-		if (result != 0) return result;
-		final int length = this.__length;
-		final HashCollector collector = new HashCollector();
-		this.__export(collector, 0, length, true);
-		this.__hash = (result = (collector.hash | 1));
-		return result;
+	public final FEMString data() {
+		return this;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final FEMType<FEMString> type() {
+		return FEMString.TYPE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMString)) return false;
+		if (!(object instanceof FEMString)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMString)) return false;
+		}
 		return this.equals((FEMString)object);
 	}
 
@@ -1224,12 +1287,12 @@ public abstract class FEMString implements Iterable<Integer>, FEM.ScriptFormatte
 
 			@Override
 			public Integer next() {
-				return new Integer(FEMString.this.__get(this.__index++));
+				return new Integer(FEMString.this._get_(this.__index++));
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.__index < FEMString.this.__length;
+				return this.__index < FEMString.this._length_;
 			}
 
 			@Override

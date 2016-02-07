@@ -25,32 +25,26 @@ public abstract class FEMContext {
 
 		@Override
 		@SuppressWarnings ("unchecked")
-		public <GData> GData dataOf(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+		public <GData> GData dataFrom(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
 			if (value.type().is(type)) return (GData)value.data();
 			throw new IllegalArgumentException();
 		}
 
 		@Override
-		public FEMValue valueOf(final Object data) throws IllegalArgumentException {
-			if (data == null) return FEM.voidValue();
+		public FEMValue valueFrom(final Object data) throws IllegalArgumentException {
+			if (data == null) return FEMVoid.INSTANCE;
 			if (data instanceof FEMValue) return (FEMValue)data;
-			if (data instanceof FEMVoid) return FEM.voidValue();
-			if (data instanceof char[]) return FEM.stringValue((char[])data);
-			if (data instanceof String) return FEM.stringValue((String)data);
-			if (data instanceof FEMString) return FEM.stringValue((FEMString)data);
-			if (data instanceof byte[]) return FEM.binaryValue((byte[])data);
-			if (data instanceof FEMBinary) return FEM.binaryValue((FEMBinary)data);
-			if (data instanceof Float) return FEM.decimalValue((Number)data);
-			if (data instanceof Double) return FEM.decimalValue((Number)data);
-			if (data instanceof BigDecimal) return FEM.decimalValue((Number)data);
-			if (data instanceof Number) return FEM.integerValue((Number)data);
-			if (data instanceof Boolean) return FEM.booleanValue((Boolean)data);
-			if (data instanceof FEMBoolean) return FEM.booleanValue((FEMBoolean)data);
-			if (data instanceof Calendar) return FEM.datetimeValue((Calendar)data);
-			if (data instanceof FEMDatetime) return FEM.datetimeValue((FEMDatetime)data);
-			if (data instanceof FEMDuration) return FEM.durationValue((FEMDuration)data);
-			if (data instanceof FEMFunction) return FEM.functionValue((FEMFunction)data);
-			return FEM.arrayValue(this.arrayOf(data));
+			if (data instanceof char[]) return FEMString.from((char[])data);
+			if (data instanceof String) return FEMString.from((String)data);
+			if (data instanceof byte[]) return FEMBinary.from((byte[])data);
+			if (data instanceof Float) return FEMDecimal.from((Number)data);
+			if (data instanceof Double) return FEMDecimal.from((Number)data);
+			if (data instanceof BigDecimal) return FEMDecimal.from((Number)data);
+			if (data instanceof Number) return FEMInteger.from((Number)data);
+			if (data instanceof Boolean) return FEMBoolean.from((Boolean)data);
+			if (data instanceof Calendar) return FEMDatetime.from((Calendar)data);
+			if (data instanceof FEMFunction) return FEMHandler.from((FEMFunction)data);
+			return this.arrayFrom(data);
 		}
 
 	}
@@ -60,12 +54,13 @@ public abstract class FEMContext {
 	/**
 	 * Dieses Feld speichert das leere Kontextobjekt.
 	 * <p>
-	 * Die {@link #dataOf(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück, wenn
+	 * Die {@link #dataFrom(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück, wenn
 	 * sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} {@link FEMType#id() ist}, d.h. wenn {@code value.type().is(type)}.
 	 * Andernfalls löst sie eine {@link IllegalArgumentException} aus.
 	 * <p>
-	 * Die {@link #valueOf(Object)}-Methode dieses Kontextobjekts konvertiert die ihr übergebenen Nutzdaten über die {@link FEMValue}-liefernden Methoden der
-	 * Klasse {@link FEM} sowie falls möglich über {@link #arrayOf(Object)}. Im Fehlerfall löst sie eine {@link IllegalArgumentException} aus.
+	 * Die {@link #valueFrom(Object)}-Methode dieses Kontextobjekts konvertiert die ihr übergebenen Nutzdaten über die {@code from}-Methoden der nachfahren von
+	 * {@link BaseValue} der Klasse {@link FEM} sowie falls möglich über {@link #arrayFrom(Object)}. Im Fehlerfall löst sie eine {@link IllegalArgumentException}
+	 * aus.
 	 */
 	public static final FEMContext EMPTY = new EmptyContext();
 
@@ -77,8 +72,8 @@ public abstract class FEMContext {
 	{}
 
 	/**
-	 * Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataOf(FEMValue) Datentypumwandlungen} genutzt wird.<br>
-	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueOf(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataOf(FEMValue)}
+	 * Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataFrom(FEMValue) Datentypumwandlungen} genutzt wird.<br>
+	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueFrom(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataFrom(FEMValue)}
 	 * verwendet.
 	 * 
 	 * @return Rückfallkontextobjekt
@@ -100,25 +95,25 @@ public abstract class FEMContext {
 	{}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code this.dataOf(input)} in siene Ausgabe überführt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code this.dataFrom(input)} in siene Ausgabe überführt.
 	 * 
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
 	 * @param type Datentyp.
-	 * @return {@code dataOf}-{@link Converter}.
+	 * @return {@code dataFrom}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
 	 */
-	public final <GData> Converter<FEMValue, GData> dataOf(final FEMType<? extends GData> type) throws NullPointerException {
+	public final <GData> Converter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
 		return new Converter<FEMValue, GData>() {
 
 			@Override
 			public GData convert(final FEMValue input) {
-				return FEMContext.this.dataOf(input, type);
+				return FEMContext.this.dataFrom(input, type);
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("dataOf", type);
+				return Objects.toInvokeString("dataFrom", type);
 			}
 
 		};
@@ -136,13 +131,13 @@ public abstract class FEMContext {
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public abstract <GData> GData dataOf(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public abstract <GData> GData dataFrom(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
 	/**
 	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
 	 * <ol>
 	 * <li>Wenn das Objekt ein {@link FEMArray} ist, wird es unverändert zurück gegeben.</li>
-	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente via {@link #valueOf(Object)} in einen Wert überführt und die so entstandene Wertliste
+	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente via {@link #valueFrom(Object)} in einen Wert überführt und die so entstandene Wertliste
 	 * geliefert.</li>
 	 * <li>Wenn es eine {@link Collection} ist, wird diese in ein natives Array überführt, welches anschließend in eine Wertliste umgewandelt wird.</li>
 	 * <li>Wenn es ein {@link Iterable} ist, wird dieses in eine {@link Collection} überführt, welche anschließend in eine Wertliste umgewandelt wird.</li>
@@ -156,41 +151,41 @@ public abstract class FEMContext {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann.
 	 */
-	public final FEMArray arrayOf(final Object data) throws NullPointerException, IllegalArgumentException {
+	public final FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
-		if (data instanceof Object[]) return this._arrayOf_((Object[])data);
-		if (data instanceof Collection<?>) return this._arrayOf_((Collection<?>)data);
-		if (data instanceof Iterable<?>) return this._arrayOf_((Iterable<?>)data);
+		if (data instanceof Object[]) return this._arrayFrom_((Object[])data);
+		if (data instanceof Collection<?>) return this._arrayFrom_((Collection<?>)data);
+		if (data instanceof Iterable<?>) return this._arrayFrom_((Iterable<?>)data);
 		final int length = Array.getLength(data);
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
 		for (int i = 0; i < length; i++) {
-			values[i] = this.valueOf(Array.get(data, i));
+			values[i] = this.valueFrom(Array.get(data, i));
 		}
 		return FEMArray.from(values);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayOf_(final Object[] data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray _arrayFrom_(final Object[] data) throws NullPointerException, IllegalArgumentException {
 		final int length = data.length;
 		if (length == 0) return FEMArray.EMPTY;
 		final FEMValue[] values = new FEMValue[length];
 		for (int i = 0; i < length; i++) {
-			values[i] = this.valueOf(data[i]);
+			values[i] = this.valueFrom(data[i]);
 		}
 		return FEMArray.from(values);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayOf_(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
+	final FEMArray _arrayFrom_(final Iterable<?> data) throws NullPointerException, IllegalArgumentException {
 		final List<Object> array = new ArrayList<>();
 		Iterables.appendAll(array, data);
-		return this._arrayOf_(array);
+		return this._arrayFrom_(array);
 	}
 
 	@SuppressWarnings ("javadoc")
-	final FEMArray _arrayOf_(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
-		return this._arrayOf_(data.toArray());
+	final FEMArray _arrayFrom_(final Collection<?> data) throws NullPointerException, IllegalArgumentException {
+		return this._arrayFrom_(data.toArray());
 	}
 
 	/**
@@ -201,7 +196,7 @@ public abstract class FEMContext {
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
 	 */
-	public abstract FEMValue valueOf(Object data) throws IllegalArgumentException;
+	public abstract FEMValue valueFrom(Object data) throws IllegalArgumentException;
 
 	{}
 

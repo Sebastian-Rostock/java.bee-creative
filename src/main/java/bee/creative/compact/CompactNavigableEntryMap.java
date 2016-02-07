@@ -77,7 +77,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected GKey getKey(final int index) {
-		return (GKey)this.items.get(index);
+		return (GKey)this._items_.get(index);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 */
 	@Override
 	protected void setEntry(final int index, final GKey key, final GValue value) {
-		this.items.set(index, key);
+		this._items_.set(index, key);
 		this.values.set(index, value);
 	}
 
@@ -102,8 +102,8 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void customInsert(final int index, final int count) throws IllegalArgumentException {
-		super.customInsert(index, count);
+	protected void _insert_(final int index, final int count) throws IllegalArgumentException {
+		super._insert_(index, count);
 		this.values.insert(index, count);
 	}
 
@@ -111,8 +111,8 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void customRemove(final int index, final int count) throws IllegalArgumentException {
-		super.customRemove(index, count);
+	protected void _remove_(final int index, final int count) throws IllegalArgumentException {
+		super._remove_(index, count);
 		this.values.remove(index, count);
 	}
 
@@ -120,8 +120,8 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void customAllocate(final int count) {
-		super.customAllocate(count);
+	protected void _allocate_(final int count) {
+		super._allocate_(count);
 		this.values.allocate(count);
 	}
 
@@ -129,8 +129,8 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void customCompact() {
-		super.customCompact();
+	protected void _compact_() {
+		super._compact_();
 		this.values.compact();
 	}
 
@@ -139,7 +139,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	 */
 	@SuppressWarnings ("unchecked")
 	@Override
-	protected int customItemCompare(final Object key, final int hash, final Object item) {
+	protected int _itemCompare_(final Object key, final int hash, final Object item) {
 		return this.comparator.compare((GKey)key, (GKey)item);
 	}
 

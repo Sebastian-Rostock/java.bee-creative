@@ -1,5 +1,6 @@
 package bee.creative.fem;
 
+import bee.creative.fem.FEM.BaseValue;
 import bee.creative.util.Comparators;
 
 /**
@@ -8,7 +9,17 @@ import bee.creative.util.Comparators;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class FEMInteger implements Comparable<FEMInteger> {
+public final class FEMInteger extends BaseValue implements Comparable<FEMInteger> {
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 6;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMInteger> TYPE = FEMType.from(FEMInteger.ID, "INTEGER");
 
 	/**
 	 * Dieses Feld speichert die Dezimalzahl {@code 0}.
@@ -53,12 +64,35 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 		return FEMInteger.from(Long.parseLong(value));
 	}
 
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMInteger.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Dezimalzahl.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMInteger from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMInteger.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMInteger.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Dezimalzahl.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMInteger from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMInteger.TYPE);
+	}
+
 	{}
 
 	/**
 	 * Dieses Feld speichert die interne Darstellung der Dezimalzahl.
 	 */
-	final long __value;
+	final long _value_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung der Dezimalzahl.
@@ -66,7 +100,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @param value interne Darstellung der Dezimalzahl.
 	 */
 	public FEMInteger(final long value) {
-		this.__value = value;
+		this._value_ = value;
 	}
 
 	{}
@@ -77,7 +111,17 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @return interne Darstellung der Dezimalzahl.
 	 */
 	public final long value() {
-		return this.__value;
+		return this._value_;
+	}
+
+	/**
+	 * Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert.
+	 */
+	public final int hash() {
+		final long value = this._value_;
+		return (int)(value >>> 0) ^ (int)(value >>> 32);
 	}
 
 	/**
@@ -88,7 +132,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final boolean equals(final FEMInteger that) throws NullPointerException {
-		return this.__value == that.__value;
+		return this._value_ == that._value_;
 	}
 
 	/**
@@ -100,7 +144,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final int compare(final FEMInteger that) throws NullPointerException {
-		return Comparators.compare(this.__value, that.__value);
+		return Comparators.compare(this._value_, that._value_);
 	}
 
 	/**
@@ -109,7 +153,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * @return {@link Number}.
 	 */
 	public final Number toNumber() {
-		return Long.valueOf(this.__value);
+		return new Long(this._value_);
 	}
 
 	{}
@@ -118,18 +162,37 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int hashCode() {
-		final long value = this.__value;
-		return (int)(value >>> 0) ^ (int)(value >>> 32);
+	public final FEMInteger data() {
+		return this;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final FEMType<FEMInteger> type() {
+		return FEMInteger.TYPE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMInteger)) return false;
+		if (!(object instanceof FEMInteger)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMInteger)) return false;
+		}
 		return this.equals((FEMInteger)object);
 	}
 
@@ -149,7 +212,7 @@ public final class FEMInteger implements Comparable<FEMInteger> {
 	 */
 	@Override
 	public final String toString() {
-		return Long.toString(this.__value);
+		return Long.toString(this._value_);
 	}
 
 }

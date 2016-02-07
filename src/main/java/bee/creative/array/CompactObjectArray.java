@@ -49,7 +49,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public GValue get(final int index) {
-			return this.owner.get(this.ownerIndex(index));
+			return this._owner_.get(this._ownerIndex_(index));
 		}
 
 		/**
@@ -57,7 +57,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public void get(final int index, final GValue[] values) {
-			this.get(index, ObjectArraySection.from(this.owner, values));
+			this.get(index, ObjectArraySection.from(this._owner_, values));
 		}
 
 		/**
@@ -65,7 +65,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public void set(final int index, final GValue value) {
-			this.owner.set(this.ownerIndex(index), value);
+			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
 		/**
@@ -73,7 +73,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public void set(final int index, final GValue[] values) {
-			this.set(index, ObjectArraySection.from(this.owner, values));
+			this.set(index, ObjectArraySection.from(this._owner_, values));
 		}
 
 		/**
@@ -106,7 +106,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public void add(final int index, final GValue[] values) {
-			this.add(this.size(), ObjectArraySection.from(this.owner, values));
+			this.add(this.size(), ObjectArraySection.from(this._owner_, values));
 		}
 
 		/**
@@ -114,7 +114,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public ObjectArray<GValue> subArray(final int fromIndex, final int toIndex) {
-			return (ObjectArray<GValue>)this.ownerSubArray(fromIndex, toIndex);
+			return (ObjectArray<GValue>)this._ownerSubArray_(fromIndex, toIndex);
 		}
 
 	}
@@ -130,7 +130,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactObjectArray<GValue> owner;
+		protected final CompactObjectArray<GValue> _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -140,7 +140,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		public CompactObjectArraySection(final CompactObjectArray<GValue> owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -149,8 +149,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-			return Comparators.compare(array1[index1], array2[index2], this.owner);
+		protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			return Comparators.compare(array1[index1], array2[index2], this._owner_);
 		}
 
 		/**
@@ -158,7 +158,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int size() {
-			return this.owner.size;
+			return this._owner_._size_;
 		}
 
 		/**
@@ -166,7 +166,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public GValue[] array() {
-			return this.owner.array;
+			return this._owner_._array_;
 		}
 
 		/**
@@ -174,7 +174,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.from;
+			return this._owner_._from_;
 		}
 
 		/**
@@ -182,8 +182,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int finalIndex() {
-			final CompactObjectArray<GValue> owner = this.owner;
-			return owner.from + owner.size;
+			final CompactObjectArray<GValue> owner = this._owner_;
+			return owner._from_ + owner._size_;
 		}
 
 	}
@@ -199,7 +199,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactObjectSubArray<GValue> owner;
+		protected final CompactObjectSubArray<GValue> _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -209,7 +209,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		public CompactObjectSubArraySection(final CompactObjectSubArray<GValue> owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -218,8 +218,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
-			return Comparators.compare(array1[index1], array2[index2], this.owner.owner);
+		protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			return Comparators.compare(array1[index1], array2[index2], this._owner_._owner_);
 		}
 
 		/**
@@ -227,7 +227,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int size() {
-			return this.owner.size();
+			return this._owner_.size();
 		}
 
 		/**
@@ -235,7 +235,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public GValue[] array() {
-			return this.owner.owner.array;
+			return this._owner_._owner_._array_;
 		}
 
 		/**
@@ -243,7 +243,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.startIndex;
+			return this._owner_._startIndex_;
 		}
 
 		/**
@@ -251,7 +251,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 		 */
 		@Override
 		public int finalIndex() {
-			return this.owner.finalIndex;
+			return this._owner_._finalIndex_;
 		}
 
 	}
@@ -261,7 +261,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	/**
 	 * Dieses Feld speichert das {@code GValue}-Array.
 	 */
-	protected GValue[] array;
+	protected GValue[] _array_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
@@ -302,23 +302,23 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected GValue[] getArray() {
-		return this.array;
+	protected GValue[] _array_() {
+		return this._array_;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setArray(final GValue[] array) {
-		this.array = array;
+	protected void _array_(final GValue[] array) {
+		this._array_ = array;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected GValue getValue(final int index) {
+	protected GValue _value_(final int index) {
 		return this.get(index);
 	}
 
@@ -326,7 +326,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setValue(final int index, final GValue value) {
+	protected void _value_(final int index, final GValue value) {
 		this.set(index, value);
 	}
 
@@ -334,8 +334,8 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getArrayLength() {
-		return this.array.length;
+	protected int _capacity_() {
+		return this._array_.length;
 	}
 
 	/**
@@ -343,7 +343,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public GValue get(final int index) {
-		return this.array[this.inclusiveIndex(index)];
+		return this._array_[this._inclusiveIndex_(index)];
 	}
 
 	/**
@@ -359,7 +359,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public void set(final int index, final GValue value) {
-		this.array[this.inclusiveIndex(index)] = value;
+		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
 	/**
@@ -375,7 +375,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public void add(final GValue value) {
-		this.add(this.size, value);
+		this.add(this._size_, value);
 	}
 
 	/**
@@ -383,7 +383,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public void add(final GValue[] values) {
-		this.add(this.size, values);
+		this.add(this._size_, values);
 	}
 
 	/**
@@ -400,7 +400,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public void add(final int index, final GValue[] values) {
-		this.add(this.size, ObjectArraySection.from(this, values));
+		this.add(this._size_, ObjectArraySection.from(this, values));
 	}
 
 	/**
@@ -408,7 +408,7 @@ public abstract class CompactObjectArray<GValue> extends CompactArray<GValue[], 
 	 */
 	@Override
 	public GValue[] array() {
-		return this.array;
+		return this._array_;
 	}
 
 	/**

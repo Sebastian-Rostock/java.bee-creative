@@ -77,7 +77,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int arrayLength(final char[] array) {
+	protected int _arrayLength_(final char[] array) {
 		return array.length;
 	}
 
@@ -85,7 +85,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int hashCode(final char[] array, final int index) {
+	protected int _hashCode_(final char[] array, final int index) {
 		return array[index];
 	}
 
@@ -93,7 +93,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean equals(final char[] array1, final char[] array2, final int index1, final int index2) {
+	protected boolean _equals_(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
@@ -101,7 +101,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int compareTo(final char[] array1, final char[] array2, final int index1, final int index2) {
+	protected int _compareTo_(final char[] array1, final char[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
@@ -109,7 +109,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void toString(final char[] array, final int index, final StringBuilder target) {
+	protected void _toString_(final char[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -120,7 +120,7 @@ public abstract class CharacterArraySection extends ArraySection<char[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof CharacterArraySection)) return false;
-		return this.equals((CharacterArraySection)object);
+		return this._equals_((CharacterArraySection)object);
 	}
 
 }

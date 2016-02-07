@@ -1,12 +1,24 @@
 package bee.creative.fem;
 
+import bee.creative.fem.FEM.BaseValue;
+
 /**
  * Diese Klasse implementiert einen Wahrheitswert.<br>
  * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public final class FEMBoolean implements Comparable<FEMBoolean> {
+public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean> {
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 3;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMBoolean> TYPE = FEMType.from(FEMBoolean.ID, "BOOLEAN");
 
 	/**
 	 * Dieses Feld speichert den Wahrheitswert {@code true}.
@@ -57,12 +69,35 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 		throw new IllegalArgumentException();
 	}
 
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBoolean.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Wahrheitswert.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMBoolean from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMBoolean.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBoolean.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Wahrheitswert.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMBoolean from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMBoolean.TYPE);
+	}
+
 	{}
 
 	/**
 	 * Dieses Feld speichert die interne Darstellung des Wahrheitswerts.
 	 */
-	final boolean __value;
+	final boolean _value_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
@@ -70,7 +105,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @param value interne Darstellung des Wahrheitswerts.
 	 */
 	public FEMBoolean(final boolean value) {
-		this.__value = value;
+		this._value_ = value;
 	}
 
 	{}
@@ -81,7 +116,16 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @return interne Darstellung des Wahrheitswerts.
 	 */
 	public final boolean value() {
-		return this.__value;
+		return this._value_;
+	}
+
+	/**
+	 * Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert.
+	 */
+	public final int hash() {
+		return this._value_ ? 1231 : 1237;
 	}
 
 	/**
@@ -92,7 +136,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMBoolean that) throws NullPointerException {
-		return this.__value == that.__value;
+		return this._value_ == that._value_;
 	}
 
 	/**
@@ -104,7 +148,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
-		return Boolean.compare(this.__value, that.__value);
+		return Boolean.compare(this._value_, that._value_);
 	}
 
 	/**
@@ -113,7 +157,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * @return {@link Boolean}.
 	 */
 	public final Boolean toBoolean() {
-		return Boolean.valueOf(this.__value);
+		return Boolean.valueOf(this._value_);
 	}
 
 	{}
@@ -122,17 +166,37 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int hashCode() {
-		return this.__value ? 1231 : 1237;
+	public final FEMBoolean data() {
+		return this;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final FEMType<FEMBoolean> type() {
+		return FEMBoolean.TYPE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMBoolean)) return false;
+		if (!(object instanceof FEMBoolean)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMBoolean)) return false;
+		}
 		return this.equals((FEMBoolean)object);
 	}
 
@@ -152,7 +216,7 @@ public final class FEMBoolean implements Comparable<FEMBoolean> {
 	 */
 	@Override
 	public final String toString() {
-		return this.__value ? "true" : "false";
+		return this._value_ ? "true" : "false";
 	}
 
 }

@@ -1,6 +1,7 @@
 package bee.creative.fem;
 
 import java.util.Iterator;
+import bee.creative.fem.FEM.BaseValue;
 import bee.creative.mmf.MMFArray;
 
 /**
@@ -8,7 +9,7 @@ import bee.creative.mmf.MMFArray;
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
-public abstract class FEMBinary implements Iterable<Byte> {
+public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	/**
 	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}.
@@ -64,23 +65,23 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class ArrayBinary extends FEMBinary {
 
-		final MMFArray __array;
+		final MMFArray _array_;
 
 		ArrayBinary(final MMFArray array) {
 			super(array.length());
-			this.__array = array;
+			this._array_ = array;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			return (byte)this.__array.get(index);
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			return (byte)this._array_.get(index);
 		}
 
 		@Override
 		public byte[] value() {
-			return this.__array.toBytes();
+			return this._array_.toBytes();
 		}
 
 	}
@@ -109,44 +110,44 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class ConcatBinary extends FEMBinary {
 
-		final FEMBinary __binary1;
+		final FEMBinary _binary1_;
 
-		final FEMBinary __binary2;
+		final FEMBinary _binary2_;
 
 		ConcatBinary(final FEMBinary binary1, final FEMBinary binary2) throws IllegalArgumentException {
-			super(binary1.__length + binary2.__length);
-			this.__binary1 = binary1;
-			this.__binary2 = binary2;
+			super(binary1._length_ + binary2._length_);
+			this._binary1_ = binary1;
+			this._binary2_ = binary2;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this.__binary1.__length;
-			return index2 < 0 ? this.__binary1.__get(index) : this.__binary2.__get(index2);
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			final int index2 = index - this._binary1_._length_;
+			return index2 < 0 ? this._binary1_._get_(index) : this._binary2_._get_(index2);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, final int length, final boolean foreward) {
-			final int offset2 = offset - this.__binary1.__length, length2 = offset2 + length;
-			if (offset2 >= 0) return this.__binary2.__export(target, offset2, length, foreward);
-			if (length2 <= 0) return this.__binary1.__export(target, offset, length, foreward);
+		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+			final int offset2 = offset - this._binary1_._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this._binary2_._export_(target, offset2, length, foreward);
+			if (length2 <= 0) return this._binary1_._export_(target, offset, length, foreward);
 			if (foreward) {
-				if (!this.__binary1.__export(target, offset, -offset2, foreward)) return false;
-				return this.__binary2.__export(target, 0, length2, foreward);
+				if (!this._binary1_._export_(target, offset, -offset2, foreward)) return false;
+				return this._binary2_._export_(target, 0, length2, foreward);
 			} else {
-				if (!this.__binary2.__export(target, 0, length2, foreward)) return false;
-				return this.__binary1.__export(target, offset, -offset2, foreward);
+				if (!this._binary2_._export_(target, 0, length2, foreward)) return false;
+				return this._binary1_._export_(target, offset, -offset2, foreward);
 			}
 		}
 
 		@Override
 		public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-			final int offset2 = offset - this.__binary1.__length, length2 = offset2 + length;
-			if (offset2 >= 0) return this.__binary2.section(offset2, length);
-			if (length2 <= 0) return this.__binary1.section(offset, length);
-			return super.section(offset, -offset2).concat(this.__binary2.section(0, length2));
+			final int offset2 = offset - this._binary1_._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this._binary2_.section(offset2, length);
+			if (length2 <= 0) return this._binary1_.section(offset, length);
+			return super.section(offset, -offset2).concat(this._binary2_.section(0, length2));
 		}
 
 	}
@@ -154,31 +155,31 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class SectionBinary extends FEMBinary {
 
-		final FEMBinary __binary;
+		final FEMBinary _binary_;
 
-		final int __offset;
+		final int _offset_;
 
 		SectionBinary(final FEMBinary binary, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
-			this.__binary = binary;
-			this.__offset = offset;
+			this._binary_ = binary;
+			this._offset_ = offset;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			return this.__binary.__get(index + this.__offset);
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			return this._binary_._get_(index + this._offset_);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this.__binary.__export(target, this.__offset + offset2, length2, foreward);
+		protected boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
+			return this._binary_._export_(target, this._offset_ + offset2, length2, foreward);
 		}
 
 		@Override
 		public FEMBinary section(final int offset2, final int length2) throws IllegalArgumentException {
-			return this.__binary.section(this.__offset + offset2, length2);
+			return this._binary_.section(this._offset_ + offset2, length2);
 		}
 
 	}
@@ -186,38 +187,38 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class ReverseBinary extends FEMBinary {
 
-		final FEMBinary __binary;
+		final FEMBinary _binary_;
 
 		ReverseBinary(final FEMBinary binary) throws IllegalArgumentException {
-			super(binary.__length);
-			this.__binary = binary;
+			super(binary._length_);
+			this._binary_ = binary;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			return this.__binary.__get(this.__length - index - 1);
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			return this._binary_._get_(this._length_ - index - 1);
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this.__binary.__export(target, offset, length, !foreward);
+		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+			return this._binary_._export_(target, offset, length, !foreward);
 		}
 
 		@Override
 		public FEMBinary concat(final FEMBinary value) throws NullPointerException {
-			return value.reverse().concat(this.__binary).reverse();
+			return value.reverse().concat(this._binary_).reverse();
 		}
 
 		@Override
 		public FEMBinary section(final int offset, final int length2) throws IllegalArgumentException {
-			return this.__binary.section(this.__length - offset - length2, length2).reverse();
+			return this._binary_.section(this._length_ - offset - length2, length2).reverse();
 		}
 
 		@Override
 		public FEMBinary reverse() {
-			return this.__binary;
+			return this._binary_;
 		}
 
 	}
@@ -225,24 +226,24 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class UniformBinary extends FEMBinary {
 
-		final byte __value;
+		final byte _value_;
 
 		UniformBinary(final int length, final byte value) throws IllegalArgumentException {
 			super(length);
-			this.__value = value;
+			this._value_ = value;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			return this.__value;
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			return this._value_;
 		}
 
 		@Override
-		protected boolean __export(final Collector target, final int offset, int length, final boolean foreward) {
+		protected boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this.__value)) return false;
+				if (!target.push(this._value_)) return false;
 				length--;
 			}
 			return true;
@@ -263,23 +264,23 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	@SuppressWarnings ("javadoc")
 	static final class CompactBinary extends FEMBinary {
 
-		final byte[] __values;
+		final byte[] _values_;
 
 		CompactBinary(final byte[] values) throws IllegalArgumentException {
 			super(values.length);
-			this.__values = values;
+			this._values_ = values;
 		}
 
 		{}
 
 		@Override
-		protected byte __get(final int index) throws IndexOutOfBoundsException {
-			return this.__values[index];
+		protected byte _get_(final int index) throws IndexOutOfBoundsException {
+			return this._values_[index];
 		}
 
 		@Override
 		public byte[] value() {
-			return this.__values.clone();
+			return this._values_.clone();
 		}
 
 		@Override
@@ -290,6 +291,16 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	}
 
 	{}
+
+	/**
+	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
+	 */
+	public static final int ID = 5;
+
+	/**
+	 * Dieses Feld speichert den {@link #type() Datentyp}.
+	 */
+	public static final FEMType<FEMBinary> TYPE = FEMType.from(FEMBinary.ID, "BINARY");
 
 	/**
 	 * Dieses Feld speichert die leere Bytefolge.
@@ -342,8 +353,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 		final byte[] bytes = new byte[count];
 		for (int i = 0; i < count; i++) {
 			bytes[i] = (byte)( //
-				(FEMBinary.__toByte(value.charAt((i << 1) + 0)) << 4) | //
-				(FEMBinary.__toByte(value.charAt((i << 1) + 1)) << 0));
+				(FEMBinary._toByte_(value.charAt((i << 1) + 0)) << 4) | //
+				(FEMBinary._toByte_(value.charAt((i << 1) + 1)) << 0));
 		}
 		return new CompactBinary(bytes);
 	}
@@ -362,8 +373,31 @@ public abstract class FEMBinary implements Iterable<Byte> {
 		throw new IllegalArgumentException();
 	}
 
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBinary.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 */
+	public static final FEMBinary from(final FEMValue value) throws NullPointerException {
+		return FEMContext._default_.dataFrom(value, FEMBinary.TYPE);
+	}
+
+	/**
+	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
+	 * 
+	 * @param value {@link FEMValue}.
+	 * @param context {@link FEMContext}.
+	 * @return Bytefolge.
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
+	 */
+	public static final FEMBinary from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMBinary.TYPE);
+	}
+
 	@SuppressWarnings ("javadoc")
-	static final int __toByte(final int value) throws IllegalArgumentException {
+	static final int _toByte_(final int value) throws IllegalArgumentException {
 		int value2 = value - '0';
 		if ((value2 >= 0) && (value <= 9)) return value2;
 		value2 = value - 'A';
@@ -372,7 +406,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final char __toChar(final int value) {
+	static final char _toChar_(final int value) {
 		final int value2 = value - 10;
 		if (value2 < 0) return (char)('0' + value);
 		return (char)('A' + value2);
@@ -383,12 +417,12 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	/**
 	 * Dieses Feld speichert den Streuwert.
 	 */
-	int __hash;
+	int _hash_;
 
 	/**
 	 * Dieses Feld speichert die Länge.
 	 */
-	protected final int __length;
+	protected final int _length_;
 
 	/**
 	 * Dieser Konstruktor initialisiert die Länge.
@@ -398,7 +432,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 */
 	protected FEMBinary(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
-		this.__length = length;
+		this._length_ = length;
 	}
 
 	{}
@@ -409,7 +443,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @param index Index.
 	 * @return {@code index}-tes Byte.
 	 */
-	protected byte __get(final int index) {
+	protected byte _get_(final int index) {
 		return 0;
 	}
 
@@ -423,14 +457,14 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 */
-	protected boolean __export(final Collector target, int offset, int length, final boolean foreward) {
+	protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
-				if (!target.push(this.__get(offset))) return false;
+				if (!target.push(this._get_(offset))) return false;
 			}
 		} else {
 			for (length += offset - 1; offset <= length; length--) {
-				if (!target.push(this.__get(length))) return false;
+				if (!target.push(this._get_(length))) return false;
 			}
 		}
 		return true;
@@ -442,7 +476,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @return Array mit den Bytes dieser Bytefolge.
 	 */
 	public byte[] value() {
-		final ValueCollector target = new ValueCollector(this.__length);
+		final ValueCollector target = new ValueCollector(this._length_);
 		this.export(target);
 		return target.array;
 	}
@@ -455,8 +489,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist.
 	 */
 	public final byte get(final int index) throws IndexOutOfBoundsException {
-		if ((index < 0) || (index >= this.__length)) throw new IndexOutOfBoundsException();
-		return this.__get(index);
+		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
+		return this._get_(index);
 	}
 
 	/**
@@ -465,7 +499,7 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @return Länge der Bytefolge.
 	 */
 	public final int length() {
-		return this.__length;
+		return this._length_;
 	}
 
 	/**
@@ -476,8 +510,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public FEMBinary concat(final FEMBinary that) throws NullPointerException {
-		if (that.__length == 0) return this;
-		if (this.__length == 0) return that;
+		if (that._length_ == 0) return this;
+		if (this._length_ == 0) return that;
 		return new ConcatBinary(this, that);
 	}
 
@@ -490,8 +524,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Bytefolge liegt oder eine negative Länge hätte.
 	 */
 	public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
-		if ((offset == 0) && (length == this.__length)) return this;
-		if ((offset < 0) || ((offset + length) > this.__length)) throw new IllegalArgumentException();
+		if ((offset == 0) && (length == this._length_)) return this;
+		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
 		if (length == 0) return FEMBinary.EMPTY;
 		return new SectionBinary(this, offset, length);
 	}
@@ -513,8 +547,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @return performanteren Bytefolge oder {@code this}.
 	 */
 	public FEMBinary compact() {
-		final FEMBinary result = this.__length == 1 ? new UniformBinary(1, this.__get(0)) : new CompactBinary(this.value());
-		result.__hash = this.__hash;
+		final FEMBinary result = this._length_ == 1 ? new UniformBinary(1, this._get_(0)) : new CompactBinary(this.value());
+		result._hash_ = this._hash_;
 		return result;
 	}
 
@@ -529,14 +563,14 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist.
 	 */
 	public final int find(final FEMBinary that, final int offset) throws NullPointerException, IllegalArgumentException {
-		if ((offset < 0) || (offset > this.__length)) throw new IllegalArgumentException();
-		final int count = that.__length;
+		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
+		final int count = that._length_;
 		if (count == 0) return offset;
-		final int value = that.__get(0), length = this.__length - count;
+		final int value = that._get_(0), length = this._length_ - count;
 		FIND: for (int i = offset; i < length; i++) {
-			if (value == this.__get(i)) {
+			if (value == this._get_(i)) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (this.__get(i + i2) != that.__get(i2)) {
+					if (this._get_(i + i2) != that._get_(i2)) {
 						continue FIND;
 					}
 				}
@@ -556,8 +590,23 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 */
 	public final boolean export(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
-		if (this.__length == 0) return true;
-		return this.__export(target, 0, this.__length, true);
+		if (this._length_ == 0) return true;
+		return this._export_(target, 0, this._length_, true);
+	}
+
+	/**
+	 * Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert.
+	 */
+	public final int hash() {
+		int result = this._hash_;
+		if (result != 0) return result;
+		final int length = this._length_;
+		final HashCollector collector = new HashCollector();
+		this._export_(collector, 0, length, true);
+		this._hash_ = (result = (collector.hash | 1));
+		return result;
 	}
 
 	/**
@@ -568,11 +617,11 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final boolean equals(final FEMBinary that) throws NullPointerException {
-		final int length = this.__length;
-		if (length != that.__length) return false;
+		final int length = this._length_;
+		if (length != that._length_) return false;
 		if (this.hashCode() != that.hashCode()) return false;
 		for (int i = 0; i < length; i++) {
-			if (this.__get(i) != that.__get(i)) return false;
+			if (this._get_(i) != that._get_(i)) return false;
 		}
 		return true;
 	}
@@ -586,12 +635,12 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
 	 */
 	public final int compare(final FEMBinary that) throws NullPointerException {
-		final int length = Math.min(this.__length, that.__length);
+		final int length = Math.min(this._length_, that._length_);
 		for (int i = 0; i < length; i++) {
-			final int result = (this.__get(i) & 255) - (that.__get(i) & 255);
+			final int result = (this._get_(i) & 255) - (that._get_(i) & 255);
 			if (result != 0) return result;
 		}
-		return this.__length - that.__length;
+		return this._length_ - that._length_;
 	}
 
 	{}
@@ -600,23 +649,37 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int hashCode() {
-		int result = this.__hash;
-		if (result != 0) return result;
-		final int length = this.__length;
-		final HashCollector collector = new HashCollector();
-		this.__export(collector, 0, length, true);
-		this.__hash = (result = (collector.hash | 1));
-		return result;
+	public final FEMBinary data() {
+		return this;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final boolean equals(final Object object) {
+	public final FEMType<FEMBinary> type() {
+		return FEMBinary.TYPE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMBinary)) return false;
+		if (!(object instanceof FEMBinary)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMBinary)) return false;
+		}
 		return this.equals((FEMBinary)object);
 	}
 
@@ -631,12 +694,12 @@ public abstract class FEMBinary implements Iterable<Byte> {
 
 			@Override
 			public Byte next() {
-				return new Byte(FEMBinary.this.__get(this.__index++));
+				return new Byte(FEMBinary.this._get_(this.__index++));
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.__index < FEMBinary.this.__length;
+				return this.__index < FEMBinary.this._length_;
 			}
 
 			@Override
@@ -649,8 +712,8 @@ public abstract class FEMBinary implements Iterable<Byte> {
 
 	/**
 	 * Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
-	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern <shy>
-	 * ({@code 0123456789ABCDEF}).
+	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h.
+	 * {@code 0123456789ABCDEF}.
 	 * 
 	 * @return Textdarstellung.
 	 */
@@ -658,9 +721,9 @@ public abstract class FEMBinary implements Iterable<Byte> {
 	public final String toString() {
 		final StringBuilder result = new StringBuilder();
 		result.append("0x");
-		for (int i = 0, length = this.__length; i < length; i++) {
-			final int value = this.__get(i);
-			result.append(FEMBinary.__toChar((value >> 4) & 0xF)).append(FEMBinary.__toChar((value >> 0) & 0xF));
+		for (int i = 0, length = this._length_; i < length; i++) {
+			final int value = this._get_(i);
+			result.append(FEMBinary._toChar_((value >> 4) & 0xF)).append(FEMBinary._toChar_((value >> 0) & 0xF));
 		}
 		return result.toString();
 	}

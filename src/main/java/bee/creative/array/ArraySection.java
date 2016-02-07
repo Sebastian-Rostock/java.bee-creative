@@ -44,7 +44,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param array Array.
 	 * @return Länge des gegebenen Arrays.
 	 */
-	protected abstract int arrayLength(GArray array);
+	protected abstract int _arrayLength_(GArray array);
 
 	/**
 	 * Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Elements des gegebenen Arrays zurück und wird in
@@ -54,7 +54,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param index Index.
 	 * @return {@link Object#hashCode() Streuwert} des {@code index}-ten Elements.
 	 */
-	protected abstract int hashCode(GArray array, int index);
+	protected abstract int _hashCode_(GArray array, int index);
 
 	/**
 	 * Diese Methode implementiert {@link #equals(Object)} ohne {@code null}-Prüfung. Sie sollte von Nachfahren in {@link #equals(Object)} aufgerufen werden.
@@ -62,14 +62,14 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param data Abschnitt.
 	 * @return {@code true}, wenn dieser Abschnitt gleich dem das gegebenen ist.
 	 */
-	protected boolean equals(final ArraySection<GArray> data) {
+	protected boolean _equals_(final ArraySection<GArray> data) {
 		int index = this.startIndex();
 		final int delta = data.startIndex() - index;
 		final int finalIndex = this.finalIndex();
 		if ((finalIndex - index) != (((data.finalIndex() - index) - delta))) return false;
 		final GArray array1 = this.array(), array2 = data.array();
 		for (; index < finalIndex; index++) {
-			if (!this.equals(array1, array2, index, index + delta)) return false;
+			if (!this._equals_(array1, array2, index, index + delta)) return false;
 		}
 		return true;
 	}
@@ -84,7 +84,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param index2 Index für Array 2.
 	 * @return {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays.
 	 */
-	protected abstract boolean equals(GArray array1, GArray array2, int index1, int index2);
+	protected abstract boolean _equals_(GArray array1, GArray array2, int index1, int index2);
 
 	/**
 	 * Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
@@ -96,7 +96,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param index2 Index für Array 2.
 	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays.
 	 */
-	protected abstract int compareTo(GArray array1, GArray array2, int index1, int index2);
+	protected abstract int _compareTo_(GArray array1, GArray array2, int index1, int index2);
 
 	/**
 	 * Diese Methode fügt das {@code index}-ten Element des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()}
@@ -112,7 +112,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @param index Index.
 	 * @param target {@link StringBuilder}.
 	 */
-	protected abstract void toString(GArray array, int index, StringBuilder target);
+	protected abstract void _toString_(GArray array, int index, StringBuilder target);
 
 	/**
 	 * Diese Methode gibt die Anzahl der Elemente im Abschnitt zurück.
@@ -136,7 +136,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @return Länge des Arrays.
 	 */
 	public int arrayLength() {
-		return this.arrayLength(this.array());
+		return this._arrayLength_(this.array());
 	}
 
 	/**
@@ -169,13 +169,13 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		final int size2 = section.finalIndex() - startIndex2;
 		if (size1 < size2) {
 			for (final int delta = startIndex2 - startIndex1; startIndex1 < finalIndex1; startIndex1++) {
-				final int comp = this.compareTo(array1, array2, startIndex1, startIndex1 + delta);
+				final int comp = this._compareTo_(array1, array2, startIndex1, startIndex1 + delta);
 				if (comp != 0) return comp;
 			}
 			return -1;
 		} else {
 			for (final int delta = startIndex1 - startIndex2; startIndex2 < finalIndex2; startIndex2++) {
-				final int comp = this.compareTo(array1, array2, startIndex2 + delta, startIndex2);
+				final int comp = this._compareTo_(array1, array2, startIndex2 + delta, startIndex2);
 				if (comp != 0) return comp;
 			}
 			if (size1 == size2) return 0;
@@ -191,7 +191,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		int hash = 1;
 		final GArray array = this.array();
 		for (int index = this.startIndex(), finalIndex = this.finalIndex(); index < finalIndex; index++) {
-			hash = (31 * hash) + this.hashCode(array, index);
+			hash = (31 * hash) + this._hashCode_(array, index);
 		}
 		return hash;
 	}
@@ -207,9 +207,9 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 		final StringBuilder builder = new StringBuilder();
 		builder.append('[');
 		final GArray array = this.array();
-		this.toString(array, index++, builder);
+		this._toString_(array, index++, builder);
 		for (; index < finalIndex; index++) {
-			this.toString(array, index, builder.append(", "));
+			this._toString_(array, index, builder.append(", "));
 		}
 		return builder.append(']').toString();
 	}

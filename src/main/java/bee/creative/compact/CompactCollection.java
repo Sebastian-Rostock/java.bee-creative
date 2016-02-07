@@ -37,8 +37,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GItem next(final int index) {
-			return this.data.getItem(index);
+		protected GItem _next_(final int index) {
+			return this._data_.getItem(index);
 		}
 
 	}
@@ -68,8 +68,8 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected GItem next(final int index) {
-			return this.data.getItem(index);
+		protected GItem _next_(final int index) {
+			return this._data_.getItem(index);
 		}
 
 	}
@@ -119,7 +119,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@SuppressWarnings ("unchecked")
 	protected final GItem getItem(final int index) {
-		return (GItem)this.items.get(index);
+		return (GItem)this._items_.get(index);
 	}
 
 	/**
@@ -129,7 +129,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @param item {@code index}-tes Element.
 	 */
 	protected final void setItem(final int index, final GItem item) {
-		this.items.set(index, item);
+		this._items_.set(index, item);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 * @param items {@code index}-tes Elemente.
 	 */
 	protected final void setItems(final int index, final Object[] items) {
-		this.items.set(index, items);
+		this._items_.set(index, items);
 	}
 
 	{}
@@ -149,7 +149,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final int size() {
-		return this.items.size();
+		return this._items_.size();
 	}
 
 	/**
@@ -157,7 +157,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final void clear() {
-		this.customRemove(0, this.items.size());
+		this._remove_(0, this._items_.size());
 	}
 
 	/**
@@ -165,7 +165,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final boolean isEmpty() {
-		return this.items.isEmpty();
+		return this._items_.isEmpty();
 	}
 
 	/**
@@ -181,9 +181,9 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final boolean remove(final Object item) {
-		final int index = this.customItemIndex(item);
+		final int index = this._itemIndex_(item);
 		if (index < 0) return false;
-		this.customRemove(index, 1);
+		this._remove_(index, 1);
 		return true;
 	}
 
@@ -192,7 +192,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public final boolean contains(final Object item) {
-		return this.customItemIndex(item) >= 0;
+		return this._itemIndex_(item) >= 0;
 	}
 
 	/**
@@ -226,7 +226,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public String toString() {
-		return this.items.values().toString();
+		return this._items_.values().toString();
 	}
 
 	/**
@@ -234,7 +234,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public Object[] toArray() {
-		return this.items.values().toArray();
+		return this._items_.values().toArray();
 	}
 
 	/**
@@ -242,7 +242,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	 */
 	@Override
 	public <T> T[] toArray(final T[] a) {
-		return this.items.values().toArray(a);
+		return this._items_.values().toArray(a);
 	}
 
 }

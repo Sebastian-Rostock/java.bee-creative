@@ -8,7 +8,7 @@ import bee.creative.util.Objects;
  * 
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link #dataOf(FEMValue)} bzw. {@link #dataOf(FEMValue, FEMContext)} gelieferten Nutzdaten.
+ * @param <GData> Typ der von {@link #dataFrom(FEMValue)} bzw. {@link #dataFrom(FEMValue, FEMContext)} gelieferten Nutzdaten.
  */
 public abstract class FEMType<GData> {
 
@@ -75,25 +75,25 @@ public abstract class FEMType<GData> {
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code Context.DEFAULT().dataOf(value, this)}.
+	 * Der Rückgabewert entspricht {@code Context.DEFAULT().dataFrom(value, this)}.
 	 * 
 	 * @see FEMContext#DEFAULT()
-	 * @see FEMContext#dataOf(FEMValue, FEMType)
+	 * @see FEMContext#dataFrom(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GData dataOf(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return FEMContext._default_.dataOf(value, this);
+	public final GData dataFrom(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
+		return FEMContext._default_.dataFrom(value, this);
 	}
 
 	/**
 	 * Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code context.dataOf(value, this)}.
+	 * Der Rückgabewert entspricht {@code context.dataFrom(value, this)}.
 	 * 
-	 * @see FEMContext#dataOf(FEMValue, FEMType)
+	 * @see FEMContext#dataFrom(FEMValue, FEMType)
 	 * @param value gegebener Wert.
 	 * @param context Kontextobjekt.
 	 * @return Nutzdaten.
@@ -101,8 +101,8 @@ public abstract class FEMType<GData> {
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
 	 */
-	public final GData dataOf(final FEMValue value, final FEMContext context) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return context.dataOf(value, this);
+	public final GData dataFrom(final FEMValue value, final FEMContext context) throws NullPointerException, ClassCastException, IllegalArgumentException {
+		return context.dataFrom(value, this);
 	}
 
 	{}

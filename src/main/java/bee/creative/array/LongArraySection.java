@@ -77,7 +77,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int arrayLength(final long[] array) {
+	protected int _arrayLength_(final long[] array) {
 		return array.length;
 	}
 
@@ -85,7 +85,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int hashCode(final long[] array, final int index) {
+	protected int _hashCode_(final long[] array, final int index) {
 		final long value = array[index];
 		return (int)(value ^ (value >>> 32));
 	}
@@ -94,7 +94,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean equals(final long[] array1, final long[] array2, final int index1, final int index2) {
+	protected boolean _equals_(final long[] array1, final long[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
@@ -102,7 +102,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int compareTo(final long[] array1, final long[] array2, final int index1, final int index2) {
+	protected int _compareTo_(final long[] array1, final long[] array2, final int index1, final int index2) {
 		final long value1 = array1[index1], value2 = array2[index2];
 		if (value1 == value2) return 0;
 		if (value1 < value2) return -1;
@@ -113,7 +113,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void toString(final long[] array, final int index, final StringBuilder target) {
+	protected void _toString_(final long[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -124,7 +124,7 @@ public abstract class LongArraySection extends ArraySection<long[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof LongArraySection)) return false;
-		return this.equals((LongArraySection)object);
+		return this._equals_((LongArraySection)object);
 	}
 
 }

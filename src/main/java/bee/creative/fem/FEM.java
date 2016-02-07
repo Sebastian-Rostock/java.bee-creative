@@ -1,9 +1,13 @@
 package bee.creative.fem;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,10 +15,15 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import bee.creative.fem.FEMScript.Range;
+import bee.creative.util.Builders.HashMapBuilder;
 import bee.creative.util.Converter;
+import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
+import bee.creative.util.Strings;
 
 /**
  * FEM - Function Evaluation Model
@@ -27,9 +36,11 @@ import bee.creative.util.Parser;
 public class FEM {
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Wert als {@link ScriptFormatterInput}.<br>
+	 * Diese Klasse implementiert einen abstrakten Wert als {@link FEMFunction} und {@link ScriptFormatterInput}.<br>
+	 * Die {@link #invoke(FEMFrame)}-Methode liefert {@code this}, sodass instanzen dieser Klassen das Einpacken in eine {@link ValueFunction} nicht benötigen.<br>
 	 * Die {@link #toString() Textdarstellung} des Werts wird über {@link ScriptFormatter#formatValue(FEMValue...)} und damit via
-	 * {@link #toScript(ScriptFormatter)} ermittelt.
+	 * {@link #toScript(ScriptFormatter)} ermittelt. Diese Methode delegiert selbst an {@link #toString()}, sodass mindestens eine dieser Methoden überschrieben
+	 * werden muss.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -37,10 +48,10 @@ public class FEM {
 
 		/**
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextfrei konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
-		 * Der Rückgabewert entspricht {@code FEMContext.DEFAULT().dataOf(this, type)}.
+		 * Der Rückgabewert entspricht {@code FEMContext.DEFAULT().dataFrom(this, type)}.
 		 * 
 		 * @see FEMContext#DEFAULT()
-		 * @see FEMContext#dataOf(FEMValue, FEMType)
+		 * @see FEMContext#dataFrom(FEMValue, FEMType)
 		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 		 * @param type Datentyp.
 		 * @return Nutzdaten.
@@ -49,14 +60,14 @@ public class FEM {
 		 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können.
 		 */
 		public final <GData> GData data(final FEMType<GData> type) throws NullPointerException, IllegalArgumentException {
-			return FEMContext._default_.dataOf(this, type);
+			return FEMContext._default_.dataFrom(this, type);
 		}
 
 		/**
 		 * Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
-		 * Der Rückgabewert entspricht {@code context.dataOf(this, type)}.
+		 * Der Rückgabewert entspricht {@code context.dataFrom(this, type)}.
 		 * 
-		 * @see FEMContext#dataOf(FEMValue, FEMType)
+		 * @see FEMContext#dataFrom(FEMValue, FEMType)
 		 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 		 * @param type Datentyp.
 		 * @param context Kontext.
@@ -68,7 +79,7 @@ public class FEM {
 
 		public final <GData> GData data(final FEMType<GData> type, final FEMContext context) throws NullPointerException, ClassCastException,
 			IllegalArgumentException {
-			return context.dataOf(this, type);
+			return context.dataFrom(this, type);
 		}
 
 		{}
@@ -77,7 +88,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			return Objects.hash(this.data());
 		}
 
@@ -85,11 +96,11 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final boolean equals(final Object object) {
+		public boolean equals(final Object object) {
 			if (object == this) return true;
 			if (!(object instanceof FEMValue)) return false;
-			final FEMValue data = (FEMValue)object;
-			return Objects.equals(this.type(), data.type()) && Objects.equals(this.data(), data.data());
+			final FEMValue that = (FEMValue)object;
+			return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
 		}
 
 		/**
@@ -105,7 +116,7 @@ public class FEM {
 		 */
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putData(this.data());
+			target.put(this.toString());
 		}
 
 		/**
@@ -119,438 +130,28 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen abstrakten Wert mit Nutzdaten.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Nutzdaten.
-	 */
-	public static abstract class DataValue<GData> extends BaseValue {
-
-		/**
-		 * Dieses Feld speichert die Nutzdaten.
-		 */
-		GData _data_;
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
-		 */
-		public DataValue() {
-			this._data_ = null;
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public DataValue(final GData data) throws NullPointerException {
-			if (data == null) throw new NullPointerException("data = null");
-			this._data_ = data;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final GData data() {
-			return this._data_;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public abstract FEMType<GData> type();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putData(this._data_);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert einen {@link DataValue} als {@link ScriptTracerInput}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GData> Typ der Nutzdaten.
-	 */
-	public static abstract class TracerValue<GData> extends DataValue<GData> implements ScriptTracerInput {
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten mit {@code null}.
-		 */
-		public TracerValue() {
-			super();
-		}
-
-		/**
-		 * Dieser Konstruktor initialisiert die Nutzdaten.
-		 * 
-		 * @param data Nutzdaten.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 */
-		public TracerValue(final GData data) throws NullPointerException {
-			super(data);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den Ergebniswert einer Funktion mit {@code call-by-reference}-Semantik, welcher eine gegebene Funktion erst dann mit gegebenen
-	 * Stapelrahmen einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Nutzdaten} gelesen werden. Der von der Funktion berechnete Ergebniswert
-	 * wird zur Wiederverwendung zwischengespeichert. Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
-	 * 
-	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
-	public static final class VirtualValue extends BaseValue {
-
-		/**
-		 * Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
-		 * 
-		 * @see FEMFunction#invoke(FEMFrame)
-		 */
-		FEMValue _value_;
-
-		/**
-		 * Dieses Feld speichert die Stapelrahmen zur Auswertung der Funktion oder {@code null}.
-		 * 
-		 * @see FEMFunction#invoke(FEMFrame)
-		 */
-		FEMFrame _frame_;
-
-		/**
-		 * Dieses Feld speichert die Funktion oder {@code null}.
-		 * 
-		 * @see FEMFunction#invoke(FEMFrame)
-		 */
-		FEMFunction _function_;
-
-		/**
-		 * Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
-		 * 
-		 * @param frame Stapelrahmen.
-		 * @param function Funktion.
-		 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist.
-		 */
-		public VirtualValue(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-			if (frame == null) throw new NullPointerException("frame = null");
-			if (function == null) throw new NullPointerException("function = null");
-			this._frame_ = frame;
-			this._function_ = function;
-		}
-
-		{}
-
-		/**
-		 * Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame()
-		 * Stapelrahmen} zurück.
-		 * 
-		 * @see FEMFunction#invoke(FEMFrame)
-		 * @return Ergebniswert.
-		 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist.
-		 */
-		public final synchronized FEMValue value() throws NullPointerException {
-			FEMValue result = this._value_;
-			if (result != null) return result;
-			result = this._function_.invoke(this._frame_);
-			if (result == null) throw new NullPointerException("this.function().invoke(this.frame()) = null");
-			this._value_ = result;
-			this._frame_ = null;
-			this._function_ = null;
-			return result;
-		}
-
-		/**
-		 * Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
-		 * Der erste Aufruf von {@link #value()} setzt die Stapelrahmen auf {@code null}.
-		 * 
-		 * @return Stapelrahmen oder {@code null}.
-		 */
-		public final FEMFrame frame() {
-			return this._frame_;
-		}
-
-		/**
-		 * Diese Methode gibt die Funktion oder {@code null} zurück.<br>
-		 * Der erste Aufruf von {@link #value()} setzt die Funktion auf {@code null}.
-		 * 
-		 * @return Funktion oder {@code null}.
-		 */
-		public final FEMFunction function() {
-			return this._function_;
-		}
-
-		{}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final FEMType<?> type() {
-			return this.value().type();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final Object data() {
-			return this.value().data();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public final synchronized void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			if (this._value_ != null) {
-				target.putValue(this._value_);
-			} else {
-				target.putHandler(this._function_).put(this._frame_);
-			}
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMVoid}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class VoidValue extends DataValue<FEMVoid> {
-
-		VoidValue() {
-			super(FEMVoid.INSTANCE);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMVoid> type() {
-			return FEM.VOID_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMArray}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class ArrayValue extends DataValue<FEMArray> {
-
-		ArrayValue(final FEMArray data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMArray> type() {
-			return FEM.ARRAY_TYPE;
-		}
-
-		@Override
-		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putArray(this._data_);
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMString}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class StringValue extends DataValue<FEMString> {
-
-		StringValue(final FEMString data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMString> type() {
-			return FEM.STRING_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMObject}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class ObjectValue extends DataValue<FEMObject> {
-
-		ObjectValue(final FEMObject data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMObject> type() {
-			return FEM.OBJECT_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMBinary}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class BinaryValue extends DataValue<FEMBinary> {
-
-		BinaryValue(final FEMBinary data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMBinary> type() {
-			return FEM.BINARY_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMInteger}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class IntegerValue extends DataValue<FEMInteger> {
-
-		IntegerValue(final FEMInteger data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMInteger> type() {
-			return FEM.INTEGER_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMDecimal}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class DecimalValue extends DataValue<FEMDecimal> {
-
-		DecimalValue(final FEMDecimal data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMDecimal> type() {
-			return FEM.DECIMAL_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMBoolean}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class BooleanValue extends DataValue<FEMBoolean> {
-
-		BooleanValue(final FEMBoolean data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMBoolean> type() {
-			return FEM.BOOLEAN_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMDuration}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class DurationValue extends DataValue<FEMDuration> {
-
-		DurationValue(final FEMDuration data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMDuration> type() {
-			return FEM.DURATION_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMDatetime}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class DatetimeValue extends DataValue<FEMDatetime> {
-
-		DatetimeValue(final FEMDatetime data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMDatetime> type() {
-			return FEM.DATETIME_TYPE;
-		}
-
-	}
-
-	/**
-	 * Diese Klasse implementiert den {@link FEMValue} zu {@link FEMFunction}.
-	 */
-	@SuppressWarnings ("javadoc")
-	public static final class FunctionValue extends TracerValue<FEMFunction> {
-
-		FunctionValue(final FEMFunction data) throws NullPointerException {
-			super(data);
-		}
-
-		{}
-
-		@Override
-		public final FEMType<FEMFunction> type() {
-			return FEM.FUNCTION_TYPE;
-		}
-
-		@Override
-		public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
-			return FEM.functionValue(tracer.trace(this._data_));
-		}
-
-		@Override
-		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.putFunction(this._data_);
-		}
-
-	}
-
-	/**
 	 * Diese Klasse implementiert eine abstakte Funktion als {@link ScriptFormatterInput}.<br>
 	 * Die {@link #toString() Textdarstellung} der Funktion wird über {@link ScriptFormatter#formatFunction(FEMFunction...)} und damit via
-	 * {@link #toScript(ScriptFormatter)} ermittelt.
+	 * {@link #toScript(ScriptFormatter)} ermittelt.<br>
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static abstract class BaseFunction implements FEMFunction, ScriptFormatterInput {
+
+		/**
+		 * Diese Methode gibt diese Funktion als Wert ({@link FEMHandler}) zurück.
+		 * 
+		 * @return {@code this} als Wert.
+		 */
+		public final FEMHandler toValue() {
+			return new FEMHandler(this);
+		}
+
+		public final InvokeFunction invokeWith(final FEMFunction... params) throws NullPointerException {
+			return new InvokeFunction(this, true, params);
+		}
+
+		{}
 
 		/**
 		 * {@inheritDoc}
@@ -564,7 +165,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public final String toString() {
+		public String toString() {
 			return FEM.scriptFormatter().formatFunction(this);
 		}
 
@@ -576,6 +177,10 @@ public class FEM {
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ProxyFunction extends BaseFunction {
+
+		// TODO from
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den Namen.
@@ -658,6 +263,10 @@ public class FEM {
 	 * @see ScriptTracer
 	 */
 	public static final class TraceFunction extends BaseFunction implements ScriptTracerInput {
+
+		// TODO from
+
+		{}
 
 		/**
 		 * Dieses Feld speichert den {@link ScriptTracer}.
@@ -767,14 +376,14 @@ public class FEM {
 
 		/**
 		 * Diese Methode gibt den gegebenen Wert als {@link ValueFunction} zurück.<br>
-		 * Wenn dieser bereits eine {@link FEMFunction} ist, wird der unverändert zurück gegeben.
+		 * Wenn dieser ein {@link BaseValue} ist, wird der unverändert zurück gegeben.
 		 * 
 		 * @param value Wert.
 		 * @return {@link FEMFunction}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 */
 		public static final FEMFunction from(final FEMValue value) throws NullPointerException {
-			if (value instanceof FEMFunction) return (FEMFunction)value;
+			if (value instanceof BaseValue) return (FEMFunction)value;
 			return new ValueFunction(value);
 		}
 
@@ -837,9 +446,9 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link VirtualValue} ist.
+	 * Diese Klasse implementiert eine Funktion mit {@code call-by-reference}-Semantik, deren Ergebniswert ein {@link FEMResult} ist.
 	 * 
-	 * @see VirtualValue
+	 * @see FEMResult
 	 * @see #invoke(FEMFrame)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -866,7 +475,7 @@ public class FEM {
 		final FEMFunction _function_;
 
 		/**
-		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #invoke(FEMFrame)} zur Erzeugung eines {@link VirtualValue} genutzt wird.
+		 * Dieser Konstruktor initialisiert die auszuwertende Funktion, die in {@link #invoke(FEMFrame)} zur Erzeugung eines {@link FEMResult} genutzt wird.
 		 * 
 		 * @param function auszuwertende Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
@@ -892,14 +501,14 @@ public class FEM {
 		/**
 		 * {@inheritDoc}
 		 * <p>
-		 * Der Ergebniswert entspricht {@code new LazyValue(frame, this.function())}.
+		 * Der Ergebniswert entspricht {@code FEMResult.from(frame, this.function())}.
 		 * 
 		 * @see #function()
-		 * @see VirtualValue#VirtualValue(FEMFrame, FEMFunction)
+		 * @see FEMResult#from(FEMFrame, FEMFunction)
 		 */
 		@Override
-		public final VirtualValue invoke(final FEMFrame frame) {
-			return new VirtualValue(frame, this._function_);
+		public final FEMResult invoke(final FEMFrame frame) {
+			return FEMResult.from(frame, this._function_);
 		}
 
 		/**
@@ -908,6 +517,402 @@ public class FEM {
 		@Override
 		public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 			target.putFunction(this._function_);
+		}
+
+	}
+
+	public static abstract class NativeFunction extends BaseFunction {
+
+		@SuppressWarnings ("javadoc")
+		static abstract class FromField extends NativeFunction {
+
+			@Override
+			public abstract Field member();
+
+			@Override
+			public boolean isField() {
+				return true;
+			}
+
+			@Override
+			public String toString() {
+				final Field field = this.member();
+				return field.getDeclaringClass().getName() + "." + field.getName();
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		static abstract class FromMethod extends NativeFunction {
+
+			@Override
+			public abstract Method member();
+
+			@Override
+			public boolean isMethod() {
+				return true;
+			}
+
+			@Override
+			public String toString() {
+				final Method method = this.member();
+				return String.format("%s.%s(%s)", //
+					method.getDeclaringClass().getName(), //
+					method.getName(),//
+					Strings.join(",", Iterables.convertedIterable(NativeFunction._name_, //
+						Arrays.asList(method.getParameterTypes()))));
+			}
+
+		}
+
+		@SuppressWarnings ("javadoc")
+		static abstract class FromConstructor extends NativeFunction {
+
+			@Override
+			public abstract Constructor<?> member();
+
+			@Override
+			public boolean isStatic() {
+				return true;
+			}
+
+			@Override
+			public boolean isConstructor() {
+				return true;
+			}
+
+			@Override
+			public String toString() {
+				final Constructor<?> method = this.member();
+				return String.format("%s.new(%s)", //
+					method.getDeclaringClass().getName(), //
+					Strings.join(",", Iterables.convertedIterable(NativeFunction._name_, //
+						Arrays.asList(method.getParameterTypes()))));
+			}
+
+		}
+
+		{}
+
+		static final Map<?, Class<?>> _class_ = new HashMapBuilder<Object, Class<?>>() //
+			.useEntry("byte", byte.class) //
+			.useEntry("short", short.class) //
+			.useEntry("int", int.class) //
+			.useEntry("long", long.class) //
+			.useEntry("char", char.class) //
+			.useEntry("float", float.class) //
+			.useEntry("double", double.class) //
+			.useEntry("boolean", boolean.class) //
+			.build();
+
+		static final Converter<Class<?>, String> _name_ = new Converter<Class<?>, String>() {
+
+			@Override
+			public String convert(final Class<?> input) {
+				return input.getName();
+			}
+
+		};
+
+		static final Pattern _pattern_ = Pattern.compile("^(.+?)\\.([^\\.\\(]+)(?:\\((.*?)\\))?$");
+
+		{}
+
+		/**
+		 * Diese Methode gibt das zurück. <br>
+		 * {@code CLASS_PATH.class}<br>
+		 * {@code CLASS_PATH.FIELD_NAME}<br>
+		 * {@code CLASS_PATH.new(type,...,type)}<br>
+		 * {@code CLASS_PATH.METHOD_NAME(type,...,type)}<br>
+		 * 
+		 * @param memberPath
+		 * @return
+		 * @throws SecurityException
+		 * @throws NullPointerException
+		 * @throws ReflectiveOperationException
+		 */
+		public static final FEMFunction from(final String memberPath) throws SecurityException, NullPointerException, ReflectiveOperationException {
+			final Matcher matcher = NativeFunction._pattern_.matcher(memberPath);
+			if (!matcher.find()) throw new IllegalArgumentException();
+			final String inputName = matcher.group(1);
+			final Class<?> inputType = Class.forName(inputName);
+			final String memberName = matcher.group(2);
+			final String paramString = matcher.group(3);
+			if (paramString != null) {
+				final String[] paramNames = paramString.split(",");
+				final int length = paramString.isEmpty() ? 0 : paramNames.length;
+				final Class<?>[] paramTypes = new Class<?>[length];
+				for (int i = 0; i < length; i++) {
+					paramTypes[i] = NativeFunction._classFrom_(paramNames[i]);
+				}
+				if ("new".equals(memberName)) return NativeFunction.fromConstructor(inputType, paramTypes);
+				return NativeFunction.fromMethod(inputType, memberName, paramTypes);
+			} else { //
+				if ("class".equals(memberName)) return FEMNative.from(inputType);
+				return NativeFunction.fromField(inputType, memberName);
+			}
+		}
+
+		public static final NativeFunction fromField(final Field field) throws IllegalAccessException, NullPointerException {
+			if (!field.isAccessible()) throw new IllegalAccessException();
+			return Modifier.isStatic(field.getModifiers()) ? NativeFunction._fromStaticField_(field) : NativeFunction._fromObjectField_(field);
+		}
+
+		public static final NativeFunction fromField(final Class<?> inputType, final String fieldName) throws SecurityException, IllegalAccessException,
+			NoSuchFieldException, NullPointerException {
+			final Field field = inputType.getField(fieldName);
+			return NativeFunction.fromField(field);
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final NativeFunction _fromStaticField_(final Field staticField) {
+			return new FromField() {
+
+				@Override
+				public FEMValue invoke(final FEMFrame frame) {
+					try {
+						switch (frame.size()) {
+							case 0:
+								final Object getValue = staticField.get(null);
+								return FEMNative.from(getValue);
+							case 1:
+								final Object setValue = frame.get(0).data();
+								staticField.set(null, setValue);
+								return FEMNative.NULL;
+						}
+						throw new IllegalArgumentException();
+					} catch (final Exception cause) {
+						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+					}
+				}
+
+				@Override
+				public Field member() {
+					return staticField;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return true;
+				}
+
+			};
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final NativeFunction _fromObjectField_(final Field objectField) {
+			return new FromField() {
+
+				@Override
+				public FEMValue invoke(final FEMFrame frame) {
+					try {
+						switch (frame.size()) {
+							case 1:
+								final Object getInput = frame.get(0).data();
+								final Object getValue = objectField.get(getInput);
+								return FEMNative.from(getValue);
+							case 2:
+								final Object setInput = frame.get(0).data();
+								final Object setValue = frame.get(1).data();
+								objectField.set(setInput, setValue);
+								return FEMNative.NULL;
+						}
+						throw new IllegalArgumentException();
+					} catch (final Exception cause) {
+						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+					}
+				}
+
+				@Override
+				public Field member() {
+					return objectField;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return false;
+				}
+
+			};
+		}
+
+		public static final NativeFunction fromMethod(final Method method) throws IllegalAccessException, NullPointerException {
+			// if (!method.isAccessible()) throw new IllegalAccessException();
+			return Modifier.isStatic(method.getModifiers()) ? NativeFunction._fromStaticMethod_(method) : NativeFunction._fromObjectMethod_(method);
+		}
+
+		public static final NativeFunction fromMethod(final Class<?> inputType, final String methodName, final Class<?>... paramTypes) throws SecurityException,
+			IllegalAccessException, NoSuchMethodException, NullPointerException {
+			final Method method = inputType.getMethod(methodName, paramTypes);
+			return NativeFunction.fromMethod(method);
+		}
+
+		public static final NativeFunction fromConstructor(final Constructor<?> constructor) throws IllegalAccessException, NullPointerException {
+			// if (!constructor.isAccessible() || !Modifier.isStatic(constructor.getModifiers())) throw new IllegalAccessException();
+			// if (!Modifier.isStatic(constructor.getModifiers())) throw new IllegalAccessException();
+			return NativeFunction._fromStaticConstructor_(constructor);
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final NativeFunction _fromStaticConstructor_(final Constructor<?> staticConstructor) {
+			return new FromConstructor() {
+
+				@Override
+				public FEMValue invoke(final FEMFrame frame) {
+					try {
+						final Object[] params = NativeFunction._paramsFrom_(frame, false);
+						final Object result = staticConstructor.newInstance(params);
+						return FEMNative.from(result);
+					} catch (final Exception cause) {
+						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+					}
+				}
+
+				@Override
+				public Constructor<?> member() {
+					return staticConstructor;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return true;
+				}
+
+			};
+		}
+
+		public static final NativeFunction fromConstructor(final Class<?> inputType, final Class<?>... paramTypes) throws SecurityException,
+			IllegalAccessException, NoSuchMethodException, NullPointerException {
+			final Constructor<?> constructor = inputType.getConstructor(paramTypes);
+			return NativeFunction.fromConstructor(constructor);
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final NativeFunction _fromStaticMethod_(final Method staticMethod) {
+			return new FromMethod() {
+
+				@Override
+				public FEMValue invoke(final FEMFrame frame) {
+					try {
+						final Object[] params = NativeFunction._paramsFrom_(frame, false);
+						final Object result = staticMethod.invoke(null, params);
+						return FEMNative.from(result);
+					} catch (final Exception cause) {
+						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+					}
+				}
+
+				@Override
+				public Method member() {
+					return staticMethod;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return true;
+				}
+
+			};
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final NativeFunction _fromObjectMethod_(final Method objectMethod) {
+			return new FromMethod() {
+
+				@Override
+				public FEMValue invoke(final FEMFrame frame) {
+					try {
+						final Object[] params = NativeFunction._paramsFrom_(frame, true);
+						final Object input = frame.get(0).data();
+						final Object result = objectMethod.invoke(input, params);
+						return FEMNative.from(result);
+					} catch (final Exception cause) {
+						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+					}
+				}
+
+				@Override
+				public Method member() {
+					return objectMethod;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return false;
+				}
+
+			};
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final Class<?> _classFrom_(final String name) throws ClassNotFoundException {
+			Class<?> result = NativeFunction._class_.get(name);
+			if (result != null) return result;
+			result = Class.forName(name);
+			return result;
+		}
+
+		@SuppressWarnings ("javadoc")
+		static final Object[] _paramsFrom_(final FEMFrame frame, final boolean skipFirst) {
+			final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
+			final Object[] result = new Object[length];
+			for (int i = 0; i < length; i++) {
+				result[i] = frame.get(i + offset).data();
+			}
+			return result;
+		}
+
+		{}
+
+		/**
+		 * Diese Methode gibt den {@link Member} zurück, auf den sich die Methode {@link #invoke(FEMFrame)} bezieht.
+		 * 
+		 * @return {@link Member}.
+		 */
+		public abstract Member member();
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} {@code static} ist.
+		 * 
+		 * @return Bezugskennzeichnung.
+		 */
+		public abstract boolean isStatic();
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} ein {@link Field} ist.
+		 * 
+		 * @return Feldkennzeichnung.
+		 */
+		public boolean isField() {
+			return false;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} eine {@link Method} ist.
+		 * 
+		 * @return Methodenkennzeichung.
+		 */
+		public boolean isMethod() {
+			return false;
+		}
+
+		/**
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} ein {@link Constructor} ist.
+		 * 
+		 * @return Konstructorkennzeichung.
+		 */
+		public boolean isConstructor() {
+			return false;
+		}
+
+		{}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put(this.toString());
 		}
 
 	}
@@ -1003,6 +1008,10 @@ public class FEM {
 	 */
 	public static final class InvokeFunction extends BaseFunction implements ScriptTracerInput {
 
+		// TODO from
+
+		{}
+
 		/**
 		 * Dieses Feld speichert {@code true}, wenn die Verkettung aktiviert ist.
 		 */
@@ -1091,7 +1100,7 @@ public class FEM {
 		 * {@inheritDoc}
 		 * <p>
 		 * Der Ergebniswert entspricht
-		 * {@code (this.direct() ? this.function() : frame.context().dataOf(this.function().invoke(frame), FUNCTION_TYPE)).invoke(frame.newFrame(this.params()))}.
+		 * {@code (this.direct() ? this.function() : frame.context().dataFrom(this.function().invoke(frame), FUNCTION_TYPE)).invoke(frame.newFrame(this.params()))}.
 		 * 
 		 * @see #direct()
 		 * @see #params()
@@ -1106,7 +1115,7 @@ public class FEM {
 			} else {
 				final FEMValue value = this._function_.invoke(frame);
 				if (value == null) throw new NullPointerException("this.function().invoke(frame) = null");
-				function = frame.__context.dataOf(value, FEM.FUNCTION_TYPE);
+				function = FEMHandler.from(value, frame._context_).value();
 			}
 			frame = frame.newFrame(this._params_);
 			final FEMValue result = function.invoke(frame);
@@ -1138,7 +1147,7 @@ public class FEM {
 
 	/**
 	 * Diese Klasse implementiert eine Funktion, welche die zusätzlichen Parameterwerte von Stapelrahmen an eine gegebene Funktion bindet und diese gebundene
-	 * Funktion anschließend als {@link FEM#functionValue(FEMFunction)} liefert.
+	 * Funktion anschließend als {@link FEMHandler} liefert.
 	 * 
 	 * @see #invoke(FEMFrame)
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -1233,7 +1242,7 @@ public class FEM {
 		 * <p>
 		 * Wenn diese Funktion über {@link #ClosureFunction(FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code functionValue(new ClosureFunction(frame, this.function()))}. Damit werden die gegebenen Stapelrahmen an die Funktion {@link #function()} gebunden
-		 * und als {@link FEM#functionValue(FEMFunction)} zurück gegeben.
+		 * und als {@link FEMHandler} zurück gegeben.
 		 * <p>
 		 * Wenn sie dagegen über {@link #ClosureFunction(FEMFrame, FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
 		 * {@code this.function().invoke(this.frame().withParams(frame.params()))}. Damit werden die gebundene Funktion mit den zugesicherten Parameterwerten der
@@ -1241,7 +1250,7 @@ public class FEM {
 		 */
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			if (this._frame_ == null) return FEM.functionValue(new ClosureFunction(frame, this._function_));
+			if (this._frame_ == null) return FEMHandler.from(new ClosureFunction(frame, this._function_));
 			return this._function_.invoke(this._frame_.withParams(frame.params()));
 		}
 
@@ -1281,6 +1290,13 @@ public class FEM {
 	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
 	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
 	 * </ul>
+	 * <p>
+	 * Beispiele für zulässige Quelltexte sind:
+	 * 
+	 * <pre> TODO
+	 * test1 {A; B: if(intComp($A; $B); $1; 34)) }
+	 * intComp: &lt;java.lang.Object.equals(java.lang.Object)&gt; / native Methode /
+	 * </pre>
 	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * 
@@ -1755,10 +1771,12 @@ public class FEM {
 	 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog
 	 * zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einer Funktion kompiliert werden.</li>
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.valueOf(0)}). Andernfalls steht der Bereich für {@link FEM#PARAMS_VIEW_FUNCTION}.</li>
-	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen werden hierbei
-	 * als {@link FunctionValue} angegeben.</li>
+	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEM#PARAMS_VIEW_FUNCTION}.</li>
+	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen als Werte werden
+	 * hierbei als {@link FEMHandler} angegeben.</li>
 	 * </ul>
+	 * <p>
+	 * TODO
 	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * <p>
@@ -2002,7 +2020,6 @@ public class FEM {
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMValue} und gibt diesen zurück.
 		 * 
-		 * @see ArrayValue
 		 * @return Wertliste als {@link FEMValue}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
@@ -2012,7 +2029,7 @@ public class FEM {
 			this.skip();
 			if (this._compileType_() == ']') {
 				this.skip();
-				return FEM._emptyArray_;
+				return FEMArray.EMPTY;
 			}
 			while (true) {
 				final FEMValue value = this._compileParamAsValue_();
@@ -2025,7 +2042,7 @@ public class FEM {
 					}
 					case ']': {
 						this.skip();
-						return FEM.arrayValue(FEMArray.from(result));
+						return FEMArray.from(result);
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -2037,7 +2054,6 @@ public class FEM {
 		/**
 		 * Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMFunction} und gibt diesen zurück.
 		 * 
-		 * @see ArrayValue
 		 * @see ValueFunction
 		 * @see InvokeFunction
 		 * @see FEM#PARAMS_VIEW_FUNCTION
@@ -2049,7 +2065,7 @@ public class FEM {
 			this.skip();
 			if (this._compileType_() == ']') {
 				this.skip();
-				return FEM._emptyArray_;
+				return FEMArray.EMPTY;
 			}
 			final List<FEMFunction> list = new ArrayList<>();
 			boolean value = true;
@@ -2074,7 +2090,7 @@ public class FEM {
 						for (int i = 0; i < size; i++) {
 							values[i] = list.get(i).invoke(FEMFrame.EMPTY);
 						}
-						return FEM.arrayValue(values);
+						return FEMArray.from(values);
 					}
 					default: {
 						throw new ScriptException().useSender(this).useHint(" Zeichen «;» oder «]» erwartet.");
@@ -2128,11 +2144,11 @@ public class FEM {
 				case '{': {
 					if (this._closureEnabled_) throw new ScriptException().useSender(this).useHint(" Ungebundene Funktion unzulässig.");
 					final FEMFunction retult = this._compileFrame_();
-					return FEM.functionValue(retult);
+					return FEMHandler.from(retult);
 				}
 				default: {
 					final FEMFunction param = this._compileParam_();
-					if (!(param instanceof ValueFunction)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
+					if (!(param instanceof ValueFunction) && !(param instanceof BaseValue)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 					final FEMValue result = param.invoke(FEMFrame.EMPTY);
 					return result;
 				}
@@ -2175,7 +2191,7 @@ public class FEM {
 					result = this._compileFrame_();
 					if (this._compileType_() != '(') {
 						if (this._closureEnabled_) return ClosureFunction.from(result);
-						return FEM.functionValue(result);
+						return FEMHandler.from(result);
 					}
 					if (!this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 					break;
@@ -2186,7 +2202,7 @@ public class FEM {
 				default: {
 					result = this._compileParam_();
 					if (this._compileType_() != '(') {
-						if (this._handlerEnabled_) return FEM.functionValue(result);
+						if (this._handlerEnabled_) return result;
 						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
 					}
 				}
@@ -2226,9 +2242,17 @@ public class FEM {
 			final String name = this._compileName_();
 			if ((name == null) || (this._compileIndex_(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
 			final ProxyFunction result = this.proxy(name);
-			if (this._compileType_() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			final FEMFunction target = this._compileFrame_();
-			result.set(target);
+			switch (this._compileType_()) {
+				case '{':
+					result.set(this._compileFrame_());
+				break;
+				case ':':
+					this.skip();
+					result.set(this._compileParamAsFunction_());
+				break;
+				default:
+					throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
+			}
 			return result;
 		}
 
@@ -2269,10 +2293,9 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode kompiliert die beim aktuellen Bereich (<code>'{'</code>) beginnende, parametrisierte Funktion in einen {@link FunctionValue} und gibt
-		 * diesen zurück.
+		 * Diese Methode kompiliert die beim aktuellen Bereich (<code>'{'</code>) beginnende, parametrisierte Funktion und gibt diese zurück.
 		 * 
-		 * @return Funktion als {@link FunctionValue}.
+		 * @return Funktion.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction _compileFrame_() throws ScriptException {
@@ -2388,7 +2411,7 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} als {@link FunctionValue}
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} als {@link FEMHandler}
 		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
 		 * 
 		 * @see #compileFunction()
@@ -2607,8 +2630,9 @@ public class FEM {
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
 		 * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
-		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String) Namen} und ist sonst durch eine parametrisierte Funktion gegeben. Wenn der Quelltext nur
-		 * Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert.
+		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String) Namen} und dann entweder durch eine in geschweifte Klammern eingeschlossene
+		 * parametrisierte Funktion oder eine nach einem Duppelpunkt angegebenen Parameter gegeben. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird
+		 * eine leere Funktionsliste geliefert.
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
@@ -2706,7 +2730,54 @@ public class FEM {
 	public static interface ScriptCompilerHelper {
 
 		/**
-		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden immer {@code null} liefern.
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler, String)} sofern möglich den Typ {@link FEMNative}
+		 * mit Nutzdaten {@code null}, {@code true}, {@code false}, {@link String} und {@link Character} sowie {@link NativeFunction} nutzt und andernfalls einen
+		 * {@link ScriptCompiler#proxy(String)} liefert.
+		 */
+		static ScriptCompilerHelper NATIVE = new ScriptCompilerHelper() {
+
+			@Override
+			public String compileName(final ScriptCompiler compiler, final String section) throws ScriptException {
+				return section;
+			}
+
+			@Override
+			public FEMFunction compileParam(final ScriptCompiler compiler, String section) throws ScriptException {
+				switch (compiler.symbol()) {
+					case '"':
+						return FEMNative.from(FEM.parseString(section));
+					case '\'':
+						return FEMNative.from(new Character(FEM.parseString(section).charAt(0)));
+					case '!':
+						try {
+							return NativeFunction.from(FEM.parseValue(section));
+						} catch (final Exception cause) {
+							return compiler.proxy(section);
+						}
+					default: {
+						section = FEM.parseValue(section);
+						if (section.equals("null")) return FEMNative.NULL;
+						if (section.equals("true")) return FEMNative.TRUE;
+						if (section.equals("false")) return FEMNative.FALSE;
+						try {
+							return FEMNative.from(new BigDecimal(section));
+						} catch (final NumberFormatException cause) {
+							return compiler.proxy(section);
+						}
+					}
+				}
+			}
+
+			@Override
+			public String toString() {
+				return "NATIVE";
+			}
+
+		};
+
+		/**
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler, String)} sofern möglich die Typen {@link FEMVoid},
+		 * {@link FEMBoolean}, {@link FEMString} und {@link FEMDecimal} nutzt und andernfalls einen {@link ScriptCompiler#proxy(String)} liefert.
 		 */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
 
@@ -2720,18 +2791,18 @@ public class FEM {
 				switch (compiler.symbol()) {
 					case '"':
 					case '\'': {
-						return FEM.stringValue(FEM.parseString(section));
+						return FEMString.from(FEM.parseString(section));
 					}
-					case '?': {
+					case '!': {
 						return compiler.proxy(FEM.parseValue(section));
 					}
 					default: {
 						section = FEM.parseValue(section);
-						if (section.equalsIgnoreCase("NULL")) return FEM._void_;
-						if (section.equalsIgnoreCase("TRUE")) return FEM._true_;
-						if (section.equalsIgnoreCase("FALSE")) return FEM._false_;
+						if (section.equalsIgnoreCase("null")) return FEMVoid.INSTANCE;
+						if (section.equalsIgnoreCase("true")) return FEMBoolean.TRUE;
+						if (section.equalsIgnoreCase("false")) return FEMBoolean.FALSE;
 						try {
-							return FEM.decimalValue(new BigDecimal(section));
+							return FEMDecimal.from(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {
 							return compiler.proxy(section);
 						}
@@ -4052,116 +4123,6 @@ public class FEM {
 	{}
 
 	/**
-	 * Dieses Feld speichert den Identifikator von {@link #VOID_TYPE}.
-	 */
-	public static final int VOID_ID = 0;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link VoidValue}.
-	 */
-	public static final FEMType<FEMVoid> VOID_TYPE = FEMType.from(FEM.VOID_ID, "VOID");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #ARRAY_TYPE}.
-	 */
-	public static final int ARRAY_ID = 1;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link ArrayValue}.
-	 */
-	public static final FEMType<FEMArray> ARRAY_TYPE = FEMType.from(FEM.ARRAY_ID, "ARRAY");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #STRING_TYPE}.
-	 */
-	public static final int STRING_ID = 4;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link StringValue}.
-	 */
-	public static final FEMType<FEMString> STRING_TYPE = FEMType.from(FEM.STRING_ID, "STRING");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #OBJECT_TYPE}.
-	 */
-	public static final int OBJECT_ID = 10;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link ObjectValue}.
-	 */
-	public static final FEMType<FEMObject> OBJECT_TYPE = FEMType.from(FEM.OBJECT_ID, "OBJECT");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #BINARY_TYPE}.
-	 */
-	public static final int BINARY_ID = 5;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link BinaryValue}.
-	 */
-	public static final FEMType<FEMBinary> BINARY_TYPE = FEMType.from(FEM.BINARY_ID, "BINARY");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #INTEGER_TYPE}.
-	 */
-	public static final int INTEGER_ID = 6;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link IntegerValue}.
-	 */
-	public static final FEMType<FEMInteger> INTEGER_TYPE = FEMType.from(FEM.INTEGER_ID, "INTEGER");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #DECIMAL_TYPE}.
-	 */
-	public static final int DECIMAL_ID = 7;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link DecimalValue}.
-	 */
-	public static final FEMType<FEMDecimal> DECIMAL_TYPE = FEMType.from(FEM.DECIMAL_ID, "DECIMAL");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #BOOLEAN_TYPE}.
-	 */
-	public static final int BOOLEAN_ID = 3;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link BooleanValue}.
-	 */
-	public static final FEMType<FEMBoolean> BOOLEAN_TYPE = FEMType.from(FEM.BOOLEAN_ID, "BOOLEAN");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #DURATION_TYPE}.
-	 */
-	public static final int DURATION_ID = 8;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link DurationValue}.
-	 */
-	public static final FEMType<FEMDuration> DURATION_TYPE = FEMType.from(FEM.DURATION_ID, "DURATION");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #DATETIME_TYPE}.
-	 */
-	public static final int DATETIME_ID = 9;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link DatetimeValue}.
-	 */
-	public static final FEMType<FEMDatetime> DATETIME_TYPE = FEMType.from(FEM.DATETIME_ID, "DATETIME");
-
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #FUNCTION_TYPE}.
-	 */
-	public static final int FUNCTION_ID = 2;
-
-	/**
-	 * Dieses Feld speichert den Datentyp von {@link FunctionValue}.
-	 */
-	public static final FEMType<FEMFunction> FUNCTION_TYPE = FEMType.from(FEM.FUNCTION_ID, "FUNCTION");
-
-	/**
 	 * Dieses Feld speichert eine Funktion mit der Signatur {@code (method: Function, params: Array): Value}, deren Ergebniswert via
 	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameterwerte des Stapelrahmens gegeben Funktion mit den im
 	 * zweiten Parameterwert gegebenen Parameterwertliste.
@@ -4171,9 +4132,9 @@ public class FEM {
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
-			final FEMContext context = frame.__context;
-			final FEMFunction method = context.dataOf(frame.get(0), FEM.FUNCTION_TYPE);
-			final FEMFrame params = frame.withParams(context.dataOf(frame.get(1), FEM.ARRAY_TYPE));
+			final FEMContext context = frame._context_;
+			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
+			final FEMFrame params = frame.withParams(FEMArray.from(frame.get(1), context));
 			return method.invoke(params);
 		}
 
@@ -4195,8 +4156,8 @@ public class FEM {
 		public FEMValue invoke(final FEMFrame frame) {
 			final int index = frame.size() - 1;
 			if (index < 0) throw new IllegalArgumentException("frame.size() < 1");
-			final FEMContext context = frame.__context;
-			final FEMFunction method = context.dataOf(frame.get(index), FEM.FUNCTION_TYPE);
+			final FEMContext context = frame._context_;
+			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
 			final FEMFrame params = frame.withParams(frame.params().section(0, index));
 			return method.invoke(params);
 		}
@@ -4210,7 +4171,7 @@ public class FEM {
 
 	/**
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte eines gegebenen Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code Array.valueOf(frame.toArray().value())}.
+	 * {@code FEMArray.from(frame.params().value())}.
 	 * 
 	 * @see FEMArray#from(FEMValue...)
 	 * @see FEMFrame#params()
@@ -4219,7 +4180,7 @@ public class FEM {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
-			return FEM.arrayValue(FEMArray.from(frame.params().value()));
+			return FEMArray.from(frame.params().value());
 		}
 
 		@Override
@@ -4231,7 +4192,7 @@ public class FEM {
 
 	/**
 	 * Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte eines gegebenen Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code frame#toArray()}.
+	 * {@code frame#params()}.
 	 * 
 	 * @see FEMFrame#params()
 	 */
@@ -4239,7 +4200,7 @@ public class FEM {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
-			return FEM.arrayValue(frame.params());
+			return frame.params();
 		}
 
 		@Override
@@ -4249,551 +4210,30 @@ public class FEM {
 
 	};
 
-	@SuppressWarnings ("javadoc")
-	static final VoidValue _void_ = new VoidValue();
-
-	@SuppressWarnings ("javadoc")
-	static final BooleanValue _true_ = new BooleanValue(FEMBoolean.TRUE);
-
-	@SuppressWarnings ("javadoc")
-	static final BooleanValue _false_ = new BooleanValue(FEMBoolean.FALSE);
-
-	@SuppressWarnings ("javadoc")
-	static final ArrayValue _emptyArray_ = new ArrayValue(FEMArray.EMPTY);
-
-	@SuppressWarnings ("javadoc")
-	static final StringValue _emptyString_ = new StringValue(FEMString.EMPTY);
-
-	@SuppressWarnings ("javadoc")
-	static final BinaryValue _emptyBinary_ = new BinaryValue(FEMBinary.EMPTY);
-
 	{}
 
 	/**
-	 * Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().arrayOf(data)}.
+	 * Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().arrayFrom(data)}.
 	 * 
-	 * @see FEMContext#arrayOf(Object)
+	 * @see FEMContext#arrayFrom(Object)
 	 * @param data Wertliste, natives Array, {@link Iterable} oder {@link Collection}.
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann.
 	 */
-	public static final FEMArray arrayOf(final Object data) throws IllegalArgumentException {
-		return FEMContext._default_.arrayOf(data);
+	public static final FEMArray arrayFrom(final Object data) throws IllegalArgumentException {
+		return FEMContext._default_.arrayFrom(data);
 	}
 
 	/**
-	 * Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().valueOf(data)}.
+	 * Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().valueFrom(data)}.
 	 * 
-	 * @see FEMContext#valueOf(Object)
+	 * @see FEMContext#valueFrom(Object)
 	 * @param data Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
 	 */
-	public static final FEMValue valueOf(final Object data) throws IllegalArgumentException {
-		return FEMContext._default_.valueOf(data);
-	}
-
-	/**
-	 * Diese Methode gibt den {@link FEMVoid#INSTANCE Leerwert} als {@link FEMValue} zurück.
-	 * 
-	 * @return {@link FEMVoid#INSTANCE}.
-	 */
-	public static final VoidValue voidValue() {
-		return FEM._void_;
-	}
-
-	/**
-	 * Diese Methode gibt {@code true} als {@link FEMValue} zurück.
-	 * 
-	 * @return {@code true}.
-	 */
-	public static final BooleanValue trueValue() {
-		return FEM._true_;
-	}
-
-	/**
-	 * Diese Methode gibt {@code false} als {@link FEMValue} zurück.
-	 * 
-	 * @return {@code false}.
-	 */
-	public static final BooleanValue falseValue() {
-		return FEM._false_;
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.ARRAY_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMArray}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMArray arrayData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.ARRAY_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.ARRAY_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMArray}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMArray arrayData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.ARRAY_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wertliste.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final ArrayValue arrayValue(final FEMArray data) throws NullPointerException {
-		if (data.__length == 0) return FEM._emptyArray_;
-		return new ArrayValue(data);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wertliste.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final ArrayValue arrayValue(final FEMValue... data) throws NullPointerException {
-		if (data.length == 0) return FEM._emptyArray_;
-		return FEM.arrayValue(FEMArray.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Wertliste als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wertliste.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final ArrayValue arrayValue(final Iterable<? extends FEMValue> data) throws NullPointerException {
-		return FEM.arrayValue(FEMArray.from(data));
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.OBJECT_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMObject}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMObject objectData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.OBJECT_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.OBJECT_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMObject}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMObject objectData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.OBJECT_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Referenz als {@link FEMValue} zurück.
-	 * 
-	 * @param data Referenz.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final ObjectValue objectValue(final FEMObject data) throws NullPointerException {
-		return new ObjectValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.STRING_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMString}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMString stringData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.STRING_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.STRING_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMString}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMString stringData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.STRING_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeichenkette.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final StringValue stringValue(final char[] data) throws NullPointerException {
-		if (data.length == 0) return FEM._emptyString_;
-		return FEM.stringValue(FEMString.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeichenkette.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final StringValue stringValue(final String data) throws NullPointerException {
-		if (data.length() == 0) return FEM._emptyString_;
-		return FEM.stringValue(FEMString.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Zeichenkette als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeichenkette.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final StringValue stringValue(final FEMString data) throws NullPointerException {
-		if (data.__length == 0) return FEM._emptyString_;
-		return new StringValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.BINARY_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMBinary}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMBinary binaryData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.BINARY_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.BINARY_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMBinary}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMBinary binaryData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.BINARY_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Bytefolge als {@link FEMValue} zurück.
-	 * 
-	 * @param data Bytefolge.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final BinaryValue binaryValue(final byte[] data) throws NullPointerException {
-		if (data.length == 0) return FEM._emptyBinary_;
-		return FEM.binaryValue(FEMBinary.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Bytefolge als {@link FEMValue} zurück.
-	 * 
-	 * @param data Bytefolge.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final BinaryValue binaryValue(final FEMBinary data) throws NullPointerException {
-		if (data.__length == 0) return FEM._emptyBinary_;
-		return new BinaryValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.INTEGER_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMInteger}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMInteger integerData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.INTEGER_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.INTEGER_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMInteger}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMInteger integerData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.INTEGER_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Dezimalzahl als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalzahl.
-	 * @return Wert.
-	 */
-	public static final IntegerValue integerValue(final long data) {
-		return FEM.integerValue(FEMInteger.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Dezimalzahl als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalzahl.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final IntegerValue integerValue(final Number data) throws NullPointerException {
-		return FEM.integerValue(FEMInteger.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Dezimalzahl als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalzahl.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final IntegerValue integerValue(final FEMInteger data) throws NullPointerException {
-		return new IntegerValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DECIMAL_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMDecimal}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMDecimal decimalData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.DECIMAL_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DECIMAL_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMDecimal}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMDecimal decimalData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.DECIMAL_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Dezimalbruch als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalbruch.
-	 * @return Wert.
-	 */
-	public static final DecimalValue decimalValue(final double data) {
-		return FEM.decimalValue(FEMDecimal.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Dezimalbruch als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalbruch.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final DecimalValue decimalValue(final Number data) throws NullPointerException {
-		return FEM.decimalValue(FEMDecimal.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Dezimalbruch als {@link FEMValue} zurück.
-	 * 
-	 * @param data Dezimalbruch.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final DecimalValue decimalValue(final FEMDecimal data) throws NullPointerException {
-		return new DecimalValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.BOOLEAN_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMBoolean}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMBoolean booleanData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.BOOLEAN_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.BOOLEAN_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMBoolean}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMBoolean booleanData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.BOOLEAN_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wahrheitswert.
-	 * @return Wert.
-	 */
-	public static final BooleanValue booleanValue(final boolean data) {
-		return (data ? FEM._true_ : FEM._false_);
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wahrheitswert.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final BooleanValue booleanValue(final Boolean data) throws NullPointerException {
-		return FEM.booleanValue(data.booleanValue());
-	}
-
-	/**
-	 * Diese Methode gibt den gegebenen Wahrheitswert als {@link FEMValue} zurück.
-	 * 
-	 * @param data Wahrheitswert.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final BooleanValue booleanValue(final FEMBoolean data) throws NullPointerException {
-		return FEM.booleanValue(data.__value);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DURATION_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMDuration}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMDuration durationData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.DURATION_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DURATION_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMDuration}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMDuration durationData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.DURATION_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebenen Zeitspanne als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeitspanne.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final DurationValue durationValue(final FEMDuration data) throws NullPointerException {
-		return new DurationValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.DATETIME_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMDatetime}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMDatetime datetimeData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.DATETIME_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.DATETIME_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMDatetime}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMDatetime datetimeData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.DATETIME_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebenen Zeitangabe als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeitangabe.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final DatetimeValue datetimeValue(final Calendar data) throws NullPointerException {
-		return FEM.datetimeValue(FEMDatetime.from(data));
-	}
-
-	/**
-	 * Diese Methode gibt die gegebenen Zeitangabe als {@link FEMValue} zurück.
-	 * 
-	 * @param data Zeitangabe.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final DatetimeValue datetimeValue(final FEMDatetime data) throws NullPointerException {
-		return new DatetimeValue(data);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataOf(value, FEM.FUNCTION_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return {@link FEMFunction}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
-	public static final FEMFunction functionData(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataOf(value, FEM.FUNCTION_TYPE);
-	}
-
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataOf(value, FEM.FUNCTION_TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @param context {@link FEMContext}.
-	 * @return {@link FEMFunction}.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
-	public static final FEMFunction functionData(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataOf(value, FEM.FUNCTION_TYPE);
-	}
-
-	/**
-	 * Diese Methode gibt die gegebene Funktion als {@link FEMValue} zurück.
-	 * 
-	 * @param data Funktion.
-	 * @return Wert.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 */
-	public static final FunctionValue functionValue(final FEMFunction data) throws NullPointerException {
-		return new FunctionValue(data);
+	public static final FEMValue valueFrom(final Object data) throws IllegalArgumentException {
+		return FEMContext._default_.valueFrom(data);
 	}
 
 	/**
@@ -4905,6 +4345,10 @@ public class FEM {
 	 */
 	public static final String formatComment(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatComment();
+	}
+
+	public static void main(final String[] args) throws Exception {
+		System.out.println(NativeFunction.from("java.lang.Integer.toString()").invoke(FEMFrame.EMPTY.withParams(FEMNative.from(12345))));
 	}
 
 }

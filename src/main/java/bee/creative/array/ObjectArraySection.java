@@ -28,7 +28,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override
-			protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 				return Comparators.compare(array1[index1], array2[index2]);
 			}
 
@@ -67,7 +67,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override
-			protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 				return Comparators.compare(array1[index1], array2[index2], comparator);
 			}
 
@@ -109,7 +109,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 			 * {@inheritDoc}
 			 */
 			@Override
-			protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 				return Comparators.compare(array1[index1], array2[index2]);
 			}
 
@@ -150,7 +150,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
 			@Override
-			protected int compareTo(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+			protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 				return Comparators.compare(array1[index1], array2[index2], comparator);
 			}
 
@@ -178,7 +178,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int arrayLength(final GValue[] array) {
+	protected int _arrayLength_(final GValue[] array) {
 		return array.length;
 	}
 
@@ -186,7 +186,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int hashCode(final GValue[] array, final int index) {
+	protected int _hashCode_(final GValue[] array, final int index) {
 		return Objects.hash(array[index]);
 	}
 
@@ -194,7 +194,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean equals(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
+	protected boolean _equals_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 		return Objects.equals(array1[index1], array2[index2]);
 	}
 
@@ -202,7 +202,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void toString(final GValue[] array, final int index, final StringBuilder target) {
+	protected void _toString_(final GValue[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -214,7 +214,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof ObjectArraySection<?>)) return false;
-		return this.equals((ObjectArraySection<GValue>)object);
+		return this._equals_((ObjectArraySection<GValue>)object);
 	}
 
 }

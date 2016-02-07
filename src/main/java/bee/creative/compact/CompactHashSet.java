@@ -60,16 +60,16 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int customItemIndex(final Object item) {
-		if (item == null) return this.defaultEqualsIndex(null, 0);
-		return this.defaultEqualsIndex(item, Objects.hash(item));
+	protected int _itemIndex_(final Object item) {
+		if (item == null) return this._itemIndexEquals_(null, 0);
+		return this._itemIndexEquals_(item, Objects.hash(item));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean customItemEquals(final Object key, final int hash, final Object item) {
+	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
 		if (key == null) return item == null;
 		return key.equals(item);
 	}
@@ -78,7 +78,7 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int customItemCompare(final Object key, final int hash, final Object item) {
+	protected int _itemCompare_(final Object key, final int hash, final Object item) {
 		if (item == null) return hash;
 		return Comparators.compare(hash, item.hashCode());
 	}

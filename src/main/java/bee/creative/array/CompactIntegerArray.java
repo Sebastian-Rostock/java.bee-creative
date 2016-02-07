@@ -44,7 +44,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int get(final int index) {
-			return this.owner.get(this.ownerIndex(index));
+			return this._owner_.get(this._ownerIndex_(index));
 		}
 
 		/**
@@ -60,7 +60,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public void set(final int index, final int value) {
-			this.owner.set(this.ownerIndex(index), value);
+			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
 		/**
@@ -109,7 +109,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public IntegerArray subArray(final int fromIndex, final int toIndex) {
-			return (IntegerArray)this.ownerSubArray(fromIndex, toIndex);
+			return (IntegerArray)this._ownerSubArray_(fromIndex, toIndex);
 		}
 
 	}
@@ -124,7 +124,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactIntegerArray owner;
+		protected final CompactIntegerArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -134,7 +134,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		public CompactIntegerArraySection(final CompactIntegerArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -144,7 +144,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int size() {
-			return this.owner.size;
+			return this._owner_._size_;
 		}
 
 		/**
@@ -152,7 +152,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int[] array() {
-			return this.owner.array;
+			return this._owner_._array_;
 		}
 
 		/**
@@ -160,7 +160,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.from;
+			return this._owner_._from_;
 		}
 
 		/**
@@ -168,8 +168,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int finalIndex() {
-			final CompactIntegerArray owner = this.owner;
-			return owner.from + owner.size;
+			final CompactIntegerArray owner = this._owner_;
+			return owner._from_ + owner._size_;
 		}
 
 	}
@@ -184,7 +184,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactIntegerSubArray owner;
+		protected final CompactIntegerSubArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -194,7 +194,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		public CompactIntegerSubArraySection(final CompactIntegerSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -204,7 +204,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int size() {
-			return this.owner.size();
+			return this._owner_.size();
 		}
 
 		/**
@@ -212,7 +212,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int[] array() {
-			return this.owner.owner.array;
+			return this._owner_._owner_._array_;
 		}
 
 		/**
@@ -220,7 +220,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.startIndex;
+			return this._owner_._startIndex_;
 		}
 
 		/**
@@ -228,7 +228,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		 */
 		@Override
 		public int finalIndex() {
-			return this.owner.finalIndex;
+			return this._owner_._finalIndex_;
 		}
 
 	}
@@ -238,7 +238,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	/**
 	 * Dieses Feld speichert das {@code int}-Array.
 	 */
-	protected int[] array;
+	protected int[] _array_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
@@ -279,23 +279,23 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int[] getArray() {
-		return this.array;
+	protected int[] _array_() {
+		return this._array_;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setArray(final int[] array) {
-		this.array = array;
+	protected void _array_(final int[] array) {
+		this._array_ = array;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int[] newArray(final int length) {
+	protected int[] _allocArray_(final int length) {
 		return new int[length];
 	}
 
@@ -303,7 +303,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Integer getValue(final int index) {
+	protected Integer _value_(final int index) {
 		return Integer.valueOf(this.get(index));
 	}
 
@@ -311,7 +311,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setValue(final int index, final Integer value) {
+	protected void _value_(final int index, final Integer value) {
 		this.set(index, value.intValue());
 	}
 
@@ -319,8 +319,8 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getArrayLength() {
-		return this.array.length;
+	protected int _capacity_() {
+		return this._array_.length;
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public int get(final int index) {
-		return this.array[this.inclusiveIndex(index)];
+		return this._array_[this._inclusiveIndex_(index)];
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public void set(final int index, final int value) {
-		this.array[this.inclusiveIndex(index)] = value;
+		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public void add(final int value) {
-		this.add(this.size, value);
+		this.add(this._size_, value);
 	}
 
 	/**
@@ -368,7 +368,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public void add(final int[] values) {
-		this.add(this.size, values);
+		this.add(this._size_, values);
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public void add(final int index, final int[] values) {
-		this.add(this.size, IntegerArraySection.from(values));
+		this.add(this._size_, IntegerArraySection.from(values));
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	 */
 	@Override
 	public int[] array() {
-		return this.array;
+		return this._array_;
 	}
 
 	/**

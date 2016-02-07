@@ -44,7 +44,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public float get(final int index) {
-			return this.owner.get(this.ownerIndex(index));
+			return this._owner_.get(this._ownerIndex_(index));
 		}
 
 		/**
@@ -60,7 +60,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public void set(final int index, final float value) {
-			this.owner.set(this.ownerIndex(index), value);
+			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
 		/**
@@ -109,7 +109,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public FloatArray subArray(final int fromIndex, final int toIndex) {
-			return (FloatArray)this.ownerSubArray(fromIndex, toIndex);
+			return (FloatArray)this._ownerSubArray_(fromIndex, toIndex);
 		}
 
 	}
@@ -124,7 +124,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactFloatArray owner;
+		protected final CompactFloatArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -134,7 +134,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -144,7 +144,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int size() {
-			return this.owner.size;
+			return this._owner_._size_;
 		}
 
 		/**
@@ -152,7 +152,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public float[] array() {
-			return this.owner.array;
+			return this._owner_._array_;
 		}
 
 		/**
@@ -160,7 +160,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.from;
+			return this._owner_._from_;
 		}
 
 		/**
@@ -168,8 +168,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int finalIndex() {
-			final CompactFloatArray owner = this.owner;
-			return owner.from + owner.size;
+			final CompactFloatArray owner = this._owner_;
+			return owner._from_ + owner._size_;
 		}
 
 	}
@@ -184,7 +184,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		/**
 		 * Dieses Feld speichert den Besitzer.
 		 */
-		protected final CompactFloatSubArray owner;
+		protected final CompactFloatSubArray _owner_;
 
 		/**
 		 * Dieser Konstruktor initialisiert den Besitzer.
@@ -194,7 +194,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
-			this.owner = owner;
+			this._owner_ = owner;
 		}
 
 		{}
@@ -204,7 +204,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int size() {
-			return this.owner.size();
+			return this._owner_.size();
 		}
 
 		/**
@@ -212,7 +212,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public float[] array() {
-			return this.owner.owner.array;
+			return this._owner_._owner_._array_;
 		}
 
 		/**
@@ -220,7 +220,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int startIndex() {
-			return this.owner.startIndex;
+			return this._owner_._startIndex_;
 		}
 
 		/**
@@ -228,7 +228,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		 */
 		@Override
 		public int finalIndex() {
-			return this.owner.finalIndex;
+			return this._owner_._finalIndex_;
 		}
 
 	}
@@ -238,7 +238,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	/**
 	 * Dieses Feld speichert das {@code float}-Array.
 	 */
-	protected float[] array;
+	protected float[] _array_;
 
 	/**
 	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
@@ -279,23 +279,23 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected float[] getArray() {
-		return this.array;
+	protected float[] _array_() {
+		return this._array_;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setArray(final float[] array) {
-		this.array = array;
+	protected void _array_(final float[] array) {
+		this._array_ = array;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected float[] newArray(final int length) {
+	protected float[] _allocArray_(final int length) {
 		return new float[length];
 	}
 
@@ -303,7 +303,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Float getValue(final int index) {
+	protected Float _value_(final int index) {
 		return Float.valueOf(this.get(index));
 	}
 
@@ -311,7 +311,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void setValue(final int index, final Float value) {
+	protected void _value_(final int index, final Float value) {
 		this.set(index, value.floatValue());
 	}
 
@@ -319,8 +319,8 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int getArrayLength() {
-		return this.array.length;
+	protected int _capacity_() {
+		return this._array_.length;
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public float get(final int index) {
-		return this.array[this.inclusiveIndex(index)];
+		return this._array_[this._inclusiveIndex_(index)];
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public void set(final int index, final float value) {
-		this.array[this.inclusiveIndex(index)] = value;
+		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public void add(final float value) {
-		this.add(this.size, value);
+		this.add(this._size_, value);
 	}
 
 	/**
@@ -368,7 +368,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public void add(final float[] values) {
-		this.add(this.size, values);
+		this.add(this._size_, values);
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public void add(final int index, final float[] values) {
-		this.add(this.size, FloatArraySection.from(values));
+		this.add(this._size_, FloatArraySection.from(values));
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	 */
 	@Override
 	public float[] array() {
-		return this.array;
+		return this._array_;
 	}
 
 	/**

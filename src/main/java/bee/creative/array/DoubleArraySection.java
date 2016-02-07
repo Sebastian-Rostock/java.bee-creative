@@ -77,7 +77,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int arrayLength(final double[] array) {
+	protected int _arrayLength_(final double[] array) {
 		return array.length;
 	}
 
@@ -85,7 +85,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int hashCode(final double[] array, final int index) {
+	protected int _hashCode_(final double[] array, final int index) {
 		final long value = Double.doubleToLongBits(array[index]);
 		return (int)(value ^ (value >>> 32));
 	}
@@ -94,7 +94,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected boolean equals(final double[] array1, final double[] array2, final int index1, final int index2) {
+	protected boolean _equals_(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.doubleToLongBits(array1[index1]) == Double.doubleToLongBits(array2[index2]);
 	}
 
@@ -102,7 +102,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected int compareTo(final double[] array1, final double[] array2, final int index1, final int index2) {
+	protected int _compareTo_(final double[] array1, final double[] array2, final int index1, final int index2) {
 		return Double.compare(array1[index1], array2[index2]);
 	}
 
@@ -110,7 +110,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void toString(final double[] array, final int index, final StringBuilder target) {
+	protected void _toString_(final double[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
@@ -121,7 +121,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	public boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof DoubleArraySection)) return false;
-		return this.equals((DoubleArraySection)object);
+		return this._equals_((DoubleArraySection)object);
 	}
 
 }

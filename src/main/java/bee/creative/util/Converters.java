@@ -263,8 +263,6 @@ public class Converters {
 	 */
 	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final Class<? super GInput> inputType, final String methodName)
 		throws SecurityException, NoSuchMethodException, NullPointerException {
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (methodName == null) throw new NullPointerException("methodName = null");
 		return Converters.nativeObjectMethod(inputType.getMethod(methodName));
 	}
 
