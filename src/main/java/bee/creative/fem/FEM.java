@@ -28,9 +28,12 @@ import bee.creative.util.Strings;
 /**
  * FEM - Function Evaluation Model
  * <p>
- * * Diese Klasse implementiert grundlegende Werte für {@code null}, {@link FEMArray Wertlisten}, {@link Object Objekte}, {@link FEMFunction Funktionen},
- * {@link String Zeichenketten}, {@link Number Zahlen} und {@link Boolean Wahrheitswerte}.
+ * Diese Klasse implementiert grundlegende {@link FEMValue Werte} und {@link FEMFunction Funktionen} sowie {@link ScriptParser Parser}, {@link ScriptFormatter
+ * Formatter} und {@link ScriptCompiler Compiler} für {@link FEMScript Queltexte}.
  * 
+ * @see ScriptParser
+ * @see ScriptFormatter
+ * @see ScriptCompiler
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
 public class FEM {
@@ -38,9 +41,8 @@ public class FEM {
 	/**
 	 * Diese Klasse implementiert einen abstrakten Wert als {@link FEMFunction} und {@link ScriptFormatterInput}.<br>
 	 * Die {@link #invoke(FEMFrame)}-Methode liefert {@code this}, sodass instanzen dieser Klassen das Einpacken in eine {@link ValueFunction} nicht benötigen.<br>
-	 * Die {@link #toString() Textdarstellung} des Werts wird über {@link ScriptFormatter#formatValue(FEMValue...)} und damit via
-	 * {@link #toScript(ScriptFormatter)} ermittelt. Diese Methode delegiert selbst an {@link #toString()}, sodass mindestens eine dieser Methoden überschrieben
-	 * werden muss.
+	 * Die {@link #toString() Textdarstellung} des Werts wird über {@link #toScript(ScriptFormatter)} ermittelt. Diese Methode delegiert selbst an
+	 * {@link #toString()}, sodass mindestens eine dieser Methoden überschrieben werden muss.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -131,8 +133,7 @@ public class FEM {
 
 	/**
 	 * Diese Klasse implementiert eine abstakte Funktion als {@link ScriptFormatterInput}.<br>
-	 * Die {@link #toString() Textdarstellung} der Funktion wird über {@link ScriptFormatter#formatFunction(FEMFunction...)} und damit via
-	 * {@link #toScript(ScriptFormatter)} ermittelt.<br>
+	 * Die {@link #toString() Textdarstellung} der Funktion wird über {@link #toScript(ScriptFormatter)} ermittelt.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -147,8 +148,17 @@ public class FEM {
 			return new FEMHandler(this);
 		}
 
-		public final InvokeFunction invokeWith(final FEMFunction... params) throws NullPointerException {
-			return new InvokeFunction(this, true, params);
+		/**
+		 * Diese Methode gibt eine neue {@link InvokeFunction} zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft.
+		 * 
+		 * @see InvokeFunction
+		 * @see FEMFrame#withParams(FEMFunction[])
+		 * @param params Parameterfunktionen.
+		 * @return {@link InvokeFunction}.
+		 * @throws NullPointerException Wenn {@code params} {@code null} ist.
+		 */
+		public final InvokeFunction withParams(final FEMFunction... params) throws NullPointerException {
+			return InvokeFunction.from(this, true, params);
 		}
 
 		{}
@@ -172,13 +182,25 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert einen benannten Platzhalter einer Funktione, dessen {@link #invoke(FEMFrame)}-Methoden an eine gegebene Funktion delegiert.
+	 * Diese Klasse implementiert den benannten Platzhalter einer Funktione, dessen {@link #invoke(FEMFrame)}-Methoden an eine {@link #set(FEMFunction) gegebene
+	 * Funktion} delegiert.
 	 * 
+	 * @see ScriptCompiler#proxy(String)
+	 * @see ScriptCompiler#proxies()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class ProxyFunction extends BaseFunction {
 
-		// TODO from
+		/**
+		 * Diese Methode gibt eine neue {@link ProxyFunction} mit dem gegebenen Namen zurück.
+		 * 
+		 * @param name Name.
+		 * @return {@link ProxyFunction}.
+		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
+		 */
+		public static final ProxyFunction from(final String name) throws NullPointerException {
+			return new ProxyFunction(name);
+		}
 
 		{}
 
@@ -264,7 +286,17 @@ public class FEM {
 	 */
 	public static final class TraceFunction extends BaseFunction implements ScriptTracerInput {
 
-		// TODO from
+		/**
+		 * Diese Methode gibt eine neue {@link TraceFunction} mit den gegebenen Parametern zurück.
+		 * 
+		 * @param tracer {@link ScriptTracer}.
+		 * @param function Funktion.
+		 * @return {@link TraceFunction}.
+		 * @throws NullPointerException Wenn {@code tracer} bzw. {@code function} {@code null} ist.
+		 */
+		public static final TraceFunction from(final ScriptTracer tracer, final FEMFunction function) throws NullPointerException {
+			return new TraceFunction(tracer, function);
+		}
 
 		{}
 
@@ -367,7 +399,7 @@ public class FEM {
 	}
 
 	/**
-	 * Diese Klasse implementiert eine Funktion, welche immer den gleichen gegebenen Ergebniswert liefert.
+	 * Diese Klasse implementiert eine Funktion, welche stats den gleichen {@link #value() gegebenen Ergebniswert} liefert.
 	 * 
 	 * @see #invoke(FEMFrame)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -521,6 +553,12 @@ public class FEM {
 
 	}
 
+	/**
+	 * Diese Klasse stellt {@link FEMFunction Funktionen} zum Lesen und Schreiben von {@link Field nativen Datenfeldern} sowie zum Aufrufen von {@link Method
+	 * nativen Methoden} und {@link Constructor nativen Konstruktoren} bereit.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
+	 */
 	public static abstract class NativeFunction extends BaseFunction {
 
 		@SuppressWarnings ("javadoc")
@@ -594,6 +632,9 @@ public class FEM {
 
 		{}
 
+		/**
+		 * Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab.
+		 */
 		static final Map<?, Class<?>> _class_ = new HashMapBuilder<Object, Class<?>>() //
 			.useEntry("byte", byte.class) //
 			.useEntry("short", short.class) //
@@ -605,6 +646,9 @@ public class FEM {
 			.useEntry("boolean", boolean.class) //
 			.build();
 
+		/**
+		 * Dieses Feld speichert den {@link Converter} zu {@link Class#getName()}.
+		 */
 		static final Converter<Class<?>, String> _name_ = new Converter<Class<?>, String>() {
 
 			@Override
@@ -614,22 +658,36 @@ public class FEM {
 
 		};
 
+		/**
+		 * Dieses Feld speichert das {@link Pattern} für {@link #from(String)}.
+		 */
 		static final Pattern _pattern_ = Pattern.compile("^(.+?)\\.([^\\.\\(]+)(?:\\((.*?)\\))?$");
 
 		{}
 
 		/**
-		 * Diese Methode gibt das zurück. <br>
-		 * {@code CLASS_PATH.class}<br>
-		 * {@code CLASS_PATH.FIELD_NAME}<br>
-		 * {@code CLASS_PATH.new(type,...,type)}<br>
-		 * {@code CLASS_PATH.METHOD_NAME(type,...,type)}<br>
+		 * Diese Methode gibt die native Funktion zur gegebenen Eingabe zurück.<br>
+		 * Die Eingabe kann hierbei eine Funktion kodieren, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld lesen bzw.
+		 * schreiben zulässt.
+		 * <p>
+		 * Mögliche Eingabemuster sind:<br>
+		 * {@code "CLASS_PATH.class"} wird in {@link FEMNative#from(Object) FEMNative.from(CLASS_PATH.class)} überführt.<br>
+		 * {@code "CLASS_PATH.FIELD_NAME"} wird in {@link #fromField(Class, String) fromField(CLASS_PATH.class, "FIELD_NAME")} überführt.<br>
+		 * {@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"} wird in {@link #fromConstructor(Class, Class...) fromConstructor(CLASS_PATH.class, TYPE_1.class, ...,
+		 * TYPE_N.class)} überführt.<br>
+		 * {@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"} wird in {@link #fromMethod(Class, String, Class...) fromMethod(CLASS_PATH.class, "METHOD_NAME",
+		 * TYPE_1.class, ..., TYPE_N.class)} überführt.
 		 * 
-		 * @param memberPath
-		 * @return
-		 * @throws SecurityException
-		 * @throws NullPointerException
-		 * @throws ReflectiveOperationException
+		 * @see #fromField(Class, String)
+		 * @see #fromMethod(Class, String, Class...)
+		 * @see #fromConstructor(Class, Class...)
+		 * @param memberPath Pfad zu einem Datenfeld oder einer Methode.
+		 * @return {@link NativeFunction}.
+		 * @throws SecurityException Wenn {@link #fromField(Class, String)}, {@link #fromMethod(Class, String, Class...)} oder
+		 *         {@link #fromConstructor(Class, Class...)} eine entsprechende Ausnahme auslöst.
+		 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
+		 * @throws ReflectiveOperationException Wenn {@link #fromField(Class, String)}, {@link #fromMethod(Class, String, Class...)},
+		 *         {@link #fromConstructor(Class, Class...)} oder {@link Class#forName(String)} eine entsprechende Ausnahme auslöst.
 		 */
 		public static final FEMFunction from(final String memberPath) throws SecurityException, NullPointerException, ReflectiveOperationException {
 			final Matcher matcher = NativeFunction._pattern_.matcher(memberPath);
@@ -653,13 +711,33 @@ public class FEM {
 			}
 		}
 
-		public static final NativeFunction fromField(final Field field) throws IllegalAccessException, NullPointerException {
-			if (!field.isAccessible()) throw new IllegalAccessException();
+		/**
+		 * Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.<br>
+		 * Wenn das gegebene Datenfeld {@code static} ist, muss die gelieferte Funktion es zum Lesen ohne Parameter und zum Schreiben mit dem Wert als Parameter
+		 * aufgerufen werden. Andernfalls muss die gelieferte Funktion es zum Lesen mit dem Objekt und zum Schreiben mit dem Objekt und dem Wert als Parameter
+		 * aufgerufen werden. Die gelieferte Funktion liefert beim Schreiben stets {@link FEMNative#NULL}.
+		 * 
+		 * @param field Datenfeld.
+		 * @return Funktion zum gegebenen Datenfeld.
+		 * @throws NullPointerException Wenn {@code field} {@code null} ist.
+		 */
+		public static final NativeFunction fromField(final Field field) throws NullPointerException {
 			return Modifier.isStatic(field.getModifiers()) ? NativeFunction._fromStaticField_(field) : NativeFunction._fromObjectField_(field);
 		}
 
-		public static final NativeFunction fromField(final Class<?> inputType, final String fieldName) throws SecurityException, IllegalAccessException,
-			NoSuchFieldException, NullPointerException {
+		/**
+		 * Diese Methode ist eine Abkürzung für {@code fromField(inputType.getField(fieldName))}.
+		 * 
+		 * @see #fromField(Field)
+		 * @param inputType Klasse, in welcher das Datenfeld definiert ist.
+		 * @param fieldName Name des Datenfelds.
+		 * @return Funktion zum gegebenen Datenfeld.
+		 * @throws SecurityException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
+		 * @throws NoSuchFieldException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
+		 * @throws NullPointerException Wenn {@code inputType} bzw. {@code fieldName} {@code null} ist.
+		 */
+		public static final NativeFunction fromField(final Class<?> inputType, final String fieldName) throws SecurityException, NoSuchFieldException,
+			NullPointerException {
 			final Field field = inputType.getField(fieldName);
 			return NativeFunction.fromField(field);
 		}
@@ -736,25 +814,49 @@ public class FEM {
 			};
 		}
 
-		public static final NativeFunction fromMethod(final Method method) throws IllegalAccessException, NullPointerException {
-			// if (!method.isAccessible()) throw new IllegalAccessException();
+		/**
+		 * Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
+		 * 
+		 * @param method Methode.
+		 * @return Funktion zur gegebenen Methode.
+		 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+		 */
+		public static final NativeFunction fromMethod(final Method method) throws NullPointerException {
 			return Modifier.isStatic(method.getModifiers()) ? NativeFunction._fromStaticMethod_(method) : NativeFunction._fromObjectMethod_(method);
 		}
 
+		/**
+		 * Diese Methode ist eine Abkürzung für {@code fromMethod(inputType.getMethod(methodName, paramTypes))}.
+		 * 
+		 * @see #fromMethod(Method)
+		 * @param inputType Klasse, in welcher das Datenfeld definiert ist.
+		 * @param methodName Name der Methode
+		 * @param paramTypes Typen der Parameter der Methode.
+		 * @return Funktion zur gegebenen Methode.
+		 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
+		 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
+		 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist.
+		 */
 		public static final NativeFunction fromMethod(final Class<?> inputType, final String methodName, final Class<?>... paramTypes) throws SecurityException,
-			IllegalAccessException, NoSuchMethodException, NullPointerException {
+			NoSuchMethodException, NullPointerException {
 			final Method method = inputType.getMethod(methodName, paramTypes);
 			return NativeFunction.fromMethod(method);
 		}
 
-		public static final NativeFunction fromConstructor(final Constructor<?> constructor) throws IllegalAccessException, NullPointerException {
-			// if (!constructor.isAccessible() || !Modifier.isStatic(constructor.getModifiers())) throw new IllegalAccessException();
-			// if (!Modifier.isStatic(constructor.getModifiers())) throw new IllegalAccessException();
-			return NativeFunction._fromStaticConstructor_(constructor);
+		/**
+		 * Diese Methode gibt eine Funktion zurück, die an den gegebenen Konstruktor delegiert.
+		 * 
+		 * @param constructor Konstruktor.
+		 * @return Funktion zum gegebenen Konstruktor.
+		 * @throws NullPointerException Wenn {@code constructor} {@code null} ist.
+		 */
+		public static final NativeFunction fromConstructor(final Constructor<?> constructor) throws NullPointerException {
+			if (constructor == null) throw new NullPointerException("constructor = null");
+			return NativeFunction._fromConstructor_(constructor);
 		}
 
 		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromStaticConstructor_(final Constructor<?> staticConstructor) {
+		static final NativeFunction _fromConstructor_(final Constructor<?> staticConstructor) {
 			return new FromConstructor() {
 
 				@Override
@@ -781,8 +883,18 @@ public class FEM {
 			};
 		}
 
-		public static final NativeFunction fromConstructor(final Class<?> inputType, final Class<?>... paramTypes) throws SecurityException,
-			IllegalAccessException, NoSuchMethodException, NullPointerException {
+		/**
+		 * Diese Methode ist eine Abkürzung für {@code fromConstructor(inputType.getConstructor(paramTypes))}.
+		 * 
+		 * @param inputType Klasse, an welcher der Konstruktor definiert ist.
+		 * @param paramTypes Typen der Parameter des Konstruktors.
+		 * @return Funktion zum gegebenen Konstruktor.
+		 * @throws SecurityException Wenn {@link Class#getConstructor(Class...)} eine entsprechende Ausnahme auslöst.
+		 * @throws NoSuchMethodException Wenn {@link Class#getConstructor(Class...)} eine entsprechende Ausnahme auslöst.
+		 * @throws NullPointerException Wenn {@code inputType} {@code null} ist.
+		 */
+		public static final NativeFunction fromConstructor(final Class<?> inputType, final Class<?>... paramTypes) throws SecurityException, NoSuchMethodException,
+			NullPointerException {
 			final Constructor<?> constructor = inputType.getConstructor(paramTypes);
 			return NativeFunction.fromConstructor(constructor);
 		}
@@ -920,6 +1032,7 @@ public class FEM {
 	/**
 	 * Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte der Stapelrahmen entspricht.
 	 * 
+	 * @see #index()
 	 * @see #invoke(FEMFrame)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
@@ -1004,11 +1117,25 @@ public class FEM {
 	 * Diese Klasse implementiert eine Funktion, die den Aufruf einer gegebenen Funktion mit den Ergebniswerten mehrerer gegebener Parameterfunktionen berechnet.
 	 * 
 	 * @see #invoke(FEMFrame)
+	 * @see FEMFrame#withParams(FEMFunction[])
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 */
 	public static final class InvokeFunction extends BaseFunction implements ScriptTracerInput {
 
-		// TODO from
+		/**
+		 * Diese Methode gibt eine neue {@link InvokeFunction} mit den gegebenen Parametern zurück.
+		 * 
+		 * @param function aufzurufende Funktion.
+		 * @param direct {@code true}, wenn die aufzurufende Funktion direkt mit den Ergebnissen der Parameterfunktionen ausgewertet werden soll, und {@code false},
+		 *        wenn die aufzurufende Funktion mit den Stapelrahmen zu einer Funktion ausgewertet werden soll, welche dann mit den Ergebnissen der
+		 *        Parameterfunktionen ausgewertet werden soll.
+		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
+		 * @return {@link InvokeFunction}.
+		 * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist.
+		 */
+		public static final InvokeFunction from(final FEMFunction function, final boolean direct, final FEMFunction... params) throws NullPointerException {
+			return new InvokeFunction(function, direct, params);
+		}
 
 		{}
 
@@ -1086,12 +1213,12 @@ public class FEM {
 		 * @see VirtualFunction#from(FEMFunction)
 		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind.
 		 */
-		public final InvokeFunction toLazy() {
+		public final InvokeFunction toVirtual() {
 			final FEMFunction[] functions = this._params_.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
 				functions[i] = VirtualFunction.from(functions[i]);
 			}
-			return new InvokeFunction(VirtualFunction.from(this._function_), this._direct_, functions);
+			return InvokeFunction.from(VirtualFunction.from(this._function_), this._direct_, functions);
 		}
 
 		{}
@@ -1132,7 +1259,7 @@ public class FEM {
 			for (int i = 0, size = params.length; i < size; i++) {
 				params[i] = tracer.trace(params[i]);
 			}
-			return new InvokeFunction(tracer.trace(this._function_), this._direct_, params);
+			return InvokeFunction.from(tracer.trace(this._function_), this._direct_, params);
 		}
 
 		/**
@@ -1290,13 +1417,6 @@ public class FEM {
 	 * <li>Sequenzen aus Zeichen kleiner gleich dem Leerzeichen werden zu Bereichen mit dem Bereichstyp {@code '_'}.</li>
 	 * <li>Alle restlichen Zeichenfolgen werden zu Bereichen mit dem Bereichstyp {@code '.'}.</li>
 	 * </ul>
-	 * <p>
-	 * Beispiele für zulässige Quelltexte sind:
-	 * 
-	 * <pre> TODO
-	 * test1 {A; B: if(intComp($A; $B); $1; 34)) }
-	 * intComp: &lt;java.lang.Object.equals(java.lang.Object)&gt; / native Methode /
-	 * </pre>
 	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * 
@@ -1767,19 +1887,15 @@ public class FEM {
 	 * Bereichen vom Typ {@code ';'} separiert werden müssen und als Funktionen kompiliert werden.</li>
 	 * <li>Bereiche mit den Typen <code>'{'</code> und <code>'}'</code> zeigen den Beginn bzw. das Ende einer parametrisierten Funktion an. Die Parameterliste
 	 * besteht aus beliebig vielen Parameternamen, die mit Bereichen vom Typ {@code ';'} separiert werden müssen und welche mit einem Bereich vom Typ {@code ':'}
-	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über
-	 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String)} aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog
-	 * zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu genau einer Funktion kompiliert werden.</li>
+	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompilerHelper#compileName(ScriptCompiler)}
+	 * aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu
+	 * genau einer Funktion kompiliert werden.</li>
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link ParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
 	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEM#PARAMS_VIEW_FUNCTION}.</li>
-	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} in Werte überführt. Funktionen als Werte werden
-	 * hierbei als {@link FEMHandler} angegeben.</li>
+	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler)} in Parameterfunktionen überführt.</li>
 	 * </ul>
 	 * <p>
-	 * TODO
-	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
-	 * <p>
 	 * 
 	 * @see #formatScript(ScriptFormatter)
 	 * @see #compileValue()
@@ -1846,6 +1962,7 @@ public class FEM {
 		final synchronized void _start_() throws IllegalStateException {
 			this._check_();
 			this._active_ = true;
+			this._proxies_.clear();
 			this.reset();
 		}
 
@@ -2072,7 +2189,7 @@ public class FEM {
 			while (true) {
 				final FEMFunction item = this._compileParamAsFunction_();
 				list.add(item);
-				value = value && (item instanceof ValueFunction);
+				value = value && (this._functionToValue(item) != null);
 				switch (this._compileType_()) {
 					case ';': {
 						this.skip();
@@ -2083,7 +2200,7 @@ public class FEM {
 						this.skip();
 						final int size = list.size();
 						if (!value) {
-							final FEMFunction result = new InvokeFunction(FEM.PARAMS_VIEW_FUNCTION, true, list.toArray(new FEMFunction[size]));
+							final FEMFunction result = FEM.PARAMS_VIEW_FUNCTION.withParams(list.toArray(new FEMFunction[size]));
 							return result;
 						}
 						final FEMValue[] values = new FEMValue[size];
@@ -2100,16 +2217,16 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode kompiliert via {@code this.helper().compileParam(this, this.section())} den beim aktuellen Bereich beginnende Parameter und gibt diesen
-		 * zurück.
+		 * Diese Methode kompiliert via {@code this.helper().compileParam(this, this.section())} die beim aktuellen Bereich beginnende Parameterfunktion und gibt
+		 * diese zurück.
 		 * 
-		 * @see ScriptCompilerHelper#compileParam(ScriptCompiler, String)
-		 * @return Parameter.
+		 * @see ScriptCompilerHelper#compileParam(ScriptCompiler)
+		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 */
 		final FEMFunction _compileParam_() throws ScriptException {
 			try {
-				final FEMFunction result = this._helper_.compileParam(this, this.section());
+				final FEMFunction result = this._helper_.compileParam(this);
 				if (result == null) throw new ScriptException().useSender(this).useHint(" Parameter erwartet.");
 				this.skip();
 				return result;
@@ -2148,8 +2265,8 @@ public class FEM {
 				}
 				default: {
 					final FEMFunction param = this._compileParam_();
-					if (!(param instanceof ValueFunction) && !(param instanceof BaseValue)) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
-					final FEMValue result = param.invoke(FEMFrame.EMPTY);
+					final FEMValue result = this._functionToValue(param);
+					if (result == null) throw new ScriptException().useSender(this).useHint(" Wert erwartet.");
 					return result;
 				}
 			}
@@ -2203,6 +2320,7 @@ public class FEM {
 					result = this._compileParam_();
 					if (this._compileType_() != '(') {
 						if (this._handlerEnabled_) return result;
+						if (this._functionToValue(result) != null) return result;
 						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
 					}
 				}
@@ -2214,7 +2332,7 @@ public class FEM {
 				while (true) {
 					if (this._compileType_() == ')') {
 						this.skip();
-						result = new InvokeFunction(result, !indirect, list.toArray(new FEMFunction[list.size()]));
+						result = InvokeFunction.from(result, !indirect, list.toArray(new FEMFunction[list.size()]));
 						break;
 					}
 					final FEMFunction item = this._compileParamAsFunction_();
@@ -2281,7 +2399,7 @@ public class FEM {
 						return null;
 					}
 				}
-				final String result = this._helper_.compileName(this, this.section());
+				final String result = this._helper_.compileName(this);
 				if (result.isEmpty()) throw new IllegalArgumentException();
 				this.skip();
 				return result;
@@ -2330,6 +2448,18 @@ public class FEM {
 		}
 
 		/**
+		 * Diese Methode gibt den Ergebniswert der gegebenen Funktion zurück, sofer diese ein {@link BaseValue} oder eine {@link ValueFunction} ist.<br>
+		 * Andernfalls wird {@code null} geliefert.
+		 * 
+		 * @param function Funktion.
+		 * @return Ergebniswert oder {@code null}.
+		 */
+		final FEMValue _functionToValue(final FEMFunction function) {
+			if ((function instanceof BaseValue) || (function instanceof ValueFunction)) return function.invoke(FEMFrame.EMPTY);
+			return null;
+		}
+
+		/**
 		 * Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
 		 * 
 		 * @param name Name des Platzhalters.
@@ -2373,7 +2503,8 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.
+		 * Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.<br>
+		 * Die gelieferte Abbildung wird vor jeder Kompilation geleert.
 		 * 
 		 * @return Abbildung von Namen auf Platzhalter.
 		 */
@@ -2411,8 +2542,8 @@ public class FEM {
 		}
 
 		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler, String)} als {@link FEMHandler}
-		 * gelieferten Funktionen als Funktionszeiger zu {@link ValueFunction}s kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
+		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler)} gelieferten Funktionen als
+		 * Funktionszeiger kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
 		 * 
 		 * @see #compileFunction()
 		 * @return Zulässigkeit von Funktionszeigern.
@@ -2630,9 +2761,9 @@ public class FEM {
 		/**
 		 * Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
 		 * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
-		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler, String) Namen} und dann entweder durch eine in geschweifte Klammern eingeschlossene
-		 * parametrisierte Funktion oder eine nach einem Duppelpunkt angegebenen Parameter gegeben. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird
-		 * eine leere Funktionsliste geliefert.
+		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler) Namen} und endet dann entweder mit einer in geschweifte Klammern eingeschlossenen
+		 * parametrisierten Funktion oder mit einer nach einem Duppelpunkt angegebenen Parameterfunktion. Wenn der Quelltext nur Bedeutungslose Bereiche enthält,
+		 * wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()} entsprechend bestückt.
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
@@ -2730,40 +2861,38 @@ public class FEM {
 	public static interface ScriptCompilerHelper {
 
 		/**
-		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler, String)} sofern möglich den Typ {@link FEMNative}
-		 * mit Nutzdaten {@code null}, {@code true}, {@code false}, {@link String} und {@link Character} sowie {@link NativeFunction} nutzt und andernfalls einen
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich den Typ {@link FEMNative} mit
+		 * Nutzdaten {@code null}, {@code true}, {@code false}, {@link String} und {@link Character} sowie {@link NativeFunction} nutzt und andernfalls einen
 		 * {@link ScriptCompiler#proxy(String)} liefert.
 		 */
 		static ScriptCompilerHelper NATIVE = new ScriptCompilerHelper() {
 
 			@Override
-			public String compileName(final ScriptCompiler compiler, final String section) throws ScriptException {
-				return section;
+			public String compileName(final ScriptCompiler compiler) throws ScriptException {
+				return compiler.section();
 			}
 
 			@Override
-			public FEMFunction compileParam(final ScriptCompiler compiler, String section) throws ScriptException {
+			public FEMFunction compileParam(final ScriptCompiler compiler) throws ScriptException {
+				String section = compiler.section();
 				switch (compiler.symbol()) {
 					case '"':
 						return FEMNative.from(FEM.parseString(section));
 					case '\'':
 						return FEMNative.from(new Character(FEM.parseString(section).charAt(0)));
 					case '!':
-						try {
-							return NativeFunction.from(FEM.parseValue(section));
-						} catch (final Exception cause) {
-							return compiler.proxy(section);
-						}
-					default: {
 						section = FEM.parseValue(section);
+					default: {
 						if (section.equals("null")) return FEMNative.NULL;
 						if (section.equals("true")) return FEMNative.TRUE;
 						if (section.equals("false")) return FEMNative.FALSE;
 						try {
 							return FEMNative.from(new BigDecimal(section));
-						} catch (final NumberFormatException cause) {
-							return compiler.proxy(section);
-						}
+						} catch (final NumberFormatException cause) {}
+						try {
+							return NativeFunction.from(FEM.parseValue(section));
+						} catch (final Exception cause) {}
+						return compiler.proxy(section);
 					}
 				}
 			}
@@ -2776,36 +2905,35 @@ public class FEM {
 		};
 
 		/**
-		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler, String)} sofern möglich die Typen {@link FEMVoid},
+		 * Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich die Typen {@link FEMVoid},
 		 * {@link FEMBoolean}, {@link FEMString} und {@link FEMDecimal} nutzt und andernfalls einen {@link ScriptCompiler#proxy(String)} liefert.
 		 */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
 
 			@Override
-			public String compileName(final ScriptCompiler compiler, final String section) throws ScriptException {
-				return section;
+			public String compileName(final ScriptCompiler compiler) throws ScriptException {
+				return compiler.section();
 			}
 
 			@Override
-			public FEMFunction compileParam(final ScriptCompiler compiler, String section) throws ScriptException {
+			public FEMFunction compileParam(final ScriptCompiler compiler) throws ScriptException {
+				String section = compiler.section();
 				switch (compiler.symbol()) {
 					case '"':
 					case '\'': {
 						return FEMString.from(FEM.parseString(section));
 					}
 					case '!': {
-						return compiler.proxy(FEM.parseValue(section));
+						section = FEM.parseValue(section);
 					}
 					default: {
-						section = FEM.parseValue(section);
 						if (section.equalsIgnoreCase("null")) return FEMVoid.INSTANCE;
 						if (section.equalsIgnoreCase("true")) return FEMBoolean.TRUE;
 						if (section.equalsIgnoreCase("false")) return FEMBoolean.FALSE;
 						try {
 							return FEMDecimal.from(new BigDecimal(section));
-						} catch (final NumberFormatException cause) {
-							return compiler.proxy(section);
-						}
+						} catch (final NumberFormatException cause) {}
+						return compiler.proxy(section);
 					}
 				}
 			}
@@ -2818,30 +2946,30 @@ public class FEM {
 		};
 
 		/**
-		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebenen Funktions- bzw. Parameternamen zurück.
+		 * Diese Methode gibt den im {@link ScriptCompiler#section() aktuellen Bereich} des gegebenen Kompilers angegebenen Funktions- bzw. Parameternamen zurück.
 		 * 
 		 * @see ScriptCompiler#range()
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
-		 * @param section aktueller Bereich des Quelltexts ({@link ScriptCompiler#section()}).
 		 * @return Funktions- bzw. Parametername.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Namen enthält (z.B. bei Verwechslungsgefahr mit anderen Datentypen).
 		 */
-		public String compileName(ScriptCompiler compiler, String section) throws ScriptException;
+		public String compileName(ScriptCompiler compiler) throws ScriptException;
 
 		/**
-		 * Diese Methode gibt den im aktuellen Bereich des Quelltexts des gegebenen Kompilers angegebene Parameter als Funktion zurück. Ein Parameter kann hierbei
-		 * für eine Funktion stehen. Konstante Parameterwerte sollten als {@link ValueFunction} oder {@link ProxyFunction} geliefert werden.
+		 * Diese Methode gibt den im {@link ScriptCompiler#section() aktuellen Bereich} des gegebenen Kompilers angegebene Parameter als Funktion zurück.<br>
+		 * Der Wert des Parameters entspricht hierbei dem Ergebniswert der gelieferten Funktion.<br>
+		 * Konstante Parameterwerte können als {@link BaseValue}, {@link ValueFunction} oder {@link ProxyFunction} geliefert werden. Funktion als Parameterwert
+		 * können als {@link FEMHandler} geliefert werden.
 		 * 
 		 * @see ScriptCompiler#proxy(String)
 		 * @see ScriptCompiler#range()
 		 * @see ScriptCompiler#script()
 		 * @param compiler Kompiler mit Bereich und Quelltext.
-		 * @param section aktueller Bereich des Quelltexts ({@link ScriptCompiler#section()}).
-		 * @return Parameter als {@link FEMFunction}, Parameterwert als {@link ValueFunction} oder Platzhalter als {@link ProxyFunction}.
+		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält.
 		 */
-		public FEMFunction compileParam(ScriptCompiler compiler, String section) throws ScriptException;
+		public FEMFunction compileParam(ScriptCompiler compiler) throws ScriptException;
 
 	}
 
@@ -4127,7 +4255,7 @@ public class FEM {
 	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameterwerte des Stapelrahmens gegeben Funktion mit den im
 	 * zweiten Parameterwert gegebenen Parameterwertliste.
 	 */
-	public static final FEMFunction CALL_FUNCTION = new BaseFunction() {
+	public static final BaseFunction CALL_FUNCTION = new BaseFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
@@ -4150,7 +4278,7 @@ public class FEM {
 	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameterwert des Stapelrahmens gegeben Funktion mit den davor
 	 * liegenden Parameterwerten.
 	 */
-	public static final FEMFunction INVOKE_FUNCTION = new BaseFunction() {
+	public static final BaseFunction INVOKE_FUNCTION = new BaseFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
@@ -4176,7 +4304,7 @@ public class FEM {
 	 * @see FEMArray#from(FEMValue...)
 	 * @see FEMFrame#params()
 	 */
-	public static final FEMFunction PARAMS_COPY_FUNCTION = new BaseFunction() {
+	public static final BaseFunction PARAMS_COPY_FUNCTION = new BaseFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
@@ -4196,7 +4324,7 @@ public class FEM {
 	 * 
 	 * @see FEMFrame#params()
 	 */
-	public static final FEMFunction PARAMS_VIEW_FUNCTION = new BaseFunction() {
+	public static final BaseFunction PARAMS_VIEW_FUNCTION = new BaseFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
@@ -4345,10 +4473,6 @@ public class FEM {
 	 */
 	public static final String formatComment(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatComment();
-	}
-
-	public static void main(final String[] args) throws Exception {
-		System.out.println(NativeFunction.from("java.lang.Integer.toString()").invoke(FEMFrame.EMPTY.withParams(FEMNative.from(12345))));
 	}
 
 }
