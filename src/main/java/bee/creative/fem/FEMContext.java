@@ -47,6 +47,29 @@ public abstract class FEMContext {
 			return this.arrayFrom(data);
 		}
 
+		@Override
+		public Object objectFrom(final FEMValue value) throws NullPointerException, IllegalArgumentException {
+			switch (value.type().id()) {
+				case FEMVoid.ID:
+					return null;
+				case FEMArray.ID:
+					return this._objectFrom_((FEMArray)value.data());
+				case FEMBinary.ID:
+					return ((FEMBinary)value.data()).value();
+				case FEMString.ID:
+					return ((FEMString)value.data()).toString();
+				case FEMInteger.ID:
+					return ((FEMInteger)value.data()).toNumber();
+				case FEMDecimal.ID:
+					return ((FEMDecimal)value.data()).toNumber();
+				case FEMDatetime.ID:
+					return ((FEMDatetime)value.data()).toCalendar();
+				case FEMBoolean.ID:
+					return ((FEMBoolean)value.data()).toBoolean();
+			}
+			return value.data();
+		}
+
 	}
 
 	{}
@@ -58,9 +81,16 @@ public abstract class FEMContext {
 	 * sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} {@link FEMType#id() ist}, d.h. wenn {@code value.type().is(type)}.
 	 * Andernfalls löst sie eine {@link IllegalArgumentException} aus.
 	 * <p>
-	 * Die {@link #valueFrom(Object)}-Methode dieses Kontextobjekts konvertiert die ihr übergebenen Nutzdaten über die {@code from}-Methoden der nachfahren von
-	 * {@link BaseValue} der Klasse {@link FEM} sowie falls möglich über {@link #arrayFrom(Object)}. Im Fehlerfall löst sie eine {@link IllegalArgumentException}
-	 * aus.
+	 * Die {@link #valueFrom(Object)}-Methode dieses Kontextobjekts gibt einen gegebenen {@link FEMValue} unverändert zurück und konvertiert {@code null} zu
+	 * {@link FEMVoid#INSTANCE}, {@code char[]} und {@link String} zu {@link FEMString}, {@code byte[]} zu {@link FEMBinary}, {@link Float}, {@link Double} und
+	 * {@link BigDecimal} zu {@link FEMDecimal}, alle anderen {@link Number} zu {@link FEMInteger}, {@link Boolean} zu {@link FEMBoolean}, {@link Calendar} zu
+	 * {@link FEMDatetime}, {@link FEMFunction} zu {@link FEMHandler} und alle anderen Eingaben via {@link #arrayFrom(Object)} in ein {@link FEMArray}. Im
+	 * Fehlerfall löst sie eine {@link IllegalArgumentException} aus.
+	 * <p>
+	 * Die {@link #objectFrom(FEMValue)}-Methode dieses Kontextobjekts konvertiert {@link FEMVoid} zu {@code null}, {@link FEMArray} und die darin enthaltenen
+	 * Werte rekursiv zu {@code Object[]}, {@link FEMBinary} zu {@code byte[]}, {@link FEMString} zu {@link String}, {@link FEMInteger} und {@link FEMDecimal} zu
+	 * {@link Number}, {@link FEMDatetime} zu {@link Calendar}, {@link FEMBoolean} zu {@link Boolean} und alle anderen Werte ihren {@link FEMValue#data()
+	 * Nutzdatensatz}.
 	 */
 	public static final FEMContext EMPTY = new EmptyContext();
 
@@ -95,7 +125,8 @@ public abstract class FEMContext {
 	{}
 
 	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@code this.dataFrom(input)} in siene Ausgabe überführt.
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in siene
+	 * Ausgabe überführt.
 	 * 
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
 	 * @param type Datentyp.
@@ -107,8 +138,8 @@ public abstract class FEMContext {
 		return new Converter<FEMValue, GData>() {
 
 			@Override
-			public GData convert(final FEMValue input) {
-				return FEMContext.this.dataFrom(input, type);
+			public GData convert(final FEMValue value) {
+				return FEMContext.this.dataFrom(value, type);
 			}
 
 			@Override
@@ -151,7 +182,7 @@ public abstract class FEMContext {
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann.
 	 */
-	public final FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
+	public FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
 		if (data instanceof Object[]) return this._arrayFrom_((Object[])data);
 		if (data instanceof Collection<?>) return this._arrayFrom_((Collection<?>)data);
@@ -189,14 +220,80 @@ public abstract class FEMContext {
 	}
 
 	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in siene Ausgabe
+	 * überführt.
+	 * 
+	 * @return {@code valueFrom}-{@link Converter}.
+	 */
+	public final Converter<Object, FEMValue> valueFrom() {
+		return new Converter<Object, FEMValue>() {
+
+			@Override
+			public FEMValue convert(final Object object) {
+				return FEMContext.this.valueFrom(object);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("valueFrom");
+			}
+
+		};
+	}
+
+	/**
 	 * Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
 	 * Welcher Wert- und Datentyp hierfür verwendet wird, ist der Implementation überlassen.
 	 * 
-	 * @param data Nutzdaten.
+	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
 	 */
-	public abstract FEMValue valueFrom(Object data) throws IllegalArgumentException;
+	public abstract FEMValue valueFrom(Object object) throws IllegalArgumentException;
+
+	/**
+	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in siene Ausgabe
+	 * überführt.
+	 * 
+	 * @return {@code objectFrom}-{@link Converter}.
+	 */
+	public final Converter<FEMValue, Object> objectFrom() {
+		return new Converter<FEMValue, Object>() {
+
+			@Override
+			public Object convert(final FEMValue value) {
+				return FEMContext.this.objectFrom(value);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("objectFrom");
+			}
+
+		};
+	}
+
+	/**
+	 * Diese Methode gibt ein {@link Object} zurück, welches via {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
+	 * äquivalenten ist.
+	 * 
+	 * @see #valueFrom(Object)
+	 * @param value Wert.
+	 * @return Objekt
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist.
+	 */
+	public abstract Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException;
+
+	@SuppressWarnings ("javadoc")
+	final Object[] _objectFrom_(final FEMArray array) {
+		final int length = array.length();
+		final Object[] result = new Object[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this.objectFrom(array.get(i));
+		}
+		return result;
+	}
 
 	{}
 

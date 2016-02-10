@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
 import bee.creative.util.Objects;
 
 /**
- * Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Unmarshaller}.
+ * Diese Klasse implementiert einen Konfigurator zum {@link #unmarshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Unmarshaller}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  */
@@ -125,7 +125,7 @@ public final class XMLUnmarshaller {
 	 * @throws SAXException Wenn {@link UnmarshallerData#getUnmarshaller()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link Unmarshaller#unmarshal(Source)} eine entsprechende Ausnahme auslöst.
 	 */
-	public final Object marshal() throws SAXException, JAXBException {
+	public final Object unmarshal() throws SAXException, JAXBException {
 		final Unmarshaller unmarshaller = this._unmarshallerData_.getUnmarshaller();
 		synchronized (unmarshaller) {
 			final Source source = this._sourceData_.getSource();
