@@ -625,7 +625,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMArray)) return false;
-		return this.equals(object);
+		return this.equals((FEMArray)object);
 	}
 
 	/**
