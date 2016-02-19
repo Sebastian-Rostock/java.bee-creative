@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import bee.creative.util.Comparators;
 
-/**
- * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der Speicherverbrauch einer
+/** Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactEntryMap}. Der Speicherverbrauch einer
  * {@link CompactEntryHashMap} liegt bei ca. {@code 28%} des Speicherverbrauchs einer {@link HashMap}.
  * <p>
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
@@ -20,62 +19,49 @@ import bee.creative.util.Comparators;
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte.
- */
+ * @param <GValue> Typ der Werte. */
 public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GValue> {
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map}.
-	 */
+	/** Dieser Konstruktor initialisiert die {@link Map}. */
 	public CompactEntryHashMap() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public CompactEntryHashMap(final int capacity) {
 		super(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
-	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
 	public CompactEntryHashMap(final Map<? extends GKey, ? extends GValue> map) {
 		super(map);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemIndex_(final Object key) {
 		if (key == null) return this._itemIndexEquals_(null, 0);
 		return this._itemIndexEquals_(key, key.hashCode());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
 		if (key == null) return item == null;
 		return key.equals(item);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemCompare_(final Object key, final int hash, final Object item) {
 		if (item == null) return hash;

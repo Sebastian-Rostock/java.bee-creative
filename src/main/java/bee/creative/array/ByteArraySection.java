@@ -1,22 +1,18 @@
 package bee.creative.array;
 
-/**
- * Diese Klasse implementiert eine {@link ArraySection} für {@code byte}-Arrays.
+/** Diese Klasse implementiert eine {@link ArraySection} für {@code byte}-Arrays.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection
- */
+ * @see ArraySection */
 public abstract class ByteArraySection extends ArraySection<byte[]> {
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
+	/** Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>ByteArraySection.from(array, 0, array.length)</pre>
 	 * 
 	 * @param array Array.
 	 * @return {@link ByteArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
 	public static ByteArraySection from(final byte... array) throws NullPointerException {
 		return ArraySection.validate(new ByteArraySection() {
 
@@ -38,8 +34,7 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 		});
 	}
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück.
+	/** Diese Methode erzeugt eine neue {@link ByteArraySection} und gibt sie zurück.
 	 * 
 	 * @param array Array.
 	 * @param startIndex Index des ersten Werts im Abschnitt.
@@ -47,8 +42,7 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 	 * @return {@link ByteArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
 	public static ByteArraySection from(final byte[] array, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException,
 		IllegalArgumentException {
 		return ArraySection.validate(new ByteArraySection() {
@@ -73,49 +67,37 @@ public abstract class ByteArraySection extends ArraySection<byte[]> {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _arrayLength_(final byte[] array) {
 		return array.length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _hashCode_(final byte[] array, final int index) {
 		return array[index];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _equals_(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _compareTo_(final byte[] array1, final byte[] array2, final int index1, final int index2) {
 		return array1[index1] - array2[index2];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _toString_(final byte[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

@@ -2,16 +2,12 @@ package bee.creative.xml;
 
 import javax.xml.transform.Templates;
 
-/**
- * Diese Klasse implementiert den Konfigurator für {@link Templates}.
+/** Diese Klasse implementiert den Konfigurator für {@link Templates}.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLTemplates extends BaseTemplatesData<XMLTemplates> {
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected final XMLTemplates _this_() {
 		return this;

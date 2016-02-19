@@ -4,25 +4,21 @@ import java.util.Comparator;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert eine {@link ArraySection} für {@link Object}-Arrays.
+/** Diese Klasse implementiert eine {@link ArraySection} für {@link Object}-Arrays.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der {@link Object}s.
- * @see ArraySection
- */
+ * @see ArraySection */
 public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> {
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
+	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>ComparableArraySection.from(array, 0, array.length)</pre>
 	 * 
 	 * @param <GValue> Typ der {@link Comparable}s.
 	 * @param array Array.
 	 * @return {@link ObjectArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
 	@SafeVarargs
 	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue... array) throws NullPointerException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
@@ -50,8 +46,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
+	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>ObjectArraySection.from(comparator, array, 0, array.length)</pre>
 	 * 
@@ -59,8 +54,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @param comparator {@link Comparator}.
 	 * @param array Array.
 	 * @return {@link ObjectArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebenen {@link Comparator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebenen {@link Comparator} {@code null} ist. */
 	@SafeVarargs
 	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue... array) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator is null");
@@ -89,8 +83,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
+	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
 	 * 
 	 * @param <GValue> Typ der {@link Object}s.
 	 * @param array Array.
@@ -99,15 +92,12 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @return {@link ObjectArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
 	public static <GValue extends Comparable<? super GValue>> ObjectArraySection<GValue> from(final GValue[] array, final int startIndex, final int finalIndex)
 		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new ObjectArraySection<GValue>() {
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			protected int _compareTo_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 				return Comparators.compare(array1[index1], array2[index2]);
@@ -131,8 +121,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 		});
 	}
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
+	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
 	 * 
 	 * @param <GValue> Typ der {@link Object}s.
 	 * @param comparator {@link Comparator}.
@@ -142,8 +131,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	 * @return {@link ObjectArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array bzw. der gegebenen {@link Comparator} {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
 	public static <GValue> ObjectArraySection<GValue> from(final Comparator<? super GValue> comparator, final GValue[] array, final int startIndex,
 		final int finalIndex) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		if (comparator == null) throw new NullPointerException("comparator is null");
@@ -174,41 +162,31 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _arrayLength_(final GValue[] array) {
 		return array.length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _hashCode_(final GValue[] array, final int index) {
 		return Objects.hash(array[index]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _equals_(final GValue[] array1, final GValue[] array2, final int index1, final int index2) {
 		return Objects.equals(array1[index1], array2[index2]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _toString_(final GValue[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings ("unchecked")
 	public boolean equals(final Object object) {

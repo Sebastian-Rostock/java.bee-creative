@@ -3,60 +3,48 @@ package bee.creative.compact;
 import java.util.Map;
 import bee.creative.util.Comparators;
 
-/**
- * Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap}.
+/** Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap}.
  * 
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte.
- */
+ * @param <GValue> Typ der Werte. */
 public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GKey, GValue> {
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map}.
-	 */
+	/** Dieser Konstruktor initialisiert die {@link Map}. */
 	public CompactItemHashMap() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public CompactItemHashMap(final int capacity) throws IllegalArgumentException {
 		super(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
 	 * 
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
-	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
 	public CompactItemHashMap(final Map<? extends GKey, ? extends GValue> map) throws NullPointerException {
 		super(map);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemIndex_(final Object key) {
 		if (key == null) return this._itemIndexEquals_(null, 0);
 		return this._itemIndexEquals_(key, key.hashCode());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
@@ -64,9 +52,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 		return key.equals(this.getKey((GValue)item));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@SuppressWarnings ("unchecked")
 	@Override
 	protected int _itemCompare_(final Object key, final int hash, final Object item) {

@@ -1,35 +1,27 @@
 package bee.creative.util;
 
-/**
- * Diese Klasse implementiert grundlegende {@link Conversion}.
+/** Diese Klasse implementiert grundlegende {@link Conversion}.
  * 
  * @see Converter
  * @see Converters
  * @see Conversion
- * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Conversions {
 
-	/**
-	 * Diese Klasse implementiert {@link #hashCode()} und {@link #equals(Object)} einer abstracten {@link Conversion}.
+	/** Diese Klasse implementiert {@link #hashCode()} und {@link #equals(Object)} einer abstracten {@link Conversion}.
 	 * 
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 */
+	 * @param <GOutput> Typ der Ausgabe. */
 	public static abstract class BaseConversion<GInput, GOutput> implements Conversion<GInput, GOutput> {
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.output());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -42,11 +34,9 @@ public class Conversions {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
+	/** Dieses Feld speichert den {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
 	 * 
-	 * @see #inverseConversion(Conversion)
-	 */
+	 * @see #inverseConversion(Conversion) */
 	public static final Converter<?, ?> INVERSE_CONVERSION = new Converter<Conversion<?, ?>, Object>() {
 
 		@Override
@@ -61,9 +51,7 @@ public class Conversions {
 
 	};
 
-	/**
-	 * Dieses Feld speichert den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
-	 */
+	/** Dieses Feld speichert den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt. */
 	public static final Converter<?, ?> CONVERSION_INPUT = new Converter<Conversion<?, ?>, Object>() {
 
 		@Override
@@ -78,9 +66,7 @@ public class Conversions {
 
 	};
 
-	/**
-	 * Dieses Feld speichert den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
-	 */
+	/** Dieses Feld speichert den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt. */
 	public static final Converter<?, ?> CONVERSION_OUTPUT = new Converter<Conversion<?, ?>, Object>() {
 
 		@Override
@@ -97,15 +83,13 @@ public class Conversions {
 
 	{}
 
-	/**
-	 * Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
+	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param output Ausgabe.
-	 * @return {@code static}-{@link Conversion}.
-	 */
+	 * @return {@code static}-{@link Conversion}. */
 	public static final <GInput, GOutput> Conversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
 		return new BaseConversion<GInput, GOutput>() {
 
@@ -127,8 +111,7 @@ public class Conversions {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in mit dem gegebenen {@link Converter} umwandelt und das Paar dieser beiden Objekte
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in mit dem gegebenen {@link Converter} umwandelt und das Paar dieser beiden Objekte
 	 * als {@link Conversion} liefert.
 	 * 
 	 * @see #staticConversion(Object, Object)
@@ -136,8 +119,7 @@ public class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #staticConversion(Object, Object)}.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
 	public static final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -156,29 +138,25 @@ public class Conversions {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
+	/** Diese Methode gibt einen {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
 	 * 
 	 * @see #inverseConversion(Conversion)
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link Converter} zu {@link #inverseConversion(Conversion)}.
-	 */
+	 * @return {@link Converter} zu {@link #inverseConversion(Conversion)}. */
 	@SuppressWarnings ("unchecked")
 	public static final <GInput, GOutput> Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> inverseConversion() {
 		return (Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>>)Conversions.INVERSE_CONVERSION;
 	}
 
-	/**
-	 * Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
+	/** Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
 	 * werden.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
 	 * @return {@code inverse}-{@link Conversion}.
-	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist. */
 	public static final <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
 		if (conversion == null) throw new NullPointerException("conversion = null");
 		return new Conversion<GInput, GOutput>() {
@@ -201,8 +179,7 @@ public class Conversions {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Converter} aus der gegebenen Eingabe
+	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Converter} aus der gegebenen Eingabe
 	 * ermittelt wird.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
@@ -210,8 +187,7 @@ public class Conversions {
 	 * @param input Eingabe.
 	 * @param converter {@link Converter}.
 	 * @return {@code dynamic}-{@link Conversion}.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
 	public static final <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -235,16 +211,14 @@ public class Conversions {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit dem gegebenen {@link Converter} via {@link #dynamicConversion(Object, Converter)}
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit dem gegebenen {@link Converter} via {@link #dynamicConversion(Object, Converter)}
 	 * in seine Ausgabe überführt.
 	 * 
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #dynamicConversion(Object, Converter)}.
-	 * @throws NullPointerException Wenn {@code converter} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
 	public static final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -263,25 +237,21 @@ public class Conversions {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
+	/** Diese Methode gibt den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#input()
 	 * @param <GInput> Typ des Eingabe.
-	 * @return {@link Converter} zu {@link Conversion#input()}.
-	 */
+	 * @return {@link Converter} zu {@link Conversion#input()}. */
 	@SuppressWarnings ("unchecked")
 	public static final <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInput() {
 		return (Converter<Conversion<? extends GInput, ?>, GInput>)Conversions.CONVERSION_INPUT;
 	}
 
-	/**
-	 * Diese Methode gibt den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
+	/** Diese Methode gibt den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
 	 * 
 	 * @see Conversion#output()
 	 * @param <GOutput> Typ der Ausgabe.
-	 * @return {@link Converter} zu {@link Conversion#output()}.
-	 */
+	 * @return {@link Converter} zu {@link Conversion#output()}. */
 	@SuppressWarnings ("unchecked")
 	public static final <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutput() {
 		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)Conversions.CONVERSION_OUTPUT;

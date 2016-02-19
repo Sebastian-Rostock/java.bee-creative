@@ -14,36 +14,26 @@ import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link BEX} Datenstrukturen.
+/** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link BEX} Datenstrukturen.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEXDecoder {
 
-	/**
-	 * Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListDecoder}
+	/** Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListDecoder}
 	 * ermittelt werden.
 	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXTextCache implements Items<String> {
 
-		/**
-		 * Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden.
-		 */
+		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
 		final IAMListDecoder __items;
 
-		/**
-		 * Dieses Feld puffert die Zeichenketten der Elemente.
-		 */
+		/** Dieses Feld puffert die Zeichenketten der Elemente. */
 		String[] __cache;
 
-		/**
-		 * Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
+		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
 		 * 
-		 * @param items Elemente.
-		 */
+		 * @param items Elemente. */
 		BEXTextCache(final IAMListDecoder items) {
 			this.__items = items;
 			this.setEnabled(false);
@@ -51,34 +41,28 @@ public class BEXDecoder {
 
 		{}
 
-		/**
-		 * Diese Methode gibt das {@code index}-te Element zurück.
+		/** Diese Methode gibt das {@code index}-te Element zurück.
 		 * 
 		 * @see IAMListDecoder#item(int)
 		 * @param index Index.
-		 * @return {@code index}-tes Element.
-		 */
+		 * @return {@code index}-tes Element. */
 		public MMFArray item(final int index) {
 			return this.__items.item(index);
 		}
 
-		/**
-		 * Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
+		/** Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
 		 * Zeichenketten bei jedem Aufruf von {@link #get(int)} über {@link BEX#toString(MMFArray)} aud dem {@code index}-ten Element abgeleitet.
 		 * 
 		 * @see #get(int)
-		 * @return {@code true}, wenn die Pufferung aktiviert ist.
-		 */
+		 * @return {@code true}, wenn die Pufferung aktiviert ist. */
 		public boolean getEnabled() {
 			return this.__cache != null;
 		}
 
-		/**
-		 * Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
+		/** Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
 		 * 
 		 * @see #get(int)
-		 * @param value {@code true}, wenn die Pufferung aktiviert ist.
-		 */
+		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
 		public void setEnabled(final boolean value) {
 			if (!value) {
 				this.__cache = null;
@@ -89,12 +73,10 @@ public class BEXDecoder {
 
 		{}
 
-		/**
-		 * Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
+		/** Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
 		 * 
 		 * @param index Index.
-		 * @return {@code index}-te Zeichenkette oder {@code ""}.
-		 */
+		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
 		@Override
 		public String get(final int index) {
 			final String[] cache = this.__cache;
@@ -110,9 +92,7 @@ public class BEXDecoder {
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return Objects.toString(Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this.__cache)));
@@ -120,113 +100,71 @@ public class BEXDecoder {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link MMFArray} dekodiert.
+	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link MMFArray} dekodiert.
 	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXFileDecoder extends BEXBaseFile {
 
-		/**
-		 * Dieses Feld speichert den leeren {@link BEXFileDecoder}.
-		 */
+		/** Dieses Feld speichert den leeren {@link BEXFileDecoder}. */
 		public static final BEXFileDecoder EMPTY = new BEXFileDecoder();
 
 		{}
 
-		/**
-		 * Dieses Feld speichert die Referenz des Wurzelelements.
-		 */
+		/** Dieses Feld speichert die Referenz des Wurzelelements. */
 		final int __rootRef;
 
-		/**
-		 * Dieses Feld speichert die URI der Attributknoten.
-		 */
+		/** Dieses Feld speichert die URI der Attributknoten. */
 		final BEXTextCache __attrUriText;
 
-		/**
-		 * Dieses Feld speichert die Namen der Attributknoten.
-		 */
+		/** Dieses Feld speichert die Namen der Attributknoten. */
 		final BEXTextCache __attrNameText;
 
-		/**
-		 * Dieses Feld speichert die Werte der Attributknoten.
-		 */
+		/** Dieses Feld speichert die Werte der Attributknoten. */
 		final BEXTextCache __attrValueText;
 
-		/**
-		 * Dieses Feld speichert die URI der Elementknoten.
-		 */
+		/** Dieses Feld speichert die URI der Elementknoten. */
 		final BEXTextCache __chldUriText;
 
-		/**
-		 * Dieses Feld speichert die Namen der Elementknoten.
-		 */
+		/** Dieses Feld speichert die Namen der Elementknoten. */
 		final BEXTextCache __chldNameText;
 
-		/**
-		 * Dieses Feld speichert die Werte der Textknoten.
-		 */
+		/** Dieses Feld speichert die Werte der Textknoten. */
 		final BEXTextCache __chldValueText;
 
-		/**
-		 * Dieses Feld speichert die URI-Spalte der Attributknotentabelle.
-		 */
+		/** Dieses Feld speichert die URI-Spalte der Attributknotentabelle. */
 		final MMFArray __attrUriRef;
 
-		/**
-		 * Dieses Feld speichert die Name-Spalte der Attributknotentabelle.
-		 */
+		/** Dieses Feld speichert die Name-Spalte der Attributknotentabelle. */
 		final MMFArray __attrNameRef;
 
-		/**
-		 * Dieses Feld speichert die Wert-Spalte der Attributknotentabelle.
-		 */
+		/** Dieses Feld speichert die Wert-Spalte der Attributknotentabelle. */
 		final MMFArray __attrValueRef;
 
-		/**
-		 * Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle.
-		 */
+		/** Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle. */
 		final MMFArray __attrParentRef;
 
-		/**
-		 * Dieses Feld speichert die URI-Spalte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert die URI-Spalte der Kindknotentabelle. */
 		final MMFArray __chldUriRef;
 
-		/**
-		 * Dieses Feld speichert die Name-Spalte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert die Name-Spalte der Kindknotentabelle. */
 		final MMFArray __chldNameRef;
 
-		/**
-		 * Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle. */
 		final MMFArray __chldContentRef;
 
-		/**
-		 * Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle. */
 		final MMFArray __chldAttributesRef;
 
-		/**
-		 * Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle. */
 		final MMFArray __chldParentRef;
 
-		/**
-		 * Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle.
-		 */
+		/** Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle. */
 		final MMFArray __chldListRange;
 
-		/**
-		 * Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle.
-		 */
+		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
 		final MMFArray __attrListRange;
 
-		/**
-		 * Dieser Konstruktor initialisiert den leeren {@link BEXFileDecoder}.
-		 */
+		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileDecoder}. */
 		BEXFileDecoder() {
 			this.__rootRef = -1;
 			this.__attrUriText = new BEXTextCache(IAMListDecoder.EMPTY);
@@ -248,13 +186,11 @@ public class BEXDecoder {
 			this.__attrListRange = MMFArray.EMPTY;
 		}
 
-		/**
-		 * Dieser Kontrukteur initialisiert dieses {@link BEXFile} als Sicht auf den gegebenen Speicherbereich.
+		/** Dieser Kontrukteur initialisiert dieses {@link BEXFile} als Sicht auf den gegebenen Speicherbereich.
 		 * 
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
 		public BEXFileDecoder(MMFArray array) throws IAMException, NullPointerException {
 			array = array.toINT32();
 			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
@@ -351,74 +287,58 @@ public class BEXDecoder {
 
 		{}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
+		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
 		 * 
-		 * @return Verwaltung der URI der Attributknoten.
-		 */
+		 * @return Verwaltung der URI der Attributknoten. */
 		public BEXTextCache attrUriCache() {
 			return this.__attrUriText;
 		}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
+		/** Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
 		 * 
-		 * @return Verwaltung der Namen der Attributknoten.
-		 */
+		 * @return Verwaltung der Namen der Attributknoten. */
 		public BEXTextCache attrNameCache() {
 			return this.__attrNameText;
 		}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
+		/** Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
 		 * 
-		 * @return Verwaltung der Werte der Attributknoten.
-		 */
+		 * @return Verwaltung der Werte der Attributknoten. */
 		public BEXTextCache attrValueCache() {
 			return this.__attrValueText;
 		}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
+		/** Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
 		 * 
-		 * @return Verwaltung der URI der Elementknoten.
-		 */
+		 * @return Verwaltung der URI der Elementknoten. */
 		public BEXTextCache chldUriCache() {
 			return this.__chldUriText;
 		}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
+		/** Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
 		 * 
-		 * @return Verwaltung der Namen der Elementknoten.
-		 */
+		 * @return Verwaltung der Namen der Elementknoten. */
 		public BEXTextCache chldNameCache() {
 			return this.__chldNameText;
 		}
 
-		/**
-		 * Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
+		/** Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
 		 * 
-		 * @return Verwaltung der Werte der Textknoten.
-		 */
+		 * @return Verwaltung der Werte der Textknoten. */
 		public BEXTextCache chldValueCache() {
 			return this.__chldValueText;
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXNode root() {
 			if (this.__rootRef < 0) return new BEXNodeDecoder(this);
 			return new BEXNodeDecoder(BEXDecoder.__keyOf(BEXDecoder.BEX_ELEM_NODE, this.__rootRef), this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXList list(final int key) {
 			switch (BEXDecoder.__typeOf(key)) {
@@ -431,9 +351,7 @@ public class BEXDecoder {
 			return new BEXListDecoder(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXNode node(final int key) {
 			switch (BEXDecoder.__typeOf(key)) {
@@ -464,54 +382,40 @@ public class BEXDecoder {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
+	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
 	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXListDecoder extends BEXBaseList {
 
-		/**
-		 * Dieses Feld speichert den leeren {@link BEXListDecoder}.
-		 */
+		/** Dieses Feld speichert den leeren {@link BEXListDecoder}. */
 		public static final BEXListDecoder EMPTY = new BEXListDecoder(BEXFileDecoder.EMPTY);
 
 		{}
 
-		/**
-		 * Dieses Feld speichert den Schlüssel.
-		 */
+		/** Dieses Feld speichert den Schlüssel. */
 		final int __key;
 
-		/**
-		 * Dieses Feld speichert die Referenz.
+		/** Dieses Feld speichert die Referenz.
 		 * 
 		 * @see BEXFileDecoder#__attrListRange
-		 * @see BEXFileDecoder#__chldListRange
-		 */
+		 * @see BEXFileDecoder#__chldListRange */
 		final int __ref;
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		final BEXFileDecoder __owner;
 
-		/**
-		 * Dieser Konstruktor initialisiert die undefinierte Knotenliste.
+		/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
 		 * 
-		 * @param owner Besitzer.
-		 */
+		 * @param owner Besitzer. */
 		BEXListDecoder(final BEXFileDecoder owner) {
 			this(BEXDecoder.__keyOf(BEXDecoder.BEX_VOID_TYPE, 0), 0, owner);
 		}
 
-		/**
-		 * Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
+		/** Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
 		 * 
 		 * @param key Schlüssel mit dem Index des Elternknoten.
 		 * @param ref Referenz auf die Knotenliste.
-		 * @param owner Besitzer.
-		 */
+		 * @param owner Besitzer. */
 		BEXListDecoder(final int key, final int ref, final BEXFileDecoder owner) {
 			this.__key = key;
 			this.__ref = ref;
@@ -520,17 +424,13 @@ public class BEXDecoder {
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int key() {
 			return this.__key;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int type() {
 			switch (BEXDecoder.__typeOf(this.__key)) {
@@ -545,17 +445,13 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXFile owner() {
 			return this.__owner;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXNode get(final int index) {
 			final int key = this.__key;
@@ -588,9 +484,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int find(final String uri, final String name, final int start) throws NullPointerException {
 			final int key = this.__key;
@@ -653,9 +547,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int length() {
 			final int key = this.__key;
@@ -678,9 +570,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXNode parent() {
 			final int key = this.__key;
@@ -698,45 +588,33 @@ public class BEXDecoder {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
+	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
 	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXNodeDecoder extends BEXBaseNode {
 
-		/**
-		 * Dieses Feld speichert den leeren {@link BEXNodeDecoder}.
-		 */
+		/** Dieses Feld speichert den leeren {@link BEXNodeDecoder}. */
 		public static final BEXNodeDecoder EMPTY = new BEXNodeDecoder(BEXFileDecoder.EMPTY);
 
 		{}
 
-		/**
-		 * Dieses Feld speichert den Schlüssel.
-		 */
+		/** Dieses Feld speichert den Schlüssel. */
 		final int __key;
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		final BEXFileDecoder __owner;
 
-		/**
-		 * Dieser Konstruktor initialisiert den undefinierten Knoten.
+		/** Dieser Konstruktor initialisiert den undefinierten Knoten.
 		 * 
-		 * @param owner Besitzer.
-		 */
+		 * @param owner Besitzer. */
 		BEXNodeDecoder(final BEXFileDecoder owner) {
 			this(BEXDecoder.__keyOf(BEXDecoder.BEX_VOID_TYPE, 0), owner);
 		}
 
-		/**
-		 * Dieser Konstruktor initialisiert Schlüssel und Besitzer.
+		/** Dieser Konstruktor initialisiert Schlüssel und Besitzer.
 		 * 
 		 * @param key Schlüssel.
-		 * @param owner Besitzer.
-		 */
+		 * @param owner Besitzer. */
 		BEXNodeDecoder(final int key, final BEXFileDecoder owner) {
 			this.__key = key;
 			this.__owner = owner;
@@ -744,17 +622,13 @@ public class BEXDecoder {
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int key() {
 			return this.__key;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int type() {
 			switch (BEXDecoder.__typeOf(this.__key)) {
@@ -771,17 +645,13 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXFile owner() {
 			return this.__owner;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String uri() {
 			final int key = this.__key;
@@ -799,9 +669,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String name() {
 			final int key = this.__key;
@@ -819,9 +687,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String value() {
 			final int key = this.__key;
@@ -844,9 +710,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int index() {
 			final int key = this.__key;
@@ -880,9 +744,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXNode parent() {
 			final int key = this.__key;
@@ -914,9 +776,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXList children() {
 			final int key = this.__key;
@@ -937,9 +797,7 @@ public class BEXDecoder {
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public BEXList attributes() {
 			final int key = this.__key;
@@ -961,79 +819,57 @@ public class BEXDecoder {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert die Typkennung für den undefinierten Knoten bzw. die undefinierte Knotenliste.
-	 */
+	/** Dieses Feld speichert die Typkennung für den undefinierten Knoten bzw. die undefinierte Knotenliste. */
 	static final int BEX_VOID_TYPE = 0;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für einen Attributknoten.
-	 */
+	/** Dieses Feld speichert die Typkennung für einen Attributknoten. */
 	static final int BEX_ATTR_NODE = 1;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für einen Elementknoten.
-	 */
+	/** Dieses Feld speichert die Typkennung für einen Elementknoten. */
 	static final int BEX_ELEM_NODE = 2;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für einen Textknoten.
-	 */
+	/** Dieses Feld speichert die Typkennung für einen Textknoten. */
 	static final int BEX_TEXT_NODE = 3;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für den Textknoten eines Elementknoten.
-	 */
+	/** Dieses Feld speichert die Typkennung für den Textknoten eines Elementknoten. */
 	static final int BEX_ELTX_NODE = 4;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für eine Attributknotenliste.
-	 */
+	/** Dieses Feld speichert die Typkennung für eine Attributknotenliste. */
 	static final int BEX_ATTR_LIST = 5;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für eine Kindknotenliste.
-	 */
+	/** Dieses Feld speichert die Typkennung für eine Kindknotenliste. */
 	static final int BEX_CHLD_LIST = 6;
 
-	/**
-	 * Dieses Feld speichert die Typkennung für die Kindknotenliste dem Textknoten eines Elementknoten.
-	 */
+	/** Dieses Feld speichert die Typkennung für die Kindknotenliste dem Textknoten eines Elementknoten. */
 	static final int BEX_CHTX_LIST = 7;
 
 	{}
 
-	/**
-	 * Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
+	/** Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
 	 * 
 	 * @see #__keyOf(int, int)
 	 * @param key Schlüssel.
-	 * @return Referenz.
-	 */
+	 * @return Referenz. */
 	final static int __refOf(final int key) {
 		return (key >> 3) & 0x1FFFFFFF;
 	}
 
-	/**
-	 * Diese Methode gibt einen Schlüssel mit den gegebenen Eigenschaften zurück.
+	/** Diese Methode gibt einen Schlüssel mit den gegebenen Eigenschaften zurück.
 	 * 
 	 * @see BEXNode#key()
 	 * @see BEXList#key()
 	 * @param type Typkennung (0..7).
 	 * @param ref Referenz als Zeilennummer des Datensatzes.
-	 * @return Schlüssel.
-	 */
+	 * @return Schlüssel. */
 	final static int __keyOf(final int type, final int ref) {
 		return (ref << 3) | (type << 0);
 	}
 
-	/**
-	 * Diese Methode gibt die Typkennung des gegebenen Schlüssels zurück.
+	/** Diese Methode gibt die Typkennung des gegebenen Schlüssels zurück.
 	 * 
 	 * @see #__keyOf(int, int)
 	 * @param key Schlüssel.
-	 * @return Typkennung.
-	 */
+	 * @return Typkennung. */
 	final static int __typeOf(final int key) {
 		return (key >> 0) & 7;
 	}

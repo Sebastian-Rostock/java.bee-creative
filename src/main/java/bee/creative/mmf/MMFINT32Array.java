@@ -2,11 +2,9 @@ package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
 
-/**
- * Diese Klasse implementiert ein {@link MMFArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT32} Zahlen interpretiert.
+/** Diese Klasse implementiert ein {@link MMFArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT32} Zahlen interpretiert.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 class MMFINT32Array extends MMFArray {
 
 	@SuppressWarnings ("javadoc")
@@ -16,25 +14,19 @@ class MMFINT32Array extends MMFArray {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _get_(final int index) {
 		return this._byteBuffer_.getInt(this._byteOffset_ + (index << 2));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected MMFArray _section_(final int offset, final int length) {
 		return new MMFINT32Array(this._byteBuffer_, this._byteOffset_ + (offset << 2), length << 2);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int mode() {
 		return 4;

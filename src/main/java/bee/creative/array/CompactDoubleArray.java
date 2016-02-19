@@ -1,29 +1,23 @@
 package bee.creative.array;
 
-/**
- * Diese Klasse implementiert ein {@link DoubleArray} als {@link CompactArray}.
+/** Diese Klasse implementiert ein {@link DoubleArray} als {@link CompactArray}.
  * 
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactDoubleArray extends CompactArray<double[], Double> implements DoubleArray {
 
-	/**
-	 * Diese Klasse implementiert ein {@link DoubleArray} als modifizierbare Sicht auf einen Teil eines {@link CompactDoubleArray}s.
+	/** Diese Klasse implementiert ein {@link DoubleArray} als modifizierbare Sicht auf einen Teil eines {@link CompactDoubleArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleSubArray extends CompactSubArray<CompactDoubleArray, double[], Double> implements DoubleArray {
 
-		/**
-		 * Dieser Konstruktor initialisiert Besitzer und Indices.
+		/** Dieser Konstruktor initialisiert Besitzer und Indices.
 		 * 
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
-		 *         {@code startIndex > finalIndex}).
-		 */
+		 *         {@code startIndex > finalIndex}). */
 		public CompactDoubleSubArray(final CompactDoubleArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
 			IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
@@ -31,82 +25,62 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public DoubleArraySection section() {
 			return new CompactDoubleSubArraySection(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public double get(final int index) {
 			return this._owner_.get(this._ownerIndex_(index));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void get(final int index, final double[] values) {
 			this.get(index, DoubleArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final double value) {
 			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final double[] values) {
 			this.set(index, DoubleArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final double value) {
 			this.add(this.size(), value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final double[] values) {
 			this.add(this.size(), values);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final double value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final double[] values) {
 			this.add(this.size(), DoubleArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public DoubleArray subArray(final int fromIndex, final int toIndex) {
 			return (DoubleArray)this._ownerSubArray_(fromIndex, toIndex);
@@ -114,24 +88,18 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleArray}s.
+	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleArraySection extends DoubleArraySection {
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		protected final CompactDoubleArray _owner_;
 
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
+		/** Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactDoubleArraySection(final CompactDoubleArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
 			this._owner_ = owner;
@@ -139,33 +107,25 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this._owner_._size_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public double[] array() {
 			return this._owner_._array_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this._owner_._from_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactDoubleArray owner = this._owner_;
@@ -174,24 +134,18 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleSubArray}s.
+	/** Diese Klasse implementiert die live {@link DoubleArraySection} eines {@link CompactDoubleSubArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactDoubleSubArraySection extends DoubleArraySection {
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		protected final CompactDoubleSubArray _owner_;
 
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
+		/** Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactDoubleSubArraySection(final CompactDoubleSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
 			this._owner_ = owner;
@@ -199,33 +153,25 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this._owner_.size();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public double[] array() {
 			return this._owner_._owner_._array_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this._owner_._startIndex_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this._owner_._finalIndex_;
@@ -235,31 +181,24 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 
 	{}
 
-	/**
-	 * Dieses Feld speichert das {@code double}-Array.
-	 */
+	/** Dieses Feld speichert das {@code double}-Array. */
 	protected double[] _array_;
 
-	/**
-	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
-	 */
+	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
 	public CompactDoubleArray() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public CompactDoubleArray(final int capacity) throws IllegalArgumentException {
 		super(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
+	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
@@ -267,146 +206,111 @@ public class CompactDoubleArray extends CompactArray<double[], Double> implement
 	 * @param section {@link ArraySection}.
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
-	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
 	public CompactDoubleArray(final ArraySection<double[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected double[] _array_() {
 		return this._array_;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _array_(final double[] array) {
 		this._array_ = array;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected double[] _allocArray_(final int length) {
 		return new double[length];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected Double _value_(final int index) {
 		return Double.valueOf(this.get(index));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _value_(final int index, final Double value) {
 		this.set(index, value.doubleValue());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _capacity_() {
 		return this._array_.length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public double get(final int index) {
 		return this._array_[this._inclusiveIndex_(index)];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final double[] values) {
 		this.get(index, DoubleArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final double value) {
 		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final double[] values) {
 		this.set(index, DoubleArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final double value) {
 		this.add(this._size_, value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final double[] values) {
 		this.add(this._size_, values);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final double value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final double[] values) {
 		this.add(this._size_, DoubleArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public double[] array() {
 		return this._array_;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public DoubleArraySection section() {
 		return new CompactDoubleArraySection(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public DoubleArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactDoubleSubArray(this, startIndex, finalIndex);

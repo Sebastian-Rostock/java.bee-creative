@@ -1,7 +1,6 @@
 package bee.creative.array;
 
-/**
- * Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung dynamischer Arrays.
+/** Diese Klasse implementiert ein abstraktes Objekt zur Verwaltung dynamischer Arrays.
  * <p>
  * Das Einfügen und Entfernen von Elementen verändern in dieser Implementation nicht nur die Größe des mit den Nutzdaten belegten Bereichs im internen Array,
  * sondern auch dessen Position.
@@ -15,62 +14,46 @@ package bee.creative.array;
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
- *        oder {@code boolean[]}).
- */
+ *        oder {@code boolean[]}). */
 public abstract class ArrayData<GArray> {
 
-	/**
-	 * Dieses Feld speichert den Index des ersten Elements.
-	 */
+	/** Dieses Feld speichert den Index des ersten Elements. */
 	protected int _from_;
 
-	/**
-	 * Dieses Feld speichert die Anzahl der Elemente.
-	 */
+	/** Dieses Feld speichert die Anzahl der Elemente. */
 	protected int _size_;
 
 	{}
 
-	/**
-	 * Diese Methode gibt das interne Array zurück.
+	/** Diese Methode gibt das interne Array zurück.
 	 * 
-	 * @return internes Array.
-	 */
+	 * @return internes Array. */
 	protected abstract GArray _array_();
 
-	/**
-	 * Diese Methode setzt das interne Array.
+	/** Diese Methode setzt das interne Array.
 	 * 
-	 * @param array Array.
-	 */
+	 * @param array Array. */
 	protected abstract void _array_(GArray array);
 
-	/**
-	 * Diese Methode gibt ein neues Array mit der gegebenen Länge zurück.
+	/** Diese Methode gibt ein neues Array mit der gegebenen Länge zurück.
 	 * 
 	 * @param length Länge des neuen Arrays.
-	 * @return neues Array.
-	 */
+	 * @return neues Array. */
 	protected abstract GArray _allocArray_(int length);
 
-	/**
-	 * Diese Methode leert den gegebenen Bereich im internen Array. Dies ist sinnvoll für Arrays von Objekten.
+	/** Diese Methode leert den gegebenen Bereich im internen Array. Dies ist sinnvoll für Arrays von Objekten.
 	 * 
 	 * @param startIndex Index des ersten Elements im Bereich.
-	 * @param finalIndex Index des ersten Elements nach dem Bereich.
-	 */
+	 * @param finalIndex Index des ersten Elements nach dem Bereich. */
 	protected void _clearArray_(final int startIndex, final int finalIndex) {
 	}
 
-	/**
-	 * Diese Methode gibt die Länge des Arrays zurück.
+	/** Diese Methode gibt die Länge des Arrays zurück.
 	 * 
-	 * @return Länge des Arrays.
-	 */
+	 * @return Länge des Arrays. */
 	protected abstract int _capacity_();
 
-	/**
-	 * Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die
+	/** Diese Methode gibt die Position zurück, an der die Elemente des internen Arrays ausgerichtet werden sollen. Bei der Ausrichtung {@code 0} werden die
 	 * Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die
 	 * relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen
 	 * von Elementen am Anfang des internen Arrays beschleunigt wird. Diese ergibt sich aus {@code space / 2}.
@@ -79,18 +62,15 @@ public abstract class ArrayData<GArray> {
 	 * @see ArrayData#_remove_(int, int)
 	 * @see ArrayData#_resize_(int)
 	 * @param space Anzahl der nicht belegten Elemente.
-	 * @return Position zur Ausrichtung ({@code 0..space}).
-	 */
+	 * @return Position zur Ausrichtung ({@code 0..space}). */
 	protected int _calcAlign_(final int space) {
 		return space / 2;
 	}
 
-	/**
-	 * Diese Methode gibt die neue Kapazität für das interne Array zurück, um darin die gegebene Anzahl an Elementen verwalten zu können.
+	/** Diese Methode gibt die neue Kapazität für das interne Array zurück, um darin die gegebene Anzahl an Elementen verwalten zu können.
 	 * 
 	 * @param count Anzahl.
-	 * @return Länge.
-	 */
+	 * @return Länge. */
 	protected int _calcLength_(final int count) {
 		final int oldLength = this._capacity_();
 		if (oldLength >= count) return oldLength;
@@ -99,14 +79,12 @@ public abstract class ArrayData<GArray> {
 		return count;
 	}
 
-	/**
-	 * Diese Methode setzt die Größe des internen Arrays. Wenn die Größe des Arrays von der gegebenen Größe abweicht, werden ein neues Array mit passender Größe
+	/** Diese Methode setzt die Größe des internen Arrays. Wenn die Größe des Arrays von der gegebenen Größe abweicht, werden ein neues Array mit passender Größe
 	 * erzeugt, die Elemente der Ausrichtung entsprechend in das neue Array kopiert und das neue Array als internes genutzt.
 	 * 
 	 * @see ArrayData#_calcAlign_(int)
 	 * @param length neue Größe.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
 	protected void _resize_(final int length) throws IllegalArgumentException {
 		final int size = this._size_;
 		if (size > length) throw new IllegalArgumentException("size > length");
@@ -120,8 +98,7 @@ public abstract class ArrayData<GArray> {
 		this._from_ = from2;
 	}
 
-	/**
-	 * Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position in das interne Array ein. Wenn die Größe des internen Arrays nicht verändert
+	/** Diese Methode fügt die gegebene Anzahl an Elementen an der gegebenen Position in das interne Array ein. Wenn die Größe des internen Arrays nicht verändert
 	 * werden muss, wird versucht, die wenigen Elemente vor bzw. nach dem gegebenen Index um die gegebene Anzahl zu verschieben. Reicht der verfügbare Platz zum
 	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die
 	 * Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der
@@ -131,8 +108,7 @@ public abstract class ArrayData<GArray> {
 	 * @see ArrayData#_calcLength_(int)
 	 * @param index Index des ersten neuen Elements.
 	 * @param count Anzahl der neuen Elemente.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
 	protected void _insert_(final int index, final int count) throws IllegalArgumentException {
 		final int from = this._from_;
 		final int index2 = index - from;
@@ -186,15 +162,13 @@ public abstract class ArrayData<GArray> {
 		}
 	}
 
-	/**
-	 * Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach
+	/** Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach
 	 * dem zu entfernenden Bereich um die gegebene Anzahl zu verschieben.
 	 * 
 	 * @see ArrayData#_calcAlign_(int)
 	 * @param index Index des ersten entfallenden Elements.
 	 * @param count Anzahl der entfallende Elemente.
-	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
 	protected void _remove_(final int index, final int count) throws IllegalArgumentException {
 		final int from = this._from_;
 		final int index2 = index - from;
@@ -221,29 +195,23 @@ public abstract class ArrayData<GArray> {
 		}
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Elementen zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
+	/** Diese Methode gibt die Anzahl der Elementen zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
 	 * 
-	 * @return Kapazität.
-	 */
+	 * @return Kapazität. */
 	public final int capacity() {
 		return this._capacity_();
 	}
 
-	/**
-	 * Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
+	/** Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
 	 * 
 	 * @param capacity Anzahl.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public final void allocate(final int capacity) throws IllegalArgumentException {
 		if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
 		this._resize_(this._calcLength_(capacity));
 	}
 
-	/**
-	 * Diese Methode verkleinert die Kapazität auf das Minimum.
-	 */
+	/** Diese Methode verkleinert die Kapazität auf das Minimum. */
 	public final void compact() {
 		this._resize_(this._size_);
 	}

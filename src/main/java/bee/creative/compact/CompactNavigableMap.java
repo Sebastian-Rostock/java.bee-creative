@@ -14,36 +14,28 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-/**
- * Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem Array verwaltet werden.
+/** Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem Array verwaltet werden.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
- * @param <GValue> Typ der Werte.
- */
+ * @param <GValue> Typ der Werte. */
 @SuppressWarnings ("javadoc")
 public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
-	/**
-	 * Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
+	/** Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GData> Typ der {@link NavigableMap}.
-	 */
+	 * @param <GData> Typ der {@link NavigableMap}. */
 	protected static abstract class AbstractNavigableKeySet<GKey, GData extends NavigableMap<GKey, ?>> extends AbstractSet<GKey> implements NavigableSet<GKey> {
 
-		/**
-		 * Dieses Feld speichert die {@link NavigableMap}.
-		 */
+		/** Dieses Feld speichert die {@link NavigableMap}. */
 		protected final GData data;
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link NavigableMap}.
+		/** Dieser Konstruktor initialisiert die {@link NavigableMap}.
 		 * 
 		 * @param data {@link NavigableMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist. */
 		public AbstractNavigableKeySet(final GData data) throws NullPointerException {
 			if (data == null) throw new NullPointerException("data = null");
 			this.data = data;
@@ -51,12 +43,10 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
+		/** Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
 		 * 
 		 * @param entry {@link ItemEntry}.
-		 * @return Schlüssel oder {@code null}.
-		 */
+		 * @return Schlüssel oder {@code null}. */
 		protected final GKey getKeyOrNull(final Entry<GKey, ?> entry) {
 			if (entry == null) return null;
 			return entry.getKey();
@@ -64,89 +54,67 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.data.size();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void clear() {
 			this.data.clear();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean isEmpty() {
 			return this.data.isEmpty();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Comparator<? super GKey> comparator() {
 			return this.data.comparator();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public SortedSet<GKey> subSet(final GKey fromElement, final GKey toElement) {
 			return this.subSet(fromElement, true, toElement, false);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> subSet(final GKey fromElement, final boolean fromInclusive, final GKey toElement, final boolean toInclusive) {
 			return this.data.subMap(fromElement, fromInclusive, toElement, toInclusive).navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public SortedSet<GKey> headSet(final GKey toElement) {
 			return this.headSet(toElement, false);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> headSet(final GKey toElement, final boolean inclusive) {
 			return this.data.headMap(toElement, inclusive).navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public SortedSet<GKey> tailSet(final GKey fromElement) {
 			return this.tailSet(fromElement, true);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> tailSet(final GKey fromElement, final boolean inclusive) {
 			return this.data.tailMap(fromElement, inclusive).navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean remove(final Object key) {
 			if (!this.data.containsKey(key)) return false;
@@ -154,89 +122,67 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			return true;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean contains(final Object key) {
 			return this.data.containsKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey first() {
 			return this.data.firstKey();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey last() {
 			return this.data.lastKey();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey lower(final GKey key) {
 			return this.data.lowerKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey floor(final GKey key) {
 			return this.data.floorKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey ceiling(final GKey key) {
 			return this.data.ceilingKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey higher(final GKey key) {
 			return this.data.higherKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey pollFirst() {
 			return this.getKeyOrNull(this.data.pollFirstEntry());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey pollLast() {
 			return this.getKeyOrNull(this.data.pollLastEntry());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> descendingSet() {
 			return this.data.descendingMap().navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> descendingIterator() {
 			return this.descendingSet().iterator();
@@ -244,29 +190,23 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactNavigableMap}.
+	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactNavigableMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 */
+	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactNavigableKeySet<GKey> extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link CompactNavigableMap}.
+		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap}.
 		 * 
 		 * @param data {@link CompactNavigableMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link CompactNavigableMap} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn die gegebene {@link CompactNavigableMap} {@code null} ist. */
 		public CompactNavigableKeySet(final CompactNavigableMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
 			return new CompactMapKeyAscendingIterator<GKey>(this.data, this.data._firstIndex_(), this.data._lastIndex_() + 1);
@@ -274,30 +214,24 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap}.
+	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 */
+	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactAscendingKeySet<GKey> extends
 		CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactAscendingSubMap<GKey, ?>> {
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link CompactAscendingSubMap}.
+		/** Dieser Konstruktor initialisiert die {@link CompactAscendingSubMap}.
 		 * 
 		 * @param data {@link CompactAscendingSubMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist. */
 		public CompactAscendingKeySet(final CompactNavigableMap.CompactAscendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
 			return new CompactMapKeyAscendingIterator<GKey>(this.data._data_, this.data._firstIndex_(), this.data._lastIndex_() + 1);
@@ -305,30 +239,24 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap}.
+	/** Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GKey> Typ der Schlüssel.
-	 */
+	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactDescendingKeySet<GKey> extends
 		CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactDescendingSubMap<GKey, ?>> {
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link CompactDescendingSubMap}.
+		/** Dieser Konstruktor initialisiert die {@link CompactDescendingSubMap}.
 		 * 
 		 * @param data {@link CompactDescendingSubMap}.
-		 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist. */
 		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
 			super(data);
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Iterator<GKey> iterator() {
 			return new CompactMapKeyDescendingIterator<GKey>(this.data._data_, this.data._firstIndex_(), this.data._lastIndex_() + 1);
@@ -336,109 +264,83 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert eine abstrakte Teilmenge einer {@link CompactNavigableMap}.
+	/** Diese Klasse implementiert eine abstrakte Teilmenge einer {@link CompactNavigableMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
+	 * @param <GValue> Typ der Werte. */
 	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends CompactSubData<CompactNavigableMap<GKey, GValue>> implements
 		NavigableMap<GKey, GValue> {
 
-		/**
-		 * Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactNavigableSubMap} delegiert.
+		/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactNavigableSubMap} delegiert.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
-		 * @param <GValue> Typ der Werte.
-		 */
+		 * @param <GValue> Typ der Werte. */
 		protected static final class EntrySet<GKey, GValue> extends AbstractSet<Entry<GKey, GValue>> {
 
-			/**
-			 * Dieses Feld speichert die {@link CompactNavigableSubMap}.
-			 */
+			/** Dieses Feld speichert die {@link CompactNavigableSubMap}. */
 			protected final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data;
 
-			/**
-			 * Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
+			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
 			 * 
-			 * @param data {@link CompactNavigableSubMap}.
-			 */
+			 * @param data {@link CompactNavigableSubMap}. */
 			public EntrySet(final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data) {
 				this.data = data;
 			}
 
 			{}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public int size() {
 				return this.data.size();
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public void clear() {
 				this.data.clear();
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public Iterator<Entry<GKey, GValue>> iterator() {
 				return new CompactMapEntryIterator<GKey, GValue>(this.data._data_, this.data._firstIndex_(), this.data._lastIndex_() - 1);
 			}
 		}
 
-		/**
-		 * Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactNavigableSubMap} delegiert.
+		/** Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactNavigableSubMap} delegiert.
 		 * 
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-		 * @param <GValue> Typ der Werte.
-		 */
+		 * @param <GValue> Typ der Werte. */
 		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
 
-			/**
-			 * Dieses Feld speichert die {@link CompactNavigableSubMap}.
-			 */
+			/** Dieses Feld speichert die {@link CompactNavigableSubMap}. */
 			protected final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data;
 
-			/**
-			 * Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
+			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
 			 * 
-			 * @param data {@link CompactNavigableSubMap}.
-			 */
+			 * @param data {@link CompactNavigableSubMap}. */
 			public ValueCollection(final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data) {
 				this.data = data;
 			}
 
 			{}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public int size() {
 				return this.data.size();
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public void clear() {
 				this.data.clear();
 			}
 
-			/**
-			 * {@inheritDoc}
-			 */
+			/** {@inheritDoc} */
 			@Override
 			public Iterator<GValue> iterator() {
 				return new CompactMapValueIterator<GValue>(this.data._data_, this.data._firstIndex_(), this.data._lastIndex_() + 1);
@@ -448,16 +350,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
+		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param map {@link CompactNavigableMap}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
 		 * @param lastItem letztes Element oder {@link CompactSubData#_open_}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
-		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
-		 */
+		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactNavigableSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
 			final boolean lastInclusive) {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
@@ -465,75 +365,57 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this._countItems_();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void clear() {
 			this._clearItems_();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean isEmpty() {
 			return this._countItems_() == 0;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> subMap(final GKey fromElement, final GKey toElement) {
 			return this.subMap(fromElement, true, toElement, false);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toElement) {
 			return this.headMap(toElement, false);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromElement) {
 			return this.tailMap(fromElement, true);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GValue get(final Object key) {
 			if (!this._isInRange_(key)) return null;
 			return this._data_.get(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GValue put(final GKey key, final GValue value) {
 			if (!this._isInRange_(key)) throw new IllegalArgumentException("key out of range");
 			return this._data_.put(key, value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void putAll(final Map<? extends GKey, ? extends GValue> map) {
 			for (final Entry<? extends GKey, ? extends GValue> entry: map.entrySet()) {
@@ -541,74 +423,56 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GValue remove(final Object key) {
 			if (!this._isInRange_(key)) return null;
 			return this._data_.remove(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean containsKey(final Object key) {
 			return this._isInRange_(key) && this._data_.containsKey(key);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean containsValue(final Object value) {
 			return this.values().contains(value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Set<GKey> keySet() {
 			return this.navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Set<Entry<GKey, GValue>> entrySet() {
 			return new CompactNavigableSubMap.EntrySet<GKey, GValue>(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> descendingKeySet() {
 			return this.descendingMap().navigableKeySet();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Collection<GValue> values() {
 			return new CompactNavigableSubMap.ValueCollection<GValue>(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return new CompactMapItems<GKey, GValue>(this).hashCode();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean equals(final Object object) {
 			if (object == this) return true;
@@ -616,9 +480,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			return new CompactMapItems<GKey, GValue>(this).equals(object);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return new CompactMapItems<GKey, GValue>(this).toString();
@@ -626,25 +488,21 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die aufsteigende Teilmenge einer {@link CompactNavigableMap} .
+	/** Diese Klasse implementiert die aufsteigende Teilmenge einer {@link CompactNavigableMap} .
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
+	 * @param <GValue> Typ der Werte. */
 	protected static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
-		/**
-		 * Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
+		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param map {@link CompactNavigableMap}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
 		 * @param lastItem letztes Element oder {@link CompactSubData#_open_}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
-		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
-		 */
+		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 		public CompactAscendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
 			final boolean lastInclusive) throws IllegalArgumentException {
 			super(map, fromItem, fromInclusive, lastItem, lastInclusive);
@@ -652,146 +510,110 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Comparator<? super GKey> comparator() {
 			return this._data_.comparator;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey firstKey() {
 			return this._data_.getKeyOrException(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> firstEntry() {
 			return this._data_.getEntryOrException(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey lastKey() {
 			return this._data_.getKeyOrException(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> lastEntry() {
 			return this._data_.getEntryOrException(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey lowerKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._lowerIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> lowerEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._lowerIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey floorKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._floorIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> floorEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._floorIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey ceilingKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._ceilingIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> ceilingEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._ceilingIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey higherKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._higherIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> higherEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._higherIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> pollFirstEntry() {
 			return this._data_.poll(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> pollLastEntry() {
 			return this._data_.poll(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this._data_, this._fromItem_, this._fromInclusive_, this._lastItem_,
 				this._lastInclusive_);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> navigableKeySet() {
 			return new CompactNavigableMap.CompactAscendingKeySet<GKey>(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if (!this._isInRange_(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
@@ -799,18 +621,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this._data_, fromKey, fromInclusive, toKey, toInclusive);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if (!this._isInRange_(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this._data_, this._fromItem_, this._fromInclusive_, toKey, inclusive);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if (!this._isInRange_(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
@@ -819,25 +637,21 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die absteigende Teilmenge einer {@link CompactNavigableMap}.
+	/** Diese Klasse implementiert die absteigende Teilmenge einer {@link CompactNavigableMap}.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
-	 * @param <GValue> Typ der Werte.
-	 */
+	 * @param <GValue> Typ der Werte. */
 	protected static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
-		/**
-		 * Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
+		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
 		 * 
 		 * @param map {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
 		 * @param lastItem letztes Element oder {@link CompactSubData#_open_}.
 		 * @param lastInclusive Inklusivität des letzten Elements.
-		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist.
-		 */
+		 * @throws IllegalArgumentException Wenn das gegebene erste Element größer als das gegebene letzte Element ist. */
 
 		public CompactDescendingSubMap(final CompactNavigableMap<GKey, GValue> map, final Object fromItem, final boolean fromInclusive, final Object lastItem,
 			final boolean lastInclusive) throws IllegalArgumentException {
@@ -847,146 +661,110 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Comparator<? super GKey> comparator() {
 			return Collections.reverseOrder(this._data_.comparator);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey firstKey() {
 			return this._data_.getKeyOrException(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> firstEntry() {
 			return this._data_.getEntryOrException(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey lastKey() {
 			return this._data_.getKeyOrException(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> lastEntry() {
 			return this._data_.getEntryOrException(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey lowerKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._higherIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> lowerEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._higherIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey floorKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._ceilingIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> floorEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._ceilingIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey ceilingKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._floorIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> ceilingEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._floorIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public GKey higherKey(final GKey key) {
 			return this._data_.getKeyOrNull(this._lowerIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> higherEntry(final GKey key) {
 			return this._data_.getEntryOrNull(this._lowerIndex_(key));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> pollFirstEntry() {
 			return this._data_.poll(this._highestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Entry<GKey, GValue> pollLastEntry() {
 			return this._data_.poll(this._lowestIndex_());
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> descendingMap() {
 			return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this._data_, this._fromItem_, this._fromInclusive_, this._lastItem_,
 				this._lastInclusive_);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableSet<GKey> navigableKeySet() {
 			return new CompactNavigableMap.CompactDescendingKeySet<GKey>(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 			if (!this._isInRange_(fromKey, fromInclusive)) throw new IllegalArgumentException("fromKey out of range");
@@ -994,18 +772,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this._data_, toKey, toInclusive, fromKey, fromInclusive);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 			if (!this._isInRange_(toKey, inclusive)) throw new IllegalArgumentException("toKey out of range");
 			return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this._data_, toKey, inclusive, this._fromItem_, this._fromInclusive_);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 			if (!this._isInRange_(fromKey, inclusive)) throw new IllegalArgumentException("fromKey out of range");
@@ -1016,45 +790,37 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den {@link Comparator}.
-	 */
+	/** Dieses Feld speichert den {@link Comparator}. */
 	protected final Comparator<? super GKey> comparator;
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
 	 * 
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		this.comparator = comparator;
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableMap(final int capacity, final Comparator<? super GKey> comparator) throws IllegalArgumentException, NullPointerException {
 		this(comparator);
 		this.allocate(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
+	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @param comparator {@link Comparator}.
-	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist. */
 	public CompactNavigableMap(final Map<? extends GKey, ? extends GValue> map, final Comparator<? super GKey> comparator) throws NullPointerException {
 		this(comparator);
 		if (map == null) throw new NullPointerException("map = null");
@@ -1064,12 +830,10 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	{}
 
-	/**
-	 * Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
+	/** Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-te Element oder {@code null}.
-	 */
+	 * @return {@code index}-te Element oder {@code null}. */
 	protected final Entry<GKey, GValue> poll(final int index) {
 		if ((index < 0) || (index >= this.size())) return null;
 		final Entry<GKey, GValue> item = this.getEntry(index);
@@ -1077,47 +841,39 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		return item;
 	}
 
-	/**
-	 * Diese Methode gibt den {@code index}-ten Schlüssel oder {@code null} zurück.
+	/** Diese Methode gibt den {@code index}-ten Schlüssel oder {@code null} zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-ter Schlüssel oder {@code null}.
-	 */
+	 * @return {@code index}-ter Schlüssel oder {@code null}. */
 	protected final GKey getKeyOrNull(final int index) {
 		if ((index < 0) || (index >= this.size())) return null;
 		return this.getKey(index);
 	}
 
-	/**
-	 * Diese Methode gibt das {@code index}-te Element oder {@code null} zurück.
+	/** Diese Methode gibt das {@code index}-te Element oder {@code null} zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-tes Element oder {@code null}.
-	 */
+	 * @return {@code index}-tes Element oder {@code null}. */
 	protected final Entry<GKey, GValue> getEntryOrNull(final int index) {
 		if ((index < 0) || (index >= this.size())) return null;
 		return this.getEntry(index);
 	}
 
-	/**
-	 * Diese Methode gibt den {@code index}-ten Schlüssel zurück oder wirft eine {@link NoSuchElementException}.
+	/** Diese Methode gibt den {@code index}-ten Schlüssel zurück oder wirft eine {@link NoSuchElementException}.
 	 * 
 	 * @param index Index.
 	 * @return {@code index}-ter Schlüssel.
-	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
-	 */
+	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist. */
 	protected final GKey getKeyOrException(final int index) throws NoSuchElementException {
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getKey(index);
 	}
 
-	/**
-	 * Diese Methode gibt das {@code index}-te Element zurück oder wirft eine {@link NoSuchElementException}.
+	/** Diese Methode gibt das {@code index}-te Element zurück oder wirft eine {@link NoSuchElementException}.
 	 * 
 	 * @param index Index.
 	 * @return {@code index}-tes Element.
-	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist.
-	 */
+	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist. */
 	protected final Entry<GKey, GValue> getEntryOrException(final int index) throws NoSuchElementException {
 		if ((index < 0) || (index >= this.size())) throw new NoSuchElementException();
 		return this.getEntry(index);
@@ -1125,217 +881,163 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemIndex_(final Object key) {
 		return this._itemIndexCompare_(key, 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
 		return false;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Comparator<? super GKey> comparator() {
 		return this.comparator;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey firstKey() {
 		return this.getKeyOrException(this._firstIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> firstEntry() {
 		return this.getEntryOrException(this._firstIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey lowerKey(final GKey key) {
 		return this.getKeyOrNull(this._lowerIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> lowerEntry(final GKey key) {
 		return this.getEntryOrNull(this._lowerIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey floorKey(final GKey key) {
 		return this.getKeyOrNull(this._floorIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> floorEntry(final GKey key) {
 		return this.getEntryOrNull(this._floorIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey ceilingKey(final GKey key) {
 		return this.getKeyOrNull(this._ceilingIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> ceilingEntry(final GKey key) {
 		return this.getEntryOrNull(this._ceilingIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey higherKey(final GKey key) {
 		return this.getKeyOrNull(this._higherIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> higherEntry(final GKey key) {
 		return this.getEntryOrNull(this._higherIndex_(key));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public GKey lastKey() {
 		return this.getKeyOrException(this._lastIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> lastEntry() {
 		return this.getEntryOrException(this._lastIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> pollFirstEntry() {
 		return this.poll(this._firstIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Entry<GKey, GValue> pollLastEntry() {
 		return this.poll(this._lastIndex_());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean containsValue(final Object value) {
 		return this.values().contains(value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> descendingMap() {
 		return new CompactNavigableMap.CompactDescendingSubMap<GKey, GValue>(this, CompactSubData._open_, true, CompactSubData._open_, true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GKey> navigableKeySet() {
 		return new CompactNavigableMap.CompactNavigableKeySet<GKey>(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableSet<GKey> descendingKeySet() {
 		return this.descendingMap().navigableKeySet();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public SortedMap<GKey, GValue> subMap(final GKey fromKey, final GKey toKey) {
 		return this.subMap(fromKey, true, toKey, false);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> subMap(final GKey fromKey, final boolean fromInclusive, final GKey toKey, final boolean toInclusive) {
 		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, fromInclusive, toKey, toInclusive);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public SortedMap<GKey, GValue> headMap(final GKey toKey) {
 		return this.headMap(toKey, false);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> headMap(final GKey toKey, final boolean inclusive) {
 		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, CompactSubData._open_, true, toKey, inclusive);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public SortedMap<GKey, GValue> tailMap(final GKey fromKey) {
 		return this.tailMap(fromKey, true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public NavigableMap<GKey, GValue> tailMap(final GKey fromKey, final boolean inclusive) {
 		return new CompactNavigableMap.CompactAscendingSubMap<GKey, GValue>(this, fromKey, inclusive, CompactSubData._open_, true);

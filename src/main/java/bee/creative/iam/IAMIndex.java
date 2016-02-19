@@ -4,13 +4,11 @@ import java.util.AbstractList;
 import java.util.List;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Listen ({@link IAMList}) und Abbildungen ({@link IAMMap}).
+/** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Listen ({@link IAMList}) und Abbildungen ({@link IAMMap}).
  * <p>
  * Die Methoden {@link #maps()} und {@link #lists()} delegieren an {@link #map(int)} und {@link #mapCount()} bzw. {@link #list(int)} und {@link #listCount()}.
  * 
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMIndex {
 
 	@SuppressWarnings ("javadoc")
@@ -86,74 +84,58 @@ public abstract class IAMIndex {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den leeren {@link IAMIndex}.
-	 */
+	/** Dieses Feld speichert den leeren {@link IAMIndex}. */
 	public static final IAMIndex EMPTY = new EmptyIndex();
 
 	{}
 
-	/**
-	 * Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
+	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
 	 * 
 	 * @see #mapCount()
 	 * @param index Index.
-	 * @return {@code index}-te Abbildung.
-	 */
+	 * @return {@code index}-te Abbildung. */
 	public abstract IAMMap map(final int index);
 
-	/**
-	 * Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
+	/** Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
 	 * 
 	 * @see #map(int)
-	 * @return Anzahl der Abbildungen.
-	 */
+	 * @return Anzahl der Abbildungen. */
 	public abstract int mapCount();
 
-	/**
-	 * Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
+	/** Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
 	 * 
 	 * @see #map(int)
 	 * @see #mapCount()
-	 * @return Abbildungen.
-	 */
+	 * @return Abbildungen. */
 	public final List<IAMMap> maps() {
 		return new MapsView(this);
 	}
 
-	/**
-	 * Diese Methode gibt die {@code index}-te Liste zurück. Bei einem ungültigen {@code index} wird eine leere Liste geliefert.
+	/** Diese Methode gibt die {@code index}-te Liste zurück. Bei einem ungültigen {@code index} wird eine leere Liste geliefert.
 	 * 
 	 * @see #listCount()
 	 * @param index Index.
-	 * @return {@code index}-te Liste.
-	 */
+	 * @return {@code index}-te Liste. */
 	public abstract IAMList list(final int index);
 
-	/**
-	 * Diese Methode gibt die Anzahl der Listen zurück.
+	/** Diese Methode gibt die Anzahl der Listen zurück.
 	 * 
 	 * @see #list(int)
-	 * @return Anzahl der Listen.
-	 */
+	 * @return Anzahl der Listen. */
 	public abstract int listCount();
 
-	/**
-	 * Diese Methode gibt {@link List}-Sicht auf die Listen zurück.
+	/** Diese Methode gibt {@link List}-Sicht auf die Listen zurück.
 	 * 
 	 * @see #list(int)
 	 * @see #listCount()
-	 * @return Listen.
-	 */
+	 * @return Listen. */
 	public final List<IAMList> lists() {
 		return new ListsView(this);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString("IAMIndex", this.maps(), this.lists());

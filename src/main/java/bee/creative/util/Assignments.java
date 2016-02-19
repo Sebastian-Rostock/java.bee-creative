@@ -7,41 +7,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/**
- * Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
+/** Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
  * 
  * @see Assignment
  * @see Assignable
- * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Assignments {
 
-	/**
-	 * Diese Klasse implementiert einen {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte durch einen gegebenen {@link Assignment}
+	/** Diese Klasse implementiert einen {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte durch einen gegebenen {@link Assignment}
 	 * verwalten lässt.
 	 * 
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GSource> Typ des Quellobjekt.
-	 */
+	 * @param <GSource> Typ des Quellobjekt. */
 	public static final class ChildAssignment<GSource> implements Assignment<GSource> {
 
-		/**
-		 * Dieses Feld speichert das {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
-		 */
+		/** Dieses Feld speichert das {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet. */
 		final Assignment<?> __parent;
 
-		/**
-		 * Dieses Feld speichert das Quellobjekt.
-		 */
+		/** Dieses Feld speichert das Quellobjekt. */
 		final GSource __source;
 
-		/**
-		 * Dieser Konstruktor initialisiert {@link Assignment} und Quellobjekt.
+		/** Dieser Konstruktor initialisiert {@link Assignment} und Quellobjekt.
 		 * 
 		 * @param parent {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
 		 * @param source Quellobjekt.
-		 * @throws NullPointerException Wenn {@code parent} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn {@code parent} {@code null} ist. */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
 			if (parent == null) throw new NullPointerException();
 			this.__parent = parent;
@@ -50,84 +40,64 @@ public class Assignments {
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final GSource value() {
 			return this.__source;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> GObject get(final GObject source) {
 			return this.__parent.get(source);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void set(final GObject source, final GObject target) {
 			this.__parent.set(source, target);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
 			this.__parent.assign(source, target, commit);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target, assigner);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
 			final boolean commit) throws NullPointerException, IllegalArgumentException {
 			this.__parent.assign(source, target, assigner, commit);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final void commit() throws IllegalArgumentException {
 			this.__parent.commit();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> Assignment<GObject> assignment(final GObject source) {
 			return this.__parent.assignment(source);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
 			return Objects.toInvokeString(this, this.__source);
@@ -135,38 +105,28 @@ public class Assignments {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert ein {@link Assignment}, der zur Abbildung der Quellobjekte auf die Zielobjekte eine {@link Map} verwendet. Das Quellobjekt
+	/** Diese Klasse implementiert ein {@link Assignment}, der zur Abbildung der Quellobjekte auf die Zielobjekte eine {@link Map} verwendet. Das Quellobjekt
 	 * dieses {@link Assignment}s ist {@code null}.
 	 * 
-	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class ParentAssignment implements Assignment<Object> {
 
-		/**
-		 * Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte.
-		 */
+		/** Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte. */
 		final Map<Object, Object> __map = new HashMap<>();
 
-		/**
-		 * Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
-		 * {@link Entry}s.
-		 */
+		/** Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
+		 * {@link Entry}s. */
 		final List<Assignable<Object>> __assignables = new LinkedList<>();
 
 		{}
 
-		/**
-		 * Diese Methode gibt {@code null} zurück.
-		 */
+		/** Diese Methode gibt {@code null} zurück. */
 		@Override
 		public final Object value() {
 			return null;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> GObject get(final GObject source) {
 			if (source == null) return null;
@@ -175,9 +135,7 @@ public class Assignments {
 			return target == null ? source : target;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
 			if (source == null) throw new NullPointerException();
@@ -188,17 +146,13 @@ public class Assignments {
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
 			this.assign(source, target, true);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
@@ -211,9 +165,7 @@ public class Assignments {
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
@@ -221,9 +173,7 @@ public class Assignments {
 			assigner.assign(target, this.assignment(source));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
 			final boolean commit) throws NullPointerException, IllegalArgumentException {
@@ -236,9 +186,7 @@ public class Assignments {
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final void commit() throws IllegalArgumentException {
 			while (!this.__assignables.isEmpty()) {
@@ -246,17 +194,13 @@ public class Assignments {
 			}
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final <GObject> Assignment<GObject> assignment(final GObject source) {
 			return new ChildAssignment<GObject>(this, source);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
 			return Objects.toInvokeString(this, this.__map);
@@ -290,18 +234,15 @@ public class Assignments {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt ein neues {@link Assignment} ohne Quellobjekt zurück.
+	/** Diese Methode gibt ein neues {@link Assignment} ohne Quellobjekt zurück.
 	 * 
 	 * @see ParentAssignment
-	 * @return {@link ParentAssignment}.
-	 */
+	 * @return {@link ParentAssignment}. */
 	public static final ParentAssignment assignment() {
 		return new ParentAssignment();
 	}
 
-	/**
-	 * Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge der
+	/** Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge der
 	 * gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht:
 	 * 
 	 * <pre>
@@ -317,8 +258,7 @@ public class Assignments {
 	 * @param assignment {@link Assignment}.
 	 * @param source Quellabbildung.
 	 * @param target Zielabbildung.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static final <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
 		throws NullPointerException {
 		if (assignment == null) throw new NullPointerException();
@@ -328,8 +268,7 @@ public class Assignments {
 		}
 	}
 
-	/**
-	 * Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
+	/** Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
 	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht:
 	 * 
 	 * <pre>
@@ -343,8 +282,7 @@ public class Assignments {
 	 * @param assignment {@link Assignment}.
 	 * @param source Quellsammlung.
 	 * @param target Zielsammlung.
-	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
 	public static final <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
 		throws NullPointerException {
 		if (assignment == null) throw new NullPointerException();

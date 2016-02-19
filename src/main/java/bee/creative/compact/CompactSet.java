@@ -6,33 +6,25 @@ import java.util.Iterator;
 import java.util.Set;
 import bee.creative.util.Iterables;
 
-/**
- * Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem Array verwaltet werden.
+/** Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem Array verwaltet werden.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente.
- */
+ * @param <GItem> Typ der Elemente. */
 public abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
 
-	/**
-	 * Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
+	/** Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ den Elemente.
-	 */
+	 * @param <GItem> Typ den Elemente. */
 	protected static final class CompactSetItems<GItem> extends AbstractSet<GItem> {
 
-		/**
-		 * Dieses Feld speichert das {@link Set}.
-		 */
+		/** Dieses Feld speichert das {@link Set}. */
 		protected final Set<GItem> set;
 
-		/**
-		 * Dieser Konstruktor initialisiert das {@link Set}.
+		/** Dieser Konstruktor initialisiert das {@link Set}.
 		 * 
 		 * @param set {@link Set}.
-		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist. */
 		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
 			if (set == null) throw new NullPointerException("set = null");
 			this.set = set;
@@ -40,17 +32,13 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this.set.size();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public Iterator<GItem> iterator() {
 			return this.set.iterator();
@@ -60,30 +48,24 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 
 	{}
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set}.
-	 */
+	/** Dieser Konstruktor initialisiert das {@link Set}. */
 	public CompactSet() {
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
-	 * @param capacity Kapazität.
-	 */
+	 * @param capacity Kapazität. */
 	public CompactSet(final int capacity) {
 		this.allocate(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
+	/** Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
 	 * 
 	 * @see Set#addAll(Collection)
 	 * @see CompactData#allocate(int)
 	 * @param collection Elemente.
-	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist. */
 	public CompactSet(final Collection<? extends GItem> collection) {
 		if (collection == null) throw new NullPointerException("collection = null");
 		this.allocate(collection.size());
@@ -92,9 +74,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean add(final GItem item) {
 		int index = this._itemIndex_(item);
@@ -105,25 +85,19 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean addAll(final Collection<? extends GItem> collection) {
 		return Iterables.appendAll(this, collection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return new CompactSetItems<GItem>(this).hashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;

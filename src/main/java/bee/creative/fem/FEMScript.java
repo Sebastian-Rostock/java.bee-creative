@@ -10,33 +10,26 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
+/** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
  * <p>
  * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Verarbeitung von aufbereiteten Quelltexten.
  * 
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScript.Range> {
 
-	/**
-	 * Diese Klasse implementiert ein Objekt, dass einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
+	/** Diese Klasse implementiert ein Objekt, dass einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
 	 * erfolgt gemäß ihrer Startposition.
 	 * 
 	 * @see FEMScript
-	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class Range implements Comparable<FEMScript.Range> {
 
-		/**
-		 * Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind.
-		 */
+		/** Dieses Feld speichert den leeren Bereich, dessen Komponenten alle {@code 0} sind. */
 		public static final FEMScript.Range EMPTY = new Range((char)0, 0, 0);
 
 		{}
 
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
 		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
 		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
 		 * 
@@ -45,8 +38,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen.
-		 */
+		 * @return {@link Comparable} für Startposition von Bereichen. */
 		public static final Comparable<FEMScript.Range> contains(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
@@ -59,8 +51,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 			};
 		}
 
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht. Der
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht. Der
 		 * Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position kleiner,
 		 * gleich bzw. größer der {@link Range#end() Endposition} eines gegebenen Bereichs ist.
 		 * 
@@ -68,8 +59,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
-		 * @return {@link Comparable} für das Ende von {@link Range}s.
-		 */
+		 * @return {@link Comparable} für das Ende von {@link Range}s. */
 		public static final Comparable<FEMScript.Range> endingAt(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
@@ -81,8 +71,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 			};
 		}
 
-		/**
-		 * Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position vergleicht.
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position vergleicht.
 		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
 		 * kleiner, gleich bzw. größer der {@link Range#start() Startposition} eines gegebenen Bereichs ist.
 		 * 
@@ -90,8 +79,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
-		 * @return {@link Comparable} für Startposition von Bereichen.
-		 */
+		 * @return {@link Comparable} für Startposition von Bereichen. */
 		public static final Comparable<FEMScript.Range> startingAt(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
@@ -105,29 +93,21 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 
 		{}
 
-		/**
-		 * Dieses Feld speichert den Typ des Bereichs.
-		 */
+		/** Dieses Feld speichert den Typ des Bereichs. */
 		final char __type;
 
-		/**
-		 * Dieses Feld speichert die Startposition.
-		 */
+		/** Dieses Feld speichert die Startposition. */
 		final int __start;
 
-		/**
-		 * Dieses Feld speichert die Länge.
-		 */
+		/** Dieses Feld speichert die Länge. */
 		final int __length;
 
-		/**
-		 * Dieser Konstruktor initialisiert Typ, Startposition und Länge.
+		/** Dieser Konstruktor initialisiert Typ, Startposition und Länge.
 		 * 
 		 * @param type Typ.
 		 * @param start Startposition.
 		 * @param length Länge.
-		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind.
-		 */
+		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind. */
 		public Range(final char type, final int start, final int length) throws IllegalArgumentException {
 			if (start < 0) throw new IllegalArgumentException("start < 0");
 			if (length < 0) throw new IllegalArgumentException("length < 0");
@@ -138,50 +118,40 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 
 		{}
 
-		/**
-		 * Diese Methode gibt den Typ des Bereichs zurück.
+		/** Diese Methode gibt den Typ des Bereichs zurück.
 		 * 
 		 * @see FEMScript
-		 * @return Bereichstyp.
-		 */
+		 * @return Bereichstyp. */
 		public final char type() {
 			return this.__type;
 		}
 
-		/**
-		 * Diese Methode gibt die Position zurück, vord der die {@link Range} endet.
+		/** Diese Methode gibt die Position zurück, vord der die {@link Range} endet.
 		 * 
-		 * @return Endposition.
-		 */
+		 * @return Endposition. */
 		public final int end() {
 			return this.__start + this.__length;
 		}
 
-		/**
-		 * Diese Methode gibt die Position zurück, an der die {@link Range} beginnt.
+		/** Diese Methode gibt die Position zurück, an der die {@link Range} beginnt.
 		 * 
-		 * @return Startposition.
-		 */
+		 * @return Startposition. */
 		public final int start() {
 			return this.__start;
 		}
 
-		/**
-		 * Diese Methode gibt die Länge des die Position zurück, an der die {@link Range} beginnt.
+		/** Diese Methode gibt die Länge des die Position zurück, an der die {@link Range} beginnt.
 		 * 
-		 * @return Startposition.
-		 */
+		 * @return Startposition. */
 		public final int length() {
 			return this.__length;
 		}
 
-		/**
-		 * Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.
+		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.
 		 * 
 		 * @param source Zeichenkette.
 		 * @return Abschnitt.
-		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
 		public final String extract(final String source) throws NullPointerException {
 			final int start = this.__start;
 			return source.substring(start, start + this.__length);
@@ -189,25 +159,19 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final int compareTo(final FEMScript.Range value) {
 			return Comparators.compare(this.__start, value.__start);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final int hashCode() {
 			return this.__type ^ this.__start ^ this.__length;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final boolean equals(final Object object) {
 			if (object == this) return true;
@@ -216,9 +180,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 			return (this.__start == that.__start) && (this.__length == that.__length) && (this.__type == that.__type);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
 			return "'" + this.__type + "'@" + this.__start + "/" + this.__length;
@@ -228,32 +190,24 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den leeren Quelltext ohne Bereiche.
-	 */
+	/** Dieses Feld speichert den leeren Quelltext ohne Bereiche. */
 	public static final FEMScript EMPTY = new FEMScript("", new FEMScript.Range[0]);
 
 	{}
 
-	/**
-	 * Dieses Feld speichert die Zeichenkette.
-	 */
+	/** Dieses Feld speichert die Zeichenkette. */
 	final String __source;
 
-	/**
-	 * Dieses Feld speichert die Bereiche.
-	 */
+	/** Dieses Feld speichert die Bereiche. */
 	final FEMScript.Range[] __ranges;
 
-	/**
-	 * Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
 	 * 
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen. */
 	public FEMScript(final String source, final FEMScript.Range[] ranges) throws NullPointerException, IllegalArgumentException {
 		int offset = 0;
 		final int length = source.length();
@@ -267,37 +221,31 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		this.__ranges = ranges.clone();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
+	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
 	 * 
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen. */
 	public FEMScript(final String source, final Collection<? extends FEMScript.Range> ranges) throws NullPointerException, IllegalArgumentException {
 		this(source, ranges.toArray(new FEMScript.Range[ranges.size()]));
 	}
 
 	{}
 
-	/**
-	 * Diese Methode gibt die Zeichenkette zurück.
+	/** Diese Methode gibt die Zeichenkette zurück.
 	 * 
-	 * @return Zeichenkette.
-	 */
+	 * @return Zeichenkette. */
 	public final String source() {
 		return this.__source;
 	}
 
-	/**
-	 * Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} das Zeichenkette zurück.
+	/** Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} das Zeichenkette zurück.
 	 * 
 	 * @see Range#type()
 	 * @see #ranges()
-	 * @return Bereichstypen als Zeichenkette.
-	 */
+	 * @return Bereichstypen als Zeichenkette. */
 	public final char[] types() {
 		final int length = this.__ranges.length;
 		final char[] types = new char[length];
@@ -307,36 +255,30 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		return types;
 	}
 
-	/**
-	 * Diese Methode gibt eine Koppie der Bereiche zurück.
+	/** Diese Methode gibt eine Koppie der Bereiche zurück.
 	 * 
 	 * @see #get(int)
 	 * @see #length()
 	 * @see #iterator()
-	 * @return Bereiche.
-	 */
+	 * @return Bereiche. */
 	public final FEMScript.Range[] ranges() {
 		return this.__ranges.clone();
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Bereiche zurück.
+	/** Diese Methode gibt die Anzahl der Bereiche zurück.
 	 * 
 	 * @see #get(int)
 	 * @see #ranges()
 	 * @see #iterator()
-	 * @return Anzahl der Bereiche.
-	 */
+	 * @return Anzahl der Bereiche. */
 	public final int length() {
 		return this.__ranges.length;
 	}
 
-	/**
-	 * Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
+	/** Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
 	 * einem der {@link #ranges() Bereiche} enthalten ist.
 	 * 
-	 * @return normalisierter Quelltext.
-	 */
+	 * @return normalisierter Quelltext. */
 	public final FEMScript normalize() {
 		final List<FEMScript.Range> normalRanges = new ArrayList<>(this.__ranges.length);
 		final StringBuilder normalSource = new StringBuilder();
@@ -352,33 +294,25 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 
 	{}
 
-	/**
-	 * Diese Methode gibt den {@code index}-ten Bereich zurück.
-	 */
+	/** Diese Methode gibt den {@code index}-ten Bereich zurück. */
 	@Override
 	public final FEMScript.Range get(final int index) throws IndexOutOfBoundsException {
 		return this.__ranges[index];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final Iterator<FEMScript.Range> iterator() {
 		return Iterators.itemsIterator(this, 0, this.length());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return Objects.hash(this.__source) ^ Objects.hash((Object[])this.__ranges);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -387,9 +321,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		return this.__source.equals(that.__source) && Objects.equals(this.__ranges, that.__ranges);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return this.source();

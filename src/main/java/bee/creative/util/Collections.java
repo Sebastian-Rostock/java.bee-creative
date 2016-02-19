@@ -11,22 +11,18 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
+/** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
  * 
- * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
 
-	/**
-	 * Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
+	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
 	 * 
 	 * @param <GItem> Typ der Elemente der Vereinigungsmenge.
 	 * @param items1 Erstes {@link Set}.
 	 * @param items2 Zweites {@link Set}.
 	 * @return {@code union}-{@link Set}.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GItem> Set<GItem> unionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
 		if (items1 == null) throw new NullPointerException("items1 = null");
 		if (items2 == null) throw new NullPointerException("items2 = null");
@@ -53,15 +49,13 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Schnittmenge der gegebenen {@link Set} zurück.
+	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Schnittmenge der gegebenen {@link Set} zurück.
 	 * 
 	 * @param <GItem> Typ der Elemente der Schnittmenge.
 	 * @param items1 Erstes {@link Set}.
 	 * @param items2 Zweites {@link Set}.
 	 * @return {@code intersection}-{@link Set}.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GItem> Set<GItem> intersectionSet(final Set<? extends GItem> items1, final Set<? extends GItem> items2) throws NullPointerException {
 		if (items1 == null) throw new NullPointerException("items1 = null");
 		if (items2 == null) throw new NullPointerException("items2 = null");
@@ -88,14 +82,12 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
+	/** Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
 	 * 
 	 * @param <GItem> Typ der Elemente.
 	 * @param items {@link List}
 	 * @return {@code reverse}-{@link List}.
-	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public static final <GItem> List<GItem> reverseList(final List<GItem> items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
 		return new AbstractList<GItem>() {
@@ -242,8 +234,7 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
+	/** Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
 	 * {@link List} eingefügt werden sollen, wird die erste {@link List} erweitert. Der Rückgabewert entspricht
 	 * {@code Collections.chainedList(items1, items2, true)}.
 	 * 
@@ -252,14 +243,12 @@ public class Collections {
 	 * @param items1 {@link List} der ersten Elemente.
 	 * @param items2 {@link List} der letzten Elemente.
 	 * @return verkettete {@link List}-Sicht.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GTarget> List<GTarget> chainedList(final List<GTarget> items1, final List<GTarget> items2) throws NullPointerException {
 		return Collections.chainedList(items1, items2, true);
 	}
 
-	/**
-	 * Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
+	/** Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
 	 * {@link List} eingefügt werden sollen, entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus
 	 * {@code true}, wird die erste {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
 	 * 
@@ -268,8 +257,7 @@ public class Collections {
 	 * @param items2 {@link List} der letzten Elemente.
 	 * @param extendMode Erweiterungsmodus.
 	 * @return verkettete {@link List}-Sicht.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GItem> List<GItem> chainedList(final List<GItem> items1, final List<GItem> items2, final boolean extendMode) throws NullPointerException {
 		if (items1 == null) throw new NullPointerException("items1 = null");
 		if (items2 == null) throw new NullPointerException("items2 = null");
@@ -448,8 +436,7 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
+	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
 	 * Wenn Elemente angefügt werden sollen, wird die erste {@link Collection} erweitert. Der Rückgabewert entspricht
 	 * {@code Collections.chainedCollection(items1, items2, true)}.
 	 * 
@@ -458,14 +445,12 @@ public class Collections {
 	 * @param items1 {@link Collection} der ersten Elemente.
 	 * @param items2 {@link Collection} der letzten Elemente.
 	 * @return verkettete {@link Collection}-Sicht.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GItem> Collection<GItem> chainedCollection(final Collection<GItem> items1, final Collection<GItem> items2) throws NullPointerException {
 		return Collections.chainedCollection(items1, items2, true);
 	}
 
-	/**
-	 * Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
+	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
 	 * Wenn Elemente angefügt werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der
 	 * Erweiterungsmodus {@code true}, wird die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
 	 * 
@@ -474,8 +459,7 @@ public class Collections {
 	 * @param items2 {@link Collection} der letzten Elemente.
 	 * @param extendMode Erweiterungsmodus.
 	 * @return verkettete {@link Collection}-Sicht.
-	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items1} bzw. {@code items2} {@code null} ist. */
 	public static final <GItem> Collection<GItem> chainedCollection(final Collection<GItem> items1, final Collection<GItem> items2, final boolean extendMode)
 		throws NullPointerException {
 		if (items1 == null) throw new NullPointerException("items1 = null");
@@ -535,8 +519,7 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine {@link Map} als übersetzte Sicht auf die gegebene {@link Map} zurück.
+	/** Diese Methode gibt eine {@link Map} als übersetzte Sicht auf die gegebene {@link Map} zurück.
 	 * 
 	 * @param <GSourceKey> Typ der Schlüssel der gegebenen {@link Map}.
 	 * @param <GSourceValue> Typ der Werte der gegebenen {@link Map}.
@@ -546,8 +529,7 @@ public class Collections {
 	 * @param keyTranslator {@link Translator} zur Übersetzung der Schlüssel.
 	 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 	 * @return {@code translated}-{@link Map}.
-	 * @throws NullPointerException Wenn {@code entries}, {@code keyTranslator} bzw. {@code valueTranslator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code entries}, {@code keyTranslator} bzw. {@code valueTranslator} {@code null} ist. */
 	public static final <GSourceKey, GSourceValue, GTargetKey, GTargetValue> Map<GTargetKey, GTargetValue> translatedMap(
 		final Map<GSourceKey, GSourceValue> entries, final Translator<GSourceKey, GTargetKey> keyTranslator,
 		final Translator<GSourceValue, GTargetValue> valueTranslator) throws NullPointerException {
@@ -677,16 +659,14 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine {@link List} als übersetzte Sicht auf die gegebene {@link List} zurück.
+	/** Diese Methode gibt eine {@link List} als übersetzte Sicht auf die gegebene {@link List} zurück.
 	 * 
 	 * @param <GSource> Typ der Elemente der gegebenen {@link List}.
 	 * @param <GTarget> Typ der Elemente der erzeugten {@link List}.
 	 * @param items Gegebene {@link List}.
 	 * @param translator {@link Translator} zur Übersetzung der Elemente.
 	 * @return {@code translated}-{@link List}.
-	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static final <GSource, GTarget> List<GTarget> translatedList(final List<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
@@ -794,16 +774,14 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt ein {@link Set} als übersetzte Sicht auf das gegebene {@link Set} zurück.
+	/** Diese Methode gibt ein {@link Set} als übersetzte Sicht auf das gegebene {@link Set} zurück.
 	 * 
 	 * @param <GSource> Typ der Elemente des gegebenen {@link Set}.
 	 * @param <GTarget> Typ der Elemente des erzeugten {@link Set}.
 	 * @param items Gegebenes {@link Set}.
 	 * @param translator {@link Translator} zur Übersetzung der Elemente.
 	 * @return {@code translated}-{@link Set}.
-	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static final <GSource, GTarget> Set<GTarget> translatedSet(final Set<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
@@ -868,16 +846,14 @@ public class Collections {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt eine {@link Collection} als übersetzte Sicht auf die gegebene {@link Collection} zurück.
+	/** Diese Methode gibt eine {@link Collection} als übersetzte Sicht auf die gegebene {@link Collection} zurück.
 	 * 
 	 * @param <GSource> Typ der Elemente der gegebenen {@link Collection}.
 	 * @param <GTarget> Typ der Elemente der erzeugten {@link Collection}.
 	 * @param items Gegebene {@link Collection}.
 	 * @param translator {@link Translator} zur Übersetzung der Elemente.
 	 * @return {@code translated}-{@link Collection}.
-	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code items} bzw. {@code translator} {@code null} ist. */
 	public static final <GSource, GTarget> Collection<GTarget> translatedCollection(final Collection<GSource> items, final Translator<GSource, GTarget> translator)
 		throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");

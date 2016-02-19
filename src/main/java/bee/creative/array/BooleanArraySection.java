@@ -1,22 +1,18 @@
 package bee.creative.array;
 
-/**
- * Diese Klasse implementiert eine {@link ArraySection} für {@code boolean}-Arrays.
+/** Diese Klasse implementiert eine {@link ArraySection} für {@code boolean}-Arrays.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @see ArraySection
- */
+ * @see ArraySection */
 public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
+	/** Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
 	 * 
 	 * <pre>BooleanArraySection.from(array, 0, array.length)</pre>
 	 * 
 	 * @param array Array.
 	 * @return {@link BooleanArraySection}.
-	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
 	public static BooleanArraySection from(final boolean... array) throws NullPointerException {
 		return ArraySection.validate(new BooleanArraySection() {
 
@@ -38,8 +34,7 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		});
 	}
 
-	/**
-	 * Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück.
+	/** Diese Methode erzeugt eine neue {@link BooleanArraySection} und gibt sie zurück.
 	 * 
 	 * @param array Array.
 	 * @param startIndex Index des ersten Werts im Abschnitt.
@@ -47,8 +42,7 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 	 * @return {@link BooleanArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
-	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
 	public static BooleanArraySection from(final boolean[] array, final int startIndex, final int finalIndex) throws NullPointerException,
 		IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new BooleanArraySection() {
@@ -73,33 +67,25 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _arrayLength_(final boolean[] array) {
 		return array.length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _hashCode_(final boolean[] array, final int index) {
 		return (array[index] ? 1231 : 1237);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _equals_(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		return array1[index1] == array2[index2];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _compareTo_(final boolean[] array1, final boolean[] array2, final int index1, final int index2) {
 		final boolean value1 = array1[index1], value2 = array2[index2];
@@ -108,17 +94,13 @@ public abstract class BooleanArraySection extends ArraySection<boolean[]> {
 		return 1;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _toString_(final boolean[] array, final int index, final StringBuilder target) {
 		target.append(array[index]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object object) {
 		if (object == this) return true;

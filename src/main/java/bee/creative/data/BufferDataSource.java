@@ -7,35 +7,27 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import bee.creative.util.Bytes;
 
-/**
- * Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link ByteBuffer}.
+/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link ByteBuffer}.
  * 
  * @see ByteBuffer
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BufferDataSource extends BaseDataSource {
 
-	/**
-	 * Dieses Feld speichert die Nutzdaten.
-	 */
+	/** Dieses Feld speichert die Nutzdaten. */
 	final ByteBuffer __data;
 
-	/**
-	 * Dieser Konstruktor initialisiert die Nutzdaten.
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 * 
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final byte... data) throws NullPointerException {
 		this(ByteBuffer.wrap(data));
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Nutzdaten.
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 * 
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final ByteBuffer data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
 		this.__data = data.slice().order(ByteOrder.BIG_ENDIAN);
@@ -43,17 +35,13 @@ public class BufferDataSource extends BaseDataSource {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final ByteBuffer data() {
 		return this.__data;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 		try {
@@ -65,65 +53,49 @@ public class BufferDataSource extends BaseDataSource {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean readBoolean() throws IOException {
 		return this.readByte() != 0;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public byte readByte() throws IOException {
 		return this.__data.get();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedByte() throws IOException {
 		return this.__data.get() & 0xFF;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public short readShort() throws IOException {
 		return this.__data.getShort();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedShort() throws IOException {
 		return this.__data.getShort() & 0xFFFF;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public char readChar() throws IOException {
 		return this.__data.getChar();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int readInt() throws IOException {
 		return this.__data.getInt();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int readInt(final int size) throws IOException {
 		switch (size) {
@@ -143,17 +115,13 @@ public class BufferDataSource extends BaseDataSource {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long readLong() throws IOException {
 		return this.__data.getLong();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long readLong(final int size) throws IOException {
 		switch (size) {
@@ -184,49 +152,37 @@ public class BufferDataSource extends BaseDataSource {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public float readFloat() throws IOException {
 		return this.__data.getFloat();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public double readDouble() throws IOException {
 		return this.__data.getDouble();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		this.__data.position((int)index);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.__data.position();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.__data.limit();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 	}

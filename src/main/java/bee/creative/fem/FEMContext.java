@@ -11,13 +11,11 @@ import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
+/** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
  * in Funktionen zur Umwandlung von Werten genutzt werden kann.
  * 
  * @see FEMFrame#context()
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMContext {
 
 	@SuppressWarnings ("javadoc")
@@ -74,8 +72,7 @@ public abstract class FEMContext {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert das leere Kontextobjekt.
+	/** Dieses Feld speichert das leere Kontextobjekt.
 	 * <p>
 	 * Die {@link #dataFrom(FEMValue, FEMType)}-Methode dieses Kontextobjekts gibt die Nutzdaten des ihr übergebenen Werts {@code value} unverändert zurück, wenn
 	 * sein Datentyp gleich oder einem Nachfahren des ihr übergebenen Datentyps {@code type} {@link FEMType#id() ist}, d.h. wenn {@code value.type().is(type)}.
@@ -90,49 +87,40 @@ public abstract class FEMContext {
 	 * Die {@link #objectFrom(FEMValue)}-Methode dieses Kontextobjekts konvertiert {@link FEMVoid} zu {@code null}, {@link FEMArray} und die darin enthaltenen
 	 * Werte rekursiv zu {@code Object[]}, {@link FEMBinary} zu {@code byte[]}, {@link FEMString} zu {@link String}, {@link FEMInteger} und {@link FEMDecimal} zu
 	 * {@link Number}, {@link FEMDatetime} zu {@link Calendar}, {@link FEMBoolean} zu {@link Boolean} und alle anderen Werte ihren {@link FEMValue#data()
-	 * Nutzdatensatz}.
-	 */
+	 * Nutzdatensatz}. */
 	public static final FEMContext EMPTY = new EmptyContext();
 
-	/**
-	 * Dieses Feld speichert das Rückfallkontextobjekt.
-	 */
+	/** Dieses Feld speichert das Rückfallkontextobjekt. */
 	static FEMContext _default_ = FEMContext.EMPTY;
 
 	{}
 
-	/**
-	 * Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataFrom(FEMValue) Datentypumwandlungen} genutzt wird.<br>
+	/** Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataFrom(FEMValue) Datentypumwandlungen} genutzt wird.<br>
 	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueFrom(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataFrom(FEMValue)}
 	 * verwendet.
 	 * 
-	 * @return Rückfallkontextobjekt
-	 */
+	 * @return Rückfallkontextobjekt */
 	public static final FEMContext DEFAULT() {
 		return FEMContext._default_;
 	}
 
-	/**
-	 * Diese Methode setzt den {@link #DEFAULT() Rückfallkontextobjekt}.<br>
+	/** Diese Methode setzt den {@link #DEFAULT() Rückfallkontextobjekt}.<br>
 	 * Wenn das gegebene Kontextobjekt {@code null} ist, wird {@link #EMPTY} verwendet.
 	 * 
-	 * @param context Rückfallkontextobjekt oder {@code null}.
-	 */
+	 * @param context Rückfallkontextobjekt oder {@code null}. */
 	public static final void DEFAULT(final FEMContext context) {
 		FEMContext._default_ = context != null ? context : FEMContext.EMPTY;
 	}
 
 	{}
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in siene
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in siene
 	 * Ausgabe überführt.
 	 * 
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
 	 * @param type Datentyp.
 	 * @return {@code dataFrom}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code type} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code type} {@code null} ist. */
 	public final <GData> Converter<FEMValue, GData> dataFrom(final FEMType<? extends GData> type) throws NullPointerException {
 		if (type == null) throw new NullPointerException("type = null");
 		return new Converter<FEMValue, GData>() {
@@ -150,8 +138,7 @@ public abstract class FEMContext {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück.<br>
+	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück.<br>
 	 * Hierbei werden die Nutzdaten {@link FEMValue#data() value.data()} in den geforderten Datentyp konvertiert.
 	 * 
 	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten des gegebenen Werts konvertiert werden.
@@ -160,12 +147,10 @@ public abstract class FEMContext {
 	 * @return Nutzdaten.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können.
-	 */
+	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können. */
 	public abstract <GData> GData dataFrom(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
 
-	/**
-	 * Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
+	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
 	 * <ol>
 	 * <li>Wenn das Objekt ein {@link FEMArray} ist, wird es unverändert zurück gegeben.</li>
 	 * <li>Wenn es ein natives Array ist, wird jedes seiner Elemente via {@link #valueFrom(Object)} in einen Wert überführt und die so entstandene Wertliste
@@ -180,8 +165,7 @@ public abstract class FEMContext {
 	 * @param data Wertliste, natives Array, {@link Iterable} oder {@link Collection}.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann.
-	 */
+	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
 	public FEMArray arrayFrom(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data instanceof FEMArray) return (FEMArray)data;
 		if (data instanceof Object[]) return this._arrayFrom_((Object[])data);
@@ -219,12 +203,10 @@ public abstract class FEMContext {
 		return this._arrayFrom_(data.toArray());
 	}
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in siene Ausgabe
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in siene Ausgabe
 	 * überführt.
 	 * 
-	 * @return {@code valueFrom}-{@link Converter}.
-	 */
+	 * @return {@code valueFrom}-{@link Converter}. */
 	public final Converter<Object, FEMValue> valueFrom() {
 		return new Converter<Object, FEMValue>() {
 
@@ -241,22 +223,18 @@ public abstract class FEMContext {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
+	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
 	 * Welcher Wert- und Datentyp hierfür verwendet wird, ist der Implementation überlassen.
 	 * 
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
-	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann.
-	 */
+	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
 	public abstract FEMValue valueFrom(Object object) throws IllegalArgumentException;
 
-	/**
-	 * Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in siene Ausgabe
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in siene Ausgabe
 	 * überführt.
 	 * 
-	 * @return {@code objectFrom}-{@link Converter}.
-	 */
+	 * @return {@code objectFrom}-{@link Converter}. */
 	public final Converter<FEMValue, Object> objectFrom() {
 		return new Converter<FEMValue, Object>() {
 
@@ -273,16 +251,14 @@ public abstract class FEMContext {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt ein {@link Object} zurück, welches via {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
+	/** Diese Methode gibt ein {@link Object} zurück, welches via {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
 	 * äquivalenten ist.
 	 * 
 	 * @see #valueFrom(Object)
 	 * @param value Wert.
 	 * @return Objekt
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public abstract Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException;
 
 	@SuppressWarnings ("javadoc")
@@ -297,9 +273,7 @@ public abstract class FEMContext {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this);

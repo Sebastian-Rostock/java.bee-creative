@@ -1,82 +1,60 @@
 package bee.creative.util;
 
-/**
- * Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette.
+/** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette.
  * 
- * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Parser {
 
-	/**
-	 * Dieses Feld speichert die aktuelle Position.
-	 */
+	/** Dieses Feld speichert die aktuelle Position. */
 	private int _index_;
 
-	/**
-	 * Dieses Feld speichert die Zeichen der Eingabe.
-	 */
+	/** Dieses Feld speichert die Zeichen der Eingabe. */
 	private char[] _chars_;
 
-	/**
-	 * Dieses Feld speichert die Ausgabe.
-	 */
+	/** Dieses Feld speichert die Ausgabe. */
 	private final StringBuffer _target_ = new StringBuffer();
 
-	/**
-	 * Dieses Feld speichert das aktuelle Zeichen oder {@code -1}.
-	 */
+	/** Dieses Feld speichert das aktuelle Zeichen oder {@code -1}. */
 	private int _symbol_;
 
-	/**
-	 * Dieses Feld speichert die Eingabe.
-	 */
+	/** Dieses Feld speichert die Eingabe. */
 	private String _source_;
 
-	/**
-	 * Dieses Feld speichert die Anzahl der Zeichen in der Eingabe.
-	 */
+	/** Dieses Feld speichert die Anzahl der Zeichen in der Eingabe. */
 	private int _length_;
 
-	/**
-	 * Dieser Konstruktor initialisiert die leere Eingabe.
-	 */
+	/** Dieser Konstruktor initialisiert die leere Eingabe. */
 	public Parser() {
 		this.source("");
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Eingabe.
+	/** Dieser Konstruktor initialisiert die Eingabe.
 	 * 
 	 * @see #source(String)
 	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	public Parser(final String source) throws NullPointerException {
 		this.source(source);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Eingabe.
+	/** Dieser Konstruktor initialisiert die Eingabe.
 	 * 
 	 * @see #source(char[])
 	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	public Parser(final char[] source) throws NullPointerException {
 		this.source(source);
 	}
 
 	{}
 
-	/**
-	 * Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
+	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
 	 * 
 	 * @see #index()
 	 * @see #symbol()
 	 * @param index Position.
 	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
-	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist.
-	 */
+	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist. */
 	public final int seek(final int index) throws IndexOutOfBoundsException {
 		if (index < 0) throw new IndexOutOfBoundsException();
 		if (index < this._length_) return this._symbol_ = this._chars_[this._index_ = index];
@@ -84,15 +62,13 @@ public class Parser {
 		return this._symbol_ = -1;
 	}
 
-	/**
-	 * Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
+	/** Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * 
 	 * @see #take()
 	 * @see #index()
 	 * @see #symbol()
 	 * @see #target()
-	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
-	 */
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int skip() {
 		final int index = this._index_ + 1, symbol = index < this._length_ ? this._chars_[index] : -1;
 		this._index_ = index;
@@ -100,71 +76,60 @@ public class Parser {
 		return symbol;
 	}
 
-	/**
-	 * Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
+	/** Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
 	 * 
-	 * @see #seek(int)
-	 */
+	 * @see #seek(int) */
 	public final void reset() {
 		this.seek(0);
 	}
 
-	/**
-	 * Diese Methode gibt die aktuelle Position zurück.
+	/** Diese Methode gibt die aktuelle Position zurück.
 	 * 
 	 * @see #skip()
 	 * @see #take()
 	 * @see #symbol()
-	 * @return aktuelle Position.
-	 */
+	 * @return aktuelle Position. */
 	public final int index() {
 		return this._index_;
 	}
 
-	/**
-	 * Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
+	/** Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
 	 * {@link #source() Eingabe} erreicht wurde.
 	 * 
 	 * @see #skip()
 	 * @see #take()
 	 * @see #index()
-	 * @return aktuelles Zeichen oder {@code -1}.
-	 */
+	 * @return aktuelles Zeichen oder {@code -1}. */
 	public final int symbol() {
 		return this._symbol_;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
 	 * Eingabe} ist.
 	 * 
 	 * @see #seek(int)
 	 * @see #reset()
 	 * @see #index()
-	 * @return {@code true}, wenn die aktuelle Position minimal ist.
-	 */
+	 * @return {@code true}, wenn die aktuelle Position minimal ist. */
 	public final boolean isReset() {
 		return this._index_ == 0;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
 	 * Position} am Ende der {@link #source() Eingabe} ist.
 	 * 
 	 * @see #seek(int)
 	 * @see #index()
 	 * @see #length()
 	 * @see #symbol()
-	 * @return {@code true}, wenn die aktuelle Position maximal ist.
-	 */
+	 * @return {@code true}, wenn die aktuelle Position maximal ist. */
 	public final boolean isParsed() {
 		return this._symbol_ < 0;
 	}
 
 	{}
 
-	/**
-	 * Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
+	/** Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
 	 * 
 	 * @see #take(int)
@@ -172,52 +137,44 @@ public class Parser {
 	 * @see #index()
 	 * @see #symbol()
 	 * @see #target()
-	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}.
-	 */
+	 * @return {@link #symbol() aktuelles Zeichen} oder {@code -1}. */
 	public final int take() {
 		this.take(this._symbol_);
 		return this.skip();
 	}
 
-	/**
-	 * Diese Methode übernimmt das gegebene Zeichen in die {@link #target() Ausgabe}, sofern diese nicht negativ ist.
+	/** Diese Methode übernimmt das gegebene Zeichen in die {@link #target() Ausgabe}, sofern diese nicht negativ ist.
 	 * 
 	 * @see #take()
 	 * @see #target()
-	 * @param symbol Zeichen.
-	 */
+	 * @param symbol Zeichen. */
 	public final void take(final int symbol) {
 		if (symbol < 0) return;
 		this._target_.append((char)symbol);
 	}
 
-	/**
-	 * Diese Methode übernimmt die gegebene Zeichenkette in die {@link #target() Ausgabe}.
+	/** Diese Methode übernimmt die gegebene Zeichenkette in die {@link #target() Ausgabe}.
 	 * 
 	 * @param symbols Zeichenkette.
 	 * @see #take()
 	 * @see #target()
-	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Zeichenkette {@code null} ist. */
 	public final void take(final String symbols) throws NullPointerException {
 		if (symbols == null) throw new NullPointerException("symbols = null");
 		this._target_.append(symbols.toString());
 	}
 
-	/**
-	 * Diese Methode leert die {@link #target() Ausgabe}.
+	/** Diese Methode leert die {@link #target() Ausgabe}.
 	 * 
 	 * @see #take()
 	 * @see #take(int)
 	 * @see #take(String)
-	 * @see #target()
-	 */
+	 * @see #target() */
 	public final void clear() {
 		this._target_.setLength(0);
 	}
 
-	/**
-	 * Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
+	/** Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
 	 * 
 	 * @see #skip()
 	 * @see #take()
@@ -225,18 +182,15 @@ public class Parser {
 	 * @see #take(String)
 	 * @see #clear()
 	 * @see #symbol()
-	 * @return Ausgabe.
-	 */
+	 * @return Ausgabe. */
 	public final String target() {
 		return this._target_.toString();
 	}
 
-	/**
-	 * Diese Methode setzt die Ausgabe.
+	/** Diese Methode setzt die Ausgabe.
 	 * 
 	 * @param value Ausgabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
 		this._target_.setLength(0);
@@ -245,33 +199,27 @@ public class Parser {
 
 	{}
 
-	/**
-	 * Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
+	/** Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
 	 * 
 	 * @see #seek(int)
 	 * @see #index()
 	 * @see #source()
-	 * @return Länge der Eingabe.
-	 */
+	 * @return Länge der Eingabe. */
 	public final int length() {
 		return this._length_;
 	}
 
-	/**
-	 * Diese Methode gibt die Eingabe zurück.
+	/** Diese Methode gibt die Eingabe zurück.
 	 * 
-	 * @return Eingabe.
-	 */
+	 * @return Eingabe. */
 	public final String source() {
 		return this._source_;
 	}
 
-	/**
-	 * Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
+	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
 	 * 
 	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final String source) throws NullPointerException {
 		this._chars_ = source.toCharArray();
 		this._length_ = source.length();
@@ -279,21 +227,17 @@ public class Parser {
 		this.reset();
 	}
 
-	/**
-	 * Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
+	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
 	 * 
 	 * @param source Eingabe.
-	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final char[] source) throws NullPointerException {
 		this.source(new String(source));
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return Objects.toInvokeString(this, this._source_);

@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert ein Objekt zum Lesen einer {@code INI}-Datenstruktur über einen {@link Reader}.
+/** Diese Klasse implementiert ein Objekt zum Lesen einer {@code INI}-Datenstruktur über einen {@link Reader}.
  * <p>
  * Die {@code INI}-Datenstruktur ist eine Abfolge beliegig vieler Abschnitte, Eigenschaften, Kommentare und Leerzeilen, welche durch Zeilenumbrüche
  * {@code '\r\n'} voneinander separiert sind.<br>
@@ -19,37 +18,28 @@ import bee.creative.util.Objects;
  * Die Maskierung der Zeichen {@code '\t'}, {@code '\r'}, {@code '\n'}, {@code '\\'}, {@code '='}, {@code ';'}, {@code '['} und {@code ']'} erfolgt durch das
  * Voranstellen des Zeichens {@code '\\'}.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class INIReader implements Closeable {
 
-	/**
-	 * Dieses Feld speichert den {@link Reader}.
-	 */
+	/** Dieses Feld speichert den {@link Reader}. */
 	final Reader _reader_;
 
-	/**
-	 * Dieses Feld speichert den Puffer für die maskierten Texte.
-	 */
+	/** Dieses Feld speichert den Puffer für die maskierten Texte. */
 	final StringBuilder _builder_;
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link File} mit der {@code INI}-Datenstruktur.
+	/** Dieser Konstruktor initialisiert das {@link File} mit der {@code INI}-Datenstruktur.
 	 * 
 	 * @param file {@link File}.
 	 * @throws IOException Wenn {@link FileReader#FileReader(File)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code file} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
 	public INIReader(final File file) throws IOException, NullPointerException {
 		this(new BufferedReader(new FileReader(file)));
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.
+	/** Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.
 	 * 
 	 * @param reader {@link Reader}.
-	 * @throws NullPointerException Wenn {@code reader} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public INIReader(final Reader reader) throws NullPointerException {
 		if (reader == null) throw new NullPointerException("reader = null");
 		this._reader_ = reader;
@@ -58,13 +48,11 @@ public final class INIReader implements Closeable {
 
 	{}
 
-	/**
-	 * Diese Methode ließt das nächste Element der {@code INI}-Datenstruktur und gibt es zurück. Wenn kein weiteres Element mehr existiert, wird {@code null}
+	/** Diese Methode ließt das nächste Element der {@code INI}-Datenstruktur und gibt es zurück. Wenn kein weiteres Element mehr existiert, wird {@code null}
 	 * geliefert.
 	 * 
 	 * @return nächstes Element oder {@code null}.
-	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst. */
 	public final INIToken read() throws IOException {
 		while (true) {
 			final int symbol = this._reader_.read();
@@ -87,15 +75,13 @@ public final class INIReader implements Closeable {
 		}
 	}
 
-	/**
-	 * Diese Methode ließt den Schlüssel einer Eigenschaft und gibt diesen zurück.<br>
+	/** Diese Methode ließt den Schlüssel einer Eigenschaft und gibt diesen zurück.<br>
 	 * Der Schlüssel beginnt mit dem gegebenen Zeichen und Endet vor dem Zeichen {@code '='}.
 	 * 
 	 * @param symbol erstes Zeichen des Schlüssels.
 	 * @return Schlüssel einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	final String _readKey_(int symbol) throws IOException, IllegalArgumentException {
 		final Reader source = this._reader_;
 		final StringBuilder result = this._builder_;
@@ -116,13 +102,11 @@ public final class INIReader implements Closeable {
 		}
 	}
 
-	/**
-	 * Diese Methode ließt den Wert einer Eigenschaft und gibt diesen zurück.
+	/** Diese Methode ließt den Wert einer Eigenschaft und gibt diesen zurück.
 	 * 
 	 * @return Wert einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	final String _readValue_() throws IOException, IllegalArgumentException {
 		final Reader source = this._reader_;
 		final StringBuilder result = this._builder_;
@@ -141,13 +125,11 @@ public final class INIReader implements Closeable {
 		}
 	}
 
-	/**
-	 * Diese Methode ließt den Namen eines Abschnitts und gibt diesen zurück.
+	/** Diese Methode ließt den Namen eines Abschnitts und gibt diesen zurück.
 	 * 
 	 * @return Name eines Abschnitts.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	final String _readSection_() throws IOException, IllegalArgumentException {
 		final Reader source = this._reader_;
 		final StringBuilder result = this._builder_;
@@ -176,13 +158,11 @@ public final class INIReader implements Closeable {
 		}
 	}
 
-	/**
-	 * Diese Methode gibt das Zeiche zurück, durch die Verkettung von {@code '\'} und dem gegebenen Zeichen maskiert wurde.
+	/** Diese Methode gibt das Zeiche zurück, durch die Verkettung von {@code '\'} und dem gegebenen Zeichen maskiert wurde.
 	 * 
 	 * @param symbol Zeichen nach dem {@code '\'}.
 	 * @return unmaskiertes Zeichen.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	final int _readSymbol_(final int symbol) throws IllegalArgumentException {
 		switch (symbol) {
 			case '\\':
@@ -201,13 +181,11 @@ public final class INIReader implements Closeable {
 		throw new IllegalArgumentException();
 	}
 
-	/**
-	 * Diese Methode ließt den Text eines Kommentars und gibt diesen zurück.
+	/** Diese Methode ließt den Text eines Kommentars und gibt diesen zurück.
 	 * 
 	 * @return Text eines Kommentars.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	final String _readComment_() throws IOException {
 		final Reader source = this._reader_;
 		final StringBuilder result = this._builder_;
@@ -228,17 +206,13 @@ public final class INIReader implements Closeable {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final void close() throws IOException {
 		this._reader_.close();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this._reader_);

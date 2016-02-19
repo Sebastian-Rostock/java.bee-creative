@@ -4,47 +4,35 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import bee.creative.util.Bytes;
 
-/**
- * Diese Klasse implementiert einen abstrakten {@link DataTarget}.
+/** Diese Klasse implementiert einen abstrakten {@link DataTarget}.
  * 
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BaseDataTarget implements DataTarget {
 
-	/**
-	 * Dieses Feld speichert den Schreibpuffer.
-	 */
+	/** Dieses Feld speichert den Schreibpuffer. */
 	protected final byte[] array = new byte[8];
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void write(final int b) throws IOException {
 		this.writeByte(b);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeBoolean(final boolean v) throws IOException {
 		this.write(v ? 1 : 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeByte(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -52,9 +40,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, 1);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeShort(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -62,17 +48,13 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, 2);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeChar(final int v) throws IOException {
 		this.writeShort(v);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeInt(final int v) throws IOException {
 		final byte[] array = this.array;
@@ -80,9 +62,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, 4);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeInt(final int v, final int size) throws IOException {
 		final byte[] array = this.array;
@@ -90,9 +70,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, size);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeLong(final long v) throws IOException {
 		final byte[] array = this.array;
@@ -100,9 +78,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, 8);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeLong(final long v, final int size) throws IOException {
 		final byte[] array = this.array;
@@ -110,25 +86,19 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(array, 0, size);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeFloat(final float v) throws IOException {
 		this.writeInt(Float.floatToIntBits(v));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeDouble(final double v) throws IOException {
 		this.writeLong(Double.doubleToLongBits(v));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeBytes(final String s) throws IOException {
 		final int len = s.length();
@@ -139,9 +109,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		this.write(data);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeChars(final String s) throws IOException {
 		for (int i = 0, size = s.length(); i < size; i++) {
@@ -149,9 +117,7 @@ public abstract class BaseDataTarget implements DataTarget {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void writeUTF(final String s) throws IOException {
 		new DataOutputStream(null) {

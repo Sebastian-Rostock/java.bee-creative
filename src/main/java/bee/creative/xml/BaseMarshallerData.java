@@ -16,36 +16,28 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 import bee.creative.xml.BaseDocumentBuilderFactoryData.SchemaData;
 
-/**
- * Diese Klasse implementiert den Konfigurator für einen {@link Marshaller}.
+/** Diese Klasse implementiert den Konfigurator für einen {@link Marshaller}.
  * 
  * @see JAXBContext#createMarshaller()
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
- */
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, GThis> {
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link JAXBContext}.
+	/** Diese Klasse implementiert den Konfigurator für die {@link JAXBContext}.
 	 * 
 	 * @see JAXBContext#createMarshaller()
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ContextData<GOwner> extends BaseContextData<ContextData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeContextData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected ContextData<GOwner> _this_() {
 			return this;
@@ -53,27 +45,21 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für das {@link Schema}.
+	/** Diese Klasse implementiert den Konfigurator für das {@link Schema}.
 	 * 
 	 * @see Marshaller#setSchema(Schema)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ShemaData<GOwner> extends BaseSchemaData<ShemaData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeShemaData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected ShemaData<GOwner> _this_() {
 			return this;
@@ -81,27 +67,21 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link XmlAdapter}.
+	/** Diese Klasse implementiert den Konfigurator für die {@link XmlAdapter}.
 	 * 
 	 * @see Marshaller#setAdapter(XmlAdapter)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class AdapterData<GOwner> extends BaseSetBuilder<XmlAdapter<?, ?>, AdapterData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeAdapterData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected AdapterData<GOwner> _this_() {
 			return this;
@@ -109,27 +89,21 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link Listener}.
+	/** Diese Klasse implementiert den Konfigurator für den {@link Listener}.
 	 * 
 	 * @see Marshaller#setListener(Listener)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<Listener, ListenerData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected ListenerData<GOwner> _this_() {
 			return this;
@@ -137,27 +111,21 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die Eigenschaften.
+	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften.
 	 * 
 	 * @see Marshaller#setProperty(String, Object)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Object, PropertyData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected PropertyData<GOwner> _this_() {
 			return this;
@@ -165,27 +133,21 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ValidationEventHandler}.
+	/** Diese Klasse implementiert den Konfigurator für den {@link ValidationEventHandler}.
 	 * 
 	 * @see Marshaller#setEventHandler(ValidationEventHandler)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ValidationData<GOwner> extends BaseValueBuilder<ValidationEventHandler, ValidationData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeValidationData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected ValidationData<GOwner> _this_() {
 			return this;
@@ -195,14 +157,10 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den {@link Marshaller}.
-	 */
+	/** Dieses Feld speichert den {@link Marshaller}. */
 	Marshaller _marshaller_;
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openContextData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openContextData()}. */
 	final ContextData<GThis> _contextData_ = new ContextData<GThis>() {
 
 		@Override
@@ -212,9 +170,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openShemaData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openShemaData()}. */
 	final ShemaData<GThis> _shemaData_ = new ShemaData<GThis>() {
 
 		@Override
@@ -224,9 +180,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openAdapterData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openAdapterData()}. */
 	final AdapterData<GThis> _adapterData_ = new AdapterData<GThis>() {
 
 		@Override
@@ -236,9 +190,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openListenerData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openListenerData()}. */
 	final ListenerData<GThis> _listenerData_ = new ListenerData<GThis>() {
 
 		@Override
@@ -248,9 +200,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openPropertyData()}. */
 	final PropertyData<GThis> _propertyData_ = new PropertyData<GThis>() {
 
 		@Override
@@ -260,9 +210,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openValidationData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openValidationData()}. */
 	final ValidationData<GThis> _validationData_ = new ValidationData<GThis>() {
 
 		@Override
@@ -274,12 +222,10 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 
 	{}
 
-	/**
-	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 * 
 	 * @param data Konfigurator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis use(final BaseMarshallerData<?> data) {
 		if (data == null) return this._this_();
 		this._marshaller_ = data._marshaller_;
@@ -291,8 +237,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt den {@link Marshaller} zurück.<br>
+	/** Diese Methode gibt den {@link Marshaller} zurück.<br>
 	 * Wenn über {@link #useMarshaller(Marshaller)} noch kein {@link Marshaller} gesetzt wurden, werden über {@link JAXBContext#createMarshaller()} ein neuer
 	 * erstellt und über {@link #useMarshaller(Marshaller)} gesetzt und über {@link #updateMarshaller()} aktualisiert. Der zur Erstellung verwendeten Kontext kann
 	 * über {@link #openContextData()} konfiguriert werden.
@@ -301,8 +246,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @see #updateMarshaller()
 	 * @return {@link Marshaller}.
 	 * @throws SAXException Wenn {@link #updateMarshaller()} eine entsprechende Ausnahme auslöst.
-	 * @throws JAXBException Wenn {@link JAXBContext#createMarshaller()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws JAXBException Wenn {@link JAXBContext#createMarshaller()} eine entsprechende Ausnahme auslöst. */
 	public final Marshaller getMarshaller() throws SAXException, JAXBException {
 		Marshaller result = this._marshaller_;
 		if (result != null) return result;
@@ -313,29 +257,24 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return result;
 	}
 
-	/**
-	 * Diese Methode setzt den {@link Marshaller} und gibt {@code this} zurück.
+	/** Diese Methode setzt den {@link Marshaller} und gibt {@code this} zurück.
 	 * 
 	 * @param marshaller {@link Marshaller} oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useMarshaller(final Marshaller marshaller) {
 		this._marshaller_ = marshaller;
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode setzt den {@link Marshaller} auf {@code null} und gibt {@code this} zurück.
+	/** Diese Methode setzt den {@link Marshaller} auf {@code null} und gibt {@code this} zurück.
 	 * 
 	 * @see #useMarshaller(Marshaller)
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis resetMarshaller() {
 		return this.useMarshaller(null);
 	}
 
-	/**
-	 * Diese Methode aktualisiert die Einstellungen des {@link Marshaller} und gibt {@code this} zurück.<br>
+	/** Diese Methode aktualisiert die Einstellungen des {@link Marshaller} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf den über {@link #getMarshaller()} ermittelten {@link Marshaller} die Einstellungen übertragen, die in
 	 * {@link #openShemaData()}, {@link #openAdapterData()}, {@link #openListenerData()}, {@link #openPropertyData()} und {@link #openValidationData()}
 	 * konfiguriert sind.
@@ -343,8 +282,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getMarshaller()} oder {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.
 	 * @throws JAXBException Wenn {@link #getMarshaller()}, {@link Marshaller#setProperty(String, Object)} oder
-	 *         {@link Marshaller#setEventHandler(ValidationEventHandler)} eine entsprechende Ausnahme auslöst.
-	 */
+	 *         {@link Marshaller#setEventHandler(ValidationEventHandler)} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateMarshaller() throws SAXException, JAXBException {
 		final Marshaller result = this.getMarshaller();
 		result.setSchema(this._shemaData_.getSchema());
@@ -359,79 +297,63 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für das Schema und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für das Schema und gibt ihn zurück.
 	 * 
 	 * @see Marshaller#setSchema(Schema)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ShemaData<GThis> openShemaData() {
 		return this._shemaData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die Adapter und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die Adapter und gibt ihn zurück.
 	 * 
 	 * @see Marshaller#setAdapter(XmlAdapter)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final AdapterData<GThis> openAdapterData() {
 		return this._adapterData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die Ereignisüberwachung und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die Ereignisüberwachung und gibt ihn zurück.
 	 * 
 	 * @see Marshaller#setListener(Listener)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ListenerData<GThis> openListenerData() {
 		return this._listenerData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die Eigenschaften und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die Eigenschaften und gibt ihn zurück.
 	 * 
 	 * @see Marshaller#setProperty(String, Object)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
 		return this._propertyData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die Validationsüberwachung und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die Validationsüberwachung und gibt ihn zurück.
 	 * 
 	 * @see Marshaller#setEventHandler(ValidationEventHandler)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ValidationData<GThis> openValidationData() {
 		return this._validationData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für den Kontext und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für den Kontext und gibt ihn zurück.
 	 * 
 	 * @see JAXBContext#createMarshaller()
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ContextData<GThis> openContextData() {
 		return this._contextData_;
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis _this_();
 
-	/**
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 * 
-	 * @see #getMarshaller()
-	 */
+	 * @see #getMarshaller() */
 	@Override
 	public final Marshaller build() throws IllegalStateException {
 		try {
@@ -443,9 +365,7 @@ public abstract class BaseMarshallerData<GThis> extends BaseBuilder<Marshaller, 
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this._shemaData_, this._adapterData_, this._listenerData_, this._propertyData_, this._validationData_);

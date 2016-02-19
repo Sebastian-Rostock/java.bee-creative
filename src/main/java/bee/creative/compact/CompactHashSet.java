@@ -6,8 +6,7 @@ import java.util.Set;
 import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet}. Der Speicherverbrauch eines {@link CompactHashSet}s liegt
+/** Diese Klasse implementiert ein {@link Object#hashCode() Streuwert} basiertes {@link CompactSet}. Der Speicherverbrauch eines {@link CompactHashSet}s liegt
  * bei ca. {@code 20%} ({@code 64-Bit}) des Speicherverbrauchs eines {@link HashSet}s.
  * <p>
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
@@ -22,61 +21,48 @@ import bee.creative.util.Objects;
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente.
- */
+ * @param <GItem> Typ der Elemente. */
 public class CompactHashSet<GItem> extends CompactSet<GItem> {
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set}.
-	 */
+	/** Dieser Konstruktor initialisiert das {@link Set}. */
 	public CompactHashSet() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
-	 * @param capacity Kapazität.
-	 */
+	 * @param capacity Kapazität. */
 	public CompactHashSet(final int capacity) {
 		super(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
+	/** Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
 	 * 
 	 * @see CompactData#allocate(int)
 	 * @see Set#addAll(Collection)
-	 * @param collection Elemente.
-	 */
+	 * @param collection Elemente. */
 	public CompactHashSet(final Collection<? extends GItem> collection) {
 		super(collection);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemIndex_(final Object item) {
 		if (item == null) return this._itemIndexEquals_(null, 0);
 		return this._itemIndexEquals_(item, Objects.hash(item));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected boolean _itemEquals_(final Object key, final int hash, final Object item) {
 		if (key == null) return item == null;
 		return key.equals(item);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _itemCompare_(final Object key, final int hash, final Object item) {
 		if (item == null) return hash;

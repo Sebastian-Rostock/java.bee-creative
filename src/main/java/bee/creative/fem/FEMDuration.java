@@ -7,32 +7,22 @@ import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 import bee.creative.util.Strings;
 
-/**
- * Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
+/** Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
  * Intern wird die Zeitspanne als ein {@code long} dargestellt.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDuration extends BaseValue implements Comparable<FEMDuration> {
 
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
-	 */
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 8;
 
-	/**
-	 * Dieses Feld speichert den {@link #type() Datentyp}.
-	 */
+	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMDuration> TYPE = FEMType.from(FEMDuration.ID, "DURATION");
 
-	/**
-	 * Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind.
-	 */
+	/** Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind. */
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
 
-	/**
-	 * Dieses Feld speichert die Ergebnisse von {@link #_rangeOf_(int)}.
-	 */
+	/** Dieses Feld speichert die Ergebnisse von {@link #_rangeOf_(int)}. */
 	static final byte[] _ranges_ = {0, 18, 33, 18, 33, 18, 33, 33, 33, 48, 33, 48, 16, 34, 34, 34, 49, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34,
 		49, 49, 49, 49, 49, 16, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 16, 19, 34, 19, 34, 19, 34, 34, 34, 49, 34, 49, 17, 35, 35, 35, 50, 35, 50, 50, 50, 50,
 		50, 50, 17, 35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 17, 19, 34, 19, 34, 34, 34, 49, 34, 49, 34, 49, 16, 19, 34, 19, 34, 19, 34, 49, 34, 49, 34, 49, 17,
@@ -163,16 +153,14 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	{}
 
-	/**
-	 * Diese Methode gibt eine neue Zeitapanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	/** Diese Methode gibt eine neue Zeitapanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 * 
 	 * @see #toString()
 	 * @param string Zeichenkette.
 	 * @return Zeitapanne.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
 		System.out.println(Strings.matchAll(FEMDuration._pattern_, string));
 		final Matcher matcher = FEMDuration._pattern_.matcher(string);
@@ -193,14 +181,12 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
+	/** Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
 	 * 
 	 * @param durationmonths Gesamtanzahl der Monate ({@code -101006..101006}).
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return Zeitapanne.
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public static final FEMDuration from(int durationmonths, long durationmillis) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(+durationmonths);
 		FEMDuration._checkMonths_(-durationmonths);
@@ -232,8 +218,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 			(days << 14) | (months << 10) | (milliseconds << 0));
 	}
 
-	/**
-	 * Diese Methode gibt eine Zeitapanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt eine Zeitapanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @see #from(int, long)
 	 * @see #durationmonthsOf(int, int)
@@ -246,32 +231,27 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return Zeitapanne.
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public static final FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDuration.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDuration.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @return Zeitapanne.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final FEMDuration from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMDuration.TYPE);
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDuration.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDuration.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Zeitapanne.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static final FEMDuration from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMDuration.TYPE);
 	}
@@ -316,16 +296,14 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		if (value < 0) throw new IllegalArgumentException();
 	}
 
-	/**
-	 * Diese Methode gibt die Zeitspanne zwischen den gegebenen Zeitangaben in Zeitzone {@code 00:00} zurück.
+	/** Diese Methode gibt die Zeitspanne zwischen den gegebenen Zeitangaben in Zeitzone {@code 00:00} zurück.
 	 * 
 	 * @see FEMDatetime#withZone(int)
 	 * @param datetime1 erste Zeitangabe.
 	 * @param datetime2 zweite Zeitangabe.
 	 * @return Zeitspanne von der ersten zur zweiten Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime1} bzw. {@code datetime2} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn nur eine der Zeitangaben ein Datum bzw eine Uhrzeit besitzt.
-	 */
+	 * @throws IllegalArgumentException Wenn nur eine der Zeitangaben ein Datum bzw eine Uhrzeit besitzt. */
 	public static final FEMDuration between(final FEMDatetime datetime1, final FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
 		if (datetime1.hasDate()) {
 			if (!datetime2.hasDate()) throw new IllegalArgumentException();
@@ -350,58 +328,49 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		}
 	}
 
-	/**
-	 * Diese Methode gibt die minnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	/** Diese Methode gibt die minnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 * 
 	 * @see FEMDatetime#moveDate(int, int, int)
 	 * @param months Anzahl der Monate ({@code 0..101006}).
 	 * @return minimale Anzahl an Tagen in den gegebenen Monaten.
-	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
 	public static final int minLengthOf(final int months) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(months);
 		FEMDuration._checkPositive_(months);
 		return FEMDuration._lengthOf_(months) - ((FEMDuration._rangeOf_(months) >> 0) & 0x0F);
 	}
 
-	/**
-	 * Diese Methode gibt die maxnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	/** Diese Methode gibt die maxnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 * 
 	 * @see FEMDatetime#moveDate(int, int, int)
 	 * @param months Anzahl der Monate ({@code 0..101006}).
 	 * @return maximale Anzahl an Tagen in den gegebenen Monaten.
-	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
 	public static final int maxLengthOf(final int months) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(months);
 		FEMDuration._checkPositive_(months);
 		return FEMDuration._lengthOf_(months) + ((FEMDuration._rangeOf_(months) >> 4) & 0x0F);
 	}
 
-	/**
-	 * Diese Methode gibt das Paar aus Min und Max zur Ergänzung von {@link #_lengthOf_(int)} zu {@link #minLengthOf(int)} und {@link #maxLengthOf(int)} zurück.<br>
+	/** Diese Methode gibt das Paar aus Min und Max zur Ergänzung von {@link #_lengthOf_(int)} zu {@link #minLengthOf(int)} und {@link #maxLengthOf(int)} zurück.<br>
 	 * {@link #minLengthOf(int)} = {@link #_lengthOf_(int)} - MIN.<br>
 	 * {@link #maxLengthOf(int)} = {@link #_lengthOf_(int)} + MAX.
 	 * 
 	 * @param months Anzahl an Monaten ({@code 0..101015}).
-	 * @return Min-Max-Paar (MIN << 0 | MAX << 4).
-	 */
+	 * @return Min-Max-Paar (MIN << 0 | MAX << 4). */
 	static final int _rangeOf_(final int months) {
 		return FEMDuration._ranges_[months % 4800];
 	}
 
-	/**
-	 * Diese Methode gibt die mittlere Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	/** Diese Methode gibt die mittlere Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 * 
 	 * @param months Anzahl der Monate ({@code 0..101006}).
-	 * @return mittlere Anzahl an Tagen in den gegebenen Monaten.
-	 */
+	 * @return mittlere Anzahl an Tagen in den gegebenen Monaten. */
 	static final int _lengthOf_(final int months) {
 		return (months * 146097) / 4800;
 	}
 
-	/**
-	 * Diese Methode gibt die Gesamtanzahl der Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt die Gesamtanzahl der Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @param days Anzahl der Tage ({@code -3074324..3074324}).
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783776}).
@@ -409,8 +378,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return die Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
 	public static final long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
 		throws IllegalArgumentException {
 		FEMDuration._checkDays_(-days);
@@ -433,14 +401,12 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return (days * 86400000L) + (hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds;
 	}
 
-	/**
-	 * Diese Methode gibt die Gesamtanzahl der Monate zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt die Gesamtanzahl der Monate zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @param years Anzahl der Jahre ({@code -8417..8417}).
 	 * @param months Anzahl der Monate ({@code -101006..101006}).
 	 * @return Gesamtanzahl der Monate ({@code -101006..101006}).
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
 	public static final int durationmonthsOf(final int years, final int months) throws IllegalArgumentException {
 		FEMDuration._checkYears_(+years);
 		FEMDuration._checkYears_(-years);
@@ -459,20 +425,17 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	{}
 
-	/**
-	 * Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitspanne.
+	/** Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Zeitspanne.
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
 	 * <ul>
 	 * <li>daysValue - 18 Bit</li>
 	 * <li>monthsValue - 4 Bit</li>
 	 * <li>millisecondsValue - 10 Bit</li>
-	 * </ul>
-	 */
+	 * </ul> */
 	final int _valueL_;
 
-	/**
-	 * Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitspanne.
+	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitspanne.
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
 	 * <ul>
@@ -481,17 +444,14 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * <li>hoursValue - 5 Bit</li>
 	 * <li>minutesValue - 6 Bit</li>
 	 * <li>secondsValue - 6 Bit</li>
-	 * </ul>
-	 */
+	 * </ul> */
 	final int _valueH_;
 
-	/**
-	 * Dieser Konstruktor initialisiert die interne Darstellung der Zeitspanne.
+	/** Dieser Konstruktor initialisiert die interne Darstellung der Zeitspanne.
 	 * 
 	 * @see #value()
 	 * @param value interne Darstellung der Zeitspanne.
-	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMDuration(final long value) throws IllegalArgumentException {
 		this((int)(value >> 32), (int)(value >> 0));
 		if (value == 0) return;
@@ -512,8 +472,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	{}
 
-	/**
-	 * Diese Methode gibt die interne Darstellung der Zeitspanne zurück.
+	/** Diese Methode gibt die interne Darstellung der Zeitspanne zurück.
 	 * <p>
 	 * Die 64 Bit von MBS zum LSB sind:
 	 * <ul>
@@ -527,124 +486,99 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * <li>millisecondsValue - 10 Bit</li>
 	 * </ul>
 	 * 
-	 * @return interne Darstellung der Zeitspanne.
-	 */
+	 * @return interne Darstellung der Zeitspanne. */
 	public final long value() {
 		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
 	}
 
-	/**
-	 * Diese Methode gibt das Vorzeichen dieser Zeitspanne zurück.<br>
+	/** Diese Methode gibt das Vorzeichen dieser Zeitspanne zurück.<br>
 	 * Das Vorzeichen ist {@code -1}, {@code 0} oder {@code +1}, wenn alle Komponenten der Zeitspanne kleiner als, gleich bzw. größer als {@code 0} sind.
 	 * 
-	 * @return Vorzeichen.
-	 */
+	 * @return Vorzeichen. */
 	public final int signValue() {
 		if ((this._valueH_ | this._valueL_) == 0) return 0;
 		return (this._valueH_ & 0x020000) != 0 ? -1 : +1;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Jahre zurück.
+	/** Diese Methode gibt die Anzahl der Jahre zurück.
 	 * 
-	 * @return Anzahl der Jahre ({@code 0..8417}).
-	 */
+	 * @return Anzahl der Jahre ({@code 0..8417}). */
 	public final int yearsValue() {
 		return (this._valueH_ >> 18) & 0x3FFF;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Monate zurück.
+	/** Diese Methode gibt die Anzahl der Monate zurück.
 	 * 
-	 * @return Anzahl der Monate ({@code 0..11}).
-	 */
+	 * @return Anzahl der Monate ({@code 0..11}). */
 	public final int monthsValue() {
 		return (this._valueL_ >> 10) & 0x0F;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Tage zurück.
+	/** Diese Methode gibt die Anzahl der Tage zurück.
 	 * 
-	 * @return Anzahl der Tage ({@code 0..146096}).
-	 */
+	 * @return Anzahl der Tage ({@code 0..146096}). */
 	public final int daysValue() {
 		return (this._valueL_ >> 14) & 0x03FFFF;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Stunden zurück.
+	/** Diese Methode gibt die Anzahl der Stunden zurück.
 	 * 
-	 * @return Anzahl der Stunde ({@code 0..23}).
-	 */
+	 * @return Anzahl der Stunde ({@code 0..23}). */
 	public final int hoursValue() {
 		return (this._valueH_ >> 12) & 0x1F;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Minuten zurück.
+	/** Diese Methode gibt die Anzahl der Minuten zurück.
 	 * 
-	 * @return Anzahl der Minuten ({@code 0..59}).
-	 */
+	 * @return Anzahl der Minuten ({@code 0..59}). */
 	public final int minutesValue() {
 		return (this._valueH_ >> 6) & 0x3F;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Sekunden zurück.
+	/** Diese Methode gibt die Anzahl der Sekunden zurück.
 	 * 
-	 * @return Anzahl der Sekunden ({@code 0..59}).
-	 */
+	 * @return Anzahl der Sekunden ({@code 0..59}). */
 	public final int secondsValue() {
 		return (this._valueH_ >> 0) & 0x3F;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Millisekunden zurück.
+	/** Diese Methode gibt die Anzahl der Millisekunden zurück.
 	 * 
-	 * @return Anzahl der Millisekunden ({@code 0..999}).
-	 */
+	 * @return Anzahl der Millisekunden ({@code 0..999}). */
 	public final int millisecondsValue() {
 		return (this._valueL_ >> 0) & 0x03FF;
 	}
 
-	/**
-	 * Diese Methode gibt die Gesamtanzahl der Millisekunden zurück.<br>
+	/** Diese Methode gibt die Gesamtanzahl der Millisekunden zurück.<br>
 	 * Diese fassen {@link #daysValue()}, {@link #hoursValue()}, {@link #minutesValue()}, {@link #secondsValue()} und {@link #millisecondsValue()} zusammen.
 	 * 
-	 * @return Gesamtanzahl der Millisekunden ({@code 0..265621593600000}).
-	 */
+	 * @return Gesamtanzahl der Millisekunden ({@code 0..265621593600000}). */
 	public final long durationmillisValue() {
 		return FEMDuration._durationmillisOf_(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
 	}
 
-	/**
-	 * Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
+	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
 	 * 
-	 * @return Gesamtanzahl der Monate ({@code 0..101006}).
-	 */
+	 * @return Gesamtanzahl der Monate ({@code 0..101006}). */
 	public final int durationmonthsValue() {
 		return FEMDuration._durationmonthsOf_(this.yearsValue(), this.monthsValue());
 	}
 
-	/**
-	 * Diese Methode gibt diese Zeitspanne mit umgekehrten Vorzeichen zurück.
+	/** Diese Methode gibt diese Zeitspanne mit umgekehrten Vorzeichen zurück.
 	 * 
 	 * @see #signValue()
-	 * @return Zeitspanne mit umgekehrten Vorzeichen.
-	 */
+	 * @return Zeitspanne mit umgekehrten Vorzeichen. */
 	public final FEMDuration negate() {
 		if (this.signValue() == 0) return this;
 		return new FEMDuration(this._valueH_ ^ 0x020000, this._valueL_);
 	}
 
-	/**
-	 * Diese Methode gibt diese Zeitspanne verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
+	/** Diese Methode gibt diese Zeitspanne verschoben um die gegebenen Gesamtanzahlen an Monate und Millisekunden zurück.
 	 * 
 	 * @param durationmonths Gesamtanzahl der Monate ({@code -101006..101006}).
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return verschobene Zeitspanne.
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public final FEMDuration move(final int durationmonths, final long durationmillis) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(-durationmonths);
 		FEMDuration._checkMonths_(+durationmonths);
@@ -653,8 +587,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return this._move_(durationmonths, durationmillis);
 	}
 
-	/**
-	 * Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @see #move(int, long)
 	 * @see #durationmonthsOf(int, int)
@@ -667,21 +600,18 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return verschobene Zeitspanne.
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public final FEMDuration move(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
 		return this._move_(FEMDuration.durationmonthsOf(years, months), FEMDuration.durationmillisOf(days, hours, minutes, seconds, milliseconds));
 	}
 
-	/**
-	 * Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden der gegebenen Zeitspanne zurück.
+	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden der gegebenen Zeitspanne zurück.
 	 * 
 	 * @param duration Gesamtanzahlen an Monate und Millisekunden.
 	 * @return verschobene Zeitspanne.
 	 * @throws NullPointerException Wenn {@code duration} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public final FEMDuration move(final FEMDuration duration) throws NullPointerException, IllegalArgumentException {
 		if (duration.signValue() < 0) return this.move(-duration.durationmonthsValue(), -duration.durationmillisValue());
 		return this.move(duration.durationmonthsValue(), duration.durationmillisValue());
@@ -693,36 +623,30 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return FEMDuration.from(durationmonths + this.durationmonthsValue(), durationmillis + this.durationmillisValue());
 	}
 
-	/**
-	 * Diese Methode gibt den Streuwert zurück.
+	/** Diese Methode gibt den Streuwert zurück.
 	 * 
-	 * @return Streuwert.
-	 */
+	 * @return Streuwert. */
 	public final int hash() {
 		return this._valueH_ ^ this._valueL_;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspannen effektiv gleich der gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspannen effektiv gleich der gegebenen ist.
 	 * 
 	 * @see #compare(FEMDuration, int)
 	 * @param that Zeitspannen.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMDuration that) throws NullPointerException {
 		return ((this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_)) || (this.compare(that, 1) == 0);
 	}
 
-	/**
-	 * Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne
+	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne
 	 * ist. Wenn die Zeitspannen nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * 
 	 * @param that Zeitspanne.
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitspannen.
 	 * @return Vergleichswert oder {@code undefined}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final int compare(final FEMDuration that, final int undefined) {
 		final int sign = this.signValue(), result = sign - that.signValue();
 		if (result != 0) return result;
@@ -748,33 +672,25 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMDuration data() {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMDuration> type() {
 		return FEMDuration.TYPE;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.hash();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -786,29 +702,23 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return this.equals((FEMDuration)object);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int compareTo(final FEMDuration that) {
 		return this.compare(that, 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatValue(this.toString()));
 	}
 
-	/**
-	 * Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
+	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
 	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus <a
 	 * href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
 	 * 
-	 * @return Textdarstellung.
-	 */
+	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
 		final int sing = this.signValue();

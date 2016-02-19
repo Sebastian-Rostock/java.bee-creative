@@ -22,8 +22,7 @@ import org.xml.sax.InputSource;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
+/** Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
  * {@link Validator}, {@link DocumentBuilder} bzw. {@link Transformer} genutzt wird.
  * 
  * @see DocumentBuilder#parse(InputSource)
@@ -31,28 +30,21 @@ import bee.creative.util.Objects;
  * @see Transformer#transform(Source, Result)
  * @see TransformerFactory#newTemplates(Source)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
- */
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
-	/**
-	 * Dieses Feld speichert die Quelldaten.
-	 */
+	/** Dieses Feld speichert die Quelldaten. */
 	Source _source_;
 
-	/**
-	 * Dieses Feld speichert den System-Identifikator.
-	 */
+	/** Dieses Feld speichert den System-Identifikator. */
 	String _systemID_;
 
 	{}
 
-	/**
-	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 * 
 	 * @param data Konfigurator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis use(final BaseSourceData<?> data) {
 		if (data == null) return this._this_();
 		this._source_ = data._source_;
@@ -60,99 +52,83 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URI} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URI} und gibt {@code this} zurück.
 	 * 
 	 * @see #useUrl(URL)
 	 * @see URI#toURL()
 	 * @param uri {@link URI}.
 	 * @return {@code this}.
-	 * @throws MalformedURLException Wenn {@link URI#toURL()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws MalformedURLException Wenn {@link URI#toURL()} eine entsprechende Ausnahme auslöst. */
 	public final GThis useUri(final URI uri) throws MalformedURLException {
 		return this.useUrl(uri.toURL());
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see URL#toExternalForm()
 	 * @see StreamSource#StreamSource(String)
 	 * @param url {@link URL}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useUrl(final URL url) {
 		return this.useSource(new StreamSource(url.toExternalForm()));
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(File)
 	 * @param file {@link File}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useFile(final File file) {
 		return this.useSource(new StreamSource(file));
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten über {@link StringReader} mit dem gegebenen Text auf eine {@link StreamSource} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten über {@link StringReader} mit dem gegebenen Text auf eine {@link StreamSource} und gibt {@code this} zurück.
 	 * 
 	 * @see #useReader(Reader)
 	 * @see StringReader#StringReader(String)
 	 * @param text Text.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useText(final String text) {
 		return this.useReader(new StringReader(text));
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link DOMSource} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link DOMSource} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see DOMSource#DOMSource(Node)
 	 * @param node {@link Node}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useNode(final Node node) {
 		return this.useSource(new DOMSource(node));
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link Reader} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link Reader} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(Reader)
 	 * @param reader {@link Reader}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useReader(final Reader reader) {
 		return this.useSource(new StreamSource(reader));
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link InputStream} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link InputStream} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(InputStream)
 	 * @param stream {@link InputStream}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useStream(final InputStream stream) {
 		return this.useSource(new StreamSource(stream));
 	}
 
-	/**
-	 * Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
+	/** Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
 	 * 
 	 * @see Source#setSystemId(String)
 	 * @param systemID System-Identifikator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useSystemID(final String systemID) {
 		this._systemID_ = systemID;
 		if (this._source_ == null) return this._this_();
@@ -160,22 +136,19 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
+	/** Diese Methode setzt die Quelldaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
 	 * 
 	 * @see #getSource()
 	 * @see #useSystemID(String)
 	 * @param source Quelldaten oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useSource(final Source source) {
 		this._source_ = source;
 		if (source == null) return this._this_();
 		return this.useSystemID(this._systemID_ != null ? this._systemID_ : source.getSystemId());
 	}
 
-	/**
-	 * Diese Methode gibt die aktuell konfigurierten Quelldaten zurück.
+	/** Diese Methode gibt die aktuell konfigurierten Quelldaten zurück.
 	 * 
 	 * @see #useFile(File)
 	 * @see #useNode(Node)
@@ -185,18 +158,15 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @see #useSystemID(String)
 	 * @see DOMSource
 	 * @see StreamSource
-	 * @return Quelldaten oder {@code null}.
-	 */
+	 * @return Quelldaten oder {@code null}. */
 	public final Source getSource() {
 		return this._source_;
 	}
 
-	/**
-	 * Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
+	/** Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
 	 * Der Rückgabewert ist {@code null}, wenn die Quelldaten keine {@link StreamSource} sind.
 	 * 
-	 * @return Quelldaten oder {@code null}.
-	 */
+	 * @return Quelldaten oder {@code null}. */
 	public final InputSource getInputSource() {
 		final Source source = this.getSource();
 		if (!(source instanceof StreamSource)) return null;
@@ -208,13 +178,11 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return result;
 	}
 
-	/**
-	 * Diese Methode setzt die Quelldaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Quelldaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
 	 * @see #useSystemID(String)
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis resetSource() {
 		this.useSystemID(null);
 		return this.useSource(null);
@@ -222,19 +190,15 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 * 
-	 * @see #getSource()
-	 */
+	 * @see #getSource() */
 	@Override
 	public final Source build() throws IllegalStateException {
 		return this.getSource();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this._source_, this._systemID_);

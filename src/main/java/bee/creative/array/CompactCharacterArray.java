@@ -1,29 +1,23 @@
 package bee.creative.array;
 
-/**
- * Diese Klasse implementiert ein {@link CharacterArray} als {@link CompactArray}.
+/** Diese Klasse implementiert ein {@link CharacterArray} als {@link CompactArray}.
  * 
- * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactCharacterArray extends CompactArray<char[], Character> implements CharacterArray {
 
-	/**
-	 * Diese Klasse implementiert ein {@link CharacterArray} als modifizierbare Sicht auf einen Teil eines {@link CompactCharacterArray}s.
+	/** Diese Klasse implementiert ein {@link CharacterArray} als modifizierbare Sicht auf einen Teil eines {@link CompactCharacterArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArray extends CompactSubArray<CompactCharacterArray, char[], Character> implements CharacterArray {
 
-		/**
-		 * Dieser Konstruktor initialisiert Besitzer und Indices.
+		/** Dieser Konstruktor initialisiert Besitzer und Indices.
 		 * 
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
-		 *         {@code startIndex > finalIndex}).
-		 */
+		 *         {@code startIndex > finalIndex}). */
 		public CompactCharacterSubArray(final CompactCharacterArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
 			IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
@@ -31,82 +25,62 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public CharacterArraySection section() {
 			return new CompactCharacterSubArraySection(this);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public char get(final int index) {
 			return this._owner_.get(this._ownerIndex_(index));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void get(final int index, final char[] values) {
 			this.get(index, CharacterArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char value) {
 			this._owner_.set(this._ownerIndex_(index), value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void set(final int index, final char[] values) {
 			this.set(index, CharacterArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final char value) {
 			this.add(this.size(), value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final char[] values) {
 			this.add(this.size(), values);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final char value) {
 			this.insert(index, 1);
 			this.set(index, value);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public void add(final int index, final char[] values) {
 			this.add(this.size(), CharacterArraySection.from(values));
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public CharacterArray subArray(final int fromIndex, final int toIndex) {
 			return (CharacterArray)this._ownerSubArray_(fromIndex, toIndex);
@@ -114,24 +88,18 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterArray}s.
+	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterArraySection extends CharacterArraySection {
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		protected final CompactCharacterArray _owner_;
 
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
+		/** Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterArraySection(final CompactCharacterArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
 			this._owner_ = owner;
@@ -139,33 +107,25 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this._owner_._size_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
 			return this._owner_._array_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this._owner_._from_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			final CompactCharacterArray owner = this._owner_;
@@ -174,24 +134,18 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	}
 
-	/**
-	 * Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterSubArray}s.
+	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterSubArray}s.
 	 * 
-	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 */
+	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArraySection extends CharacterArraySection {
 
-		/**
-		 * Dieses Feld speichert den Besitzer.
-		 */
+		/** Dieses Feld speichert den Besitzer. */
 		protected final CompactCharacterSubArray _owner_;
 
-		/**
-		 * Dieser Konstruktor initialisiert den Besitzer.
+		/** Dieser Konstruktor initialisiert den Besitzer.
 		 * 
 		 * @param owner Besitzer.
-		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
-		 */
+		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterSubArraySection(final CompactCharacterSubArray owner) throws NullPointerException {
 			if (owner == null) throw new NullPointerException("owner = null");
 			this._owner_ = owner;
@@ -199,33 +153,25 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int size() {
 			return this._owner_.size();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public char[] array() {
 			return this._owner_._owner_._array_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int startIndex() {
 			return this._owner_._startIndex_;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int finalIndex() {
 			return this._owner_._finalIndex_;
@@ -235,31 +181,24 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	{}
 
-	/**
-	 * Dieses Feld speichert das {@code char}-Array.
-	 */
+	/** Dieses Feld speichert das {@code char}-Array. */
 	protected char[] _array_;
 
-	/**
-	 * Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}.
-	 */
+	/** Dieser Konstruktor initialisiert das Array mit der Kapazität {@code 0} und der relativen Ausrichtungsposition {@code 0.5}. */
 	public CompactCharacterArray() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
+	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
 	 * 
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
-	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public CompactCharacterArray(final int capacity) throws IllegalArgumentException {
 		super(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
+	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
 	 * 
 	 * @see ArrayData#allocate(int)
@@ -267,146 +206,111 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	 * @param section {@link ArraySection}.
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
-	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
 	public CompactCharacterArray(final ArraySection<char[]> section) throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		super(section);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected char[] _array_() {
 		return this._array_;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _array_(final char[] array) {
 		this._array_ = array;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected char[] _allocArray_(final int length) {
 		return new char[length];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected Character _value_(final int index) {
 		return Character.valueOf(this.get(index));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void _value_(final int index, final Character value) {
 		this.set(index, value.charValue());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected int _capacity_() {
 		return this._array_.length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public char get(final int index) {
 		return this._array_[this._inclusiveIndex_(index)];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void get(final int index, final char[] values) {
 		this.get(index, CharacterArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char value) {
 		this._array_[this._inclusiveIndex_(index)] = value;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void set(final int index, final char[] values) {
 		this.set(index, CharacterArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final char value) {
 		this.add(this._size_, value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final char[] values) {
 		this.add(this._size_, values);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char value) {
 		this.insert(index, 1);
 		this.set(index, value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void add(final int index, final char[] values) {
 		this.add(this._size_, CharacterArraySection.from(values));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public char[] array() {
 		return this._array_;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public CharacterArraySection section() {
 		return new CompactCharacterArraySection(this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public CharacterArray subArray(final int startIndex, final int finalIndex) {
 		return new CompactCharacterSubArray(this, startIndex, finalIndex);

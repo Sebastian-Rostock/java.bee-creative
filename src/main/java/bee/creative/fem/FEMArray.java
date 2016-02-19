@@ -10,24 +10,18 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 
-/**
- * Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
+/** Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  * 
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Iterable<FEMValue> {
 
-	/**
-	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#export(Collector)}.
-	 */
+	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#export(Collector)}. */
 	public static interface Collector {
 
-		/**
-		 * Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
+		/** Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
 		 * 
 		 * @param value Wert.
-		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll.
-		 */
+		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(FEMValue value);
 
 	}
@@ -273,121 +267,97 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
-	 */
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 1;
 
-	/**
-	 * Dieses Feld speichert den {@link #type() Datentyp}.
-	 */
+	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID, "ARRAY");
 
-	/**
-	 * Dieses Feld speichert eine leere Wertliste.
-	 */
+	/** Dieses Feld speichert eine leere Wertliste. */
 	public static final FEMArray EMPTY = new EmptyArray();
 
 	{}
 
-	/**
-	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
 	 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
 	 * 
 	 * @param values Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
 	public static final FEMArray from(final FEMValue... values) throws NullPointerException {
 		if (values.length == 0) return FEMArray.EMPTY;
 		if (values.length == 1) return FEMArray.from(values[0], 1);
 		return new CompactArray(values.clone());
 	}
 
-	/**
-	 * Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
+	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 * 
 	 * @param value Wert.
 	 * @param length Länge.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static final FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
 		if (length == 0) return FEMArray.EMPTY;
 		if (value == null) throw new NullPointerException("value = null");
 		return new UniformArray(length, value);
 	}
 
-	/**
-	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see #from(Collection)
 	 * @param values Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
 	public static final FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
 		final ArrayList<FEMValue> result = new ArrayList<>();
 		Iterables.appendAll(result, values);
 		return FEMArray.from(result);
 	}
 
-	/**
-	 * Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
+	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see Collection#toArray(Object[])
 	 * @see #from(FEMValue...)
 	 * @param values Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
 	public static final FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
 		if (values.size() == 0) return FEMArray.EMPTY;
 		return FEMArray.from(values.toArray(new FEMValue[values.size()]));
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMArray.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMArray.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final FEMArray from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMArray.TYPE);
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static final FEMArray from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMArray.TYPE);
 	}
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den Streuwert.
-	 */
+	/** Dieses Feld speichert den Streuwert. */
 	int _hash_;
 
-	/**
-	 * Dieses Feld speichert die Länge.
-	 */
+	/** Dieses Feld speichert die Länge. */
 	protected final int _length_;
 
-	/**
-	 * Dieser Konstruktor initialisiert die Länge.
+	/** Dieser Konstruktor initialisiert die Länge.
 	 * 
 	 * @param length Länge.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMArray(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this._length_ = length;
@@ -395,26 +365,22 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 
 	{}
 
-	/**
-	 * Diese Methode gibt den {@code index}-ten Wert zurück.
+	/** Diese Methode gibt den {@code index}-ten Wert zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-ter Wert.
-	 */
+	 * @return {@code index}-ter Wert. */
 	protected FEMValue _get_(final int index) {
 		return null;
 	}
 
-	/**
-	 * Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
-	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 */
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
@@ -428,47 +394,39 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return true;
 	}
 
-	/**
-	 * Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
+	/** Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
 	 * 
-	 * @return Array mit den Werten dieser Wertliste.
-	 */
+	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
 		this.export(target);
 		return target.array;
 	}
 
-	/**
-	 * Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
+	/** Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
 	 * 
-	 * @return Länge der Bytefolge.
-	 */
+	 * @return Länge der Bytefolge. */
 	public final int length() {
 		return this._length_;
 	}
 
-	/**
-	 * Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
+	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
 	 * 
 	 * @param that Wertliste.
 	 * @return {@link FEMArray}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public FEMArray concat(final FEMArray that) throws NullPointerException {
 		if (that._length_ == 0) return this;
 		if (this._length_ == 0) return that;
 		return new ConcatArray(this, that);
 	}
 
-	/**
-	 * Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück.
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück.
 	 * 
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste.
-	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte.
-	 */
+	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Wertliste liegt oder eine negative Länge hätte. */
 	public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this._length_)) return this;
 		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
@@ -476,38 +434,32 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return new SectionArray(this, offset, length);
 	}
 
-	/**
-	 * Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
+	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
 	 * 
-	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste.
-	 */
+	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste. */
 	public FEMArray reverse() {
 		return new ReverseArray(this);
 	}
 
-	/**
-	 * Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück.
+	/** Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück.
 	 * 
 	 * @see #from(FEMValue...)
 	 * @see #value()
-	 * @return performanteren Wertliste oder {@code this}.
-	 */
+	 * @return performanteren Wertliste oder {@code this}. */
 	public FEMArray compact() {
 		final FEMArray result = this._length_ == 1 ? new UniformArray(1, this._get_(0)) : new CompactArray(this.value());
 		result._hash_ = this._hash_;
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt die Position des ersten Vorkommens der gegebene Wertliste innerhalb dieser Wertliste zurück.<br>
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Wertliste innerhalb dieser Wertliste zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Wenn die Wertliste nicht gefunden wird, liefert diese Methode {@code -1}.
 	 * 
 	 * @param that gesuchte Wertliste.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMArray that, final int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
 		final int count = that._length_;
@@ -527,25 +479,21 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return -1;
 	}
 
-	/**
-	 * Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen , wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean export(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
 		if (this._length_ == 0) return true;
 		return this._export_(target, 0, this._length_, true);
 	}
 
-	/**
-	 * Diese Methode gibt den Streuwert zurück.
+	/** Diese Methode gibt den Streuwert zurück.
 	 * 
-	 * @return Streuwert.
-	 */
+	 * @return Streuwert. */
 	public final int hash() {
 		int result = this._hash_;
 		if (result != 0) return result;
@@ -556,13 +504,11 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist.
 	 * 
 	 * @param that Wertliste.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMArray that) throws NullPointerException {
 		final int length = this._length_;
 		if (length != that._length_) return false;
@@ -573,54 +519,42 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return true;
 	}
 
-	/**
-	 * Diese Methode gibt diese Wertliste als {@link List} zurück.
+	/** Diese Methode gibt diese Wertliste als {@link List} zurück.
 	 * 
 	 * @see Arrays#asList(Object...)
-	 * @return {@link List}.
-	 */
+	 * @return {@link List}. */
 	public final List<FEMValue> toList() {
 		return Arrays.asList(this.value());
 	}
 
 	{}
 
-	/**
-	 * Diese Methode gibt den {@code index}-ten Wert zurück.
-	 */
+	/** Diese Methode gibt den {@code index}-ten Wert zurück. */
 	@Override
 	public final FEMValue get(final int index) throws IndexOutOfBoundsException {
 		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
 		return this._get_(index);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMArray data() {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMArray> type() {
 		return FEMArray.TYPE;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.hash();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(final Object object) {
 		if (object == this) return true;
@@ -628,17 +562,13 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return this.equals((FEMArray)object);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final Iterator<FEMValue> iterator() {
 		return Iterators.itemsIterator(this, 0, this._length_);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
 		target.putArray(this);

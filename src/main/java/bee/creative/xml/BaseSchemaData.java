@@ -7,35 +7,27 @@ import org.xml.sax.SAXException;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Schema}.
+/** Diese Klasse implementiert einen abstrakten Konfigurator für ein {@link Schema}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
- */
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die Schemadaten eines {@link Schema}.
+	/** Diese Klasse implementiert den Konfigurator für die Schemadaten eines {@link Schema}.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class SourceData<GOwner> extends BaseSourceData<SourceData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeSourceData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final SourceData<GOwner> _this_() {
 			return this;
@@ -43,27 +35,21 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory}.
+	/** Diese Klasse implementiert den Konfigurator einer {@link SchemaFactory}.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FactoryData<GOwner> extends BaseSchemaFactoryData<FactoryData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> _this_() {
 			return this;
@@ -73,14 +59,10 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert das {@link Schema}.
-	 */
+	/** Dieses Feld speichert das {@link Schema}. */
 	Schema _schema_;
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
 	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
 
 		@Override
@@ -90,9 +72,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator {@link #openSourceData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator {@link #openSourceData()}. */
 	final SourceData<GThis> _sourceData_ = new SourceData<GThis>() {
 
 		@Override
@@ -104,12 +84,10 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 
 	{}
 
-	/**
-	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 * 
 	 * @param data Konfigurator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis use(final BaseSchemaData<?> data) {
 		if (data == null) return this._this_();
 		this._schema_ = data._schema_;
@@ -118,16 +96,14 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt das {@link Schema} zurück.<br>
+	/** Diese Methode gibt das {@link Schema} zurück.<br>
 	 * Wenn über {@link #useSchema(Schema)} noch kein {@link Schema} gesetzt wurden, werden über {@link SchemaFactory#newSchema(Source)} ein neues erstellt und
 	 * über {@link #useSchema(Schema)} gesetzt. Die zur Erstellung verwendeten Quelldaten können über {@link #openSourceData()} konfiguriert werden. Wenn diese
 	 * {@code null} sind, wird {@code null} geliefert.
 	 * 
 	 * @see #useSchema(Schema)
 	 * @return {@link Schema} oder {@code null}.
-	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws SAXException Wenn {@link SchemaFactory#newSchema(Source)} eine entsprechende Ausnahme auslöst. */
 	public final Schema getSchema() throws SAXException {
 		Schema result = this._schema_;
 		if (result != null) return result;
@@ -138,61 +114,49 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		return result;
 	}
 
-	/**
-	 * Diese Methode setzt das {@link Schema} und gibt {@code this} zurück.
+	/** Diese Methode setzt das {@link Schema} und gibt {@code this} zurück.
 	 * 
 	 * @param schema {@link Schema} oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useSchema(final Schema schema) {
 		this._schema_ = schema;
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode setzt das {@link Schema} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getSchema()} {@code null} liefern soll, müssen die
+	/** Diese Methode setzt das {@link Schema} auf {@code null} und gibt {@code this} zurück. Wenn {@link #getSchema()} {@code null} liefern soll, müssen die
 	 * {@link #openSourceData() Quelldaten} ebenfalls {@link SourceData#resetSource() rückgesetzt} werden.
 	 * 
 	 * @see #useSchema(Schema)
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis resetSchema() {
 		return this.useSchema(null);
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die Schemadaten (z.B. xsd-Datei) und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die Schemadaten (z.B. xsd-Datei) und gibt ihn zurück.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final SourceData<GThis> openSourceData() {
 		return this._sourceData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link SchemaFactory} und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die {@link SchemaFactory} und gibt ihn zurück.
 	 * 
 	 * @see SchemaFactory#newSchema(Source)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final FactoryData<GThis> openFactoryData() {
 		return this._factoryData_;
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis _this_();
 
-	/**
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 * 
-	 * @see #getSchema()
-	 */
+	 * @see #getSchema() */
 	@Override
 	public final Schema build() throws IllegalStateException {
 		try {
@@ -202,9 +166,7 @@ public abstract class BaseSchemaData<GThis> extends BaseBuilder<Schema, GThis> {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this._sourceData_, this._factoryData_);

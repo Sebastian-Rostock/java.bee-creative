@@ -9,19 +9,15 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import bee.creative.iam.IAMArray;
 
-/**
- * Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@link File} oder einen {@link ByteBuffer} gegeben sind.<br>
+/** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@link File} oder einen {@link ByteBuffer} gegeben sind.<br>
  * Die Methoden {@link #get(int)}, {@link #length()} und {@link #section(int, int)} liefern in dieser Basisklasse immer {@code 0} bzw. {@code this}.<br>
  * Zur Interpretation des Speicherbereichs muss eine entsprechende, über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()} oder
  * {@link #toINT32()} erzeugte Sicht verwendet werden.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MMFArray extends IAMArray {
 
-	/**
-	 * Dieses Feld speichert das leere {@link MMFArray}.
-	 */
+	/** Dieses Feld speichert das leere {@link MMFArray}. */
 	public static final MMFArray EMPTY = new MMFArray(0, null, 0, 0);
 
 	{}
@@ -40,52 +36,40 @@ public class MMFArray extends IAMArray {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den Speicherbereich.
-	 */
+	/** Dieses Feld speichert den Speicherbereich. */
 	protected final ByteBuffer _byteBuffer_;
 
-	/**
-	 * Dieses Feld speichert die Startposition.
-	 */
+	/** Dieses Feld speichert die Startposition. */
 	protected final int _byteOffset_;
 
-	/**
-	 * Dieses Feld speichert die Länge.
-	 */
+	/** Dieses Feld speichert die Länge. */
 	protected final int _byteLength_;
 
-	/**
-	 * Dieser Konstruktor initialisiert den Speicherbereich.
+	/** Dieser Konstruktor initialisiert den Speicherbereich.
 	 * 
 	 * @param buffer Speicherbereich.
-	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
 	public MMFArray(final ByteBuffer buffer) throws NullPointerException {
 		this(0, buffer, 0, Math.min(buffer.limit(), 1073741823));
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert den Speicherbereich mit dem aus der gegebene Datei und der gegebenen Bytereihenfolge erzeugten {@link MappedByteBuffer}.
+	/** Dieser Konstruktor initialisiert den Speicherbereich mit dem aus der gegebene Datei und der gegebenen Bytereihenfolge erzeugten {@link MappedByteBuffer}.
 	 * Wenn die Bytereihenfolge {@code null} ist, wird die native Bytereihenfolge verwendet.
 	 * 
 	 * @param file Datei.
 	 * @param order Bytereihenfolge oder {@code null} für {@link ByteOrder#nativeOrder()}.
 	 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
-	 * @throws NullPointerException Wenn {@code file} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
 	public MMFArray(final File file, final ByteOrder order) throws IOException, NullPointerException {
 		this(MMFArray._buffer_(file, order));
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert den Speicherbereich mit dem aus den gegebenen Bytes erzeugten {@link ByteBuffer}. Wenn die Bytereihenfolge {@code null}
+	/** Dieser Konstruktor initialisiert den Speicherbereich mit dem aus den gegebenen Bytes erzeugten {@link ByteBuffer}. Wenn die Bytereihenfolge {@code null}
 	 * ist, wird die native Bytereihenfolge verwendet.
 	 * 
 	 * @param bytes Bytes.
 	 * @param order Bytereihenfolge.
-	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
 	public MMFArray(final byte[] bytes, final ByteOrder order) throws NullPointerException {
 		this(ByteBuffer.wrap(bytes).order(MMFArray._order_(order)));
 	}
@@ -101,22 +85,18 @@ public class MMFArray extends IAMArray {
 
 	{}
 
-	/**
-	 * Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
+	/** Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
 	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation {@code 0}, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
 	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
 	 * 
-	 * @return Anzahl der Byte je Zahl der Folge (0..4).
-	 */
+	 * @return Anzahl der Byte je Zahl der Folge (0..4). */
 	public int mode() {
 		return 0;
 	}
 
-	/**
-	 * Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
+	/** Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
 	 * 
-	 * @return Kopie des Speicherbereichs.
-	 */
+	 * @return Kopie des Speicherbereichs. */
 	public final byte[] toBytes() {
 		final int length = this._byteLength_;
 		final byte[] result = new byte[length];
@@ -132,69 +112,55 @@ public class MMFArray extends IAMArray {
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
 	 * 
 	 * @see ByteBuffer#get(int)
-	 * @return {@link MMFINT8Array}.
-	 */
+	 * @return {@link MMFINT8Array}. */
 	public final MMFArray toINT8() {
 		return new MMFINT8Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
-	/**
-	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
 	 * 
 	 * @see ByteBuffer#getShort()
-	 * @return {@link MMFINT16Array}.
-	 */
+	 * @return {@link MMFINT16Array}. */
 	public final MMFArray toINT16() {
 		return new MMFINT16Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
-	/**
-	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
 	 * 
 	 * @see ByteBuffer#getInt()
-	 * @return {@link MMFINT32Array}.
-	 */
+	 * @return {@link MMFINT32Array}. */
 	public final MMFArray toINT32() {
 		return new MMFINT32Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
-	/**
-	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
 	 * 
 	 * @see ByteBuffer#get()
-	 * @return {@link MMFUINT8Array}.
-	 */
+	 * @return {@link MMFUINT8Array}. */
 	public final MMFArray toUINT8() {
 		return new MMFUINT8Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
-	/**
-	 * Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
+	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
 	 * 
 	 * @see ByteBuffer#getShort()
-	 * @return {@link MMFUINT16Array}.
-	 */
+	 * @return {@link MMFUINT16Array}. */
 	public final MMFArray toUINT16() {
 		return new MMFUINT16Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected MMFArray _section_(final int offset, final int length) {
 		return MMFArray.EMPTY;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final MMFArray section(final int offset, final int length) {
 		return (MMFArray)super.section(offset, length);

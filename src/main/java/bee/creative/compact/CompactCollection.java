@@ -4,38 +4,30 @@ import java.util.Collection;
 import java.util.Iterator;
 import bee.creative.util.Iterables;
 
-/**
- * Diese Klasse implementiert eine abstrakte {@link Collection}, deren Elemente in einem Array verwaltet werden.
+/** Diese Klasse implementiert eine abstrakte {@link Collection}, deren Elemente in einem Array verwaltet werden.
  * 
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GItem> Typ der Elemente.
- */
+ * @param <GItem> Typ der Elemente. */
 public abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
 
-	/**
-	 * Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
+	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
+	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactCollectionAscendingIterator<GItem> extends CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
 
-		/**
-		 * Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
+		/** Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
 		 * 
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
-		 * @param last Index des letzten Elements (exklusiv).
-		 */
+		 * @param last Index des letzten Elements (exklusiv). */
 		public CompactCollectionAscendingIterator(final CompactCollection<GItem> data, final int from, final int last) {
 			super(data, from, last);
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected GItem _next_(final int index) {
 			return this._data_.getItem(index);
@@ -43,30 +35,24 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den absteigenden {@link Iterator} für {@link CompactCollection}s.
+	/** Diese Klasse implementiert den absteigenden {@link Iterator} für {@link CompactCollection}s.
 	 * 
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GItem> Typ der Elemente.
-	 */
+	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactCollectionDescendingIterator<GItem> extends CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
 
-		/**
-		 * Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
+		/** Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
 		 * 
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
-		 * @param last Index des letzten Elements (exklusiv).
-		 */
+		 * @param last Index des letzten Elements (exklusiv). */
 		public CompactCollectionDescendingIterator(final CompactCollection<GItem> data, final int from, final int last) {
 			super(data, from, last);
 		}
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected GItem _next_(final int index) {
 			return this._data_.getItem(index);
@@ -76,32 +62,26 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 
 	{}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Collection}.
-	 */
+	/** Dieser Konstruktor initialisiert die {@link Collection}. */
 	public CompactCollection() {
 		super();
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Collection} mit der gegebenen Kapazität.
+	/** Dieser Konstruktor initialisiert die {@link Collection} mit der gegebenen Kapazität.
 	 * 
 	 * @see CompactData#allocate(int)
-	 * @param capacity Kapazität.
-	 */
+	 * @param capacity Kapazität. */
 	public CompactCollection(final int capacity) {
 		super();
 		this.allocate(capacity);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die {@link Collection} mit den gegebenen Elementen.
+	/** Dieser Konstruktor initialisiert die {@link Collection} mit den gegebenen Elementen.
 	 * 
 	 * @see Collection#addAll(Collection)
 	 * @see CompactData#allocate(int)
 	 * @param collection Elemente.
-	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn die gegebene {@link Collection} {@code null} ist. */
 	public CompactCollection(final Collection<? extends GItem> collection) {
 		super();
 		if (collection == null) throw new NullPointerException("collection = null");
@@ -111,74 +91,58 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 
 	{}
 
-	/**
-	 * Diese Methode gibt das {@code index}-te Element zurück.
+	/** Diese Methode gibt das {@code index}-te Element zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-tes Element.
-	 */
+	 * @return {@code index}-tes Element. */
 	@SuppressWarnings ("unchecked")
 	protected final GItem getItem(final int index) {
 		return (GItem)this._items_.get(index);
 	}
 
-	/**
-	 * Diese Methode setzt das {@code index}-te Element.
+	/** Diese Methode setzt das {@code index}-te Element.
 	 * 
 	 * @param index Index.
-	 * @param item {@code index}-tes Element.
-	 */
+	 * @param item {@code index}-tes Element. */
 	protected final void setItem(final int index, final GItem item) {
 		this._items_.set(index, item);
 	}
 
-	/**
-	 * Diese Methode kopiert die Werte des gegebenen Arrays an die gegebene Position.
+	/** Diese Methode kopiert die Werte des gegebenen Arrays an die gegebene Position.
 	 * 
 	 * @param index Index.
-	 * @param items {@code index}-tes Elemente.
-	 */
+	 * @param items {@code index}-tes Elemente. */
 	protected final void setItems(final int index, final Object[] items) {
 		this._items_.set(index, items);
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int size() {
 		return this._items_.size();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final void clear() {
 		this._remove_(0, this._items_.size());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean isEmpty() {
 		return this._items_.isEmpty();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final Iterator<GItem> iterator() {
 		return new CompactCollectionAscendingIterator<GItem>(this, 0, this.size());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean remove(final Object item) {
 		final int index = this._itemIndex_(item);
@@ -187,59 +151,45 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean contains(final Object item) {
 		return this._itemIndex_(item) >= 0;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean retainAll(final Collection<?> collection) {
 		if (this.isEmpty()) return false;
 		return Iterables.retainAll((Iterable<?>)this, collection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean removeAll(final Collection<?> collection) {
 		if (this.isEmpty()) return false;
 		return Iterables.removeAll((Iterable<?>)this, collection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean containsAll(final Collection<?> collection) {
 		return Iterables.containsAll(this, collection);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return this._items_.values().toString();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public Object[] toArray() {
 		return this._items_.values().toArray();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public <T> T[] toArray(final T[] a) {
 		return this._items_.values().toArray(a);

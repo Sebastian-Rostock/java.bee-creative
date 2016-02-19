@@ -2,16 +2,12 @@ package bee.creative.xml;
 
 import javax.xml.transform.TransformerFactory;
 
-/**
- * Diese Klasse implementiert den Konfigurator für einn {@link TransformerFactory}.
+/** Diese Klasse implementiert den Konfigurator für einn {@link TransformerFactory}.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLTransformerFactory extends BaseTransformerFactoryData<XMLTransformerFactory> {
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected final XMLTransformerFactory _this_() {
 		return this;

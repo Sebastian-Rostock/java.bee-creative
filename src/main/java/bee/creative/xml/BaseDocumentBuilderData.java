@@ -10,35 +10,27 @@ import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
+/** Diese Klasse implementiert einen Konfigurator für einen {@link DocumentBuilder}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
- */
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<DocumentBuilder, GThis> {
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
+	/** Diese Klasse implementiert den Konfigurator für die {@link DocumentBuilderFactory}.
 	 * 
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FactoryData<GOwner> extends BaseDocumentBuilderFactoryData<FactoryData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeFactoryData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final FactoryData<GOwner> _this_() {
 			return this;
@@ -46,27 +38,21 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
+	/** Diese Klasse implementiert den Konfigurator für den {@link ErrorHandler}.
 	 * 
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class HandlerData<GOwner> extends BaseValueBuilder<ErrorHandler, HandlerData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeHandlerData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final HandlerData<GOwner> _this_() {
 			return this;
@@ -74,27 +60,21 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
+	/** Diese Klasse implementiert den Konfigurator für den {@link EntityResolver}.
 	 * 
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<EntityResolver, ResolverData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final ResolverData<GOwner> _this_() {
 			return this;
@@ -104,14 +84,10 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den {@link DocumentBuilder}.
-	 */
+	/** Dieses Feld speichert den {@link DocumentBuilder}. */
 	DocumentBuilder _builder_;
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openFactoryData()}. */
 	final FactoryData<GThis> _factoryData_ = new FactoryData<GThis>() {
 
 		@Override
@@ -121,9 +97,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openHandlerData()}. */
 	final HandlerData<GThis> _handlerData_ = new HandlerData<GThis>() {
 
 		@Override
@@ -133,9 +107,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	};
 
-	/**
-	 * Dieses Feld speichert den Konfigurator für {@link #openResolverData()}.
-	 */
+	/** Dieses Feld speichert den Konfigurator für {@link #openResolverData()}. */
 	final ResolverData<GThis> _resolverData_ = new ResolverData<GThis>() {
 
 		@Override
@@ -147,12 +119,10 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 
 	{}
 
-	/**
-	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 * 
 	 * @param data Konfigurator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis use(final BaseDocumentBuilderData<?> data) {
 		if (data == null) return this._this_();
 		this._builder_ = data._builder_;
@@ -162,8 +132,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt den {@link DocumentBuilder} zurück.<br>
+	/** Diese Methode gibt den {@link DocumentBuilder} zurück.<br>
 	 * Wenn über {@link #useBuilder(DocumentBuilder)} noch kein {@link DocumentBuilder} gesetzt wurde, wird über
 	 * {@link DocumentBuilderFactory#newDocumentBuilder()} ein neuer erstellt, über {@link #useBuilder(DocumentBuilder)} gesetzt und über {@link #updateBuilder()}
 	 * aktualisiert. Für die Erstellung wird die {@link DocumentBuilderFactory} genutzt, die in {@link #openFactoryData()} konfiguriert ist.
@@ -172,8 +141,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 	 * @see #updateBuilder()
 	 * @return {@link DocumentBuilder}.
 	 * @throws SAXException Wenn {@link FactoryData#getFactory()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#newDocumentBuilder()} eine entsprechende Ausnahme auslöst. */
 	public final DocumentBuilder getBuilder() throws SAXException, ParserConfigurationException {
 		DocumentBuilder result = this._builder_;
 		if (result != null) return result;
@@ -183,36 +151,30 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return result;
 	}
 
-	/**
-	 * Diese Methode setzt den {@link DocumentBuilder} und gibt {@code this} zurück.
+	/** Diese Methode setzt den {@link DocumentBuilder} und gibt {@code this} zurück.
 	 * 
 	 * @param builder {@link DocumentBuilder} oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis useBuilder(final DocumentBuilder builder) {
 		this._builder_ = builder;
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode setzt den {@link DocumentBuilder} auf {@code null} und gibt {@code this} zurück.
+	/** Diese Methode setzt den {@link DocumentBuilder} auf {@code null} und gibt {@code this} zurück.
 	 * 
 	 * @see #useBuilder(DocumentBuilder)
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	public final GThis resetBuilder() {
 		return this.useBuilder(null);
 	}
 
-	/**
-	 * Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück.<br>
+	/** Diese Methode aktualisiert die Einstellungen des {@link DocumentBuilder} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf den über {@link #getBuilder()} ermittelten {@link DocumentBuilder} die Einstellungen übertragen, die in
 	 * {@link #openHandlerData()} und {@link #openResolverData()} konfiguriert sind.
 	 * 
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
-	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws ParserConfigurationException Wenn {@link #getBuilder()} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateBuilder() throws SAXException, ParserConfigurationException {
 		final DocumentBuilder builder = this.getBuilder();
 		for (final ErrorHandler value: this._handlerData_) {
@@ -224,49 +186,39 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory} und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für die {@link DocumentBuilderFactory} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilderFactory#newDocumentBuilder()
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final FactoryData<GThis> openFactoryData() {
 		return this._factoryData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für den {@link ErrorHandler} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilder#setErrorHandler(ErrorHandler)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final HandlerData<GThis> openHandlerData() {
 		return this._handlerData_;
 	}
 
-	/**
-	 * Diese Methode öffnet den Konfigurator für den {@link EntityResolver} und gibt ihn zurück.
+	/** Diese Methode öffnet den Konfigurator für den {@link EntityResolver} und gibt ihn zurück.
 	 * 
 	 * @see DocumentBuilder#setEntityResolver(EntityResolver)
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ResolverData<GThis> openResolverData() {
 		return this._resolverData_;
 	}
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis _this_();
 
-	/**
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 * 
-	 * @see #getBuilder()
-	 */
+	 * @see #getBuilder() */
 	@Override
 	public final DocumentBuilder build() throws IllegalStateException {
 		try {
@@ -276,9 +228,7 @@ public abstract class BaseDocumentBuilderData<GThis> extends BaseBuilder<Documen
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this._factoryData_, this._handlerData_, this._resolverData_);

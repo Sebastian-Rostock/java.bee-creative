@@ -3,48 +3,36 @@ package bee.creative.data;
 import java.io.IOException;
 import bee.creative.array.CompactByteArray;
 
-/**
- * Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link CompactByteArray}.
+/** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link CompactByteArray}.
  * 
  * @see CompactByteArray
- * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ArrayDataTarget extends BaseDataTarget {
 
-	/**
-	 * Dieses Feld speichert die Nutzdaten.
-	 */
+	/** Dieses Feld speichert die Nutzdaten. */
 	final CompactByteArray __data;
 
-	/**
-	 * Dieses Feld speichert die Schreibeposition.
-	 */
+	/** Dieses Feld speichert die Schreibeposition. */
 	int __index;
 
-	/**
-	 * Dieser Konstruktor initialisiert die Nutzdaten mit 128 Byte Größe.
-	 */
+	/** Dieser Konstruktor initialisiert die Nutzdaten mit 128 Byte Größe. */
 	public ArrayDataTarget() {
 		this(128);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Nutzdaten mit der gegebenen Größe.
+	/** Dieser Konstruktor initialisiert die Nutzdaten mit der gegebenen Größe.
 	 * 
 	 * @see CompactByteArray#CompactByteArray(int)
-	 * @param size Größe.
-	 */
+	 * @param size Größe. */
 	public ArrayDataTarget(final int size) {
 		this(new CompactByteArray(size));
 		this.__data.setAlignment(0);
 	}
 
-	/**
-	 * Dieser Konstruktor initialisiert die Nutzdaten.
+	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 * 
 	 * @param data Nutzdaten.
-	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind.
-	 */
+	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind. */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
 		this.__data = data;
@@ -52,17 +40,13 @@ public class ArrayDataTarget extends BaseDataTarget {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public CompactByteArray data() {
 		return this.__data;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
@@ -73,33 +57,25 @@ public class ArrayDataTarget extends BaseDataTarget {
 		this.__index = index2;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
 		this.__index = (int)index;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
 		return this.__index;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
 		return this.__data.size();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
 		final int size = this.__data.size();
@@ -112,9 +88,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public void close() throws IOException {
 	}

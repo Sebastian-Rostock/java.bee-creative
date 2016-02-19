@@ -3,8 +3,7 @@ package bee.creative.util;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter}s.
+/** Diese Schnittstelle definiert das Paar aus Ein- und Ausgabe eines {@link Converter}s.
  * <p>
  * Im nachfolgenden Beispiel wird aus den gegebenen Elementen {@code entries} mit Hilfe des {@link Converter}s {@code converter} eine {@link List} aus
  * {@link Conversion}s erzeugt. Diese {@link Conversion}s werden anschließend bezüglich ihrer Ausgabe ({@link Conversion#output()}) gemäß dem {@link Comparator}
@@ -28,33 +27,24 @@ import java.util.List;
  * @see Conversions
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GInput> Typ des Eingabe.
- * @param <GOutput> Typ der Ausgabe.
- */
+ * @param <GOutput> Typ der Ausgabe. */
 public interface Conversion<GInput, GOutput> {
 
-	/**
-	 * Diese Methode gibt die Eingabe eines {@link Converter}s zurück.
+	/** Diese Methode gibt die Eingabe eines {@link Converter}s zurück.
 	 * 
-	 * @return Eingabe.
-	 */
+	 * @return Eingabe. */
 	public GInput input();
 
-	/**
-	 * Diese Methode gibt die Ausgabe eines {@link Converter}s zurück.
+	/** Diese Methode gibt die Ausgabe eines {@link Converter}s zurück.
 	 * 
-	 * @return Ausgabe.
-	 */
+	 * @return Ausgabe. */
 	public GOutput output();
 
-	/**
-	 * Der Streuwert entspricht dem der {@link #output() Ausgabe}. {@inheritDoc}
-	 */
+	/** Der Streuwert entspricht dem der {@link #output() Ausgabe}. {@inheritDoc} */
 	@Override
 	public int hashCode();
 
-	/**
-	 * Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #output() Ausgaben}. {@inheritDoc}
-	 */
+	/** Die Äquivalenz dieses und der gegebenen {@link Conversion} basiert auf der Äquivalenz ihrer {@link #output() Ausgaben}. {@inheritDoc} */
 	@Override
 	public boolean equals(Object object);
 

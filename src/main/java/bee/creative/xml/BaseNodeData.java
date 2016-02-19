@@ -11,38 +11,30 @@ import org.w3c.dom.Text;
 import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
-/**
- * Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
+/** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GThis> Typ des konkreten Nachfahren dieser Klasse.
- */
+ * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBuilder<Node, GThis> {
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für einen Attributknoten.
+	/** Diese Klasse implementiert den Konfigurator für einen Attributknoten.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class AttrData<GOwner extends BaseNodeData<?>> extends BaseNodeData<AttrData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeAttr();
 
-		/**
-		 * Diese Methode entfernt den {@link #getNode() aktuelen Attributknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
+		/** Diese Methode entfernt den {@link #getNode() aktuelen Attributknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
 		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
 		 * 
 		 * @see #closeAttr()
 		 * @see Element#removeAttributeNode(Attr)
 		 * @return Besitzer.
-		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Attributknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
-		 */
+		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Attributknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist. */
 		public final GOwner removeAttr() throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeAttr();
@@ -58,9 +50,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final AttrData<GOwner> _this_() {
 			return this;
@@ -68,23 +58,18 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	}
 
-	/**
-	 * Diese Klasse implementiert den Konfigurator für einen Kindknoten.
+	/** Diese Klasse implementiert den Konfigurator für einen Kindknoten.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
-	 * @param <GOwner> Typ des Besitzers.
-	 */
+	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ChldData<GOwner extends BaseNodeData<?>> extends BaseNodeData<ChldData<GOwner>> {
 
-		/**
-		 * Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
+		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
 		 * 
-		 * @return Besitzer.
-		 */
+		 * @return Besitzer. */
 		public abstract GOwner closeChld();
 
-		/**
-		 * Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer zurück.<br>
+		/** Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer zurück.<br>
 		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten
 		 * usw. Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
 		 * 
@@ -92,8 +77,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		 * @see Node#insertBefore(Node, Node)
 		 * @param index Position.
 		 * @return Besitzer.
-		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
-		 */
+		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist. */
 		public final GOwner insertChld(int index) throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeChld();
@@ -115,15 +99,13 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 			}
 		}
 
-		/**
-		 * Diese Methode entfernt den {@link #getNode() aktuelen Kindknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
+		/** Diese Methode entfernt den {@link #getNode() aktuelen Kindknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
 		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
 		 * 
 		 * @see #closeChld()
 		 * @see Element#removeAttributeNode(Attr)
 		 * @return Besitzer.
-		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist.
-		 */
+		 * @throws IllegalStateException Wenn der aktuelle Knoten kein Kindknoten bzw. der Knoten des Besitzers kein kompatibler Elementknoten ist. */
 		public final GOwner removeChld() throws IllegalStateException {
 			try {
 				final GOwner owner = this.closeChld();
@@ -138,9 +120,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 		{}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		protected final ChldData<GOwner> _this_() {
 			return this;
@@ -150,9 +130,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	{}
 
-	/**
-	 * Dieses Feld speichert die leere Attributknotenliste.
-	 */
+	/** Dieses Feld speichert die leere Attributknotenliste. */
 	public static final NamedNodeMap EMPTY_ATTR_MAP = new NamedNodeMap() {
 
 		@Override
@@ -197,9 +175,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	};
 
-	/**
-	 * Dieses Feld speichert die leere Kondknotenliste.
-	 */
+	/** Dieses Feld speichert die leere Kondknotenliste. */
 	public static final NodeList EMPTY_CHLD_LIST = new NodeList() {
 
 		@Override
@@ -216,18 +192,14 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den aktuellen Knoten.
-	 */
+	/** Dieses Feld speichert den aktuellen Knoten. */
 	Node _node_;
 
 	{}
 
-	/**
-	 * Diese Methode gibt einen neuen Konfigurator für einen Attributknoten zurück.
+	/** Diese Methode gibt einen neuen Konfigurator für einen Attributknoten zurück.
 	 * 
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	protected final AttrData<GThis> newAttrData() {
 		return new AttrData<GThis>() {
 
@@ -239,11 +211,9 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		};
 	}
 
-	/**
-	 * Diese Methode gibt einen neuen Konfigurator für einen Kindnoten zurück.
+	/** Diese Methode gibt einen neuen Konfigurator für einen Kindnoten zurück.
 	 * 
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	protected final ChldData<GThis> newChldData() {
 		return new ChldData<GThis>() {
 
@@ -255,114 +225,93 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		};
 	}
 
-	/**
-	 * Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
+	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
 	 * 
 	 * @param data Konfigurator oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	protected GThis use(final BaseNodeData<?> data) {
 		if (data == null) return this._this_();
 		this._node_ = data._node_;
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
 	 * 
 	 * @see #getType()
 	 * @param nodeType Knotentyp.
-	 * @return {@code true}, wenn der {@link #getNode() aktuelle Knoten} den gegebenen Knotentyp hat.
-	 */
+	 * @return {@code true}, wenn der {@link #getNode() aktuelle Knoten} den gegebenen Knotentyp hat. */
 	public final boolean hasType(final int nodeType) {
 		return this.getType() == nodeType;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#TEXT_NODE} ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#TEXT_NODE} ist.
 	 * 
 	 * @see #hasType(int)
-	 * @return {@code true} bei einem Textknoten.
-	 */
+	 * @return {@code true} bei einem Textknoten. */
 	public final boolean hasType_TEXT() {
 		return this.hasType(Node.TEXT_NODE);
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ELEMENT_NODE} ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ELEMENT_NODE} ist.
 	 * 
 	 * @see #hasType(int)
-	 * @return {@code true} bei einem Elementknoten.
-	 */
+	 * @return {@code true} bei einem Elementknoten. */
 	public final boolean hasType_ELEM() {
 		return this.hasType(Node.ELEMENT_NODE);
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ATTRIBUTE_NODE} ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ATTRIBUTE_NODE} ist.
 	 * 
 	 * @see #hasType(int)
-	 * @return {@code true} bei einem Attributknoten.
-	 */
+	 * @return {@code true} bei einem Attributknoten. */
 	public final boolean hasType_ATTR() {
 		return this.hasType(Node.ATTRIBUTE_NODE);
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#DOCUMENT_NODE} ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#DOCUMENT_NODE} ist.
 	 * 
 	 * @see #hasType(int)
-	 * @return {@code true} bei einem Dokumentknoten.
-	 */
+	 * @return {@code true} bei einem Dokumentknoten. */
 	public final boolean hasType_DOCU() {
 		return this.hasType(Node.DOCUMENT_NODE);
 	}
 
-	/**
-	 * Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück.<br>
+	/** Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück.<br>
 	 * Wenn es {@link #hasNode() keinen solchen Knoten gibt}, wird {@code 0} geliefert.
 	 * 
-	 * @return Knotentyp oder {@code 0}.
-	 */
+	 * @return Knotentyp oder {@code 0}. */
 	public final int getType() {
 		final Node node = this.getNode();
 		if (node == null) return 0;
 		return node.getNodeType();
 	}
 
-	/**
-	 * Diese Methode gibt den aktuellen Knote oder {@code null} zurück.
+	/** Diese Methode gibt den aktuellen Knote oder {@code null} zurück.
 	 * 
 	 * @see #useNode(Node)
-	 * @return Knoten oder {@code null}.
-	 */
+	 * @return Knoten oder {@code null}. */
 	public final Node getNode() {
 		return this._node_;
 	}
 
-	/**
-	 * Diese Methode setzt den {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
+	/** Diese Methode setzt den {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
 	 * 
 	 * @param node Knoten oder {@code null}.
-	 * @return {@code this}.
-	 */
+	 * @return {@code this}. */
 	protected GThis useNode(final Node node) {
 		this._node_ = node;
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück zurück.
+	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück zurück.
 	 * 
 	 * @see #getValue(String)
-	 * @return Wert bzw. Inhalt oder {@code null}.
-	 */
+	 * @return Wert bzw. Inhalt oder {@code null}. */
 	public final String getValue() {
 		return this.getValue(null);
 	}
 
-	/**
-	 * Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück.<br>
+	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn der Knoten ein {@link #hasType_ELEM() Elementknoten} ist, wird dessen {@link Node#getTextContent() Inhalt} geliefert. Wenn es {@link #hasNode() keinen
 	 * aktuellen Knoten gibt}, wird der gegebene Vorgabewert geliefert. Andernfalls wird der {@link Node#getNodeValue() Wert} des Knoten geliefert.
 	 * 
@@ -370,8 +319,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getNodeValue()
 	 * @see Node#getTextContent()
 	 * @param defaultValue Vorgabewert.
-	 * @return Wert bzw. Inhalt oder Vorgabewert.
-	 */
+	 * @return Wert bzw. Inhalt oder Vorgabewert. */
 	public final String getValue(final String defaultValue) {
 		final Node node = this.getNode();
 		if (node == null) return defaultValue;
@@ -379,16 +327,14 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return node.getNodeValue();
 	}
 
-	/**
-	 * Diese Methode setzt den Wert des {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
+	/** Diese Methode setzt den Wert des {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
 	 * 
 	 * @see Node#setNodeValue(String)
 	 * @see Node#setTextContent(String)
 	 * @param value Wert.
 	 * @return {@code this}.
 	 * @throws DOMException Wenn {@link Node#setNodeValue(String)} bzw. {@link Node#setTextContent(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt. */
 	public final GThis useValue(final String value) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
@@ -400,14 +346,12 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this._this_();
 	}
 
-	/**
-	 * Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	/** Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keinen Elternknoten hat, wird {@code null} geliefert.
 	 * 
 	 * @see Attr#getOwnerElement()
 	 * @see Node#getParentNode()
-	 * @return Elternknoten oder {@code null}.
-	 */
+	 * @return Elternknoten oder {@code null}. */
 	public final Node getParent() {
 		final Node node = this.getNode();
 		if (node == null) return null;
@@ -415,13 +359,11 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return node.getParentNode();
 	}
 
-	/**
-	 * Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück.<br>
+	/** Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn der der aktuelle Knoten {@code null} ist, wird {@code null} geliefert.
 	 * 
 	 * @see Node#getOwnerDocument()
-	 * @return {@link Document} oder {@code null}.
-	 */
+	 * @return {@link Document} oder {@code null}. */
 	public final Document getDocument() {
 		final Node node = this.getNode();
 		if (node == null) return null;
@@ -429,13 +371,11 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return node.getOwnerDocument();
 	}
 
-	/**
-	 * Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	/** Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Attribute hat, wird {@link #EMPTY_ATTR_MAP} geliefert.
 	 * 
 	 * @see Node#getAttributes()
-	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}.
-	 */
+	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}. */
 	public final NamedNodeMap getAttrMap() {
 		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_ATTR_MAP;
@@ -444,23 +384,19 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Attributknoten des {@link #getNode() aktuellen Knoten} zurück.
+	/** Diese Methode gibt die Anzahl der Attributknoten des {@link #getNode() aktuellen Knoten} zurück.
 	 * 
 	 * @see #getAttrMap()
-	 * @return Attributknotenanzahl.
-	 */
+	 * @return Attributknotenanzahl. */
 	public final int getAttrCount() {
 		return this.getAttrMap().getLength();
 	}
 
-	/**
-	 * Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
+	/** Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Kindknoten hat, wird {@link #EMPTY_CHLD_LIST} geliefert.
 	 * 
 	 * @see Node#getChildNodes()
-	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}.
-	 */
+	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}. */
 	public final NodeList getChldList() {
 		final Node node = this.getNode();
 		if (node == null) return BaseNodeData.EMPTY_CHLD_LIST;
@@ -469,27 +405,22 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt die Anzahl der Kindknoten des {@link #getNode() aktuellen Knoten} zurück.
+	/** Diese Methode gibt die Anzahl der Kindknoten des {@link #getNode() aktuellen Knoten} zurück.
 	 * 
 	 * @see #getChldList()
-	 * @return Kindknotenanzahl.
-	 */
+	 * @return Kindknotenanzahl. */
 	public final int getChldCount() {
 		return this.getChldList().getLength();
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn es einen {@link #getNode() aktuelle Knoten} gibt, d.h. dieser nicht {@code null} ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn es einen {@link #getNode() aktuelle Knoten} gibt, d.h. dieser nicht {@code null} ist.
 	 * 
-	 * @return {@code true}, wenn {@link #getNode()} nicht {@code null} liefert.
-	 */
+	 * @return {@code true}, wenn {@link #getNode()} nicht {@code null} liefert. */
 	public final boolean hasNode() {
 		return this.getNode() != null;
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen Namen in die Attributknotenliste ein und gibt den Konfigurator dieses Knoten
+	/** Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen Namen in die Attributknotenliste ein und gibt den Konfigurator dieses Knoten
 	 * zurück.
 	 * 
 	 * @see Document#createAttribute(String)
@@ -497,8 +428,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator des Attributknoten.
 	 * @throws DOMException Wenn {@link NamedNodeMap#setNamedItem(Node)} bzw. {@link Document#createAttribute(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt. */
 	public final AttrData<GThis> newAttr(final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttribute(name);
@@ -507,8 +437,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newAttrData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen URI und Namen in die Attributknotenliste ein und gibt den Konfigurator dieses
+	/** Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen URI und Namen in die Attributknotenliste ein und gibt den Konfigurator dieses
 	 * Knoten zurück.
 	 * 
 	 * @see Document#createAttributeNS(String, String)
@@ -518,8 +447,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @return Konfigurator des Attributknoten.
 	 * @throws DOMException Wenn {@link NamedNodeMap#setNamedItemNS(Node)} bzw. {@link Document#createAttributeNS(String, String)} eine entsprechende Ausnahme
 	 *         auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasType_ELEM() aktuell keinen Elementknoten} gibt. */
 	public final AttrData<GThis> newAttr(final String uri, final String name) throws DOMException, IllegalStateException {
 		if (!this.hasType_ELEM()) throw new IllegalStateException();
 		final Attr item = this.getDocument().createAttributeNS(uri, name);
@@ -528,13 +456,11 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newAttrData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Text Textknoten} an die Kindknotenliste an und gibt den Konfigurator dieses Knoten zurück.
+	/** Diese Methode fügt einen neuen {@link Text Textknoten} an die Kindknotenliste an und gibt den Konfigurator dieses Knoten zurück.
 	 * 
 	 * @return Konfigurator des Textknoten.
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt. */
 	public final ChldData<GThis> newText() throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
@@ -544,30 +470,26 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData().useNode(text);
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Text Textknoten} mit dem gegebenen Wert an die Kindknotenliste an und gibt {@code this} zurück.
+	/** Diese Methode fügt einen neuen {@link Text Textknoten} mit dem gegebenen Wert an die Kindknotenliste an und gibt {@code this} zurück.
 	 * 
 	 * @see #newText()
 	 * @see #useValue(String)
 	 * @param text Wert.
 	 * @return {@code this}.
 	 * @throws DOMException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst.
-	 */
+	 * @throws IllegalStateException Wenn {@link #newText()} eine entsprechende Ausnahme auslöst. */
 	public final GThis newText(final String text) throws DOMException, IllegalStateException {
 		return this.newText().useValue(text).closeChld();
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen Namen an die Kindknotenliste an und gibt den Konfigurator dieses Knoten
+	/** Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen Namen an die Kindknotenliste an und gibt den Konfigurator dieses Knoten
 	 * zurück.
 	 * 
 	 * @see Document#createElement(String)
 	 * @param name Name.
 	 * @return Konfigurator des Elementknoten.
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElement(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt. */
 	public final ChldData<GThis> newElem(final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
@@ -577,8 +499,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData().useNode(elem);
 	}
 
-	/**
-	 * Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen URI und Namen an die Kindknotenliste an und gibt den Konfigurator dieses
+	/** Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen URI und Namen an die Kindknotenliste an und gibt den Konfigurator dieses
 	 * Knoten zurück.
 	 * 
 	 * @see Document#createElementNS(String, String)
@@ -586,8 +507,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @param name Name.
 	 * @return Konfigurator des Elementknoten.
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} bzw. {@link Document#createElementNS(String, String)} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt.
-	 */
+	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt. */
 	public final ChldData<GThis> newElem(final String uri, final String name) throws DOMException, IllegalStateException {
 		if (!this.hasNode()) throw new IllegalStateException();
 		final Node node = this.getNode();
@@ -597,70 +517,60 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData().useNode(elem);
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück.<br>
+	/** Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück.<br>
 	 * Negative Positionen zählen vom Ende der Attributknotenliste.
 	 * 
 	 * @see #getAttrMap()
 	 * @param index Position.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final AttrData<GThis> openAttr(final int index) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newAttrData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen Namen zurück.
+	/** Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen Namen zurück.
 	 * 
 	 * @see NamedNodeMap#getNamedItem(String)
 	 * @param name Name.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final AttrData<GThis> openAttr(final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItem(name);
 		return this.newAttrData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen URI und Namen zurück.
+	/** Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen URI und Namen zurück.
 	 * 
 	 * @see NamedNodeMap#getNamedItemNS(String, String)
 	 * @param uri URI.
 	 * @param name Name.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final AttrData<GThis> openAttr(final String uri, final String name) {
 		final NamedNodeMap list = this.getAttrMap();
 		final Node item = list.getNamedItemNS(uri, name);
 		return this.newAttrData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück.<br>
+	/** Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück.<br>
 	 * Negative Positionen zählen vom Ende der Kindknotenliste.
 	 * 
 	 * @see #getChldList()
 	 * @param index Position.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ChldData<GThis> openChld(final int index) {
 		final NodeList list = this.getChldList();
 		final Node item = list.item(index < 0 ? list.getLength() + index : index);
 		return this.newChldData().useNode(item);
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen Namen zurück.
+	/** Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen Namen zurück.
 	 * 
 	 * @see #getChldList()
 	 * @see Node#getNodeType()
 	 * @see Node#getNodeName()
 	 * @param name Name.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ChldData<GThis> openChld(final String name) {
 		final NodeList list = this.getChldList();
 		for (int i = 0, length = list.getLength(); i < length; i++) {
@@ -671,8 +581,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		return this.newChldData();
 	}
 
-	/**
-	 * Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen URI und Namen zurück.
+	/** Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen URI und Namen zurück.
 	 * 
 	 * @see #getChldList()
 	 * @see Node#getNodeType()
@@ -680,8 +589,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	 * @see Node#getNamespaceURI()
 	 * @param uri URI.
 	 * @param name Name.
-	 * @return Konfigurator.
-	 */
+	 * @return Konfigurator. */
 	public final ChldData<GThis> openChld(final String uri, final String name) {
 		final NodeList list = this.getChldList();
 		for (int i = 0, length = list.getLength(); i < length; i++) {
@@ -694,25 +602,19 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected abstract GThis _this_();
 
-	/**
-	 * {@inheritDoc}
+	/** {@inheritDoc}
 	 * 
-	 * @see #getNode()
-	 */
+	 * @see #getNode() */
 	@Override
 	public final Node build() throws IllegalStateException {
 		return this.getNode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
 		return Objects.toInvokeString(this, this.getNode());

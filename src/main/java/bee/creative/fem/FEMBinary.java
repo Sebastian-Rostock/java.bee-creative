@@ -4,24 +4,18 @@ import java.util.Iterator;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.mmf.MMFArray;
 
-/**
- * Diese Klasse implementiert eine Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen realisiert sind.
+/** Diese Klasse implementiert eine Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen realisiert sind.
  * 
- * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- */
+ * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
-	/**
-	 * Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}.
-	 */
+	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}. */
 	public static interface Collector {
 
-		/**
-		 * Diese Methode fügt das gegebene Byte an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
+		/** Diese Methode fügt das gegebene Byte an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
 		 * 
 		 * @param value Byte.
-		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll.
-		 */
+		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(byte value);
 
 	}
@@ -292,60 +286,48 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den Identifikator von {@link #TYPE}.
-	 */
+	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 5;
 
-	/**
-	 * Dieses Feld speichert den {@link #type() Datentyp}.
-	 */
+	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMBinary> TYPE = FEMType.from(FEMBinary.ID, "BINARY");
 
-	/**
-	 * Dieses Feld speichert die leere Bytefolge.
-	 */
+	/** Dieses Feld speichert die leere Bytefolge. */
 	public static final FEMBinary EMPTY = new EmptyBinary();
 
 	{}
 
-	/**
-	 * Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
 	 * Das gegebene Array wird hierbei kopiert.
 	 * 
 	 * @param value Bytes.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final FEMBinary from(final byte[] value) throws NullPointerException {
 		if (value.length == 0) return FEMBinary.EMPTY;
 		if (value.length == 1) return FEMBinary.from(value[0], 1);
 		return new CompactBinary(value.clone());
 	}
 
-	/**
-	 * Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
+	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
 	 * 
 	 * @param value Byte.
 	 * @param length Länge.
 	 * @return Bytefolge.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	public static final FEMBinary from(final byte value, final int length) throws IllegalArgumentException {
 		if (length == 0) return FEMBinary.EMPTY;
 		return new UniformBinary(length, value);
 	}
 
-	/**
-	 * Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 * 
 	 * @see #toString()
 	 * @param value Zeichenkette.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMBinary from(final String value) throws NullPointerException, IllegalArgumentException {
 		final int length = value.length();
 		if ((length < 2) || ((length & 1) != 0) || (value.charAt(0) != '0') || (value.charAt(1) != 'x')) throw new IllegalArgumentException();
@@ -359,39 +341,33 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return new CompactBinary(bytes);
 	}
 
-	/**
-	 * Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
+	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
 	 * 
 	 * @param value Zahlenfolge.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link MMFArray#mode() UNI8/UINT8} vorliegt.
-	 */
+	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link MMFArray#mode() UNI8/UINT8} vorliegt. */
 	public static final FEMBinary from(final MMFArray value) throws NullPointerException, IllegalArgumentException {
 		if (value.length() == 0) return FEMBinary.EMPTY;
 		if (value.mode() == 1) return new ArrayBinary(value);
 		throw new IllegalArgumentException();
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBinary.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBinary.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final FEMBinary from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMBinary.TYPE);
 	}
 
-	/**
-	 * Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static final FEMBinary from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMBinary.TYPE);
 	}
@@ -414,22 +390,16 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	{}
 
-	/**
-	 * Dieses Feld speichert den Streuwert.
-	 */
+	/** Dieses Feld speichert den Streuwert. */
 	int _hash_;
 
-	/**
-	 * Dieses Feld speichert die Länge.
-	 */
+	/** Dieses Feld speichert die Länge. */
 	protected final int _length_;
 
-	/**
-	 * Dieser Konstruktor initialisiert die Länge.
+	/** Dieser Konstruktor initialisiert die Länge.
 	 * 
 	 * @param length Länge.
-	 * @throws IllegalArgumentException Wenn {@code length < 0} ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMBinary(final int length) throws IllegalArgumentException {
 		if (length < 0) throw new IllegalArgumentException("length < 0");
 		this._length_ = length;
@@ -437,26 +407,22 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	{}
 
-	/**
-	 * Diese Methode gibt das {@code index}-te Byte zurück.
+	/** Diese Methode gibt das {@code index}-te Byte zurück.
 	 * 
 	 * @param index Index.
-	 * @return {@code index}-tes Byte.
-	 */
+	 * @return {@code index}-tes Byte. */
 	protected byte _get_(final int index) {
 		return 0;
 	}
 
-	/**
-	 * Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @param foreward {@code true}, wenn die Reigenfolge forwärts ist, bzw. {@code false}, wenn sie rückwärts ist.
-	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 */
+	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde. */
 	protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 		if (foreward) {
 			for (length += offset; offset < length; offset++) {
@@ -470,59 +436,49 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/**
-	 * Diese Methode konvertiert diese Bytefolge in ein Array und gibt diese zurück.
+	/** Diese Methode konvertiert diese Bytefolge in ein Array und gibt diese zurück.
 	 * 
-	 * @return Array mit den Bytes dieser Bytefolge.
-	 */
+	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
 		this.export(target);
 		return target.array;
 	}
 
-	/**
-	 * Diese Methode gibt das {@code index}-te Byte zurück.
+	/** Diese Methode gibt das {@code index}-te Byte zurück.
 	 * 
 	 * @param index Index.
 	 * @return {@code index}-tes Byte.
-	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist.
-	 */
+	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
 	public final byte get(final int index) throws IndexOutOfBoundsException {
 		if ((index < 0) || (index >= this._length_)) throw new IndexOutOfBoundsException();
 		return this._get_(index);
 	}
 
-	/**
-	 * Diese Methode gibt die Länge, d.h. die Anzahl der Bytes in der Bytefolge zurück.
+	/** Diese Methode gibt die Länge, d.h. die Anzahl der Bytes in der Bytefolge zurück.
 	 * 
-	 * @return Länge der Bytefolge.
-	 */
+	 * @return Länge der Bytefolge. */
 	public final int length() {
 		return this._length_;
 	}
 
-	/**
-	 * Diese Methode gibt eine Sicht auf die Verkettung dieser Bytefolge mit der gegebenen Bytefolge zurück.
+	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Bytefolge mit der gegebenen Bytefolge zurück.
 	 * 
 	 * @param that Bytefolge.
 	 * @return {@link FEMBinary}-Sicht auf die Verkettung dieser mit der gegebenen Bytefolge.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public FEMBinary concat(final FEMBinary that) throws NullPointerException {
 		if (that._length_ == 0) return this;
 		if (this._length_ == 0) return that;
 		return new ConcatBinary(this, that);
 	}
 
-	/**
-	 * Diese Methode gibt eine Sicht auf einen Abschnitt dieser Bytefolge zurück.
+	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Bytefolge zurück.
 	 * 
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Bytes im Abschnitt.
 	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge.
-	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Bytefolge liegt oder eine negative Länge hätte.
-	 */
+	 * @throws IllegalArgumentException Wenn der Abschnitt nicht innerhalb dieser Bytefolge liegt oder eine negative Länge hätte. */
 	public FEMBinary section(final int offset, final int length) throws IllegalArgumentException {
 		if ((offset == 0) && (length == this._length_)) return this;
 		if ((offset < 0) || ((offset + length) > this._length_)) throw new IllegalArgumentException();
@@ -530,38 +486,32 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return new SectionBinary(this, offset, length);
 	}
 
-	/**
-	 * Diese Methode gibt eine rückwärts geordnete Sicht auf diese Bytefolge zurück.
+	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Bytefolge zurück.
 	 * 
-	 * @return rückwärts geordnete {@link FEMBinary}-Sicht auf diese Bytefolge.
-	 */
+	 * @return rückwärts geordnete {@link FEMBinary}-Sicht auf diese Bytefolge. */
 	public FEMBinary reverse() {
 		return new ReverseBinary(this);
 	}
 
-	/**
-	 * Diese Methode gibt die {@link #value() Bytes dieser Bytefolge} in einer performanteren oder zumindest gleichwertigen Bytefolge zurück.
+	/** Diese Methode gibt die {@link #value() Bytes dieser Bytefolge} in einer performanteren oder zumindest gleichwertigen Bytefolge zurück.
 	 * 
 	 * @see #from(byte[])
 	 * @see #value()
-	 * @return performanteren Bytefolge oder {@code this}.
-	 */
+	 * @return performanteren Bytefolge oder {@code this}. */
 	public FEMBinary compact() {
 		final FEMBinary result = this._length_ == 1 ? new UniformBinary(1, this._get_(0)) : new CompactBinary(this.value());
 		result._hash_ = this._hash_;
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt die Position des ersten Vorkommens der gegebene Bytefolge innerhalb dieser Bytefolge zurück.<br>
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Bytefolge innerhalb dieser Bytefolge zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Wenn die Bytefolge nicht gefunden wird, liefert diese Methode {@code -1}.
 	 * 
 	 * @param that gesuchte Bytefolge.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Bytefolge ({@code offset..this.length()-that.length()}) oder {@code -1}.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist.
-	 */
+	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
 	public final int find(final FEMBinary that, final int offset) throws NullPointerException, IllegalArgumentException {
 		if ((offset < 0) || (offset > this._length_)) throw new IllegalArgumentException();
 		final int count = that._length_;
@@ -580,25 +530,21 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return -1;
 	}
 
-	/**
-	 * Diese Methode fügt alle Bytes dieser Bytefolge vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
+	/** Diese Methode fügt alle Bytes dieser Bytefolge vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
-	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
 	public final boolean export(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
 		if (this._length_ == 0) return true;
 		return this._export_(target, 0, this._length_, true);
 	}
 
-	/**
-	 * Diese Methode gibt den Streuwert zurück.
+	/** Diese Methode gibt den Streuwert zurück.
 	 * 
-	 * @return Streuwert.
-	 */
+	 * @return Streuwert. */
 	public final int hash() {
 		int result = this._hash_;
 		if (result != 0) return result;
@@ -609,13 +555,11 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return result;
 	}
 
-	/**
-	 * Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist.
 	 * 
 	 * @param that Bytefolge.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMBinary that) throws NullPointerException {
 		final int length = this._length_;
 		if (length != that._length_) return false;
@@ -626,14 +570,12 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/**
-	 * Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich
+	/** Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich
 	 * oder größer als die der gegebenen Bytefolge ist.
 	 * 
 	 * @param that Bytefolge.
 	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist.
-	 */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMBinary that) throws NullPointerException {
 		final int length = Math.min(this._length_, that._length_);
 		for (int i = 0; i < length; i++) {
@@ -645,33 +587,25 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	{}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMBinary data() {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final FEMType<FEMBinary> type() {
 		return FEMBinary.TYPE;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
 		return this.hash();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
@@ -683,9 +617,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return this.equals((FEMBinary)object);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public final Iterator<Byte> iterator() {
 		return new Iterator<Byte>() {
@@ -710,13 +642,11 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		};
 	}
 
-	/**
-	 * Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
+	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
 	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h.
 	 * {@code 0123456789ABCDEF}.
 	 * 
-	 * @return Textdarstellung.
-	 */
+	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
 		final StringBuilder result = new StringBuilder();
