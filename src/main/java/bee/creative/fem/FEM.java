@@ -286,8 +286,8 @@ public class FEM {
 
 		/** {@inheritDoc}
 		 * <p>
-		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Stapelrahmen sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die
-		 * Methode {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
+		 * Hierbei werden dem {@link #tracer()} zuerst der gegebene Stapelrahmen sowie der {@link #function() aufzurufenden Funktion} bekannt gegeben und die Methode
+		 * {@link ScriptTracerHelper#onExecute(ScriptTracer) tracer().helper().onExecute(tracer())} aufgerufen.<br>
 		 * Anschließend wird die {@link ScriptTracer#getFunction() aktuelle Funktion} des {@link #tracer()} mit seinem {@link ScriptTracer#getFrame() aktuellen
 		 * Stapelrahmen} ausgewertet und das Ergebnis im {@link #tracer()} {@link ScriptTracer#useResult(FEMValue) gespeichert}.<br>
 		 * Abschließend werden dann {@link ScriptTracerHelper#onReturn(ScriptTracer) tracer().helper().onReturn(tracer())} aufgerufen und der
@@ -2414,9 +2414,9 @@ public class FEM {
 
 		/** Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
 		 * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
-		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler) Namen} und endet dann entweder mit einer in geschweifte Klammern eingeschlossenen
-		 * parametrisierten Funktion oder mit einer nach einem Duppelpunkt angegebenen Parameterfunktion. Wenn der Quelltext nur Bedeutungslose Bereiche enthält,
-		 * wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()} entsprechend bestückt.
+		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler) Namen} und endet dann entweder mit einer in geschweifte Klammern eingeschlossenen parametrisierten
+		 * Funktion oder mit einer nach einem Duppelpunkt angegebenen Parameterfunktion. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere
+		 * Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()} entsprechend bestückt.
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
@@ -2694,8 +2694,8 @@ public class FEM {
 		/** Dieses Feld speichert den Stack der Hierarchieebenen. */
 		final LinkedList<Boolean> _indents_ = new LinkedList<Boolean>();
 
-		/** Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "    "}. */
-		String _indent_ = "\t";
+		/** Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "  "}. */
+		String _indent_;
 
 		/** Dieses Feld speichert die Formatierungsmethoden. */
 		ScriptFormatterHelper _helper_ = ScriptFormatterHelper.EMPTY;
@@ -2842,7 +2842,7 @@ public class FEM {
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
 		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (data == null) throw new NullPointerException("function = null");
+			if (data == null) throw new NullPointerException("data = null");
 			this._check_(false);
 			if (data instanceof ScriptFormatterInput) {
 				((ScriptFormatterInput)data).toScript(this);
@@ -3045,8 +3045,8 @@ public class FEM {
 			return this._helper_;
 		}
 
-		/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück. Wenn diese {@code null} ist, wird nicht
-		 * eingerückt.
+		/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
+		 * Wenn diese {@code null} ist, wird nicht eingerückt.
 		 * 
 		 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 		 * @return {@code this}.
@@ -3102,9 +3102,9 @@ public class FEM {
 		 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
 		 * hierfür {@link #putData(Object)}, {@link #putValue(FEMValue)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
 		 * 
-		 * @see #formatData(Iterable)
-		 * @see #formatValue(Iterable)
-		 * @see #formatFunction(Iterable)
+		 * @see #formatDatas(Iterable)
+		 * @see #formatValues(Iterable)
+		 * @see #formatFunctions(Iterable)
 		 * @param <GItem> Typ der Elemente.
 		 * @param items Elemente.
 		 * @param formatter {@link Converter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
@@ -3136,32 +3136,30 @@ public class FEM {
 			}
 		}
 
-		/** Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatData(Arrays.asList(datas))}.
+		/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatDatas(Iterables.itemIterable(object))}.
 		 * 
-		 * @see #formatData(Iterable)
-		 * @param datas Objekte.
+		 * @see #formatDatas(Iterable)
+		 * @param object Objekt.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code datas} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code object} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann. */
-		public final String formatData(final Object... datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (datas == null) throw new NullPointerException("datas = null");
-			return this.formatData(Arrays.asList(datas));
+		 * @throws IllegalArgumentException Wenn das Object nicht formatiert werden kann. */
+		public final String formatData(final Object object) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.formatDatas(Iterables.itemIterable(object));
 		}
 
 		/** Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
 		 * Die Objekt werden über {@link #putData(Object)} angefügt und mit {@code ';'} separiert.
 		 * 
 		 * @see #putData(Object)
-		 * @param datas Objekte.
+		 * @param objects Objekte.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code datas} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code objects} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann. */
-		public final String formatData(final Iterable<?> datas) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (datas == null) throw new NullPointerException("values = null");
-			return this._format_(datas, new Converter<Object, Object>() {
+		public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this._format_(objects, new Converter<Object, Object>() {
 
 				@Override
 				public Object convert(final Object input) {
@@ -3171,18 +3169,17 @@ public class FEM {
 			});
 		}
 
-		/** Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatValue(Arrays.asList(values))}.
+		/** Diese Methode formatiert den gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatValue(Iterables.itemIterable(value))}.
 		 * 
-		 * @see #formatValue(Iterable)
-		 * @param values Werte.
+		 * @see #formatValues(Iterable)
+		 * @param value Wert.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann. */
-		public final String formatValue(final FEMValue... values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (values == null) throw new NullPointerException("values = null");
-			return this.formatValue(Arrays.asList(values));
+		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann. */
+		public final String formatValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.formatValues(Iterables.itemIterable(value));
 		}
 
 		/** Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
@@ -3194,8 +3191,7 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann. */
-		public final String formatValue(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (values == null) throw new NullPointerException("values = null");
+		public final String formatValues(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			return this._format_(values, new Converter<FEMValue, Object>() {
 
 				@Override
@@ -3206,18 +3202,17 @@ public class FEM {
 			});
 		}
 
-		/** Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatFunction(Arrays.asList(functions))}.
+		/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und gibt diesen zurück.<br>
+		 * Der Rückgabewert entspricht {@code this.formatFunction(Iterables.itemIterable(function))}.
 		 * 
-		 * @see #formatFunction(Iterable)
-		 * @param functions Funktionen.
+		 * @see #formatFunctions(Iterable)
+		 * @param function Funktion.
 		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
+		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
-		public final String formatFunction(final FEMFunction... functions) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (functions == null) throw new NullPointerException("functions = null");
-			return this.formatFunction(Arrays.asList(functions));
+		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann. */
+		public final String formatFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+			return this.formatFunctions(Iterables.itemIterable(function));
 		}
 
 		/** Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
@@ -3229,9 +3224,8 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
 		 * @throws IllegalStateException Wenn aktuell formatiert wird.
 		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
-		public final String formatFunction(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
+		public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
 			IllegalArgumentException {
-			if (functions == null) throw new NullPointerException("functions = null");
 			return this._format_(functions, new Converter<FEMFunction, Object>() {
 
 				@Override
@@ -3283,7 +3277,7 @@ public class FEM {
 	public static interface ScriptFormatterHelper {
 
 		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
-		 * {@link FEMScript Aufbereitete Quelltexte} wirden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
+		 * {@link FEMScript Aufbereitete Quelltexte} werden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
 		 * formatiert. */
 		static ScriptFormatterHelper EMPTY = new ScriptFormatterHelper() {
 
@@ -3820,7 +3814,8 @@ public class FEM {
 		return new ScriptCompiler();
 	}
 
-	/** Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.
+	/** Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.<br>
+	 * Der gelieferte {@link ScriptFormatter} nutzt {@link ScriptFormatterHelper#EMPTY} und keine {@link ScriptFormatter#useIndent(String) Einrückung}.
 	 * 
 	 * @see ScriptFormatter
 	 * @return {@link ScriptFormatter}. */
@@ -3828,7 +3823,7 @@ public class FEM {
 		return new ScriptFormatter();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseValue()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).parseValue()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#parseValue()
@@ -3840,7 +3835,7 @@ public class FEM {
 		return FEM.scriptParser().useSource(source).parseValue();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseString()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).parseString()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#parseString()
@@ -3852,7 +3847,7 @@ public class FEM {
 		return FEM.scriptParser().useSource(source).parseString();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).parseComment()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).parseComment()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#parseComment()
@@ -3864,7 +3859,7 @@ public class FEM {
 		return FEM.scriptParser().useSource(source).parseComment();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatValue()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).formatValue()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#formatValue()
@@ -3875,7 +3870,7 @@ public class FEM {
 		return FEM.scriptParser().useSource(source).formatValue();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatString()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).formatString()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#formatString()
@@ -3886,7 +3881,7 @@ public class FEM {
 		return FEM.scriptParser().useSource(source).formatString();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEM.scriptParser().useSource(source).formatComment()}.
+	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).formatComment()}.
 	 * 
 	 * @see #scriptParser()
 	 * @see ScriptParser#formatComment()

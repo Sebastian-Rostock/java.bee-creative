@@ -178,7 +178,7 @@ public class Iterables {
 	 * @param <GItem> Typ des Elements.
 	 * @param item Element.
 	 * @return {@code item}-{@link Iterable}. */
-	public static final <GItem> Iterable<GItem> itemIterator(final GItem item) {
+	public static final <GItem> Iterable<GItem> itemIterable(final GItem item) {
 		return Iterables.itemIterable(item, 1);
 	}
 

@@ -76,9 +76,12 @@ public final class FEMVoid extends BaseValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean equals(final Object object) {
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		return object instanceof FEMValue;
+		if (object instanceof FEMVoid) return true;
+		if (!(object instanceof FEMValue)) return false;
+		object = ((FEMValue)object).data();
+		return object instanceof FEMVoid;
 	}
 
 	/** {@inheritDoc} */

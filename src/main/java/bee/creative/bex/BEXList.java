@@ -38,9 +38,9 @@ public interface BEXList extends Items<BEXNode>, Iterable<BEXNode> {
 	public BEXNode get(int index);
 
 	/** Diese Methode sucht linear ab der gegebenen {@code start}-Position den ersten Element- bzw. Attribut-knoten mit der gegebenen {@code uri} sowie dem
-	 * gegebenen {@code name} und gibt dessen Position zurück. Bei einer erfolglosen Suche wird {@code -1} geliefert. Ein leerer {@code uri} bzw. {@code name}
-	 * wird bei der Suche ignoriert, d.h. der gesuchte Knoten hat einen beliebigen URI bzw. Namen. Bei einer negativen {@code start}-Position wird immer
-	 * {@code -1} geliefert.
+	 * gegebenen {@code name} und gibt dessen Position zurück. Bei einer erfolglosen Suche wird {@code -1} geliefert. Ein leerer {@code uri} bzw. {@code name} wird
+	 * bei der Suche ignoriert, d.h. der gesuchte Knoten hat einen beliebigen URI bzw. Namen. Bei einer negativen {@code start}-Position wird immer {@code -1}
+	 * geliefert.
 	 * 
 	 * @param uri URI.
 	 * @param name Name.

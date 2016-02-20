@@ -70,8 +70,8 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 		public abstract GOwner closeChld();
 
 		/** Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer zurück.<br>
-		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten
-		 * usw. Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
+		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten usw.
+		 * Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
 		 * 
 		 * @see #closeChld()
 		 * @see Node#insertBefore(Node, Node)

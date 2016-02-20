@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.Arrays;
 import java.util.Iterator;
 import bee.creative.fem.FEM.BaseValue;
+import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 
@@ -1205,7 +1206,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatString(this.toString()));
 	}
 

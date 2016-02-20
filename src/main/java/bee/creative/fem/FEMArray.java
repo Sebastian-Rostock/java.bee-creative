@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.fem.FEM.BaseValue;
+import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
@@ -570,7 +571,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 		target.putArray(this);
 	}
 

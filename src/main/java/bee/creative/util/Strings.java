@@ -19,8 +19,8 @@ public class Strings {
 	{}
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
-	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette
-	 * in diese Liste eingetragen werden sollen.
+	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in
+	 * diese Liste eingetragen werden sollen.
 	 * 
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -256,8 +256,8 @@ public class Strings {
 	}
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von
-	 * der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette
-	 * am Komma hinter einer Ziffer:
+	 * der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am
+	 * Komma hinter einer Ziffer:
 	 * 
 	 * <pre>
 	 * Strings.split(Pattern.compile("\\d(,)"), "12,3x,56", 1); // [ "12", "3x,56" ]

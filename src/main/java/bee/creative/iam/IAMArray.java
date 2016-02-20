@@ -326,7 +326,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this.length() > 50 ? Objects.toString(Iterables.chainedIterable(this.section(0, 45), Iterables.itemIterator("..."))) : Objects.toString(this);
+		return this.length() > 50 ? Objects.toString(Iterables.chainedIterable(this.section(0, 45), Iterables.itemIterable("..."))) : Objects.toString(this);
 	}
 
 }
