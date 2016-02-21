@@ -15,15 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import bee.creative.fem.FEMScript.Range;
-import bee.creative.util.Builders.HashMapBuilder;
 import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
+import bee.creative.util.Natives;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
-import bee.creative.util.Strings;
 
 /** FEM - Function Evaluation Model
  * <p>
@@ -474,8 +471,7 @@ public class FEM {
 
 			@Override
 			public String toString() {
-				final Field field = this.member();
-				return field.getDeclaringClass().getName() + "." + field.getName();
+				return Natives.formatField(this.member());
 			}
 
 		}
@@ -493,12 +489,7 @@ public class FEM {
 
 			@Override
 			public String toString() {
-				final Method method = this.member();
-				return String.format("%s.%s(%s)", //
-					method.getDeclaringClass().getName(), //
-					method.getName(),//
-					Strings.join(",", Iterables.convertedIterable(NativeFunction._name_, //
-						Arrays.asList(method.getParameterTypes()))));
+				return Natives.formatMethod(this.member());
 			}
 
 		}
@@ -521,86 +512,43 @@ public class FEM {
 
 			@Override
 			public String toString() {
-				final Constructor<?> method = this.member();
-				return String.format("%s.new(%s)", //
-					method.getDeclaringClass().getName(), //
-					Strings.join(",", Iterables.convertedIterable(NativeFunction._name_, //
-						Arrays.asList(method.getParameterTypes()))));
+				return Natives.formatConstructor(this.member());
 			}
 
 		}
 
 		{}
 
-		/** Dieses Feld bildet von den Namen der primitiven Datentypen auf deren Klassen ab. */
-		static final Map<?, Class<?>> _class_ = new HashMapBuilder<Object, Class<?>>() //
-			.useEntry("byte", byte.class) //
-			.useEntry("short", short.class) //
-			.useEntry("int", int.class) //
-			.useEntry("long", long.class) //
-			.useEntry("char", char.class) //
-			.useEntry("float", float.class) //
-			.useEntry("double", double.class) //
-			.useEntry("boolean", boolean.class) //
-			.build();
-
-		/** Dieses Feld speichert den {@link Converter} zu {@link Class#getName()}. */
-		static final Converter<Class<?>, String> _name_ = new Converter<Class<?>, String>() {
-
-			@Override
-			public String convert(final Class<?> input) {
-				return input.getName();
-			}
-
-		};
-
-		/** Dieses Feld speichert das {@link Pattern} für {@link #from(String)}. */
-		static final Pattern _pattern_ = Pattern.compile("^(.+?)\\.([^\\.\\(]+)(?:\\((.*?)\\))?$");
-
-		{}
-
 		/** Diese Methode gibt die native Funktion zur gegebenen Eingabe zurück.<br>
-		 * Die Eingabe kann hierbei eine Funktion kodieren, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld lesen bzw.
-		 * schreiben zulässt.
+		 * Die Eingabe kann hierbei eine Funktion kodieren, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw.
+		 * schreibt.
 		 * <p>
-		 * Mögliche Eingabemuster sind:<br>
-		 * {@code "CLASS_PATH.class"} wird in {@link FEMNative#from(Object) FEMNative.from(CLASS_PATH.class)} überführt.<br>
-		 * {@code "CLASS_PATH.FIELD_NAME"} wird in {@link #fromField(Class, String) fromField(CLASS_PATH.class, "FIELD_NAME")} überführt.<br>
-		 * {@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"} wird in {@link #fromConstructor(Class, Class...) fromConstructor(CLASS_PATH.class, TYPE_1.class, ...,
-		 * TYPE_N.class)} überführt.<br>
-		 * {@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"} wird in {@link #fromMethod(Class, String, Class...) fromMethod(CLASS_PATH.class, "METHOD_NAME",
-		 * TYPE_1.class, ..., TYPE_N.class)} überführt.
+		 * <h4>{@code "CLASS_PATH.class"}</h4> Dieser Pfad ergibt {@link FEMNative#from(Object) FEMNative.from(CLASS_PATH.class)}.
+		 * <p>
+		 * <h4>{@code "CLASS_PATH.FIELD_NAME"}</h4> Dieser Pfad ergibt {@link #fromField(Field) fromField(CLASS_PATH.class.getDeclaredField("FIELD_NAME"))}.
+		 * <p>
+		 * <h4>{@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #fromConstructor(Constructor)
+		 * fromConstructor(CLASS_PATH.class.getDeclaredConstructor(TYPE_1.class, ..., TYPE_N.class))}.
+		 * <p>
+		 * <h4>{@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #fromMethod(Method)
+		 * fromMethod(CLASS_PATH.class.getDeclaredMethod("METHOD_NAME", TYPE_1.class, ..., TYPE_N.class))}.
+		 * <p>
 		 * 
-		 * @see #fromField(Class, String)
-		 * @see #fromMethod(Class, String, Class...)
-		 * @see #fromConstructor(Class, Class...)
-		 * @param memberPath Pfad zu einem Datenfeld oder einer Methode.
+		 * @see #fromField(Field)
+		 * @see #fromMethod(Method)
+		 * @see #fromConstructor(Constructor)
+		 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
 		 * @return {@link NativeFunction}.
-		 * @throws SecurityException Wenn {@link #fromField(Class, String)}, {@link #fromMethod(Class, String, Class...)} oder
-		 *         {@link #fromConstructor(Class, Class...)} eine entsprechende Ausnahme auslöst.
 		 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-		 * @throws ReflectiveOperationException Wenn {@link #fromField(Class, String)}, {@link #fromMethod(Class, String, Class...)},
-		 *         {@link #fromConstructor(Class, Class...)} oder {@link Class#forName(String)} eine entsprechende Ausnahme auslöst. */
-		public static final FEMFunction from(final String memberPath) throws SecurityException, NullPointerException, ReflectiveOperationException {
-			final Matcher matcher = NativeFunction._pattern_.matcher(memberPath);
-			if (!matcher.find()) throw new IllegalArgumentException();
-			final String inputName = matcher.group(1);
-			final Class<?> inputType = Class.forName(inputName);
-			final String memberName = matcher.group(2);
-			final String paramString = matcher.group(3);
-			if (paramString != null) {
-				final String[] paramNames = paramString.split(",");
-				final int length = paramString.isEmpty() ? 0 : paramNames.length;
-				final Class<?>[] paramTypes = new Class<?>[length];
-				for (int i = 0; i < length; i++) {
-					paramTypes[i] = NativeFunction._classFrom_(paramNames[i]);
-				}
-				if ("new".equals(memberName)) return NativeFunction.fromConstructor(inputType, paramTypes);
-				return NativeFunction.fromMethod(inputType, memberName, paramTypes);
-			} else { //
-				if ("class".equals(memberName)) return FEMNative.from(inputType);
-				return NativeFunction.fromField(inputType, memberName);
-			}
+		 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} oder {@link Natives#parseConstructor(String)} eine entsprechende Ausnahme
+		 *         auslöst.
+		 * @throws ReflectiveOperationException Wenn {@link Natives#parseField(String)}, {@link Natives#parseMethod(String)},
+		 *         {@link Natives#parseConstructor(String)} oder {@link Natives#parseClass(String)} eine entsprechende Ausnahme auslöst. */
+		public static final FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+			if (memberPath.endsWith(".class")) return FEMNative.from(Natives.parseClass(memberPath.substring(0, memberPath.length() - 6)));
+			if (memberPath.contains(".new(")) return NativeFunction.fromConstructor(Natives.parseConstructor(memberPath));
+			if (memberPath.contains("(")) return FEMNative.from(Natives.parseMethod(memberPath));
+			return NativeFunction.fromField(Natives.parseField(memberPath));
 		}
 
 		/** Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.<br>
@@ -613,21 +561,6 @@ public class FEM {
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 		public static final NativeFunction fromField(final Field field) throws NullPointerException {
 			return Modifier.isStatic(field.getModifiers()) ? NativeFunction._fromStaticField_(field) : NativeFunction._fromObjectField_(field);
-		}
-
-		/** Diese Methode ist eine Abkürzung für {@code fromField(inputType.getField(fieldName))}.
-		 * 
-		 * @see #fromField(Field)
-		 * @param inputType Klasse, in welcher das Datenfeld definiert ist.
-		 * @param fieldName Name des Datenfelds.
-		 * @return Funktion zum gegebenen Datenfeld.
-		 * @throws SecurityException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
-		 * @throws NoSuchFieldException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
-		 * @throws NullPointerException Wenn {@code inputType} bzw. {@code fieldName} {@code null} ist. */
-		public static final NativeFunction fromField(final Class<?> inputType, final String fieldName) throws SecurityException, NoSuchFieldException,
-			NullPointerException {
-			final Field field = inputType.getField(fieldName);
-			return NativeFunction.fromField(field);
 		}
 
 		@SuppressWarnings ("javadoc")
@@ -711,22 +644,6 @@ public class FEM {
 			return Modifier.isStatic(method.getModifiers()) ? NativeFunction._fromStaticMethod_(method) : NativeFunction._fromObjectMethod_(method);
 		}
 
-		/** Diese Methode ist eine Abkürzung für {@code fromMethod(inputType.getMethod(methodName, paramTypes))}.
-		 * 
-		 * @see #fromMethod(Method)
-		 * @param inputType Klasse, in welcher das Datenfeld definiert ist.
-		 * @param methodName Name der Methode
-		 * @param paramTypes Typen der Parameter der Methode.
-		 * @return Funktion zur gegebenen Methode.
-		 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-		 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-		 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist. */
-		public static final NativeFunction fromMethod(final Class<?> inputType, final String methodName, final Class<?>... paramTypes) throws SecurityException,
-			NoSuchMethodException, NullPointerException {
-			final Method method = inputType.getMethod(methodName, paramTypes);
-			return NativeFunction.fromMethod(method);
-		}
-
 		/** Diese Methode gibt eine Funktion zurück, die an den gegebenen Konstruktor delegiert.
 		 * 
 		 * @param constructor Konstruktor.
@@ -763,20 +680,6 @@ public class FEM {
 				}
 
 			};
-		}
-
-		/** Diese Methode ist eine Abkürzung für {@code fromConstructor(inputType.getConstructor(paramTypes))}.
-		 * 
-		 * @param inputType Klasse, an welcher der Konstruktor definiert ist.
-		 * @param paramTypes Typen der Parameter des Konstruktors.
-		 * @return Funktion zum gegebenen Konstruktor.
-		 * @throws SecurityException Wenn {@link Class#getConstructor(Class...)} eine entsprechende Ausnahme auslöst.
-		 * @throws NoSuchMethodException Wenn {@link Class#getConstructor(Class...)} eine entsprechende Ausnahme auslöst.
-		 * @throws NullPointerException Wenn {@code inputType} {@code null} ist. */
-		public static final NativeFunction fromConstructor(final Class<?> inputType, final Class<?>... paramTypes) throws SecurityException, NoSuchMethodException,
-			NullPointerException {
-			final Constructor<?> constructor = inputType.getConstructor(paramTypes);
-			return NativeFunction.fromConstructor(constructor);
 		}
 
 		@SuppressWarnings ("javadoc")
@@ -834,14 +737,6 @@ public class FEM {
 				}
 
 			};
-		}
-
-		@SuppressWarnings ("javadoc")
-		static final Class<?> _classFrom_(final String name) throws ClassNotFoundException {
-			Class<?> result = NativeFunction._class_.get(name);
-			if (result != null) return result;
-			result = Class.forName(name);
-			return result;
 		}
 
 		@SuppressWarnings ("javadoc")

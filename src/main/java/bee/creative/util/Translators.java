@@ -49,7 +49,7 @@ public class Translators {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("defaultTranslator", sourceClass, targetClass, sourceConverter, targetConverter);
+				return Objects.toInvokeString("simpleTranslator", sourceClass, targetClass, sourceConverter, targetConverter);
 			}
 
 		};

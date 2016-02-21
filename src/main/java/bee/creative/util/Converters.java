@@ -1,6 +1,7 @@
 package bee.creative.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -108,146 +109,6 @@ public class Converters {
 		};
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der die über die native {@link java.lang.reflect.Method Methode} gegebene Umwandlung durchführt.
-	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param method Native statischen Methode, die mit der Eingabe als Parameter aufgerufen wird, d.h. {@code method(input)}.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final java.lang.reflect.Method method) throws NullPointerException {
-		if (method == null) throw new NullPointerException("method = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GOutput result = (GOutput)method.invoke(null, input);
-					return result;
-				} catch (final IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeStaticMethod", method);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Umwandlung durchführt.
-	 * 
-	 * @see #nativeStaticMethod(java.lang.reflect.Method)
-	 * @see Class#getMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param staticType {@link Class}, an der die {@code static}-Methode definiert ist.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param methodName Name der nativen statischen Methode, die parameterlos an der Eingabe aufgerufen wird, d.h. {@code staticType.method(input)}.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code staticType}, {@code inputType} bzw. {@code methodName} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeStaticMethod(final Class<?> staticType, final Class<? super GInput> inputType,
-		final String methodName) throws SecurityException, NoSuchMethodException, NullPointerException {
-		if (staticType == null) throw new NullPointerException("staticType = null");
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (methodName == null) throw new NullPointerException("methodName = null");
-		return Converters.nativeStaticMethod(staticType.getMethod(methodName, inputType));
-	}
-
-	/** Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
-	 * ließt. Die native Methode wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
-	 * 
-	 * @see Class#getMethod(String, Class...)
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param methodName Name der nativen Methode, die parameterlos an der Eingabe aufgerufen wird, d.h. {@code input.method()}.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code methodName} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final String methodName) throws NullPointerException {
-		if (methodName == null) throw new NullPointerException("methodName = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Method method = input.getClass().getMethod(methodName);
-					try {
-						@SuppressWarnings ("unchecked")
-						final GOutput result = (GOutput)method.invoke(input);
-						return result;
-					} catch (final IllegalAccessException | InvocationTargetException e) {
-						throw new IllegalArgumentException(e);
-					}
-				} catch (final SecurityException | NoSuchMethodException e) {
-					throw new IllegalArgumentException(e);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeObjectMethod", methodName);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Converter} zurück, der die über die native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe ließt.
-	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param method Nativen Methode, die parameterlos an der Eingabe aufgerufen wird, d.h. {@code input.method()}.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final java.lang.reflect.Method method) throws NullPointerException {
-		if (method == null) throw new NullPointerException("method = null");
-		return new Converter<GInput, GOutput>() {
-
-			@Override
-			public GOutput convert(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GOutput result = (GOutput)method.invoke(input);
-					return result;
-				} catch (final IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeObjectMethod", method);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt einen {@link Converter} zurück, der die über eine native {@link java.lang.reflect.Method Methode} gegebene Eigenschaft der Eingabe
-	 * ließt.
-	 * 
-	 * @see #nativeObjectMethod(java.lang.reflect.Method)
-	 * @see Class#getMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GOutput> Typ der Ausgabe.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param methodName Name der nativen Methode, die parameterlos an der Eingabe aufgerufen wird, d.h. {@code input.method()}.
-	 * @return {@code native}-{@link Converter}.
-	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code methodName} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeObjectMethod(final Class<? super GInput> inputType, final String methodName)
-		throws SecurityException, NoSuchMethodException, NullPointerException {
-		return Converters.nativeObjectMethod(inputType.getMethod(methodName));
-	}
-
 	/** Diese Methode gibt einen {@link Converter} zurück, welcher stats die gegebene Ausgabe liefert.
 	 * 
 	 * @param <GValue> Typ der Ausgabe.
@@ -264,6 +125,67 @@ public class Converters {
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("valueConverter", value);
+			}
+
+		};
+	}
+
+	/** Diese Methode gibt einen {@link Converter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
+	 * Für eine Eingabe {@code input} entsprich die Ausgabe des gelieferten {@link Converter} für Klassenmethoden {@code method.invoke(null, input)} und für
+	 * Objektmethoden {@code method.invoke(input)}.
+	 * 
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param method Native Methode.
+	 * @return {@code native}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
+	public static final <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final java.lang.reflect.Method method) throws NullPointerException {
+		if (Modifier.isStatic(method.getModifiers())) return Converters._nativeConverterStatic_(method);
+		return Converters._nativeConverterObject_(method);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final <GInput, GOutput> Converter<GInput, GOutput> _nativeConverterStatic_(final java.lang.reflect.Method method) {
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				try {
+					@SuppressWarnings ("unchecked")
+					final GOutput result = (GOutput)method.invoke(null, input);
+					return result;
+				} catch (final IllegalAccessException | InvocationTargetException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("nativeMethod", method);
+			}
+
+		};
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final <GInput, GOutput> Converter<GInput, GOutput> _nativeConverterObject_(final java.lang.reflect.Method method) {
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				try {
+					@SuppressWarnings ("unchecked")
+					final GOutput result = (GOutput)method.invoke(input);
+					return result;
+				} catch (final IllegalAccessException | InvocationTargetException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("nativeMethod", method);
 			}
 
 		};

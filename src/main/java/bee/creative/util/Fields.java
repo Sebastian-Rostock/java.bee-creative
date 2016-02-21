@@ -471,77 +471,30 @@ public final class Fields {
 
 	{}
 
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} beschriebene Eigenschaft abbildet.<br>
-	 * Das Lesen des Datenfeldes erfolgt über {@code getMethod(input)}, das Schreiben über {@code setMethod(input, value)}.
+	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
 	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getMethod Methode zum Lesen der Eigenschaft, z.B. {@code get(input)}.
-	 * @param setMethod Methode zum Schreiben der Eigenschaft, z.B. {@code set(input, value)}.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeStaticField(final java.lang.reflect.Method getMethod,
-		final java.lang.reflect.Method setMethod) throws NullPointerException {
-		if (getMethod == null) throw new NullPointerException("getMethod = null");
-		if (setMethod == null) throw new NullPointerException("setMethod = null");
-		return new Field<GInput, GValue>() {
+	 * @param <GValue> Typ des Werts.
+	 * @param value Wert.
+	 * @return {@code value}-{@link Field}. */
+	public static final <GValue> Field<Object, GValue> valueField(final GValue value) {
+		return new BaseField<Object, GValue>() {
 
 			@Override
-			public GValue get(final GInput input) {
-				try {
-					@SuppressWarnings ("unchecked")
-					final GValue result = (GValue)getMethod.invoke(null, input);
-					return result;
-				} catch (IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				try {
-					setMethod.invoke(null, input, value);
-				} catch (IllegalAccessException | InvocationTargetException cause) {
-					throw new IllegalArgumentException(cause);
-				}
+			public GValue get(final Object input) {
+				return value;
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeStaticField", getMethod, setMethod);
+				return Objects.toInvokeString("valueField", value);
 			}
 
 		};
 	}
 
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} beschriebene Eigenschaft abbildet.
-	 * 
-	 * @see #nativeStaticField(java.lang.reflect.Method, java.lang.reflect.Method)
-	 * @see Class#getMethod(String, Class...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param staticType {@link Class}, an der die {@code static final }-Methoden definiert sind.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param valueType {@link Class} des Werts der Eigenschaft.
-	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, d.h. {@code static final Type.getMethod(input)}.
-	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, d.h. {@code static final Type.setMethod(input, value)}.
-	 * @return {@code native}-{@link Field}.
-	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code static final Type},{@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeStaticField(final Class<?> staticType, final Class<? super GInput> inputType,
-		final Class<? super GValue> valueType, final String getName, final String setName) throws SecurityException, NoSuchMethodException, NullPointerException {
-		if (staticType == null) throw new NullPointerException("static final Type = null");
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (valueType == null) throw new NullPointerException("valueType = null");
-		if (getName == null) throw new NullPointerException("getName = null");
-		if (setName == null) throw new NullPointerException("setName = null");
-		return Fields.nativeStaticField(staticType.getMethod(getName, inputType), staticType.getMethod(setName, inputType, valueType));
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über das native {@link java.lang.reflect.Field Datenfeld} gegebene Eigenschaft der Eingabe
-	 * abbildet.
+	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück.<br>
+	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code field.get(input)}. Das Schreiben eines Werts {@code value}
+	 * erfolgt hierbei über {@code field.set(input, value)}. Bei Klassenfeldern wird die Eingabe ignoriert.
 	 * 
 	 * @see java.lang.reflect.Field#get(Object)
 	 * @see java.lang.reflect.Field#set(Object, Object)
@@ -550,8 +503,32 @@ public final class Fields {
 	 * @param field Datenfeld.
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Field field) throws NullPointerException {
+	public static final <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
+		return Fields._nativeField_(field);
+	}
+
+	/** Diese Methode gibt ein {@link Field} zu den gegebenen {@link java.lang.reflect.Method nativen Methoden} zurück.<br>
+	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code getMethod.invoke(input)}. Das Schreiben des Werts {@code value}
+	 * erfolgt hierbei für Klassenmethoden über {@code setMethod.invoke(input, value)}. Bei Klassenmethoden wird die Eingabe ignoriert.
+	 * 
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param getMethod Methode zum Lesen der Eigenschaft.
+	 * @param setMethod Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
+	public static final <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
+		throws NullPointerException, IllegalArgumentException {
+		final int getSize = getMethod.getParameterTypes().length, setSize = setMethod.getParameterTypes().length;
+		if ((getSize != 0) || (setSize != 1)) throw new IllegalArgumentException();
+		return Fields._nativeField_(getMethod, setMethod);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Field field) {
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -560,8 +537,8 @@ public final class Fields {
 					@SuppressWarnings ("unchecked")
 					final GValue result = (GValue)field.get(input);
 					return result;
-				} catch (final IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
+				} catch (final IllegalAccessException cause) {
+					throw new IllegalArgumentException(cause);
 				}
 			}
 
@@ -569,87 +546,21 @@ public final class Fields {
 			public void set(final GInput input, final GValue value) {
 				try {
 					field.set(input, value);
-				} catch (final IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
+				} catch (final IllegalAccessException cause) {
+					throw new IllegalArgumentException(cause);
 				}
 			}
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeObjectField", field);
+				return Objects.toInvokeString("nativeField", field);
 			}
 
 		};
 	}
 
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über ein natives {@link java.lang.reflect.Field Datenfeld} beschriebene Eigenschaft der Eingabe
-	 * abbildet. Das native Datenfeld wird bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
-	 * 
-	 * @see Class#getField(String)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param fieldName Name des nativen Datenfelds.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final String fieldName) throws NullPointerException {
-		if (fieldName == null) throw new NullPointerException("fieldName = null");
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Field field = input.getClass().getField(fieldName);
-					try {
-						@SuppressWarnings ("unchecked")
-						final GValue result = (GValue)field.get(input);
-						return result;
-					} catch (final IllegalAccessException e) {
-						throw new IllegalArgumentException(e);
-					}
-				} catch (final SecurityException | NoSuchFieldException e) {
-					throw new IllegalArgumentException(e);
-				}
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Field field = input.getClass().getField(fieldName);
-					try {
-						field.set(input, value);
-					} catch (final IllegalAccessException e) {
-						throw new IllegalArgumentException(e);
-					}
-				} catch (final SecurityException | NoSuchFieldException e) {
-					throw new IllegalArgumentException(e);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeObjectField", fieldName);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} gegebene Eigenschaft der Eingabe
-	 * abbildet.<br>
-	 * Das Lesen des Datenfeldes erfolgt über {@code input.getMethod()}, das Schreiben über {@code input.setMethod(value)}.
-	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getMethod Methode zum Lesen der Eigenschaft, z.B. {@code input.get()}.
-	 * @param setMethod Methode zum Schreiben der Eigenschaft, z.B. {@code input.set(value)}.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final java.lang.reflect.Method getMethod,
-		final java.lang.reflect.Method setMethod) throws NullPointerException {
-		if (getMethod == null) throw new NullPointerException("getMethod = null");
-		if (setMethod == null) throw new NullPointerException("setMethod = null");
+	@SuppressWarnings ("javadoc")
+	static final <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod) {
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -674,125 +585,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeObjectField", getMethod, setMethod);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über ein natives {@link java.lang.reflect.Field Datenfeld} beschriebene Eigenschaft der Eingabe
-	 * abbildet.
-	 * 
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param fieldName Name des nativen Datenfelds.
-	 * @return {@code native}-{@link Field}.
-	 * @throws SecurityException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchFieldException Wenn {@link Class#getField(String)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code inputType} bzw. {@code fieldName} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final String fieldName)
-		throws SecurityException, NoSuchFieldException, NullPointerException {
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (fieldName == null) throw new NullPointerException("fieldName = null");
-		return Fields.nativeObjectField(inputType.getField(fieldName));
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} beschriebene Eigenschaft der Eingabe
-	 * abbildet. Die nativen Methoden werden bei jedem Zugriff dynamisch über die {@link Class} der Eingabe ermittelt.
-	 * 
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param valueType {@link Class} des Werts der Eigenschaft.
-	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
-	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GValue> valueType, final String getName, final String setName)
-		throws NullPointerException {
-		if (valueType == null) throw new NullPointerException("valueType = null");
-		if (getName == null) throw new NullPointerException("getName = null");
-		if (setName == null) throw new NullPointerException("setName = null");
-		return new Field<GInput, GValue>() {
-
-			@Override
-			public GValue get(final GInput input) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Method method = input.getClass().getMethod(getName);
-					try {
-						@SuppressWarnings ("unchecked")
-						final GValue result = (GValue)method.invoke(input);
-						return result;
-					} catch (IllegalAccessException | InvocationTargetException cause) {
-						throw new IllegalArgumentException(cause);
-					}
-				} catch (final SecurityException | NoSuchMethodException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public void set(final GInput input, final GValue value) {
-				if (input == null) throw new NullPointerException("input = null");
-				try {
-					final java.lang.reflect.Method method = input.getClass().getMethod(setName, valueType);
-					try {
-						method.invoke(input, value);
-					} catch (IllegalAccessException | InvocationTargetException cause) {
-						throw new IllegalArgumentException(cause);
-					}
-				} catch (final SecurityException | NoSuchMethodException cause) {
-					throw new IllegalArgumentException(cause);
-				}
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("nativeObjectField", getName, setName);
-			}
-
-		};
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches die über zwei native {@link java.lang.reflect.Method Methoden} beschriebene Eigenschaft der Eingabe
-	 * abbildet.
-	 * 
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param inputType {@link Class} der Eingabe.
-	 * @param valueType {@link Class} des Werts der Eigenschaft.
-	 * @param getName Name der nativen Methode zum Lesen der Eigenschaft, z.B. {@code "get"}.
-	 * @param setName Name der nativen Methode zum Schreiben der Eigenschaft, z.B. {@code "set"}.
-	 * @return {@code native}-{@link Field}.
-	 * @throws SecurityException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NoSuchMethodException Wenn {@link Class#getMethod(String, Class...)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code inputType}, {@code valueType}, {@code getName} bzw. {@code setName} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeObjectField(final Class<? super GInput> inputType, final Class<? super GValue> valueType,
-		final String getName, final String setName) throws SecurityException, NoSuchMethodException, NullPointerException {
-		if (inputType == null) throw new NullPointerException("inputType = null");
-		if (valueType == null) throw new NullPointerException("valueType = null");
-		if (getName == null) throw new NullPointerException("getName = null");
-		if (setName == null) throw new NullPointerException("setName = null");
-		return Fields.nativeObjectField(inputType.getMethod(getName), inputType.getMethod(setName, valueType));
-	}
-
-	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
-	 * 
-	 * @param <GValue> Typ des Werts.
-	 * @param value Wert.
-	 * @return {@code value}-{@link Field}. */
-	public static final <GValue> Field<Object, GValue> valueField(final GValue value) {
-		return new BaseField<Object, GValue>() {
-
-			@Override
-			public GValue get(final Object input) {
-				return value;
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("valueField", value);
+				return Objects.toInvokeString("nativeField", getMethod, setMethod);
 			}
 
 		};

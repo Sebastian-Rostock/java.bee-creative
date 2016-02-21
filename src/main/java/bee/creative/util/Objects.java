@@ -155,6 +155,14 @@ public class Objects {
 		final String result;
 		if (object.getClass().isArray()) {
 			result = Objects._arrayToString_(format, object);
+		} else if (object instanceof Class<?>) {
+			result = Natives.formatClass((Class<?>)object);
+		} else if (object instanceof java.lang.reflect.Field) {
+			result = Natives.formatField((java.lang.reflect.Field)object);
+		} else if (object instanceof java.lang.reflect.Method) {
+			result = Natives.formatMethod((java.lang.reflect.Method)object);
+		} else if (object instanceof java.lang.reflect.Constructor<?>) {
+			result = Natives.formatConstructor((java.lang.reflect.Constructor<?>)object);
 		} else if (object instanceof Character) {
 			result = Objects._charToString_((Character)object);
 		} else if (object instanceof UseToString) {
