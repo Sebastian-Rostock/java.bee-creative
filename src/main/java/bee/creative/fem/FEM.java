@@ -525,18 +525,18 @@ public class FEM {
 		 * <p>
 		 * <h4>{@code "CLASS_PATH.class"}</h4> Dieser Pfad ergibt {@link FEMNative#from(Object) FEMNative.from(CLASS_PATH.class)}.
 		 * <p>
-		 * <h4>{@code "CLASS_PATH.FIELD_NAME"}</h4> Dieser Pfad ergibt {@link #fromField(Field) fromField(CLASS_PATH.class.getDeclaredField("FIELD_NAME"))}.
+		 * <h4>{@code "CLASS_PATH.FIELD_NAME"}</h4> Dieser Pfad ergibt {@link #from(Field) fromField(CLASS_PATH.class.getDeclaredField("FIELD_NAME"))}.
 		 * <p>
-		 * <h4>{@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #fromConstructor(Constructor)
+		 * <h4>{@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #from(Constructor)
 		 * fromConstructor(CLASS_PATH.class.getDeclaredConstructor(TYPE_1.class, ..., TYPE_N.class))}.
 		 * <p>
-		 * <h4>{@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #fromMethod(Method)
+		 * <h4>{@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #from(Method)
 		 * fromMethod(CLASS_PATH.class.getDeclaredMethod("METHOD_NAME", TYPE_1.class, ..., TYPE_N.class))}.
 		 * <p>
 		 * 
-		 * @see #fromField(Field)
-		 * @see #fromMethod(Method)
-		 * @see #fromConstructor(Constructor)
+		 * @see #from(Field)
+		 * @see #from(Method)
+		 * @see #from(Constructor)
 		 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
 		 * @return {@link NativeFunction}.
 		 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
@@ -546,9 +546,9 @@ public class FEM {
 		 *         {@link Natives#parseConstructor(String)} oder {@link Natives#parseClass(String)} eine entsprechende Ausnahme auslöst. */
 		public static final FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
 			if (memberPath.endsWith(".class")) return FEMNative.from(Natives.parseClass(memberPath.substring(0, memberPath.length() - 6)));
-			if (memberPath.contains(".new(")) return NativeFunction.fromConstructor(Natives.parseConstructor(memberPath));
-			if (memberPath.contains("(")) return FEMNative.from(Natives.parseMethod(memberPath));
-			return NativeFunction.fromField(Natives.parseField(memberPath));
+			if (memberPath.contains(".new(")) return NativeFunction.from(Natives.parseConstructor(memberPath));
+			if (memberPath.contains("(")) return NativeFunction.from(Natives.parseMethod(memberPath));
+			return NativeFunction.from(Natives.parseField(memberPath));
 		}
 
 		/** Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.<br>
@@ -559,80 +559,72 @@ public class FEM {
 		 * @param field Datenfeld.
 		 * @return Funktion zum gegebenen Datenfeld.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static final NativeFunction fromField(final Field field) throws NullPointerException {
-			return Modifier.isStatic(field.getModifiers()) ? NativeFunction._fromStaticField_(field) : NativeFunction._fromObjectField_(field);
-		}
+		public static final NativeFunction from(final Field field) throws NullPointerException {
+			return Modifier.isStatic(field.getModifiers()) ? //
+				new FromField() {
 
-		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromStaticField_(final Field staticField) {
-			return new FromField() {
-
-				@Override
-				public FEMValue invoke(final FEMFrame frame) {
-					try {
-						switch (frame.size()) {
-							case 0:
-								final Object getValue = staticField.get(null);
-								return FEMNative.from(getValue);
-							case 1:
-								final Object setValue = frame.get(0).data();
-								staticField.set(null, setValue);
-								return FEMNative.NULL;
+					@Override
+					public FEMValue invoke(final FEMFrame frame) {
+						try {
+							switch (frame.size()) {
+								case 0:
+									final Object getValue = field.get(null);
+									return FEMNative.from(getValue);
+								case 1:
+									final Object setValue = frame.get(0).data();
+									field.set(null, setValue);
+									return FEMNative.NULL;
+							}
+							throw new IllegalArgumentException();
+						} catch (final Exception cause) {
+							throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
 						}
-						throw new IllegalArgumentException();
-					} catch (final Exception cause) {
-						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
 					}
-				}
 
-				@Override
-				public Field member() {
-					return staticField;
-				}
+					@Override
+					public Field member() {
+						return field;
+					}
 
-				@Override
-				public boolean isStatic() {
-					return true;
-				}
+					@Override
+					public boolean isStatic() {
+						return true;
+					}
 
-			};
-		}
+				} : //
+				new FromField() {
 
-		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromObjectField_(final Field objectField) {
-			return new FromField() {
-
-				@Override
-				public FEMValue invoke(final FEMFrame frame) {
-					try {
-						switch (frame.size()) {
-							case 1:
-								final Object getInput = frame.get(0).data();
-								final Object getValue = objectField.get(getInput);
-								return FEMNative.from(getValue);
-							case 2:
-								final Object setInput = frame.get(0).data();
-								final Object setValue = frame.get(1).data();
-								objectField.set(setInput, setValue);
-								return FEMNative.NULL;
+					@Override
+					public FEMValue invoke(final FEMFrame frame) {
+						try {
+							switch (frame.size()) {
+								case 1:
+									final Object getInput = frame.get(0).data();
+									final Object getValue = field.get(getInput);
+									return FEMNative.from(getValue);
+								case 2:
+									final Object setInput = frame.get(0).data();
+									final Object setValue = frame.get(1).data();
+									field.set(setInput, setValue);
+									return FEMNative.NULL;
+							}
+							throw new IllegalArgumentException();
+						} catch (final Exception cause) {
+							throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
 						}
-						throw new IllegalArgumentException();
-					} catch (final Exception cause) {
-						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
 					}
-				}
 
-				@Override
-				public Field member() {
-					return objectField;
-				}
+					@Override
+					public Field member() {
+						return field;
+					}
 
-				@Override
-				public boolean isStatic() {
-					return false;
-				}
+					@Override
+					public boolean isStatic() {
+						return false;
+					}
 
-			};
+				};
 		}
 
 		/** Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
@@ -640,8 +632,57 @@ public class FEM {
 		 * @param method Methode.
 		 * @return Funktion zur gegebenen Methode.
 		 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-		public static final NativeFunction fromMethod(final Method method) throws NullPointerException {
-			return Modifier.isStatic(method.getModifiers()) ? NativeFunction._fromStaticMethod_(method) : NativeFunction._fromObjectMethod_(method);
+		public static final NativeFunction from(final Method method) throws NullPointerException {
+			return Modifier.isStatic(method.getModifiers()) ? //
+				new FromMethod() {
+
+					@Override
+					public FEMValue invoke(final FEMFrame frame) {
+						try {
+							final Object[] params = NativeFunction._params_(frame, false);
+							final Object result = method.invoke(null, params);
+							return FEMNative.from(result);
+						} catch (final Exception cause) {
+							throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+						}
+					}
+
+					@Override
+					public Method member() {
+						return method;
+					}
+
+					@Override
+					public boolean isStatic() {
+						return true;
+					}
+
+				} : //
+				new FromMethod() {
+
+					@Override
+					public FEMValue invoke(final FEMFrame frame) {
+						try {
+							final Object[] params = NativeFunction._params_(frame, true);
+							final Object input = frame.get(0).data();
+							final Object result = method.invoke(input, params);
+							return FEMNative.from(result);
+						} catch (final Exception cause) {
+							throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+						}
+					}
+
+					@Override
+					public Method member() {
+						return method;
+					}
+
+					@Override
+					public boolean isStatic() {
+						return false;
+					}
+
+				};
 		}
 
 		/** Diese Methode gibt eine Funktion zurück, die an den gegebenen Konstruktor delegiert.
@@ -649,20 +690,15 @@ public class FEM {
 		 * @param constructor Konstruktor.
 		 * @return Funktion zum gegebenen Konstruktor.
 		 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-		public static final NativeFunction fromConstructor(final Constructor<?> constructor) throws NullPointerException {
+		public static final NativeFunction from(final Constructor<?> constructor) throws NullPointerException {
 			if (constructor == null) throw new NullPointerException("constructor = null");
-			return NativeFunction._fromConstructor_(constructor);
-		}
-
-		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromConstructor_(final Constructor<?> staticConstructor) {
 			return new FromConstructor() {
 
 				@Override
 				public FEMValue invoke(final FEMFrame frame) {
 					try {
-						final Object[] params = NativeFunction._paramsFrom_(frame, false);
-						final Object result = staticConstructor.newInstance(params);
+						final Object[] params = NativeFunction._params_(frame, false);
+						final Object result = constructor.newInstance(params);
 						return FEMNative.from(result);
 					} catch (final Exception cause) {
 						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
@@ -671,7 +707,7 @@ public class FEM {
 
 				@Override
 				public Constructor<?> member() {
-					return staticConstructor;
+					return constructor;
 				}
 
 				@Override
@@ -683,64 +719,7 @@ public class FEM {
 		}
 
 		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromStaticMethod_(final Method staticMethod) {
-			return new FromMethod() {
-
-				@Override
-				public FEMValue invoke(final FEMFrame frame) {
-					try {
-						final Object[] params = NativeFunction._paramsFrom_(frame, false);
-						final Object result = staticMethod.invoke(null, params);
-						return FEMNative.from(result);
-					} catch (final Exception cause) {
-						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-					}
-				}
-
-				@Override
-				public Method member() {
-					return staticMethod;
-				}
-
-				@Override
-				public boolean isStatic() {
-					return true;
-				}
-
-			};
-		}
-
-		@SuppressWarnings ("javadoc")
-		static final NativeFunction _fromObjectMethod_(final Method objectMethod) {
-			return new FromMethod() {
-
-				@Override
-				public FEMValue invoke(final FEMFrame frame) {
-					try {
-						final Object[] params = NativeFunction._paramsFrom_(frame, true);
-						final Object input = frame.get(0).data();
-						final Object result = objectMethod.invoke(input, params);
-						return FEMNative.from(result);
-					} catch (final Exception cause) {
-						throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-					}
-				}
-
-				@Override
-				public Method member() {
-					return objectMethod;
-				}
-
-				@Override
-				public boolean isStatic() {
-					return false;
-				}
-
-			};
-		}
-
-		@SuppressWarnings ("javadoc")
-		static final Object[] _paramsFrom_(final FEMFrame frame, final boolean skipFirst) {
+		static final Object[] _params_(final FEMFrame frame, final boolean skipFirst) {
 			final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
 			final Object[] result = new Object[length];
 			for (int i = 0; i < length; i++) {
@@ -2390,7 +2369,7 @@ public class FEM {
 							return FEMNative.from(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {}
 						try {
-							return NativeFunction.from(FEM.parseValue(section));
+							return NativeFunction.from(section);
 						} catch (final Exception cause) {}
 						return compiler.proxy(section);
 					}
