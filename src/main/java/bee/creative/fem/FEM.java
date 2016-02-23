@@ -1567,9 +1567,6 @@ public class FEM {
 		/** Dieses Feld speichert die Zulässigkeit von Wertlisten. */
 		boolean _arrayEnabled_ = true;
 
-		/** Dieses Feld speichert die Zulässigkeit von Funktionszeigern. */
-		boolean _handlerEnabled_ = true;
-
 		/** Dieses Feld speichert die Zulässigkeit der Bindung des Stapelrahmens. */
 		boolean _closureEnabled_ = true;
 
@@ -1919,11 +1916,7 @@ public class FEM {
 				}
 				default: {
 					result = this._compileParam_();
-					if (this._compileType_() != '(') {
-						if (this._handlerEnabled_) return result;
-						if (this._functionToValue(result) != null) return result;
-						throw new ScriptException().useSender(this).useHint(" Funktionsverweise sind nicht zulässig.");
-					}
+					if (this._compileType_() != '(') return result;
 				}
 			}
 			do {
@@ -1959,17 +1952,8 @@ public class FEM {
 			final String name = this._compileName_();
 			if ((name == null) || (this._compileIndex_(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
 			final ProxyFunction result = this.proxy(name);
-			switch (this._compileType_()) {
-				case '{':
-					result.set(this._compileFrame_());
-				break;
-				case ':':
-					this.skip();
-					result.set(this._compileParamAsFunction_());
-				break;
-				default:
-					throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
-			}
+			if (this._compileType_() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
+			result.set(this._compileFrame_());
 			return result;
 		}
 
@@ -2118,15 +2102,6 @@ public class FEM {
 			return this._arrayEnabled_;
 		}
 
-		/** Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link ScriptCompilerHelper#compileParam(ScriptCompiler)} gelieferten Funktionen als
-		 * Funktionszeiger kompiliert werden dürfen (z.B {@code SORT(array; compFun)}).
-		 * 
-		 * @see #compileFunction()
-		 * @return Zulässigkeit von Funktionszeigern. */
-		public final boolean isHandlerEnabled() {
-			return this._handlerEnabled_;
-		}
-
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link ClosureFunction}s kompiliert werden.
 		 * 
 		 * @see #compileFunction()
@@ -2205,18 +2180,6 @@ public class FEM {
 		public synchronized final ScriptCompiler useArrayEnabled(final boolean value) throws IllegalStateException {
 			this._check_();
 			this._arrayEnabled_ = value;
-			return this;
-		}
-
-		/** Diese Methode setzt die Zulässigkeit von Funktionszeigern.
-		 * 
-		 * @see #isHandlerEnabled()
-		 * @param value Zulässigkeit von Funktionszeigern.
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-		public synchronized final ScriptCompiler useHandlerEnabled(final boolean value) throws IllegalStateException {
-			this._check_();
-			this._handlerEnabled_ = value;
 			return this;
 		}
 
@@ -2309,9 +2272,9 @@ public class FEM {
 
 		/** Diese Methode kompiliert den Quelltext in eine Liste von Parameterfunktion und gibt diese zurück.<br>
 		 * Die Parameterfunktion müssen durch Bereiche vom Typ {@code ';'} separiert sein. Eine Parameterfunktion beginnt mit einem
-		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler) Namen} und endet dann entweder mit einer in geschweifte Klammern eingeschlossenen parametrisierten
-		 * Funktion oder mit einer nach einem Duppelpunkt angegebenen Parameterfunktion. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere
-		 * Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()} entsprechend bestückt.
+		 * {@link ScriptCompilerHelper#compileName(ScriptCompiler) Namen} und endet dann mit einer in geschweifte Klammern eingeschlossenen parametrisierten
+		 * Funktion. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung
+		 * {@link #proxies()} entsprechend bestückt.
 		 * 
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
