@@ -155,6 +155,7 @@ public class BEX {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final String toString(final MMFArray value) {
+		if (value.length() == 0) return "";
 		return new String(value.section(0, value.length() - 1).toBytes(), BEX.CHARSET);
 	}
 

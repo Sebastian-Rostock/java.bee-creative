@@ -68,7 +68,7 @@ public class MMFArray extends IAMArray {
 	 * ist, wird die native Bytereihenfolge verwendet.
 	 * 
 	 * @param bytes Bytes.
-	 * @param order Bytereihenfolge.
+	 * @param order Bytereihenfolge oder {@code null} für {@link ByteOrder#nativeOrder()}.
 	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
 	public MMFArray(final byte[] bytes, final ByteOrder order) throws NullPointerException {
 		this(ByteBuffer.wrap(bytes).order(MMFArray._order_(order)));

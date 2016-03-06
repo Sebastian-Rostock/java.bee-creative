@@ -47,7 +47,11 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMInteger from(final String value) throws NullPointerException, IllegalArgumentException {
-		return FEMInteger.from(Long.parseLong(value));
+		try {
+			return FEMInteger.from(Long.parseLong(value));
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMInteger.TYPE)}.

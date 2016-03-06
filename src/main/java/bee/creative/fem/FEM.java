@@ -2384,7 +2384,8 @@ public class FEM {
 		};
 
 		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich die Typen {@link FEMVoid},
-		 * {@link FEMBoolean}, {@link FEMString} und {@link FEMDecimal} nutzt und andernfalls einen {@link ScriptCompiler#proxy(String)} liefert. */
+		 * {@link FEMBoolean}, {@link FEMString}, {@link FEMBinary}, {@link FEMInteger}, {@link FEMDecimal}, {@link FEMDatetime} und {@link FEMDuration} nutzt und
+		 * andernfalls einen {@link ScriptCompiler#proxy(String)} liefert. */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
 
 			@Override
@@ -2404,12 +2405,27 @@ public class FEM {
 						section = FEM.parseValue(section);
 					}
 					default: {
-						if (section.equalsIgnoreCase("null")) return FEMVoid.INSTANCE;
-						if (section.equalsIgnoreCase("true")) return FEMBoolean.TRUE;
-						if (section.equalsIgnoreCase("false")) return FEMBoolean.FALSE;
 						try {
-							return FEMDecimal.from(new BigDecimal(section));
-						} catch (final NumberFormatException cause) {}
+							return FEMVoid.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMBoolean.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMInteger.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMDecimal.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMDatetime.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMDuration.from(section);
+						} catch (final IllegalArgumentException cause) {}
+						try {
+							return FEMBinary.from(section);
+						} catch (final IllegalArgumentException cause) {}
 						return compiler.proxy(section);
 					}
 				}
@@ -3643,7 +3659,9 @@ public class FEM {
 		return new ScriptParser();
 	}
 
-	/** Diese Methode erzeugt einen neuen {@link ScriptCompiler} und gibt diesen zurück.
+	/** Diese Methode erzeugt einen neuen {@link ScriptCompiler} und gibt diesen zurück.<br>
+	 * Der gelieferte {@link ScriptCompiler} nutzt {@link ScriptCompilerHelper#DEFAULT} und lässt {@link ScriptCompiler#useArrayEnabled(boolean) Wertlisten},
+	 * {@link ScriptCompiler#useClosureEnabled(boolean) Stapelrahmenbindung} sowie {@link ScriptCompiler#useChainingEnabled(boolean) Funktionsverkettung} zu.
 	 * 
 	 * @see ScriptCompiler
 	 * @return {@link ScriptCompiler}. */

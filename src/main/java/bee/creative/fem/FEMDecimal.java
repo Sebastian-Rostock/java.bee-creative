@@ -46,7 +46,11 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMDecimal from(final String value) throws NullPointerException, IllegalArgumentException {
-		return FEMDecimal.from(Double.parseDouble(value));
+		try {
+			return FEMDecimal.from(Double.parseDouble(value));
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDecimal.TYPE)}.

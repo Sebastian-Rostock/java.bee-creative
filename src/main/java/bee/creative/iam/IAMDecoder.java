@@ -25,8 +25,11 @@ public class IAMDecoder {
 		/** Dieses Feld speichert den Vergleichswert. */
 		final int _value_;
 
-		@SuppressWarnings ("javadoc")
-		IAMHeader(final int mask, final int value) {
+		/** Dieser Konstruktor initialisiert Bitmaske und Vergleichswert.
+		 * 
+		 * @param mask Bitmaske.
+		 * @param value Vergleichswert. */
+		public IAMHeader(final int mask, final int value) {
 			this._mask_ = mask;
 			this._value_ = value;
 		}
@@ -50,12 +53,11 @@ public class IAMDecoder {
 		 * @return Bytereihenfolge oder {@code null}.
 		 * @throws IOException Wenn {@link RandomAccessFile#RandomAccessFile(File, String)} bzw. {@link RandomAccessFile#read(byte[])} eine entsprechende Ausnahme
 		 *         auslöst.
-		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind. */
-		public final ByteOrder orderOf(final File file) throws IOException, NullPointerException, IllegalArgumentException {
+		 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
+		public final ByteOrder orderOf(final File file) throws IOException, NullPointerException {
 			try (RandomAccessFile source = new RandomAccessFile(file.getAbsoluteFile(), "r")) {
 				final byte[] bytes = new byte[4];
-				if (source.read(bytes) < 4) throw new IllegalArgumentException();
+				if (source.read(bytes) < 4) return null;
 				return this.orderOf(bytes);
 			}
 		}
@@ -66,10 +68,9 @@ public class IAMDecoder {
 		 * 
 		 * @param bytes Quelldaten.
 		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind. */
-		public final ByteOrder orderOf(final byte[] bytes) throws NullPointerException, IllegalArgumentException {
-			if (bytes.length < 4) throw new IllegalArgumentException();
+		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
+		public final ByteOrder orderOf(final byte[] bytes) throws NullPointerException {
+			if (bytes.length < 4) return null;
 			if (this.isValid(Bytes.getInt4BE(bytes, 0))) return ByteOrder.BIG_ENDIAN;
 			if (this.isValid(Bytes.getInt4LE(bytes, 0))) return ByteOrder.LITTLE_ENDIAN;
 			return null;
@@ -82,12 +83,12 @@ public class IAMDecoder {
 		 * @see #orderOf(byte[])
 		 * @param buffer Puffer mit den Quelldaten.
 		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist.
-		 * @throws IllegalArgumentException Wenn die Quelldaten unzureichend sind. */
-		public final ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException, IllegalArgumentException {
-			if (buffer.remaining() < 4) throw new IllegalArgumentException();
+		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
+		public final ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException {
+			if (buffer.remaining() < 4) return null;
 			final byte[] bytes = new byte[4];
 			buffer.get(bytes);
+			buffer.position(buffer.position() - 4);
 			return this.orderOf(bytes);
 		}
 

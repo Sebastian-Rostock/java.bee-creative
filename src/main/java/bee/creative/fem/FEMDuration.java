@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
-import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
  * Intern wird die Zeitspanne als ein {@code long} dargestellt.
@@ -162,23 +161,25 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
-		System.out.println(Strings.matchAll(FEMDuration._pattern_, string));
-		final Matcher matcher = FEMDuration._pattern_.matcher(string);
-		if (!matcher.find()) throw new IllegalArgumentException();
-		if (((matcher.start(6) > 0) || (matcher.start(8) > 0)) && (matcher.start(5) < 0)) throw new IllegalArgumentException();
-		FEMDuration result = FEMDuration.EMPTY;
-
-		final int years = matcher.start(2) > 0 ? Integer.parseInt(matcher.group(2)) : 0;
-		final int months = matcher.start(3) > 0 ? Integer.parseInt(matcher.group(3)) : 0;
-		final int days = matcher.start(4) > 0 ? Integer.parseInt(matcher.group(4)) : 0;
-		final int hours = matcher.start(6) > 0 ? Integer.parseInt(matcher.group(6)) : 0;
-		final long minutes = matcher.start(7) > 0 ? Long.parseLong(matcher.group(7)) : 0;
-		final long seconds = matcher.start(8) > 0 ? Long.parseLong(matcher.group(8)) : 0;
-		final long milliseconds = matcher.start(9) > 0 ? Long.parseLong(matcher.group(9)) : 0;
-		result = result.move(years, months, days, hours, minutes, seconds, milliseconds);
-		if (matcher.start(1) < 0) return result;
-		result = result.negate();
-		return result;
+		try {
+			final Matcher matcher = FEMDuration._pattern_.matcher(string);
+			if (!matcher.find()) throw new IllegalArgumentException();
+			if (((matcher.start(6) > 0) || (matcher.start(8) > 0)) && (matcher.start(5) < 0)) throw new IllegalArgumentException();
+			FEMDuration result = FEMDuration.EMPTY;
+			final int years = matcher.start(2) > 0 ? Integer.parseInt(matcher.group(2)) : 0;
+			final int months = matcher.start(3) > 0 ? Integer.parseInt(matcher.group(3)) : 0;
+			final int days = matcher.start(4) > 0 ? Integer.parseInt(matcher.group(4)) : 0;
+			final int hours = matcher.start(6) > 0 ? Integer.parseInt(matcher.group(6)) : 0;
+			final long minutes = matcher.start(7) > 0 ? Long.parseLong(matcher.group(7)) : 0;
+			final long seconds = matcher.start(8) > 0 ? Long.parseLong(matcher.group(8)) : 0;
+			final long milliseconds = matcher.start(9) > 0 ? Long.parseLong(matcher.group(9)) : 0;
+			result = result.move(years, months, days, hours, minutes, seconds, milliseconds);
+			if (matcher.start(1) < 0) return result;
+			result = result.negate();
+			return result;
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	/** Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.

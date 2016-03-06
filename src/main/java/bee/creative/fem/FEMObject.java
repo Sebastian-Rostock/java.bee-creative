@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 
@@ -22,7 +24,31 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
 	public static final FEMObject EMPTY = new FEMObject(0, 0);
 
+	@SuppressWarnings ("javadoc")
+	static final Pattern _pattern_ = Pattern.compile("^#(\\d+)\\.(\\d+):(\\d+)$");
+
 	{}
+
+	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
+	 * 
+	 * @see #toString()
+	 * @param string Zeichenkette.
+	 * @return Referenz.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
+	public static final FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
+		try {
+			final Matcher matcher = FEMDuration._pattern_.matcher(string);
+			if (!matcher.find()) throw new IllegalArgumentException();
+			final int ref = Integer.parseInt(matcher.group(1));
+			final int type = Integer.parseInt(matcher.group(3));
+			final int owner = Integer.parseInt(matcher.group(2));
+			return FEMObject.from(ref, type, owner);
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
+		}
+	}
 
 	/** Diese Methode gibt eine neue Referenz mit den gegebenen Eigenschaften zurück.
 	 * 
@@ -260,10 +286,13 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 		target.put(FEM.formatValue(this.toString()));
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
+	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #type() TYPE}{@code :}{@link #ownerValue() OWNER}.
+	 * 
+	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return String.format("%s.%s:%s", this.refValue(), this.ownerValue(), this.typeValue());
+		return String.format("#%s.%s:%s", this.refValue(), this.ownerValue(), this.typeValue());
 	}
 
 }

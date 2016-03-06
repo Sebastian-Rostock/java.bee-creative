@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
-import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein {@code long} dargestellt.
@@ -130,36 +129,39 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
-		System.out.println(Strings.matchAll(FEMDatetime._pattern_, string));
-		final Matcher matcher = FEMDatetime._pattern_.matcher(string);
-		if (!matcher.find()) throw new IllegalArgumentException();
-		FEMDatetime result = FEMDatetime.EMPTY;
-		if (matcher.start(1) >= 0) {
-			result = result.withDate( //
-				Integer.parseInt(matcher.group(1)), //
-				Integer.parseInt(matcher.group(2)), //
-				Integer.parseInt(matcher.group(3)));
+		try {
+			final Matcher matcher = FEMDatetime._pattern_.matcher(string);
+			if (!matcher.find()) throw new IllegalArgumentException();
+			FEMDatetime result = FEMDatetime.EMPTY;
+			if (matcher.start(1) >= 0) {
+				result = result.withDate( //
+					Integer.parseInt(matcher.group(1)), //
+					Integer.parseInt(matcher.group(2)), //
+					Integer.parseInt(matcher.group(3)));
+			}
+			if (matcher.start(5) >= 0) {
+				result = result.withTime( //
+					Integer.parseInt(matcher.group(5)), //
+					Integer.parseInt(matcher.group(6)), //
+					Integer.parseInt(matcher.group(7)), //
+					matcher.start(8) >= 0 ? Integer.parseInt(matcher.group(8)) : 0);
+			}
+			if (matcher.start(4) >= 0) {
+				if (!result.hasDate() || !result.hasTime()) throw new IllegalArgumentException();
+			} else {
+				if (result.hasDate() && result.hasTime()) throw new IllegalArgumentException();
+			}
+			if (matcher.start(9) >= 0) {
+				result = result.withZone(0);
+			} else if (matcher.start(10) >= 0) {
+				result = result.withZone( //
+					Integer.parseInt(matcher.group(10)), //
+					Integer.parseInt(matcher.group(11)));
+			}
+			return result;
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
 		}
-		if (matcher.start(5) >= 0) {
-			result = result.withTime( //
-				Integer.parseInt(matcher.group(5)), //
-				Integer.parseInt(matcher.group(6)), //
-				Integer.parseInt(matcher.group(7)), //
-				matcher.start(8) >= 0 ? Integer.parseInt(matcher.group(8)) : 0);
-		}
-		if (matcher.start(4) >= 0) {
-			if (!result.hasDate() || !result.hasTime()) throw new IllegalArgumentException();
-		} else {
-			if (result.hasDate() && result.hasTime()) throw new IllegalArgumentException();
-		}
-		if (matcher.start(9) >= 0) {
-			result = result.withZone(0);
-		} else if (matcher.start(10) >= 0) {
-			result = result.withZone( //
-				Integer.parseInt(matcher.group(10)), //
-				Integer.parseInt(matcher.group(11)));
-		}
-		return result;
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
