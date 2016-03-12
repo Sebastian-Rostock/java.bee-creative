@@ -14,17 +14,17 @@ import bee.creative.util.Bytes;
 public class ArrayDataSource extends BaseDataSource {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final ByteArraySection __data;
+	final ByteArraySection _data_;
 
 	/** Dieses Feld speichert die Leseposition. */
-	int __index;
+	int _index_;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 * 
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final byte... data) throws NullPointerException {
-		this.__data = ByteArraySection.from(data);
+		this._data_ = ByteArraySection.from(data);
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
@@ -33,7 +33,7 @@ public class ArrayDataSource extends BaseDataSource {
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.__data = data;
+		this._data_ = data;
 	}
 
 	{}
@@ -41,35 +41,35 @@ public class ArrayDataSource extends BaseDataSource {
 	/** {@inheritDoc} */
 	@Override
 	public ByteArraySection data() {
-		return this.__data;
+		return this._data_;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
-		final ByteArraySection data = this.__data;
-		final int index = this.__index, index2 = index + length;
+		final ByteArraySection data = this._data_;
+		final int index = this._index_, index2 = index + length;
 		if (index2 > data.size()) throw new EOFException();
 		System.arraycopy(data.array(), data.startIndex() + index, array, offset, length);
-		this.__index = index2;
+		this._index_ = index2;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.__index = (int)index;
+		this._index_ = (int)index;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
-		return this.__index;
+		return this._index_;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
-		return this.__data.size();
+		return this._data_.size();
 	}
 
 	/** {@inheritDoc} */

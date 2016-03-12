@@ -1,11 +1,9 @@
 package bee.creative.ini;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import bee.creative.util.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein Objekt zum Lesen einer {@code INI}-Datenstruktur über einen {@link Reader}.
@@ -21,20 +19,27 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class INIReader implements Closeable {
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück.<br>
+	 * Wenn das Objekt ein {@link INIReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
+	 * überführt}.
+	 * 
+	 * @see IO#inputReaderFrom(Object)
+	 * @see INIReader#INIReader(Reader)
+	 * @param data Objekt.
+	 * @return {@link INIReader}.
+	 * @throws IOException Wenn der {@link INIReader} nicht erzeugt werden kann. */
+	public static final INIReader from(final Object data) throws IOException {
+		if (data instanceof INIReader) return (INIReader)data;
+		return new INIReader(IO.inputReaderFrom(data));
+	}
+
+	{}
+
 	/** Dieses Feld speichert den {@link Reader}. */
 	final Reader _reader_;
 
 	/** Dieses Feld speichert den Puffer für die maskierten Texte. */
 	final StringBuilder _builder_;
-
-	/** Dieser Konstruktor initialisiert das {@link File} mit der {@code INI}-Datenstruktur.
-	 * 
-	 * @param file {@link File}.
-	 * @throws IOException Wenn {@link FileReader#FileReader(File)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
-	public INIReader(final File file) throws IOException, NullPointerException {
-		this(new BufferedReader(new FileReader(file)));
-	}
 
 	/** Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.
 	 * 

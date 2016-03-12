@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
+import bee.creative.ini.INIWriter;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Bytes;
+import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@code Integer Array Model} Datenstrukturen.
  * 
@@ -593,6 +596,164 @@ public class IAMDecoder {
 			return this._lists_.length;
 		}
 
+	}
+
+	{}
+
+	@SuppressWarnings ("javadoc")
+	static final String _formatInt_(final int value) {
+		return Integer.toString(value);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final String _formatArray_(final int[] value) {
+		final int length = value.length;
+		if (length == 0) return "";
+		final StringBuilder result = new StringBuilder().append(value[0]);
+		for (int index = 1; index < length; index++) {
+			result.append('/').append(value[index]);
+		}
+		return result.toString();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final String _formatMode_(final boolean mode) {
+		return mode ? "H" : "S";
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final String _formatOrder_(final ByteOrder value) {
+		return value == ByteOrder.BIG_ENDIAN ? "B" : "L";
+	}
+
+	{}
+
+	/** Dieses Feld speichert die Bytereihenfolge. */
+	ByteOrder _order_;
+
+	/** Dieses Feld speichert die Eingabedaten. */
+	Object _source_;
+
+	/** Dieses Feld speichert die Ausgabedaten. */
+	Object _target_;
+
+	{}
+
+	/** Diese Methode gibt die Bytereihenfolge zurück.
+	 * 
+	 * @see #useOrder(ByteOrder)
+	 * @return Bytereihenfolge. */
+	public final ByteOrder getOrder() {
+		return this._order_;
+	}
+
+	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.<br>
+	 * Wenn diese {@code null} ist, wird {@link ByteOrder#nativeOrder()} verwendet.
+	 * 
+	 * @see IAMIndexEncoder#encode(ByteOrder)
+	 * @param order Bytereihenfolge.
+	 * @return {@code this}. */
+	public final IAMDecoder useOrder(final ByteOrder order) {
+		this._order_ = order;
+		return this;
+	}
+
+	/** Diese Methode gibt die Eingabedaten zurück.
+	 * 
+	 * @see #useSource(Object)
+	 * @return Eingabedaten. */
+	public final Object getSource() {
+		return this._source_;
+	}
+
+	/** Diese Methode setzt die Eingabedaten (INI-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @see MMFArray#from(Object)
+	 * @param source Eingabedaten.
+	 * @return {@code this}. */
+	public final IAMDecoder useSource(final Object source) {
+		this._source_ = source;
+		return this;
+	}
+
+	/** Diese Methode gibt die Ausgabedaten zurück.
+	 * 
+	 * @see #useTarget(Object)
+	 * @return Ausgabedaten. */
+	public final Object getTarget() {
+		return this._target_;
+	}
+
+	/** Diese Methode setzt die Ausgabedaten (IAM-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @see INIWriter#from(Object)
+	 * @param target Ausgabedaten.
+	 * @return {@code this}. */
+	public final IAMDecoder useTarget(final Object target) {
+		this._target_ = target;
+		return this;
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (INI-Dokument) in die {@link #getTarget() Ausgabedaten} (IAM-Dokument) und gibt {@code this}
+	 * zurück.
+	 * 
+	 * @see #decodeSource()
+	 * @see #decodeTarget(IAMIndex)
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link #decodeSource()} bzw. {@link #decodeTarget(IAMIndex)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link #decodeSource()} eine entsprechende Ausnahme auslöst. */
+	public final IAMDecoder decode() throws IOException, IllegalArgumentException {
+		return this.decodeTarget(this.decodeSource());
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link IAMIndexEncoder} und gibt diesen zurück.<br>
+	 * Hierbei wird die {@link #getOrder() Bytereihenfolge} aktualisiert.
+	 * 
+	 * @return {@link IAMIndexEncoder}.
+	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
+	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig ist. */
+	public final IAMIndexDecoder decodeSource() throws IOException, IAMException {
+		final MMFArray array = MMFArray.from(this._source_);
+		return new IAMIndexDecoder(array.withOrder(IAMIndexDecoder.HEADER.orderOf(array.toINT8().section(0, 4).toBytes())));
+	}
+
+	/** Diese Methode überführt den gegebenen {@link IAMIndex} in die {@link #getTarget() Ausgabedaten} (INI-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @param source {@link IAMIndex}.
+	 * @return {@code this}.
+	 * @throws IOException Wenn die Ausgabedaten nicht erzeigt oder geschrieben werden können. */
+	public final IAMDecoder decodeTarget(final IAMIndex source) throws IOException {
+		final ByteOrder order = this._order_;
+		try (final INIWriter target = INIWriter.from(this._target_)) {
+			target.writeSection("IAM_INDEX");
+			target.writeProperty("mapCount", IAMDecoder._formatInt_(source.mapCount()));
+			target.writeProperty("listCount", IAMDecoder._formatInt_(source.listCount()));
+			target.writeProperty("byteOrder", IAMDecoder._formatOrder_(order));
+			for (int mapIndex = 0, mapCount = source.mapCount(); mapIndex < mapCount; mapIndex++) {
+				final IAMMap map = source.map(mapIndex);
+				target.writeSection("IAM_MAP/".concat(IAMDecoder._formatInt_(mapIndex)));
+				target.writeProperty("findMode", IAMDecoder._formatMode_(map.mode()));
+				for (int entryIndex = 0, entryCount = map.entryCount(); entryIndex < entryCount; entryIndex++) {
+					target.writeProperty(IAMDecoder._formatArray_(map.key(entryIndex).toArray()), IAMDecoder._formatArray_(map.value(entryIndex).toArray()));
+				}
+			}
+			for (int listIndex = 0, listCount = source.listCount(); listIndex < listCount; listIndex++) {
+				final IAMList list = source.list(listIndex);
+				target.writeSection("IAM_LIST/".concat(IAMDecoder._formatInt_(listIndex)));
+				for (int itemIndex = 0, itemCount = list.itemCount(); itemIndex < itemCount; itemIndex++) {
+					target.writeProperty(IAMDecoder._formatInt_(itemIndex), IAMDecoder._formatArray_(list.item(itemIndex).toArray()));
+				}
+			}
+		}
+		return this;
+	}
+
+	{}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this._order_, this._source_, this._target_);
 	}
 
 }

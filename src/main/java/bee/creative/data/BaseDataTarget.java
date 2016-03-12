@@ -134,4 +134,33 @@ public abstract class BaseDataTarget implements DataTarget {
 		}.writeUTF(s);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public void seek(final long index) throws IOException {
+		throw new IOException();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void close() throws IOException {
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long index() throws IOException {
+		throw new IOException();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long length() throws IOException {
+		throw new IOException();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void allocate(final long value) throws IOException {
+		throw new IOException();
+	}
+
 }

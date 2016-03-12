@@ -3,7 +3,6 @@ package bee.creative.bex;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import bee.creative.bex.BEX.BEXBaseFile;
 import bee.creative.bex.BEX.BEXBaseList;
@@ -19,7 +18,9 @@ import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@link BEX} Datenstrukturen.
+/** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@link BEX} Datenstrukturen
+ * und kann als Konfigurator zur {@link #decode() Überführung} eines
+ * {@link #useSource(Object) BEX-Dokuments} in ein {@link #getTarget() XML-Dokument} eingesetzt werden.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class BEXDecoder {
@@ -901,14 +902,26 @@ public final class BEXDecoder {
 
 	/** Diese Methode gibt die Eingabedaten zurück.
 	 * 
-	 * @see #useSource(File)
-	 * @see #useSource(String)
-	 * @see #useSource(byte[])
-	 * @see #useSource(ByteBuffer)
-	 * @see #useSource(MMFArray)
+	 * @see #useSource(Object)
 	 * @return Eingabedaten. */
 	public final Object getSource() {
 		return this._source_;
+	}
+
+	/** Diese Methode setzt die Eingabedaten (BEX-Dokument) und gibt {@code this} zurück.<br>
+	 * Hierbei werden Folgende Datentypen unterstützt:
+	 * <dl>
+	 * <dt>{@link File}, {@link String}</dt>
+	 * <dd>Liest das BEX-Dokument aus der Datei mit dem gegebenen Dateinamen.</dd>
+	 * <dt>{@code byte[]}, {@link ByteBuffer}, {@link MMFArray}</dt>
+	 * <dd>Liest den Bytestrom des BEX-Dokuments aus der gegebenen Datenquelle.</dd>
+	 * </dl>
+	 * 
+	 * @param source Eingabedaten.
+	 * @return {@code this}. */
+	public final BEXDecoder useSource(final Object source) {
+		this._source_ = source;
+		return this;
 	}
 
 	/** Diese Methode gibt die Ausgabedaten zurück.<br>
@@ -919,62 +932,13 @@ public final class BEXDecoder {
 		return this._target_;
 	}
 
-	/** Diese Methode setzt die Eingabedaten auf die gegebene Datei und gibt {@code this} zurück.
-	 * 
-	 * @see MMFArray#MMFArray(File, ByteOrder)
-	 * @param source Datei.
-	 * @return {@code this}. */
-	public final BEXDecoder useSource(final File source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die Datei mit dem gegebenen Namen und gibt {@code this} zurück.
-	 * 
-	 * @see MMFArray#MMFArray(File, ByteOrder)
-	 * @param source Dateiname.
-	 * @return {@code this}. */
-	public final BEXDecoder useSource(final String source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf dei gegebenen und gibt {@code this} zurück.
-	 * 
-	 * @see MMFArray#MMFArray(byte[], ByteOrder)
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXDecoder useSource(final byte[] source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die gegebenen und gibt {@code this} zurück.
-	 * 
-	 * @see MMFArray#MMFArray(ByteBuffer)
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXDecoder useSource(final ByteBuffer source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die gegebenen und gibt {@code this} zurück.
-	 * 
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXDecoder useSource(final MMFArray source) {
-		this._source_ = source;
-		return this;
-	}
-
 	/** Diese Methode transformiert die {@link #getSource() Eingabedaten} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.
 	 * 
 	 * @return {@code this}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
 	 * @throws IAMException Wenn die Eingabedaten fehlerhaft kodiert sind.
 	 * @throws IllegalStateException Wenn die Eingabedaten un gültig sind. */
-	public final BEXDecoder decode() throws IOException, IAMException, IllegalStateException {
+	public final BEXDecoder decode() throws IOException, IAMException {
 		this._target_ = null;
 		Object source = this._source_;
 		if (source instanceof String) {

@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import bee.creative.util.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Parser für Daten im {@code CSV}-Format.<br>
@@ -14,6 +15,22 @@ import bee.creative.util.Objects;
  * @see CSVWriter
  * @author Sebastian Rostock 2014. */
 public final class CSVReader implements Closeable {
+
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVReader} und gibt diesen zurück.<br>
+	 * Wenn das Objekt ein {@link CSVReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
+	 * überführt}.
+	 * 
+	 * @see IO#inputReaderFrom(Object)
+	 * @see CSVReader#CSVReader(Reader)
+	 * @param data Objekt.
+	 * @return {@link CSVReader}.
+	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
+	public static final CSVReader from(final Object data) throws IOException {
+		if (data instanceof CSVReader) return (CSVReader)data;
+		return new CSVReader(IO.inputReaderFrom(data));
+	}
+
+	{}
 
 	@SuppressWarnings ("javadoc")
 	static final void _check_(final char symbol) throws IllegalArgumentException {

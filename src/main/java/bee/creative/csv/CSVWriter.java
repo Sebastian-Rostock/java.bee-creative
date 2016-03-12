@@ -3,6 +3,7 @@ package bee.creative.csv;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
+import bee.creative.util.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format.<br>
@@ -12,6 +13,22 @@ import bee.creative.util.Objects;
  * @see CSVReader
  * @author Sebastian Rostock 2014. */
 public final class CSVWriter implements Closeable {
+
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück.<br>
+	 * Wenn das Objekt ein {@link CSVWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
+	 * überführt}.
+	 * 
+	 * @see IO#outputWriterFrom(Object)
+	 * @see CSVWriter#CSVWriter(Writer)
+	 * @param data Objekt.
+	 * @return {@link CSVWriter}.
+	 * @throws IOException Wenn der {@link CSVWriter} nicht erzeugt werden kann. */
+	public static final CSVWriter from(final Object data) throws IOException {
+		if (data instanceof CSVWriter) return (CSVWriter)data;
+		return new CSVWriter(IO.outputWriterFrom(data));
+	}
+
+	{}
 
 	/** Dieses Feld speichert die Zieldaten. */
 	final Writer _writer_;
@@ -39,8 +56,8 @@ public final class CSVWriter implements Closeable {
 	 * @throws IOException Wenn {@link Writer#flush()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
 	public CSVWriter(final Writer writer) throws IOException, NullPointerException {
-		this._writer_ = writer;
 		writer.flush();
+		this._writer_ = writer;
 	}
 
 	{}

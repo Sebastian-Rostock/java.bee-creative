@@ -32,7 +32,7 @@ public interface DataTarget extends DataBase, DataOutput, Closeable {
 	 * 
 	 * @see #length()
 	 * @param value Anzahl verfügbarer {@code byte}s.
-	 * @throws IOException Wenn ein I/O-Fehler auftritt. */
+	 * @throws IOException Wenn ein I/O-Fehler auftritt oder die Lönge nicht gesetzt werden kann. */
 	public void allocate(long value) throws IOException;
 
 }

@@ -1,11 +1,9 @@
 package bee.creative.ini;
 
-import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import bee.creative.util.IO;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein Objekt zum Schreiben einer {@code INI}-Datenstruktur über einen {@link Writer}, analog zu einem {@link INIReader}.
@@ -13,17 +11,24 @@ import bee.creative.util.Objects;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class INIWriter implements Closeable {
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIWriter} und gibt diesen zurück.<br>
+	 * Wenn das Objekt ein {@link INIWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
+	 * überführt}.
+	 * 
+	 * @see IO#outputWriterFrom(Object)
+	 * @see INIWriter#INIWriter(Writer)
+	 * @param object Objekt.
+	 * @return {@link INIWriter}.
+	 * @throws IOException Wenn der {@link INIWriter} nicht erzeugt werden kann. */
+	public static final INIWriter from(final Object object) throws IOException {
+		if (object instanceof INIWriter) return (INIWriter)object;
+		return new INIWriter(IO.outputWriterFrom(object));
+	}
+
+	{}
+
 	/** Dieses Feld speichert den {@link Writer}. */
 	final Writer _writer_;
-
-	/** Dieser Konstruktor initialisiert das {@link File} für die {@code INI}-Datenstruktur.
-	 * 
-	 * @param file {@link File}.
-	 * @throws IOException Wenn {@link FileWriter#FileWriter(File)} eine entsprechende Ausnahme auslöst.
-	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
-	public INIWriter(final File file) throws IOException, NullPointerException {
-		this(new BufferedWriter(new FileWriter(file)));
-	}
 
 	/** Dieser Konstruktor initialisiert den {@link Writer} für die {@code INI}-Datenstruktur.
 	 * 

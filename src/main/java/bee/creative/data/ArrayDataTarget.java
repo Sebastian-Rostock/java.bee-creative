@@ -10,10 +10,10 @@ import bee.creative.array.CompactByteArray;
 public class ArrayDataTarget extends BaseDataTarget {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final CompactByteArray __data;
+	final CompactByteArray _data_;
 
 	/** Dieses Feld speichert die Schreibeposition. */
-	int __index;
+	int _index_;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten mit 128 Byte Größe. */
 	public ArrayDataTarget() {
@@ -26,7 +26,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 * @param size Größe. */
 	public ArrayDataTarget(final int size) {
 		this(new CompactByteArray(size));
-		this.__data.setAlignment(0);
+		this._data_.setAlignment(0);
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
@@ -35,7 +35,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind. */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.__data = data;
+		this._data_ = data;
 	}
 
 	{}
@@ -43,54 +43,49 @@ public class ArrayDataTarget extends BaseDataTarget {
 	/** {@inheritDoc} */
 	@Override
 	public CompactByteArray data() {
-		return this.__data;
+		return this._data_;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void write(final byte[] array, final int offset, final int length) throws IOException {
 		if ((offset < 0) || ((offset + length) > array.length)) throw new IndexOutOfBoundsException();
-		final CompactByteArray data = this.__data;
-		final int size = data.size(), index = this.__index, index2 = index + length;
+		final CompactByteArray data = this._data_;
+		final int size = data.size(), index = this._index_, index2 = index + length;
 		data.insert(size, Math.max(index2 - size, 0));
 		System.arraycopy(array, offset, data.array(), data.startIndex() + index, length);
-		this.__index = index2;
+		this._index_ = index2;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.__index = (int)index;
+		this._index_ = (int)index;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
-		return this.__index;
+		return this._index_;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
-		return this.__data.size();
+		return this._data_.size();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void allocate(final long value) throws IOException {
-		final int size = this.__data.size();
+		final int size = this._data_.size();
 		final int count = (int)value - size;
 		if (count < 0) {
-			this.__data.remove(size - count, count);
-			this.__index = Math.min(this.__index, size - count);
+			this._data_.remove(size - count, count);
+			this._index_ = Math.min(this._index_, size - count);
 		} else if (count > 0) {
-			this.__data.insert(size, count);
+			this._data_.insert(size, count);
 		}
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void close() throws IOException {
 	}
 
 }

@@ -1,8 +1,6 @@
 package bee.creative.iam;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.AbstractList;
@@ -10,14 +8,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import bee.creative.data.DataTarget;
 import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
 import bee.creative.iam.IAMDecoder.IAMListDecoder;
 import bee.creative.iam.IAMDecoder.IAMMapDecoder;
+import bee.creative.ini.INIReader;
+import bee.creative.ini.INIToken;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
+import bee.creative.util.IO;
+import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
-/** Diese Klasse implementiert die Klassen und Methoden zur Kodierung der {code Integer Array Model} Datenstrukturen.
+/** Diese Klasse implementiert die Algorithmen zur Kodierung der {code Integer Array Model} Datenstrukturen und kann selbst als Konfigurator zur
+ * {@link #encode() Überführung} eines {@link #useSource(Object) INI-Dokuments} in ein {@link #useTarget(Object) IAM-Dokument} eingesetzt werden.
  * 
  * @see MapData
  * @see IAMMapEncoder
@@ -892,8 +896,8 @@ public class IAMEncoder {
 			final byte[][] lists = IAMEncoder._encodeBytes_(this._lists_, order);
 			int length = 12;
 			length += (maps.length + lists.length + 2) << 2;
-			length += IAMEncoder.length(maps);
-			length += IAMEncoder.length(lists);
+			length += IAMEncoder._length_(maps);
+			length += IAMEncoder._length_(lists);
 			final byte[] result = new byte[length];
 			final ByteBuffer buffer = ByteBuffer.wrap(result).order(order);
 			buffer.putInt(0xF00DBA5E);
@@ -930,7 +934,9 @@ public class IAMEncoder {
 	 * @param buffer {@link ByteBuffer}.
 	 * @param source Zahlenfolgen. */
 	static final void _putData_(final ByteBuffer buffer, final byte[][] source) {
-		IAMEncoder.write(source, buffer);
+		for (final byte[] data: source) {
+			buffer.put(data);
+		}
 	}
 
 	/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an. Der geschriebene Speicherbereich wird mit Nullwerten ergänzt, um
@@ -1017,6 +1023,15 @@ public class IAMEncoder {
 		return true;
 	}
 
+	@SuppressWarnings ("javadoc")
+	static final int _length_(final byte[][] source) throws NullPointerException {
+		int length = 0;
+		for (final byte[] bytes: source) {
+			length += bytes.length;
+		}
+		return length;
+	}
+
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw.
 	 * größer als die der zweiten Zahlenfolge ist.
 	 * 
@@ -1066,72 +1081,274 @@ public class IAMEncoder {
 		return (result - 1) & 536870911;
 	}
 
-	/** Diese Methode speichert die gegebenen Bytefolgen in die gegebene Datei.
-	 * 
-	 * @see #write(byte[][], RandomAccessFile)
-	 * @param source Bytefolgen.
-	 * @param target Datei.
-	 * @throws IOException Wenn ein E/A-Fehler eintritt.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist. */
-	public static final void write(final byte[][] source, final File target) throws IOException, NullPointerException {
-		final RandomAccessFile file = new RandomAccessFile(target, "rw");
+	@SuppressWarnings ("javadoc")
+	final static int _parseInt_(final String value) throws IllegalArgumentException {
 		try {
-			IAMEncoder.write(source, file);
-		} finally {
-			file.close();
+			return Integer.parseInt(value);
+		} catch (final NumberFormatException cause) {
+			throw new IllegalArgumentException(cause);
 		}
 	}
 
-	/** Diese Methode fügt die gegebenen Bytefolgen an den gegebenen {@link ByteBuffer} an.
-	 * 
-	 * @see ByteBuffer#put(byte[])
-	 * @param source Bytefolgen.
-	 * @param target {@link ByteBuffer}.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Bytefolge aus {@code source} nicht in {@code target} passen. */
-	public static final void write(final byte[][] source, final ByteBuffer target) throws NullPointerException, IllegalArgumentException {
-		if (target.remaining() < IAMEncoder.length(source)) throw new IllegalArgumentException();
-		for (final byte[] data: source) {
-			target.put(data);
+	@SuppressWarnings ("javadoc")
+	final static int[] _parseArray_(final String value) throws IllegalArgumentException {
+		if (value.length() == 0) return new int[0];
+		final String[] parts = value.split("/", -1);
+		final int length = parts.length;
+		final int[] result = new int[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = IAMEncoder._parseInt_(parts[i]);
 		}
+		return result;
 	}
 
-	/** Diese Methode speichert die gegebenen Bytefolgen in die gegebene Datei.
-	 * 
-	 * @see RandomAccessFile#write(byte[])
-	 * @param source Bytefolgen.
-	 * @param target Datei.
-	 * @throws IOException Wenn ein E/A-Fehler eintritt.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält bzw. {@code target} {@code null} ist. */
-	public static final void write(final byte[][] source, final RandomAccessFile target) throws IOException, NullPointerException {
-		for (final byte[] data: source) {
-			target.write(data);
-		}
+	@SuppressWarnings ("javadoc")
+	final static boolean _parseMode_(final String value) throws IllegalArgumentException {
+		if (value.equals("H")) return true;
+		if (value.equals("S")) return false;
+		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Summe der Anzahl der Bytes in den gegebenen Bytefolgen zurück.
-	 * 
-	 * @param source Bytefolgen.
-	 * @return Anzahl der Bytes.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält. */
-	public static final int length(final byte[][] source) throws NullPointerException {
-		int length = 0;
-		for (final byte[] bytes: source) {
-			length += bytes.length;
-		}
-		return length;
+	@SuppressWarnings ("javadoc")
+	final static ByteOrder _parseOrder_(final String value) throws IllegalArgumentException {
+		if (value.equals("B")) return ByteOrder.BIG_ENDIAN;
+		if (value.equals("L")) return ByteOrder.LITTLE_ENDIAN;
+		if (value.equals("N")) return ByteOrder.nativeOrder();
+		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Summe der Anzahl der Bytes in den gegebenen Bytefolgen zurück.
+	{}
+
+	/** Dieses Feld speichert die Bytereihenfolge. */
+	ByteOrder _order_;
+
+	/** Dieses Feld speichert die Eingabedaten. */
+	Object _source_;
+
+	/** Dieses Feld speichert die Ausgabedaten. */
+	Object _target_;
+
+	{}
+
+	/** Diese Methode gibt die Bytereihenfolge zurück.
 	 * 
-	 * @see #write(byte[][], ByteBuffer)
-	 * @param source Bytefolgen.
-	 * @return Anzahl der Bytes.
-	 * @throws NullPointerException Wenn {@code source} {@code null} ist oder enthält. */
-	public static final byte[] compact(final byte[][] source) throws NullPointerException {
-		final byte[] target = new byte[IAMEncoder.length(source)];
-		IAMEncoder.write(source, ByteBuffer.wrap(target));
-		return target;
+	 * @see #useOrder(ByteOrder)
+	 * @return Bytereihenfolge. */
+	public final ByteOrder getOrder() {
+		return this._order_;
+	}
+
+	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.<br>
+	 * Wenn diese {@code null} ist, wird {@link ByteOrder#nativeOrder()} verwendet.
+	 * 
+	 * @see IAMIndexEncoder#encode(ByteOrder)
+	 * @param order Bytereihenfolge.
+	 * @return {@code this}. */
+	public final IAMEncoder useOrder(final ByteOrder order) {
+		this._order_ = order;
+		return this;
+	}
+
+	/** Diese Methode gibt die Eingabedaten zurück.
+	 * 
+	 * @see #useSource(Object)
+	 * @return Eingabedaten. */
+	public final Object getSource() {
+		return this._source_;
+	}
+
+	/** Diese Methode setzt die Eingabedaten (INI-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @see INIReader#from(Object)
+	 * @param source Eingabedaten.
+	 * @return {@code this}. */
+	public final IAMEncoder useSource(final Object source) {
+		this._source_ = source;
+		return this;
+	}
+
+	/** Diese Methode gibt die Ausgabedaten zurück.
+	 * 
+	 * @see #useTarget(Object)
+	 * @return Ausgabedaten. */
+	public final Object getTarget() {
+		return this._target_;
+	}
+
+	/** Diese Methode setzt die Ausgabedaten (IAM-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @see IO#outputDataFrom(Object)
+	 * @param target Ausgabedaten.
+	 * @return {@code this}. */
+	public final IAMEncoder useTarget(final Object target) {
+		this._target_ = target;
+		return this;
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (INI-Dokument) in die {@link #getTarget() Ausgabedaten} (IAM-Dokument) und gibt {@code this}
+	 * zurück.
+	 * 
+	 * @see #encodeSource()
+	 * @see #encodeTarget(IAMIndexEncoder)
+	 * @return {@code this}.
+	 * @throws IOException Wenn {@link #encodeSource()} bzw. {@link #encodeTarget(IAMIndexEncoder)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link #encodeSource()} eine entsprechende Ausnahme auslöst. */
+	public final IAMEncoder encode() throws IOException, IllegalArgumentException {
+		return this.encodeTarget(this.encodeSource());
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link IAMIndexEncoder} und gibt diesen zurück.<br>
+	 * Hierbei wird die {@link #getOrder() Bytereihenfolge} aktualisiert.
+	 * 
+	 * @return {@link IAMIndexEncoder}.
+	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
+	 * @throws IllegalArgumentException Wenn die Struktur der Eingabedaten ungültig ist. */
+	public final IAMIndexEncoder encodeSource() throws IOException, IllegalArgumentException {
+		ByteOrder order = null;
+		IAMIndexEncoder index = null;
+		IAMMapEncoder map = null;
+		IAMMapEncoder[] maps = null;
+		int mapIndex = 0;
+		IAMListEncoder list = null;
+		IAMListEncoder[] lists = null;
+		int listIndex = 0;
+		try (INIReader reader = INIReader.from(this._source_)) {
+			for (INIToken token = reader.read(); token != null; token = reader.read()) {
+				switch (token.type()) {
+					case INIToken.SECTION: {
+						final String tokenName = token.section();
+						if (tokenName.equals("IAM_INDEX")) {
+							if (index != null) throw new IllegalArgumentException("multiple IAM_INDEX-structures");
+							index = new IAMIndexEncoder();
+						} else if (tokenName.startsWith("IAM_MAP/")) {
+							if (index == null) throw new IllegalArgumentException("IAM_MAP-structure defined before IAM_INDEX-structure");
+							if (maps == null) throw new IllegalArgumentException("missing mapCount-field in IAM_INDEX-structure");
+							try {
+								mapIndex = IAMEncoder._parseInt_(tokenName.substring(8));
+								map = maps[mapIndex];
+								list = null;
+							} catch (final Exception cause) {
+								throw new IllegalArgumentException("invalid index of IAM_MAP-structure: " + tokenName, cause);
+							}
+						} else if (tokenName.startsWith("IAM_LIST/")) {
+							if (index == null) throw new IllegalArgumentException("IAM_LIST-structure defined before IAM_INDEX-structure");
+							if (lists == null) throw new IllegalArgumentException("missing listCount-field in IAM_INDEX-structure");
+							try {
+								listIndex = IAMEncoder._parseInt_(tokenName.substring(9));
+								map = null;
+								list = lists[listIndex];
+							} catch (final Exception cause) {
+								throw new IllegalArgumentException("invalid index of IAM_LIST-structure: " + tokenName, cause);
+							}
+						} else throw new IllegalArgumentException(tokenName + "-structure unknown");
+						break;
+					}
+					case INIToken.PROPERTY: {
+						final String tokenKey = token.key(), tokenValue = token.value();
+						if (map != null) {
+							if (tokenKey.equals("findMode")) {
+								try {
+									map.mode(IAMEncoder._parseMode_(tokenValue) ? IAMMap.MODE_HASHED : IAMMap.MODE_SORTED);
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid findMode-field in IAM_MAP-structure " + mapIndex + ": " + tokenValue, cause);
+								}
+							} else {
+								final int[] key, value;
+								try {
+									key = IAMEncoder._parseArray_(tokenKey);
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid key in IAM_MAP-structure " + mapIndex + ": " + tokenKey, cause);
+								}
+								try {
+									value = IAMEncoder._parseArray_(tokenValue);
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid value in IAM_MAP-structure  " + mapIndex + ": " + tokenValue, cause);
+								}
+								final int count = map.entryCount() + 1;
+								map.put(key, value);
+								if (count != map.entryCount()) throw new IllegalArgumentException("inconsistent key in IAM_MAP-structure " + mapIndex);
+							}
+						} else if (list != null) {
+							int key;
+							final int[] item;
+							try {
+								key = IAMEncoder._parseInt_(tokenKey);
+							} catch (final Exception cause) {
+								throw new IllegalArgumentException("invalid key in IAM_LIST-structure " + listIndex + ": " + tokenKey, cause);
+							}
+							try {
+								item = IAMEncoder._parseArray_(tokenValue);
+							} catch (final Exception cause) {
+								throw new IllegalArgumentException("invalid element in IAM_LIST-structure " + listIndex + ": " + tokenValue, cause);
+							}
+							if (key != list.itemCount()) throw new IllegalArgumentException("inconsistent key in IAM_LIST-structure " + listIndex);
+							list.put(item, false);
+						} else if (index != null) {
+							if (tokenKey.equals("mapCount")) {
+								if (maps != null) throw new IllegalArgumentException("multiple mapCount-fields in IAM_INDEX-structure");
+								final int count;
+								try {
+									count = IAMEncoder._parseInt_(tokenValue);
+									maps = new IAMMapEncoder[count];
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid mapCount-field in IAM_INDEX-structure", cause);
+								}
+								for (int i = 0; i < count; i++) {
+									index.putMap(maps[i] = new IAMMapEncoder());
+								}
+							} else if (tokenKey.equals("listCount")) {
+								if (lists != null) throw new IllegalArgumentException("multiple listCount-fields in IAM_INDEX-structure");
+								final int count;
+								try {
+									count = IAMEncoder._parseInt_(tokenValue);
+									lists = new IAMListEncoder[count];
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid listCount-field in IAM_INDEX-structure", cause);
+								}
+								for (int i = 0; i < count; i++) {
+									index.putList(lists[i] = new IAMListEncoder());
+								}
+							} else if (tokenKey.equals("byteOrder")) {
+								if (order != null) throw new IllegalArgumentException("multiple byteOrder-fields in IAM_INDEX-structure");
+								try {
+									order = IAMEncoder._parseOrder_(tokenValue);
+								} catch (final Exception cause) {
+									throw new IllegalArgumentException("invalid byteOrder-field in IAM_INDEX-structure", cause);
+								}
+							} else throw new IllegalArgumentException(tokenKey + "-field unknown");
+						} else throw new IllegalArgumentException(tokenKey + "-field defined without structure");
+						break;
+					}
+				}
+			}
+		}
+		if (index == null) throw new IllegalArgumentException("missing IAM_INDEX-structure");
+		this._order_ = order;
+		return index;
+	}
+
+	/** Diese Methode überführt den gegebenen {@link IAMIndexEncoder} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.<br>
+	 * Hierbei wird die über {@link #encodeSource()} bzw. {@link #useOrder(ByteOrder)} bestimmte Bytereihenfolge verwendet.
+	 * 
+	 * @see IAMIndexEncoder#encode(ByteOrder)
+	 * @param source {@link IAMIndexEncoder}.
+	 * @return {@code this}.
+	 * @throws IOException Wenn die Ausgabedaten nicht erzeigt oder geschrieben werden können. */
+	public final IAMEncoder encodeTarget(final IAMIndexEncoder source) throws IOException {
+		try (DataTarget result = IO.outputDataFrom(this._target_)) {
+			final ByteOrder order = this._order_;
+			final byte[] bytes = source.encode(order == null ? ByteOrder.nativeOrder() : order);
+			result.write(bytes);
+		}
+		return this;
+	}
+
+	{}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this._order_, this._source_, this._target_);
 	}
 
 }

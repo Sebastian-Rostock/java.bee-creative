@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import bee.creative.iam.IAMArray;
+import bee.creative.util.IO;
 
 /** Diese Klasse implementiert ein {@link IAMArray}, dessen Zahlen durch ein {@link File} oder einen {@link ByteBuffer} gegeben sind.<br>
  * Die Methoden {@link #get(int)}, {@link #length()} und {@link #section(int, int)} liefern in dieser Basisklasse immer {@code 0} bzw. {@code this}.<br>
@@ -18,9 +19,22 @@ import bee.creative.iam.IAMArray;
 public class MMFArray extends IAMArray {
 
 	/** Dieses Feld speichert das leere {@link MMFArray}. */
-	public static final MMFArray EMPTY = new MMFArray(0, null, 0, 0);
+	public static final MMFArray EMPTY = new MMFArray(ByteBuffer.wrap(new byte[0]));
 
 	{}
+
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück.<br>
+	 * Wenn das Objekt ein {@link MMFArray} ist, wird dieses geliefert. Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object)
+	 * überführt}.
+	 * 
+	 * @see IO#inputBufferFrom(Object)
+	 * @see MMFArray#MMFArray(ByteBuffer)
+	 * @param object Objekt.
+	 * @return {@link MMFArray}.
+	 * @throws IOException Wenn das {@link MMFArray} nicht erzeugt werden kann. */
+	public static final MMFArray from(final Object object) throws IOException {
+		return new MMFArray(IO.inputBufferFrom(object));
+	}
 
 	@SuppressWarnings ("javadoc")
 	static final ByteOrder _order_(final ByteOrder order) {
@@ -86,8 +100,8 @@ public class MMFArray extends IAMArray {
 	{}
 
 	/** Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
-	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation {@code 0}, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für
-	 * {@code INT16}- sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
+	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie
+	 * {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
 	 * 
 	 * @return Anzahl der Byte je Zahl der Folge (0..4). */
 	public int mode() {
@@ -150,6 +164,15 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFUINT16Array}. */
 	public final MMFArray toUINT16() {
 		return new MMFUINT16Array(this._byteBuffer_, this._byteOffset_, this._byteLength_);
+	}
+
+	/** Diese Methode gibt eine Kopie dieses {@link MMFArray} mit der gegebenen Bytereihenfolge zurück.
+	 * 
+	 * @see ByteBuffer#order()
+	 * @param order Bytereihenfolge.
+	 * @return {@link MMFArray}. */
+	public final MMFArray withOrder(final ByteOrder order) {
+		return new MMFArray(this._length_, this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
 	}
 
 	{}

@@ -1,12 +1,8 @@
 package bee.creative.bex;
 
-import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -24,16 +20,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import bee.creative.array.ByteArray;
 import bee.creative.bex.BEXDecoder.BEXFileDecoder;
+import bee.creative.data.DataTarget;
 import bee.creative.iam.IAMEncoder;
 import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.iam.IAMEncoder.IAMListEncoder;
 import bee.creative.util.Comparators;
+import bee.creative.util.IO;
 import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
-/** Diese Klasse implementiert die Klassen und Methoden zur Kodierung der {@link BEX} Datenstrukturen.
+/** Diese Klasse implementiert die Algorithmen zur Kodierung der {@link BEX} Datenstrukturen und kann als Konfigurator zur {@link #encode() Überführung} eines
+ * {@link #useSource(Object) XML-Dokuments} in ein {@link #useTarget(Object) BEX-Dokument} eingesetzt werden.
  * 
  * @see BEXFileEncoder
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -912,7 +910,10 @@ public final class BEXEncoder {
 			encoder.putList(this._encodePART_(this._attrTablePart_));
 			encoder.putList(this._encodePART_(this._chldTablePart_));
 			final byte[] dataB = encoder.encode(order);
-			return IAMEncoder.compact(new byte[][]{dataA, dataB});
+			final byte[] result = new byte[dataA.length + dataB.length];
+			System.arraycopy(dataA, 0, result, 0, dataA.length);
+			System.arraycopy(dataB, 0, result, dataA.length, dataB.length);
+			return result;
 		}
 
 		/** {@inheritDoc} */
@@ -926,7 +927,7 @@ public final class BEXEncoder {
 	{}
 
 	/** Dieses Feld speichert die Bytereihenfolge. */
-	ByteOrder _order_ = ByteOrder.nativeOrder();
+	ByteOrder _order_;
 
 	/** Dieses Feld speichert die Eingabedaten. */
 	Object _source_;
@@ -939,39 +940,13 @@ public final class BEXEncoder {
 	/** Diese Methode gibt die Bytereihenfolge zurück.
 	 * 
 	 * @see #useOrder(ByteOrder)
-	 * @see #useOrderNative()
-	 * @see #useOrderBigendian()
-	 * @see #useOrderLittleendian()
 	 * @return Bytereihenfolge. */
 	public final ByteOrder getOrder() {
 		return this._order_;
 	}
 
-	/** Diese Methode gibt die Eingabedaten zurück.
-	 * 
-	 * @see #useSource(File)
-	 * @see #useSource(String)
-	 * @see #useSource(Reader)
-	 * @see #useSource(Document)
-	 * @see #useSource(InputStream)
-	 * @return Eingabedaten. */
-	public final Object getSource() {
-		return this._source_;
-	}
-
-	/** Diese Methode gibt die Ausgabedaten zurück.
-	 * 
-	 * @see #useTarget(File)
-	 * @see #useTarget(String)
-	 * @see #useTarget(ByteArray)
-	 * @see #useTarget(DataOutput)
-	 * @see #useTarget(OutputStream)
-	 * @return Ausgabedaten. */
-	public final Object getTarget() {
-		return this._target_;
-	}
-
-	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.
+	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.<br>
+	 * Wenn diese {@code null} ist, wird {@link ByteOrder#nativeOrder()} verwendet.
 	 * 
 	 * @see BEXFileEncoder#encode(ByteOrder)
 	 * @param order Bytereihenfolge.
@@ -981,171 +956,89 @@ public final class BEXEncoder {
 		return this;
 	}
 
-	/** Diese Methode setzt die Bytereihenfolge auf {@link ByteOrder#nativeOrder() nativ} und gibt {@code this} zurück.
+	/** Diese Methode gibt die Eingabedaten zurück.
 	 * 
-	 * @see #useOrder(ByteOrder)
-	 * @return {@code this}. */
-	public final BEXEncoder useOrderNative() {
-		return this.useOrder(ByteOrder.nativeOrder());
+	 * @see #useSource(Object)
+	 * @return Eingabedaten. */
+	public final Object getSource() {
+		return this._source_;
 	}
 
-	/** Diese Methode setzt die Bytereihenfolge auf {@link ByteOrder#BIG_ENDIAN} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Eingabedaten (XML-Dokument) und gibt {@code this} zurück.<br>
+	 * Wenn die Eingabedaten ein {@link Document} sind, wird dieses {@link BEXFileEncoder#putNode(Node) eingelesen}. Andernfalls werden die Eingabedaten in eine
+	 * {@link Reader} {@link IO#inputReaderFrom(Object) überführt}.
 	 * 
-	 * @see #useOrder(ByteOrder)
-	 * @return {@code this}. */
-	public final BEXEncoder useOrderBigendian() {
-		return this.useOrder(ByteOrder.BIG_ENDIAN);
-	}
-
-	/** Diese Methode setzt die Bytereihenfolge auf {@link ByteOrder#LITTLE_ENDIAN nativ} und gibt {@code this} zurück.
-	 * 
-	 * @see #useOrder(ByteOrder)
-	 * @return {@code this}. */
-	public final BEXEncoder useOrderLittleendian() {
-		return this.useOrder(ByteOrder.LITTLE_ENDIAN);
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die gegebene Daten und gibt {@code this} zurück.
-	 * 
-	 * @param source Datei.
-	 * @return {@code this}. */
-	public final BEXEncoder useSource(final File source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die Daten mit dem gegebenen Namen und gibt {@code this} zurück.
-	 * 
-	 * @param source Dateiname.
-	 * @return {@code this}. */
-	public final BEXEncoder useSource(final String source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Eingabedaten auf die gegebenen und gibt {@code this} zurück.
-	 * 
+	 * @see IO#inputReaderFrom(Object)
 	 * @param source Eingabedaten.
 	 * @return {@code this}. */
-	public final BEXEncoder useSource(final Reader source) {
+	public final BEXEncoder useSource(final Object source) {
 		this._source_ = source;
 		return this;
 	}
 
-	/** Diese Methode setzt die Eingabedaten auf das gegebenen Dokument gibt {@code this} zurück.
+	/** Diese Methode gibt die Ausgabedaten zurück.
 	 * 
-	 * @param source Dokument.
-	 * @return {@code this}. */
-	public final BEXEncoder useSource(final Document source) {
-		this._source_ = source;
-		return this;
+	 * @see #useTarget(Object)
+	 * @return Ausgabedaten. */
+	public final Object getTarget() {
+		return this._target_;
 	}
 
-	/** Diese Methode setzt die Eingabedaten auf die gegebenen und gibt {@code this} zurück.
+	/** Diese Methode setzt die Ausgabedaten (BEX-Dokument) und gibt {@code this} zurück.
 	 * 
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXEncoder useSource(final InputStream source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten auf die gegebene Daten und gibt {@code this} zurück.
-	 * 
-	 * @see FileOutputStream#FileOutputStream(File)
-	 * @param target Datei.
-	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final File target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten auf die Daten mit dem gegebenen Namen und gibt {@code this} zurück.
-	 * 
-	 * @see FileOutputStream#FileOutputStream(String)
-	 * @param target Dateiname.
-	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final String target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten die gegebenen und gibt {@code this} zurück.
-	 * 
-	 * @see ByteArray#add(byte[])
+	 * @see IO#outputDataFrom(Object)
 	 * @param target Ausgabedaten.
 	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final ByteArray target) {
+	public final BEXEncoder useTarget(final Object target) {
 		this._target_ = target;
 		return this;
 	}
 
-	/** Diese Methode setzt die Ausgabedaten die gegebenen und gibt {@code this} zurück.
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (XML-Dokument) in die {@link #getTarget() Ausgabedaten} (BEX-Dokument) und gibt {@code this}
+	 * zurück.
 	 * 
-	 * @see DataOutput#write(byte[])
-	 * @param target Ausgabedaten.
-	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final DataOutput target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten die gegebenen und gibt {@code this} zurück.
-	 * 
-	 * @see OutputStream#write(byte[])
-	 * @param target Ausgabedaten.
-	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final OutputStream target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode transformiert die {@link #getSource() Eingabedaten} gemäß der {@link #getOrder() Bytereihenfolge} in die {@link #getTarget() Ausgabedaten}
-	 * und gibt {@code this} zurück.
-	 * 
+	 * @see #encodeSource()
+	 * @see #encodeTarget(BEXFileEncoder)
 	 * @return {@code this}.
-	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
-	 * @throws SAXException Wenn die eingabedaten nicht gelesen werden können.
-	 * @throws IllegalStateException Wenn die Bytereihenfolge, Eingabedaten oder Ausgabedaten ungültig sind. */
-	public final BEXEncoder encode() throws IOException, SAXException, IllegalStateException {
-		final Object target = this._target_;
-		if (target instanceof File) {
-			try (OutputStream result = new FileOutputStream((File)target)) {
-				result.write(this._encodeSource_());
-			}
-		} else if (target instanceof String) {
-			try (OutputStream result = new FileOutputStream((String)target)) {
-				result.write(this._encodeSource_());
-			}
-		} else if (target instanceof ByteArray) {
-			((ByteArray)target).add(this._encodeSource_());
-		} else if (target instanceof DataOutput) {
-			((DataOutput)target).write(this._encodeSource_());
-		} else if (target instanceof OutputStream) {
-			((OutputStream)target).write(this._encodeSource_());
-		} else throw new IllegalStateException("target invalid");
-		return this;
+	 * @throws IOException Wenn {@link #encodeSource()} bzw. {@link #encodeTarget(BEXFileEncoder)} eine entsprechende Ausnahme auslöst.
+	 * @throws SAXException Wenn {@link #encodeSource()} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link #encodeTarget(BEXFileEncoder)} eine entsprechende Ausnahme auslöst. */
+	public final BEXEncoder encode() throws IOException, SAXException, IllegalArgumentException {
+		return this.encodeTarget(this.encodeSource());
 	}
 
-	@SuppressWarnings ("javadoc")
-	final byte[] _encodeSource_() throws IllegalStateException, IOException, SAXException {
-		final ByteOrder order = this._order_;
-		if (order == null) throw new IllegalStateException("order invalid");
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link BEXFileEncoder} und gibt diesen zurück.
+	 * 
+	 * @return {@link IAMIndexEncoder}.
+	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
+	 * @throws SAXException Wenn {@link BEXFileEncoder#putNode(InputSource, XMLReader)} eine entsprechende Ausnahme auslöst. */
+
+	public final BEXFileEncoder encodeSource() throws IOException, SAXException {
 		final Object source = this._source_;
-		final BEXFileEncoder encoder = new BEXFileEncoder();
-		if (source instanceof File) {
-			encoder.putNode((File)source);
-		} else if (source instanceof String) {
-			encoder.putNode(new File((String)source));
-		} else if (source instanceof Reader) {
-			encoder.putNode(new InputSource((Reader)source), XMLReaderFactory.createXMLReader());
-		} else if (source instanceof Document) {
-			encoder.putNode((Document)source);
-		} else if (source instanceof InputStream) {
-			encoder.putNode(new InputSource((InputStream)source), XMLReaderFactory.createXMLReader());
-		} else throw new IllegalStateException("source invalid");
-		final byte[] result = encoder.encode(order);
+		final BEXFileEncoder result = new BEXFileEncoder();
+		if (source instanceof Document) {
+			result.putNode((Document)source);
+		} else {
+			result.putNode(new InputSource(IO.inputReaderFrom(source)), XMLReaderFactory.createXMLReader());
+		}
 		return result;
+	}
+
+	/** Diese Methode überführt den gegebenen {@link BEXFileEncoder} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.<br>
+	 * Hierbei wird die über {@link #useOrder(ByteOrder)} bestimmte Bytereihenfolge verwendet.
+	 * 
+	 * @see BEXFileEncoder#encode(ByteOrder)
+	 * @param source {@link BEXFileEncoder}.
+	 * @return {@code this}.
+	 * @throws IOException Wenn die Ausgabedaten nicht erzeigt oder geschrieben werden können.
+	 * @throws IllegalArgumentException Wenn {@link BEXFileEncoder#encode(ByteOrder)} eine entsprechende Ausnahme auslöst. */
+	public final BEXEncoder encodeTarget(final BEXFileEncoder source) throws IOException, IllegalArgumentException {
+		try (DataTarget target = IO.outputDataFrom(this._target_)) {
+			final ByteOrder order = this._order_;
+			final byte[] bytes = source.encode(order == null ? ByteOrder.nativeOrder() : order);
+			target.write(bytes);
+		}
+		return this;
 	}
 
 	{}

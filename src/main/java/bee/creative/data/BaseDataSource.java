@@ -131,7 +131,7 @@ public abstract class BaseDataSource implements DataSource {
 						result.append((char)value);
 				}
 			}
-		} catch (final EOFException e) {
+		} catch (final EOFException cause) {
 			if (result.length() == 0) return null;
 			return result.toString();
 		}
@@ -141,6 +141,29 @@ public abstract class BaseDataSource implements DataSource {
 	@Override
 	public String readUTF() throws IOException {
 		return DataInputStream.readUTF(this);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void seek(final long index) throws IOException {
+		throw new IOException();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void close() throws IOException {
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long index() throws IOException {
+		throw new IOException();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public long length() throws IOException {
+		throw new IOException();
 	}
 
 }
