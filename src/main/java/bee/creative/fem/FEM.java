@@ -73,6 +73,12 @@ public class FEM {
 			return context.dataFrom(this, type);
 		}
 
+		/** {@inheritDoc} */
+		@Override
+		public FEMValue result() {
+			return this;
+		}
+
 		{}
 
 		/** {@inheritDoc} */
