@@ -1,9 +1,6 @@
 package bee.creative.iam;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
 import bee.creative.ini.INIWriter;
@@ -51,24 +48,6 @@ public class IAMDecoder {
 		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
 		 * geliefert.
 		 * 
-		 * @see #orderOf(byte[])
-		 * @param file Datei mit den Quelldaten.
-		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws IOException Wenn {@link RandomAccessFile#RandomAccessFile(File, String)} bzw. {@link RandomAccessFile#read(byte[])} eine entsprechende Ausnahme
-		 *         auslöst.
-		 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
-		public final ByteOrder orderOf(final File file) throws IOException, NullPointerException {
-			try (RandomAccessFile source = new RandomAccessFile(file.getAbsoluteFile(), "r")) {
-				final byte[] bytes = new byte[4];
-				if (source.read(bytes) < 4) return null;
-				return this.orderOf(bytes);
-			}
-		}
-
-		/** Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
-		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
-		 * geliefert.
-		 * 
 		 * @param bytes Quelldaten.
 		 * @return Bytereihenfolge oder {@code null}.
 		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
@@ -84,14 +63,12 @@ public class IAMDecoder {
 		 * geliefert.
 		 * 
 		 * @see #orderOf(byte[])
-		 * @param buffer Puffer mit den Quelldaten.
+		 * @see MMFArray#from(Object)
+		 * @param object Quelldaten.
 		 * @return Bytereihenfolge oder {@code null}.
-		 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
-		public final ByteOrder orderOf(final ByteBuffer buffer) throws NullPointerException {
-			if (buffer.remaining() < 4) return null;
-			final byte[] bytes = new byte[4];
-			buffer.get(bytes);
-			buffer.position(buffer.position() - 4);
+		 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst. **/
+		public final ByteOrder orderOf(final Object object) throws IOException {
+			final byte[] bytes = MMFArray.from(object).toUINT8().section(0, 4).toBytes();
 			return this.orderOf(bytes);
 		}
 
@@ -658,7 +635,7 @@ public class IAMDecoder {
 		return this;
 	}
 
-	/** Diese Methode gibt die Eingabedaten zurück.
+	/** Diese Methode gibt die Eingabedaten (IAM-Dokument) zurück.
 	 * 
 	 * @see #useSource(Object)
 	 * @return Eingabedaten. */
@@ -666,7 +643,8 @@ public class IAMDecoder {
 		return this._source_;
 	}
 
-	/** Diese Methode setzt die Eingabedaten (INI-Dokument) und gibt {@code this} zurück.
+	/** Diese Methode setzt die Eingabedaten (IAM-Dokument) und gibt {@code this} zurück.<br>
+	 * Das gegebene Objekt wird in ein {@link MMFArray} {@link MMFArray#from(Object) überführt}.
 	 * 
 	 * @see MMFArray#from(Object)
 	 * @param source Eingabedaten.
@@ -676,7 +654,7 @@ public class IAMDecoder {
 		return this;
 	}
 
-	/** Diese Methode gibt die Ausgabedaten zurück.
+	/** Diese Methode gibt die Ausgabedaten (INI-Dokument) zurück.
 	 * 
 	 * @see #useTarget(Object)
 	 * @return Ausgabedaten. */
@@ -684,7 +662,8 @@ public class IAMDecoder {
 		return this._target_;
 	}
 
-	/** Diese Methode setzt die Ausgabedaten (IAM-Dokument) und gibt {@code this} zurück.
+	/** Diese Methode setzt die Ausgabedaten (INI-Dokument) und gibt {@code this} zurück.<br>
+	 * Das gegebene Objekt wird in einen {@link INIWriter} {@link INIWriter#from(Object) überführt}.
 	 * 
 	 * @see INIWriter#from(Object)
 	 * @param target Ausgabedaten.
@@ -694,7 +673,7 @@ public class IAMDecoder {
 		return this;
 	}
 
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (INI-Dokument) in die {@link #getTarget() Ausgabedaten} (IAM-Dokument) und gibt {@code this}
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (IAM-Dokument) in die {@link #getTarget() Ausgabedaten} (INI-Dokument) und gibt {@code this}
 	 * zurück.
 	 * 
 	 * @see #decodeSource()
@@ -706,15 +685,15 @@ public class IAMDecoder {
 		return this.decodeTarget(this.decodeSource());
 	}
 
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link IAMIndexEncoder} und gibt diesen zurück.<br>
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (IAM-Dokument) in einen {@link IAMIndexDecoder} und gibt diesen zurück.<br>
 	 * Hierbei wird die {@link #getOrder() Bytereihenfolge} aktualisiert.
 	 * 
-	 * @return {@link IAMIndexEncoder}.
+	 * @return {@link IAMIndexDecoder}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
-	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig ist. */
+	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig sind. */
 	public final IAMIndexDecoder decodeSource() throws IOException, IAMException {
 		final MMFArray array = MMFArray.from(this._source_);
-		return new IAMIndexDecoder(array.withOrder(IAMIndexDecoder.HEADER.orderOf(array.toINT8().section(0, 4).toBytes())));
+		return new IAMIndexDecoder(array.withOrder(IAMIndexDecoder.HEADER.orderOf(array)));
 	}
 
 	/** Diese Methode überführt den gegebenen {@link IAMIndex} in die {@link #getTarget() Ausgabedaten} (INI-Dokument) und gibt {@code this} zurück.

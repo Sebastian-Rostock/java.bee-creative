@@ -3,10 +3,7 @@ package bee.creative.bex;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
-import bee.creative.bex.BEXDecoder.BEXFileDecoder;
-import bee.creative.bex.BEXEncoder.BEXFileEncoder;
 import bee.creative.iam.IAMArray;
-import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
@@ -159,22 +156,18 @@ public class BEX {
 		return new String(value.section(0, value.length() - 1).toBytes(), BEX.CHARSET);
 	}
 
-	/** Diese Methode gibt einen neuen {@link BEXFileEncoder} zurück.
+	/** Diese Methode gibt einen neuen {@link BEXEncoder} zurück.
 	 * 
-	 * @see BEXFileEncoder#BEXFileEncoder()
-	 * @return neuer {@link BEXFileEncoder}. */
-	public static final BEXFileEncoder encoder() {
-		return new BEXFileEncoder();
+	 * @return neuer {@link BEXEncoder}. */
+	public static final BEXEncoder encoder() {
+		return new BEXEncoder();
 	}
 
-	/** Diese Methode gibt einen neuen {@link BEXFileDecoder} zurück.
+	/** Diese Methode gibt einen neuen {@link BEXDecoder} zurück.
 	 * 
-	 * @param array Speicherbereich mit {@code INT32} Zahlen.
-	 * @return neuer {@link BEXFileDecoder}.
-	 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
-	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static final BEXFileDecoder decoder(final MMFArray array) throws IAMException, NullPointerException {
-		return new BEXFileDecoder(array);
+	 * @return neuer {@link BEXDecoder}. */
+	public static final BEXDecoder decoder() {
+		return new BEXDecoder();
 	}
 
 }

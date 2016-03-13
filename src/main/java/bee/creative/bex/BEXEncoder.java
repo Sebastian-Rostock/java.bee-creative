@@ -7,9 +7,12 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -924,6 +927,33 @@ public final class BEXEncoder {
 
 	}
 
+	/** Diese Klasse implementiert die Optionen für {@link BEXEncoder#useOptions(BEXOption...)}.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static enum BEXOption {
+
+		/** Diese Option kennzeichnet die Aktivierung der URI von Attributknoten.
+		 * 
+		 * @see BEXFileEncoder#useAttrUriEnabled(boolean) */
+		EnableAttrUri,
+
+		/** Diese Option kennzeichnet die Aktivierung der Elternknoten von Attributknoten.
+		 * 
+		 * @see BEXFileEncoder#useAttrParentEnabled(boolean) */
+		EnableAttrParent,
+
+		/** Diese Option kennzeichnet die Aktivierung der URI von Kindknoten.
+		 * 
+		 * @see BEXFileEncoder#useChldUriEnabled(boolean) */
+		EnableChldUri,
+
+		/** Diese Option kennzeichnet die Aktivierung der Elternknoten von Kindknoten.
+		 * 
+		 * @see BEXFileEncoder#useChldParentEnabled(boolean) */
+		EnableChldParent;
+
+	}
+
 	{}
 
 	/** Dieses Feld speichert die Bytereihenfolge. */
@@ -934,6 +964,9 @@ public final class BEXEncoder {
 
 	/** Dieses Feld speichert die Ausgabedaten. */
 	Object _target_;
+
+	/** Dieses Feld speichert die Optionen. */
+	Set<BEXOption> _options_ = new HashSet<>();
 
 	{}
 
@@ -994,6 +1027,29 @@ public final class BEXEncoder {
 		return this;
 	}
 
+	/** Diese Methode gibt die Optionen zurück.
+	 * 
+	 * @see #useOptions(BEXOption...)
+	 * @return Optionen. */
+	public final Set<BEXOption> getOptions() {
+		return this._options_;
+	}
+
+	/** Diese Methode setzt die Optionen und gibt {@code this} zurück.
+	 * 
+	 * @see BEXFileEncoder#useAttrUriEnabled(boolean)
+	 * @see BEXFileEncoder#useAttrParentEnabled(boolean)
+	 * @see BEXFileEncoder#useChldUriEnabled(boolean)
+	 * @see BEXFileEncoder#useChldParentEnabled(boolean)
+	 * @param options Optionen.
+	 * @return {@code this}. */
+	public final BEXEncoder useOptions(final BEXOption... options) {
+		this._options_ = new HashSet<>();
+		if (options == null) return this;
+		this._options_.addAll(Arrays.asList(options));
+		return this;
+	}
+
 	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (XML-Dokument) in die {@link #getTarget() Ausgabedaten} (BEX-Dokument) und gibt {@code this}
 	 * zurück.
 	 * 
@@ -1015,7 +1071,12 @@ public final class BEXEncoder {
 
 	public final BEXFileEncoder encodeSource() throws IOException, SAXException {
 		final Object source = this._source_;
+		final Set<?> options = this._options_;
 		final BEXFileEncoder result = new BEXFileEncoder();
+		result.useAttrUriEnabled(options.contains(BEXOption.EnableAttrUri));
+		result.useAttrParentEnabled(options.contains(BEXOption.EnableAttrParent));
+		result.useChldUriEnabled(options.contains(BEXOption.EnableChldUri));
+		result.useChldParentEnabled(options.contains(BEXOption.EnableChldParent));
 		if (source instanceof Document) {
 			result.putNode((Document)source);
 		} else {

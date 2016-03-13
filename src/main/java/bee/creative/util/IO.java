@@ -35,8 +35,31 @@ import bee.creative.data.DataTarget;
 import bee.creative.data.FileDataSource;
 import bee.creative.data.FileDataTarget;
 
+/** Diese Klasse implementiert Methoden zur Erzeugung von Ein- und Ausgabe.
+ * 
+ * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IO {
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt eine {@link DataSource} und gibt diese zurück.<br>
+	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	 * <dl>
+	 * <dt>{@link DataSource}</dt>
+	 * <dd>Die gegebene {@link DataSource} wird geliefert.</dd>
+	 * <dt>{@link File}, {@link String}, {@link RandomAccessFile}</dt>
+	 * <dd>Es wird eine ais der Datei lesende {@link FileDataSource} geliefert.</dd>
+	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
+	 * <dd>Es wird eine das gegebenen Array lesende {@link ArrayDataSource} geliefert.</dd>
+	 * <dt>{@link DataInput}</dt>
+	 * <dd>Es wird eine den gegebenen {@link DataInput} lesende {@link DataSource} geliefert, welche keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dt>{@link InputStream}</dt>
+	 * <dd>Es wird eine den gegebenen {@link InputStream} lesende {@link DataSource} geliefert, welche keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dt> {@link ByteBuffer}</dt>
+	 * <dd>Es wird eine den gegebenen {@link ByteBuffer} lesende {@link DataSource} geliefert, welche keine Größenänderung unterstützt.</dd>
+	 * </dl>
+	 * 
+	 * @param object Objekt.
+	 * @return {@link DataSource}.
+	 * @throws IOException Wenn der {@link DataSource} nicht erzeugt werden kann. */
 	public static final DataSource inputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataSource) return (DataSource)object;
 		if (object instanceof File) return IO._inputDataFrom_((File)object);
@@ -47,7 +70,44 @@ public class IO {
 		if (object instanceof byte[]) return IO._inputDataFrom_((byte[])object);
 		if (object instanceof DataInput) return IO._inputDataFrom_((DataInput)object);
 		if (object instanceof InputStream) return IO._inputDataFrom_((InputStream)object);
+		if (object instanceof ByteBuffer) return IO._inputDataFrom_((ByteBuffer)object);
 		throw new IOException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final DataSource _inputDataFrom_(final ByteBuffer object) {
+		return new BaseDataSource() {
+
+			@Override
+			public Object data() {
+				return object;
+			}
+
+			@Override
+			public void readFully(final byte[] b, final int off, final int len) throws IOException {
+				object.get(b, off, len);
+			}
+
+			@Override
+			public void seek(final long index) throws IOException {
+				try {
+					object.position((int)index);
+				} catch (final IllegalArgumentException cause) {
+					throw new IOException(cause);
+				}
+			}
+
+			@Override
+			public long index() throws IOException {
+				return object.position();
+			}
+
+			@Override
+			public long length() throws IOException {
+				return object.limit();
+			}
+
+		};
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -191,6 +251,20 @@ public class IO {
 		return IO._inputBufferFrom_(object.getChannel());
 	}
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link InputStream} und gibt diesen zurück.<br>
+	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	 * <dl>
+	 * <dt>{@link InputStream}</dt>
+	 * <dd>Der gegebene {@link InputStream} wird geliefert.</dd>
+	 * <dt>{@link File}, {@link String}</dt>
+	 * <dd>Es wird ein aus der gegebenen Datei lesender {@link FileInputStream} geliefert.</dd>
+	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
+	 * <dd>Es wird ein das gegebene Array lesender {@link InputStream} geliefert.</dd>
+	 * </dl>
+	 * 
+	 * @param object Objekt.
+	 * @return {@link InputStream}.
+	 * @throws IOException Wenn der {@link InputStream} nicht erzeugt werden kann. */
 	public static final InputStream inputStreamFrom(final Object object) throws IOException {
 		if (object instanceof InputStream) return (InputStream)object;
 		if (object instanceof File) return IO._inputStreamFrom_((File)object);
@@ -285,6 +359,28 @@ public class IO {
 		return new CharArrayReader(object.array(), object.startIndex(), object.size());
 	}
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link DataTarget} und gibt dieses zurück.<br>
+	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	 * <dl>
+	 * <dt>{@link DataTarget}</dt>
+	 * <dd>Das gegebene {@link DataTarget} wird geliefert.</dd>
+	 * <dt>{@link File}, {@link String}, {@link RandomAccessFile}</dt>
+	 * <dd>Es wird ein in die gegebenen Datei schreibendes {@link FileDataTarget} geliefert.</dd>
+	 * <dt>{@link CompactByteArray}</dt>
+	 * <dd>Es wird ein in das gegebenen {@link CompactByteArray} schreibendes {@link ArrayDataTarget} geliefert.</dd>
+	 * <dt>{@link ByteArray}</dt>
+	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibendes {@link DataTarget} geliefert, welches keine Navigation unterstützt.</dd>
+	 * <dt>{@link OutputStream}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dt>{@link DataOutput}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link DataOutput} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dt> {@link ByteBuffer}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link ByteBuffer} schreibendes {@link DataTarget} geliefert, welches keine Größenänderung unterstützt.</dd>
+	 * </dl>
+	 * 
+	 * @param object Objekt.
+	 * @return {@link DataTarget}.
+	 * @throws IOException Wenn der {@link DataTarget} nicht erzeugt werden kann. */
 	public static final DataTarget outputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataTarget) return (DataTarget)object;
 		if (object instanceof File) return IO._outputDataFrom_((File)object);
@@ -336,56 +432,75 @@ public class IO {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final DataTarget _outputDataFrom_(final ByteBuffer data) {
+	static final DataTarget _outputDataFrom_(final ByteBuffer object) {
 		return new BaseDataTarget() {
 
 			@Override
 			public Object data() {
-				return data;
+				return object;
 			}
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				data.put(b, off, len);
+				object.put(b, off, len);
+			}
+
+			@Override
+			public void seek(final long index) throws IOException {
+				try {
+					object.position((int)index);
+				} catch (final IllegalArgumentException cause) {
+					throw new IOException(cause);
+				}
+			}
+
+			@Override
+			public long index() throws IOException {
+				return object.position();
+			}
+
+			@Override
+			public long length() throws IOException {
+				return object.limit();
 			}
 
 		};
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final DataTarget _outputDataFrom_(final DataOutput data) {
+	static final DataTarget _outputDataFrom_(final DataOutput object) {
 		return new BaseDataTarget() {
 
 			@Override
 			public Object data() {
-				return data;
+				return object;
 			}
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				data.write(b, off, len);
+				object.write(b, off, len);
 			}
 
 		};
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final DataTarget _outputDataFrom_(final OutputStream data) {
+	static final DataTarget _outputDataFrom_(final OutputStream object) {
 		return new BaseDataTarget() {
 
 			@Override
 			public Object data() {
-				return data;
+				return object;
 			}
 
 			@Override
 			public void write(final byte[] b, final int off, final int len) throws IOException {
-				data.write(b, off, len);
+				object.write(b, off, len);
 			}
 
 			@Override
 			public void close() throws IOException {
-				data.close();
+				object.close();
 			}
 
 		};
@@ -454,6 +569,20 @@ public class IO {
 		return ByteBuffer.wrap(object.array(), object.startIndex(), object.size());
 	}
 
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link OutputStream} und gibt diesen zurück.<br>
+	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	 * <dl>
+	 * <dt>{@link OutputStream}</dt>
+	 * <dd>Der gegebene {@link OutputStream} wird geliefert.</dd>
+	 * <dt>{@link File}, {@link String}</dt>
+	 * <dd>Es wird ein in die gegebenen Datei schreibender {@link FileOutputStream} geliefert.</dd>
+	 * <dt>{@link ByteArray}</dt>
+	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibender {@link OutputStream} geliefert.</dd>
+	 * </dl>
+	 * 
+	 * @param object Objekt.
+	 * @return {@link OutputStream}.
+	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
 	public static final OutputStream outputStreamFrom(final Object object) throws IOException {
 		if (object instanceof OutputStream) return (OutputStream)object;
 		if (object instanceof File) return IO._outputStreamFrom_((File)object);
@@ -462,6 +591,17 @@ public class IO {
 		throw new IOException();
 	}
 
+	@SuppressWarnings ("javadoc")
+	static final OutputStream _outputStreamFrom_(final File object) throws IOException {
+		return new FileOutputStream(object);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final OutputStream _outputStreamFrom_(final String object) throws IOException {
+		return new FileOutputStream(object);
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final OutputStream _outputStreamFrom_(final ByteArray object) throws IOException {
 		return new OutputStream() {
 
@@ -478,14 +618,22 @@ public class IO {
 		};
 	}
 
-	static final OutputStream _outputStreamFrom_(final File object) throws IOException {
-		return new FileOutputStream(object);
-	}
-
-	static final OutputStream _outputStreamFrom_(final String object) throws IOException {
-		return new FileOutputStream(object);
-	}
-
+	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link Writer} und gibt diesen zurück.<br>
+	 * Hierbei werden folgende Datentypen für {@code object} unterstützt:
+	 * <dl>
+	 * <dt>{@link Writer}</dt>
+	 * <dd>Der gegebene {@link Writer} wird geliefert.</dd>
+	 * <dt>{@link File}, {@link String}</dt>
+	 * <dd>Es wird ein in die gegebenen Datei schreibender {@link FileWriter} geliefert.</dd>
+	 * <dt>{@link OutputStream}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibender {@link OutputStreamWriter} geliefert.</dd>
+	 * <dt>{@link CharacterArray}</dt>
+	 * <dd>Es wird ein in das gegebenen {@link CharacterArray} schreibender {@link OutputStream} geliefert.</dd>
+	 * </dl>
+	 * 
+	 * @param object Objekt.
+	 * @return {@link OutputStream}.
+	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
 	public static final Writer outputWriterFrom(final Object object) throws IOException {
 		if (object instanceof Writer) return (Writer)object;
 		if (object instanceof File) return IO._outputWriterFrom_((File)object);

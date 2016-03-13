@@ -51,6 +51,16 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 		return this.useResult(new StreamResult(file));
 	}
 
+	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit der gegebenen Datei und gibt {@code this} zurück.
+	 * 
+	 * @see #useFile(File)
+	 * @see File#File(String)
+	 * @param file Datei.
+	 * @return {@code this}. */
+	public final GThis useFile(final String file) {
+		return this.useFile(new File(file));
+	}
+
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link DOMResult} und gibt {@code this} zurück.
 	 * 
 	 * @see #useResult(Result)

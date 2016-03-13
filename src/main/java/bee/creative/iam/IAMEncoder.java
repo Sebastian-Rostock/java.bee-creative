@@ -1149,7 +1149,7 @@ public class IAMEncoder {
 		return this;
 	}
 
-	/** Diese Methode gibt die Eingabedaten zurück.
+	/** Diese Methode gibt die Eingabedaten (INI-Dokument) zurück.
 	 * 
 	 * @see #useSource(Object)
 	 * @return Eingabedaten. */
@@ -1157,7 +1157,8 @@ public class IAMEncoder {
 		return this._source_;
 	}
 
-	/** Diese Methode setzt die Eingabedaten (INI-Dokument) und gibt {@code this} zurück.
+	/** Diese Methode setzt die Eingabedaten (INI-Dokument) und gibt {@code this} zurück.<br>
+	 * Das gegebene Objekt wird in einen {@link INIReader} {@link INIReader#from(Object) überführt}.
 	 * 
 	 * @see INIReader#from(Object)
 	 * @param source Eingabedaten.
@@ -1167,7 +1168,7 @@ public class IAMEncoder {
 		return this;
 	}
 
-	/** Diese Methode gibt die Ausgabedaten zurück.
+	/** Diese Methode gibt die Ausgabedaten (IAM-Dokument) zurück.
 	 * 
 	 * @see #useTarget(Object)
 	 * @return Ausgabedaten. */
@@ -1175,7 +1176,8 @@ public class IAMEncoder {
 		return this._target_;
 	}
 
-	/** Diese Methode setzt die Ausgabedaten (IAM-Dokument) und gibt {@code this} zurück.
+	/** Diese Methode setzt die Ausgabedaten (IAM-Dokument) und gibt {@code this} zurück.<br>
+	 * Das gegebene Objekt wird in ein {@link DataTarget} {@link IO#outputDataFrom(Object) überführt}.
 	 * 
 	 * @see IO#outputDataFrom(Object)
 	 * @param target Ausgabedaten.
@@ -1197,12 +1199,12 @@ public class IAMEncoder {
 		return this.encodeTarget(this.encodeSource());
 	}
 
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link IAMIndexEncoder} und gibt diesen zurück.<br>
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (INI-Dokument) in einen {@link IAMIndexEncoder} und gibt diesen zurück.<br>
 	 * Hierbei wird die {@link #getOrder() Bytereihenfolge} aktualisiert.
 	 * 
 	 * @return {@link IAMIndexEncoder}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
-	 * @throws IllegalArgumentException Wenn die Struktur der Eingabedaten ungültig ist. */
+	 * @throws IllegalArgumentException Wenn die Struktur der Eingabedaten ungültig sind. */
 	public final IAMIndexEncoder encodeSource() throws IOException, IllegalArgumentException {
 		ByteOrder order = null;
 		IAMIndexEncoder index = null;
@@ -1327,7 +1329,7 @@ public class IAMEncoder {
 		return index;
 	}
 
-	/** Diese Methode überführt den gegebenen {@link IAMIndexEncoder} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.<br>
+	/** Diese Methode überführt den gegebenen {@link IAMIndexEncoder} in die {@link #getTarget() Ausgabedaten} (IAM-Dokument) und gibt {@code this} zurück.<br>
 	 * Hierbei wird die über {@link #encodeSource()} bzw. {@link #useOrder(ByteOrder)} bestimmte Bytereihenfolge verwendet.
 	 * 
 	 * @see IAMIndexEncoder#encode(ByteOrder)

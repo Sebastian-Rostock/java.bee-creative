@@ -1,9 +1,9 @@
 package bee.creative.bex;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.Writer;
 import java.util.Arrays;
+import javax.xml.transform.TransformerException;
 import bee.creative.bex.BEX.BEXBaseFile;
 import bee.creative.bex.BEX.BEXBaseList;
 import bee.creative.bex.BEX.BEXBaseNode;
@@ -15,11 +15,13 @@ import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Filters;
+import bee.creative.util.IO;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
+import bee.creative.xml.XML;
+import bee.creative.xml.XMLFormatter;
 
-/** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@link BEX} Datenstrukturen
- * und kann als Konfigurator zur {@link #decode() Überführung} eines
+/** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@link BEX} Datenstrukturen und kann als Konfigurator zur {@link #decode() Überführung} eines
  * {@link #useSource(Object) BEX-Dokuments} in ein {@link #getTarget() XML-Dokument} eingesetzt werden.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -896,11 +898,11 @@ public final class BEXDecoder {
 	Object _source_;
 
 	/** Dieses Feld speichert das Ausgabedaten. */
-	BEXFileDecoder _target_;
+	Object _target_;
 
 	{}
 
-	/** Diese Methode gibt die Eingabedaten zurück.
+	/** Diese Methode gibt die Eingabedaten (BEX-Dokument) zurück.
 	 * 
 	 * @see #useSource(Object)
 	 * @return Eingabedaten. */
@@ -909,14 +911,9 @@ public final class BEXDecoder {
 	}
 
 	/** Diese Methode setzt die Eingabedaten (BEX-Dokument) und gibt {@code this} zurück.<br>
-	 * Hierbei werden Folgende Datentypen unterstützt:
-	 * <dl>
-	 * <dt>{@link File}, {@link String}</dt>
-	 * <dd>Liest das BEX-Dokument aus der Datei mit dem gegebenen Dateinamen.</dd>
-	 * <dt>{@code byte[]}, {@link ByteBuffer}, {@link MMFArray}</dt>
-	 * <dd>Liest den Bytestrom des BEX-Dokuments aus der gegebenen Datenquelle.</dd>
-	 * </dl>
+	 * Das gegebene Objekt wird in ein {@link MMFArray} {@link MMFArray#from(Object) überführt}.
 	 * 
+	 * @see MMFArray#from(Object)
 	 * @param source Eingabedaten.
 	 * @return {@code this}. */
 	public final BEXDecoder useSource(final Object source) {
@@ -924,40 +921,58 @@ public final class BEXDecoder {
 		return this;
 	}
 
-	/** Diese Methode gibt die Ausgabedaten zurück.<br>
-	 * Diese werden in {@link #decode()} gesetzt.
+	/** Diese Methode gibt die Ausgabedaten (XML-Dokument) zurück.
 	 * 
+	 * @see #useTarget(Object)
 	 * @return Ausgabedaten. */
-	public final BEXFileDecoder getTarget() {
+	public final Object getTarget() {
 		return this._target_;
 	}
 
-	/** Diese Methode transformiert die {@link #getSource() Eingabedaten} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.
+	/** Diese Methode setzt die Ausgabedaten (XML-Dokument) und gibt {@code this} zurück.<br>
+	 * Das gegebene Objekt wird in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
+	 * 
+	 * @see IO#outputWriterFrom(Object)
+	 * @param target Ausgabedaten.
+	 * @return {@code this}. */
+	public final BEXDecoder useTarget(final Object target) {
+		this._target_ = target;
+		return this;
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in die {@link #getTarget() Ausgabedaten} (XML-Dokument) und gibt {@code this}
+	 * zurück.
 	 * 
 	 * @return {@code this}.
+	 * @throws IOException Wenn {@link #decodeSource()} bzw. {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link #decodeSource()} eine entsprechende Ausnahme auslöst.
+	 * @throws TransformerException Wenn {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst. */
+	public final BEXDecoder decode() throws IOException, IAMException, TransformerException {
+		return this.decodeTarget(this.decodeSource());
+	}
+
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in einen {@link BEXFileDecoder} und gibt diesen zurück.
+	 * 
+	 * @return {@link BEXFileDecoder}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
-	 * @throws IAMException Wenn die Eingabedaten fehlerhaft kodiert sind.
-	 * @throws IllegalStateException Wenn die Eingabedaten un gültig sind. */
-	public final BEXDecoder decode() throws IOException, IAMException {
-		this._target_ = null;
-		Object source = this._source_;
-		if (source instanceof String) {
-			source = new File((String)source);
-		}
-		if (source instanceof File) {
-			final File file = (File)source;
-			source = new MMFArray(file, BEXFileDecoder.HEADER.orderOf(file));
-		}
-		if (source instanceof byte[]) {
-			final byte[] bytes = (byte[])source;
-			source = new MMFArray(bytes, BEXFileDecoder.HEADER.orderOf(bytes));
-		}
-		if (source instanceof ByteBuffer) {
-			source = new MMFArray((ByteBuffer)source);
-		}
-		if (source instanceof MMFArray) {
-			this._target_ = new BEXFileDecoder((MMFArray)source);
-		} else throw new IllegalStateException("source invalid");
+	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig sind. */
+	public final BEXFileDecoder decodeSource() throws IOException, IAMException {
+		final MMFArray array = MMFArray.from(this._source_);
+		return new BEXFileDecoder(array.withOrder(BEXFileDecoder.HEADER.orderOf(array)));
+	}
+
+	/** Diese Methode überführt das gegebene {@link BEXFile} in die {@link #getTarget() Ausgabedaten} (XML-Dokument) und gibt {@code this} zurück.
+	 * 
+	 * @see XMLFormatter#transform()
+	 * @param source {@link BEXFile}.
+	 * @return {@code this}.
+	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
+	 * @throws TransformerException Wenn die Ausgabedaten nicht erzeigt werden können. */
+	public final BEXDecoder decodeTarget(final BEXFile source) throws IOException, TransformerException {
+		XML.newFormatter() //
+			.openResultData().useWriter(IO.outputWriterFrom(this._target_)).closeResultData() //
+			.openSourceData().useNode(BEXAdapter.wrap(source)).closeSourceData() //
+			.transform();
 		return this;
 	}
 

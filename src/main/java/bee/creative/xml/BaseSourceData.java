@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Result;
@@ -63,6 +64,18 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this.useUrl(uri.toURL());
 	}
 
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen URI und gibt {@code this} zurück.
+	 * 
+	 * @see #useUri(URI)
+	 * @see URI#URI(String)
+	 * @param uri URI.
+	 * @return {@code this}.
+	 * @throws URISyntaxException Wenn {@link URI#URI(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws MalformedURLException Wenn {@link #useUri(URI)} eine entsprechende Ausnahme auslöst. */
+	public final GThis useUri(final String uri) throws URISyntaxException, MalformedURLException {
+		return this.useUri(new URI(uri));
+	}
+
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
@@ -74,6 +87,17 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 		return this.useSource(new StreamSource(url.toExternalForm()));
 	}
 
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen URL und gibt {@code this} zurück.
+	 * 
+	 * @see #useUrl(URL)
+	 * @see URL#URL(String)
+	 * @param url URL.
+	 * @return {@code this}.
+	 * @throws MalformedURLException Wenn {@link URL#URL(String)} eine entsprechende Ausnahme auslöst. */
+	public final GThis useUrl(final String url) throws MalformedURLException {
+		return this.useUrl(new URL(url));
+	}
+
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this} zurück.
 	 * 
 	 * @see #useSource(Source)
@@ -82,6 +106,16 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	 * @return {@code this}. */
 	public final GThis useFile(final File file) {
 		return this.useSource(new StreamSource(file));
+	}
+
+	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit der gegebenen Datei und gibt {@code this} zurück.
+	 * 
+	 * @see #useFile(File)
+	 * @see File#File(String)
+	 * @param file Datei.
+	 * @return {@code this}. */
+	public final GThis useFile(final String file) {
+		return this.useFile(new File(file));
 	}
 
 	/** Diese Methode setzt die Quelldaten über {@link StringReader} mit dem gegebenen Text auf eine {@link StreamSource} und gibt {@code this} zurück.
