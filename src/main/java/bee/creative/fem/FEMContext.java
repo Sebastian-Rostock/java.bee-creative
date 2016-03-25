@@ -79,7 +79,7 @@ public abstract class FEMContext {
 	 * Andernfalls löst sie eine {@link IllegalArgumentException} aus.
 	 * <p>
 	 * Die {@link #valueFrom(Object)}-Methode dieses Kontextobjekts gibt einen gegebenen {@link FEMValue} unverändert zurück und konvertiert {@code null} zu
-	 * {@link FEMVoid#INSTANCE}, {@code char[]} und {@link String} zu {@link FEMString}, {@code byte[]} zu {@link FEMBinary}, {@link Float}, {@link Double} und
+	 * {@link FEMVoid}, {@code char[]} und {@link String} zu {@link FEMString}, {@code byte[]} zu {@link FEMBinary}, {@link Float}, {@link Double} und
 	 * {@link BigDecimal} zu {@link FEMDecimal}, alle anderen {@link Number} zu {@link FEMInteger}, {@link Boolean} zu {@link FEMBoolean}, {@link Calendar} zu
 	 * {@link FEMDatetime}, {@link FEMFunction} zu {@link FEMHandler} und alle anderen Eingaben via {@link #arrayFrom(Object)} in ein {@link FEMArray}. Im
 	 * Fehlerfall löst sie eine {@link IllegalArgumentException} aus.
@@ -114,7 +114,7 @@ public abstract class FEMContext {
 
 	{}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in siene
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
 	 * 
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
@@ -203,7 +203,7 @@ public abstract class FEMContext {
 		return this._arrayFrom_(data.toArray());
 	}
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in siene Ausgabe
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
 	 * 
 	 * @return {@code valueFrom}-{@link Converter}. */
@@ -231,7 +231,7 @@ public abstract class FEMContext {
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
 	public abstract FEMValue valueFrom(Object object) throws IllegalArgumentException;
 
-	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in siene Ausgabe
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
 	 * 
 	 * @return {@code objectFrom}-{@link Converter}. */

@@ -21,6 +21,28 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class FindCollector implements Collector {
+
+		public final byte that;
+
+		public int index;
+
+		FindCollector(final byte that) {
+			this.that = that;
+		}
+
+		{}
+
+		@Override
+		public final boolean push(final byte value) {
+			if (value == this.that) return false;
+			this.index++;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class HashCollector implements Collector {
 
 		public int hash = 0x811C9DC5;
@@ -502,6 +524,21 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		final FEMBinary result = this._length_ == 1 ? new UniformBinary(1, this._get_(0)) : new CompactBinary(this.value());
 		result._hash_ = this._hash_;
 		return result;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytewerts innerhalb dieser Bytefolge zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Wenn der Bytewert nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * 
+	 * @param that gesuchter Bytewert.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Bytewerts ({@code offset..this.length()-1}) oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
+	public final int find(final byte that, final int offset) throws IllegalArgumentException {
+		final int length = this._length_ - offset;
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
+		final FindCollector collector = new FindCollector(that);
+		if (this._export_(collector, offset, length, true)) return -1;
+		return collector.index + offset;
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Bytefolge innerhalb dieser Bytefolge zurück.<br>

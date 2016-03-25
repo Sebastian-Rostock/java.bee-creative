@@ -28,6 +28,28 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class FindCollector implements Collector {
+
+		public final FEMValue that;
+
+		public int index;
+
+		FindCollector(final FEMValue that) {
+			this.that = that;
+		}
+
+		{}
+
+		@Override
+		public final boolean push(final FEMValue value) {
+			if (value.equals(this.that)) return false;
+			this.index++;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class HashCollector implements Collector {
 
 		public int hash = 0x811C9DC5;
@@ -451,6 +473,21 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		final FEMArray result = this._length_ == 1 ? new UniformArray(1, this._get_(0)) : new CompactArray(this.value());
 		result._hash_ = this._hash_;
 		return result;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Wenn der Wert nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * 
+	 * @param that gesuchter Wert.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
+	public final int find(final FEMValue that, final int offset) throws IllegalArgumentException {
+		final int length = this._length_ - offset;
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
+		final FindCollector collector = new FindCollector(that);
+		if (this._export_(collector, offset, length, true)) return -1;
+		return collector.index + offset;
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Wertliste innerhalb dieser Wertliste zurück.<br>

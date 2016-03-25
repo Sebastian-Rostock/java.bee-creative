@@ -240,11 +240,11 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
 	 * @param second Sekunde ({@code 0..59}).
-	 * @param millisecond Millisekunde ({@code 0..999}).
+	 * @param millis Millisekunde ({@code 0..999}).
 	 * @return Zeitangabe mit Uhrzeit.
 	 * @throws IllegalArgumentException Wenn {@link #withTime(int, int, int, int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		return FEMDatetime.EMPTY.withTime(hour, minute, second, millisecond);
+	public static final FEMDatetime fromTime(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
+		return FEMDatetime.EMPTY.withTime(hour, minute, second, millis);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -292,6 +292,27 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	@SuppressWarnings ("javadoc")
 	static final void _checkZone_(final int zone) throws IllegalArgumentException {
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Zeitzone zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withZone(zone)}.
+	 * 
+	 * @see #withZone(int)
+	 * @param zone Zeitzone ({@code -840..840})
+	 * @return Zeitangabe mit Zeitzone.
+	 * @throws IllegalArgumentException Wenn {@link #withZone(int)} eine entsprechende Ausnahme auslöst. */
+	public static final FEMDatetime fromZone(final int zone) throws IllegalArgumentException {
+		return FEMDatetime.EMPTY.withZone(zone);
+	}
+
+	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Zeitzone zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withZone(zoneHour, zoneMinute)}.
+	 * 
+	 * @see #withZone(int, int)
+	 * @param zoneHour Stunde der Zeitzone ({@code -14..14}).
+	 * @param zoneMinute Minute der Zeitzone ({@code 0..59}).
+	 * @return Zeitangabe mit Zeitzone.
+	 * @throws IllegalArgumentException Wenn {@link #withZone(int, int)} eine entsprechende Ausnahme auslöst. */
+	public static final FEMDatetime fromZone(final int zoneHour, final int zoneMinute) throws IllegalArgumentException {
+		return FEMDatetime.EMPTY.withZone(zoneHour, zoneMinute);
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Jahr ein Schaltjahr im Gregorianischen Kalender ist.<br>
@@ -415,12 +436,12 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
 	 * @param second Sekunde ({@code 0..59}).
-	 * @param millisecond Millisekunde ({@code 0..999}).
+	 * @param millis Millisekunde ({@code 0..999}).
 	 * @return Anzahl der Millisekunden zwischen {@code 00:00:00.000} und der gegebenen Uhrzeit ({@code 0..86400000}).
 	 * @throws IllegalArgumentException Wenn die gegebene Uhrzeit ungültig ist. */
-	public static final int daymillisOf(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
-		FEMDatetime._checkTime_(hour, minute, second, millisecond);
-		return FEMDatetime._daymillisOf_(hour, minute, second, millisecond);
+	public static final int daymillisOf(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
+		FEMDatetime._checkTime_(hour, minute, second, millis);
+		return FEMDatetime._daymillisOf_(hour, minute, second, millis);
 	}
 
 	@SuppressWarnings ("javadoc")

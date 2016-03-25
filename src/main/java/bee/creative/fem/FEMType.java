@@ -13,24 +13,24 @@ public abstract class FEMType<GData> {
 	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
 	 * 
 	 * @see #id()
-	 * @param <GValue> Typ des Werts.
+	 * @param <GData> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
 	 * @return {@code simple}-{@link FEMType}. */
-	public static final <GValue> FEMType<GValue> from(final int id) {
+	public static final <GData> FEMType<GData> from(final int id) {
 		return FEMType.from(id, Objects.toInvokeString("simpleType", id));
 	}
 
 	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator und der gegebenen Textdarstellung zurück.
 	 * 
 	 * @see #id()
-	 * @param <GValue> Typ des Werts.
+	 * @param <GData> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
 	 * @param toString Textdarstellung für {@link #toString()}.
 	 * @return {@code simple}-{@link FEMType}.
 	 * @throws NullPointerException Wenn {@code toString} {@code null} ist. */
-	public static final <GValue> FEMType<GValue> from(final int id, final String toString) throws NullPointerException {
+	public static final <GData> FEMType<GData> from(final int id, final String toString) throws NullPointerException {
 		if (toString == null) throw new NullPointerException("toString = null");
-		return new FEMType<GValue>() {
+		return new FEMType<GData>() {
 
 			@Override
 			public int id() {
@@ -54,7 +54,7 @@ public abstract class FEMType<GData> {
 	public abstract int id();
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. Dies kann der Fall sein, wenn der gegebene
-	 * Datentyp gleich zu diesem oder ein Vorfahre dieses Datentyps ist. Wenn der gegebene Datentyp {@code null} ist, wird {@code false} zurück gegeben.
+	 * Datentyp gleich zu diesem oder ein Vorfahre dieses Datentyps ist. Wenn der gegebene Datentyp {@code null} ist, wird {@code false} geliefert.
 	 * 
 	 * @see Class#isAssignableFrom(Class)
 	 * @param type Datentyp.
@@ -63,7 +63,7 @@ public abstract class FEMType<GData> {
 		return (type == this) || ((type != null) && (type.id() == this.id()));
 	}
 
-	/** Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
+	/** Diese Methode gibt die in den Datentyp {@code GData} kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code Context.DEFAULT().dataFrom(value, this)}.
 	 * 
 	 * @see FEMContext#DEFAULT()
@@ -77,7 +77,7 @@ public abstract class FEMType<GData> {
 		return FEMContext._default_.dataFrom(value, this);
 	}
 
-	/** Diese Methode gibt die in diesen Datentyp ({@code GData}) kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
+	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.dataFrom(value, this)}.
 	 * 
 	 * @see FEMContext#dataFrom(FEMValue, FEMType)

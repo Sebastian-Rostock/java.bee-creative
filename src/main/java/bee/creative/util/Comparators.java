@@ -222,34 +222,34 @@ public class Comparators {
 
 	{}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
 	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 == item2 ? 0 : 1))</pre>
+	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
 	public static final int compare(final int item1, final int item2) {
-		return (item1 < item2 ? -1 : (item1 == item2 ? 0 : 1));
+		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
 	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 == item2 ? 0 : 1))</pre>
+	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
 	public static final int compare(final long item1, final long item2) {
-		return (item1 < item2 ? -1 : (item1 == item2 ? 0 : 1));
+		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
 	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 == item2 ? 0 : 1))</pre>
+	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
@@ -261,7 +261,7 @@ public class Comparators {
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
 	 * ist. Der berechnete Vergleichswert entspricht:
 	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 == item2 ? 0 : 1))</pre>
+	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.

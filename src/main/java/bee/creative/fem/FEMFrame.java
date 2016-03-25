@@ -213,7 +213,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	{}
 
 	/** Diese Methode gibt die Anzahl der Parameterwerte zurück, die zur Verwendung durch eine aufgerufene Funktion bestimmt sind.<br>
-	 * Über die Methode {@link #get(int)} werden mindestens soviele Parameterwerte bereitgestellt.
+	 * Über die Methode {@link #get(int)} werden mindestens so viele Parameterwerte bereitgestellt.
 	 * 
 	 * @return Anzahl der zugesicherten Parameterwert. */
 	public abstract int size();
@@ -225,7 +225,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this._parent_;
 	}
 
-	/** Diese Methode gibt die Wertliste der zugesicherten Parameterwerte zurück.
+	/** Diese Methode gibt die Wertliste der zugesicherten Parameterwerte zurück.<br>
+	 * Die Elemente dieser Wertliste können der <em>return-by-reference</em>-Semantik angehören.
 	 * 
 	 * @see #get(int)
 	 * @see #size()

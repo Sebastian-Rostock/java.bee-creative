@@ -90,7 +90,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 
 	/** {@inheritDoc} */
 	@Override
-	public FEMHandler data() {
+	public final FEMHandler data() {
 		return this;
 	}
 

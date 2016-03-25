@@ -641,8 +641,8 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return ((this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_)) || (this.compare(that, 1) == 0);
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne
-	 * ist. Wenn die Zeitspannen nicht vergleichbar sind, wird {@code undefined} geliefert.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitspanne kürzer, gleich bzw. länger als die gegebene Zeitspanne ist. Wenn die
+	 * Zeitspannen nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * 
 	 * @param that Zeitspanne.
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitspannen.

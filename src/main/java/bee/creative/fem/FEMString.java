@@ -24,6 +24,28 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class FindCollector implements Collector {
+
+		public final int that;
+
+		public int index;
+
+		FindCollector(final int that) {
+			this.that = that;
+		}
+
+		{}
+
+		@Override
+		public final boolean push(final int value) {
+			if (value == this.that) return false;
+			this.index++;
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class HashCollector implements Collector {
 
 		public int hash = 0x811C9DC5;
@@ -1044,6 +1066,21 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		final FEMString result = this._length_ == 1 ? new UniformString(1, this._get_(0)) : new UTF8CompactString(this.toBytes());
 		result._hash_ = this._hash_;
 		return result;
+	}
+
+	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Wenn das Zeichen nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * 
+	 * @param that gesuchtes Zeichen.
+	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
+	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}.
+	 * @throws IllegalArgumentException Wenn {@code offset} ungültig ist. */
+	public final int find(final int that, final int offset) throws IllegalArgumentException {
+		final int length = this._length_ - offset;
+		if ((offset < 0) || (length < 0)) throw new IllegalArgumentException();
+		final FindCollector collector = new FindCollector(that);
+		if (this._export_(collector, offset, length, true)) return -1;
+		return collector.index + offset;
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Zeichenkette innerhalb dieser Zeichenkette zurück.<br>
