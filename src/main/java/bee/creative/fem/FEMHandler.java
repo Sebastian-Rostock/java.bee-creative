@@ -19,7 +19,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 
 	{}
 
-	/** Diese Methode gibt die gegebene Funktion als {@link FEMValue} zurück.
+	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 * 
 	 * @param data Funktion.
 	 * @return Funktionszeiger.
@@ -77,7 +77,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 		return this._value_.hashCode();
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Methode gleich de gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
 	 * 
 	 * @param that Methode.
 	 * @return Gleichheit.

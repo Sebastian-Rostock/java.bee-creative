@@ -13,7 +13,7 @@ public final class FEMResult extends BaseValue {
 
 	/** Diese Methode den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen mit
 	 * {@code call-by-reference}-Semantik zurück.<br>
-	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion mis zum ersten Lesen seines {@link #type() Datentyp} bzw. seiner {@link #data()
+	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten Lesen seines {@link #type() Datentyp} bzw. seiner {@link #data()
 	 * Nutzdaten}.
 	 * 
 	 * @param frame Stapelrahmen.
@@ -21,6 +21,8 @@ public final class FEMResult extends BaseValue {
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
 	public static final FEMResult from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
+		if (frame == null) throw new NullPointerException("frame = null");
+		if (function == null) throw new NullPointerException("function = null");
 		return new FEMResult(frame, function);
 	}
 
@@ -46,9 +48,7 @@ public final class FEMResult extends BaseValue {
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
-	public FEMResult(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
-		if (frame == null) throw new NullPointerException("frame = null");
-		if (function == null) throw new NullPointerException("function = null");
+	FEMResult(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 		this._frame_ = frame;
 		this._function_ = function;
 	}
@@ -77,7 +77,7 @@ public final class FEMResult extends BaseValue {
 	 * Der erste Aufruf von {@link #result()} setzt die Stapelrahmen auf {@code null}.
 	 * 
 	 * @return Stapelrahmen oder {@code null}. */
-	public final FEMFrame frame() {
+	public final synchronized FEMFrame frame() {
 		return this._frame_;
 	}
 
@@ -85,7 +85,7 @@ public final class FEMResult extends BaseValue {
 	 * Der erste Aufruf von {@link #result()} setzt die Funktion auf {@code null}.
 	 * 
 	 * @return Funktion oder {@code null}. */
-	public final FEMFunction function() {
+	public final synchronized FEMFunction function() {
 		return this._function_;
 	}
 

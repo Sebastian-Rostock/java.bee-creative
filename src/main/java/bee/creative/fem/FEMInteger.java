@@ -111,8 +111,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 		return this._value_ == that._value_;
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn diese Dezimalzahl gleiner, gleich oder größer als die gegebene
-	 * Dezimalzahl ist.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Dezimalzahl kleiner, gleich oder größer als die gegebene Dezimalzahl ist.
 	 * 
 	 * @param that Dezimalzahl.
 	 * @return Vergleichswert.

@@ -84,7 +84,7 @@ public final class FEMVoid extends BaseValue {
 		return object instanceof FEMVoid;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code "void"} zurück. */
 	@Override
 	public final String toString() {
 		return "void";

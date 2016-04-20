@@ -12,14 +12,14 @@ import bee.creative.util.Objects;
  * Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und {@link #entryCount()}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class IAMMap implements Iterable<IAMEntry> {
+public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	@SuppressWarnings ("javadoc")
-	static final class ListView extends AbstractList<IAMEntry> {
+	static final class EntryList extends AbstractList<IAMEntry> {
 
-		final IAMMap _owner_;
+		final IAMMapping _owner_;
 
-		ListView(final IAMMap owner) {
+		EntryList(final IAMMapping owner) {
 			this._owner_ = owner;
 		}
 
@@ -39,11 +39,11 @@ public abstract class IAMMap implements Iterable<IAMEntry> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyMap extends IAMMap {
+	static final class EmptyMapping extends IAMMapping {
 
 		@Override
 		public boolean mode() {
-			return IAMMap.MODE_HASHED;
+			return IAMMapping.MODE_HASHED;
 		}
 
 		@Override
@@ -71,8 +71,8 @@ public abstract class IAMMap implements Iterable<IAMEntry> {
 
 	{}
 
-	/** Dieses Feld speichert die leere {@link IAMMap}. */
-	public static final IAMMap EMPTY = new EmptyMap();
+	/** Dieses Feld speichert die leere {@link IAMMapping}. */
+	public static final IAMMapping EMPTY = new EmptyMapping();
 
 	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge über den Streuwert ihrer Schlüssel gesucht werden. */
 	public static final boolean MODE_HASHED = true;
@@ -82,13 +82,13 @@ public abstract class IAMMap implements Iterable<IAMEntry> {
 
 	{}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
-	 * Wenn sie {@code false} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
+	/** Diese Methode gibt nur dann {@value #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
+	 * Wenn sie {@value #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
 	 * 
 	 * @see #find(IAMArray)
 	 * @see #MODE_HASHED
 	 * @see #MODE_SORTED
-	 * @return {@code true} bei Nutzung von {@link IAMArray#hash()} und {@code false} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
+	 * @return {@value #MODE_HASHED} bei Nutzung von {@link IAMArray#hash()} bzw. {@value #MODE_SORTED} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
 	 *         {@link #find(IAMArray)}. */
 	public abstract boolean mode();
 
@@ -169,7 +169,7 @@ public abstract class IAMMap implements Iterable<IAMEntry> {
 	 * @see #entryCount()
 	 * @return Einträge. */
 	public final List<IAMEntry> entries() {
-		return new ListView(this);
+		return new EntryList(this);
 	}
 
 	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Bei erfolgloser Suche wird {@code -1}

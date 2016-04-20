@@ -4,55 +4,58 @@ import java.util.AbstractList;
 import java.util.List;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Listen ({@link IAMList}) und Abbildungen ({@link IAMMap}).
+/** Diese Klasse implementiert eine abstrakte Zusammenstellung beliebig vieler Listen ({@link IAMListing}) und Abbildungen ({@link IAMMapping}).
  * <p>
- * Die Methoden {@link #maps()} und {@link #lists()} delegieren an {@link #map(int)} und {@link #mapCount()} bzw. {@link #list(int)} und {@link #listCount()}.
+ * Die Methoden {@link #mappings()} und {@link #listings()} delegieren an {@link #mapping(int)} und {@link #mappingCount()} bzw. {@link #listing(int)} und
+ * {@link #listingCount()}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMIndex {
 
 	@SuppressWarnings ("javadoc")
-	static final class ListsView extends AbstractList<IAMList> {
+	static final class ListingsList extends AbstractList<IAMListing> {
 
 		final IAMIndex _owner_;
 
-		ListsView(final IAMIndex owner) {
+		ListingsList(final IAMIndex owner) {
 			this._owner_ = owner;
 		}
 
 		{}
 
 		@Override
-		public IAMList get(final int index) {
-			if ((index < 0) || (index >= this._owner_.listCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.list(index);
+		public IAMListing get(final int index) {
+			if ((index < 0) || (index >= this._owner_.listingCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.listing(index);
 		}
 
 		@Override
 		public int size() {
-			return this._owner_.listCount();
+			return this._owner_.listingCount();
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class MapsView extends AbstractList<IAMMap> {
+	static final class MappingList extends AbstractList<IAMMapping> {
 
 		final IAMIndex _owner_;
 
-		MapsView(final IAMIndex owner) {
+		MappingList(final IAMIndex owner) {
 			this._owner_ = owner;
 		}
 
+		{}
+
 		@Override
-		public IAMMap get(final int index) {
-			if ((index < 0) || (index >= this._owner_.mapCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.map(index);
+		public IAMMapping get(final int index) {
+			if ((index < 0) || (index >= this._owner_.mappingCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.mapping(index);
 		}
 
 		@Override
 		public int size() {
-			return this._owner_.mapCount();
+			return this._owner_.mappingCount();
 		}
 
 	}
@@ -61,22 +64,22 @@ public abstract class IAMIndex {
 	static final class EmptyIndex extends IAMIndex {
 
 		@Override
-		public IAMMap map(final int index) {
-			return IAMMap.EMPTY;
+		public IAMMapping mapping(final int index) {
+			return IAMMapping.EMPTY;
 		}
 
 		@Override
-		public int mapCount() {
+		public int mappingCount() {
 			return 0;
 		}
 
 		@Override
-		public IAMList list(final int index) {
-			return IAMList.EMPTY;
+		public IAMListing listing(final int index) {
+			return IAMListing.EMPTY;
 		}
 
 		@Override
-		public int listCount() {
+		public int listingCount() {
 			return 0;
 		}
 
@@ -91,46 +94,46 @@ public abstract class IAMIndex {
 
 	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
 	 * 
-	 * @see #mapCount()
+	 * @see #mappingCount()
 	 * @param index Index.
 	 * @return {@code index}-te Abbildung. */
-	public abstract IAMMap map(final int index);
+	public abstract IAMMapping mapping(final int index);
 
 	/** Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
 	 * 
-	 * @see #map(int)
+	 * @see #mapping(int)
 	 * @return Anzahl der Abbildungen. */
-	public abstract int mapCount();
+	public abstract int mappingCount();
 
 	/** Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
 	 * 
-	 * @see #map(int)
-	 * @see #mapCount()
+	 * @see #mapping(int)
+	 * @see #mappingCount()
 	 * @return Abbildungen. */
-	public final List<IAMMap> maps() {
-		return new MapsView(this);
+	public final List<IAMMapping> mappings() {
+		return new MappingList(this);
 	}
 
 	/** Diese Methode gibt die {@code index}-te Liste zurück. Bei einem ungültigen {@code index} wird eine leere Liste geliefert.
 	 * 
-	 * @see #listCount()
+	 * @see #listingCount()
 	 * @param index Index.
 	 * @return {@code index}-te Liste. */
-	public abstract IAMList list(final int index);
+	public abstract IAMListing listing(final int index);
 
 	/** Diese Methode gibt die Anzahl der Listen zurück.
 	 * 
-	 * @see #list(int)
+	 * @see #listing(int)
 	 * @return Anzahl der Listen. */
-	public abstract int listCount();
+	public abstract int listingCount();
 
 	/** Diese Methode gibt {@link List}-Sicht auf die Listen zurück.
 	 * 
-	 * @see #list(int)
-	 * @see #listCount()
+	 * @see #listing(int)
+	 * @see #listingCount()
 	 * @return Listen. */
-	public final List<IAMList> lists() {
-		return new ListsView(this);
+	public final List<IAMListing> listings() {
+		return new ListingsList(this);
 	}
 
 	{}
@@ -138,7 +141,7 @@ public abstract class IAMIndex {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString("IAMIndex", this.maps(), this.lists());
+		return Objects.toInvokeString("IAMIndex", this.mappings(), this.listings());
 	}
 
 }

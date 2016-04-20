@@ -34,7 +34,7 @@ import bee.creative.util.Parser;
 public class FEM {
 
 	/** Diese Klasse implementiert einen abstrakten Wert als {@link FEMFunction} und {@link ScriptFormatterInput}.<br>
-	 * Die {@link #invoke(FEMFrame)}-Methode liefert {@code this}, sodass instanzen dieser Klassen das Einpacken in eine {@link ValueFunction} nicht benötigen.<br>
+	 * Die {@link #invoke(FEMFrame)}-Methode liefert {@code this}, sodass Instanzen dieser Klassen das Einpacken in eine {@link ValueFunction} nicht benötigen.<br>
 	 * Die {@link #toString() Textdarstellung} des Werts wird über {@link #toScript(ScriptFormatter)} ermittelt. Diese Methode delegiert selbst an
 	 * {@link #toString()}, sodass mindestens eine dieser Methoden überschrieben werden muss.
 	 * 
@@ -2668,12 +2668,12 @@ public class FEM {
 			return this;
 		}
 
+		// * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
+		// * seine {@link Object#toString() Textdarstellung} angefügt.
+		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-		 * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
-		 * seine {@link Object#toString() Textdarstellung} angefügt.
 		 * 
 		 * @see Object#toString()
-		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		 * @param part Objekt.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
@@ -2681,19 +2681,19 @@ public class FEM {
 		public final ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
 			if (part == null) throw new NullPointerException("part = null");
 			this._check_(false);
-			if (part instanceof ScriptFormatterInput) {
-				((ScriptFormatterInput)part).toScript(this);
-			} else {
-				this._items_.add(part.toString());
-			}
+			// if (part instanceof ScriptFormatterInput) {
+			// ((ScriptFormatterInput)part).toScript(this);
+			// } else {
+			this._items_.add(part.toString());
+			// }
 			return this;
 		}
 
+		// * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird es
+		// * über {@link ScriptFormatterHelper#formatData(ScriptFormatter, Object)} angefügt.
+		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-		 * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird es
-		 * über {@link ScriptFormatterHelper#formatData(ScriptFormatter, Object)} angefügt.
 		 * 
-		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		 * @see ScriptFormatterHelper#formatData(ScriptFormatter, Object)
 		 * @param data Objekt.
 		 * @return {@code this}.
@@ -2703,11 +2703,11 @@ public class FEM {
 		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (data == null) throw new NullPointerException("data = null");
 			this._check_(false);
-			if (data instanceof ScriptFormatterInput) {
-				((ScriptFormatterInput)data).toScript(this);
-			} else {
-				this._helper_.formatData(this, data);
-			}
+			// if (data instanceof ScriptFormatterInput) {
+			// ((ScriptFormatterInput)data).toScript(this);
+			// } else {
+			this._helper_.formatData(this, data);
+			// }
 			return this;
 		}
 
@@ -2750,11 +2750,11 @@ public class FEM {
 			return this;
 		}
 
+		// * Wenn der Wert ein {@link ScriptFormatterInput} ist, wird er über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird er
+		// * über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)} angefügt.
+		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.<br>
-		 * Wenn der Wert ein {@link ScriptFormatterInput} ist, wird er über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird er
-		 * über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)} angefügt.
 		 * 
-		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)
 		 * @param value Wert.
 		 * @return {@code this}.
@@ -2764,11 +2764,11 @@ public class FEM {
 		public final ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
 			this._check_(false);
-			if (value instanceof ScriptFormatterInput) {
-				((ScriptFormatterInput)value).toScript(this);
-			} else {
-				this._helper_.formatValue(this, value);
-			}
+			// if (value instanceof ScriptFormatterInput) {
+			// ((ScriptFormatterInput)value).toScript(this);
+			// } else {
+			this._helper_.formatValue(this, value);
+			// }
 			return this;
 		}
 
@@ -2868,11 +2868,11 @@ public class FEM {
 			return this.put("{: ").putFunction(function).put("}");
 		}
 
+		// * Wenn die Funktion ein {@link ScriptFormatterInput} ist, wird sie über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
+		// * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)} angefügt.
+		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
-		 * Wenn die Funktion ein {@link ScriptFormatterInput} ist, wird sie über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
-		 * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)} angefügt.
 		 * 
-		 * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)
 		 * @param function Funktion.
 		 * @return {@code this}.
@@ -2882,11 +2882,11 @@ public class FEM {
 		public final ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
 			this._check_(false);
-			if (function instanceof ScriptFormatterInput) {
-				((ScriptFormatterInput)function).toScript(this);
-			} else {
-				this._helper_.formatFunction(this, function);
-			}
+			// if (function instanceof ScriptFormatterInput) {
+			// ((ScriptFormatterInput)function).toScript(this);
+			// } else {
+			this._helper_.formatFunction(this, function);
+			// }
 			return this;
 		}
 
@@ -3137,13 +3137,16 @@ public class FEM {
 
 		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
 		 * {@link FEMScript Aufbereitete Quelltexte} werden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
-		 * formatiert. */
+		 * formatiert. Daten, Werte und Funktionen mit der Schnittstelle {@link ScriptFormatterInput} werden über deren
+		 * {@link ScriptFormatterInput#toScript(ScriptFormatter)}-Methode formatiert. */
 		static ScriptFormatterHelper EMPTY = new ScriptFormatterHelper() {
 
 			@Override
 			public void formatData(final ScriptFormatter target, final Object data) throws IllegalArgumentException {
 				if (data instanceof FEMScript) {
 					FEM.scriptCompiler().useScript((FEMScript)data).formatScript(target);
+				} else if (data instanceof ScriptFormatterInput) {
+					((ScriptFormatterInput)data).toScript(target);
 				} else {
 					target.put(String.valueOf(data));
 				}
@@ -3151,12 +3154,20 @@ public class FEM {
 
 			@Override
 			public void formatValue(final ScriptFormatter target, final FEMValue value) throws IllegalArgumentException {
-				target.put(String.valueOf(value));
+				if (value instanceof ScriptFormatterInput) {
+					((ScriptFormatterInput)value).toScript(target);
+				} else {
+					target.put(String.valueOf(value));
+				}
 			}
 
 			@Override
 			public void formatFunction(final ScriptFormatter target, final FEMFunction function) throws IllegalArgumentException {
-				target.put(String.valueOf(function));
+				if (function instanceof ScriptFormatterInput) {
+					((ScriptFormatterInput)function).toScript(target);
+				} else {
+					target.put(String.valueOf(function));
+				}
 			}
 
 			@Override

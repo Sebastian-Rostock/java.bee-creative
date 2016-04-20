@@ -111,7 +111,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 		return (this._value_ == that._value_) || (Double.isNaN(this._value_) && Double.isNaN(that._value_));
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diesr Dezimalbruch gleiner, gleich oder größer als der gegebene Dezimalbruch ist.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Dezimalbruch kleiner, gleich oder größer als der gegebene Dezimalbruch ist.
 	 * Wenn die Dezimalbrüche nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * 
 	 * @param that Dezimalbruch.

@@ -46,7 +46,7 @@ public final class FEMNative extends BaseValue {
 	/** Dieser Konstruktor initialisiert das native Objekt.
 	 * 
 	 * @param data Objekt. */
-	FEMNative(final Object data) {
+	public FEMNative(final Object data) {
 		this._data_ = data;
 	}
 

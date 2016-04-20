@@ -1,12 +1,12 @@
 package bee.creative.iam;
 
-/** Diese Klasse implementiert einen abstrakten Eintrag einer Abbildung ({@link IAMMap}) und besteht aus einem Schlüssel sowie einem Wert, welche selbst
+/** Diese Klasse implementiert einen abstrakten Eintrag einer Abbildung ({@link IAMMapping}) und besteht aus einem Schlüssel sowie einem Wert, welche selbst
  * Zahlenfolgen ({@link IAMArray}) sind.
  * <p>
  * Die Methoden {@link #key(int)} und {@link #keyLength()} delegieren an {@link #key()}. Die Methoden {@link #value(int)} und {@link #valueLength()} delegieren
  * an {@link #value()}.
  * 
- * @see IAMMap#entry(int)
+ * @see IAMMapping#entry(int)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMEntry {
 
@@ -73,13 +73,13 @@ public abstract class IAMEntry {
 
 	/** Diese Methode gibt den Schlüssel als Zahlenfolge zurück.
 	 * 
-	 * @see IAMMap#key(int)
+	 * @see IAMMapping#key(int)
 	 * @return Schlüssel. */
 	public abstract IAMArray key();
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Schlüssels zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
 	 * 
-	 * @see IAMMap#key(int, int)
+	 * @see IAMMapping#key(int, int)
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Schlüssels. */
 	public final int key(final int index) {
@@ -88,7 +88,7 @@ public abstract class IAMEntry {
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Schlüssels zurück ({@code 0..1073741823}).
 	 * 
-	 * @see IAMMap#keyLength(int)
+	 * @see IAMMapping#keyLength(int)
 	 * @return Größe der Schlüssel. */
 	public final int keyLength() {
 		return this.key().length();
@@ -96,13 +96,13 @@ public abstract class IAMEntry {
 
 	/** Diese Methode gibt den Wert als Zahlenfolge zurück.
 	 * 
-	 * @see IAMMap#value(int)
+	 * @see IAMMapping#value(int)
 	 * @return Wert. */
 	public abstract IAMArray value();
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Werts zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
 	 * 
-	 * @see IAMMap#value(int, int)
+	 * @see IAMMapping#value(int, int)
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Werts. */
 	public final int value(final int index) {
@@ -111,7 +111,7 @@ public abstract class IAMEntry {
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Werts zurück ({@code 0..1073741823}).
 	 * 
-	 * @see IAMMap#valueLength(int)
+	 * @see IAMMapping#valueLength(int)
 	 * @return Größe der Werte. */
 	public final int valueLength() {
 		return this.value().length();

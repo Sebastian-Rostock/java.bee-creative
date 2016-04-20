@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://bee.creative.iam/xml-schema-1" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:iam="http://bee.creative.iam/xml-schema-1">
+	<element name="index" type="iam:IAM_INDEX_TYPE"/>
+	<complexType name="IAM_INDEX_TYPE">
+		<sequence>
+			<element name="map" minOccurs="0" maxOccurs="1073741823" type="iam:IAM_MAP_TYPE"/>
+			<element name="list" type="iam:IAM_LIST_TYPE" minOccurs="0" maxOccurs="1073741823"/>
+		</sequence>
+		<attribute name="byteOrder" type="iam:IAM_ORDER_ENUM"/>
+	</complexType>
+	<complexType name="IAM_MAP_TYPE">
+		<sequence>
+			<element name="entry" type="iam:IAM_ENTRY_TYPE" minOccurs="0" maxOccurs="1073741823"/>
+		</sequence>
+		<attribute name="findMode" type="iam:IAM_MODE_ENUM" use="optional"/>
+		<attribute name="keyFormat" type="iam:IAM_FORMAT_ENUM" use="optional"/>
+		<attribute name="valueFormat" type="iam:IAM_FORMAT_ENUM" use="optional"/>
+	</complexType>
+	<complexType name="IAM_LIST_TYPE">
+		<sequence>
+            <element name="item" type="iam:IAM_ITEM_TYPE" minOccurs="0" maxOccurs="1073741823"/>
+		</sequence>
+		<attribute name="itemFormat" type="iam:IAM_FORMAT_ENUM"/>
+	</complexType>
+	<simpleType name="IAM_MODE_ENUM">
+		<restriction base="string">
+    		<enumeration value="H"/>
+    		<enumeration value="O"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="IAM_FORMAT_ENUM">
+		<restriction base="string">
+			<enumeration value="UTF8"/>
+			<enumeration value="UTF16"/>
+			<enumeration value="UTF32"/>
+			<enumeration value="CP1252"/>
+		</restriction>
+	</simpleType>
+
+    <complexType name="IAM_ITEM_TYPE">
+    	<attribute name="text" type="iam:IAM_TEXT_VALUE"/>
+    	<attribute name="array" type="iam:IAM_ARRAY_VALUE"/>
+    </complexType>
+    <complexType name="IAM_ENTRY_TYPE">
+    	<attribute name="keyText" type="iam:IAM_TEXT_VALUE"/>
+    	<attribute name="keyArray" type="iam:IAM_ARRAY_VALUE"/>
+    	<attribute name="valueText" type="iam:IAM_TEXT_VALUE"/>
+    	<attribute name="valueArray" type="iam:IAM_ARRAY_VALUE"/>
+    </complexType>
+    <simpleType name="IAM_ORDER_ENUM">
+    	<restriction base="string">
+    		<enumeration value="N"/>
+    		<enumeration value="B"/>
+    		<enumeration value="L"/>
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="IAM_TEXT_VALUE">
+    	<restriction base="string"/>
+    </simpleType>
+
+    <simpleType name="IAM_ARRAY_VALUE">
+    	<list itemType="int"/>
+   	</simpleType>
+</schema>

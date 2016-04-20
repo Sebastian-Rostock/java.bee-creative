@@ -9,7 +9,7 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert ein Objekt zum Lesen einer {@code INI}-Datenstruktur über einen {@link Reader}.
  * <p>
  * Die {@code INI}-Datenstruktur ist eine Abfolge beliegig vieler Abschnitte, Eigenschaften, Kommentare und Leerzeilen, welche durch Zeilenumbrüche
- * {@code '\r\n'} voneinander separiert sind.<br>
+ * {@code '\r\n'} voneinander separiert sind. Beim Parsen werden auch einzeln stehenden Zeichen {@code '\r'} und {@code '\n'} als Zeilenumbruch akzeptiert.<br>
  * Ein Abschnitt besteht aus dem Zeichen {@code '['}, dem maskierten Namen des Abschnitts und dem Zeichen {@code ']'}.<br>
  * Eine Eigenschaft besteht aus dem maskierten Schlüssel der Eigenschaft, dem Zeichen {@code '='} und dem maskierten Wert der Eigenschaft.<br>
  * Eine Kommentar besteht aus dem Zeichen {@code ';'} und dem maskierten Text des Kommentars.<br>
@@ -66,14 +66,14 @@ public final class INIReader implements Closeable {
 					return null;
 				case '[':
 					final String section = this._readSection_();
-					return INIToken.sectionToken(section);
+					return INIToken.fromSection(section);
 				case ';':
 					final String comment = this._readComment_();
-					return INIToken.commentToken(comment);
+					return INIToken.fromComment(comment);
 				default:
 					final String key = this._readKey_(symbol);
 					final String value = this._readValue_();
-					return INIToken.propertyToken(key, value);
+					return INIToken.fromProperty(key, value);
 				case '\r':
 				case '\n': // skip
 			}

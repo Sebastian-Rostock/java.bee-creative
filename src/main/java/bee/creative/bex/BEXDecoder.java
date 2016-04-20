@@ -8,9 +8,9 @@ import bee.creative.bex.BEX.BEXBaseFile;
 import bee.creative.bex.BEX.BEXBaseList;
 import bee.creative.bex.BEX.BEXBaseNode;
 import bee.creative.iam.IAMArray;
-import bee.creative.iam.IAMDecoder.IAMHeader;
-import bee.creative.iam.IAMDecoder.IAMIndexDecoder;
-import bee.creative.iam.IAMDecoder.IAMListDecoder;
+import bee.creative.iam.IAMLoader.IAMHeader;
+import bee.creative.iam.IAMLoader.IAMIndexLoader;
+import bee.creative.iam.IAMLoader.IAMListingLoader;
 import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
@@ -27,19 +27,19 @@ import bee.creative.xml.XMLFormatter;
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class BEXDecoder {
 
-	/** Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListDecoder}
+	/** Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListingLoader}
 	 * ermittelt werden.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXTextCache implements Items<String> {
 
 		/** Dieses Feld speichert den leeren {@link BEXTextCache}. */
-		public static final BEXTextCache EMPTY = new BEXTextCache(IAMListDecoder.EMPTY);
+		public static final BEXTextCache EMPTY = new BEXTextCache(IAMListingLoader.EMPTY);
 
 		{}
 
 		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
-		final IAMListDecoder _items_;
+		final IAMListingLoader _items_;
 
 		/** Dieses Feld puffert die Zeichenketten der Elemente. */
 		String[] _cache_;
@@ -47,7 +47,7 @@ public final class BEXDecoder {
 		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
 		 * 
 		 * @param items Elemente. */
-		BEXTextCache(final IAMListDecoder items) {
+		BEXTextCache(final IAMListingLoader items) {
 			this._items_ = items;
 			this.setEnabled(false);
 		}
@@ -56,7 +56,7 @@ public final class BEXDecoder {
 
 		/** Diese Methode gibt das {@code index}-te Element zurück.
 		 * 
-		 * @see IAMListDecoder#item(int)
+		 * @see IAMListingLoader#item(int)
 		 * @param index Index.
 		 * @return {@code index}-tes Element. */
 		public final MMFArray item(final int index) {
@@ -217,29 +217,29 @@ public final class BEXDecoder {
 			if (_header != 0xBE10BA5E) throw new IAMException(IAMException.INVALID_HEADER);
 
 			final int rootRef = array.get(1);
-			final IAMIndexDecoder nodeData = new IAMIndexDecoder(array.section(2, array.length() - 2));
+			final IAMIndexLoader nodeData = new IAMIndexLoader(array.section(2, array.length() - 2));
 			if (false || //
-				(nodeData.mapCount() != 0) || //
-				(nodeData.listCount() != 17) //
+				(nodeData.mappingCount() != 0) || //
+				(nodeData.listingCount() != 17) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMListDecoder attrUriTextList = nodeData.list(0);
-			final IAMListDecoder attrNameTextList = nodeData.list(1);
-			final IAMListDecoder attrValueTextList = nodeData.list(2);
-			final IAMListDecoder chldUriTextList = nodeData.list(3);
-			final IAMListDecoder chldNameTextList = nodeData.list(4);
-			final IAMListDecoder chldValueTextList = nodeData.list(5);
-			final IAMListDecoder attrUriRefList = nodeData.list(6);
-			final IAMListDecoder attrNameRefList = nodeData.list(7);
-			final IAMListDecoder attrValueRefList = nodeData.list(8);
-			final IAMListDecoder attrParentRefList = nodeData.list(9);
-			final IAMListDecoder chldUriRefList = nodeData.list(10);
-			final IAMListDecoder chldNameRefList = nodeData.list(11);
-			final IAMListDecoder chldContentRefList = nodeData.list(12);
-			final IAMListDecoder chldAttributesRefList = nodeData.list(13);
-			final IAMListDecoder chldParentRefList = nodeData.list(14);
-			final IAMListDecoder attrListRangeList = nodeData.list(15);
-			final IAMListDecoder chldListRangeList = nodeData.list(16);
+			final IAMListingLoader attrUriTextList = nodeData.listing(0);
+			final IAMListingLoader attrNameTextList = nodeData.listing(1);
+			final IAMListingLoader attrValueTextList = nodeData.listing(2);
+			final IAMListingLoader chldUriTextList = nodeData.listing(3);
+			final IAMListingLoader chldNameTextList = nodeData.listing(4);
+			final IAMListingLoader chldValueTextList = nodeData.listing(5);
+			final IAMListingLoader attrUriRefList = nodeData.listing(6);
+			final IAMListingLoader attrNameRefList = nodeData.listing(7);
+			final IAMListingLoader attrValueRefList = nodeData.listing(8);
+			final IAMListingLoader attrParentRefList = nodeData.listing(9);
+			final IAMListingLoader chldUriRefList = nodeData.listing(10);
+			final IAMListingLoader chldNameRefList = nodeData.listing(11);
+			final IAMListingLoader chldContentRefList = nodeData.listing(12);
+			final IAMListingLoader chldAttributesRefList = nodeData.listing(13);
+			final IAMListingLoader chldParentRefList = nodeData.listing(14);
+			final IAMListingLoader attrListRangeList = nodeData.listing(15);
+			final IAMListingLoader chldListRangeList = nodeData.listing(16);
 			if (false || //
 				(attrUriRefList.itemCount() != 1) || //
 				(attrNameRefList.itemCount() != 1) || //

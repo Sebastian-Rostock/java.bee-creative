@@ -109,7 +109,8 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * <p>
 	 * Die 32 Bit von MBS zum LSB sind:
 	 * <ul>
-	 * <li>refValue - 32 Bit</li>
+	 * <li>0 - 1 Bit</li>
+	 * <li>refValue - 31 Bit</li>
 	 * </ul> */
 	final int _valueL_;
 
@@ -146,7 +147,8 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * <p>
 	 * Die 64 Bit von MBS zum LSB sind:
 	 * <ul>
-	 * <li>refValue - 32 Bit</li>
+	 * <li>0 - 1 Bit</li>
+	 * <li>refValue - 31 Bit</li>
 	 * <li>ownerValue - 16 Bit</li>
 	 * <li>typeValue - 16 Bit</li>
 	 * </ul>
@@ -228,8 +230,8 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 		return (this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_);
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der
-	 * gegebenen Referenz ist.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen
+	 * Referenz ist.
 	 * 
 	 * @param that Referenz.
 	 * @return Vergleichswert.

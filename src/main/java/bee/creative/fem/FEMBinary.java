@@ -357,8 +357,8 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		final byte[] bytes = new byte[count];
 		for (int i = 0; i < count; i++) {
 			bytes[i] = (byte)( //
-				(FEMBinary._toByte_(value.charAt((i << 1) + 0)) << 4) | //
-				(FEMBinary._toByte_(value.charAt((i << 1) + 1)) << 0));
+				(FEMBinary.toDigit(value.charAt((i << 1) + 0)) << 4) | //
+				(FEMBinary.toDigit(value.charAt((i << 1) + 1)) << 0));
 		}
 		return new CompactBinary(bytes);
 	}
@@ -394,20 +394,32 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return context.dataFrom(value, FEMBinary.TYPE);
 	}
 
-	@SuppressWarnings ("javadoc")
-	static final int _toByte_(final int value) throws IllegalArgumentException {
-		int value2 = value - '0';
-		if ((value2 >= 0) && (value <= 9)) return value2;
-		value2 = value - 'A';
-		if ((value2 >= 0) && (value <= 5)) return value2 + 10;
-		throw new IllegalArgumentException();
+	/** Diese Methode gibt das Zeichen zur gegebenen hexadezimalen Ziffer zurück.
+	 * 
+	 * @param hexDigit hexadezimale Ziffer ({@code 0..15}).
+	 * @return Zeichen ({@code '0'..'9', 'A'..'F'}).
+	 * @throws IllegalArgumentException Wenn {@code hexDigit} ungültig ist. */
+	public static final char toChar(final int hexDigit) throws IllegalArgumentException {
+		final int letter = hexDigit - 10;
+		if (letter >= 6) throw new IllegalArgumentException("hexDigit > 15");
+		if (letter >= 0) return (char)('A' + letter);
+		if (hexDigit >= 0) return (char)('0' + hexDigit);
+		throw new IllegalArgumentException("hexDigit < 0");
 	}
 
-	@SuppressWarnings ("javadoc")
-	static final char _toChar_(final int value) {
-		final int value2 = value - 10;
-		if (value2 < 0) return (char)('0' + value);
-		return (char)('A' + value2);
+	/** Diese Methode gibt die hexadezimale Ziffer zum gegebenen Zeichen zurück.
+	 * 
+	 * @param hexChar Zeichen ({@code '0'..'9', 'A'..'F'}).
+	 * @return hexadezimale Ziffer ({@code 0..15}).
+	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
+	public static final int toDigit(final int hexChar) throws IllegalArgumentException {
+		int number = hexChar - '0';
+		if (number < 0) throw new IllegalArgumentException("hexChar < '0'");
+		if (number <= 9) return number;
+		int letter = hexChar - 'A';
+		if (letter < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
+		if (letter <= 5) return letter + 10;
+		throw new IllegalArgumentException("hexChar > 'F'");
 	}
 
 	{}
@@ -458,7 +470,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/** Diese Methode konvertiert diese Bytefolge in ein Array und gibt diese zurück.
+	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt diese zurück.
 	 * 
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
@@ -541,7 +553,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return collector.index + offset;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Bytefolge innerhalb dieser Bytefolge zurück.<br>
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Bytefolge innerhalb dieser Bytefolge zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Wenn die Bytefolge nicht gefunden wird, liefert diese Methode {@code -1}.
 	 * 
 	 * @param that gesuchte Bytefolge.
@@ -607,8 +619,8 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich
-	 * oder größer als die der gegebenen Bytefolge ist.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die der
+	 * gegebenen Bytefolge ist.
 	 * 
 	 * @param that Bytefolge.
 	 * @return Vergleichswert.
@@ -690,7 +702,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		result.append("0x");
 		for (int i = 0, length = this._length_; i < length; i++) {
 			final int value = this._get_(i);
-			result.append(FEMBinary._toChar_((value >> 4) & 0xF)).append(FEMBinary._toChar_((value >> 0) & 0xF));
+			result.append(FEMBinary.toChar((value >> 4) & 0xF)).append(FEMBinary.toChar((value >> 0) & 0xF));
 		}
 		return result.toString();
 	}

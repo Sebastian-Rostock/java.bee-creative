@@ -45,8 +45,8 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link DataSource}</dt>
 	 * <dd>Die gegebene {@link DataSource} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}, {@link RandomAccessFile}</dt>
-	 * <dd>Es wird eine ais der Datei lesende {@link FileDataSource} geliefert.</dd>
+	 * <dt>{@link File}, {@link RandomAccessFile}</dt>
+	 * <dd>Es wird eine die gegebene Datei lesende {@link FileDataSource} geliefert.</dd>
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird eine das gegebenen Array lesende {@link ArrayDataSource} geliefert.</dd>
 	 * <dt>{@link DataInput}</dt>
@@ -63,7 +63,6 @@ public class IO {
 	public static final DataSource inputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataSource) return (DataSource)object;
 		if (object instanceof File) return IO._inputDataFrom_((File)object);
-		if (object instanceof String) return IO._inputDataFrom_((String)object);
 		if (object instanceof RandomAccessFile) return IO._inputDataFrom_((RandomAccessFile)object);
 		if (object instanceof ByteArraySection) return IO._inputDataFrom_((ByteArraySection)object);
 		if (object instanceof ByteArray) return IO._inputDataFrom_((ByteArray)object);
@@ -131,11 +130,6 @@ public class IO {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final DataSource _inputDataFrom_(final String object) throws IOException {
-		return new FileDataSource(object);
-	}
-
-	@SuppressWarnings ("javadoc")
 	static final DataSource _inputDataFrom_(final RandomAccessFile object) throws IOException {
 		return new FileDataSource(object);
 	}
@@ -193,7 +187,7 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}, {@link FileChannel}, {@link RandomAccessFile}</dt>
+	 * <dt>{@link File}, {@link FileChannel}, {@link RandomAccessFile}</dt>
 	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} geliefert.</dd>
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
@@ -205,7 +199,6 @@ public class IO {
 	public static final ByteBuffer inputBufferFrom(final Object object) throws IOException {
 		if (object instanceof ByteBuffer) return (ByteBuffer)object;
 		if (object instanceof File) return IO._inputBufferFrom_((File)object);
-		if (object instanceof String) return IO._inputBufferFrom_((String)object);
 		if (object instanceof FileChannel) return IO._inputBufferFrom_((FileChannel)object);
 		if (object instanceof RandomAccessFile) return IO._inputBufferFrom_((RandomAccessFile)object);
 		if (object instanceof ByteArraySection) return IO._inputBufferFrom_((ByteArraySection)object);
@@ -237,11 +230,6 @@ public class IO {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final ByteBuffer _inputBufferFrom_(final String object) throws IOException {
-		return IO._inputBufferFrom_(new File(object));
-	}
-
-	@SuppressWarnings ("javadoc")
 	static final ByteBuffer _inputBufferFrom_(final FileChannel object) throws IOException {
 		return object.map(MapMode.READ_ONLY, 0, object.size());
 	}
@@ -256,7 +244,7 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link InputStream}</dt>
 	 * <dd>Der gegebene {@link InputStream} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}</dt>
+	 * <dt>{@link File}</dt>
 	 * <dd>Es wird ein aus der gegebenen Datei lesender {@link FileInputStream} geliefert.</dd>
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein das gegebene Array lesender {@link InputStream} geliefert.</dd>
@@ -268,7 +256,6 @@ public class IO {
 	public static final InputStream inputStreamFrom(final Object object) throws IOException {
 		if (object instanceof InputStream) return (InputStream)object;
 		if (object instanceof File) return IO._inputStreamFrom_((File)object);
-		if (object instanceof String) return IO._inputStreamFrom_((String)object);
 		if (object instanceof ByteArraySection) return IO._inputStreamFrom_((ByteArraySection)object);
 		if (object instanceof ByteArray) return IO._inputStreamFrom_((ByteArray)object);
 		if (object instanceof byte[]) return IO._inputStreamFrom_((byte[])object);
@@ -277,11 +264,6 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static final InputStream _inputStreamFrom_(final File object) throws IOException {
-		return new FileInputStream(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final InputStream _inputStreamFrom_(final String object) throws IOException {
 		return new FileInputStream(object);
 	}
 
@@ -307,12 +289,12 @@ public class IO {
 	 * <dd>Der gegebene {@link Reader} wird geliefert.</dd>
 	 * <dt>{@link File}</dt>
 	 * <dd>Es wird ein zur gegebenen Datei erzeugter {@link FileReader} geliefert.</dd>
-	 * <dt>{@link String}</dt>
-	 * <dd>Es wird ein zur gegebenen Zeichenkette erzeugter {@link StringReader} geliefert.</dd>
-	 * <dt>{@code char[]}, {@link CharacterArray}, {@link CharacterArraySection}</dt>
-	 * <dd>Es wird ein zum gegebenen Array erzeugter {@link CharArrayReader} geliefert.</dd>
 	 * <dt>{@link InputStream}</dt>
 	 * <dd>Es wird ein zum gegebenen Eingabestrom erzeugter {@link InputStreamReader} geliefert.</dd>
+	 * <dt>{@code char[]}, {@link CharacterArray}, {@link CharacterArraySection}</dt>
+	 * <dd>Es wird ein zum gegebenen Array erzeugter {@link CharArrayReader} geliefert.</dd>
+	 * <dt>{@link String}</dt>
+	 * <dd>Es wird ein zur gegebenen Zeichenkette erzeugter {@link StringReader} geliefert.</dd>
 	 * </dl>
 	 * 
 	 * @param object Objekt.
@@ -321,11 +303,11 @@ public class IO {
 	public static final Reader inputReaderFrom(final Object object) throws IOException {
 		if (object instanceof Reader) return (Reader)object;
 		if (object instanceof File) return IO._inputReaderFrom_((File)object);
+		if (object instanceof InputStream) return IO._inputReaderFrom_((InputStream)object);
 		if (object instanceof CharacterArraySection) return IO._inputReaderFrom_((CharacterArraySection)object);
 		if (object instanceof CharacterArray) return IO._inputReaderFrom_((CharacterArray)object);
 		if (object instanceof char[]) return IO._inputReaderFrom_((char[])object);
 		if (object instanceof String) return IO._inputReaderFrom_((String)object);
-		if (object instanceof InputStream) return IO._inputReaderFrom_((InputStream)object);
 		throw new IOException();
 	}
 
@@ -364,16 +346,16 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link DataTarget}</dt>
 	 * <dd>Das gegebene {@link DataTarget} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}, {@link RandomAccessFile}</dt>
+	 * <dt>{@link File}, {@link RandomAccessFile}</dt>
 	 * <dd>Es wird ein in die gegebenen Datei schreibendes {@link FileDataTarget} geliefert.</dd>
 	 * <dt>{@link CompactByteArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link CompactByteArray} schreibendes {@link ArrayDataTarget} geliefert.</dd>
 	 * <dt>{@link ByteArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibendes {@link DataTarget} geliefert, welches keine Navigation unterstützt.</dd>
-	 * <dt>{@link OutputStream}</dt>
-	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
 	 * <dt>{@link DataOutput}</dt>
 	 * <dd>Es wird ein in den gegebenen {@link DataOutput} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dt>{@link OutputStream}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
 	 * <dt> {@link ByteBuffer}</dt>
 	 * <dd>Es wird ein in den gegebenen {@link ByteBuffer} schreibendes {@link DataTarget} geliefert, welches keine Größenänderung unterstützt.</dd>
 	 * </dl>
@@ -384,23 +366,17 @@ public class IO {
 	public static final DataTarget outputDataFrom(final Object object) throws IOException {
 		if (object instanceof DataTarget) return (DataTarget)object;
 		if (object instanceof File) return IO._outputDataFrom_((File)object);
-		if (object instanceof String) return IO._outputDataFrom_((String)object);
 		if (object instanceof RandomAccessFile) return IO._outputDataFrom_((RandomAccessFile)object);
 		if (object instanceof CompactByteArray) return IO._outputDataFrom_((CompactByteArray)object);
 		if (object instanceof ByteArray) return IO._outputDataFrom_((ByteArray)object);
-		if (object instanceof OutputStream) return IO._outputDataFrom_((OutputStream)object);
 		if (object instanceof DataOutput) return IO._outputDataFrom_((DataOutput)object);
+		if (object instanceof OutputStream) return IO._outputDataFrom_((OutputStream)object);
 		if (object instanceof ByteBuffer) return IO._outputDataFrom_((ByteBuffer)object);
 		throw new IOException();
 	}
 
 	@SuppressWarnings ("javadoc")
 	static final DataTarget _outputDataFrom_(final File object) throws IOException {
-		return new FileDataTarget(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final DataTarget _outputDataFrom_(final String object) throws IOException {
 		return new FileDataTarget(object);
 	}
 
@@ -511,9 +487,9 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Der gegebene {@link ByteBuffer} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}, {@link FileChannel}, {@link RandomAccessFile}</dt>
+	 * <dt>{@link File}, {@link FileChannel}, {@link RandomAccessFile}</dt>
 	 * <dd>Es wird ein zur gegebenen Datei {@link FileChannel#map(MapMode, long, long) erzeugter} {@link ByteBuffer} geliefert.</dd>
-	 * <dt>{@code byte[]}, {@link ByteArraySection}</dt>
+	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
 	 * </dl>
 	 * 
@@ -523,7 +499,6 @@ public class IO {
 	public static final ByteBuffer outputBufferFrom(final Object object) throws IOException {
 		if (object instanceof ByteBuffer) return (ByteBuffer)object;
 		if (object instanceof File) return IO._outputBufferFrom_((File)object);
-		if (object instanceof String) return IO._outputBufferFrom_((String)object);
 		if (object instanceof FileChannel) return IO._outputBufferFrom_((FileChannel)object);
 		if (object instanceof RandomAccessFile) return IO._outputBufferFrom_((RandomAccessFile)object);
 		if (object instanceof ByteArraySection) return IO._outputBufferFrom_((ByteArraySection)object);
@@ -537,11 +512,6 @@ public class IO {
 		try (final RandomAccessFile file = new RandomAccessFile(object, "rw")) {
 			return IO._outputBufferFrom_(file);
 		}
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final ByteBuffer _outputBufferFrom_(final String object) throws IOException {
-		return IO._outputBufferFrom_(new File(object));
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -574,7 +544,7 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link OutputStream}</dt>
 	 * <dd>Der gegebene {@link OutputStream} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}</dt>
+	 * <dt>{@link File}</dt>
 	 * <dd>Es wird ein in die gegebenen Datei schreibender {@link FileOutputStream} geliefert.</dd>
 	 * <dt>{@link ByteArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibender {@link OutputStream} geliefert.</dd>
@@ -586,18 +556,12 @@ public class IO {
 	public static final OutputStream outputStreamFrom(final Object object) throws IOException {
 		if (object instanceof OutputStream) return (OutputStream)object;
 		if (object instanceof File) return IO._outputStreamFrom_((File)object);
-		if (object instanceof String) return IO._outputStreamFrom_((String)object);
 		if (object instanceof ByteArray) return IO._outputStreamFrom_((ByteArray)object);
 		throw new IOException();
 	}
 
 	@SuppressWarnings ("javadoc")
 	static final OutputStream _outputStreamFrom_(final File object) throws IOException {
-		return new FileOutputStream(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final OutputStream _outputStreamFrom_(final String object) throws IOException {
 		return new FileOutputStream(object);
 	}
 
@@ -623,7 +587,7 @@ public class IO {
 	 * <dl>
 	 * <dt>{@link Writer}</dt>
 	 * <dd>Der gegebene {@link Writer} wird geliefert.</dd>
-	 * <dt>{@link File}, {@link String}</dt>
+	 * <dt>{@link File}</dt>
 	 * <dd>Es wird ein in die gegebenen Datei schreibender {@link FileWriter} geliefert.</dd>
 	 * <dt>{@link OutputStream}</dt>
 	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibender {@link OutputStreamWriter} geliefert.</dd>
@@ -637,7 +601,6 @@ public class IO {
 	public static final Writer outputWriterFrom(final Object object) throws IOException {
 		if (object instanceof Writer) return (Writer)object;
 		if (object instanceof File) return IO._outputWriterFrom_((File)object);
-		if (object instanceof String) return IO._outputWriterFrom_((String)object);
 		if (object instanceof OutputStream) return IO._outputWriterFrom_((OutputStream)object);
 		if (object instanceof CharacterArray) return IO._outputWriterFrom_((CharacterArray)object);
 		throw new IOException();
@@ -645,11 +608,6 @@ public class IO {
 
 	@SuppressWarnings ("javadoc")
 	static final Writer _outputWriterFrom_(final File object) throws IOException {
-		return new FileWriter(object);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final Writer _outputWriterFrom_(final String object) throws IOException {
 		return new FileWriter(object);
 	}
 

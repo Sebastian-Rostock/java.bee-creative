@@ -25,9 +25,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 import bee.creative.bex.BEXDecoder.BEXFileDecoder;
 import bee.creative.data.DataTarget;
-import bee.creative.iam.IAMEncoder;
-import bee.creative.iam.IAMEncoder.IAMIndexEncoder;
-import bee.creative.iam.IAMEncoder.IAMListEncoder;
+import bee.creative.iam.IAMBuilder;
+import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
+import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.util.Comparators;
 import bee.creative.util.IO;
 import bee.creative.util.Objects;
@@ -358,7 +358,7 @@ public final class BEXEncoder {
 	/** Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileDecoder}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXFileEncoder implements IAMEncoder.DataEncoder {
+	public static final class BEXFileEncoder implements IAMBuilder.DataEncoder {
 
 		/** Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten. */
 		final StringBuilder _text_ = new StringBuilder();
@@ -442,7 +442,7 @@ public final class BEXEncoder {
 		 * 
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @return Auflistung mit einer Zahlenfolge. */
-		IAMListEncoder _encodePART_(final BEXGroupPool pool) {
+		IAMListingBuilder _encodePART_(final BEXGroupPool pool) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = groups.size();
 			final int[] value = new int[length + 1];
@@ -450,7 +450,7 @@ public final class BEXEncoder {
 				value[i] = groups.get(i).offset;
 			}
 			value[length] = pool.length;
-			final IAMListEncoder encoder = new IAMListEncoder();
+			final IAMListingBuilder encoder = new IAMListingBuilder();
 			encoder.put(value, false);
 			return encoder;
 		}
@@ -460,7 +460,7 @@ public final class BEXEncoder {
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param prop Spaltenindex (0..4).
 		 * @return Auflistung mit einer Zahlenfolge. */
-		IAMListEncoder _encodePROP_(final BEXGroupPool pool, final int prop) {
+		IAMListingBuilder _encodePROP_(final BEXGroupPool pool, final int prop) {
 			final List<BEXGroupItem> groups = pool.items;
 			final int length = pool.length;
 			final int[] value = new int[length];
@@ -475,7 +475,7 @@ public final class BEXEncoder {
 			}
 			boolean empty = false;
 			for (int i = (prop == 0) || (prop == 4) ? 0 : length; (i < length) && (empty = value[i] == 0); i++) {}
-			final IAMListEncoder encoder = new IAMListEncoder();
+			final IAMListingBuilder encoder = new IAMListingBuilder();
 			encoder.put(empty ? new int[0] : value, false);
 			return encoder;
 		}
@@ -485,10 +485,10 @@ public final class BEXEncoder {
 		 * @see BEX#toItem(String)
 		 * @param pool Auflistung von Zeichenketten.
 		 * @return Auflistung von Zahlenfolgen. */
-		IAMListEncoder _encodeTEXT_(final BEXTextPool pool) {
+		IAMListingBuilder _encodeTEXT_(final BEXTextPool pool) {
 			final List<BEXTextItem> texts = pool.items;
 			Collections.sort(texts, BEXTextItem.ORDER);
-			final IAMListEncoder encoder = new IAMListEncoder();
+			final IAMListingBuilder encoder = new IAMListingBuilder();
 			for (final BEXTextItem text: texts) {
 				text.key = encoder.put(BEX.toItem(text.text), false);
 			}
@@ -894,24 +894,24 @@ public final class BEXEncoder {
 			this._updatePART_(this._chldTablePart_, -1);
 			final byte[] dataA = new byte[8];
 			ByteBuffer.wrap(dataA).order(order).putInt(0xBE10BA5E).putInt(stack.children.offset);
-			final IAMIndexEncoder encoder = new IAMIndexEncoder();
-			encoder.putList(this._encodeTEXT_(this._attrUriText_));
-			encoder.putList(this._encodeTEXT_(this._attrNameText_));
-			encoder.putList(this._encodeTEXT_(this._attrValueText_));
-			encoder.putList(this._encodeTEXT_(this._chldUriText_));
-			encoder.putList(this._encodeTEXT_(this._chldNameText_));
-			encoder.putList(this._encodeTEXT_(this._chldValueText_));
-			encoder.putList(this._encodePROP_(this._attrTablePart_, 0));
-			encoder.putList(this._encodePROP_(this._attrTablePart_, 1));
-			encoder.putList(this._encodePROP_(this._attrTablePart_, 2));
-			encoder.putList(this._encodePROP_(this._attrTablePart_, 4));
-			encoder.putList(this._encodePROP_(this._chldTablePart_, 0));
-			encoder.putList(this._encodePROP_(this._chldTablePart_, 1));
-			encoder.putList(this._encodePROP_(this._chldTablePart_, 2));
-			encoder.putList(this._encodePROP_(this._chldTablePart_, 3));
-			encoder.putList(this._encodePROP_(this._chldTablePart_, 4));
-			encoder.putList(this._encodePART_(this._attrTablePart_));
-			encoder.putList(this._encodePART_(this._chldTablePart_));
+			final IAMIndexBuilder encoder = new IAMIndexBuilder();
+			encoder.putListing(this._encodeTEXT_(this._attrUriText_));
+			encoder.putListing(this._encodeTEXT_(this._attrNameText_));
+			encoder.putListing(this._encodeTEXT_(this._attrValueText_));
+			encoder.putListing(this._encodeTEXT_(this._chldUriText_));
+			encoder.putListing(this._encodeTEXT_(this._chldNameText_));
+			encoder.putListing(this._encodeTEXT_(this._chldValueText_));
+			encoder.putListing(this._encodePROP_(this._attrTablePart_, 0));
+			encoder.putListing(this._encodePROP_(this._attrTablePart_, 1));
+			encoder.putListing(this._encodePROP_(this._attrTablePart_, 2));
+			encoder.putListing(this._encodePROP_(this._attrTablePart_, 4));
+			encoder.putListing(this._encodePROP_(this._chldTablePart_, 0));
+			encoder.putListing(this._encodePROP_(this._chldTablePart_, 1));
+			encoder.putListing(this._encodePROP_(this._chldTablePart_, 2));
+			encoder.putListing(this._encodePROP_(this._chldTablePart_, 3));
+			encoder.putListing(this._encodePROP_(this._chldTablePart_, 4));
+			encoder.putListing(this._encodePART_(this._attrTablePart_));
+			encoder.putListing(this._encodePART_(this._chldTablePart_));
 			final byte[] dataB = encoder.encode(order);
 			final byte[] result = new byte[dataA.length + dataB.length];
 			System.arraycopy(dataA, 0, result, 0, dataA.length);
@@ -1065,7 +1065,7 @@ public final class BEXEncoder {
 
 	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link BEXFileEncoder} und gibt diesen zurück.
 	 * 
-	 * @return {@link IAMIndexEncoder}.
+	 * @return {@link IAMIndexBuilder}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
 	 * @throws SAXException Wenn {@link BEXFileEncoder#putNode(InputSource, XMLReader)} eine entsprechende Ausnahme auslöst. */
 

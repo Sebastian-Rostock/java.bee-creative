@@ -152,12 +152,12 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	{}
 
-	/** Diese Methode gibt eine neue Zeitapanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
+	/** Diese Methode gibt eine neue Zeitspanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
 	 * 
 	 * @see #toString()
 	 * @param string Zeichenkette.
-	 * @return Zeitapanne.
+	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static final FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
@@ -182,11 +182,11 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		}
 	}
 
-	/** Diese Methode gibt eine Zeitapanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
+	/** Diese Methode gibt eine Zeitspanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
 	 * 
 	 * @param durationmonths Gesamtanzahl der Monate ({@code -101006..101006}).
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
-	 * @return Zeitapanne.
+	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public static final FEMDuration from(int durationmonths, long durationmillis) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(+durationmonths);
@@ -219,7 +219,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 			(days << 14) | (months << 10) | (milliseconds << 0));
 	}
 
-	/** Diese Methode gibt eine Zeitapanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt eine Zeitspanne mit den Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @see #from(int, long)
 	 * @see #durationmonthsOf(int, int)
@@ -231,7 +231,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026560}).
 	 * @param seconds Anzahl der Sekunden ({@code -265621593600..265621593600}).
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
-	 * @return Zeitapanne.
+	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
 	public static final FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
@@ -241,7 +241,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDuration.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
-	 * @return Zeitapanne.
+	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public static final FEMDuration from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMDuration.TYPE);
@@ -251,7 +251,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
-	 * @return Zeitapanne.
+	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
 	public static final FEMDuration from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMDuration.TYPE);
@@ -329,7 +329,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		}
 	}
 
-	/** Diese Methode gibt die minnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	/** Diese Methode gibt die minimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 * 
 	 * @see FEMDatetime#moveDate(int, int, int)
 	 * @param months Anzahl der Monate ({@code 0..101006}).
@@ -341,7 +341,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return FEMDuration._lengthOf_(months) - ((FEMDuration._rangeOf_(months) >> 0) & 0x0F);
 	}
 
-	/** Diese Methode gibt die maxnimale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
+	/** Diese Methode gibt die maximale Anzahl an Tagen zurück, die durch die gegebene Anzahl an Monaten ausgedrückt werden kann.
 	 * 
 	 * @see FEMDatetime#moveDate(int, int, int)
 	 * @param months Anzahl der Monate ({@code 0..101006}).
@@ -588,7 +588,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return this._move_(durationmonths, durationmillis);
 	}
 
-	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monate und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
+	/** Diese Methode gibt diese Zeitspanne verschoben um die Gesamtanzahlen an Monaten und Millisekunden zurück, die sich aus den gegebenen Anzahlen ergeben.
 	 * 
 	 * @see #move(int, long)
 	 * @see #durationmonthsOf(int, int)

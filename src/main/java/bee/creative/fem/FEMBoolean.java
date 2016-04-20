@@ -109,8 +109,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 		return this._value_ == that._value_;
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner als, gleich zu bzw. größer als {@code 0} zurück, wenn dieser Wahrheitswert gleiner, gleich oder größer als der
-	 * gegebene Wahrheitswert ist.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Wahrheitswert kleiner, gleich oder größer als der gegebene Wahrheitswert ist.
 	 * 
 	 * @param that Wahrheitswert.
 	 * @return Vergleichswert.
@@ -164,7 +163,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 		return this.compare(value);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswert zurück.<br>
+	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück.<br>
 	 * Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen {@code "true"} und {@code "false"}.
 	 * 
 	 * @return Textdarstellung. */

@@ -11,14 +11,14 @@ import bee.creative.util.Objects;
  * Die Methoden {@link #item(int, int)} und {@link #itemLength(int)} delegieren an {@link #item(int)}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class IAMList implements Iterable<IAMArray> {
+public abstract class IAMListing implements Iterable<IAMArray> {
 
 	@SuppressWarnings ("javadoc")
-	static final class ListView extends AbstractList<IAMArray> {
+	static final class ItemList extends AbstractList<IAMArray> {
 
-		final IAMList _owner_;
+		final IAMListing _owner_;
 
-		ListView(final IAMList owner) {
+		ItemList(final IAMListing owner) {
 			this._owner_ = owner;
 		}
 
@@ -38,7 +38,7 @@ public abstract class IAMList implements Iterable<IAMArray> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class EmptyList extends IAMList {
+	static final class EmptyListing extends IAMListing {
 
 		@Override
 		public final IAMArray item(final int itemIndex) {
@@ -54,8 +54,8 @@ public abstract class IAMList implements Iterable<IAMArray> {
 
 	{}
 
-	/** Dieses Feld speichert die leere {@link IAMList}. */
-	public static final IAMList EMPTY = new EmptyList();
+	/** Dieses Feld speichert das leere {@link IAMListing}. */
+	public static final IAMListing EMPTY = new EmptyListing();
 
 	{}
 
@@ -104,7 +104,7 @@ public abstract class IAMList implements Iterable<IAMArray> {
 	 * @see #itemCount()
 	 * @return Elemente. */
 	public final List<IAMArray> items() {
-		return new ListView(this);
+		return new ItemList(this);
 	}
 
 	{}
