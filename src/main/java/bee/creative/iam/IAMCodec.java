@@ -1,9 +1,9 @@
 package bee.creative.iam;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.util.Map;
-import bee.creative.data.DataTarget;
 import bee.creative.fem.FEMBinary;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.ini.INIReader;
@@ -17,15 +17,18 @@ public final class IAMCodec {
 	/** Diese Klasse implementiert die Aufzählung aller unterstützter Ein- und Ausgabedatenformate eines {@link IAMCodec}.
 	 * 
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static enum DataType {
+	public static enum IAMDataType {
 
 		/** Dieses Feld identifiziert das optimierte Binärdatenformat, das über einen {@link IAMIndexLoader} gelesen werden kann. */
-		BIN {
+		IAM {
 
 			@Override
 			public IAMIndex decode(final IAMCodec codec) throws IOException, IllegalArgumentException {
 				try {
-					return new IAMCodec_BIN().decode(codec);
+					final MMFArray array = MMFArray.from(codec.getSourceData());
+					final ByteOrder order = IAMIndexLoader.HEADER.orderOf(array);
+					codec.useByteOrder(order);
+					return new IAMIndexLoader(array.withOrder(order));
 				} catch (IOException | IllegalArgumentException cause) {
 					throw cause;
 				} catch (final Exception cause) {
@@ -36,7 +39,9 @@ public final class IAMCodec {
 			@Override
 			public void encode(final IAMCodec codec, final IAMIndex index) throws IOException, IllegalArgumentException {
 				try {
-					new IAMCodec_BIN().encode(codec, index);
+					try (OutputStream stream = IO.outputStreamFrom(codec.getTargetData())) {
+						stream.write(index.toBytes(codec.getByteOrder()));
+					}
 				} catch (IOException | IllegalArgumentException cause) {
 					throw cause;
 				} catch (final Exception cause) {
@@ -105,7 +110,7 @@ public final class IAMCodec {
 
 	}
 
-	public static enum FindMode {
+	public static enum IAMFindMode {
 
 		AUTO {
 
@@ -138,7 +143,7 @@ public final class IAMCodec {
 
 	}
 
-	public static enum ArrayFormat {
+	public static enum IAMArrayFormat {
 
 		ARRAY {
 
@@ -177,11 +182,11 @@ public final class IAMCodec {
 
 	{}
 
-	static final Map<String, FindMode> _parseFindModeMap_ = new HashMapBuilder<String, FindMode>() //
-		.useEntry(null, FindMode.AUTO).useEntry("", FindMode.AUTO) //
-		.useEntry("A", FindMode.AUTO).useEntry("AUTO", FindMode.AUTO) //
-		.useEntry("S", FindMode.SORTED).useEntry("SORTED", FindMode.SORTED) //
-		.useEntry("H", FindMode.HASHED).useEntry("HASHED", FindMode.HASHED) //
+	static final Map<String, IAMFindMode> _parseFindModeMap_ = new HashMapBuilder<String, IAMFindMode>() //
+		.useEntry(null, IAMFindMode.AUTO).useEntry("", IAMFindMode.AUTO) //
+		.useEntry("A", IAMFindMode.AUTO).useEntry("AUTO", IAMFindMode.AUTO) //
+		.useEntry("S", IAMFindMode.SORTED).useEntry("SORTED", IAMFindMode.SORTED) //
+		.useEntry("H", IAMFindMode.HASHED).useEntry("HASHED", IAMFindMode.HASHED) //
 		.build();
 
 	@SuppressWarnings ("javadoc")
@@ -192,14 +197,14 @@ public final class IAMCodec {
 		.useEntry("L", ByteOrder.LITTLE_ENDIAN).useEntry("LITTLEENDIAN", ByteOrder.LITTLE_ENDIAN) //
 		.build();
 
-	static final Map<String, ArrayFormat> _parseArrayFormatMap_ = new HashMapBuilder<String, ArrayFormat>() //
-		.useEntry(null, ArrayFormat.ARRAY).useEntry("", ArrayFormat.ARRAY) //
-		.useEntry("A", ArrayFormat.ARRAY).useEntry("ARRAY", ArrayFormat.ARRAY) //
+	static final Map<String, IAMArrayFormat> _parseArrayFormatMap_ = new HashMapBuilder<String, IAMArrayFormat>() //
+		.useEntry(null, IAMArrayFormat.ARRAY).useEntry("", IAMArrayFormat.ARRAY) //
+		.useEntry("A", IAMArrayFormat.ARRAY).useEntry("ARRAY", IAMArrayFormat.ARRAY) //
 		// TODO
 		.build();
 
-	static final Map<FindMode, String> _formatFindModeMap_ = new HashMapBuilder<FindMode, String>() //
-		.useEntry(FindMode.AUTO, "AUTO") //
+	static final Map<IAMFindMode, String> _formatFindModeMap_ = new HashMapBuilder<IAMFindMode, String>() //
+		.useEntry(IAMFindMode.AUTO, "AUTO") //
 		// TODO
 		.build();
 
@@ -210,8 +215,8 @@ public final class IAMCodec {
 		.useEntry(ByteOrder.LITTLE_ENDIAN, "LITTLEENDIAN") //
 		.build();
 
-	static final Map<ArrayFormat, String> _formatArrayFormatMap_ = new HashMapBuilder<ArrayFormat, String>() //
-		.useEntry(ArrayFormat.ARRAY, "AUTO") //
+	static final Map<IAMArrayFormat, String> _formatArrayFormatMap_ = new HashMapBuilder<IAMArrayFormat, String>() //
+		.useEntry(IAMArrayFormat.ARRAY, "AUTO") //
 		// TODO
 		.build();
 
@@ -223,7 +228,7 @@ public final class IAMCodec {
 		throw new IllegalArgumentException();
 	}
 
-	public static final FindMode parseFindMode(final String value) throws IllegalArgumentException {
+	public static final IAMFindMode parseFindMode(final String value) throws IllegalArgumentException {
 		return IAMCodec._get_(IAMCodec._parseFindModeMap_, value);
 	}
 
@@ -231,11 +236,11 @@ public final class IAMCodec {
 		return IAMCodec._get_(IAMCodec._parseByteOrderMap_, value);
 	}
 
-	public static final ArrayFormat parseArrayFormat(final String value) {
+	public static final IAMArrayFormat parseArrayFormat(final String value) {
 		return IAMCodec._get_(IAMCodec._parseArrayFormatMap_, value);
 	}
 
-	public static final String formatFindMode(final FindMode value) throws IllegalArgumentException {
+	public static final String formatFindMode(final IAMFindMode value) throws IllegalArgumentException {
 		return IAMCodec._get_(IAMCodec._formatFindModeMap_, value);
 	}
 
@@ -243,7 +248,7 @@ public final class IAMCodec {
 		return IAMCodec._get_(IAMCodec._formatByteOrderMap_, value);
 	}
 
-	public static final String formatArrayFormat(final ArrayFormat value) throws IllegalArgumentException {
+	public static final String formatArrayFormat(final IAMArrayFormat value) throws IllegalArgumentException {
 		return IAMCodec._get_(IAMCodec._formatArrayFormatMap_, value);
 	}
 
@@ -332,13 +337,13 @@ public final class IAMCodec {
 	Object _sourceData_;
 
 	/** Dieses Feld speichert das Eingabeformat. */
-	DataType _sourceFormat_;
+	IAMDataType _sourceFormat_;
 
 	/** Dieses Feld speichert die Ausgabedaten. */
 	Object _targetData_;
 
 	/** Dieses Feld speichert das Ausgabeformat. */
-	DataType _targetFormat_;
+	IAMDataType _targetFormat_;
 
 	{}
 
@@ -361,16 +366,16 @@ public final class IAMCodec {
 
 	/** Diese Methode gibt das Format der Eingabedaten zurück.
 	 * <dl>
-	 * <dt> {@link DataType#BIN}</dt>
+	 * <dt> {@link IAMDataType#IAM}</dt>
 	 * <dd> {@link MMFArray#from(Object)}</dd>
-	 * <dt> {@link DataType#INI}</dt>
+	 * <dt> {@link IAMDataType#INI}</dt>
 	 * <dd> {@link INIReader#from(Object)}</dd>
-	 * <dt> {@link DataType#XML}</dt>
+	 * <dt> {@link IAMDataType#XML}</dt>
 	 * <dd> {@link IO#inputReaderFrom(Object)}</dd>
 	 * </dl>
 	 * 
 	 * @return Eingabeformat. */
-	public final synchronized DataType getSourceFormat() {
+	public final synchronized IAMDataType getSourceFormat() {
 		return this._sourceFormat_;
 	}
 
@@ -385,16 +390,16 @@ public final class IAMCodec {
 
 	/** Diese Methode gibt das Format der Ausgabedaten zurück.
 	 * <dl>
-	 * <dt> {@link DataType#BIN}</dt>
+	 * <dt> {@link IAMDataType#IAM}</dt>
 	 * <dd> {@link IO#outputDataFrom(Object)}</dd>
-	 * <dt> {@link DataType#INI}</dt>
+	 * <dt> {@link IAMDataType#INI}</dt>
 	 * <dd> {@link INIWriter#from(Object)}</dd>
-	 * <dt> {@link DataType#XML}</dt>
+	 * <dt> {@link IAMDataType#XML}</dt>
 	 * <dd> {@link IO#outputWriterFrom(Object)}</dd>
 	 * </dl>
 	 * 
 	 * @return Ausgabeformat. */
-	public final DataType getTargetFormat() {
+	public final IAMDataType getTargetFormat() {
 		return this._targetFormat_;
 	}
 
@@ -425,7 +430,7 @@ public final class IAMCodec {
 	 * @see #getSourceFormat()
 	 * @param format Eingabeformat.
 	 * @return {@code this}. */
-	public final synchronized IAMCodec useSourceFormat(final DataType format) {
+	public final synchronized IAMCodec useSourceFormat(final IAMDataType format) {
 		this._sourceFormat_ = format;
 		return this;
 	}
@@ -447,7 +452,7 @@ public final class IAMCodec {
 	 * @see #getTargetFormat()
 	 * @param format Ausgabeformat.
 	 * @return {@code this}. */
-	public final synchronized IAMCodec useTargetFormat(final DataType format) {
+	public final synchronized IAMCodec useTargetFormat(final IAMDataType format) {
 		this._targetFormat_ = format;
 		return this;
 	}
@@ -457,13 +462,13 @@ public final class IAMCodec {
 	}
 
 	public final synchronized IAMIndex decodeSource() throws IOException, IllegalStateException, IllegalArgumentException {
-		final DataType format = this._sourceFormat_;
+		final IAMDataType format = this._sourceFormat_;
 		if (format == null) throw new IllegalStateException();
 		return format.decode(this);
 	}
 
 	public final synchronized void encodeTarget(final IAMIndex index) throws IOException, IllegalStateException, IllegalArgumentException {
-		final DataType format = this._targetFormat_;
+		final IAMDataType format = this._targetFormat_;
 		if (format == null) throw new IllegalStateException();
 		format.encode(this, index);
 	}

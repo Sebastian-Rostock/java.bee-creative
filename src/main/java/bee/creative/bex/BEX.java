@@ -10,108 +10,10 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert grundlegende Klassen und Methoden zur Umsetzung des {@code BEX – Binary Encoded XML}.
  * 
- * @see BEXEncoder
- * @see BEXDecoder
+ * @see BEXBuilder
+ * @see BEXLoader
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEX {
-
-	/** Diese Klasse implementiert ein abstraktes {@link BEXFile}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static abstract class BEXBaseFile implements BEXFile {
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.root());
-		}
-
-	}
-
-	/** Diese Klasse implementiert eine abstrakte {@link BEXList}.<br>
-	 * Die Mathoden {@link #hashCode()} und {@link #equals(Object)} basieren auf {@link #key()} und {@link #owner()}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static abstract class BEXBaseList implements BEXList {
-
-		/** {@inheritDoc} */
-		@Override
-		public int find(final String uri, final String name, final int start) throws NullPointerException {
-			if (start < 0) return -1;
-			final boolean useUri = uri.length() != 0, useName = name.length() != 0;
-			for (int i = start, length = this.length(); i < length; i++) {
-				final BEXNode node = this.get(i);
-				if (useUri && !node.uri().equals(uri)) {
-					continue;
-				}
-				if (useName && !node.name().equals(name)) {
-					continue;
-				}
-				return i;
-			}
-			return -1;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public Iterator<BEXNode> iterator() {
-			return Iterators.itemsIterator(this, 0, this.length());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int hashCode() {
-			return this.key() ^ this.owner().hashCode();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean equals(final Object object) {
-			if (this == object) return true;
-			if (!(object instanceof BEXList)) return false;
-			final BEXList data = (BEXList)object;
-			return (this.key() == data.key()) && this.owner().equals(data.owner());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this);
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen abstrakten {@link BEXNode}.<br>
-	 * Die Mathoden {@link #hashCode()} und {@link #equals(Object)} basieren auf {@link #key()} und {@link #owner()}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static abstract class BEXBaseNode implements BEXNode {
-
-		/** {@inheritDoc} */
-		@Override
-		public int hashCode() {
-			return this.key() ^ this.owner().hashCode();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean equals(final Object object) {
-			if (this == object) return true;
-			if (!(object instanceof BEXNode)) return false;
-			final BEXNode data = (BEXNode)object;
-			return (this.key() == data.key()) && this.owner().equals(data.owner());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return Objects.toInvokeString(this, this.key(), this.type(), this.index(), //
-				this.uri(), this.name(), this.value(), this.children().length(), this.attributes().length());
-		}
-
-	}
-
-	{}
 
 	/** Dieses Feld speichert das {@code UTF8}-{@link Charset} zur kodierung und dekodierung von Zeichenketten. */
 	public static final Charset CHARSET = Charset.forName("UTF8");
@@ -156,18 +58,18 @@ public class BEX {
 		return new String(value.section(0, value.length() - 1).toBytes(), BEX.CHARSET);
 	}
 
-	/** Diese Methode gibt einen neuen {@link BEXEncoder} zurück.
+	/** Diese Methode gibt einen neuen {@link BEXBuilder} zurück.
 	 * 
-	 * @return neuer {@link BEXEncoder}. */
-	public static final BEXEncoder encoder() {
-		return new BEXEncoder();
+	 * @return neuer {@link BEXBuilder}. */
+	public static final BEXBuilder encoder() {
+		return new BEXBuilder();
 	}
 
-	/** Diese Methode gibt einen neuen {@link BEXDecoder} zurück.
+	/** Diese Methode gibt einen neuen {@link BEXLoader} zurück.
 	 * 
-	 * @return neuer {@link BEXDecoder}. */
-	public static final BEXDecoder decoder() {
-		return new BEXDecoder();
+	 * @return neuer {@link BEXLoader}. */
+	public static final BEXLoader decoder() {
+		return new BEXLoader();
 	}
 
 }

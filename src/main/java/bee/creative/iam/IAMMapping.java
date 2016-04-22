@@ -1,8 +1,17 @@
 package bee.creative.iam;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.AbstractList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.iam.IAMIndex.DataStats;
+import bee.creative.iam.IAMIndex.SizeStats;
+import bee.creative.iam.IAMLoader.IAMMappingLoader;
+import bee.creative.mmf.MMFArray;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte Abbildung von Schlüsseln auf Werte, welche beide selbst Zahlenfolgen ({@link IAMArray}) sind.
@@ -13,30 +22,6 @@ import bee.creative.util.Objects;
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMMapping implements Iterable<IAMEntry> {
-
-	@SuppressWarnings ("javadoc")
-	static final class EntryList extends AbstractList<IAMEntry> {
-
-		final IAMMapping _owner_;
-
-		EntryList(final IAMMapping owner) {
-			this._owner_ = owner;
-		}
-
-		{}
-
-		@Override
-		public final IAMEntry get(final int index) {
-			if ((index < 0) || (index >= this._owner_.entryCount())) throw new IndexOutOfBoundsException();
-			return this._owner_.entry(index);
-		}
-
-		@Override
-		public final int size() {
-			return this._owner_.entryCount();
-		}
-
-	}
 
 	@SuppressWarnings ("javadoc")
 	static final class EmptyMapping extends IAMMapping {
@@ -69,6 +54,30 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	}
 
+	@SuppressWarnings ("javadoc")
+	static final class Entries extends AbstractList<IAMEntry> {
+
+		final IAMMapping _owner_;
+
+		Entries(final IAMMapping owner) {
+			this._owner_ = owner;
+		}
+
+		{}
+
+		@Override
+		public final IAMEntry get(final int index) {
+			if ((index < 0) || (index >= this._owner_.entryCount())) throw new IndexOutOfBoundsException();
+			return this._owner_.entry(index);
+		}
+
+		@Override
+		public final int size() {
+			return this._owner_.entryCount();
+		}
+
+	}
+
 	{}
 
 	/** Dieses Feld speichert die leere {@link IAMMapping}. */
@@ -79,6 +88,20 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge binär über die Ordnung ihrer Schlüssel gesucht werden. */
 	public static final boolean MODE_SORTED = false;
+
+	{}
+
+	/** Diese Methode ist eine Abkürzung für {@code new IAMMappingLoader(MMFArray.from(object))}.
+	 * 
+	 * @see MMFArray#from(Object)
+	 * @see IAMMappingLoader#IAMMappingLoader(MMFArray)
+	 * @param object Objekt.
+	 * @return {@link IAMMappingLoader}.
+	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link IAMMappingLoader#IAMMappingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
+	public static final IAMMappingLoader from(Object object) throws IOException, IAMException {
+		return new IAMMappingLoader(MMFArray.from(object));
+	}
 
 	{}
 
@@ -169,7 +192,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @see #entryCount()
 	 * @return Einträge. */
 	public final List<IAMEntry> entries() {
-		return new EntryList(this);
+		return new Entries(this);
 	}
 
 	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Bei erfolgloser Suche wird {@code -1}
@@ -179,6 +202,120 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @return Index des Entrags.
 	 * @throws NullPointerException Wenn {@code key} {@code null} ist. */
 	public abstract int find(final IAMArray key) throws NullPointerException;
+
+	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
+	 * 
+	 * @return Binärdatenformat {@code IAM_LISTING}. */
+	public final byte[] toBytes() {
+		return this.toBytes(ByteOrder.nativeOrder());
+	}
+
+	/** Diese Methode kodiert dieses {@link IAMMapping} in das binäre optimierte Datenformat {@code IAM_MAPPING} und gibt dieses als Bytefolge zurück.
+	 * 
+	 * @param order Bytereihenfolge.
+	 * @return {@code IAM_MAPPING}. */
+	public final byte[] toBytes(final ByteOrder order) {
+
+		final int entryCount = this.entryCount();
+		final int[][] keyArray = new int[entryCount][];
+		final int[][] valueArray = new int[entryCount][];
+		final Integer[] indexArray = new Integer[entryCount];
+		for (int i = 0; i < entryCount; i++) {
+			keyArray[i] = this.key(i).toArray();
+			valueArray[i] = this.value(i).toArray();
+			indexArray[i] = new Integer(i);
+		}
+
+		final int[][] keyArray2 = keyArray.clone();
+		final int[][] valueArray2 = valueArray.clone();
+
+		final int rangeMask;
+		final int rangeCount;
+		final int[] rangeData;
+		final int rangeDataType;
+		final int rangeDataBytes;
+		final int rangeBytes;
+
+		if (this.mode()) {
+
+			rangeMask = IAMMapping._computeRangeMask_(entryCount);
+			rangeCount = rangeMask + 2;
+			rangeData = new int[rangeCount];
+			rangeDataType = SizeStats.computeSizeType(entryCount);
+			rangeDataBytes = rangeCount * IAMLoader._byteCount_(rangeDataType);
+			rangeBytes = ((rangeDataBytes + 3) & -4) + 4;
+
+			final int[] rangeIndex = new int[entryCount];
+			for (int i = 0; i < entryCount; i++) {
+				final int index = IAMBuilder.hash(keyArray[i]) & rangeMask;
+				rangeData[index]++;
+				rangeIndex[i] = index;
+			}
+
+			int offset = 0;
+			for (int i = 0; i < rangeCount; i++) {
+				final int value = rangeData[i];
+				rangeData[i] = offset;
+				offset += value;
+			}
+
+			Arrays.sort(indexArray, new Comparator<Integer>() {
+
+				@Override
+				public int compare(final Integer index1, final Integer index2) {
+					return rangeIndex[index1.intValue()] - rangeIndex[index2.intValue()];
+				}
+
+			});
+
+		} else {
+
+			Arrays.sort(indexArray, new Comparator<Integer>() {
+
+				@Override
+				public int compare(final Integer index1, final Integer index2) {
+					return IAMBuilder.compare(keyArray[index1.intValue()], keyArray[index2.intValue()]);
+				}
+
+			});
+
+			rangeMask = 0;
+			rangeData = null;
+			rangeDataType = 0;
+			rangeDataBytes = 0;
+			rangeBytes = 0;
+
+		}
+
+		for (int i = 0; i < entryCount; i++) {
+			final int index = indexArray[i].intValue();
+			keyArray[i] = keyArray2[index];
+			valueArray[i] = valueArray2[index];
+		}
+
+		final IAMIndex.DataStats keyData = new IAMIndex.DataStats(Arrays.asList(keyArray));
+		final IAMIndex.SizeStats keySize = keyData.dataSize;
+
+		final IAMIndex.DataStats valueData = new IAMIndex.DataStats(Arrays.asList(valueArray));
+		final IAMIndex.SizeStats valueSize = valueData.dataSize;
+
+		final int length = 8 + rangeBytes + keySize.bytes + keyData.bytes + valueSize.bytes + valueData.bytes;
+		final byte[] result = new byte[length];
+
+		final ByteBuffer buffer = ByteBuffer.wrap(result).order(order);
+		buffer.putInt(0xF00D1000 | (keyData.type << 8) | (keySize.type << 6) | (rangeDataType << 4) | (valueData.type << 2) | (valueSize.type << 0));
+		buffer.putInt(entryCount);
+		if (rangeDataType != 0) {
+			buffer.putInt(rangeMask);
+			DataStats.putData(buffer, rangeDataType, rangeData);
+		}
+		keySize.putSize(buffer);
+		keyData.putData(buffer);
+		valueSize.putSize(buffer);
+		valueData.putData(buffer);
+
+		return result;
+	}
 
 	{}
 
@@ -192,6 +329,18 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString("IAMMap", this.entryCount());
+	}
+
+	/** Diese Methode gibt die Bitmaske zur Umrechnung von Streuwerten zurück.
+	 * 
+	 * @param entryCount Anzahl der Einträge der Abbildung.
+	 * @return Bitmaske. */
+	static final int _computeRangeMask_(final int entryCount) {
+		int result = 2;
+		while (result < entryCount) {
+			result <<= 1;
+		}
+		return (result - 1) & 536870911;
 	}
 
 }

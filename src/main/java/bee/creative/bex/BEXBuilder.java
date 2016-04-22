@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-import bee.creative.bex.BEXDecoder.BEXFileDecoder;
+import bee.creative.bex.BEXLoader.BEXFileLoader;
 import bee.creative.data.DataTarget;
 import bee.creative.iam.IAMBuilder;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
@@ -36,9 +36,9 @@ import bee.creative.util.Unique.UniqueMap;
 /** Diese Klasse implementiert die Algorithmen zur Kodierung der {@link BEX} Datenstrukturen und kann als Konfigurator zur {@link #encode() Überführung} eines
  * {@link #useSource(Object) XML-Dokuments} in ein {@link #useTarget(Object) BEX-Dokument} eingesetzt werden.
  * 
- * @see BEXFileEncoder
+ * @see BEXFileBuilder
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class BEXEncoder {
+public final class BEXBuilder {
 
 	/** Diese Klasse implementiert einen Datensatz, dem ein identifizierender {@link #key()} zugeordnet werden kann.
 	 * 
@@ -74,7 +74,7 @@ public final class BEXEncoder {
 
 		/** Dieses Feld speichert einen {@link Comparator}, der einen Datensatz mit leerem {@link #text} vor einen mit nichtleerem {@link #text} ordnet und
 		 * andernfalls zwei Datensätze bezüglich des {@link #key} aufsteigend ordnet. */
-		public static final Comparator<BEXTextItem> ORDER = new Comparator<BEXEncoder.BEXTextItem>() {
+		public static final Comparator<BEXTextItem> ORDER = new Comparator<BEXTextItem>() {
 
 			@Override
 			public int compare(final BEXTextItem item1, final BEXTextItem item2) {
@@ -355,10 +355,10 @@ public final class BEXEncoder {
 
 	}
 
-	/** Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileDecoder}.
+	/** Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileLoader}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXFileEncoder implements IAMBuilder.DataEncoder {
+	public static final class BEXFileBuilder {
 
 		/** Dieses Feld speichert den Puffer zur Zusammenfassung benachbarter Textknoten. */
 		final StringBuilder _text_ = new StringBuilder();
@@ -402,8 +402,8 @@ public final class BEXEncoder {
 		/** Dieses Feld speichert die Aktivierung der Elternknoten von Kindknoten. */
 		boolean _chldParentEnabled_ = false;
 
-		/** Dieser Konstruktor initialisiert einen leeren {@link BEXFileEncoder}. */
-		public BEXFileEncoder() {
+		/** Dieser Konstruktor initialisiert einen leeren {@link BEXFileBuilder}. */
+		public BEXFileBuilder() {
 			this.clear();
 		}
 
@@ -475,9 +475,9 @@ public final class BEXEncoder {
 			}
 			boolean empty = false;
 			for (int i = (prop == 0) || (prop == 4) ? 0 : length; (i < length) && (empty = value[i] == 0); i++) {}
-			final IAMListingBuilder encoder = new IAMListingBuilder();
-			encoder.put(empty ? new int[0] : value, false);
-			return encoder;
+			final IAMListingBuilder result = new IAMListingBuilder();
+			result.put(empty ? new int[0] : value, false);
+			return result;
 		}
 
 		/** Diese Methode kodiert die gegebenen Zeichenketten in eine Liste von Zahlenfolgen und gibt diese zurück.
@@ -500,7 +500,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Attributknoten bestückt wird oder dessen Name unbestimmt ist. */
-		public BEXFileEncoder putAttr() throws IllegalStateException {
+		public BEXFileBuilder putAttr() throws IllegalStateException {
 			final BEXStack stack = this._stack_;
 			if ((stack.type != BEXStack.ATTR) || (stack.name == null)) throw new IllegalStateException();
 			final BEXStack parent = stack.parent;
@@ -519,7 +519,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
-		public BEXFileEncoder newAttr() throws IllegalStateException {
+		public BEXFileBuilder newAttr() throws IllegalStateException {
 			final BEXStack parent = this._stack_;
 			if (parent.type != BEXStack.ELEM) throw new IllegalStateException();
 			final BEXStack stack = new BEXStack();
@@ -534,7 +534,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
-		public BEXFileEncoder putText() throws IllegalStateException {
+		public BEXFileBuilder putText() throws IllegalStateException {
 			final BEXStack stack = this._stack_;
 			if (stack.type != BEXStack.TEXT) throw new IllegalStateException();
 			stack.type = BEXStack.ELEM;
@@ -550,7 +550,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
-		public BEXFileEncoder newText() throws IllegalStateException {
+		public BEXFileBuilder newText() throws IllegalStateException {
 			final BEXStack stack = this._stack_;
 			if (stack.type != BEXStack.ELEM) throw new IllegalStateException();
 			stack.type = BEXStack.TEXT;
@@ -563,7 +563,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
-		public BEXFileEncoder putElem() throws IllegalStateException {
+		public BEXFileBuilder putElem() throws IllegalStateException {
 			final BEXStack stack = this._stack_;
 			if (stack.type != BEXStack.ELEM) throw new IllegalStateException();
 			this._putText_(stack);
@@ -594,7 +594,7 @@ public final class BEXEncoder {
 		 * 
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
-		public BEXFileEncoder newElem() throws IllegalStateException {
+		public BEXFileBuilder newElem() throws IllegalStateException {
 			final BEXStack parent = this._stack_;
 			if ((parent.type != BEXStack.VOID) && (parent.type != BEXStack.ELEM)) throw new IllegalStateException();
 			this._putText_(parent);
@@ -617,7 +617,7 @@ public final class BEXEncoder {
 		 * @throws SAXException Wenn die Datei nicht geparst werden kann.
 		 * @throws NullPointerException Wenn {@code file} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
-		public BEXFileEncoder putNode(final File file) throws IOException, SAXException, NullPointerException, IllegalStateException {
+		public BEXFileBuilder putNode(final File file) throws IOException, SAXException, NullPointerException, IllegalStateException {
 			try (FileInputStream stream = new FileInputStream(file)) {
 				return this.putNode(new InputSource(stream), XMLReaderFactory.createXMLReader());
 			}
@@ -639,7 +639,7 @@ public final class BEXEncoder {
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht der passende Knoten bestückt wird. */
-		public BEXFileEncoder putNode(final Node node) throws NullPointerException, IllegalStateException {
+		public BEXFileBuilder putNode(final Node node) throws NullPointerException, IllegalStateException {
 			switch (node.getNodeType()) {
 				case Node.DOCUMENT_NODE: {
 					return this.putNode(((Document)node).getDocumentElement());
@@ -682,27 +682,27 @@ public final class BEXEncoder {
 		 * @throws SAXException Wenn die Datenquelle nicht geparst werden kann.
 		 * @throws NullPointerException Wenn {@code source} bzw. {@code reader} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
-		public BEXFileEncoder putNode(final InputSource source, final XMLReader reader) throws IOException, SAXException, NullPointerException,
+		public BEXFileBuilder putNode(final InputSource source, final XMLReader reader) throws IOException, SAXException, NullPointerException,
 			IllegalStateException {
 			reader.setContentHandler(new DefaultHandler() {
 
 				@Override
 				public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
-					BEXFileEncoder.this.newElem().useUri(uri).useName(localName);
+					BEXFileBuilder.this.newElem().useUri(uri).useName(localName);
 					for (int i = 0, length = attributes.getLength(); i < length; i++) {
-						BEXFileEncoder.this.newAttr().useUri(attributes.getURI(i)).useName(attributes.getLocalName(i)).useValue(attributes.getValue(i)).putAttr();
+						BEXFileBuilder.this.newAttr().useUri(attributes.getURI(i)).useName(attributes.getLocalName(i)).useValue(attributes.getValue(i)).putAttr();
 					}
 				}
 
 				@Override
 				public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-					BEXFileEncoder.this.putElem();
+					BEXFileBuilder.this.putElem();
 				}
 
 				@Override
 				public void characters(final char[] ch, final int start, final int length) throws SAXException {
-					if (BEXFileEncoder.this._stack_.type != BEXStack.ELEM) throw new IllegalStateException();
-					BEXFileEncoder.this._text_.append(ch, start, length);
+					if (BEXFileBuilder.this._stack_.type != BEXStack.ELEM) throw new IllegalStateException();
+					BEXFileBuilder.this._text_.append(ch, start, length);
 				}
 
 				@Override
@@ -723,7 +723,7 @@ public final class BEXEncoder {
 		 * @param uri URI oder {@code null}.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Element- noch ein Attributknoten ist. */
-		public BEXFileEncoder useUri(final String uri) throws IllegalStateException {
+		public BEXFileBuilder useUri(final String uri) throws IllegalStateException {
 			final BEXStack node = this._stack_;
 			if ((node.type != BEXStack.ATTR) && (node.type != BEXStack.ELEM)) throw new IllegalStateException();
 			node.uri = uri;
@@ -740,7 +740,7 @@ public final class BEXEncoder {
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Element- noch ein Attributknoten ist.
 		 * @throws NullPointerException Wenn {@code name} {@code null} ist.
 		 * @throws IllegalArgumentException Wenn {@code name} leer ist. */
-		public BEXFileEncoder useName(final String name) throws IllegalStateException, NullPointerException, IllegalArgumentException {
+		public BEXFileBuilder useName(final String name) throws IllegalStateException, NullPointerException, IllegalArgumentException {
 			final BEXStack stack = this._stack_;
 			if ((stack.type != BEXStack.ATTR) && (stack.type != BEXStack.ELEM)) throw new IllegalStateException();
 			if (name == null) throw new IllegalArgumentException("name = null");
@@ -757,7 +757,7 @@ public final class BEXEncoder {
 		 * @param value Wert oder {@code null}.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten weder ein Text- noch ein Attributknoten ist. */
-		public BEXFileEncoder useValue(final String value) throws IllegalStateException {
+		public BEXFileBuilder useValue(final String value) throws IllegalStateException {
 			final BEXStack node = this._stack_;
 			if ((node.type != BEXStack.ATTR) && (node.type != BEXStack.TEXT)) throw new IllegalStateException();
 			node.value = value;
@@ -808,7 +808,7 @@ public final class BEXEncoder {
 		 * @param value {@code true}, wenn die URI von Attributknoten erfasst werden.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
-		public BEXFileEncoder useAttrUriEnabled(final boolean value) throws IllegalStateException {
+		public BEXFileBuilder useAttrUriEnabled(final boolean value) throws IllegalStateException {
 			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
 			this._attrUriEnabled_ = value;
 			return this;
@@ -821,7 +821,7 @@ public final class BEXEncoder {
 		 * @param value {@code true}, wenn die Elternknoten von Attributknoten erfasst werden.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
-		public BEXFileEncoder useAttrParentEnabled(final boolean value) throws IllegalStateException {
+		public BEXFileBuilder useAttrParentEnabled(final boolean value) throws IllegalStateException {
 			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
 			this._attrParentEnabled_ = value;
 			if (!value) return this;
@@ -839,7 +839,7 @@ public final class BEXEncoder {
 		 * @param value {@code true}, wenn die URI von Elementknoten erfasst werden.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
-		public BEXFileEncoder useChldUriEnabled(final boolean value) throws IllegalStateException {
+		public BEXFileBuilder useChldUriEnabled(final boolean value) throws IllegalStateException {
 			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
 			this._chldUriEnabled_ = value;
 			return this;
@@ -852,7 +852,7 @@ public final class BEXEncoder {
 		 * @param value {@code true}, wenn die Elternknoten von Kindknoten erfasst werden.
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell Text-, Element- oder Attributknoten bestückt werden. */
-		public BEXFileEncoder useChldParentEnabled(final boolean value) throws IllegalStateException {
+		public BEXFileBuilder useChldParentEnabled(final boolean value) throws IllegalStateException {
 			if (this._stack_.type != BEXStack.VOID) throw new IllegalStateException();
 			this._chldParentEnabled_ = value;
 			if (value) return this;
@@ -885,34 +885,34 @@ public final class BEXEncoder {
 		 * @see #putNode(File)
 		 * @see #putNode(Node)
 		 * @see #putNode(InputSource, XMLReader) */
-		@Override
-		public byte[] encode(final ByteOrder order) throws NullPointerException, IllegalArgumentException {
-			if (order == null) throw new NullPointerException("order = null");
+
+		public byte[] toBytes(final ByteOrder order) {
+
 			final BEXStack stack = this._stack_;
 			if (stack.type != BEXStack.ROOT) throw new IllegalStateException();
 			this._updatePART_(this._attrTablePart_, +1);
 			this._updatePART_(this._chldTablePart_, -1);
 			final byte[] dataA = new byte[8];
 			ByteBuffer.wrap(dataA).order(order).putInt(0xBE10BA5E).putInt(stack.children.offset);
-			final IAMIndexBuilder encoder = new IAMIndexBuilder();
-			encoder.putListing(this._encodeTEXT_(this._attrUriText_));
-			encoder.putListing(this._encodeTEXT_(this._attrNameText_));
-			encoder.putListing(this._encodeTEXT_(this._attrValueText_));
-			encoder.putListing(this._encodeTEXT_(this._chldUriText_));
-			encoder.putListing(this._encodeTEXT_(this._chldNameText_));
-			encoder.putListing(this._encodeTEXT_(this._chldValueText_));
-			encoder.putListing(this._encodePROP_(this._attrTablePart_, 0));
-			encoder.putListing(this._encodePROP_(this._attrTablePart_, 1));
-			encoder.putListing(this._encodePROP_(this._attrTablePart_, 2));
-			encoder.putListing(this._encodePROP_(this._attrTablePart_, 4));
-			encoder.putListing(this._encodePROP_(this._chldTablePart_, 0));
-			encoder.putListing(this._encodePROP_(this._chldTablePart_, 1));
-			encoder.putListing(this._encodePROP_(this._chldTablePart_, 2));
-			encoder.putListing(this._encodePROP_(this._chldTablePart_, 3));
-			encoder.putListing(this._encodePROP_(this._chldTablePart_, 4));
-			encoder.putListing(this._encodePART_(this._attrTablePart_));
-			encoder.putListing(this._encodePART_(this._chldTablePart_));
-			final byte[] dataB = encoder.encode(order);
+			final IAMIndexBuilder builder = new IAMIndexBuilder();
+			builder.putListing(this._encodeTEXT_(this._attrUriText_));
+			builder.putListing(this._encodeTEXT_(this._attrNameText_));
+			builder.putListing(this._encodeTEXT_(this._attrValueText_));
+			builder.putListing(this._encodeTEXT_(this._chldUriText_));
+			builder.putListing(this._encodeTEXT_(this._chldNameText_));
+			builder.putListing(this._encodeTEXT_(this._chldValueText_));
+			builder.putListing(this._encodePROP_(this._attrTablePart_, 0));
+			builder.putListing(this._encodePROP_(this._attrTablePart_, 1));
+			builder.putListing(this._encodePROP_(this._attrTablePart_, 2));
+			builder.putListing(this._encodePROP_(this._attrTablePart_, 4));
+			builder.putListing(this._encodePROP_(this._chldTablePart_, 0));
+			builder.putListing(this._encodePROP_(this._chldTablePart_, 1));
+			builder.putListing(this._encodePROP_(this._chldTablePart_, 2));
+			builder.putListing(this._encodePROP_(this._chldTablePart_, 3));
+			builder.putListing(this._encodePROP_(this._chldTablePart_, 4));
+			builder.putListing(this._encodePART_(this._attrTablePart_));
+			builder.putListing(this._encodePART_(this._chldTablePart_));
+			final byte[] dataB = builder.toBytes(order);
 			final byte[] result = new byte[dataA.length + dataB.length];
 			System.arraycopy(dataA, 0, result, 0, dataA.length);
 			System.arraycopy(dataB, 0, result, dataA.length, dataB.length);
@@ -925,189 +925,6 @@ public final class BEXEncoder {
 			return Objects.toInvokeString(this, this._attrTablePart_.items.size(), this._chldTablePart_.items.size());
 		}
 
-	}
-
-	/** Diese Klasse implementiert die Optionen für {@link BEXEncoder#useOptions(BEXOption...)}.
-	 * 
-	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static enum BEXOption {
-
-		/** Diese Option kennzeichnet die Aktivierung der URI von Attributknoten.
-		 * 
-		 * @see BEXFileEncoder#useAttrUriEnabled(boolean) */
-		EnableAttrUri,
-
-		/** Diese Option kennzeichnet die Aktivierung der Elternknoten von Attributknoten.
-		 * 
-		 * @see BEXFileEncoder#useAttrParentEnabled(boolean) */
-		EnableAttrParent,
-
-		/** Diese Option kennzeichnet die Aktivierung der URI von Kindknoten.
-		 * 
-		 * @see BEXFileEncoder#useChldUriEnabled(boolean) */
-		EnableChldUri,
-
-		/** Diese Option kennzeichnet die Aktivierung der Elternknoten von Kindknoten.
-		 * 
-		 * @see BEXFileEncoder#useChldParentEnabled(boolean) */
-		EnableChldParent;
-
-	}
-
-	{}
-
-	/** Dieses Feld speichert die Bytereihenfolge. */
-	ByteOrder _order_;
-
-	/** Dieses Feld speichert die Eingabedaten. */
-	Object _source_;
-
-	/** Dieses Feld speichert die Ausgabedaten. */
-	Object _target_;
-
-	/** Dieses Feld speichert die Optionen. */
-	Set<BEXOption> _options_ = new HashSet<>();
-
-	{}
-
-	/** Diese Methode gibt die Bytereihenfolge zurück.
-	 * 
-	 * @see #useOrder(ByteOrder)
-	 * @return Bytereihenfolge. */
-	public final ByteOrder getOrder() {
-		return this._order_;
-	}
-
-	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.<br>
-	 * Wenn diese {@code null} ist, wird {@link ByteOrder#nativeOrder()} verwendet.
-	 * 
-	 * @see BEXFileEncoder#encode(ByteOrder)
-	 * @param order Bytereihenfolge.
-	 * @return {@code this}. */
-	public final BEXEncoder useOrder(final ByteOrder order) {
-		this._order_ = order;
-		return this;
-	}
-
-	/** Diese Methode gibt die Eingabedaten zurück.
-	 * 
-	 * @see #useSource(Object)
-	 * @return Eingabedaten. */
-	public final Object getSource() {
-		return this._source_;
-	}
-
-	/** Diese Methode setzt die Eingabedaten (XML-Dokument) und gibt {@code this} zurück.<br>
-	 * Wenn die Eingabedaten ein {@link Document} sind, wird dieses {@link BEXFileEncoder#putNode(Node) eingelesen}. Andernfalls werden die Eingabedaten in eine
-	 * {@link Reader} {@link IO#inputReaderFrom(Object) überführt}.
-	 * 
-	 * @see IO#inputReaderFrom(Object)
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXEncoder useSource(final Object source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode gibt die Ausgabedaten zurück.
-	 * 
-	 * @see #useTarget(Object)
-	 * @return Ausgabedaten. */
-	public final Object getTarget() {
-		return this._target_;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten (BEX-Dokument) und gibt {@code this} zurück.
-	 * 
-	 * @see IO#outputDataFrom(Object)
-	 * @param target Ausgabedaten.
-	 * @return {@code this}. */
-	public final BEXEncoder useTarget(final Object target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode gibt die Optionen zurück.
-	 * 
-	 * @see #useOptions(BEXOption...)
-	 * @return Optionen. */
-	public final Set<BEXOption> getOptions() {
-		return this._options_;
-	}
-
-	/** Diese Methode setzt die Optionen und gibt {@code this} zurück.
-	 * 
-	 * @see BEXFileEncoder#useAttrUriEnabled(boolean)
-	 * @see BEXFileEncoder#useAttrParentEnabled(boolean)
-	 * @see BEXFileEncoder#useChldUriEnabled(boolean)
-	 * @see BEXFileEncoder#useChldParentEnabled(boolean)
-	 * @param options Optionen.
-	 * @return {@code this}. */
-	public final BEXEncoder useOptions(final BEXOption... options) {
-		this._options_ = new HashSet<>();
-		if (options == null) return this;
-		this._options_.addAll(Arrays.asList(options));
-		return this;
-	}
-
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (XML-Dokument) in die {@link #getTarget() Ausgabedaten} (BEX-Dokument) und gibt {@code this}
-	 * zurück.
-	 * 
-	 * @see #encodeSource()
-	 * @see #encodeTarget(BEXFileEncoder)
-	 * @return {@code this}.
-	 * @throws IOException Wenn {@link #encodeSource()} bzw. {@link #encodeTarget(BEXFileEncoder)} eine entsprechende Ausnahme auslöst.
-	 * @throws SAXException Wenn {@link #encodeSource()} eine entsprechende Ausnahme auslöst.
-	 * @throws IllegalArgumentException Wenn {@link #encodeTarget(BEXFileEncoder)} eine entsprechende Ausnahme auslöst. */
-	public final BEXEncoder encode() throws IOException, SAXException, IllegalArgumentException {
-		return this.encodeTarget(this.encodeSource());
-	}
-
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} in einen {@link BEXFileEncoder} und gibt diesen zurück.
-	 * 
-	 * @return {@link IAMIndexBuilder}.
-	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
-	 * @throws SAXException Wenn {@link BEXFileEncoder#putNode(InputSource, XMLReader)} eine entsprechende Ausnahme auslöst. */
-
-	public final BEXFileEncoder encodeSource() throws IOException, SAXException {
-		final Object source = this._source_;
-		final Set<?> options = this._options_;
-		final BEXFileEncoder result = new BEXFileEncoder();
-		result.useAttrUriEnabled(options.contains(BEXOption.EnableAttrUri));
-		result.useAttrParentEnabled(options.contains(BEXOption.EnableAttrParent));
-		result.useChldUriEnabled(options.contains(BEXOption.EnableChldUri));
-		result.useChldParentEnabled(options.contains(BEXOption.EnableChldParent));
-		if (source instanceof Document) {
-			result.putNode((Document)source);
-		} else {
-			result.putNode(new InputSource(IO.inputReaderFrom(source)), XMLReaderFactory.createXMLReader());
-		}
-		return result;
-	}
-
-	/** Diese Methode überführt den gegebenen {@link BEXFileEncoder} in die {@link #getTarget() Ausgabedaten} und gibt {@code this} zurück.<br>
-	 * Hierbei wird die über {@link #useOrder(ByteOrder)} bestimmte Bytereihenfolge verwendet.
-	 * 
-	 * @see BEXFileEncoder#encode(ByteOrder)
-	 * @param source {@link BEXFileEncoder}.
-	 * @return {@code this}.
-	 * @throws IOException Wenn die Ausgabedaten nicht erzeigt oder geschrieben werden können.
-	 * @throws IllegalArgumentException Wenn {@link BEXFileEncoder#encode(ByteOrder)} eine entsprechende Ausnahme auslöst. */
-	public final BEXEncoder encodeTarget(final BEXFileEncoder source) throws IOException, IllegalArgumentException {
-		try (DataTarget target = IO.outputDataFrom(this._target_)) {
-			final ByteOrder order = this._order_;
-			final byte[] bytes = source.encode(order == null ? ByteOrder.nativeOrder() : order);
-			target.write(bytes);
-		}
-		return this;
-	}
-
-	{}
-
-	/** {@inheritDoc} */
-	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this._order_, this._source_, this._target_);
 	}
 
 }

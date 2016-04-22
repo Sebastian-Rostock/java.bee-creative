@@ -141,6 +141,159 @@ public class IAMBuilder {
 
 	}
 
+	/** Diese Klasse implementiert einen modifizierbaren {@link IAMIndex}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static final class IAMIndexBuilder extends IAMIndex {
+	
+		/** Dieses Feld speichert die {@link IAMMapping}. */
+		final List<IAMMapping> _mappings_ = new ArrayList<>();
+	
+		/** Dieses Feld speichert die {@link IAMListing}. */
+		final List<IAMListing> _listings_ = new ArrayList<>();
+	
+		/** Dieser Konstruktor initialisiert einen leeren {@link IAMIndexBuilder}. */
+		public IAMIndexBuilder() {
+		}
+	
+		{}
+	
+		/** Diese Methode fügt das gegebene {@link IAMMapping} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
+		 * 
+		 * @param mapping {@link IAMMapping}.
+		 * @return Index des {@link IAMMapping}.
+		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
+		public final int putMapping(final IAMMapping mapping) throws NullPointerException {
+			mapping.entryCount();
+			final int result = this._mappings_.size();
+			this._mappings_.add(result, mapping);
+			return result;
+		}
+	
+		/** Diese Methode fügt das gegebene {@link IAMListing} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
+		 * 
+		 * @param listing {@link IAMListingBuilder}.
+		 * @return Index des {@link IAMListing}.
+		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
+		public final int putListing(final IAMListing listing) throws NullPointerException {
+			listing.itemCount();
+			final int result = this._listings_.size();
+			this._listings_.add(result, listing);
+			return result;
+		}
+	
+		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
+		public final void clear() {
+			this._mappings_.clear();
+			this._listings_.clear();
+		}
+	
+		{}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final IAMMapping mapping(final int index) {
+			if ((index < 0) || (index >= this._mappings_.size())) return IAMMapping.EMPTY;
+			return this._mappings_.get(index);
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int mappingCount() {
+			return this._mappings_.size();
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final IAMListing listing(final int index) {
+			if ((index < 0) || (index >= this._listings_.size())) return IAMListing.EMPTY;
+			return this._listings_.get(index);
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int listingCount() {
+			return this._listings_.size();
+		}
+	
+	}
+
+	/** Diese Klasse implementiert ein modifizierbares {@link IAMListing}.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static final class IAMListingBuilder extends IAMListing {
+	
+		/** Dieses Feld speichert die bisher gesammelten Elemente. */
+		final UniqueItemPool _items_ = new UniqueItemPool();
+	
+		/** Dieser Konstruktor initialisiert einen leeren {@link IAMListingBuilder}. */
+		public IAMListingBuilder() {
+		}
+	
+		{}
+	
+		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück.<br>
+		 * Dieses Array sollte nur dann verändert werden, wenn es über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
+		 * 
+		 * @see #put(int[], boolean)
+		 * @see #itemCount()
+		 * @param itemIndex Index des Elements.
+		 * @return {@code int}-Array des {@code itemIndex}-ten Elements.
+		 * @throws IndexOutOfBoundsException Wenn eine der Eingaben ungültig ist. */
+		public final int[] get(final int itemIndex) throws IndexOutOfBoundsException {
+			return this._items_.datas.get(itemIndex).item;
+		}
+	
+		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn bereits ein Element mit dem gleichen
+		 * Daten existiert, wird dessen Index zurück gegeben.
+		 * <p>
+		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
+		 * 
+		 * @see #put(int[], boolean)
+		 * @param value Element.
+		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+		public final int put(final int[] value) throws NullPointerException {
+			return this._items_.put(value).index;
+		}
+	
+		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn die Wiederverwendung aktiviert ist
+		 * und bereits ein Element mit dem gleichen Daten existiert, wird dessen Index zurück gegeben.
+		 * <p>
+		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
+		 * 
+		 * @param value Element.
+		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert ist.
+		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
+		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+		public final int put(final int[] value, final boolean reuse) throws NullPointerException {
+			if (reuse) return this._items_.get(value).index;
+			return this._items_.put(value).index;
+		}
+	
+		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
+		public final void clear() {
+			this._items_.clear();
+		}
+	
+		{}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final IAMArray item(final int itemIndex) {
+			final List<ItemData> datas = this._items_.datas;
+			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAMArray.EMPTY;
+			return IAMArray.from(datas.get(itemIndex).item);
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int itemCount() {
+			return this._items_.datas.size();
+		}
+	
+	}
+
 	/** Diese Klasse implementiert ein modifizierbares {@link IAMMapping}.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -229,159 +382,6 @@ public class IAMBuilder {
 		public final int find(final IAMArray key) throws NullPointerException {
 			final EntryData result = this._entries_.entryMap().get(key.toArray());
 			return result == null ? -1 : result.index;
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein modifizierbares {@link IAMListing}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class IAMListingBuilder extends IAMListing {
-
-		/** Dieses Feld speichert die bisher gesammelten Elemente. */
-		final UniqueItemPool _items_ = new UniqueItemPool();
-
-		/** Dieser Konstruktor initialisiert einen leeren {@link IAMListingBuilder}. */
-		public IAMListingBuilder() {
-		}
-
-		{}
-
-		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück.<br>
-		 * Dieses Array sollte nur dann verändert werden, wenn es über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
-		 * 
-		 * @see #put(int[], boolean)
-		 * @see #itemCount()
-		 * @param itemIndex Index des Elements.
-		 * @return {@code int}-Array des {@code itemIndex}-ten Elements.
-		 * @throws IndexOutOfBoundsException Wenn eine der Eingaben ungültig ist. */
-		public final int[] get(final int itemIndex) throws IndexOutOfBoundsException {
-			return this._items_.datas.get(itemIndex).item;
-		}
-
-		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn bereits ein Element mit dem gleichen
-		 * Daten existiert, wird dessen Index zurück gegeben.
-		 * <p>
-		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
-		 * 
-		 * @see #put(int[], boolean)
-		 * @param value Element.
-		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-		public final int put(final int[] value) throws NullPointerException {
-			return this._items_.put(value).index;
-		}
-
-		/** Diese Methode fügt das gegebene Element hinzu und gibt den Index zurück, unter dem das Element verwaltet wird. Wenn die Wiederverwendung aktiviert ist
-		 * und bereits ein Element mit dem gleichen Daten existiert, wird dessen Index zurück gegeben.
-		 * <p>
-		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
-		 * 
-		 * @param value Element.
-		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert ist.
-		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-		public final int put(final int[] value, final boolean reuse) throws NullPointerException {
-			if (reuse) return this._items_.get(value).index;
-			return this._items_.put(value).index;
-		}
-
-		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
-		public final void clear() {
-			this._items_.clear();
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final IAMArray item(final int itemIndex) {
-			final List<ItemData> datas = this._items_.datas;
-			if ((itemIndex < 0) || (itemIndex >= datas.size())) return IAMArray.EMPTY;
-			return IAMArray.from(datas.get(itemIndex).item);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int itemCount() {
-			return this._items_.datas.size();
-		}
-
-	}
-
-	/** Diese Klasse implementiert einen modifizierbaren {@link IAMIndex}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class IAMIndexBuilder extends IAMIndex {
-
-		/** Dieses Feld speichert die {@link IAMMapping}. */
-		final List<IAMMapping> _mappings_ = new ArrayList<>();
-
-		/** Dieses Feld speichert die {@link IAMListing}. */
-		final List<IAMListing> _listings_ = new ArrayList<>();
-
-		/** Dieser Konstruktor initialisiert einen leeren {@link IAMIndexBuilder}. */
-		public IAMIndexBuilder() {
-		}
-
-		{}
-
-		/** Diese Methode fügt das gegebene {@link IAMMapping} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
-		 * 
-		 * @param mapping {@link IAMMapping}.
-		 * @return Index des {@link IAMMapping}.
-		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
-		public final int putMapping(final IAMMapping mapping) throws NullPointerException {
-			mapping.entryCount();
-			final int result = this._mappings_.size();
-			this._mappings_.add(result, mapping);
-			return result;
-		}
-
-		/** Diese Methode fügt das gegebene {@link IAMListing} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
-		 * 
-		 * @param listing {@link IAMListingBuilder}.
-		 * @return Index des {@link IAMListing}.
-		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
-		public final int putListing(final IAMListing listing) throws NullPointerException {
-			listing.itemCount();
-			final int result = this._listings_.size();
-			this._listings_.add(result, listing);
-			return result;
-		}
-
-		/** Diese Methode entfernt alle bisher zusammengestellten Daten. */
-		public final void clear() {
-			this._mappings_.clear();
-			this._listings_.clear();
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final IAMMapping mapping(final int index) {
-			if ((index < 0) || (index >= this._mappings_.size())) return IAMMapping.EMPTY;
-			return this._mappings_.get(index);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int mappingCount() {
-			return this._mappings_.size();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final IAMListing listing(final int index) {
-			if ((index < 0) || (index >= this._listings_.size())) return IAMListing.EMPTY;
-			return this._listings_.get(index);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int listingCount() {
-			return this._listings_.size();
 		}
 
 	}

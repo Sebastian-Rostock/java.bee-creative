@@ -1,8 +1,14 @@
 package bee.creative.iam;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import bee.creative.iam.IAMLoader.IAMListingLoader;
+import bee.creative.mmf.MMFArray;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine abstrakte geordnete Liste von Elementen, welche selbst Zahlenfolgen ({@link IAMArray}) sind.
@@ -14,11 +20,26 @@ import bee.creative.util.Objects;
 public abstract class IAMListing implements Iterable<IAMArray> {
 
 	@SuppressWarnings ("javadoc")
-	static final class ItemList extends AbstractList<IAMArray> {
+	static final class EmptyListing extends IAMListing {
+
+		@Override
+		public final IAMArray item(final int itemIndex) {
+			return IAMArray.EMPTY;
+		}
+
+		@Override
+		public final int itemCount() {
+			return 0;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class Items extends AbstractList<IAMArray> {
 
 		final IAMListing _owner_;
 
-		ItemList(final IAMListing owner) {
+		Items(final IAMListing owner) {
 			this._owner_ = owner;
 		}
 
@@ -37,25 +58,24 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	}
 
-	@SuppressWarnings ("javadoc")
-	static final class EmptyListing extends IAMListing {
-
-		@Override
-		public final IAMArray item(final int itemIndex) {
-			return IAMArray.EMPTY;
-		}
-
-		@Override
-		public final int itemCount() {
-			return 0;
-		}
-
-	}
-
 	{}
 
 	/** Dieses Feld speichert das leere {@link IAMListing}. */
 	public static final IAMListing EMPTY = new EmptyListing();
+
+	{}
+
+	/** Diese Methode ist eine Abkürzung für {@code new IAMListingLoader(MMFArray.from(object))}.
+	 * 
+	 * @see MMFArray#from(Object)
+	 * @see IAMListingLoader#IAMListingLoader(MMFArray)
+	 * @param object Objekt.
+	 * @return {@link IAMListingLoader}.
+	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
+	 * @throws IAMException Wenn {@link IAMListingLoader#IAMListingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
+	public static final IAMListingLoader from(Object object) throws IOException, IAMException {
+		return new IAMListingLoader(MMFArray.from(object));
+	}
 
 	{}
 
@@ -104,7 +124,41 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @see #itemCount()
 	 * @return Elemente. */
 	public final List<IAMArray> items() {
-		return new ItemList(this);
+		return new Items(this);
+	}
+
+	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
+	 * 
+	 * @return Binärdatenformat {@code IAM_LISTING}. */
+	public final byte[] toBytes() {
+		return this.toBytes(ByteOrder.nativeOrder());
+	}
+
+	/** Diese Methode kodiert dieses {@link IAMListing} in das binäre optimierte Datenformat {@code IAM_LISTING} und gibt dieses als Bytefolge zurück.
+	 * 
+	 * @param order Bytereihenfolge.
+	 * @return {@code IAM_LISTING}. */
+	public final byte[] toBytes(final ByteOrder order) {
+
+		final int itemCount = this.itemCount();
+		final int[][] itemArray = new int[itemCount][];
+		for (int i = 0; i < itemCount; i++) {
+			itemArray[i] = this.item(i).toArray();
+		}
+
+		final IAMIndex.DataStats itemData = new IAMIndex.DataStats(Arrays.asList(itemArray));
+		final IAMIndex.SizeStats itemSize = itemData.dataSize;
+
+		final int length = 8 + itemSize.bytes + itemData.bytes;
+		final byte[] result = new byte[length];
+
+		final ByteBuffer buffer = ByteBuffer.wrap(result).order(order);
+		buffer.putInt(0xF00D2000 | (itemData.type << 2) | (itemSize.type << 0));
+		buffer.putInt(itemCount);
+		itemSize.putSize(buffer);
+		itemData.putData(buffer);
+
+		return result;
 	}
 
 	{}

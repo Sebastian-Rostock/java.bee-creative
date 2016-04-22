@@ -5,8 +5,8 @@ import java.nio.ByteOrder;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
-import bee.creative.iam.IAMCodec.ArrayFormat;
-import bee.creative.iam.IAMCodec.FindMode;
+import bee.creative.iam.IAMCodec.IAMArrayFormat;
+import bee.creative.iam.IAMCodec.IAMFindMode;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIToken;
 import bee.creative.ini.INIWriter;
@@ -58,7 +58,7 @@ class IAMCodec_INI {
 		}
 	}
 
-	final FindMode _readPropertyAsMode_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	final IAMFindMode _readPropertyAsMode_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this._readProperty_(key);
 		try {
 			return IAMCodec.parseFindMode(token.value());
@@ -67,7 +67,7 @@ class IAMCodec_INI {
 		}
 	}
 
-	final ArrayFormat _readPropertyAsFormat_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	final IAMArrayFormat _readPropertyAsFormat_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this._readProperty_(key);
 		try {
 			return IAMCodec.parseArrayFormat(token.value());
@@ -82,12 +82,12 @@ class IAMCodec_INI {
 		IAMIndexBuilder indexBuilder = null;
 		IAMMappingBuilder mappingBuilder = null;
 		IAMMappingBuilder[] mappingBuilders = null;
-		FindMode mappingFindMode = null;
-		ArrayFormat mappingKeyFormat = null;
-		ArrayFormat mappingValueFormat = null;
+		IAMFindMode mappingFindMode = null;
+		IAMArrayFormat mappingKeyFormat = null;
+		IAMArrayFormat mappingValueFormat = null;
 		IAMListingBuilder listingBuilder = null;
 		IAMListingBuilder[] listingBuilders = null;
-		ArrayFormat listingItemFormat = null;
+		IAMArrayFormat listingItemFormat = null;
 		try (INIReader reader = INIReader.from(codec.getSourceData())) {
 			this._reader_ = reader;
 
@@ -202,10 +202,10 @@ class IAMCodec_INI {
 
 		this._writeSection_("IAM_LISTING");
 		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("itemFormat", IAMCodec.formatArrayFormat(ArrayFormat.ARRAY));
+		this._writeProperty_("itemFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
 
 		for (int i = 0; i < itemCount; i++) {
-			this._writeProperty_(Integer.toString(i), ArrayFormat.ARRAY.format(source.item(i).toArray()));
+			this._writeProperty_(Integer.toString(i), IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
 		}
 
 	}
@@ -216,12 +216,12 @@ class IAMCodec_INI {
 
 		this._writeSection_("IAM_MAPPING");
 		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("findMode", IAMCodec.formatFindMode(source.mode() ? FindMode.HASHED : FindMode.SORTED));
-		this._writeProperty_("keyFormat", IAMCodec.formatArrayFormat(ArrayFormat.ARRAY));
-		this._writeProperty_("valueFormat", IAMCodec.formatArrayFormat(ArrayFormat.ARRAY));
+		this._writeProperty_("findMode", IAMCodec.formatFindMode(source.mode() ? IAMFindMode.HASHED : IAMFindMode.SORTED));
+		this._writeProperty_("keyFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
+		this._writeProperty_("valueFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
 
 		for (int i = 0; i < entryCount; i++) {
-			this._writeProperty_(ArrayFormat.ARRAY.format(source.key(i).toArray()), ArrayFormat.ARRAY.format(source.value(i).toArray()));
+			this._writeProperty_(IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
 		}
 
 	}

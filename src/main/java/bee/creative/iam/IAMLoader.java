@@ -79,384 +79,6 @@ public class IAMLoader {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link IAMMapping}, die ihre Daten aus einem {@link MMFArray} dekodiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class IAMMappingLoader extends IAMMapping {
-
-		/** Dieses Feld speichert den leeren {@link IAMMappingLoader}. */
-		public static final IAMMappingLoader EMPTY = new IAMMappingLoader();
-
-		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP} Datenstruktur. */
-		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
-
-		{}
-
-		/** Dieses Feld speichert die Zahlen der Schlüssel. */
-		final MMFArray _keyData_;
-
-		/** Dieses Feld speichert die Startpositionen der Schlüssel. */
-		final MMFArray _keyOffset_;
-
-		/** Dieses Feld speichert die Länge der Schlüssel. */
-		final int _keyLength_;
-
-		/** Dieses Feld speichert die Zahlen der Werte. */
-		final MMFArray _valueData_;
-
-		/** Dieses Feld speichert die Startpositionen der Werte. */
-		final MMFArray _valueOffset_;
-
-		/** Dieses Feld speichert die Länge der Werte. */
-		final int _valueLength_;
-
-		/** Dieses Feld speichert die Bitmaske der Schlüsselbereiche. */
-		final int _rangeMask_;
-
-		/** Dieses Feld speichert die Startpositionen der Schlüsselbereiche. */
-		final MMFArray _rangeOffset_;
-
-		/** Dieses Feld speichert die Anzahl der Einträge. */
-		final int _entryCount_;
-
-		/** Dieser Konstruktor initialisiert die leere Abbildung. */
-		IAMMappingLoader() {
-			this._keyData_ = null;
-			this._keyOffset_ = null;
-			this._keyLength_ = 0;
-			this._valueData_ = null;
-			this._valueOffset_ = null;
-			this._valueLength_ = 0;
-			this._rangeMask_ = 0;
-			this._rangeOffset_ = null;
-			this._entryCount_ = 0;
-		}
-
-		/** Dieser Kontrukteur initialisiert diese {@link IAMMapping} als Sicht auf den gegebenen Speicherbereich.
-		 * 
-		 * @param array Speicherbereich mit {@code INT32} Zahlen.
-		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-		public IAMMappingLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
-			if (array.length() < 4) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			int offset = 0;
-			final int header = array.get(offset);
-			offset++;
-			if ((header & 0xFFFFFC00) != 0xF00D1000) throw new IAMException(IAMException.INVALID_HEADER);
-
-			final int keyDataType = (header >> 8) & 3;
-			final int keySizeType = (header >> 6) & 3;
-			final int rangeSizeType = (header >> 4) & 3;
-			final int valueDataType = (header >> 2) & 3;
-			final int valueSizeType = (header >> 0) & 3;
-			if ((keyDataType == 0) || (valueDataType == 0)) throw new IAMException(IAMException.INVALID_HEADER);
-
-			final int entryCount = array.get(offset);
-			offset++;
-			if ((entryCount < 0) || (entryCount > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
-
-			int rangeValue;
-			final int rangeMask;
-			final MMFArray rangeOffset;
-			if (rangeSizeType != 0) {
-
-				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				rangeMask = array.get(offset);
-				offset++;
-				if ((rangeMask < 1) || (rangeMask > 0x1FFFFFFF) || (((rangeMask + 1) & rangeMask) != 0)) throw new IAMException(IAMException.INVALID_VALUE);
-
-				rangeValue = IAMLoader._byteAlign_((rangeMask + 2) * IAMLoader._byteCount_(rangeSizeType));
-				rangeOffset = IAMLoader._sizeArray_(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
-				offset += rangeValue;
-				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				IAMLoader._checkArray_(rangeOffset);
-				rangeValue = rangeOffset.get(rangeMask + 1);
-				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
-
-			} else {
-
-				rangeMask = 0;
-				rangeOffset = null;
-
-			}
-
-			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			int keyValue;
-			final int keyLength;
-			final MMFArray keyOffset;
-			if (keySizeType != 0) {
-
-				keyValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(keySizeType));
-				keyLength = 0;
-				keyOffset = IAMLoader._sizeArray_(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
-				offset += keyValue;
-				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				IAMLoader._checkArray_(keyOffset);
-				keyValue = keyOffset.get(entryCount);
-
-			} else {
-
-				keyValue = array.get(offset);
-				offset++;
-				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				keyLength = keyValue;
-				keyValue = entryCount * keyValue;
-				keyOffset = null;
-
-			}
-			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
-
-			keyValue = IAMLoader._byteAlign_(keyValue * IAMLoader._byteCount_(keyDataType));
-			final MMFArray keyData = IAMLoader._dataArray_(array.section(offset, keyValue), keyDataType);
-			offset += keyValue;
-			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			int valueValue;
-			final int valueLength;
-			final MMFArray valueOffset;
-			if (valueSizeType != 0) {
-
-				valueValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(valueSizeType));
-				valueLength = 0;
-				valueOffset = IAMLoader._sizeArray_(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
-				offset += valueValue;
-				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				IAMLoader._checkArray_(valueOffset);
-				valueValue = valueOffset.get(entryCount);
-
-			} else {
-
-				valueValue = array.get(offset);
-				offset++;
-				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				valueLength = valueValue;
-				valueValue = entryCount * valueValue;
-				valueOffset = null;
-
-			}
-			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
-
-			valueValue = IAMLoader._byteAlign_(valueValue * IAMLoader._byteCount_(valueDataType));
-			final MMFArray valueData = IAMLoader._dataArray_(array.section(offset, valueValue), valueDataType);
-			offset += valueValue;
-			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			this._keyData_ = keyData;
-			this._keyOffset_ = keyOffset;
-			this._keyLength_ = keyLength;
-			this._valueData_ = valueData;
-			this._valueOffset_ = valueOffset;
-			this._valueLength_ = valueLength;
-			this._rangeMask_ = rangeMask;
-			this._rangeOffset_ = rangeOffset;
-			this._entryCount_ = entryCount;
-
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final boolean mode() {
-			return this._rangeMask_ != 0;
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final MMFArray key(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this._keyOffset_;
-			if (keyOffset != null) {
-				final int offset = keyOffset._get_(entryIndex);
-				final int length = keyOffset._get_(entryIndex + 1) - offset;
-				return this._keyData_.section(offset, length);
-			} else {
-				final int length = this._keyLength_;
-				final int offset = length * entryIndex;
-				return this._keyData_.section(offset, length);
-			}
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final MMFArray value(final int entryIndex) {
-			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
-			final IAMArray keyOffset = this._valueOffset_;
-			if (keyOffset != null) {
-				final int offset = keyOffset._get_(entryIndex);
-				final int length = keyOffset._get_(entryIndex + 1) - offset;
-				return this._valueData_.section(offset, length);
-			} else {
-				final int length = this._valueLength_;
-				final int offset = length * entryIndex;
-				return this._valueData_.section(offset, length);
-			}
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int entryCount() {
-			return this._entryCount_;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int find(final IAMArray key) throws NullPointerException {
-			if (key == null) throw new NullPointerException("key = null");
-			int i = this._rangeMask_;
-			if (i != 0) {
-				final IAMArray range = this._rangeOffset_;
-				i = key.hash() & i;
-				for (int l = range._get_(i), r = range._get_(i + 1); l < r; l++) {
-					if (this.key(l).equals(key)) return l;
-				}
-			} else {
-				int l = 0, r = this._entryCount_;
-				while (l < r) {
-					i = (l + r) >> 1;
-					i = key.compare(this.key(i));
-					if (i < 0) {
-						r = i;
-					} else if (i > 0) {
-						l = i + 1;
-					} else return i;
-				}
-			}
-			return -1;
-		}
-
-	}
-
-	/** Diese Klasse implementiert eine {@link IAMListing}, die ihre Daten aus einem {@link MMFArray} dekodiert.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class IAMListingLoader extends IAMListing {
-
-		/** Dieses Feld speichert den leeren {@link IAMListingLoader}. */
-		public static final IAMListingLoader EMPTY = new IAMListingLoader();
-
-		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST} Datenstruktur. */
-		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
-
-		{}
-
-		/** Dieses Feld speichert die Zahlen der Elemente. */
-		final MMFArray _itemData_;
-
-		/** Dieses Feld speichert die Startpositionen der Elemente. */
-		final MMFArray _itemOffset_;
-
-		/** Dieses Feld speichert die Länge der Elemente. */
-		final int _itemLength_;
-
-		/** Dieses Feld speichert die Anzahl der Elemente. */
-		final int _itemCount_;
-
-		/** Dieser Konstruktor initialisiert die leere Liste. */
-		IAMListingLoader() {
-			this._itemData_ = null;
-			this._itemOffset_ = null;
-			this._itemLength_ = 0;
-			this._itemCount_ = 0;
-		}
-
-		/** Dieser Kontrukteur initialisiert diese {@link IAMListing} als Sicht auf den gegebenen Speicherbereich.
-		 * 
-		 * @param array Speicherbereich mit {@code INT32} Zahlen.
-		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-		public IAMListingLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
-			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			int offset = 0;
-			final int header = array.get(offset);
-			offset++;
-			if ((header & 0xFFFFFFF0) != 0xF00D2000) throw new IAMException(IAMException.INVALID_HEADER);
-
-			final int itemDataType = (header >> 2) & 3;
-			final int itemSizeType = (header >> 0) & 3;
-			if (itemDataType == 0) throw new IAMException(IAMException.INVALID_HEADER);
-
-			final int itemCount = array.get(offset);
-			offset++;
-			if ((itemCount < 0) || (itemCount > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
-
-			int itemValue;
-			final int itemLength;
-			final MMFArray itemOffset;
-			if (itemSizeType != 0) {
-
-				itemValue = IAMLoader._byteAlign_((itemCount + 1) * IAMLoader._byteCount_(itemSizeType));
-				itemLength = 0;
-				itemOffset = IAMLoader._sizeArray_(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
-				offset += itemValue;
-				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-				IAMLoader._checkArray_(itemOffset);
-				itemValue = itemOffset.get(itemCount);
-
-			} else {
-
-				itemValue = array.get(offset);
-				offset++;
-				if ((itemValue < 0) || (itemValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
-
-				itemLength = itemValue;
-				itemValue = itemCount * itemValue;
-				itemOffset = null;
-
-			}
-
-			itemValue = IAMLoader._byteAlign_(itemValue * IAMLoader._byteCount_(itemDataType));
-			final MMFArray itemData = IAMLoader._dataArray_(array.section(offset, itemValue), itemDataType);
-			offset += itemValue;
-			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
-
-			this._itemData_ = itemData;
-			this._itemOffset_ = itemOffset;
-			this._itemLength_ = itemLength;
-			this._itemCount_ = itemCount;
-
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final MMFArray item(final int itemIndex) {
-			if ((itemIndex < 0) || (itemIndex >= this._itemCount_)) return MMFArray.EMPTY;
-			final IAMArray itemOffset = this._itemOffset_;
-			if (itemOffset != null) {
-				final int offset = itemOffset._get_(itemIndex);
-				final int length = itemOffset._get_(itemIndex + 1) - offset;
-				return this._itemData_.section(offset, length);
-			} else {
-				final int length = this._itemLength_;
-				final int offset = length * itemIndex;
-				return this._itemData_.section(offset, length);
-			}
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final int itemCount() {
-			return this._itemCount_;
-		}
-
-	}
-
 	/** Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -572,6 +194,384 @@ public class IAMLoader {
 
 	}
 
+	/** Diese Klasse implementiert eine {@link IAMListing}, die ihre Daten aus einem {@link MMFArray} dekodiert.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static final class IAMListingLoader extends IAMListing {
+	
+		/** Dieses Feld speichert den leeren {@link IAMListingLoader}. */
+		public static final IAMListingLoader EMPTY = new IAMListingLoader();
+	
+		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_LIST} Datenstruktur. */
+		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFF0, 0xF00D2000);
+	
+		{}
+	
+		/** Dieses Feld speichert die Zahlen der Elemente. */
+		final MMFArray _itemData_;
+	
+		/** Dieses Feld speichert die Startpositionen der Elemente. */
+		final MMFArray _itemOffset_;
+	
+		/** Dieses Feld speichert die Länge der Elemente. */
+		final int _itemLength_;
+	
+		/** Dieses Feld speichert die Anzahl der Elemente. */
+		final int _itemCount_;
+	
+		/** Dieser Konstruktor initialisiert die leere Liste. */
+		IAMListingLoader() {
+			this._itemData_ = null;
+			this._itemOffset_ = null;
+			this._itemLength_ = 0;
+			this._itemCount_ = 0;
+		}
+	
+		/** Dieser Kontrukteur initialisiert diese {@link IAMListing} als Sicht auf den gegebenen Speicherbereich.
+		 * 
+		 * @param array Speicherbereich mit {@code INT32} Zahlen.
+		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public IAMListingLoader(MMFArray array) throws IAMException, NullPointerException {
+			array = array.toINT32();
+			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			int offset = 0;
+			final int header = array.get(offset);
+			offset++;
+			if ((header & 0xFFFFFFF0) != 0xF00D2000) throw new IAMException(IAMException.INVALID_HEADER);
+	
+			final int itemDataType = (header >> 2) & 3;
+			final int itemSizeType = (header >> 0) & 3;
+			if (itemDataType == 0) throw new IAMException(IAMException.INVALID_HEADER);
+	
+			final int itemCount = array.get(offset);
+			offset++;
+			if ((itemCount < 0) || (itemCount > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+			int itemValue;
+			final int itemLength;
+			final MMFArray itemOffset;
+			if (itemSizeType != 0) {
+	
+				itemValue = IAMLoader._byteAlign_((itemCount + 1) * IAMLoader._byteCount_(itemSizeType));
+				itemLength = 0;
+				itemOffset = IAMLoader.sizeArray(array.section(offset, itemValue), itemSizeType).section(0, itemCount + 1);
+				offset += itemValue;
+				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				IAMLoader._checkArray_(itemOffset);
+				itemValue = itemOffset.get(itemCount);
+	
+			} else {
+	
+				itemValue = array.get(offset);
+				offset++;
+				if ((itemValue < 0) || (itemValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+				itemLength = itemValue;
+				itemValue = itemCount * itemValue;
+				itemOffset = null;
+	
+			}
+	
+			itemValue = IAMLoader._byteAlign_(itemValue * IAMLoader._byteCount_(itemDataType));
+			final MMFArray itemData = IAMLoader._dataArray_(array.section(offset, itemValue), itemDataType);
+			offset += itemValue;
+			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			this._itemData_ = itemData;
+			this._itemOffset_ = itemOffset;
+			this._itemLength_ = itemLength;
+			this._itemCount_ = itemCount;
+	
+		}
+	
+		{}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final MMFArray item(final int itemIndex) {
+			if ((itemIndex < 0) || (itemIndex >= this._itemCount_)) return MMFArray.EMPTY;
+			final IAMArray itemOffset = this._itemOffset_;
+			if (itemOffset != null) {
+				final int offset = itemOffset._get_(itemIndex);
+				final int length = itemOffset._get_(itemIndex + 1) - offset;
+				return this._itemData_.section(offset, length);
+			} else {
+				final int length = this._itemLength_;
+				final int offset = length * itemIndex;
+				return this._itemData_.section(offset, length);
+			}
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int itemCount() {
+			return this._itemCount_;
+		}
+	
+	}
+
+	/** Diese Klasse implementiert eine {@link IAMMapping}, die ihre Daten aus einem {@link MMFArray} dekodiert.
+	 * 
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static final class IAMMappingLoader extends IAMMapping {
+	
+		/** Dieses Feld speichert den leeren {@link IAMMappingLoader}. */
+		public static final IAMMappingLoader EMPTY = new IAMMappingLoader();
+	
+		/** Dieses Feld speichert den {@link IAMHeader} einer {@code IAM_MAP} Datenstruktur. */
+		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFC00, 0xF00D1000);
+	
+		{}
+	
+		/** Dieses Feld speichert die Zahlen der Schlüssel. */
+		final MMFArray _keyData_;
+	
+		/** Dieses Feld speichert die Startpositionen der Schlüssel. */
+		final MMFArray _keyOffset_;
+	
+		/** Dieses Feld speichert die Länge der Schlüssel. */
+		final int _keyLength_;
+	
+		/** Dieses Feld speichert die Zahlen der Werte. */
+		final MMFArray _valueData_;
+	
+		/** Dieses Feld speichert die Startpositionen der Werte. */
+		final MMFArray _valueOffset_;
+	
+		/** Dieses Feld speichert die Länge der Werte. */
+		final int _valueLength_;
+	
+		/** Dieses Feld speichert die Bitmaske der Schlüsselbereiche. */
+		final int _rangeMask_;
+	
+		/** Dieses Feld speichert die Startpositionen der Schlüsselbereiche. */
+		final MMFArray _rangeOffset_;
+	
+		/** Dieses Feld speichert die Anzahl der Einträge. */
+		final int _entryCount_;
+	
+		/** Dieser Konstruktor initialisiert die leere Abbildung. */
+		IAMMappingLoader() {
+			this._keyData_ = null;
+			this._keyOffset_ = null;
+			this._keyLength_ = 0;
+			this._valueData_ = null;
+			this._valueOffset_ = null;
+			this._valueLength_ = 0;
+			this._rangeMask_ = 0;
+			this._rangeOffset_ = null;
+			this._entryCount_ = 0;
+		}
+	
+		/** Dieser Kontrukteur initialisiert diese {@link IAMMapping} als Sicht auf den gegebenen Speicherbereich.
+		 * 
+		 * @param array Speicherbereich mit {@code INT32} Zahlen.
+		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
+		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+		public IAMMappingLoader(MMFArray array) throws IAMException, NullPointerException {
+			array = array.toINT32();
+			if (array.length() < 4) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			int offset = 0;
+			final int header = array.get(offset);
+			offset++;
+			if ((header & 0xFFFFFC00) != 0xF00D1000) throw new IAMException(IAMException.INVALID_HEADER);
+	
+			final int keyDataType = (header >> 8) & 3;
+			final int keySizeType = (header >> 6) & 3;
+			final int rangeSizeType = (header >> 4) & 3;
+			final int valueDataType = (header >> 2) & 3;
+			final int valueSizeType = (header >> 0) & 3;
+			if ((keyDataType == 0) || (valueDataType == 0)) throw new IAMException(IAMException.INVALID_HEADER);
+	
+			final int entryCount = array.get(offset);
+			offset++;
+			if ((entryCount < 0) || (entryCount > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+			int rangeValue;
+			final int rangeMask;
+			final MMFArray rangeOffset;
+			if (rangeSizeType != 0) {
+	
+				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				rangeMask = array.get(offset);
+				offset++;
+				if ((rangeMask < 1) || (rangeMask > 0x1FFFFFFF) || (((rangeMask + 1) & rangeMask) != 0)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+				rangeValue = IAMLoader._byteAlign_((rangeMask + 2) * IAMLoader._byteCount_(rangeSizeType));
+				rangeOffset = IAMLoader.sizeArray(array.section(offset, rangeValue), rangeSizeType).section(0, rangeMask + 2);
+				offset += rangeValue;
+				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				IAMLoader._checkArray_(rangeOffset);
+				rangeValue = rangeOffset.get(rangeMask + 1);
+				if (rangeValue != entryCount) throw new IAMException(IAMException.INVALID_OFFSET);
+	
+			} else {
+	
+				rangeMask = 0;
+				rangeOffset = null;
+	
+			}
+	
+			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			int keyValue;
+			final int keyLength;
+			final MMFArray keyOffset;
+			if (keySizeType != 0) {
+	
+				keyValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(keySizeType));
+				keyLength = 0;
+				keyOffset = IAMLoader.sizeArray(array.section(offset, keyValue), keySizeType).section(0, entryCount + 1);
+				offset += keyValue;
+				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				IAMLoader._checkArray_(keyOffset);
+				keyValue = keyOffset.get(entryCount);
+	
+			} else {
+	
+				keyValue = array.get(offset);
+				offset++;
+				if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				keyLength = keyValue;
+				keyValue = entryCount * keyValue;
+				keyOffset = null;
+	
+			}
+			if ((keyValue < 0) || (keyValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+			keyValue = IAMLoader._byteAlign_(keyValue * IAMLoader._byteCount_(keyDataType));
+			final MMFArray keyData = IAMLoader._dataArray_(array.section(offset, keyValue), keyDataType);
+			offset += keyValue;
+			if (array.length() <= offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			int valueValue;
+			final int valueLength;
+			final MMFArray valueOffset;
+			if (valueSizeType != 0) {
+	
+				valueValue = IAMLoader._byteAlign_((entryCount + 1) * IAMLoader._byteCount_(valueSizeType));
+				valueLength = 0;
+				valueOffset = IAMLoader.sizeArray(array.section(offset, valueValue), valueSizeType).section(0, entryCount + 1);
+				offset += valueValue;
+				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				IAMLoader._checkArray_(valueOffset);
+				valueValue = valueOffset.get(entryCount);
+	
+			} else {
+	
+				valueValue = array.get(offset);
+				offset++;
+				if (array.length() < offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+				valueLength = valueValue;
+				valueValue = entryCount * valueValue;
+				valueOffset = null;
+	
+			}
+			if ((valueValue < 0) || (valueValue > 0x3FFFFFFF)) throw new IAMException(IAMException.INVALID_VALUE);
+	
+			valueValue = IAMLoader._byteAlign_(valueValue * IAMLoader._byteCount_(valueDataType));
+			final MMFArray valueData = IAMLoader._dataArray_(array.section(offset, valueValue), valueDataType);
+			offset += valueValue;
+			if (array.length() != offset) throw new IAMException(IAMException.INVALID_LENGTH);
+	
+			this._keyData_ = keyData;
+			this._keyOffset_ = keyOffset;
+			this._keyLength_ = keyLength;
+			this._valueData_ = valueData;
+			this._valueOffset_ = valueOffset;
+			this._valueLength_ = valueLength;
+			this._rangeMask_ = rangeMask;
+			this._rangeOffset_ = rangeOffset;
+			this._entryCount_ = entryCount;
+	
+		}
+	
+		{}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final boolean mode() {
+			return this._rangeMask_ != 0;
+		}
+	
+		{}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final MMFArray key(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this._keyOffset_;
+			if (keyOffset != null) {
+				final int offset = keyOffset._get_(entryIndex);
+				final int length = keyOffset._get_(entryIndex + 1) - offset;
+				return this._keyData_.section(offset, length);
+			} else {
+				final int length = this._keyLength_;
+				final int offset = length * entryIndex;
+				return this._keyData_.section(offset, length);
+			}
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final MMFArray value(final int entryIndex) {
+			if ((entryIndex < 0) || (entryIndex >= this._entryCount_)) return MMFArray.EMPTY;
+			final IAMArray keyOffset = this._valueOffset_;
+			if (keyOffset != null) {
+				final int offset = keyOffset._get_(entryIndex);
+				final int length = keyOffset._get_(entryIndex + 1) - offset;
+				return this._valueData_.section(offset, length);
+			} else {
+				final int length = this._valueLength_;
+				final int offset = length * entryIndex;
+				return this._valueData_.section(offset, length);
+			}
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int entryCount() {
+			return this._entryCount_;
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final int find(final IAMArray key) throws NullPointerException {
+			if (key == null) throw new NullPointerException("key = null");
+			int i = this._rangeMask_;
+			if (i != 0) {
+				final IAMArray range = this._rangeOffset_;
+				i = key.hash() & i;
+				for (int l = range._get_(i), r = range._get_(i + 1); l < r; l++) {
+					if (this.key(l).equals(key)) return l;
+				}
+			} else {
+				int l = 0, r = this._entryCount_;
+				while (l < r) {
+					i = (l + r) >> 1;
+					i = key.compare(this.key(i));
+					if (i < 0) {
+						r = i;
+					} else if (i > 0) {
+						l = i + 1;
+					} else return i;
+				}
+			}
+			return -1;
+		}
+	
+	}
+
 	{}
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
@@ -583,7 +583,7 @@ public class IAMLoader {
 	 * @param sizeType Größentyp ({@code 1..3}).
 	 * @return Folge von {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen.
 	 * @throws IllegalArgumentException Wenn der gegebene Größentyp ungültig ist. */
-	static final MMFArray _sizeArray_(final MMFArray array, final int sizeType) throws IllegalArgumentException {
+	public static final MMFArray sizeArray(final MMFArray array, final int sizeType) throws IllegalArgumentException {
 		switch (sizeType) {
 			case 1:
 				return array.toUINT8();

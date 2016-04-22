@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import javax.xml.transform.TransformerException;
-import bee.creative.bex.BEX.BEXBaseFile;
-import bee.creative.bex.BEX.BEXBaseList;
-import bee.creative.bex.BEX.BEXBaseNode;
 import bee.creative.iam.IAMArray;
+import bee.creative.iam.IAMException;
 import bee.creative.iam.IAMLoader.IAMHeader;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.iam.IAMLoader.IAMListingLoader;
-import bee.creative.iam.IAMException;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Filters;
@@ -25,7 +22,7 @@ import bee.creative.xml.XMLFormatter;
  * {@link #useSource(Object) BEX-Dokuments} in ein {@link #getTarget() XML-Dokument} eingesetzt werden.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class BEXDecoder {
+public final class BEXLoader {
 
 	/** Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListingLoader}
 	 * ermittelt werden.
@@ -118,10 +115,10 @@ public final class BEXDecoder {
 	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link MMFArray} dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXFileDecoder extends BEXBaseFile {
+	public static final class BEXFileLoader extends BEXFile {
 
-		/** Dieses Feld speichert den leeren {@link BEXFileDecoder}. */
-		public static final BEXFileDecoder EMPTY = new BEXFileDecoder();
+		/** Dieses Feld speichert den leeren {@link BEXFileLoader}. */
+		public static final BEXFileLoader EMPTY = new BEXFileLoader();
 
 		/** Dieses Feld speichert den {@link IAMHeader} einer {@code BEX_FILE} Datenstruktur. */
 		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFFF, 0xBE10BA5E);
@@ -182,8 +179,8 @@ public final class BEXDecoder {
 		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
 		final MMFArray _attrListRange_;
 
-		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileDecoder}. */
-		BEXFileDecoder() {
+		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
+		BEXFileLoader() {
 			this._rootRef_ = -1;
 			this._attrUriText_ = BEXTextCache.EMPTY;
 			this._attrNameText_ = BEXTextCache.EMPTY;
@@ -209,7 +206,7 @@ public final class BEXDecoder {
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-		public BEXFileDecoder(MMFArray array) throws IAMException, NullPointerException {
+		public BEXFileLoader(MMFArray array) throws IAMException, NullPointerException {
 			array = array.toINT32();
 			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
 
@@ -308,42 +305,42 @@ public final class BEXDecoder {
 		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der URI der Attributknoten. */
-		public BEXTextCache attrUriCache() {
+		public final BEXTextCache attrUriCache() {
 			return this._attrUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der Namen der Attributknoten. */
-		public BEXTextCache attrNameCache() {
+		public final BEXTextCache attrNameCache() {
 			return this._attrNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der Werte der Attributknoten. */
-		public BEXTextCache attrValueCache() {
+		public final BEXTextCache attrValueCache() {
 			return this._attrValueText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
 		 * 
 		 * @return Verwaltung der URI der Elementknoten. */
-		public BEXTextCache chldUriCache() {
+		public final BEXTextCache chldUriCache() {
 			return this._chldUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
 		 * 
 		 * @return Verwaltung der Namen der Elementknoten. */
-		public BEXTextCache chldNameCache() {
+		public final BEXTextCache chldNameCache() {
 			return this._chldNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
 		 * 
 		 * @return Verwaltung der Werte der Textknoten. */
-		public BEXTextCache chldValueCache() {
+		public final BEXTextCache chldValueCache() {
 			return this._chldValueText_;
 		}
 
@@ -351,51 +348,51 @@ public final class BEXDecoder {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXNode root() {
-			if (this._rootRef_ < 0) return new BEXNodeDecoder(this);
-			return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, this._rootRef_), this);
+		public final BEXNode root() {
+			if (this._rootRef_ < 0) return new BEXNodeLoader(this);
+			return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, this._rootRef_), this);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXList list(final int key) {
-			switch (BEXDecoder._typeOf_(key)) {
+		public final BEXList list(final int key) {
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_LIST:
-					return this.node(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, BEXDecoder._refOf_(key))).attributes();
+					return this.node(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, BEXLoader._refOf_(key))).attributes();
 				case BEX_CHLD_LIST:
 				case BEX_CHTX_LIST:
-					return this.node(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, BEXDecoder._refOf_(key))).children();
+					return this.node(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, BEXLoader._refOf_(key))).children();
 			}
-			return new BEXListDecoder(this);
+			return new BEXListLoader(this);
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXNode node(final int key) {
-			switch (BEXDecoder._typeOf_(key)) {
+		public final BEXNode node(final int key) {
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
-					if (ref >= this._attrNameRef_.length()) return new BEXNodeDecoder(this);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ATTR_NODE, ref), this);
+					final int ref = BEXLoader._refOf_(key);
+					if (ref >= this._attrNameRef_.length()) return new BEXNodeLoader(this);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ATTR_NODE, ref), this);
 				}
 				case BEX_ELEM_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
-					if (this._chldNameRef_.get(ref) == 0) return new BEXNodeDecoder(this);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, ref), this);
+					final int ref = BEXLoader._refOf_(key);
+					if (this._chldNameRef_.get(ref) == 0) return new BEXNodeLoader(this);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, ref), this);
 				}
 				case BEX_TEXT_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					final IAMArray names = this._chldNameRef_;
-					if ((ref >= names.length()) || (names.get(ref) != 0)) return new BEXNodeDecoder(this);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_TEXT_NODE, ref), this);
+					if ((ref >= names.length()) || (names.get(ref) != 0)) return new BEXNodeLoader(this);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_TEXT_NODE, ref), this);
 				}
 				case BEX_ELTX_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
-					if ((this._chldNameRef_.get(ref) == 0) || (this._chldContentRef_.get(ref) < 0)) return new BEXNodeDecoder(this);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELTX_NODE, ref), this);
+					final int ref = BEXLoader._refOf_(key);
+					if ((this._chldNameRef_.get(ref) == 0) || (this._chldContentRef_.get(ref) < 0)) return new BEXNodeLoader(this);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELTX_NODE, ref), this);
 				}
 			}
-			return new BEXNodeDecoder(this);
+			return new BEXNodeLoader(this);
 		}
 
 	}
@@ -403,10 +400,10 @@ public final class BEXDecoder {
 	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXListDecoder extends BEXBaseList {
+	public static final class BEXListLoader extends BEXList {
 
-		/** Dieses Feld speichert den leeren {@link BEXListDecoder}. */
-		public static final BEXListDecoder EMPTY = new BEXListDecoder(BEXFileDecoder.EMPTY);
+		/** Dieses Feld speichert den leeren {@link BEXListLoader}. */
+		public static final BEXListLoader EMPTY = new BEXListLoader(BEXFileLoader.EMPTY);
 
 		{}
 
@@ -415,18 +412,18 @@ public final class BEXDecoder {
 
 		/** Dieses Feld speichert die Referenz.
 		 * 
-		 * @see BEXFileDecoder#_attrListRange_
-		 * @see BEXFileDecoder#_chldListRange_ */
+		 * @see BEXFileLoader#_attrListRange_
+		 * @see BEXFileLoader#_chldListRange_ */
 		final int _ref_;
 
 		/** Dieses Feld speichert den Besitzer. */
-		final BEXFileDecoder _owner_;
+		final BEXFileLoader _owner_;
 
 		/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
 		 * 
 		 * @param owner Besitzer. */
-		BEXListDecoder(final BEXFileDecoder owner) {
-			this(BEXDecoder._keyOf_(BEXDecoder.BEX_VOID_TYPE, 0), 0, owner);
+		BEXListLoader(final BEXFileLoader owner) {
+			this(BEXLoader._keyOf_(BEXLoader.BEX_VOID_TYPE, 0), 0, owner);
 		}
 
 		/** Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
@@ -434,7 +431,7 @@ public final class BEXDecoder {
 		 * @param key Schlüssel mit dem Index des Elternknoten.
 		 * @param ref Referenz auf die Knotenliste.
 		 * @param owner Besitzer. */
-		BEXListDecoder(final int key, final int ref, final BEXFileDecoder owner) {
+		BEXListLoader(final int key, final int ref, final BEXFileLoader owner) {
 			this._key_ = key;
 			this._ref_ = ref;
 			this._owner_ = owner;
@@ -451,7 +448,7 @@ public final class BEXDecoder {
 		/** {@inheritDoc} */
 		@Override
 		public int type() {
-			switch (BEXDecoder._typeOf_(this._key_)) {
+			switch (BEXLoader._typeOf_(this._key_)) {
 				case BEX_VOID_TYPE:
 					return BEXList.VOID_LIST;
 				case BEX_ATTR_LIST:
@@ -473,30 +470,30 @@ public final class BEXDecoder {
 		@Override
 		public BEXNode get(final int index) {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
-					return new BEXNodeDecoder(owner);
+					return new BEXNodeLoader(owner);
 				case BEX_ATTR_LIST: {
-					if (index < 0) return new BEXNodeDecoder(owner);
+					if (index < 0) return new BEXNodeLoader(owner);
 					final IAMArray array = owner._attrListRange_;
 					final int ref = this._ref_;
 					final int result = array.get(ref) + index;
-					if (result >= array.get(ref + 1)) return new BEXNodeDecoder(owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ATTR_NODE, result), owner);
+					if (result >= array.get(ref + 1)) return new BEXNodeLoader(owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ATTR_NODE, result), owner);
 				}
 				case BEX_CHLD_LIST: {
-					if (index < 0) return new BEXNodeDecoder(owner);
+					if (index < 0) return new BEXNodeLoader(owner);
 					final IAMArray array = this._owner_._chldListRange_;
 					final int ref = this._ref_;
 					final int result = array.get(ref) + index;
-					if (result >= array.get(ref + 1)) return new BEXNodeDecoder(owner);
-					if (owner._chldNameRef_.get(result) == 0) return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_TEXT_NODE, result), owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, result), owner);
+					if (result >= array.get(ref + 1)) return new BEXNodeLoader(owner);
+					if (owner._chldNameRef_.get(result) == 0) return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_TEXT_NODE, result), owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, result), owner);
 				}
 				case BEX_CHTX_LIST: {
-					if (index != 0) return new BEXNodeDecoder(owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELTX_NODE, BEXDecoder._refOf_(key)), owner);
+					if (index != 0) return new BEXNodeLoader(owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELTX_NODE, BEXLoader._refOf_(key)), owner);
 				}
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
@@ -506,8 +503,8 @@ public final class BEXDecoder {
 		@Override
 		public int find(final String uri, final String name, final int start) throws NullPointerException {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_LIST: {
 					if (start < 0) return -1;
 					final boolean useUri = uri.length() != 0, useName = name.length() != 0;
@@ -569,7 +566,7 @@ public final class BEXDecoder {
 		@Override
 		public int length() {
 			final int key = this._key_;
-			switch (BEXDecoder._typeOf_(key)) {
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
 					return 0;
 				case BEX_ATTR_LIST: {
@@ -592,14 +589,14 @@ public final class BEXDecoder {
 		@Override
 		public BEXNode parent() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
-					return new BEXNodeDecoder(owner);
+					return new BEXNodeLoader(owner);
 				case BEX_ATTR_LIST:
 				case BEX_CHLD_LIST:
 				case BEX_CHTX_LIST:
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, BEXDecoder._refOf_(key)), owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, BEXLoader._refOf_(key)), owner);
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
@@ -609,10 +606,10 @@ public final class BEXDecoder {
 	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXNodeDecoder extends BEXBaseNode {
+	public static final class BEXNodeLoader extends BEXNode {
 
-		/** Dieses Feld speichert den leeren {@link BEXNodeDecoder}. */
-		public static final BEXNodeDecoder EMPTY = new BEXNodeDecoder(BEXFileDecoder.EMPTY);
+		/** Dieses Feld speichert den leeren {@link BEXNodeLoader}. */
+		public static final BEXNodeLoader EMPTY = new BEXNodeLoader(BEXFileLoader.EMPTY);
 
 		{}
 
@@ -620,20 +617,20 @@ public final class BEXDecoder {
 		final int _key_;
 
 		/** Dieses Feld speichert den Besitzer. */
-		final BEXFileDecoder _owner_;
+		final BEXFileLoader _owner_;
 
 		/** Dieser Konstruktor initialisiert den undefinierten Knoten.
 		 * 
 		 * @param owner Besitzer. */
-		BEXNodeDecoder(final BEXFileDecoder owner) {
-			this(BEXDecoder._keyOf_(BEXDecoder.BEX_VOID_TYPE, 0), owner);
+		BEXNodeLoader(final BEXFileLoader owner) {
+			this(BEXLoader._keyOf_(BEXLoader.BEX_VOID_TYPE, 0), owner);
 		}
 
 		/** Dieser Konstruktor initialisiert Schlüssel und Besitzer.
 		 * 
 		 * @param key Schlüssel.
 		 * @param owner Besitzer. */
-		BEXNodeDecoder(final int key, final BEXFileDecoder owner) {
+		BEXNodeLoader(final int key, final BEXFileLoader owner) {
 			this._key_ = key;
 			this._owner_ = owner;
 		}
@@ -649,7 +646,7 @@ public final class BEXDecoder {
 		/** {@inheritDoc} */
 		@Override
 		public int type() {
-			switch (BEXDecoder._typeOf_(this._key_)) {
+			switch (BEXLoader._typeOf_(this._key_)) {
 				case BEX_VOID_TYPE:
 					return BEXNode.VOID_NODE;
 				case BEX_ATTR_NODE:
@@ -673,12 +670,12 @@ public final class BEXDecoder {
 		@Override
 		public String uri() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_NODE:
-					return owner._attrUriText_.get(owner._attrUriRef_.get(BEXDecoder._refOf_(key)));
+					return owner._attrUriText_.get(owner._attrUriRef_.get(BEXLoader._refOf_(key)));
 				case BEX_ELEM_NODE:
-					return owner._chldUriText_.get(owner._chldUriRef_.get(BEXDecoder._refOf_(key)));
+					return owner._chldUriText_.get(owner._chldUriRef_.get(BEXLoader._refOf_(key)));
 				case BEX_VOID_TYPE:
 				case BEX_TEXT_NODE:
 				case BEX_ELTX_NODE:
@@ -691,12 +688,12 @@ public final class BEXDecoder {
 		@Override
 		public String name() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_NODE:
-					return owner._attrNameText_.get(owner._attrNameRef_.get(BEXDecoder._refOf_(key)));
+					return owner._attrNameText_.get(owner._attrNameRef_.get(BEXLoader._refOf_(key)));
 				case BEX_ELEM_NODE:
-					return owner._chldNameText_.get(owner._chldNameRef_.get(BEXDecoder._refOf_(key)));
+					return owner._chldNameText_.get(owner._chldNameRef_.get(BEXLoader._refOf_(key)));
 				case BEX_VOID_TYPE:
 				case BEX_TEXT_NODE:
 				case BEX_ELTX_NODE:
@@ -709,21 +706,21 @@ public final class BEXDecoder {
 		@Override
 		public String value() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
 					return "";
 				case BEX_ATTR_NODE:
-					return owner._attrValueText_.get(owner._attrValueRef_.get(BEXDecoder._refOf_(key)));
+					return owner._attrValueText_.get(owner._attrValueRef_.get(BEXLoader._refOf_(key)));
 				case BEX_ELEM_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					final int contentRef = owner._chldContentRef_.get(ref);
 					if (contentRef >= 0) return owner._chldValueText_.get(contentRef);
-					return new BEXListDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_CHLD_LIST, ref), -contentRef, this._owner_).get(0).value();
+					return new BEXListLoader(BEXLoader._keyOf_(BEXLoader.BEX_CHLD_LIST, ref), -contentRef, this._owner_).get(0).value();
 				}
 				case BEX_TEXT_NODE:
 				case BEX_ELTX_NODE:
-					return owner._chldValueText_.get(owner._chldContentRef_.get(BEXDecoder._refOf_(key)));
+					return owner._chldValueText_.get(owner._chldContentRef_.get(BEXLoader._refOf_(key)));
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
@@ -732,20 +729,20 @@ public final class BEXDecoder {
 		@Override
 		public int index() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
 					return -1;
 				case BEX_ATTR_NODE: {
 					final MMFArray array = owner._attrParentRef_;
 					if (array.length() == 0) return -1;
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					return ref - owner._attrListRange_.get(owner._chldAttributesRef_.get(array.get(ref)));
 				}
 				case BEX_ELEM_NODE: {
 					final MMFArray array = owner._chldParentRef_;
 					if (array.length() == 0) return -1;
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					final int parentRef = array.get(ref);
 					if (ref == parentRef) return -1;
 					return ref - owner._chldListRange_.get(-owner._chldContentRef_.get(parentRef));
@@ -753,7 +750,7 @@ public final class BEXDecoder {
 				case BEX_TEXT_NODE: {
 					final MMFArray array = owner._chldParentRef_;
 					if (array.length() == 0) return -1;
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					return ref - owner._chldListRange_.get(-owner._chldContentRef_.get(array.get(ref)));
 				}
 				case BEX_ELTX_NODE:
@@ -766,30 +763,30 @@ public final class BEXDecoder {
 		@Override
 		public BEXNode parent() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
-					return new BEXNodeDecoder(owner);
+					return new BEXNodeLoader(owner);
 				case BEX_ATTR_NODE: {
 					final MMFArray array = owner._attrParentRef_;
-					if (array.length() == 0) return new BEXNodeDecoder(owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, array.get(BEXDecoder._refOf_(key))), owner);
+					if (array.length() == 0) return new BEXNodeLoader(owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader._refOf_(key))), owner);
 				}
 				case BEX_ELEM_NODE: {
 					final MMFArray array = owner._chldParentRef_;
-					if (array.length() == 0) return new BEXNodeDecoder(owner);
-					final int ref = BEXDecoder._refOf_(key);
+					if (array.length() == 0) return new BEXNodeLoader(owner);
+					final int ref = BEXLoader._refOf_(key);
 					final int parentRef = array.get(ref);
-					if (ref == parentRef) return new BEXNodeDecoder(owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, parentRef), owner);
+					if (ref == parentRef) return new BEXNodeLoader(owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, parentRef), owner);
 				}
 				case BEX_TEXT_NODE: {
 					final MMFArray array = owner._chldParentRef_;
-					if (array.length() == 0) return new BEXNodeDecoder(owner);
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, array.get(BEXDecoder._refOf_(key))), owner);
+					if (array.length() == 0) return new BEXNodeLoader(owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader._refOf_(key))), owner);
 				}
 				case BEX_ELTX_NODE:
-					return new BEXNodeDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ELEM_NODE, BEXDecoder._refOf_(key)), owner);
+					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, BEXLoader._refOf_(key)), owner);
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
@@ -798,19 +795,19 @@ public final class BEXDecoder {
 		@Override
 		public BEXList children() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ELEM_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
+					final int ref = BEXLoader._refOf_(key);
 					final int contentRef = owner._chldContentRef_.get(ref);
-					if (contentRef >= 0) return new BEXListDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_CHTX_LIST, ref), 0, owner);
-					return new BEXListDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_CHLD_LIST, ref), -contentRef, owner);
+					if (contentRef >= 0) return new BEXListLoader(BEXLoader._keyOf_(BEXLoader.BEX_CHTX_LIST, ref), 0, owner);
+					return new BEXListLoader(BEXLoader._keyOf_(BEXLoader.BEX_CHLD_LIST, ref), -contentRef, owner);
 				}
 				case BEX_VOID_TYPE:
 				case BEX_ATTR_NODE:
 				case BEX_TEXT_NODE:
 				case BEX_ELTX_NODE:
-					return new BEXListDecoder(owner);
+					return new BEXListLoader(owner);
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
@@ -819,17 +816,17 @@ public final class BEXDecoder {
 		@Override
 		public BEXList attributes() {
 			final int key = this._key_;
-			final BEXFileDecoder owner = this._owner_;
-			switch (BEXDecoder._typeOf_(key)) {
+			final BEXFileLoader owner = this._owner_;
+			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ELEM_NODE: {
-					final int ref = BEXDecoder._refOf_(key);
-					return new BEXListDecoder(BEXDecoder._keyOf_(BEXDecoder.BEX_ATTR_LIST, ref), owner._chldAttributesRef_.get(ref), owner);
+					final int ref = BEXLoader._refOf_(key);
+					return new BEXListLoader(BEXLoader._keyOf_(BEXLoader.BEX_ATTR_LIST, ref), owner._chldAttributesRef_.get(ref), owner);
 				}
 				case BEX_VOID_TYPE:
 				case BEX_ATTR_NODE:
 				case BEX_TEXT_NODE:
 				case BEX_ELTX_NODE:
-					return new BEXListDecoder(owner);
+					return new BEXListLoader(owner);
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
@@ -916,7 +913,7 @@ public final class BEXDecoder {
 	 * @see MMFArray#from(Object)
 	 * @param source Eingabedaten.
 	 * @return {@code this}. */
-	public final BEXDecoder useSource(final Object source) {
+	public final BEXLoader useSource(final Object source) {
 		this._source_ = source;
 		return this;
 	}
@@ -935,7 +932,7 @@ public final class BEXDecoder {
 	 * @see IO#outputWriterFrom(Object)
 	 * @param target Ausgabedaten.
 	 * @return {@code this}. */
-	public final BEXDecoder useTarget(final Object target) {
+	public final BEXLoader useTarget(final Object target) {
 		this._target_ = target;
 		return this;
 	}
@@ -947,18 +944,18 @@ public final class BEXDecoder {
 	 * @throws IOException Wenn {@link #decodeSource()} bzw. {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link #decodeSource()} eine entsprechende Ausnahme auslöst.
 	 * @throws TransformerException Wenn {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst. */
-	public final BEXDecoder decode() throws IOException, IAMException, TransformerException {
+	public final BEXLoader decode() throws IOException, IAMException, TransformerException {
 		return this.decodeTarget(this.decodeSource());
 	}
 
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in einen {@link BEXFileDecoder} und gibt diesen zurück.
+	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in einen {@link BEXFileLoader} und gibt diesen zurück.
 	 * 
-	 * @return {@link BEXFileDecoder}.
+	 * @return {@link BEXFileLoader}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
 	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig sind. */
-	public final BEXFileDecoder decodeSource() throws IOException, IAMException {
+	public final BEXFileLoader decodeSource() throws IOException, IAMException {
 		final MMFArray array = MMFArray.from(this._source_);
-		return new BEXFileDecoder(array.withOrder(BEXFileDecoder.HEADER.orderOf(array)));
+		return new BEXFileLoader(array.withOrder(BEXFileLoader.HEADER.orderOf(array)));
 	}
 
 	/** Diese Methode überführt das gegebene {@link BEXFile} in die {@link #getTarget() Ausgabedaten} (XML-Dokument) und gibt {@code this} zurück.
@@ -968,7 +965,7 @@ public final class BEXDecoder {
 	 * @return {@code this}.
 	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
 	 * @throws TransformerException Wenn die Ausgabedaten nicht erzeigt werden können. */
-	public final BEXDecoder decodeTarget(final BEXFile source) throws IOException, TransformerException {
+	public final BEXLoader decodeTarget(final BEXFile source) throws IOException, TransformerException {
 		XML.newFormatter() //
 			.openResultData().useWriter(IO.outputWriterFrom(this._target_)).closeResultData() //
 			.openSourceData().useNode(BEXAdapter.wrap(source)).closeSourceData() //
