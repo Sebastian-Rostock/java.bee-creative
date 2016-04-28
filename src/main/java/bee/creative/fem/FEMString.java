@@ -660,7 +660,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param data UTF32-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-	public final static FEMString from(final int[] data) throws NullPointerException {
+	public static FEMString from(final int[] data) throws NullPointerException {
 		if (data.length == 0) return FEMString.EMPTY;
 		return new UTF32CompactString(data.clone());
 	}
@@ -671,7 +671,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final static FEMString from(final byte[] data) throws NullPointerException, IllegalArgumentException {
+	public static FEMString from(final byte[] data) throws NullPointerException, IllegalArgumentException {
 		if (data.length == 0) return FEMString.EMPTY;
 		return new UTF8CompactString(data.clone());
 	}
@@ -682,7 +682,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final static FEMString from(final char[] data) throws NullPointerException, IllegalArgumentException {
+	public static FEMString from(final char[] data) throws NullPointerException, IllegalArgumentException {
 		if (data.length == 0) return FEMString.EMPTY;
 		return new UTF16CompactString(data.clone());
 	}
@@ -692,7 +692,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param data Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-	public final static FEMString from(final String data) throws NullPointerException {
+	public static FEMString from(final String data) throws NullPointerException {
 		if (data.length() == 0) return FEMString.EMPTY;
 		return new UTF16CompactString(data.toCharArray());
 	}
@@ -703,7 +703,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param length Länge.
 	 * @return Zeichenkette.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public final static FEMString from(final int value, final int length) throws IllegalArgumentException {
+	public static FEMString from(final int value, final int length) throws IllegalArgumentException {
 		if (length == 0) return FEMString.EMPTY;
 		return new UniformString(length, value);
 	}
@@ -716,7 +716,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public final static FEMString from(final MMFArray data) throws NullPointerException, IllegalArgumentException {
+	public static FEMString from(final MMFArray data) throws NullPointerException, IllegalArgumentException {
 		final int mode = data.mode(), length = data.length();
 		if (mode == 0) throw new IllegalArgumentException();
 		if (length == 0) return FEMString.EMPTY;
@@ -737,7 +737,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param value {@link FEMValue}.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMString from(final FEMValue value) throws NullPointerException {
+	public static FEMString from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMString.TYPE);
 	}
 
@@ -747,7 +747,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param context {@link FEMContext}.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMString from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMString from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMString.TYPE);
 	}
 
@@ -756,7 +756,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param token Token, an dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static final int _utf8Size_(final int token) throws IllegalArgumentException {
+	static int _utf8Size_(final int token) throws IllegalArgumentException {
 		switch ((token >> 4) & 15) {
 			case 0:
 			case 1:
@@ -782,7 +782,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * 
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
-	static final boolean _utf8Start_(final int token) {
+	static boolean _utf8Start_(final int token) {
 		return (token & 192) != 128;
 	}
 
@@ -792,7 +792,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf8Value_(final byte[] array, final int offset) throws IllegalArgumentException {
+	static int _utf8Value_(final byte[] array, final int offset) throws IllegalArgumentException {
 		switch ((array[offset] >> 4) & 15) {
 			case 0:
 			case 1:
@@ -820,7 +820,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf8Value_(final IAMArray array, final int offset) throws IllegalArgumentException {
+	static int _utf8Value_(final IAMArray array, final int offset) throws IllegalArgumentException {
 		switch ((array.get(offset) >> 4) & 15) {
 			case 0:
 			case 1:
@@ -847,7 +847,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf8Count_(final byte[] array) throws IllegalArgumentException {
+	static int _utf8Count_(final byte[] array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length;
 		while (index < length) {
@@ -863,7 +863,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf8Count_(final MMFArray array) throws IllegalArgumentException {
+	static int _utf8Count_(final MMFArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {
@@ -879,7 +879,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param token Token, an dem ein UTF16-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static final int _utf16Size_(final int token) throws IllegalArgumentException {
+	static int _utf16Size_(final int token) throws IllegalArgumentException {
 		final int value = token & 64512;
 		if (value == 55296) return 2;
 		if (value != 56320) return 1;
@@ -890,7 +890,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * 
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
-	static final boolean _utf16Start_(final int token) {
+	static boolean _utf16Start_(final int token) {
 		return (token & 64512) != 56320;
 	}
 
@@ -900,7 +900,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf16Value_(final char[] array, final int offset) throws IllegalArgumentException {
+	static int _utf16Value_(final char[] array, final int offset) throws IllegalArgumentException {
 		final int token = array[offset], value = token & 64512;
 		if (value == 55296) return (((token & 1032) << 10) | (array[offset + 1] & 1023)) + 65536;
 		if (value != 56320) return token;
@@ -913,7 +913,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf16Value_(final MMFArray array, final int offset) throws IllegalArgumentException {
+	static int _utf16Value_(final MMFArray array, final int offset) throws IllegalArgumentException {
 		final int token = array.get(offset), value = token & 64512;
 		if (value == 55296) return (((token & 1032) << 10) | (array.get(offset + 1) & 1023)) + 65536;
 		if (value != 56320) return token;
@@ -925,7 +925,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf16Count_(final char[] array) throws IllegalArgumentException {
+	static int _utf16Count_(final char[] array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length;
 		while (index < length) {
@@ -941,7 +941,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static final int _utf16Count_(final MMFArray array) throws IllegalArgumentException {
+	static int _utf16Count_(final MMFArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {

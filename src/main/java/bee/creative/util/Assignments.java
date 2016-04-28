@@ -211,7 +211,7 @@ public class Assignments {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static final <GObject> Assignable<Object> __assignable(final GObject source, final Assignable<? super GObject> target) {
+	static <GObject> Assignable<Object> __assignable(final GObject source, final Assignable<? super GObject> target) {
 		return new Assignable<Object>() {
 
 			@Override
@@ -223,7 +223,7 @@ public class Assignments {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final <GObject> Assignable<Object> __assignable(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
+	static <GObject> Assignable<Object> __assignable(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
 		return new Assignable<Object>() {
 
 			@Override
@@ -238,7 +238,7 @@ public class Assignments {
 	 * 
 	 * @see ParentAssignment
 	 * @return {@link ParentAssignment}. */
-	public static final ParentAssignment assignment() {
+	public static ParentAssignment assignment() {
 		return new ParentAssignment();
 	}
 
@@ -259,7 +259,7 @@ public class Assignments {
 	 * @param source Quellabbildung.
 	 * @param target Zielabbildung.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static final <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
+	public static <GInput, GKey, GValue> void assignEntries(final Assignment<?> assignment, final Map<GKey, GValue> source, final Map<GKey, GValue> target)
 		throws NullPointerException {
 		if (assignment == null) throw new NullPointerException();
 		target.clear();
@@ -283,7 +283,7 @@ public class Assignments {
 	 * @param source Quellsammlung.
 	 * @param target Zielsammlung.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static final <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
+	public static <GValue> void assignValues(final Assignment<?> assignment, final Collection<GValue> source, final Collection<GValue> target)
 		throws NullPointerException {
 		if (assignment == null) throw new NullPointerException();
 		target.clear();

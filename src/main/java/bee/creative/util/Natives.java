@@ -41,7 +41,7 @@ public class Natives {
 	 * @return Datenfeld.
 	 * @throws NullPointerException Wenn {@code fieldPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fieldPath} ungültig ist bzw. das Datenfeld nicht gefunden wurde. */
-	public static final Field parseField(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+	public static Field parseField(final String fieldPath) throws NullPointerException, IllegalArgumentException {
 		try {
 			final int i = fieldPath.lastIndexOf('.');
 			return Natives.parseField(Natives.parseClass(fieldPath.substring(0, i)), fieldPath.substring(i + 1));
@@ -60,7 +60,7 @@ public class Natives {
 	 * @return Datenfeld.
 	 * @throws NullPointerException Wenn {@code fieldOwner} bzw. {@code fieldName} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das Datenfeld nicht gefunden wurde. */
-	public static final Field parseField(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
+	public static Field parseField(final Class<?> fieldOwner, final String fieldName) throws NullPointerException, IllegalArgumentException {
 		try {
 			return fieldOwner.getDeclaredField(fieldName);
 		} catch (NullPointerException | IllegalArgumentException cause) {
@@ -78,7 +78,7 @@ public class Natives {
 	 * @return Klasse.
 	 * @throws NullPointerException Wenn {@code classText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code classText} ungültig ist bzw. die Klasse nicht gefunden wurde. */
-	public static final Class<?> parseClass(final String classText) throws NullPointerException, IllegalArgumentException {
+	public static Class<?> parseClass(final String classText) throws NullPointerException, IllegalArgumentException {
 		try {
 			if (classText.endsWith("[]")) return Array.newInstance(Natives.parseClass(classText.substring(0, classText.length() - 2)), 0).getClass();
 			Class<?> result = Natives._parseClass_.get(classText);
@@ -99,7 +99,7 @@ public class Natives {
 	 * @return Parametertypen.
 	 * @throws NullPointerException Wenn {@code paramsText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code paramsText} ungültig ist bzw. eine der Klassen nicht gefunden wurde. */
-	public static final Class<?>[] parseParams(final String paramsText) throws NullPointerException, IllegalArgumentException {
+	public static Class<?>[] parseParams(final String paramsText) throws NullPointerException, IllegalArgumentException {
 		try {
 			int i = paramsText.length() - 1;
 			if ((paramsText.charAt(0) != '(') || (paramsText.charAt(i) != ')')) throw new IllegalArgumentException();
@@ -125,7 +125,7 @@ public class Natives {
 	 * @return Methoden.
 	 * @throws NullPointerException Wenn {@code methodText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code methodText} ungültig ist bzw. die Methode nicht gefunden wurde. */
-	public static final Method parseMethod(final String methodText) throws NullPointerException, IllegalArgumentException {
+	public static Method parseMethod(final String methodText) throws NullPointerException, IllegalArgumentException {
 		try {
 			final int i = methodText.indexOf('('), j = methodText.lastIndexOf('.', i);
 			return Natives.parseMethod(Natives.parseClass(methodText.substring(0, j)), methodText.substring(j + 1, i), Natives.parseParams(methodText.substring(i)));
@@ -145,7 +145,7 @@ public class Natives {
 	 * @return Methode.
 	 * @throws NullPointerException Wenn {@code methodOwner} bzw. {@code methodName} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methode nicht gefunden wurde. */
-	public static final Method parseMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException,
+	public static Method parseMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException,
 		IllegalArgumentException {
 		try {
 			return methodOwner.getDeclaredMethod(methodName, methodParams);
@@ -163,7 +163,7 @@ public class Natives {
 	 * @return Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructorText} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code constructorText} ungültig ist bzw. der Konstruktor nicht gefunden wurde. */
-	public static final Constructor<?> parseConstructor(final String constructorText) throws NullPointerException, IllegalArgumentException {
+	public static Constructor<?> parseConstructor(final String constructorText) throws NullPointerException, IllegalArgumentException {
 		try {
 			final int i = constructorText.indexOf(".new(");
 			return Natives.parseConstructor(Natives.parseClass(constructorText.substring(0, i)), Natives.parseParams(constructorText.substring(i + 4)));
@@ -182,7 +182,7 @@ public class Natives {
 	 * @return Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructorOwner} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Konstruktor nicht gefunden wurde. */
-	public static final Constructor<?> parseConstructor(final Class<?> constructorOwner, final Class<?>... constructorParams) throws NullPointerException,
+	public static Constructor<?> parseConstructor(final Class<?> constructorOwner, final Class<?>... constructorParams) throws NullPointerException,
 		IllegalArgumentException {
 		try {
 			return constructorOwner.getDeclaredConstructor(constructorParams);
@@ -201,7 +201,7 @@ public class Natives {
 	 * @param field Datenfeld.
 	 * @return Datenfeldtext.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final String formatField(final Field field) throws NullPointerException {
+	public static String formatField(final Field field) throws NullPointerException {
 		return Natives.formatClass(field.getDeclaringClass()) + "." + field.getName();
 	}
 
@@ -213,7 +213,7 @@ public class Natives {
 	 * @param clazz Klasse.
 	 * @return Klassentext.
 	 * @throws NullPointerException Wenn {@code clazz} {@code null} ist. */
-	public static final String formatClass(final Class<?> clazz) throws NullPointerException {
+	public static String formatClass(final Class<?> clazz) throws NullPointerException {
 		return clazz.getCanonicalName();
 	}
 
@@ -225,7 +225,7 @@ public class Natives {
 	 * @param types Parametertypen.
 	 * @return Parametertypentext.
 	 * @throws NullPointerException Wenn {@code types} {@code null} ist oder enthält. */
-	public static final String formatParams(final Class<?>... types) throws NullPointerException {
+	public static String formatParams(final Class<?>... types) throws NullPointerException {
 		return "(" + Strings.join(",", Iterables.convertedIterable(Natives._formatClass_, Arrays.asList(types))) + ")";
 	}
 
@@ -239,7 +239,7 @@ public class Natives {
 	 * @param method Methode.
 	 * @return Methodentext.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static final String formatMethod(final Method method) throws NullPointerException {
+	public static String formatMethod(final Method method) throws NullPointerException {
 		return Natives._formatMethod_(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
 	}
 
@@ -250,12 +250,12 @@ public class Natives {
 	 * @param constructor Konstruktor.
 	 * @return Konstruktortext.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static final String formatConstructor(final Constructor<?> constructor) throws NullPointerException {
+	public static String formatConstructor(final Constructor<?> constructor) throws NullPointerException {
 		return Natives._formatMethod_(constructor.getDeclaringClass(), "new", constructor.getParameterTypes());
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final String _formatMethod_(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
+	static String _formatMethod_(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException {
 		return Natives.formatClass(methodOwner) + "." + methodName + Natives.formatParams(methodParams);
 	}
 

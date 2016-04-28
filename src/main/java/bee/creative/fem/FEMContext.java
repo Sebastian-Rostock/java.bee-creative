@@ -100,7 +100,7 @@ public abstract class FEMContext {
 	 * verwendet.
 	 * 
 	 * @return Rückfallkontextobjekt */
-	public static final FEMContext DEFAULT() {
+	public static FEMContext DEFAULT() {
 		return FEMContext._default_;
 	}
 
@@ -108,7 +108,7 @@ public abstract class FEMContext {
 	 * Wenn das gegebene Kontextobjekt {@code null} ist, wird {@link #EMPTY} verwendet.
 	 * 
 	 * @param context Rückfallkontextobjekt oder {@code null}. */
-	public static final void DEFAULT(final FEMContext context) {
+	public static void DEFAULT(final FEMContext context) {
 		FEMContext._default_ = context != null ? context : FEMContext.EMPTY;
 	}
 

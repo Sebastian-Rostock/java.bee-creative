@@ -362,12 +362,12 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	{}
 
 	/** Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder
-	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#_itemIndexEquals_(Object, int)
 	 * @see CompactData#_itemIndexCompare_(Object, int)
 	 * @param key Syhlüssel.
-	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+	 * @return Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 	@Override
 	protected abstract int _itemIndex_(final Object key);
 

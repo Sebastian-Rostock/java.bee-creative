@@ -160,7 +160,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
 			final Matcher matcher = FEMDuration._pattern_.matcher(string);
 			if (!matcher.find()) throw new IllegalArgumentException();
@@ -188,7 +188,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param durationmillis Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public static final FEMDuration from(int durationmonths, long durationmillis) throws IllegalArgumentException {
+	public static FEMDuration from(int durationmonths, long durationmillis) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(+durationmonths);
 		FEMDuration._checkMonths_(-durationmonths);
 		FEMDuration._checkMilliseconds_(+durationmillis);
@@ -233,7 +233,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return Zeitspanne.
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen zu einer ungültigen Zeitspanne führen würden. */
-	public static final FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
+	public static FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
 	}
@@ -243,7 +243,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param value {@link FEMValue}.
 	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMDuration from(final FEMValue value) throws NullPointerException {
+	public static FEMDuration from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMDuration.TYPE);
 	}
 
@@ -253,47 +253,47 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param context {@link FEMContext}.
 	 * @return Zeitspanne.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMDuration from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMDuration from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMDuration.TYPE);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkDays_(final int days) throws IllegalArgumentException {
+	static void _checkDays_(final int days) throws IllegalArgumentException {
 		if (days > 3074324) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkYears_(final int years) throws IllegalArgumentException {
+	static void _checkYears_(final int years) throws IllegalArgumentException {
 		if (years > 8417) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkMonths_(final int months) throws IllegalArgumentException {
+	static void _checkMonths_(final int months) throws IllegalArgumentException {
 		if (months > 101006) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkHours_(final int hours) throws IllegalArgumentException {
+	static void _checkHours_(final int hours) throws IllegalArgumentException {
 		if (hours > 73783776) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkMinutes_(final long minutes) throws IllegalArgumentException {
+	static void _checkMinutes_(final long minutes) throws IllegalArgumentException {
 		if (minutes > 4427026560L) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkSeconds_(final long seconds) throws IllegalArgumentException {
+	static void _checkSeconds_(final long seconds) throws IllegalArgumentException {
 		if (seconds > 265621593600L) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkMilliseconds_(final long milliseconds) throws IllegalArgumentException {
+	static void _checkMilliseconds_(final long milliseconds) throws IllegalArgumentException {
 		if (milliseconds > 265621593600000L) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkPositive_(final int value) throws IllegalArgumentException {
+	static void _checkPositive_(final int value) throws IllegalArgumentException {
 		if (value < 0) throw new IllegalArgumentException();
 	}
 
@@ -305,7 +305,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @return Zeitspanne von der ersten zur zweiten Zeitangabe.
 	 * @throws NullPointerException Wenn {@code datetime1} bzw. {@code datetime2} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn nur eine der Zeitangaben ein Datum bzw eine Uhrzeit besitzt. */
-	public static final FEMDuration between(final FEMDatetime datetime1, final FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
+	public static FEMDuration between(final FEMDatetime datetime1, final FEMDatetime datetime2) throws NullPointerException, IllegalArgumentException {
 		if (datetime1.hasDate()) {
 			if (!datetime2.hasDate()) throw new IllegalArgumentException();
 			if (datetime1.hasTime()) {
@@ -335,7 +335,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param months Anzahl der Monate ({@code 0..101006}).
 	 * @return minimale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
-	public static final int minLengthOf(final int months) throws IllegalArgumentException {
+	public static int minLengthOf(final int months) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(months);
 		FEMDuration._checkPositive_(months);
 		return FEMDuration._lengthOf_(months) - ((FEMDuration._rangeOf_(months) >> 0) & 0x0F);
@@ -347,7 +347,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param months Anzahl der Monate ({@code 0..101006}).
 	 * @return maximale Anzahl an Tagen in den gegebenen Monaten.
 	 * @throws IllegalArgumentException Wenn {@code months} ungültig ist. */
-	public static final int maxLengthOf(final int months) throws IllegalArgumentException {
+	public static int maxLengthOf(final int months) throws IllegalArgumentException {
 		FEMDuration._checkMonths_(months);
 		FEMDuration._checkPositive_(months);
 		return FEMDuration._lengthOf_(months) + ((FEMDuration._rangeOf_(months) >> 4) & 0x0F);
@@ -359,7 +359,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * 
 	 * @param months Anzahl an Monaten ({@code 0..101015}).
 	 * @return Min-Max-Paar (MIN << 0 | MAX << 4). */
-	static final int _rangeOf_(final int months) {
+	static int _rangeOf_(final int months) {
 		return FEMDuration._ranges_[months % 4800];
 	}
 
@@ -367,7 +367,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * 
 	 * @param months Anzahl der Monate ({@code 0..101006}).
 	 * @return mittlere Anzahl an Tagen in den gegebenen Monaten. */
-	static final int _lengthOf_(final int months) {
+	static int _lengthOf_(final int months) {
 		return (months * 146097) / 4800;
 	}
 
@@ -380,7 +380,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param milliseconds Anzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @return die Gesamtanzahl der Millisekunden ({@code -265621593600000..265621593600000}).
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
-	public static final long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+	public static long durationmillisOf(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
 		throws IllegalArgumentException {
 		FEMDuration._checkDays_(-days);
 		FEMDuration._checkDays_(+days);
@@ -397,7 +397,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final long _durationmillisOf_(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
+	static long _durationmillisOf_(final int days, final int hours, final long minutes, final long seconds, final long milliseconds)
 		throws IllegalArgumentException {
 		return (days * 86400000L) + (hours * 3600000L) + (minutes * 60000L) + (seconds * 1000L) + milliseconds;
 	}
@@ -408,7 +408,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	 * @param months Anzahl der Monate ({@code -101006..101006}).
 	 * @return Gesamtanzahl der Monate ({@code -101006..101006}).
 	 * @throws IllegalArgumentException Wenn die gegebenen Anzahlen ungültig sind oder zu einer ungültigen Gesamtanzahl führen würde. */
-	public static final int durationmonthsOf(final int years, final int months) throws IllegalArgumentException {
+	public static int durationmonthsOf(final int years, final int months) throws IllegalArgumentException {
 		FEMDuration._checkYears_(+years);
 		FEMDuration._checkYears_(-years);
 		FEMDuration._checkMonths_(-months);
@@ -420,7 +420,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _durationmonthsOf_(final int years, final int months) {
+	static int _durationmonthsOf_(final int years, final int months) {
 		return (years * 12) + months;
 	}
 

@@ -30,7 +30,7 @@ public class Objects {
 	 * 
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug. */
-	static final String _indent_(final String value) {
+	static String _indent_(final String value) {
 		if (value == null) return "null";
 		final StringBuilder result = new StringBuilder();
 		int last = -1, next = 0;
@@ -51,7 +51,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	static final String _format_(final boolean format, final boolean indent, final Object object) {
+	static String _format_(final boolean format, final boolean indent, final Object object) {
 		if (object == null) return "null";
 		final String result;
 		if (object.getClass().isArray()) {
@@ -86,7 +86,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String formatMap(final boolean format, final Map<?, ?> object) {
+	public static String formatMap(final boolean format, final Map<?, ?> object) {
 		if (object == null) return "null";
 		if (object.isEmpty()) return "{}";
 		String space = (format ? "{\n  " : "{");
@@ -103,7 +103,7 @@ public class Objects {
 	 * 
 	 * @param object {@link Character} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String formatChar(final Character object) {
+	public static String formatChar(final Character object) {
 		if (object == null) return "null";
 		final StringBuilder result = new StringBuilder(4).append('\'');
 		switch (object.charValue()) {
@@ -132,7 +132,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt kein Array ist. */
-	public static final String formatArray(final boolean format, final Object object) throws IllegalArgumentException {
+	public static String formatArray(final boolean format, final Object object) throws IllegalArgumentException {
 		if (object == null) return "null";
 		final int size = Array.getLength(object);
 		if (size == 0) return "[]";
@@ -152,7 +152,7 @@ public class Objects {
 	 * @param object {@link String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String formatString(final boolean format, final CharSequence object) {
+	public static String formatString(final boolean format, final CharSequence object) {
 		if (object == null) return "null";
 		final String space = (format ? "\\n\"+\n\"" : "\\n");
 		final StringBuilder result = new StringBuilder("\"");
@@ -184,7 +184,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String formatIterable(final boolean format, final Iterable<?> object) {
+	public static String formatIterable(final boolean format, final Iterable<?> object) {
 		if (object == null) return "null";
 		final Iterator<?> iter = object.iterator();
 		if (!iter.hasNext()) return "[]";
@@ -202,7 +202,7 @@ public class Objects {
 	 * 
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int hash(final Object object) {
+	public static int hash(final Object object) {
 		return object == null ? 0 : object.hashCode();
 	}
 
@@ -211,7 +211,7 @@ public class Objects {
 	 * @see Objects#hash(Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int hash(final Object... objects) {
+	public static int hash(final Object... objects) {
 		if (objects == null) return 0;
 		int result = Objects.hashInit();
 		for (final Object object: objects) {
@@ -227,7 +227,7 @@ public class Objects {
 	 * @param object1 Objekt oder {@code null}.
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int hash(final Object object1, final Object object2) {
+	public static int hash(final Object object1, final Object object2) {
 		return Objects.hashPush(Objects.hashPush(Objects.hashInit(), Objects.hash(object1)), Objects.hash(object2));
 	}
 
@@ -239,7 +239,7 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int hash(final Object object1, final Object object2, final Object object3) {
+	public static int hash(final Object object1, final Object object2, final Object object3) {
 		return Objects.hashPush(Objects.hash(object1, object2), Objects.hash(object3));
 	}
 
@@ -249,7 +249,7 @@ public class Objects {
 	 * @see #hash(Object, Object)
 	 * @see #hash(Object, Object, Object)
 	 * @return Startstreuwert. */
-	public static final int hashInit() {
+	public static int hashInit() {
 		return 0x811C9DC5;
 	}
 
@@ -261,7 +261,7 @@ public class Objects {
 	 * @param prev vorheriger Streuwert.
 	 * @param next nächater Streuwert.
 	 * @return kombinierter Streuwert. */
-	public static final int hashPush(final int prev, final int next) {
+	public static int hashPush(final int prev, final int next) {
 		return (prev * 0x01000193) ^ next;
 	}
 
@@ -272,7 +272,7 @@ public class Objects {
 	 * @see Objects#equals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
-	public static final boolean equals(final Object... objects) {
+	public static boolean equals(final Object... objects) {
 		if (objects == null) return true;
 		for (int i = 0, size = objects.length; i < size; i += 2) {
 			if (!Objects.equals(objects[i], objects[i + 1])) return false;
@@ -290,7 +290,7 @@ public class Objects {
 	 * @param object1 Objekt 1 oder {@code null}.
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-	public static final boolean equals(final Object object1, final Object object2) {
+	public static boolean equals(final Object object1, final Object object2) {
 		return (object1 == object2) || ((object1 != null) && (object2 != null) && object1.equals(object2));
 	}
 
@@ -301,7 +301,7 @@ public class Objects {
 	 * @param objects1 Array 1 oder {@code null}.
 	 * @param objects2 Array 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-	public static final boolean equals(final Object[] objects1, final Object[] objects2) {
+	public static boolean equals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
@@ -326,7 +326,7 @@ public class Objects {
 	 * @see Objects#deepHash(Object...)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int deepHash(final Object object) {
+	public static int deepHash(final Object object) {
 		if (object == null) return 0;
 		final Class<?> clazz = object.getClass();
 		if (!clazz.isArray()) return object.hashCode();
@@ -347,7 +347,7 @@ public class Objects {
 	 * @see Objects#deepHash(Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int deepHash(final Object... objects) {
+	public static int deepHash(final Object... objects) {
 		if (objects == null) return 0;
 		int result = Objects.hashInit();
 		for (final Object object: objects) {
@@ -364,7 +364,7 @@ public class Objects {
 	 * @param object1 Objekt oder {@code null}.
 	 * @param object2 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int deepHash(final Object object1, final Object object2) {
+	public static int deepHash(final Object object1, final Object object2) {
 		return Objects.hashPush(Objects.hashPush(Objects.hashInit(), Objects.deepHash(object1)), Objects.deepHash(object2));
 	}
 
@@ -377,7 +377,7 @@ public class Objects {
 	 * @param object2 Objekt oder {@code null}.
 	 * @param object3 Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
-	public static final int deepHash(final Object object1, final Object object2, final Object object3) {
+	public static int deepHash(final Object object1, final Object object2, final Object object3) {
 		return Objects.hashPush(Objects.deepHash(object1, object2), Objects.deepHash(object3));
 	}
 
@@ -389,7 +389,7 @@ public class Objects {
 	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
-	public static final boolean deepEquals(final Object... objects) {
+	public static boolean deepEquals(final Object... objects) {
 		if (objects == null) return true;
 		for (int i = 0, size = objects.length; i < size; i += 2) {
 			if (!Objects.deepEquals(objects[i], objects[i + 1])) return false;
@@ -417,7 +417,7 @@ public class Objects {
 	 * @param object1 Objekt 1 oder {@code null}.
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-	public static final boolean deepEquals(final Object object1, final Object object2) {
+	public static boolean deepEquals(final Object object1, final Object object2) {
 		if (object1 == object2) return true;
 		if ((object1 == null) || (object2 == null)) return false;
 		final Class<?> c1 = object1.getClass();
@@ -443,7 +443,7 @@ public class Objects {
 	 * @param objects1 Array 1 oder {@code null}.
 	 * @param objects2 Array 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
-	public static final boolean deepEquals(final Object[] objects1, final Object[] objects2) {
+	public static boolean deepEquals(final Object[] objects1, final Object[] objects2) {
 		if (objects1 == objects2) return true;
 		if ((objects1 == null) || (objects2 == null)) return false;
 		final int length = objects1.length;
@@ -460,7 +460,7 @@ public class Objects {
 	 * @see Objects#toString(boolean, Object)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String toString(final Object object) {
+	public static String toString(final Object object) {
 		return Objects.toString(false, object);
 	}
 
@@ -474,7 +474,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
-	public static final String toString(final boolean format, final Object object) {
+	public static String toString(final boolean format, final Object object) {
 		return Objects._format_(format, false, object);
 	}
 
@@ -485,7 +485,7 @@ public class Objects {
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Objects#toString(boolean, Object)}-Objekt. */
-	public static final Object toStringObject(final boolean format, final Object object) {
+	public static Object toStringObject(final boolean format, final Object object) {
 		if (object == null) return "null";
 		return new Object() {
 
@@ -505,7 +505,7 @@ public class Objects {
 	 * @param args Argumente.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
-	public static final String toInvokeString(final String name, final Object... args) throws NullPointerException {
+	public static String toInvokeString(final String name, final Object... args) throws NullPointerException {
 		return Objects.toFormatString(false, false, name, args);
 	}
 
@@ -517,7 +517,7 @@ public class Objects {
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code object} bzw. {@code args} {@code null} ist. */
-	public static final String toInvokeString(final Object object, final Object... args) throws NullPointerException {
+	public static String toInvokeString(final Object object, final Object... args) throws NullPointerException {
 		return Objects.toFormatString(false, false, object.getClass().getSimpleName(), args);
 	}
 
@@ -532,7 +532,7 @@ public class Objects {
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn {@code name} bzw. {@code args} {@code null} ist. */
-	public static final String toFormatString(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
+	public static String toFormatString(final boolean format, final boolean label, final String name, final Object... args) throws NullPointerException {
 		final StringBuilder result = new StringBuilder(name.length() + 128);
 		result.append(name);
 		if (args.length != 0) {
@@ -566,7 +566,7 @@ public class Objects {
 	 * @param args Argumente bzw. Parameter.
 	 * @return {@link Object#toString() Textdarstelung}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static final String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
+	public static String toFormatString(final boolean format, final boolean label, final Object object, final Object... args) throws NullPointerException {
 		return Objects.toFormatString(format, label, object.getClass().getSimpleName(), args);
 	}
 

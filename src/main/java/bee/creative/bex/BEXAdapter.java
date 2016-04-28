@@ -26,8 +26,8 @@ import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert die Adapter zur Überführung von {@link BEXFile}, {@link BEXNode} und {@link BEXList} in {@link Document}, {@link Node},
- * {@link NodeList} bzw. {@link NamedNodeMap}.
+/** Diese Klasse implementiert die Adapter zur Überführung von {@link BEXFile}, {@link BEXNode} und {@link BEXList} in {@link Document}, {@link Text},
+ * {@link Attr}, {@link Element}, {@link NodeList} und {@link NamedNodeMap}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEXAdapter {
@@ -343,7 +343,7 @@ public class BEXAdapter {
 		 * @param content {@link StringBuffer} mit dem bisher gesammelten Texten.
 		 * @param children {@link BEXList} der rekursiv analysierten Kindknoten.
 		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist. */
-		static final void collectContent(final StringBuffer content, final BEXList children) throws NullPointerException {
+		static void collectContent(final StringBuffer content, final BEXList children) throws NullPointerException {
 			for (final BEXNode child: children) {
 				if (child.type() == BEXNode.ELEM_NODE) {
 					BEXElemAdapter.collectContent(content, child.children());

@@ -73,7 +73,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @return {@link IAMListingLoader}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMListingLoader#IAMListingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static final IAMListingLoader from(Object object) throws IOException, IAMException {
+	public static IAMListingLoader from(Object object) throws IOException, IAMException {
 		return new IAMListingLoader(MMFArray.from(object));
 	}
 

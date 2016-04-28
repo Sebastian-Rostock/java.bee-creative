@@ -1065,7 +1065,7 @@ public class Builders {
 		 * @param items {@link Set}.
 		 * @return {@link SimpleSetBuilder}.
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static final <GItem> SimpleSetBuilder<GItem> from(final Set<GItem> items) throws NullPointerException {
+		public static <GItem> SimpleSetBuilder<GItem> from(final Set<GItem> items) throws NullPointerException {
 			return new SimpleSetBuilder<>(items);
 		}
 
@@ -1101,7 +1101,7 @@ public class Builders {
 		 * @param items {@link List}.
 		 * @return {@link SimpleListBuilder}.
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static final <GItem> SimpleListBuilder<GItem> from(final List<GItem> items) throws NullPointerException {
+		public static <GItem> SimpleListBuilder<GItem> from(final List<GItem> items) throws NullPointerException {
 			return new SimpleListBuilder<>(items);
 		}
 
@@ -1139,7 +1139,7 @@ public class Builders {
 		 * @param entries {@link Map}.
 		 * @return {@link SimpleMapBuilder}.
 		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public static final <GKey, GValue> SimpleMapBuilder<GKey, GValue> from(final Map<GKey, GValue> entries) throws NullPointerException {
+		public static <GKey, GValue> SimpleMapBuilder<GKey, GValue> from(final Map<GKey, GValue> entries) throws NullPointerException {
 			return new SimpleMapBuilder<>(entries);
 		}
 
@@ -1175,7 +1175,7 @@ public class Builders {
 		 * @param items {@link Collection}.
 		 * @return {@link SimpleCollectionBuilder}.
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static final <GItem> SimpleCollectionBuilder<GItem> from(final Collection<GItem> items) throws NullPointerException {
+		public static <GItem> SimpleCollectionBuilder<GItem> from(final Collection<GItem> items) throws NullPointerException {
 			return new SimpleCollectionBuilder<>(items);
 		}
 
@@ -1211,7 +1211,7 @@ public class Builders {
 		 * @param items {@link SortedSet}.
 		 * @return {@link SimpleSortedSetBuilder}.
 		 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-		public static final <GItem> SimpleSortedSetBuilder<GItem> from(final SortedSet<GItem> items) throws NullPointerException {
+		public static <GItem> SimpleSortedSetBuilder<GItem> from(final SortedSet<GItem> items) throws NullPointerException {
 			return new SimpleSortedSetBuilder<>(items);
 		}
 
@@ -1249,7 +1249,7 @@ public class Builders {
 		 * @param entries {@link SortedMap}.
 		 * @return {@link SimpleSortedMapBuilder}.
 		 * @throws NullPointerException Wenn {@code entries} {@code null} ist. */
-		public static final <GKey, GValue> SimpleSortedMapBuilder<GKey, GValue> from(final SortedMap<GKey, GValue> entries) throws NullPointerException {
+		public static <GKey, GValue> SimpleSortedMapBuilder<GKey, GValue> from(final SortedMap<GKey, GValue> entries) throws NullPointerException {
 			return new SimpleSortedMapBuilder<>(entries);
 		}
 
@@ -1280,7 +1280,7 @@ public class Builders {
 	 * @param <GValue> Typ des Datensatzes.
 	 * @param value Datensatz.
 	 * @return {@code value}-{@link Builder}. */
-	public static final <GValue> Builder<GValue> valueBuilder(final GValue value) {
+	public static <GValue> Builder<GValue> valueBuilder(final GValue value) {
 		return new Builder<GValue>() {
 
 			@Override
@@ -1304,7 +1304,7 @@ public class Builders {
 	 * @param builder {@link Builder}.
 	 * @return {@code buffered}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist. */
-	public static final <GValue> Builder<GValue> bufferedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
+	public static <GValue> Builder<GValue> bufferedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
 		return Builders.bufferedBuilder(Pointers.SOFT, builder);
 	}
 
@@ -1317,7 +1317,7 @@ public class Builders {
 	 * @return {@code buffered}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code mode} ungültig ist. */
-	public static final <GValue> Builder<GValue> bufferedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
+	public static <GValue> Builder<GValue> bufferedBuilder(final int mode, final Builder<? extends GValue> builder) throws NullPointerException,
 		IllegalArgumentException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		Pointers.pointer(mode, null);
@@ -1355,7 +1355,7 @@ public class Builders {
 	 * @param builder {@link Builder}.
 	 * @return {@code converted}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code builder} {@code null} ist. */
-	public static final <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Builder<GOutput> convertedBuilder(final Converter<? super GInput, ? extends GOutput> converter,
 		final Builder<? extends GInput> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		if (converter == null) throw new NullPointerException("converter = null");
@@ -1380,7 +1380,7 @@ public class Builders {
 	 * @param builder {@link Builder}.
 	 * @return {@code synchronized}-{@link Builder}.
 	 * @throws NullPointerException Wenn {@code builder} {@code null} ist. */
-	public static final <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
+	public static <GValue> Builder<GValue> synchronizedBuilder(final Builder<? extends GValue> builder) throws NullPointerException {
 		if (builder == null) throw new NullPointerException("builder = null");
 		return new Builder<GValue>() {
 

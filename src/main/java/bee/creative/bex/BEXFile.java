@@ -1,5 +1,6 @@
 package bee.creative.bex;
 
+import bee.creative.iam.IAMArray;
 import bee.creative.util.Objects;
 
 /** Diese Schnittstelle definiert die Verwaltung aller Element-, Text- und Attributknoten sowie aller Kind- und Attributknotenlisten, die in einem Dokument (vgl.
@@ -12,17 +13,17 @@ public abstract class BEXFile {
 	static final class EmptyFile extends BEXFile {
 
 		@Override
-		public BEXNode root() {
+		public final BEXNode root() {
 			return BEXNode.EMPTY;
 		}
 
 		@Override
-		public BEXList list(final int key) {
+		public final BEXList list(final int key) {
 			return BEXList.EMPTY;
 		}
 
 		@Override
-		public BEXNode node(final int key) {
+		public final BEXNode node(final int key) {
 			return BEXNode.EMPTY;
 		}
 
@@ -30,7 +31,47 @@ public abstract class BEXFile {
 
 	{}
 
+	/** Dieses Feld speichert das leere {@link BEXFile}. */
 	public static final BEXFile EMPTY = new EmptyFile();
+
+	{}
+
+	/** Diese Methode wandelt die gegebene Zeichenkette in eine nullterminierte Folge von UTF-16-Token um und gibt diese als Zahlenfolge zurück.<br>
+	 * Die gelieferte Zahlenfolge ist damit immer um eins länger, als {@link String#length()}.
+	 * 
+	 * @param string Zeichenkette.
+	 * @return Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static int[] valueFrom(final String string) throws NullPointerException {
+		final int length = string.length();
+		final int[] result = new int[length + 1];
+		for (int i = 0; i < length; i++) {
+			result[i] = (short)string.charAt(i);
+		}
+		return result;
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code IAMArray.from(BEX.toItem(string))}.
+	 * 
+	 * @param string Zeichenkette.
+	 * @return Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
+	public static IAMArray arrayFrom(final String string) throws NullPointerException {
+		return IAMArray.from(BEXFile.valueFrom(string));
+	}
+
+	/** Diese Methode wandelt die gegebene nullterminierte Zahlenfolge in eine Zeichenkette um und gibt diese zurück.
+	 * 
+	 * @param array Zahlenfolge.
+	 * @return Zeichenkette.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@code array} leer ist oder nicht mit {@code 0} endet. */
+	public static String stringFrom(final IAMArray array) throws NullPointerException, IllegalArgumentException {
+		final int length = array.length() - 1;
+		if ((length < 0) || (array.get(length) != 0)) throw new IllegalArgumentException();
+		if (length == 0) return "";
+		return new String(IAMArray.toChars(array.section(0, length)));
+	}
 
 	{}
 

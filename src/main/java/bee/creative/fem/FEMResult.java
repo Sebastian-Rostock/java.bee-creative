@@ -20,7 +20,7 @@ public final class FEMResult extends BaseValue {
 	 * @param function Funktion.
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
-	public static final FEMResult from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
+	public static FEMResult from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 		if (frame == null) throw new NullPointerException("frame = null");
 		if (function == null) throw new NullPointerException("function = null");
 		return new FEMResult(frame, function);

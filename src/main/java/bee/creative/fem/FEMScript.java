@@ -39,7 +39,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Bereichen. */
-		public static final Comparable<FEMScript.Range> contains(final int index) {
+		public static Comparable<FEMScript.Range> contains(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
 				@Override
@@ -60,7 +60,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für das Ende von {@link Range}s. */
-		public static final Comparable<FEMScript.Range> endingAt(final int index) {
+		public static Comparable<FEMScript.Range> endingAt(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
 				@Override
@@ -80,7 +80,7 @@ public final class FEMScript implements Items<FEMScript.Range>, Iterable<FEMScri
 		 * @see Comparators#compare(int, int)
 		 * @param index Position.
 		 * @return {@link Comparable} für Startposition von Bereichen. */
-		public static final Comparable<FEMScript.Range> startingAt(final int index) {
+		public static Comparable<FEMScript.Range> startingAt(final int index) {
 			return new Comparable<FEMScript.Range>() {
 
 				@Override

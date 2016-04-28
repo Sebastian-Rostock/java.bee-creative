@@ -52,7 +52,7 @@ public abstract class IAMIndex {
 		 * 
 		 * @param buffer {@link ByteBuffer}.
 		 * @param source Zahlenfolgen. */
-		public static final void putSize(final ByteBuffer buffer, final byte[][] source) {
+		public static void putSize(final ByteBuffer buffer, final byte[][] source) {
 			int offset = 0;
 			buffer.putInt(0);
 			for (final byte[] data: source) {
@@ -66,7 +66,7 @@ public abstract class IAMIndex {
 		 * 
 		 * @param value Größe.
 		 * @return Datentyp ({@code 1..3}). */
-		public static final int computeSizeType(final int value) {
+		public static int computeSizeType(final int value) {
 			if (value <= 255) return 1;
 			if (value <= 65535) return 2;
 			return 3;
@@ -151,7 +151,7 @@ public abstract class IAMIndex {
 		 * @param buffer {@link ByteBuffer}.
 		 * @param type Datentyp ({@code 1=INT8/UINT8}, {@code 2=INT16/UINT16}, {@code 3=INT32}).
 		 * @param values Zahlenfolge. */
-		public static final void putData(final ByteBuffer buffer, final int type, final int[] values) {
+		public static void putData(final ByteBuffer buffer, final int type, final int[] values) {
 			switch (type) {
 				case 1:
 					for (int i = 0, length = values.length; i < length; i++) {
@@ -188,7 +188,7 @@ public abstract class IAMIndex {
 		 * 
 		 * @param value Wert.
 		 * @return Datengrößentyps ({@code 1..3}). */
-		public static final int computeDataType(final int value) {
+		public static int computeDataType(final int value) {
 			if ((-128 <= value) && (value <= 127)) return 1;
 			if ((-32768 <= value) && (value <= 32767)) return 2;
 			return 3;
@@ -312,7 +312,7 @@ public abstract class IAMIndex {
 	 * @return {@link IAMIndexLoader}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMIndexLoader#IAMIndexLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static final IAMIndexLoader from(Object object) throws IOException, IAMException {
+	public static IAMIndexLoader from(Object object) throws IOException, IAMException {
 		return new IAMIndexLoader(MMFArray.from(object));
 	}
 

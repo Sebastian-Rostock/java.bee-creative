@@ -12,49 +12,68 @@ import bee.creative.util.Objects;
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
 	@SuppressWarnings ("javadoc")
-	static final class INT8Array extends IAMArray {
-
-		final byte[] _array_;
-
-		INT8Array(final byte[] array) {
-			super(array.length);
-			this._array_ = array;
-		}
-
-		{}
-
-		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class INT16Array extends IAMArray {
-
-		final short[] _array_;
-
-		INT16Array(final short[] array) {
-			super(array.length);
-			this._array_ = array;
-		}
-
-		{}
-
-		@Override
-		protected final int _get_(final int index) {
-			return this._array_[index];
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class INT32Array extends IAMArray {
+	static final class IntArray extends IAMArray {
 
 		final int[] _array_;
 
-		INT32Array(final int[] array) {
+		IntArray(final int[] array) {
+			super(array.length);
+			this._array_ = array;
+		}
+
+		{}
+
+		@Override
+		protected final int _get_(final int index) {
+			return this._array_[index];
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ByteArray extends IAMArray {
+
+		final byte[] _array_;
+
+		ByteArray(final byte[] array) {
+			super(array.length);
+			this._array_ = array;
+		}
+
+		{}
+
+		@Override
+		protected final int _get_(final int index) {
+			return this._array_[index];
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class CharArray extends IAMArray {
+
+		final char[] _array_;
+
+		CharArray(final char[] array) {
+			super(array.length);
+			this._array_ = array;
+		}
+
+		{}
+
+		@Override
+		protected final int _get_(final int index) {
+			return this._array_[index];
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ShortArray extends IAMArray {
+
+		final short[] _array_;
+
+		ShortArray(final short[] array) {
 			super(array.length);
 			this._array_ = array;
 		}
@@ -117,9 +136,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static final IAMArray from(final byte[] array) throws NullPointerException {
+	public static IAMArray from(final int... array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
-		return new INT8Array(array);
+		return new IntArray(array);
 	}
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
@@ -128,9 +147,9 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static final IAMArray from(final short[] array) throws NullPointerException {
+	public static IAMArray from(final byte[] array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
-		return new INT16Array(array);
+		return new ByteArray(array);
 	}
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
@@ -139,9 +158,68 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static final IAMArray from(final int... array) throws NullPointerException {
+	public static IAMArray from(final char[] array) throws NullPointerException {
 		if (array.length == 0) return IAMArray.EMPTY;
-		return new INT32Array(array);
+		return new CharArray(array);
+	}
+
+	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
+	 * {@link IAMArray} übertragen!
+	 * 
+	 * @param array Zahlen.
+	 * @return {@link IAMArray}-Sicht auf {@code array}.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static IAMArray from(final short[] array) throws NullPointerException {
+		if (array.length == 0) return IAMArray.EMPTY;
+		return new ShortArray(array);
+	}
+
+	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
+	 * 
+	 * @see #get(int)
+	 * @see #length()
+	 * @param array Zahlenfolge.
+	 * @return Kopie der Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static byte[] toBytes(final IAMArray array) throws NullPointerException {
+		final int length = array._length_;
+		final byte[] result = new byte[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = (byte)array._get_(i);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
+	 * 
+	 * @see #get(int)
+	 * @see #length()
+	 * @param array Zahlenfolge.
+	 * @return Kopie der Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static char[] toChars(final IAMArray array) throws NullPointerException {
+		final int length = array._length_;
+		final char[] result = new char[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = (char)array._get_(i);
+		}
+		return result;
+	}
+
+	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code short[]} zurück.
+	 * 
+	 * @see #get(int)
+	 * @see #length()
+	 * @param array Zahlenfolge.
+	 * @return Kopie der Zahlenfolge.
+	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
+	public static short[] toShorts(final IAMArray array) throws NullPointerException {
+		final int length = array._length_;
+		final short[] result = new short[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = (short)array._get_(i);
+		}
+		return result;
 	}
 
 	{}

@@ -25,7 +25,7 @@ public final class CSVReader implements Closeable {
 	 * @param data Objekt.
 	 * @return {@link CSVReader}.
 	 * @throws IOException Wenn der {@link CSVReader} nicht erzeugt werden kann. */
-	public static final CSVReader from(final Object data) throws IOException {
+	public static CSVReader from(final Object data) throws IOException {
 		if (data instanceof CSVReader) return (CSVReader)data;
 		return new CSVReader(IO.inputReaderFrom(data));
 	}
@@ -33,7 +33,7 @@ public final class CSVReader implements Closeable {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static final void _check_(final char symbol) throws IllegalArgumentException {
+	static void _check_(final char symbol) throws IllegalArgumentException {
 		if ((symbol == '\r') || (symbol == '\n')) throw new IllegalArgumentException();
 	}
 

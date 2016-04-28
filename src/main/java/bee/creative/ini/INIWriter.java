@@ -20,7 +20,7 @@ public final class INIWriter implements Closeable {
 	 * @param object Objekt.
 	 * @return {@link INIWriter}.
 	 * @throws IOException Wenn der {@link INIWriter} nicht erzeugt werden kann. */
-	public static final INIWriter from(final Object object) throws IOException {
+	public static INIWriter from(final Object object) throws IOException {
 		if (object instanceof INIWriter) return (INIWriter)object;
 		return new INIWriter(IO.outputWriterFrom(object));
 	}

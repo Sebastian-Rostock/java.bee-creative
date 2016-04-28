@@ -66,7 +66,7 @@ public final class XMLUnmarshaller {
 	 * 
 	 * @param classes Klasse.
 	 * @return {@link XMLUnmarshaller}. */
-	public static final XMLUnmarshaller from(final Class<?>... classes) {
+	public static XMLUnmarshaller from(final Class<?>... classes) {
 		return new XMLUnmarshaller() //
 			.openUnmarshallerData().openContextData().openClassData() //
 			.useItems(Arrays.asList(classes)) //

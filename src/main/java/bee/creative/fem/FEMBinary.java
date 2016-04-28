@@ -325,7 +325,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param value Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMBinary from(final byte[] value) throws NullPointerException {
+	public static FEMBinary from(final byte[] value) throws NullPointerException {
 		if (value.length == 0) return FEMBinary.EMPTY;
 		if (value.length == 1) return FEMBinary.from(value[0], 1);
 		return new CompactBinary(value.clone());
@@ -337,7 +337,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param length Länge.
 	 * @return Bytefolge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static final FEMBinary from(final byte value, final int length) throws IllegalArgumentException {
+	public static FEMBinary from(final byte value, final int length) throws IllegalArgumentException {
 		if (length == 0) return FEMBinary.EMPTY;
 		return new UniformBinary(length, value);
 	}
@@ -350,7 +350,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMBinary from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMBinary from(final String value) throws NullPointerException, IllegalArgumentException {
 		final int length = value.length();
 		if ((length < 2) || ((length & 1) != 0) || (value.charAt(0) != '0') || (value.charAt(1) != 'x')) throw new IllegalArgumentException();
 		final int count = (length >> 1) - 1;
@@ -369,7 +369,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zahlenfolge nicht als {@link MMFArray#mode() UNI8/UINT8} vorliegt. */
-	public static final FEMBinary from(final MMFArray value) throws NullPointerException, IllegalArgumentException {
+	public static FEMBinary from(final MMFArray value) throws NullPointerException, IllegalArgumentException {
 		if (value.length() == 0) return FEMBinary.EMPTY;
 		if (value.mode() == 1) return new ArrayBinary(value);
 		throw new IllegalArgumentException();
@@ -380,7 +380,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param value {@link FEMValue}.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMBinary from(final FEMValue value) throws NullPointerException {
+	public static FEMBinary from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMBinary.TYPE);
 	}
 
@@ -390,7 +390,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param context {@link FEMContext}.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMBinary from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMBinary from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMBinary.TYPE);
 	}
 
@@ -399,7 +399,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param hexDigit hexadezimale Ziffer ({@code 0..15}).
 	 * @return Zeichen ({@code '0'..'9', 'A'..'F'}).
 	 * @throws IllegalArgumentException Wenn {@code hexDigit} ungültig ist. */
-	public static final char toChar(final int hexDigit) throws IllegalArgumentException {
+	public static char toChar(final int hexDigit) throws IllegalArgumentException {
 		final int letter = hexDigit - 10;
 		if (letter >= 6) throw new IllegalArgumentException("hexDigit > 15");
 		if (letter >= 0) return (char)('A' + letter);
@@ -412,7 +412,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @param hexChar Zeichen ({@code '0'..'9', 'A'..'F'}).
 	 * @return hexadezimale Ziffer ({@code 0..15}).
 	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
-	public static final int toDigit(final int hexChar) throws IllegalArgumentException {
+	public static int toDigit(final int hexChar) throws IllegalArgumentException {
 		int number = hexChar - '0';
 		if (number < 0) throw new IllegalArgumentException("hexChar < '0'");
 		if (number <= 9) return number;

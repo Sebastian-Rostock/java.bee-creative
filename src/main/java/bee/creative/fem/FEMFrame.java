@@ -186,7 +186,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * @param context Kontextobjekt.
 	 * @return neue Stapelrahmen.
 	 * @throws NullPointerException Wenn {@code context} {@code null} ist. */
-	public static final FEMFrame from(final FEMContext context) throws NullPointerException {
+	public static FEMFrame from(final FEMContext context) throws NullPointerException {
 		return FEMFrame.EMPTY.withContext(context);
 	}
 

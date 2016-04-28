@@ -9,63 +9,63 @@ public class XML {
 	/** Diese Methode gibt einen neuen {@link XMLNode} zurück.
 	 * 
 	 * @return {@link XMLNode}. */
-	public static final XMLNode newNode() {
+	public static XMLNode newNode() {
 		return new XMLNode();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLParser} zurück.
 	 * 
 	 * @return {@link XMLParser}. */
-	public static final XMLParser newParser() {
+	public static XMLParser newParser() {
 		return new XMLParser();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLResult} zurück.
 	 * 
 	 * @return {@link XMLResult}. */
-	public static final XMLResult newResult() {
+	public static XMLResult newResult() {
 		return new XMLResult();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLSource} zurück.
 	 * 
 	 * @return {@link XMLSource}. */
-	public static final XMLSource newSource() {
+	public static XMLSource newSource() {
 		return new XMLSource();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLSchema} zurück.
 	 * 
 	 * @return {@link XMLSchema}. */
-	public static final XMLSchema newSchema() {
+	public static XMLSchema newSchema() {
 		return new XMLSchema();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLEvaluator} zurück.
 	 * 
 	 * @return {@link XMLEvaluator}. */
-	public static final XMLEvaluator newEvaluator() {
+	public static XMLEvaluator newEvaluator() {
 		return new XMLEvaluator();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLFormatter} zurück.
 	 * 
 	 * @return {@link XMLFormatter}. */
-	public static final XMLFormatter newFormatter() {
+	public static XMLFormatter newFormatter() {
 		return new XMLFormatter();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLMarshaller} zurück.
 	 * 
 	 * @return {@link XMLMarshaller}. */
-	public static final XMLMarshaller newMarshaller() {
+	public static XMLMarshaller newMarshaller() {
 		return new XMLMarshaller();
 	}
 
 	/** Diese Methode gibt einen neuen {@link XMLUnmarshaller} zurück.
 	 * 
 	 * @return {@link XMLUnmarshaller}. */
-	public static final XMLUnmarshaller newUnmarshaller() {
+	public static XMLUnmarshaller newUnmarshaller() {
 		return new XMLUnmarshaller();
 	}
 

@@ -37,7 +37,7 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
 			final Matcher matcher = FEMDuration._pattern_.matcher(string);
 			if (!matcher.find()) throw new IllegalArgumentException();
@@ -57,7 +57,7 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * @param owner Besitzerkennung ({@code 0..65535}).
 	 * @return Referenz.
 	 * @throws IllegalArgumentException Wenn {@code ref}, {@code type} bzw. {@code owner} ungültig ist. */
-	public static final FEMObject from(final int ref, final int type, final int owner) throws IllegalArgumentException {
+	public static FEMObject from(final int ref, final int type, final int owner) throws IllegalArgumentException {
 		FEMObject._checkRef_(ref);
 		FEMObject._checkType_(type);
 		FEMObject._checkOwner_(owner);
@@ -69,7 +69,7 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * @param value {@link FEMValue}.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMObject from(final FEMValue value) throws NullPointerException {
+	public static FEMObject from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMObject.TYPE);
 	}
 
@@ -79,27 +79,27 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 	 * @param context {@link FEMContext}.
 	 * @return Referenz.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMObject from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMObject from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMObject.TYPE);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final FEMObject _from_(final int ref, final int type, final int owner) throws IllegalArgumentException {
+	static FEMObject _from_(final int ref, final int type, final int owner) throws IllegalArgumentException {
 		return new FEMObject(ref, (type << 16) | (owner << 0));
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkRef_(final int ref) throws IllegalArgumentException {
+	static void _checkRef_(final int ref) throws IllegalArgumentException {
 		if (ref < 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkType_(final int type) throws IllegalArgumentException {
+	static void _checkType_(final int type) throws IllegalArgumentException {
 		if ((type < 0) || (type > 65535)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkOwner_(final int owner) throws IllegalArgumentException {
+	static void _checkOwner_(final int owner) throws IllegalArgumentException {
 		if ((owner < 0) || (owner > 65535)) throw new IllegalArgumentException();
 	}
 

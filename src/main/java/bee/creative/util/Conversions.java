@@ -90,7 +90,7 @@ public class Conversions {
 	 * @param input Eingabe.
 	 * @param output Ausgabe.
 	 * @return {@code static}-{@link Conversion}. */
-	public static final <GInput, GOutput> Conversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
+	public static <GInput, GOutput> Conversion<GInput, GOutput> staticConversion(final GInput input, final GOutput output) {
 		return new BaseConversion<GInput, GOutput>() {
 
 			@Override
@@ -120,7 +120,7 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #staticConversion(Object, Object)}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Converter<GInput, Conversion<GInput, GOutput>>() {
@@ -145,7 +145,7 @@ public class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link Converter} zu {@link #inverseConversion(Conversion)}. */
 	@SuppressWarnings ("unchecked")
-	public static final <GInput, GOutput> Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> inverseConversion() {
+	public static <GInput, GOutput> Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>> inverseConversion() {
 		return (Converter<Conversion<? extends GOutput, ? extends GInput>, Conversion<GInput, GOutput>>)Conversions.INVERSE_CONVERSION;
 	}
 
@@ -157,7 +157,7 @@ public class Conversions {
 	 * @param conversion {@link Conversion}.
 	 * @return {@code inverse}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code conversion} {@code null} ist. */
-	public static final <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
+	public static <GInput, GOutput> Conversion<GInput, GOutput> inverseConversion(final Conversion<? extends GOutput, ? extends GInput> conversion) {
 		if (conversion == null) throw new NullPointerException("conversion = null");
 		return new Conversion<GInput, GOutput>() {
 
@@ -188,7 +188,7 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static final <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
+	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Conversion<GInput, GOutput>() {
@@ -219,7 +219,7 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #dynamicConversion(Object, Converter)}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static final <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(
 		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Converter<GInput, Conversion<GInput, GOutput>>() {
@@ -243,7 +243,7 @@ public class Conversions {
 	 * @param <GInput> Typ des Eingabe.
 	 * @return {@link Converter} zu {@link Conversion#input()}. */
 	@SuppressWarnings ("unchecked")
-	public static final <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInput() {
+	public static <GInput> Converter<Conversion<? extends GInput, ?>, GInput> conversionInput() {
 		return (Converter<Conversion<? extends GInput, ?>, GInput>)Conversions.CONVERSION_INPUT;
 	}
 
@@ -253,7 +253,7 @@ public class Conversions {
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link Converter} zu {@link Conversion#output()}. */
 	@SuppressWarnings ("unchecked")
-	public static final <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutput() {
+	public static <GOutput> Converter<Conversion<?, ? extends GOutput>, GOutput> conversionOutput() {
 		return (Converter<Conversion<?, ? extends GOutput>, GOutput>)Conversions.CONVERSION_OUTPUT;
 	}
 

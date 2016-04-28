@@ -23,7 +23,7 @@ public final class CSVWriter implements Closeable {
 	 * @param data Objekt.
 	 * @return {@link CSVWriter}.
 	 * @throws IOException Wenn der {@link CSVWriter} nicht erzeugt werden kann. */
-	public static final CSVWriter from(final Object data) throws IOException {
+	public static CSVWriter from(final Object data) throws IOException {
 		if (data instanceof CSVWriter) return (CSVWriter)data;
 		return new CSVWriter(IO.outputWriterFrom(data));
 	}

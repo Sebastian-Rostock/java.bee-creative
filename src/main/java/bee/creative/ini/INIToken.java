@@ -129,7 +129,7 @@ public abstract class INIToken {
 	 * @param section Name des Abschnitts.
 	 * @return Abschnitt.
 	 * @throws NullPointerException Wenn {@code section} {@code null} ist. */
-	public static final INIToken fromSection(final String section) throws NullPointerException {
+	public static INIToken fromSection(final String section) throws NullPointerException {
 		return new SectionToken(section.intern());
 	}
 
@@ -141,7 +141,7 @@ public abstract class INIToken {
 	 * @param value Wert der Eigenschaft.
 	 * @return Eigenschaft
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
-	public static final INIToken fromProperty(final String key, final String value) throws NullPointerException {
+	public static INIToken fromProperty(final String key, final String value) throws NullPointerException {
 		return new PropertyToken(key.intern(), value.intern());
 	}
 
@@ -151,7 +151,7 @@ public abstract class INIToken {
 	 * @param comment Text des Kommentar.
 	 * @return Kommentar.
 	 * @throws NullPointerException Wenn {@code comment} {@code null} ist. */
-	public static final INIToken fromComment(final String comment) throws NullPointerException {
+	public static INIToken fromComment(final String comment) throws NullPointerException {
 		return new CommentToken(comment.intern());
 	}
 

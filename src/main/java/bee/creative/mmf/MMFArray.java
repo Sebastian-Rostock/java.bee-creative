@@ -32,17 +32,17 @@ public class MMFArray extends IAMArray {
 	 * @param object Objekt.
 	 * @return {@link MMFArray}.
 	 * @throws IOException Wenn das {@link MMFArray} nicht erzeugt werden kann. */
-	public static final MMFArray from(final Object object) throws IOException {
+	public static MMFArray from(final Object object) throws IOException {
 		return new MMFArray(IO.inputBufferFrom(object));
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final ByteOrder _order_(final ByteOrder order) {
+	static ByteOrder _order_(final ByteOrder order) {
 		return order != null ? order : ByteOrder.nativeOrder();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final ByteBuffer _buffer_(final File file, final ByteOrder order) throws IOException, NullPointerException {
+	static ByteBuffer _buffer_(final File file, final ByteOrder order) throws IOException, NullPointerException {
 		try (final RandomAccessFile data = new RandomAccessFile(file, "r")) {
 			return data.getChannel().map(MapMode.READ_ONLY, 0, file.length()).order(MMFArray._order_(order));
 		}
@@ -108,6 +108,15 @@ public class MMFArray extends IAMArray {
 		return 0;
 	}
 
+	/** Diese Methode gibt die Bytereihenfolge des internen {@link ByteBuffer} zurück.
+	 * 
+	 * @see #withOrder(ByteOrder)
+	 * @see ByteBuffer#order()
+	 * @return Bytereihenfolge. */
+	public final ByteOrder order() {
+		return this._byteBuffer_.order();
+	}
+
 	/** Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
 	 * 
 	 * @return Kopie des Speicherbereichs. */
@@ -168,11 +177,21 @@ public class MMFArray extends IAMArray {
 
 	/** Diese Methode gibt eine Kopie dieses {@link MMFArray} mit der gegebenen Bytereihenfolge zurück.
 	 * 
+	 * @see #order()
 	 * @see ByteBuffer#order()
 	 * @param order Bytereihenfolge.
 	 * @return {@link MMFArray}. */
-	public final MMFArray withOrder(final ByteOrder order) {
+	public MMFArray withOrder(final ByteOrder order) {
 		return new MMFArray(this._length_, this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
+	}
+
+	/** Diese Methode gibt eine Kopie dieses {@link MMFArray} mit umgekehrter Bytereihenfolge zurück.
+	 * 
+	 * @see #order()
+	 * @see #withOrder(ByteOrder)
+	 * @return {@link MMFArray}. */
+	public final MMFArray withInverseOrder() {
+		return this.withOrder(this.order() == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 	}
 
 	{}

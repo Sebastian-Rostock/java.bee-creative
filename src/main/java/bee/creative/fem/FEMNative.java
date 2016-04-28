@@ -30,7 +30,7 @@ public final class FEMNative extends BaseValue {
 	 * 
 	 * @param data Objekt oder {@code null}.
 	 * @return Wert. */
-	public static final FEMNative from(final Object data) {
+	public static FEMNative from(final Object data) {
 		if (data == null) return FEMNative.NULL;
 		if (data == Boolean.TRUE) return FEMNative.TRUE;
 		if (data == Boolean.FALSE) return FEMNative.FALSE;

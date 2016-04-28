@@ -181,7 +181,7 @@ public final class Fields {
 		 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
 		 * @return {@link SetField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static final <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
+		public static <GInput, GItem> BaseSetField<GInput, GItem> from(final Field<? super GInput, Set<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseSetField<GInput, GItem>() {
 
@@ -272,7 +272,7 @@ public final class Fields {
 		 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
 		 * @return {@link ListField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static final <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
+		public static <GInput, GItem> BaseListField<GInput, GItem> from(final Field<? super GInput, List<GItem>> field) throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseListField<GInput, GItem>() {
 
@@ -387,7 +387,7 @@ public final class Fields {
 		 * @param field {@link Field} zum Lesen und Schreiben einer {@link Map}.
 		 * @return {@link MapField}.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static final <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
+		public static <GInput, GKey, GValue> BaseMapField<GInput, GKey, GValue> from(final Field<? super GInput, Map<GKey, GValue>> field)
 			throws NullPointerException {
 			if (field == null) throw new NullPointerException("field = null");
 			return new BaseMapField<GInput, GKey, GValue>() {
@@ -476,7 +476,7 @@ public final class Fields {
 	 * @param <GValue> Typ des Werts.
 	 * @param value Wert.
 	 * @return {@code value}-{@link Field}. */
-	public static final <GValue> Field<Object, GValue> valueField(final GValue value) {
+	public static <GValue> Field<Object, GValue> valueField(final GValue value) {
 		return new BaseField<Object, GValue>() {
 
 			@Override
@@ -503,7 +503,7 @@ public final class Fields {
 	 * @param field Datenfeld.
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return Fields._nativeField_(field);
 	}
@@ -520,7 +520,7 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
-	public static final <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
 		final int getSize = getMethod.getParameterTypes().length, setSize = setMethod.getParameterTypes().length;
 		if ((getSize != 0) || (setSize != 1)) throw new IllegalArgumentException();
@@ -528,7 +528,7 @@ public final class Fields {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Field field) {
+	static <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Field field) {
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -560,7 +560,7 @@ public final class Fields {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod) {
+	static <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod) {
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -602,7 +602,7 @@ public final class Fields {
 	 * @param field {@link Field} zur Manipulation.
 	 * @return {@code navigated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code field} {@code null} ist. */
-	public static final <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Converter<? super GInput, ? extends GOutput> converter,
 		final Field<? super GOutput, GValue> field) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (field == null) throw new NullPointerException("field = null");
@@ -641,7 +641,7 @@ public final class Fields {
 	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
 	 * @return {@code converted}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
+	public static <GInput, GValue, GValue2> Field<GInput, GValue> convertedField(final Field<? super GInput, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
@@ -674,7 +674,7 @@ public final class Fields {
 	 * @param field {@link Field}.
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
+	public static <GInput, GValue> Field<Iterable<? extends GInput>, GValue> aggregatedField(final Field<? super GInput, GValue> field)
 		throws NullPointerException {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), null, null);
 	}
@@ -689,7 +689,7 @@ public final class Fields {
 	 * @param mixedValue Mischwert.
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field,
+	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field,
 		final GValue emptyValue, final GValue mixedValue) throws NullPointerException {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
 	}
@@ -707,7 +707,7 @@ public final class Fields {
 	 * @param formatter {@link Converter} zum Umwandeln des internen in den externen Wert (Formatieren) für das Lesen oder {@code null}.
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter) throws NullPointerException {
 		return Fields.aggregatedField(field, parser, formatter, null, null);
 	}
@@ -741,7 +741,7 @@ public final class Fields {
 	 * @param mixedValue Mischwert.
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
+	public static <GItem, GValue, GValue2> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue2> field,
 		final Converter<? super GValue, ? extends GValue2> parser, final Converter<? super GValue2, ? extends GValue> formatter, final GValue emptyValue,
 		final GValue mixedValue) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
@@ -790,7 +790,7 @@ public final class Fields {
 	 * @param reject {@code reject}-{@link Field}.
 	 * @return {@code conditional}-{@link Field}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition,
+	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition,
 		final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject) throws NullPointerException {
 		if (condition == null) throw new NullPointerException("condition = null");
 		if (accept == null) throw new NullPointerException("accept = null");
@@ -826,7 +826,7 @@ public final class Fields {
 	 * @param field {@link Field}.
 	 * @return {@code synchronized}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static final <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
+	public static <GInput, GValue> Field<GInput, GValue> synchronizedField(final Field<? super GInput, GValue> field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		return new Field<GInput, GValue>() {
 

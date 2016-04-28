@@ -394,7 +394,7 @@ public class IAMBuilder {
 	 * @param array Zahlenfolge.
 	 * @return Streuwert.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-	public static final int hash(final int[] array) throws NullPointerException {
+	public static int hash(final int[] array) throws NullPointerException {
 		int hash = 0x811C9DC5;
 		for (int i = 0, size = array.length; i < size; i++) {
 			hash = (hash * 0x01000193) ^ array[i];
@@ -409,7 +409,7 @@ public class IAMBuilder {
 	 * @param array2 zweite Zahlenfolge.
 	 * @return {@code true}, wenn die Zahlenfolgen gleich sind.
 	 * @throws NullPointerException Wenn {@code array1} bzw. {@code array2} {@code null} ist. */
-	public static final boolean equals(final int[] array1, final int[] array2) throws NullPointerException {
+	public static boolean equals(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
 		if (length1 != length2) return false;
 		for (int i = 0; i < length1; i++)
@@ -425,7 +425,7 @@ public class IAMBuilder {
 	 * @param array2 zweite Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
 	 * @throws NullPointerException Wenn {@code array1} bzw. {@code array2} {@code null} ist. */
-	public static final int compare(final int[] array1, final int[] array2) throws NullPointerException {
+	public static int compare(final int[] array1, final int[] array2) throws NullPointerException {
 		final int length1 = array1.length, length2 = array2.length;
 		for (int i = 0, length = length1 < length2 ? length1 : length2, result; i < length; i++)
 			if ((result = Comparators.compare(array1[i], array2[i])) != 0) return result;

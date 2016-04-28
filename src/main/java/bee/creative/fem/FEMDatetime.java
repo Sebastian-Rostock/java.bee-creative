@@ -101,7 +101,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * 
 	 * @return aktueller Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime now() throws IllegalArgumentException {
+	public static FEMDatetime now() throws IllegalArgumentException {
 		return FEMDatetime.from(new GregorianCalendar());
 	}
 
@@ -111,7 +111,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param millis Anzahl der Millisekunden.
 	 * @return Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime from(final long millis) throws IllegalArgumentException {
+	public static FEMDatetime from(final long millis) throws IllegalArgumentException {
 		final GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTimeInMillis(millis);
 		return FEMDatetime.from(calendar);
@@ -128,7 +128,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @return Zeitangabe.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
+	public static FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
 			final Matcher matcher = FEMDatetime._pattern_.matcher(string);
 			if (!matcher.find()) throw new IllegalArgumentException();
@@ -175,7 +175,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @throws NullPointerException Wenn {@code calendar} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link #withDate(Calendar)}, {@link #withTime(Calendar)} bzw. {@link #withZone(Calendar)} eine entsprechende Ausnahme
 	 *         auslöst. */
-	public static final FEMDatetime from(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
+	public static FEMDatetime from(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		return FEMDatetime.EMPTY.withDate(calendar).withTime(calendar).withZone(calendar);
 	}
 
@@ -184,7 +184,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param value {@link FEMValue}.
 	 * @return Zeitangabe.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMDatetime from(final FEMValue value) throws NullPointerException {
+	public static FEMDatetime from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMDatetime.TYPE);
 	}
 
@@ -194,7 +194,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param context {@link FEMContext}.
 	 * @return Zeitangabe.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMDatetime from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMDatetime from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMDatetime.TYPE);
 	}
 
@@ -205,7 +205,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Zeitangabe mit Datum.
 	 * @throws IllegalArgumentException Wenn {@link #withDate(int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromDate(final int calendarday) throws IllegalArgumentException {
+	public static FEMDatetime fromDate(final int calendarday) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withDate(calendarday);
 	}
 
@@ -217,7 +217,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param date Tag ({@code 1..31}).
 	 * @return Zeitangabe mit Datum.
 	 * @throws IllegalArgumentException Wenn {@link #withDate(int, int, int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromDate(final int year, final int month, final int date) throws IllegalArgumentException {
+	public static FEMDatetime fromDate(final int year, final int month, final int date) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withDate(year, month, date);
 	}
 
@@ -229,7 +229,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param daymillis Tagesmillis ({@code 0..86400000}).
 	 * @return Zeitangabe mit Uhrzeit.
 	 * @throws IllegalArgumentException Wenn {@link #withTime(int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromTime(final int daymillis) throws IllegalArgumentException {
+	public static FEMDatetime fromTime(final int daymillis) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withTime(daymillis);
 	}
 
@@ -243,17 +243,17 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param millis Millisekunde ({@code 0..999}).
 	 * @return Zeitangabe mit Uhrzeit.
 	 * @throws IllegalArgumentException Wenn {@link #withTime(int, int, int, int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromTime(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
+	public static FEMDatetime fromTime(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withTime(hour, minute, second, millis);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkDate_(final int calendarday) throws IllegalArgumentException {
+	static void _checkDate_(final int calendarday) throws IllegalArgumentException {
 		if ((calendarday < 0) || (calendarday > 3074323)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkDate_(final int year, final int month, final int date) throws IllegalArgumentException {
+	static void _checkDate_(final int year, final int month, final int date) throws IllegalArgumentException {
 		if (year != 1582) {
 			FEMDatetime._checkYear_(year);
 			if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
@@ -266,7 +266,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkTime_(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
+	static void _checkTime_(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
 		if (hour == 24) {
 			if (minute != 0) throw new IllegalArgumentException();
 			if (second != 0) throw new IllegalArgumentException();
@@ -280,17 +280,17 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkYear_(final int year) throws IllegalArgumentException {
+	static void _checkYear_(final int year) throws IllegalArgumentException {
 		if ((year < 1582) || (year > 9999)) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkZero_(final int data, final int ignore) {
+	static void _checkZero_(final int data, final int ignore) {
 		if ((data & ~ignore) != 0) throw new IllegalArgumentException();
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final void _checkZone_(final int zone) throws IllegalArgumentException {
+	static void _checkZone_(final int zone) throws IllegalArgumentException {
 		if ((zone < -840) || (zone > 840)) throw new IllegalArgumentException();
 	}
 
@@ -300,7 +300,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param zone Zeitzone ({@code -840..840})
 	 * @return Zeitangabe mit Zeitzone.
 	 * @throws IllegalArgumentException Wenn {@link #withZone(int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromZone(final int zone) throws IllegalArgumentException {
+	public static FEMDatetime fromZone(final int zone) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withZone(zone);
 	}
 
@@ -311,7 +311,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param zoneMinute Minute der Zeitzone ({@code 0..59}).
 	 * @return Zeitangabe mit Zeitzone.
 	 * @throws IllegalArgumentException Wenn {@link #withZone(int, int)} eine entsprechende Ausnahme auslöst. */
-	public static final FEMDatetime fromZone(final int zoneHour, final int zoneMinute) throws IllegalArgumentException {
+	public static FEMDatetime fromZone(final int zoneHour, final int zoneMinute) throws IllegalArgumentException {
 		return FEMDatetime.EMPTY.withZone(zoneHour, zoneMinute);
 	}
 
@@ -321,13 +321,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param year Jahr ({@code 1582..9999}).
 	 * @return {@code true} bei einem Schaltjahr.
 	 * @throws IllegalArgumentException Wenn {@code year} ungültig ist. */
-	public static final boolean leapOf(final int year) throws IllegalArgumentException {
+	public static boolean leapOf(final int year) throws IllegalArgumentException {
 		FEMDatetime._checkYear_(year);
 		return FEMDatetime._leapOf_(year);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final boolean _leapOf_(final int year) {
+	static boolean _leapOf_(final int year) {
 		final int div = year / 100, mod = year % 100;
 		return ((mod != 0 ? mod : div) & 3) == 0;
 	}
@@ -343,7 +343,7 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * 
 	 * @param calendarday Kalendertag.
 	 * @return Jahr, Monat und Tag. */
-	static final int _dateOf_(final int calendarday) {
+	static int _dateOf_(final int calendarday) {
 		final int months = (int)(((calendarday + 139824) * 400 * 12L) / 146097);
 		final int div = months / 12, mod = months % 12;
 		int year = div + 1200, month = mod + 1, date = (calendarday - FEMDatetime._calendardayOf_(year, month, 1)) + 1;
@@ -367,14 +367,14 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param year Jahr ({@code 1582..9999}).
 	 * @return Länge des Monats ({@code 1..31}).
 	 * @throws IllegalArgumentException Wenn {@code month} bzw. {@code year} ungültig ist. */
-	public static final int lengthOf(final int month, final int year) throws IllegalArgumentException {
+	public static int lengthOf(final int month, final int year) throws IllegalArgumentException {
 		if (year != 1582) return FEMDatetime.lengthOf(month, FEMDatetime.leapOf(year));
 		if ((month < 10) || (month > 12)) throw new IllegalArgumentException();
 		return FEMDatetime._lengthOf_(month, FEMDatetime.leapOf(year));
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _lengthOf_(final int month, final int year) {
+	static int _lengthOf_(final int month, final int year) {
 		return FEMDatetime._lengthOf_(month, FEMDatetime._leapOf_(year));
 	}
 
@@ -385,13 +385,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param leap {@code true} in einem Schaltjahr mit 366 Tagen.
 	 * @return Länge des Monats ({@code 1..31}).
 	 * @throws IllegalArgumentException Wenn {@code month} ungültig ist. */
-	public static final int lengthOf(final int month, final boolean leap) throws IllegalArgumentException {
+	public static int lengthOf(final int month, final boolean leap) throws IllegalArgumentException {
 		if ((month < 1) || (month > 12)) throw new IllegalArgumentException();
 		return FEMDatetime._lengthOf_(month, leap);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _lengthOf_(final int month, final boolean isLeap) {
+	static int _lengthOf_(final int month, final boolean isLeap) {
 		return 28 + (((isLeap ? 62648028 : 62648012) >> (month << 1)) & 3);
 	}
 
@@ -401,13 +401,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Jahrestag ({@code 1..366}).
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
-	public static final int yeardayOf(final int calendarday) throws IllegalArgumentException {
+	public static int yeardayOf(final int calendarday) throws IllegalArgumentException {
 		FEMDatetime._checkDate_(calendarday);
 		return FEMDatetime._yeardayOf_(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _yeardayOf_(final int calendarday) {
+	static int _yeardayOf_(final int calendarday) {
 		final int year = (((calendarday + 139810) * 400) / 146097) + 1200;
 		final int result = (calendarday - FEMDatetime._calendardayOf_(year, 1, 1)) + 1;
 		if (result == 0) return FEMDatetime._leapOf_(year - 1) ? 366 : 365;
@@ -421,13 +421,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Wochentag ({@code 1..7}).
 	 * @throws IllegalArgumentException Wenn {@code calendarday} ungültig ist. */
-	public static final int weekdayOf(final int calendarday) throws IllegalArgumentException {
+	public static int weekdayOf(final int calendarday) throws IllegalArgumentException {
 		FEMDatetime._checkDate_(calendarday);
 		return FEMDatetime._weekdayOf_(calendarday);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _weekdayOf_(final int calendarday) {
+	static int _weekdayOf_(final int calendarday) {
 		return ((calendarday + 5) % 7) + 1;
 	}
 
@@ -439,13 +439,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param millis Millisekunde ({@code 0..999}).
 	 * @return Anzahl der Millisekunden zwischen {@code 00:00:00.000} und der gegebenen Uhrzeit ({@code 0..86400000}).
 	 * @throws IllegalArgumentException Wenn die gegebene Uhrzeit ungültig ist. */
-	public static final int daymillisOf(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
+	public static int daymillisOf(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
 		FEMDatetime._checkTime_(hour, minute, second, millis);
 		return FEMDatetime._daymillisOf_(hour, minute, second, millis);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _daymillisOf_(final int hour, final int minute, final int second, final int millisecond) {
+	static int _daymillisOf_(final int hour, final int minute, final int second, final int millisecond) {
 		return (hour * 3600000) + (minute * 60000) + (second * 1000) + millisecond;
 	}
 
@@ -456,13 +456,13 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param date Tag des Monats ({@code 1..31}).
 	 * @return Anzahl der Tage zwischen dem {@code 15.10.1582} und dem gegebenen Datum ({@code 0..3074323}).
 	 * @throws IllegalArgumentException Wenn das gegebene Datum ungültig ist. */
-	public static final int calendardayOf(final int year, final int month, final int date) throws IllegalArgumentException {
+	public static int calendardayOf(final int year, final int month, final int date) throws IllegalArgumentException {
 		FEMDatetime._checkDate_(year, month, date);
 		return FEMDatetime._calendardayOf_(year, month, date);
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final int _calendardayOf_(final int year, final int month, final int date) {
+	static int _calendardayOf_(final int year, final int month, final int date) {
 		final int year2 = (year - ((7 >> month) & 1)) >> 2, year3 = year2 / 25, month2 = month << 1;
 		final int month3 = (month * 29) + ((59630432 >> month2) & 3) + ((266948608 >> month2) & 12);
 		return ((((year * 365) + year2) - year3) + (year3 >> 2) + month3 + date) - 578130;

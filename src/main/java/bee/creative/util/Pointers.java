@@ -173,7 +173,7 @@ public class Pointers {
 	 * @see Pointer#hashCode()
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Object#hashCode() Streuwert}. */
-	static final int _hash_(final Pointer<?> pointer) {
+	static int _hash_(final Pointer<?> pointer) {
 		return Objects.hash(pointer.data());
 	}
 
@@ -183,7 +183,7 @@ public class Pointers {
 	 * @param pointer {@link Pointer}.
 	 * @param object Objekt.
 	 * @return {@link Object#equals(Object) Äquivalenz}. */
-	static final boolean _equals_(final Pointer<?> pointer, final Object object) {
+	static boolean _equals_(final Pointer<?> pointer, final Object object) {
 		if (object == pointer) return true;
 		if (!(object instanceof Pointer<?>)) return false;
 		final Pointer<?> data = (Pointer<?>)object;
@@ -195,7 +195,7 @@ public class Pointers {
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Pointer}-Validität.
 	 * @throws NullPointerException Wenn {@code pointer} {@code null} ist. */
-	public static final boolean isValid(final Pointer<?> pointer) throws NullPointerException {
+	public static boolean isValid(final Pointer<?> pointer) throws NullPointerException {
 		if (pointer == null) throw new NullPointerException("pointer = null");
 		return (pointer == Pointers._null_) || (pointer.data() != null);
 	}
@@ -206,7 +206,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer} oder {@code null}.
 	 * @return gegebener {@link Pointer} oder {@link #_null_}. */
-	public static final <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
+	public static <GData> Pointer<GData> pointer(final Pointer<GData> pointer) {
 		if (pointer == null) return Pointers.nullPointer();
 		return pointer;
 	}
@@ -221,7 +221,7 @@ public class Pointers {
 	 * @param data Datensatz.
 	 * @return {@link Pointer} auf den Datensatz.
 	 * @throws IllegalArgumentException Wenn der gegebenen Modus ungültig ist. */
-	public static final <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
+	public static <GData> Pointer<GData> pointer(final int mode, final GData data) throws IllegalArgumentException {
 		switch (mode) {
 			case HARD:
 				return Pointers.hardPointer(data);
@@ -238,7 +238,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link #_null_}. */
 	@SuppressWarnings ("unchecked")
-	public static final <GData> Pointer<GData> nullPointer() {
+	public static <GData> Pointer<GData> nullPointer() {
 		return (Pointer<GData>)Pointers._null_;
 	}
 
@@ -249,7 +249,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link HardPointer} oder {@link #_null_}. */
-	public static final <GData> Pointer<GData> hardPointer(final GData data) {
+	public static <GData> Pointer<GData> hardPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
 		return new HardPointer<>(data);
 	}
@@ -261,7 +261,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link WeakPointer} oder {@link #_null_}. */
-	public static final <GData> Pointer<GData> weakPointer(final GData data) {
+	public static <GData> Pointer<GData> weakPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
 		return new WeakPointer<>(data);
 	}
@@ -273,7 +273,7 @@ public class Pointers {
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
 	 * @return {@link SoftPointer} oder {@link #_null_}. */
-	public static final <GData> Pointer<GData> softPointer(final GData data) {
+	public static <GData> Pointer<GData> softPointer(final GData data) {
 		if (data == null) return Pointers.nullPointer();
 		return new SoftPointer<>(data);
 	}
@@ -287,7 +287,7 @@ public class Pointers {
 	 * @param pointer {@link Pointer}.
 	 * @return {@code converted}-{@link Pointer}.
 	 * @throws NullPointerException Wenn {@code converter} bzw. {@code pointer} {@code null} ist. */
-	public static final <GInput, GOutput> Pointer<GOutput> convertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
+	public static <GInput, GOutput> Pointer<GOutput> convertedPointer(final Converter<? super GInput, ? extends GOutput> converter,
 		final Pointer<? extends GInput> pointer) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		if (pointer == null) throw new NullPointerException("pointer = null");

@@ -169,7 +169,7 @@ public class FEM {
 		 * @param name Name.
 		 * @return {@link ProxyFunction}.
 		 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-		public static final ProxyFunction from(final String name) throws NullPointerException {
+		public static ProxyFunction from(final String name) throws NullPointerException {
 			return new ProxyFunction(name);
 		}
 
@@ -245,7 +245,7 @@ public class FEM {
 		 * @param function Funktion.
 		 * @return {@link TraceFunction}.
 		 * @throws NullPointerException Wenn {@code tracer} bzw. {@code function} {@code null} ist. */
-		public static final TraceFunction from(final ScriptTracer tracer, final FEMFunction function) throws NullPointerException {
+		public static TraceFunction from(final ScriptTracer tracer, final FEMFunction function) throws NullPointerException {
 			return new TraceFunction(tracer, function);
 		}
 
@@ -345,7 +345,7 @@ public class FEM {
 		 * @param value Wert.
 		 * @return {@link FEMFunction}.
 		 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-		public static final FEMFunction from(final FEMValue value) throws NullPointerException {
+		public static FEMFunction from(final FEMValue value) throws NullPointerException {
 			if (value instanceof BaseValue) return (FEMFunction)value;
 			return new ValueFunction(value);
 		}
@@ -409,7 +409,7 @@ public class FEM {
 		 * @param function Funktion.
 		 * @return {@link VirtualFunction}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-		public static final VirtualFunction from(final FEMFunction function) throws NullPointerException {
+		public static VirtualFunction from(final FEMFunction function) throws NullPointerException {
 			if (function instanceof VirtualFunction) return (VirtualFunction)function;
 			return new VirtualFunction(function);
 		}
@@ -550,7 +550,7 @@ public class FEM {
 		 *         auslöst.
 		 * @throws ReflectiveOperationException Wenn {@link Natives#parseField(String)}, {@link Natives#parseMethod(String)},
 		 *         {@link Natives#parseConstructor(String)} oder {@link Natives#parseClass(String)} eine entsprechende Ausnahme auslöst. */
-		public static final FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+		public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
 			if (memberPath.endsWith(".class")) return FEMNative.from(Natives.parseClass(memberPath.substring(0, memberPath.length() - 6)));
 			if (memberPath.contains(".new(")) return NativeFunction.from(Natives.parseConstructor(memberPath));
 			if (memberPath.contains("(")) return NativeFunction.from(Natives.parseMethod(memberPath));
@@ -565,7 +565,7 @@ public class FEM {
 		 * @param field Datenfeld.
 		 * @return Funktion zum gegebenen Datenfeld.
 		 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-		public static final NativeFunction from(final Field field) throws NullPointerException {
+		public static NativeFunction from(final Field field) throws NullPointerException {
 			return Modifier.isStatic(field.getModifiers()) ? //
 				new FromField() {
 
@@ -638,7 +638,7 @@ public class FEM {
 		 * @param method Methode.
 		 * @return Funktion zur gegebenen Methode.
 		 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-		public static final NativeFunction from(final Method method) throws NullPointerException {
+		public static NativeFunction from(final Method method) throws NullPointerException {
 			return Modifier.isStatic(method.getModifiers()) ? //
 				new FromMethod() {
 
@@ -696,7 +696,7 @@ public class FEM {
 		 * @param constructor Konstruktor.
 		 * @return Funktion zum gegebenen Konstruktor.
 		 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-		public static final NativeFunction from(final Constructor<?> constructor) throws NullPointerException {
+		public static NativeFunction from(final Constructor<?> constructor) throws NullPointerException {
 			if (constructor == null) throw new NullPointerException("constructor = null");
 			return new FromConstructor() {
 
@@ -725,7 +725,7 @@ public class FEM {
 		}
 
 		@SuppressWarnings ("javadoc")
-		static final Object[] _params_(final FEMFrame frame, final boolean skipFirst) {
+		static Object[] _params_(final FEMFrame frame, final boolean skipFirst) {
 			final int offset = skipFirst ? 1 : 0, length = frame.size() - offset;
 			final Object[] result = new Object[length];
 			for (int i = 0; i < length; i++) {
@@ -795,7 +795,7 @@ public class FEM {
 		 * @param index Index des Parameterwerts.
 		 * @return {@link ParamFunction}.
 		 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist. */
-		public static final ParamFunction from(final int index) throws IndexOutOfBoundsException {
+		public static ParamFunction from(final int index) throws IndexOutOfBoundsException {
 			if (index < 0) throw new IndexOutOfBoundsException("index < 0");
 			if (index < ParamFunction._cache_.length) return ParamFunction._cache_[index];
 			return new ParamFunction(index);
@@ -861,7 +861,7 @@ public class FEM {
 		 * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 		 * @return {@link InvokeFunction}.
 		 * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist. */
-		public static final InvokeFunction from(final FEMFunction function, final boolean direct, final FEMFunction... params) throws NullPointerException {
+		public static InvokeFunction from(final FEMFunction function, final boolean direct, final FEMFunction... params) throws NullPointerException {
 			return new InvokeFunction(function, direct, params);
 		}
 
@@ -991,7 +991,7 @@ public class FEM {
 		 * @param function Funktion.
 		 * @return {@link ClosureFunction}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-		public static final ClosureFunction from(final FEMFunction function) throws NullPointerException {
+		public static ClosureFunction from(final FEMFunction function) throws NullPointerException {
 			if (function instanceof ClosureFunction) return (ClosureFunction)function;
 			return new ClosureFunction(function);
 		}
@@ -3654,7 +3654,7 @@ public class FEM {
 	 * @param data Wertliste, natives Array, {@link Iterable} oder {@link Collection}.
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
-	public static final FEMArray arrayFrom(final Object data) throws IllegalArgumentException {
+	public static FEMArray arrayFrom(final Object data) throws IllegalArgumentException {
 		return FEMContext._default_.arrayFrom(data);
 	}
 
@@ -3664,7 +3664,7 @@ public class FEM {
 	 * @param data Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
-	public static final FEMValue valueFrom(final Object data) throws IllegalArgumentException {
+	public static FEMValue valueFrom(final Object data) throws IllegalArgumentException {
 		return FEMContext._default_.valueFrom(data);
 	}
 
@@ -3672,7 +3672,7 @@ public class FEM {
 	 * 
 	 * @see ScriptParser
 	 * @return {@link ScriptParser}. */
-	public static final ScriptParser scriptParser() {
+	public static ScriptParser scriptParser() {
 		return new ScriptParser();
 	}
 
@@ -3682,7 +3682,7 @@ public class FEM {
 	 * 
 	 * @see ScriptCompiler
 	 * @return {@link ScriptCompiler}. */
-	public static final ScriptCompiler scriptCompiler() {
+	public static ScriptCompiler scriptCompiler() {
 		return new ScriptCompiler();
 	}
 
@@ -3691,7 +3691,7 @@ public class FEM {
 	 * 
 	 * @see ScriptFormatter
 	 * @return {@link ScriptFormatter}. */
-	public static final ScriptFormatter scriptFormatter() {
+	public static ScriptFormatter scriptFormatter() {
 		return new ScriptFormatter();
 	}
 
@@ -3703,7 +3703,7 @@ public class FEM {
 	 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
-	public static final String parseValue(final String source) throws NullPointerException, IllegalArgumentException {
+	public static String parseValue(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseValue();
 	}
 
@@ -3715,7 +3715,7 @@ public class FEM {
 	 * @return Eingabe ohne Maskierung mit {@code '\''} bzw. {@code '\"'}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
-	public static final String parseString(final String source) throws NullPointerException, IllegalArgumentException {
+	public static String parseString(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseString();
 	}
 
@@ -3727,7 +3727,7 @@ public class FEM {
 	 * @return Eingabe ohne Maskierung mit {@code '/'}.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
-	public static final String parseComment(final String source) throws NullPointerException, IllegalArgumentException {
+	public static String parseComment(final String source) throws NullPointerException, IllegalArgumentException {
 		return FEM.scriptParser().useSource(source).parseComment();
 	}
 
@@ -3738,7 +3738,7 @@ public class FEM {
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public static final String formatValue(final String source) throws NullPointerException {
+	public static String formatValue(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatValue();
 	}
 
@@ -3749,7 +3749,7 @@ public class FEM {
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public static final String formatString(final String source) throws NullPointerException {
+	public static String formatString(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatString();
 	}
 
@@ -3760,7 +3760,7 @@ public class FEM {
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
-	public static final String formatComment(final String source) throws NullPointerException {
+	public static String formatComment(final String source) throws NullPointerException {
 		return FEM.scriptParser().useSource(source).formatComment();
 	}
 

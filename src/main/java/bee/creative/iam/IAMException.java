@@ -17,7 +17,7 @@ public final class IAMException extends RuntimeException {
 	/** Dieses Feld identifiziert die Ausnahme bei der Erkennugn eines ungenügend großen Speicherbereichs. */
 	public static final int INVALID_LENGTH = 4;
 
-	/** Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer unbekannten Datentypkennung. */
+	/** Dieses Feld identifiziert die Ausnahme bei der Erkennugn einer unbekannten Datentypkennung oder Datenstruktur. */
 	public static final int INVALID_HEADER = 8;
 
 	{}

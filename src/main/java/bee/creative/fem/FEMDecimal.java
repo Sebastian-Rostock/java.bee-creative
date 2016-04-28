@@ -23,7 +23,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * 
 	 * @param value Wert.
 	 * @return Dezimalbruch. */
-	public static final FEMDecimal from(final double value) {
+	public static FEMDecimal from(final double value) {
 		return new FEMDecimal(value);
 	}
 
@@ -32,7 +32,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * @param value Wert.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMDecimal from(final Number value) throws NullPointerException {
+	public static FEMDecimal from(final Number value) throws NullPointerException {
 		return FEMDecimal.from(value.doubleValue());
 	}
 
@@ -45,7 +45,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMDecimal from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMDecimal from(final String value) throws NullPointerException, IllegalArgumentException {
 		try {
 			return FEMDecimal.from(Double.parseDouble(value));
 		} catch (final NumberFormatException cause) {
@@ -58,7 +58,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * @param value {@link FEMValue}.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMDecimal from(final FEMValue value) throws NullPointerException {
+	public static FEMDecimal from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMDecimal.TYPE);
 	}
 
@@ -68,7 +68,7 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMDecimal from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMDecimal from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMDecimal.TYPE);
 	}
 

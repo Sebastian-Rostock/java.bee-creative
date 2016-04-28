@@ -24,7 +24,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 	 * @param data Funktion.
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-	public static final FEMHandler from(final FEMFunction data) throws NullPointerException {
+	public static FEMHandler from(final FEMFunction data) throws NullPointerException {
 		return new FEMHandler(data);
 	}
 
@@ -33,7 +33,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 	 * @param value {@link FEMValue}.
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMHandler from(final FEMValue value) throws NullPointerException {
+	public static FEMHandler from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMHandler.TYPE);
 	}
 
@@ -43,7 +43,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 	 * @param context {@link FEMContext}.
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMHandler from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMHandler from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMHandler.TYPE);
 	}
 

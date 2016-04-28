@@ -28,7 +28,7 @@ public final class INIReader implements Closeable {
 	 * @param data Objekt.
 	 * @return {@link INIReader}.
 	 * @throws IOException Wenn der {@link INIReader} nicht erzeugt werden kann. */
-	public static final INIReader from(final Object data) throws IOException {
+	public static INIReader from(final Object data) throws IOException {
 		if (data instanceof INIReader) return (INIReader)data;
 		return new INIReader(IO.inputReaderFrom(data));
 	}

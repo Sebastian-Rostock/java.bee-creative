@@ -346,20 +346,20 @@ public abstract class CompactData {
 			return data._lowerIndex_(lastItem);
 		}
 
-		/** Diese Methode gibt den Index des kleinsten Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
+		/** Diese Methode gibt den Index des kleinsten Elements oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück.
 		 * 
 		 * @see NavigableSet#first()
-		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _lowestIndex_() {
 			final int index = this._firstIndex_();
 			if (this._isTooHigh_(index)) return -index - 1;
 			return index;
 		}
 
-		/** Diese Methode gibt den Index des größten Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück.
+		/** Diese Methode gibt den Index des größten Elements oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück.
 		 * 
 		 * @see NavigableSet#last()
-		 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _highestIndex_() {
 			final int index = this._lastIndex_();
 			if (this._isTooLow_(index)) return -index - 1;
@@ -367,11 +367,11 @@ public abstract class CompactData {
 		}
 
 		/** Diese Methode gibt den Index des größten Elements zurück, dass kleiner dem gegebenen ist. Wenn kein solches Element existiert wird
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#lower(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index des größten Elements, dass kleiner dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _lowerIndex_(final Object item) {
 			if (this._isTooHigh_(item)) return this._highestIndex_();
 			final int index = this._data_._lowerIndex_(item);
@@ -380,11 +380,11 @@ public abstract class CompactData {
 		}
 
 		/** Diese Methode gibt den Index des größten Elements zurück, dass kleiner oder gleich dem gegebenen ist. Wenn kein solches Element existiert wird
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#floor(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index des größten Elements, dass kleiner oder gleich dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _floorIndex_(final Object item) {
 			if (this._isTooHigh_(item)) return this._highestIndex_();
 			final int index = this._data_._floorIndex_(item);
@@ -393,11 +393,11 @@ public abstract class CompactData {
 		}
 
 		/** Diese Methode gibt den Index des größten Elements zurück, dass größer oder gleich dem gegebenen ist. Wenn kein solches Element existiert wird
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#ceiling(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index des größten Elements, dass größer oder gleich dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _ceilingIndex_(final Object item) {
 			if (this._isTooLow_(item)) return this._lowestIndex_();
 			final int index = this._data_._ceilingIndex_(item);
@@ -406,11 +406,11 @@ public abstract class CompactData {
 		}
 
 		/** Diese Methode gibt den Index des größten Elements zurück, dass größer dem gegebenen ist. Wenn kein solches Element existiert wird
-		 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück gegeben.
+		 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück gegeben.
 		 * 
 		 * @see NavigableSet#higher(Object)
 		 * @param item Element.
-		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+		 * @return Index des größten Elements, dass größer dem gegebenen ist, oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 		protected final int _higherIndex_(final Object item) {
 			if (this._isTooLow_(item)) return this._lowestIndex_();
 			final int index = this._data_._higherIndex_(item);
@@ -482,17 +482,17 @@ public abstract class CompactData {
 		this._items_.compact();
 	}
 
-	/** Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i>
+	/** Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em>
 	 * ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#_itemIndexEquals_(Object, int)
 	 * @see CompactData#_itemIndexCompare_(Object, int)
 	 * @param item Objekt oder {@code null}.
-	 * @return Index oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+	 * @return Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 	protected abstract int _itemIndex_(final Object item);
 
 	/** Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses
-	 * Elements oder <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	 * Elements oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
 	 * 
 	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
@@ -502,7 +502,7 @@ public abstract class CompactData {
 	 * @see CompactData#_itemCompare_(Object, int, Object)
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+	 * @return Index des Eintrags oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 	protected final int _itemIndexEquals_(final Object key, final int hash) {
 		final int index = this._itemIndexCompare_(key, hash);
 		if (index < 0) return index;
@@ -521,12 +521,12 @@ public abstract class CompactData {
 	}
 
 	/** Diese Methode sucht benär nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt dessen Index oder
-	 * <code>(-(<i>Einfügeposition</i>) - 1)</code> zurück. Die <i>Einfügeposition</i> ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#_itemCompare_(Object, int, Object)
 	 * @param key Schlüssel.
 	 * @param hash {@link Object#hashCode() Streuwert} des Schlüssels.
-	 * @return Index des Eintrags oder <code>(-(<i>Einfügeposition</i>) - 1)</code>. */
+	 * @return Index des Eintrags oder <code>(-(<em>Einfügeposition</em>) - 1)</code>. */
 	protected final int _itemIndexCompare_(final Object key, final int hash) {
 		final CompactDataArray data = this._items_;
 		final Object[] array = data.array();

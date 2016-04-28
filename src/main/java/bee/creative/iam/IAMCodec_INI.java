@@ -1,24 +1,26 @@
 package bee.creative.iam;
 
 import java.io.IOException;
-import java.nio.ByteOrder;
 import bee.creative.iam.IAMBuilder.IAMIndexBuilder;
 import bee.creative.iam.IAMBuilder.IAMListingBuilder;
 import bee.creative.iam.IAMBuilder.IAMMappingBuilder;
 import bee.creative.iam.IAMCodec.IAMArrayFormat;
+import bee.creative.iam.IAMCodec.IAMByteOrder;
 import bee.creative.iam.IAMCodec.IAMFindMode;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIToken;
 import bee.creative.ini.INIWriter;
 
 @SuppressWarnings ("javadoc")
-class IAMCodec_INI {
-
-	ByteOrder _order_;
+final class IAMCodec_INI {
+ // TODO stateless
+	IAMByteOrder _order_;
 
 	INIReader _reader_;
 
 	INIWriter _writer_;
+
+	{}
 
 	final INIToken _readContent_() throws IOException {
 		while (true) {
@@ -49,10 +51,10 @@ class IAMCodec_INI {
 		}
 	}
 
-	final ByteOrder _readPropertyAsOrder_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
+	final IAMByteOrder _readPropertyAsOrder_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this._readProperty_(key);
 		try {
-			return IAMCodec.parseByteOrder(token.value());
+			return IAMByteOrder.from(token.value());
 		} catch (final Exception cause) {
 			throw this._newIllegalProperty_(token, cause);
 		}
@@ -61,7 +63,7 @@ class IAMCodec_INI {
 	final IAMFindMode _readPropertyAsMode_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this._readProperty_(key);
 		try {
-			return IAMCodec.parseFindMode(token.value());
+			return IAMFindMode.from(token.value());
 		} catch (final Exception cause) {
 			throw this._newIllegalProperty_(token, cause);
 		}
@@ -70,7 +72,7 @@ class IAMCodec_INI {
 	final IAMArrayFormat _readPropertyAsFormat_(final String key) throws IOException, IllegalStateException, IllegalArgumentException {
 		final INIToken token = this._readProperty_(key);
 		try {
-			return IAMCodec.parseArrayFormat(token.value());
+			return IAMArrayFormat.from(token.value());
 		} catch (final Exception cause) {
 			throw this._newIllegalProperty_(token, cause);
 		}
@@ -78,7 +80,7 @@ class IAMCodec_INI {
 
 	public final IAMIndexBuilder decode(final IAMCodec codec) throws IOException, IllegalStateException, IllegalArgumentException {
 		INIToken token;
-		ByteOrder indexOrder = null;
+		IAMByteOrder indexOrder = null;
 		IAMIndexBuilder indexBuilder = null;
 		IAMMappingBuilder mappingBuilder = null;
 		IAMMappingBuilder[] mappingBuilders = null;
@@ -133,7 +135,7 @@ class IAMCodec_INI {
 					final int newCount = mappingBuilder.entryCount();
 
 					if (oldCount == newCount) throw new IllegalStateException("[IAM_MAPPING] incomplete");
-					mappingBuilder.mode(mappingFindMode.mode(newCount));
+					mappingBuilder.mode(mappingFindMode.toMode(newCount));
 
 					continue;
 				}
@@ -179,11 +181,12 @@ class IAMCodec_INI {
 
 	final void _writeIndex_(final IAMIndex source) throws IOException, IllegalArgumentException {
 
-		this._writeSection_("IAM_INDEX");
-		this._writeProperty_("byteOrder", IAMCodec.formatByteOrder(this._order_));
 		final int mappingCount = source.mappingCount();
-		this._writeProperty_("mappingCount", Integer.toString(mappingCount));
 		final int listingCount = source.listingCount();
+
+		this._writeSection_("IAM_INDEX");
+		this._writeProperty_("byteOrder", this._order_.toString());
+		this._writeProperty_("mappingCount", Integer.toString(mappingCount));
 		this._writeProperty_("listingCount", Integer.toString(listingCount));
 
 		for (int i = 0; i < mappingCount; i++) {
@@ -197,12 +200,13 @@ class IAMCodec_INI {
 	}
 
 	final void _writeListing_(final IAMListing source, final int index) throws IOException, IllegalArgumentException {
+
 		final int itemCount = source.itemCount();
 		if (itemCount == 0) return;
 
 		this._writeSection_("IAM_LISTING");
 		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("itemFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
+		this._writeProperty_("itemFormat", IAMArrayFormat.ARRAY.toString());
 
 		for (int i = 0; i < itemCount; i++) {
 			this._writeProperty_(Integer.toString(i), IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
@@ -211,14 +215,15 @@ class IAMCodec_INI {
 	}
 
 	final void _writeMapping_(final IAMMapping source, final int index) throws IOException, IllegalArgumentException {
+
 		final int entryCount = source.entryCount();
 		if (entryCount == 0) return;
 
 		this._writeSection_("IAM_MAPPING");
 		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("findMode", IAMCodec.formatFindMode(source.mode() ? IAMFindMode.HASHED : IAMFindMode.SORTED));
-		this._writeProperty_("keyFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
-		this._writeProperty_("valueFormat", IAMCodec.formatArrayFormat(IAMArrayFormat.ARRAY));
+		this._writeProperty_("findMode", IAMFindMode.from(source.mode()).toString());
+		this._writeProperty_("keyFormat", IAMArrayFormat.ARRAY.toString());
+		this._writeProperty_("valueFormat", IAMArrayFormat.ARRAY.toString());
 
 		for (int i = 0; i < entryCount; i++) {
 			this._writeProperty_(IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));

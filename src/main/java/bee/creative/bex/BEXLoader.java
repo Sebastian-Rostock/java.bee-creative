@@ -1,118 +1,22 @@
 package bee.creative.bex;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Arrays;
-import javax.xml.transform.TransformerException;
 import bee.creative.iam.IAMArray;
 import bee.creative.iam.IAMException;
-import bee.creative.iam.IAMLoader.IAMHeader;
-import bee.creative.iam.IAMLoader.IAMIndexLoader;
-import bee.creative.iam.IAMLoader.IAMListingLoader;
-import bee.creative.mmf.MMFArray;
+import bee.creative.iam.IAMIndex;
+import bee.creative.iam.IAMListing;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Filters;
-import bee.creative.util.IO;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
-import bee.creative.xml.XML;
-import bee.creative.xml.XMLFormatter;
 
-/** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@link BEX} Datenstrukturen und kann als Konfigurator zur {@link #decode() Überführung} eines
- * {@link #useSource(Object) BEX-Dokuments} in ein {@link #getTarget() XML-Dokument} eingesetzt werden.
+/** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@code Binary Encoded XML} Datenstrukturen.
  * 
+ * @see BEXFileLoader
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class BEXLoader {
 
-	/** Diese Klasse implementiert eine Verwaltung von Zeichenketten, die über {@link BEX#toString(MMFArray)} aus den Elementen eines {@link IAMListingLoader}
-	 * ermittelt werden.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class BEXTextCache implements Items<String> {
-
-		/** Dieses Feld speichert den leeren {@link BEXTextCache}. */
-		public static final BEXTextCache EMPTY = new BEXTextCache(IAMListingLoader.EMPTY);
-
-		{}
-
-		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
-		final IAMListingLoader _items_;
-
-		/** Dieses Feld puffert die Zeichenketten der Elemente. */
-		String[] _cache_;
-
-		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
-		 * 
-		 * @param items Elemente. */
-		BEXTextCache(final IAMListingLoader items) {
-			this._items_ = items;
-			this.setEnabled(false);
-		}
-
-		{}
-
-		/** Diese Methode gibt das {@code index}-te Element zurück.
-		 * 
-		 * @see IAMListingLoader#item(int)
-		 * @param index Index.
-		 * @return {@code index}-tes Element. */
-		public final MMFArray item(final int index) {
-			return this._items_.item(index);
-		}
-
-		/** Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
-		 * Zeichenketten bei jedem Aufruf von {@link #get(int)} erneut über {@link BEX#toString(MMFArray)} aud dem {@code index}-ten Element abgeleitet.
-		 * 
-		 * @see #get(int)
-		 * @return {@code true}, wenn die Pufferung aktiviert ist. */
-		public final boolean getEnabled() {
-			return this._cache_ != null;
-		}
-
-		/** Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
-		 * 
-		 * @see #get(int)
-		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
-		public final void setEnabled(final boolean value) {
-			if (!value) {
-				this._cache_ = null;
-			} else if (this._cache_ == null) {
-				final int count = this._items_.itemCount();
-				if (count == 0) return;
-				this._cache_ = new String[count];
-			}
-		}
-
-		{}
-
-		/** Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
-		 * 
-		 * @param index Index.
-		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
-		@Override
-		public final String get(final int index) {
-			final String[] cache = this._cache_;
-			if (cache != null) {
-				if ((index < 0) || (index >= cache.length)) return "";
-				String result = cache[index];
-				if (result != null) return result;
-				cache[index] = result = BEX.toString(this._items_.item(index));
-				return result;
-			} else {
-				final String result = BEX.toString(this._items_.item(index));
-				return result;
-			}
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final String toString() {
-			return Objects.formatIterable(true, Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this._cache_)));
-		}
-
-	}
-
-	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link MMFArray} dekodiert.
+	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link IAMIndex} bezieht.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXFileLoader extends BEXFile {
@@ -120,152 +24,150 @@ public final class BEXLoader {
 		/** Dieses Feld speichert den leeren {@link BEXFileLoader}. */
 		public static final BEXFileLoader EMPTY = new BEXFileLoader();
 
-		/** Dieses Feld speichert den {@link IAMHeader} einer {@code BEX_FILE} Datenstruktur. */
-		public static final IAMHeader HEADER = new IAMHeader(0xFFFFFFFF, 0xBE10BA5E);
-
 		{}
 
 		/** Dieses Feld speichert die Referenz des Wurzelelements. */
 		final int _rootRef_;
 
 		/** Dieses Feld speichert die URI der Attributknoten. */
-		final BEXTextCache _attrUriText_;
+		final BEXStringLoader _attrUriText_;
 
 		/** Dieses Feld speichert die Namen der Attributknoten. */
-		final BEXTextCache _attrNameText_;
+		final BEXStringLoader _attrNameText_;
 
 		/** Dieses Feld speichert die Werte der Attributknoten. */
-		final BEXTextCache _attrValueText_;
+		final BEXStringLoader _attrValueText_;
 
 		/** Dieses Feld speichert die URI der Elementknoten. */
-		final BEXTextCache _chldUriText_;
+		final BEXStringLoader _chldUriText_;
 
 		/** Dieses Feld speichert die Namen der Elementknoten. */
-		final BEXTextCache _chldNameText_;
+		final BEXStringLoader _chldNameText_;
 
 		/** Dieses Feld speichert die Werte der Textknoten. */
-		final BEXTextCache _chldValueText_;
+		final BEXStringLoader _chldValueText_;
 
 		/** Dieses Feld speichert die URI-Spalte der Attributknotentabelle. */
-		final MMFArray _attrUriRef_;
+		final IAMArray _attrUriRef_;
 
 		/** Dieses Feld speichert die Name-Spalte der Attributknotentabelle. */
-		final MMFArray _attrNameRef_;
+		final IAMArray _attrNameRef_;
 
 		/** Dieses Feld speichert die Wert-Spalte der Attributknotentabelle. */
-		final MMFArray _attrValueRef_;
+		final IAMArray _attrValueRef_;
 
 		/** Dieses Feld speichert die Elternknoten-Spalte der Attributknotentabelle. */
-		final MMFArray _attrParentRef_;
+		final IAMArray _attrParentRef_;
 
 		/** Dieses Feld speichert die URI-Spalte der Kindknotentabelle. */
-		final MMFArray _chldUriRef_;
+		final IAMArray _chldUriRef_;
 
 		/** Dieses Feld speichert die Name-Spalte der Kindknotentabelle. */
-		final MMFArray _chldNameRef_;
+		final IAMArray _chldNameRef_;
 
 		/** Dieses Feld speichert die Inhalt-Spalte der Kindknotentabelle. */
-		final MMFArray _chldContentRef_;
+		final IAMArray _chldContentRef_;
 
 		/** Dieses Feld speichert die Attribut-Spalte der Kindknotentabelle. */
-		final MMFArray _chldAttributesRef_;
+		final IAMArray _chldAttributesRef_;
 
 		/** Dieses Feld speichert die Elternknoten-Spalte der Kindknotentabelle. */
-		final MMFArray _chldParentRef_;
+		final IAMArray _chldParentRef_;
 
 		/** Dieses Feld speichert Kindknotenlisten als Abschnitte der Kindknotentabelle. */
-		final MMFArray _chldListRange_;
+		final IAMArray _chldListRange_;
 
 		/** Dieses Feld speichert Attributknotenlisten als Abschnitte der Attributknotentabelle. */
-		final MMFArray _attrListRange_;
+		final IAMArray _attrListRange_;
 
 		/** Dieser Konstruktor initialisiert den leeren {@link BEXFileLoader}. */
 		BEXFileLoader() {
 			this._rootRef_ = -1;
-			this._attrUriText_ = BEXTextCache.EMPTY;
-			this._attrNameText_ = BEXTextCache.EMPTY;
-			this._attrValueText_ = BEXTextCache.EMPTY;
-			this._chldUriText_ = BEXTextCache.EMPTY;
-			this._chldNameText_ = BEXTextCache.EMPTY;
-			this._chldValueText_ = BEXTextCache.EMPTY;
-			this._attrUriRef_ = MMFArray.EMPTY;
-			this._attrNameRef_ = MMFArray.EMPTY;
-			this._attrValueRef_ = MMFArray.EMPTY;
-			this._attrParentRef_ = MMFArray.EMPTY;
-			this._chldUriRef_ = MMFArray.EMPTY;
-			this._chldNameRef_ = MMFArray.EMPTY;
-			this._chldContentRef_ = MMFArray.EMPTY;
-			this._chldAttributesRef_ = MMFArray.EMPTY;
-			this._chldParentRef_ = MMFArray.EMPTY;
-			this._chldListRange_ = MMFArray.EMPTY;
-			this._attrListRange_ = MMFArray.EMPTY;
+			this._attrUriText_ = BEXStringLoader.EMPTY;
+			this._attrNameText_ = BEXStringLoader.EMPTY;
+			this._attrValueText_ = BEXStringLoader.EMPTY;
+			this._chldUriText_ = BEXStringLoader.EMPTY;
+			this._chldNameText_ = BEXStringLoader.EMPTY;
+			this._chldValueText_ = BEXStringLoader.EMPTY;
+			this._attrUriRef_ = IAMArray.EMPTY;
+			this._attrNameRef_ = IAMArray.EMPTY;
+			this._attrValueRef_ = IAMArray.EMPTY;
+			this._attrParentRef_ = IAMArray.EMPTY;
+			this._chldUriRef_ = IAMArray.EMPTY;
+			this._chldNameRef_ = IAMArray.EMPTY;
+			this._chldContentRef_ = IAMArray.EMPTY;
+			this._chldAttributesRef_ = IAMArray.EMPTY;
+			this._chldParentRef_ = IAMArray.EMPTY;
+			this._chldListRange_ = IAMArray.EMPTY;
+			this._attrListRange_ = IAMArray.EMPTY;
 		}
 
-		/** Dieser Kontrukteur initialisiert dieses {@link BEXFile} als Sicht auf den gegebenen Speicherbereich.
+		/** Dieser Kontrukteur initialisiert das {@link BEXFile} als Sicht auf den gegebenen {@link IAMIndex}.
 		 * 
-		 * @param array Speicherbereich mit {@code INT32} Zahlen.
-		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
-		public BEXFileLoader(MMFArray array) throws IAMException, NullPointerException {
-			array = array.toINT32();
-			if (array.length() < 3) throw new IAMException(IAMException.INVALID_LENGTH);
+		 * @param index {@link IAMIndex}.
+		 * @throws IAMException Wenn {@code index} strukturell oder referenzienn ungültig ist.
+		 * @throws NullPointerException Wenn {@code index} {@code null} ist. */
+		public BEXFileLoader(final IAMIndex index) throws IAMException, NullPointerException {
 
-			final int _header = array.get(0);
-			if (_header != 0xBE10BA5E) throw new IAMException(IAMException.INVALID_HEADER);
-
-			final int rootRef = array.get(1);
-			final IAMIndexLoader nodeData = new IAMIndexLoader(array.section(2, array.length() - 2));
 			if (false || //
-				(nodeData.mappingCount() != 0) || //
-				(nodeData.listingCount() != 17) //
+				(index.mappingCount() != 0) || //
+				(index.listingCount() != 18) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final IAMListingLoader attrUriTextList = nodeData.listing(0);
-			final IAMListingLoader attrNameTextList = nodeData.listing(1);
-			final IAMListingLoader attrValueTextList = nodeData.listing(2);
-			final IAMListingLoader chldUriTextList = nodeData.listing(3);
-			final IAMListingLoader chldNameTextList = nodeData.listing(4);
-			final IAMListingLoader chldValueTextList = nodeData.listing(5);
-			final IAMListingLoader attrUriRefList = nodeData.listing(6);
-			final IAMListingLoader attrNameRefList = nodeData.listing(7);
-			final IAMListingLoader attrValueRefList = nodeData.listing(8);
-			final IAMListingLoader attrParentRefList = nodeData.listing(9);
-			final IAMListingLoader chldUriRefList = nodeData.listing(10);
-			final IAMListingLoader chldNameRefList = nodeData.listing(11);
-			final IAMListingLoader chldContentRefList = nodeData.listing(12);
-			final IAMListingLoader chldAttributesRefList = nodeData.listing(13);
-			final IAMListingLoader chldParentRefList = nodeData.listing(14);
-			final IAMListingLoader attrListRangeList = nodeData.listing(15);
-			final IAMListingLoader chldListRangeList = nodeData.listing(16);
+			final IAMListing headRootListing = index.listing(0);
+			final IAMListing attrUriTextListing = index.listing(1);
+			final IAMListing attrNameTextListing = index.listing(2);
+			final IAMListing attrValueTextListing = index.listing(3);
+			final IAMListing chldUriTextListing = index.listing(4);
+			final IAMListing chldNameTextListing = index.listing(5);
+			final IAMListing chldValueTextListing = index.listing(6);
+			final IAMListing attrUriRefListing = index.listing(7);
+			final IAMListing attrNameRefListing = index.listing(8);
+			final IAMListing attrValueRefListing = index.listing(9);
+			final IAMListing attrParentRefListing = index.listing(11);
+			final IAMListing chldUriRefListing = index.listing(11);
+			final IAMListing chldNameRefListing = index.listing(12);
+			final IAMListing chldContentRefListing = index.listing(13);
+			final IAMListing chldAttributesRefListing = index.listing(14);
+			final IAMListing chldParentRefListing = index.listing(15);
+			final IAMListing attrListRangeListing = index.listing(16);
+			final IAMListing chldListRangeListing = index.listing(17);
+
 			if (false || //
-				(attrUriRefList.itemCount() != 1) || //
-				(attrNameRefList.itemCount() != 1) || //
-				(attrValueRefList.itemCount() != 1) || //
-				(attrParentRefList.itemCount() != 1) || //
-				(chldUriRefList.itemCount() != 1) || //
-				(chldNameRefList.itemCount() != 1) || //
-				(chldContentRefList.itemCount() != 1) || //
-				(chldAttributesRefList.itemCount() != 1) || //
-				(chldParentRefList.itemCount() != 1) || //
-				(attrListRangeList.itemCount() != 1) || //
-				(chldListRangeList.itemCount() != 1) //
+				(headRootListing.itemCount() != 1) || //
+				(attrUriRefListing.itemCount() != 1) || //
+				(attrNameRefListing.itemCount() != 1) || //
+				(attrValueRefListing.itemCount() != 1) || //
+				(attrParentRefListing.itemCount() != 1) || //
+				(chldUriRefListing.itemCount() != 1) || //
+				(chldNameRefListing.itemCount() != 1) || //
+				(chldContentRefListing.itemCount() != 1) || //
+				(chldAttributesRefListing.itemCount() != 1) || //
+				(chldParentRefListing.itemCount() != 1) || //
+				(attrListRangeListing.itemCount() != 1) || //
+				(chldListRangeListing.itemCount() != 1) //
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
-			final MMFArray attrUriRef = attrUriRefList.item(0);
-			final MMFArray attrNameRef = attrNameRefList.item(0);
-			final MMFArray attrValueRef = attrValueRefList.item(0);
-			final MMFArray attrParentRef = attrParentRefList.item(0);
-			final MMFArray chldUriRef = chldUriRefList.item(0);
-			final MMFArray chldNameRef = chldNameRefList.item(0);
-			final MMFArray chldContentRef = chldContentRefList.item(0);
-			final MMFArray chldAttributesRef = chldAttributesRefList.item(0);
-			final MMFArray chldParentRef = chldParentRefList.item(0);
-			final MMFArray chldListRange = chldListRangeList.item(0);
-			final MMFArray attrListRange = attrListRangeList.item(0);
+			final IAMArray headRoot = headRootListing.item(0);
+			final IAMArray attrUriRef = attrUriRefListing.item(0);
+			final IAMArray attrNameRef = attrNameRefListing.item(0);
+			final IAMArray attrValueRef = attrValueRefListing.item(0);
+			final IAMArray attrParentRef = attrParentRefListing.item(0);
+			final IAMArray chldUriRef = chldUriRefListing.item(0);
+			final IAMArray chldNameRef = chldNameRefListing.item(0);
+			final IAMArray chldContentRef = chldContentRefListing.item(0);
+			final IAMArray chldAttributesRef = chldAttributesRefListing.item(0);
+			final IAMArray chldParentRef = chldParentRefListing.item(0);
+			final IAMArray chldListRange = chldListRangeListing.item(0);
+			final IAMArray attrListRange = attrListRangeListing.item(0);
+
+			final int headVal = headRoot.get(0);
+			final int rootRef = headRoot.get(1);
 			final int attrCount = attrNameRef.length();
 			final int chldCount = chldNameRef.length();
 
 			if (false || //
+				(headVal != 0xBE10BA5E) || //
 				(rootRef < 0) || //
 				(chldCount <= rootRef) || //
 				((attrUriRef.length() != attrCount) && (attrUriRef.length() != 0)) || //
@@ -280,12 +182,12 @@ public final class BEXLoader {
 			) throw new IAMException(IAMException.INVALID_VALUE);
 
 			this._rootRef_ = rootRef;
-			this._attrUriText_ = new BEXTextCache(attrUriTextList);
-			this._attrNameText_ = new BEXTextCache(attrNameTextList);
-			this._attrValueText_ = new BEXTextCache(attrValueTextList);
-			this._chldUriText_ = new BEXTextCache(chldUriTextList);
-			this._chldNameText_ = new BEXTextCache(chldNameTextList);
-			this._chldValueText_ = new BEXTextCache(chldValueTextList);
+			this._attrUriText_ = new BEXStringLoader(attrUriTextListing);
+			this._attrNameText_ = new BEXStringLoader(attrNameTextListing);
+			this._attrValueText_ = new BEXStringLoader(attrValueTextListing);
+			this._chldUriText_ = new BEXStringLoader(chldUriTextListing);
+			this._chldNameText_ = new BEXStringLoader(chldNameTextListing);
+			this._chldValueText_ = new BEXStringLoader(chldValueTextListing);
 			this._attrUriRef_ = attrUriRef;
 			this._attrNameRef_ = attrNameRef;
 			this._attrValueRef_ = attrValueRef;
@@ -305,42 +207,42 @@ public final class BEXLoader {
 		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der URI der Attributknoten. */
-		public final BEXTextCache attrUriCache() {
+		public final BEXStringLoader attrUriCache() {
 			return this._attrUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der Namen der Attributknoten. */
-		public final BEXTextCache attrNameCache() {
+		public final BEXStringLoader attrNameCache() {
 			return this._attrNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
 		 * 
 		 * @return Verwaltung der Werte der Attributknoten. */
-		public final BEXTextCache attrValueCache() {
+		public final BEXStringLoader attrValueCache() {
 			return this._attrValueText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
 		 * 
 		 * @return Verwaltung der URI der Elementknoten. */
-		public final BEXTextCache chldUriCache() {
+		public final BEXStringLoader chldUriCache() {
 			return this._chldUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
 		 * 
 		 * @return Verwaltung der Namen der Elementknoten. */
-		public final BEXTextCache chldNameCache() {
+		public final BEXStringLoader chldNameCache() {
 			return this._chldNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
 		 * 
 		 * @return Verwaltung der Werte der Textknoten. */
-		public final BEXTextCache chldValueCache() {
+		public final BEXStringLoader chldValueCache() {
 			return this._chldValueText_;
 		}
 
@@ -397,7 +299,7 @@ public final class BEXLoader {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
+	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXListLoader extends BEXList {
@@ -441,13 +343,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public int key() {
+		public final int key() {
 			return this._key_;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public int type() {
+		public final int type() {
 			switch (BEXLoader._typeOf_(this._key_)) {
 				case BEX_VOID_TYPE:
 					return BEXList.VOID_LIST;
@@ -462,13 +364,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXFile owner() {
+		public final BEXFile owner() {
 			return this._owner_;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXNode get(final int index) {
+		public final BEXNode get(final int index) {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -501,14 +403,14 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public int find(final String uri, final String name, final int start) throws NullPointerException {
+		public final int find(final String uri, final String name, final int start) throws NullPointerException {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
 				case BEX_ATTR_LIST: {
 					if (start < 0) return -1;
 					final boolean useUri = uri.length() != 0, useName = name.length() != 0;
-					final IAMArray array = owner._attrListRange_, uriArray = BEX.toArray(uri), nameArray = BEX.toArray(name);
+					final IAMArray array = owner._attrListRange_, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
 					int ref = this._ref_;
 					final int startRef = array.get(ref), finalRef = array.get(ref + 1);
 					for (ref = startRef + start; ref < finalRef; ref++) {
@@ -531,7 +433,7 @@ public final class BEXLoader {
 				case BEX_CHLD_LIST: {
 					if (start < 0) return -1;
 					final boolean useUri = uri.length() != 0, useName = name.length() != 0;
-					final IAMArray array = owner._chldListRange_, uriArray = BEX.toArray(uri), nameArray = BEX.toArray(name);
+					final IAMArray array = owner._chldListRange_, uriArray = BEXFile.arrayFrom(uri), nameArray = BEXFile.arrayFrom(name);
 					int ref = this._ref_;
 					final int startRef = array.get(ref), finalRef = array.get(ref + 1);
 					for (ref = startRef + start; ref < finalRef; ref++) {
@@ -564,7 +466,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public int length() {
+		public final int length() {
 			final int key = this._key_;
 			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
@@ -587,7 +489,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXNode parent() {
+		public final BEXNode parent() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -603,7 +505,7 @@ public final class BEXLoader {
 
 	}
 
-	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link MMFArray} seines Besitzers dekodiert.
+	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
 	 * 
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXNodeLoader extends BEXNode {
@@ -639,13 +541,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public int key() {
+		public final int key() {
 			return this._key_;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public int type() {
+		public final int type() {
 			switch (BEXLoader._typeOf_(this._key_)) {
 				case BEX_VOID_TYPE:
 					return BEXNode.VOID_NODE;
@@ -662,13 +564,13 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXFile owner() {
+		public final BEXFile owner() {
 			return this._owner_;
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public String uri() {
+		public final String uri() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -686,7 +588,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public String name() {
+		public final String name() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -704,7 +606,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public String value() {
+		public final String value() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -727,20 +629,20 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public int index() {
+		public final int index() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
 					return -1;
 				case BEX_ATTR_NODE: {
-					final MMFArray array = owner._attrParentRef_;
+					final IAMArray array = owner._attrParentRef_;
 					if (array.length() == 0) return -1;
 					final int ref = BEXLoader._refOf_(key);
 					return ref - owner._attrListRange_.get(owner._chldAttributesRef_.get(array.get(ref)));
 				}
 				case BEX_ELEM_NODE: {
-					final MMFArray array = owner._chldParentRef_;
+					final IAMArray array = owner._chldParentRef_;
 					if (array.length() == 0) return -1;
 					final int ref = BEXLoader._refOf_(key);
 					final int parentRef = array.get(ref);
@@ -748,7 +650,7 @@ public final class BEXLoader {
 					return ref - owner._chldListRange_.get(-owner._chldContentRef_.get(parentRef));
 				}
 				case BEX_TEXT_NODE: {
-					final MMFArray array = owner._chldParentRef_;
+					final IAMArray array = owner._chldParentRef_;
 					if (array.length() == 0) return -1;
 					final int ref = BEXLoader._refOf_(key);
 					return ref - owner._chldListRange_.get(-owner._chldContentRef_.get(array.get(ref)));
@@ -761,19 +663,19 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXNode parent() {
+		public final BEXNode parent() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
 				case BEX_VOID_TYPE:
 					return new BEXNodeLoader(owner);
 				case BEX_ATTR_NODE: {
-					final MMFArray array = owner._attrParentRef_;
+					final IAMArray array = owner._attrParentRef_;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader._refOf_(key))), owner);
 				}
 				case BEX_ELEM_NODE: {
-					final MMFArray array = owner._chldParentRef_;
+					final IAMArray array = owner._chldParentRef_;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
 					final int ref = BEXLoader._refOf_(key);
 					final int parentRef = array.get(ref);
@@ -781,7 +683,7 @@ public final class BEXLoader {
 					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, parentRef), owner);
 				}
 				case BEX_TEXT_NODE: {
-					final MMFArray array = owner._chldParentRef_;
+					final IAMArray array = owner._chldParentRef_;
 					if (array.length() == 0) return new BEXNodeLoader(owner);
 					return new BEXNodeLoader(BEXLoader._keyOf_(BEXLoader.BEX_ELEM_NODE, array.get(BEXLoader._refOf_(key))), owner);
 				}
@@ -793,7 +695,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXList children() {
+		public final BEXList children() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -814,7 +716,7 @@ public final class BEXLoader {
 
 		/** {@inheritDoc} */
 		@Override
-		public BEXList attributes() {
+		public final BEXList attributes() {
 			final int key = this._key_;
 			final BEXFileLoader owner = this._owner_;
 			switch (BEXLoader._typeOf_(key)) {
@@ -830,6 +732,94 @@ public final class BEXLoader {
 			}
 			throw new IAMException(IAMException.INVALID_HEADER);
 		}
+	}
+
+	/** Diese Klasse implementiert eine Verwaltung von gepufferten Zeichenketten, die über {@link BEXFile#stringFrom(IAMArray)} aus den Elementen eines
+	 * {@link IAMListing} ermittelt werden.
+	 * 
+	 * @see #getEnabled()
+	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
+	public static final class BEXStringLoader implements Items<String> {
+
+		/** Dieses Feld speichert den leeren {@link BEXStringLoader}. */
+		public static final BEXStringLoader EMPTY = new BEXStringLoader(IAMListing.EMPTY);
+
+		{}
+
+		/** Dieses Feld speichert die Elemente, deren Zeichenketten verwaltet werden. */
+		final IAMListing _items_;
+
+		/** Dieses Feld puffert die Zeichenketten der Elemente. */
+		String[] _cache_;
+
+		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
+		 * 
+		 * @param items Elemente. */
+		BEXStringLoader(final IAMListing items) {
+			this._items_ = items;
+		}
+
+		{}
+
+		/** Diese Methode gibt das {@code index}-te Element zurück.
+		 * 
+		 * @see IAMListing#item(int)
+		 * @param index Index.
+		 * @return {@code index}-tes Element. */
+		public final IAMArray item(final int index) {
+			return this._items_.item(index);
+		}
+
+		/** Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
+		 * Zeichenketten bei jedem Aufruf von {@link #get(int)} erneut über {@link BEXFile#stringFrom(IAMArray)} aud dem {@code index}-ten Element abgeleitet.
+		 * 
+		 * @see #get(int)
+		 * @return {@code true}, wenn die Pufferung aktiviert ist. */
+		public final boolean getEnabled() {
+			return this._cache_ != null;
+		}
+
+		/** Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
+		 * 
+		 * @see #get(int)
+		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
+		public final void setEnabled(final boolean value) {
+			if (!value) {
+				this._cache_ = null;
+			} else if (this._cache_ == null) {
+				final int count = this._items_.itemCount();
+				if (count == 0) return;
+				this._cache_ = new String[count];
+			}
+		}
+
+		{}
+
+		/** Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
+		 * 
+		 * @param index Index.
+		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
+		@Override
+		public final String get(final int index) {
+			final String[] cache = this._cache_;
+			if (cache != null) {
+				if ((index < 0) || (index >= cache.length)) return "";
+				String result = cache[index];
+				if (result != null) return result;
+				cache[index] = result = BEXFile.stringFrom(this._items_.item(index));
+				return result;
+			} else {
+				final String result = BEXFile.stringFrom(this._items_.item(index));
+				return result;
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public final String toString() {
+			return Objects.formatIterable(true, Iterables.filteredIterable(Filters.nullFilter(), Arrays.asList(this._cache_)));
+		}
+
 	}
 
 	{}
@@ -865,7 +855,7 @@ public final class BEXLoader {
 	 * @see #_keyOf_(int, int)
 	 * @param key Schlüssel.
 	 * @return Referenz. */
-	final static int _refOf_(final int key) {
+	static int _refOf_(final int key) {
 		return (key >> 3) & 0x1FFFFFFF;
 	}
 
@@ -876,7 +866,7 @@ public final class BEXLoader {
 	 * @param type Typkennung (0..7).
 	 * @param ref Referenz als Zeilennummer des Datensatzes.
 	 * @return Schlüssel. */
-	final static int _keyOf_(final int type, final int ref) {
+	static int _keyOf_(final int type, final int ref) {
 		return (ref << 3) | (type << 0);
 	}
 
@@ -885,100 +875,8 @@ public final class BEXLoader {
 	 * @see #_keyOf_(int, int)
 	 * @param key Schlüssel.
 	 * @return Typkennung. */
-	final static int _typeOf_(final int key) {
+	static int _typeOf_(final int key) {
 		return (key >> 0) & 7;
-	}
-
-	{}
-
-	/** Dieses Feld speichert die Eingabedaten. */
-	Object _source_;
-
-	/** Dieses Feld speichert das Ausgabedaten. */
-	Object _target_;
-
-	{}
-
-	/** Diese Methode gibt die Eingabedaten (BEX-Dokument) zurück.
-	 * 
-	 * @see #useSource(Object)
-	 * @return Eingabedaten. */
-	public final Object getSource() {
-		return this._source_;
-	}
-
-	/** Diese Methode setzt die Eingabedaten (BEX-Dokument) und gibt {@code this} zurück.<br>
-	 * Das gegebene Objekt wird in ein {@link MMFArray} {@link MMFArray#from(Object) überführt}.
-	 * 
-	 * @see MMFArray#from(Object)
-	 * @param source Eingabedaten.
-	 * @return {@code this}. */
-	public final BEXLoader useSource(final Object source) {
-		this._source_ = source;
-		return this;
-	}
-
-	/** Diese Methode gibt die Ausgabedaten (XML-Dokument) zurück.
-	 * 
-	 * @see #useTarget(Object)
-	 * @return Ausgabedaten. */
-	public final Object getTarget() {
-		return this._target_;
-	}
-
-	/** Diese Methode setzt die Ausgabedaten (XML-Dokument) und gibt {@code this} zurück.<br>
-	 * Das gegebene Objekt wird in einen {@link Writer} {@link IO#outputWriterFrom(Object) überführt}.
-	 * 
-	 * @see IO#outputWriterFrom(Object)
-	 * @param target Ausgabedaten.
-	 * @return {@code this}. */
-	public final BEXLoader useTarget(final Object target) {
-		this._target_ = target;
-		return this;
-	}
-
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in die {@link #getTarget() Ausgabedaten} (XML-Dokument) und gibt {@code this}
-	 * zurück.
-	 * 
-	 * @return {@code this}.
-	 * @throws IOException Wenn {@link #decodeSource()} bzw. {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst.
-	 * @throws IAMException Wenn {@link #decodeSource()} eine entsprechende Ausnahme auslöst.
-	 * @throws TransformerException Wenn {@link #decodeTarget(BEXFile)} eine entsprechende Ausnahme auslöst. */
-	public final BEXLoader decode() throws IOException, IAMException, TransformerException {
-		return this.decodeTarget(this.decodeSource());
-	}
-
-	/** Diese Methode überführt die {@link #getSource() Eingabedaten} (BEX-Dokument) in einen {@link BEXFileLoader} und gibt diesen zurück.
-	 * 
-	 * @return {@link BEXFileLoader}.
-	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
-	 * @throws IAMException Wenn die Struktur der Eingabedaten ungültig sind. */
-	public final BEXFileLoader decodeSource() throws IOException, IAMException {
-		final MMFArray array = MMFArray.from(this._source_);
-		return new BEXFileLoader(array.withOrder(BEXFileLoader.HEADER.orderOf(array)));
-	}
-
-	/** Diese Methode überführt das gegebene {@link BEXFile} in die {@link #getTarget() Ausgabedaten} (XML-Dokument) und gibt {@code this} zurück.
-	 * 
-	 * @see XMLFormatter#transform()
-	 * @param source {@link BEXFile}.
-	 * @return {@code this}.
-	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
-	 * @throws TransformerException Wenn die Ausgabedaten nicht erzeigt werden können. */
-	public final BEXLoader decodeTarget(final BEXFile source) throws IOException, TransformerException {
-		XML.newFormatter() //
-			.openResultData().useWriter(IO.outputWriterFrom(this._target_)).closeResultData() //
-			.openSourceData().useNode(BEXAdapter.wrap(source)).closeSourceData() //
-			.transform();
-		return this;
-	}
-
-	{}
-
-	/** {@inheritDoc} */
-	@Override
-	public final String toString() {
-		return Objects.toInvokeString(this, this._source_, this._target_);
 	}
 
 }

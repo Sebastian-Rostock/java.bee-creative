@@ -83,10 +83,14 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	/** Dieses Feld speichert die leere {@link IAMMapping}. */
 	public static final IAMMapping EMPTY = new EmptyMapping();
 
-	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge über den Streuwert ihrer Schlüssel gesucht werden. */
+	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge über den Streuwert ihrer Schlüssel gesucht werden.
+	 * 
+	 * @see #mode() */
 	public static final boolean MODE_HASHED = true;
 
-	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge binär über die Ordnung ihrer Schlüssel gesucht werden. */
+	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge binär über die Ordnung ihrer Schlüssel gesucht werden.
+	 * 
+	 * @see #mode() */
 	public static final boolean MODE_SORTED = false;
 
 	{}
@@ -99,19 +103,19 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	 * @return {@link IAMMappingLoader}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMMappingLoader#IAMMappingLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static final IAMMappingLoader from(Object object) throws IOException, IAMException {
+	public static IAMMappingLoader from(final Object object) throws IOException, IAMException {
 		return new IAMMappingLoader(MMFArray.from(object));
 	}
 
 	{}
 
-	/** Diese Methode gibt nur dann {@value #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
-	 * Wenn sie {@value #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
+	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
+	 * Wenn sie {@link #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
 	 * 
 	 * @see #find(IAMArray)
 	 * @see #MODE_HASHED
 	 * @see #MODE_SORTED
-	 * @return {@value #MODE_HASHED} bei Nutzung von {@link IAMArray#hash()} bzw. {@value #MODE_SORTED} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
+	 * @return {@link #MODE_HASHED} bei Nutzung von {@link IAMArray#hash()} bzw. {@link #MODE_SORTED} bei Nutzung von {@link IAMArray#compare(IAMArray)} in
 	 *         {@link #find(IAMArray)}. */
 	public abstract boolean mode();
 
@@ -238,7 +242,12 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 		if (this.mode()) {
 
-			rangeMask = IAMMapping._computeRangeMask_(entryCount);
+			int limit = 2;
+			while (limit < entryCount) {
+				limit <<= 1;
+			}
+			rangeMask = (limit - 1) & 536870911;
+
 			rangeCount = rangeMask + 2;
 			rangeData = new int[rangeCount];
 			rangeDataType = SizeStats.computeSizeType(entryCount);
@@ -329,18 +338,6 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	@Override
 	public String toString() {
 		return Objects.toInvokeString("IAMMap", this.entryCount());
-	}
-
-	/** Diese Methode gibt die Bitmaske zur Umrechnung von Streuwerten zurück.
-	 * 
-	 * @param entryCount Anzahl der Einträge der Abbildung.
-	 * @return Bitmaske. */
-	static final int _computeRangeMask_(final int entryCount) {
-		int result = 2;
-		while (result < entryCount) {
-			result <<= 1;
-		}
-		return (result - 1) & 536870911;
 	}
 
 }

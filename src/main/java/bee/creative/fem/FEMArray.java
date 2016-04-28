@@ -307,7 +307,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param values Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static final FEMArray from(final FEMValue... values) throws NullPointerException {
+	public static FEMArray from(final FEMValue... values) throws NullPointerException {
 		if (values.length == 0) return FEMArray.EMPTY;
 		if (values.length == 1) return FEMArray.from(values[0], 1);
 		return new CompactArray(values.clone());
@@ -320,7 +320,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static final FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
+	public static FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
 		if (length == 0) return FEMArray.EMPTY;
 		if (value == null) throw new NullPointerException("value = null");
 		return new UniformArray(length, value);
@@ -332,7 +332,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param values Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static final FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
+	public static FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
 		final ArrayList<FEMValue> result = new ArrayList<>();
 		Iterables.appendAll(result, values);
 		return FEMArray.from(result);
@@ -345,7 +345,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param values Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static final FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
+	public static FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
 		if (values.size() == 0) return FEMArray.EMPTY;
 		return FEMArray.from(values.toArray(new FEMValue[values.size()]));
 	}
@@ -355,7 +355,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param value {@link FEMValue}.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMArray from(final FEMValue value) throws NullPointerException {
+	public static FEMArray from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMArray.TYPE);
 	}
 
@@ -365,7 +365,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param context {@link FEMContext}.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMArray from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMArray from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMArray.TYPE);
 	}
 

@@ -64,7 +64,7 @@ public abstract class IAMEntry {
 	 * @param value Wert.
 	 * @return {@link IAMEntry}-Sicht auf {@code key} und {@code value}.
 	 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
-	public static final IAMEntry from(final IAMArray key, final IAMArray value) throws NullPointerException {
+	public static IAMEntry from(final IAMArray key, final IAMArray value) throws NullPointerException {
 		if ((key.length() == 0) && (value.length() == 0)) return IAMEntry.EMPTY;
 		return new SimpleEntry(key, value);
 	}

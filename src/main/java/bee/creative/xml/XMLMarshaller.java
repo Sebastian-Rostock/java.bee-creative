@@ -94,7 +94,7 @@ public final class XMLMarshaller {
 	 * 
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
-	public static final XMLMarshaller from(final Class<?>... classes) {
+	public static XMLMarshaller from(final Class<?>... classes) {
 		return new XMLMarshaller() //
 			.openMarshallerData().openContextData().openClassData() //
 			.useItems(Arrays.asList(classes)) //

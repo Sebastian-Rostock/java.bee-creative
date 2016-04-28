@@ -30,7 +30,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	static final List<String> _apply_(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
+	static List<String> _apply_(final String regex, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
 		if (regex == null) throw new NullPointerException("regex = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -50,7 +50,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	static final List<String> _apply_(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
+	static List<String> _apply_(final Pattern pattern, final CharSequence string, final int index, final boolean split, final boolean match)
 		throws NullPointerException, IllegalArgumentException {
 		if (pattern == null) throw new NullPointerException("pattern = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -88,7 +88,7 @@ public class Strings {
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	static final List<List<String>> _applyAll_(final String regex, final CharSequence string, final boolean split, final boolean match)
+	static List<List<String>> _applyAll_(final String regex, final CharSequence string, final boolean split, final boolean match)
 		throws NullPointerException {
 		if (regex == null) throw new NullPointerException("regex = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -105,7 +105,7 @@ public class Strings {
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	static final List<List<String>> _applyAll_(final Pattern pattern, final CharSequence string, final boolean split, final boolean match)
+	static List<List<String>> _applyAll_(final Pattern pattern, final CharSequence string, final boolean split, final boolean match)
 		throws NullPointerException {
 		if (pattern == null) throw new NullPointerException("pattern = null");
 		if (string == null) throw new NullPointerException("string = null");
@@ -156,7 +156,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static final String join(final Object... items) throws NullPointerException {
+	public static String join(final Object... items) throws NullPointerException {
 		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join("", items);
 	}
@@ -169,7 +169,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code space} bzw. {@code items} {@code null} ist. */
-	public static final String join(final String space, final Object... items) throws NullPointerException {
+	public static String join(final String space, final Object... items) throws NullPointerException {
 		if (space == null) throw new NullPointerException("space = null");
 		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join(space, Arrays.asList(items));
@@ -182,7 +182,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
-	public static final String join(final Iterable<?> items) {
+	public static String join(final Iterable<?> items) {
 		if (items == null) throw new NullPointerException("items = null");
 		return Strings.join("", items);
 	}
@@ -194,7 +194,7 @@ public class Strings {
 	 * @param items Objekte.
 	 * @return Verkettungstext.
 	 * @throws NullPointerException Wenn {@code space} bzw. {@code items} {@code null} ist. */
-	public static final String join(final String space, final Iterable<?> items) {
+	public static String join(final String space, final Iterable<?> items) {
 		if (space == null) throw new NullPointerException("space = null");
 		if (items == null) throw new NullPointerException("items = null");
 		final StringBuilder builder = new StringBuilder();
@@ -220,7 +220,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<String> split(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<String> split(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(regex, string, 0, true, false);
 	}
 
@@ -239,7 +239,7 @@ public class Strings {
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> split(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
+	public static List<String> split(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(regex, string, index, true, false);
 	}
 
@@ -251,7 +251,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<String> split(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<String> split(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(pattern, string, 0, true, false);
 	}
 
@@ -269,7 +269,7 @@ public class Strings {
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> split(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
+	public static List<String> split(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, true, false);
 	}
@@ -286,7 +286,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> splitAll(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> splitAll(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(regex, string, true, false);
 	}
 
@@ -302,7 +302,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> splitAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> splitAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(pattern, string, true, false);
 	}
 
@@ -314,7 +314,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<String> match(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<String> match(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(regex, string, 0, false, true);
 	}
 
@@ -332,7 +332,7 @@ public class Strings {
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> match(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
+	public static List<String> match(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(regex, string, index, false, true);
 	}
 
@@ -344,7 +344,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<String> match(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<String> match(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(pattern, string, 0, false, true);
 	}
 
@@ -362,7 +362,7 @@ public class Strings {
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> match(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
+	public static List<String> match(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, false, true);
 	}
@@ -379,7 +379,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> matchAll(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> matchAll(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(regex, string, false, true);
 	}
 
@@ -395,7 +395,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> matchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> matchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(pattern, string, false, true);
 	}
 
@@ -407,7 +407,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<String> splatch(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<String> splatch(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(regex, string, 0, true, true);
 	}
 
@@ -425,7 +425,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> splatch(final String regex, final CharSequence string, final int index) throws NullPointerException,
+	public static List<String> splatch(final String regex, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
 		return Strings._apply_(regex, string, index, true, true);
 	}
@@ -438,7 +438,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<String> splatch(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<String> splatch(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._apply_(pattern, string, 0, true, true);
 	}
 
@@ -456,7 +456,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static final List<String> splatch(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
+	public static List<String> splatch(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
 		IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, true, true);
 	}
@@ -473,7 +473,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> splatchAll(final String regex, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> splatchAll(final String regex, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(regex, string, true, true);
 	}
 
@@ -489,7 +489,7 @@ public class Strings {
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	public static final List<List<String>> splatchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
+	public static List<List<String>> splatchAll(final Pattern pattern, final CharSequence string) throws NullPointerException {
 		return Strings._applyAll_(pattern, string, true, true);
 	}
 
@@ -500,7 +500,7 @@ public class Strings {
 	 * @param flags Flags ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE},
 	 *        {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})
 	 * @return {@link Pattern}-Compiler. */
-	public static final Converter<String, Pattern> patternCompiler(final int flags) {
+	public static Converter<String, Pattern> patternCompiler(final int flags) {
 		return new Converter<String, Pattern>() {
 
 			@Override

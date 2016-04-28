@@ -1,6 +1,7 @@
 package bee.creative.mmf;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /** Diese Klasse implementiert ein {@link MMFArray}, welches einen gegebenen Speicherbereich als Folge von {@code INT16} Zahlen interpretiert.
  * 
@@ -24,6 +25,12 @@ class MMFUINT16Array extends MMFINT16Array {
 	@Override
 	protected MMFArray _section_(final int offset, final int length) {
 		return new MMFUINT16Array(this._byteBuffer_, this._byteOffset_ + (offset << 1), length << 1);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public MMFArray withOrder(ByteOrder order) {
+		return new MMFUINT16Array(this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
 	}
 
 }

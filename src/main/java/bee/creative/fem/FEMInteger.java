@@ -24,7 +24,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * 
 	 * @param value Wert.
 	 * @return Dezimalzahl. */
-	public static final FEMInteger from(final long value) {
+	public static FEMInteger from(final long value) {
 		return new FEMInteger(value);
 	}
 
@@ -33,7 +33,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMInteger from(final Number value) throws NullPointerException {
+	public static FEMInteger from(final Number value) throws NullPointerException {
 		return new FEMInteger(value.longValue());
 	}
 
@@ -46,7 +46,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMInteger from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMInteger from(final String value) throws NullPointerException, IllegalArgumentException {
 		try {
 			return FEMInteger.from(Long.parseLong(value));
 		} catch (final NumberFormatException cause) {
@@ -59,7 +59,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * @param value {@link FEMValue}.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMInteger from(final FEMValue value) throws NullPointerException {
+	public static FEMInteger from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMInteger.TYPE);
 	}
 
@@ -69,7 +69,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMInteger from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMInteger from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMInteger.TYPE);
 	}
 

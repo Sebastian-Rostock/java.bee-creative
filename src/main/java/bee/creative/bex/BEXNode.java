@@ -67,6 +67,7 @@ public abstract class BEXNode {
 
 	{}
 
+	/** Dieses Feld speichert den leeren {@link BEXNode} als undefinierten Knoten im {@link BEXFile#EMPTY}. */
 	public static final BEXNode EMPTY = new EmptyNode();
 
 	/** Dieses Feld speichert die Typkennung eines undefinierten Knoten. */

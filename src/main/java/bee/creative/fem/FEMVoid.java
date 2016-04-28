@@ -24,7 +24,7 @@ public final class FEMVoid extends BaseValue {
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMVoid from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMVoid from(final String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("void")) return FEMVoid.INSTANCE;
 		throw new IllegalArgumentException();
 	}
@@ -34,7 +34,7 @@ public final class FEMVoid extends BaseValue {
 	 * @param value {@link FEMValue}.
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMVoid from(final FEMValue value) throws NullPointerException {
+	public static FEMVoid from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMVoid.TYPE);
 	}
 
@@ -44,7 +44,7 @@ public final class FEMVoid extends BaseValue {
 	 * @param context {@link FEMContext}.
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMVoid from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMVoid from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMVoid.TYPE);
 	}
 

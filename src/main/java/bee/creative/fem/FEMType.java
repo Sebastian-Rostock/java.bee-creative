@@ -16,7 +16,7 @@ public abstract class FEMType<GData> {
 	 * @param <GData> Typ des Werts.
 	 * @param id Identifikator für {@link #id()}.
 	 * @return {@code simple}-{@link FEMType}. */
-	public static final <GData> FEMType<GData> from(final int id) {
+	public static <GData> FEMType<GData> from(final int id) {
 		return FEMType.from(id, Objects.toInvokeString("simpleType", id));
 	}
 
@@ -28,7 +28,7 @@ public abstract class FEMType<GData> {
 	 * @param toString Textdarstellung für {@link #toString()}.
 	 * @return {@code simple}-{@link FEMType}.
 	 * @throws NullPointerException Wenn {@code toString} {@code null} ist. */
-	public static final <GData> FEMType<GData> from(final int id, final String toString) throws NullPointerException {
+	public static <GData> FEMType<GData> from(final int id, final String toString) throws NullPointerException {
 		if (toString == null) throw new NullPointerException("toString = null");
 		return new FEMType<GData>() {
 

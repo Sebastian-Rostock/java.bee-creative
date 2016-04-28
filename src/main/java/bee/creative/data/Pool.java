@@ -72,7 +72,7 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	public int size();
 
 	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item}s im {@link Item#APPEND_STATE} zurück. Das einfügen von Elementen ist unzulässig.<br>
-	 * <i>Achtung:</i> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
+	 * <em>Achtung:</em> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
 	 * 
 	 * @see Item#state()
 	 * @see Pool#items(int)
@@ -81,7 +81,7 @@ public interface Pool<GItem extends Item> extends Part, Selection<GItem> {
 	public Collection<? extends GItem> items();
 
 	/** Diese Methode gibt eine {@link Collection}-Sicht auf die {@link Item}s im gegebenen Status zurück. Das einfügen von Elementen ist unzulässig.<br>
-	 * <i>Achtung:</i> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
+	 * <em>Achtung:</em> Beim Entfernen von Datensätzen werden diese in den {@link Item#CREATE_STATE} überführt.
 	 * 
 	 * @see Item#state()
 	 * @see Pool#items()

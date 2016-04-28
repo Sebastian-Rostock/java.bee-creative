@@ -26,7 +26,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 	 * 
 	 * @param value Wert.
 	 * @return Wahrheitswert. */
-	public static final FEMBoolean from(final boolean value) {
+	public static FEMBoolean from(final boolean value) {
 		return value ? FEMBoolean.TRUE : FEMBoolean.FALSE;
 	}
 
@@ -37,7 +37,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 	 * @param value Wert.
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMBoolean from(final Boolean value) throws NullPointerException {
+	public static FEMBoolean from(final Boolean value) throws NullPointerException {
 		return FEMBoolean.from(value.booleanValue());
 	}
 
@@ -47,7 +47,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static final FEMBoolean from(final String value) throws NullPointerException, IllegalArgumentException {
+	public static FEMBoolean from(final String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("true")) return FEMBoolean.TRUE;
 		if (value.equals("false")) return FEMBoolean.FALSE;
 		throw new IllegalArgumentException();
@@ -58,7 +58,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 	 * @param value {@link FEMValue}.
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static final FEMBoolean from(final FEMValue value) throws NullPointerException {
+	public static FEMBoolean from(final FEMValue value) throws NullPointerException {
 		return FEMContext._default_.dataFrom(value, FEMBoolean.TYPE);
 	}
 
@@ -68,7 +68,7 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 	 * @param context {@link FEMContext}.
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static final FEMBoolean from(final FEMValue value, final FEMContext context) throws NullPointerException {
+	public static FEMBoolean from(final FEMValue value, final FEMContext context) throws NullPointerException {
 		return context.dataFrom(value, FEMBoolean.TYPE);
 	}
 
