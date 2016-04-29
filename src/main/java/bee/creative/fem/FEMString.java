@@ -902,7 +902,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
 	static int _utf16Value_(final char[] array, final int offset) throws IllegalArgumentException {
 		final int token = array[offset], value = token & 64512;
-		if (value == 55296) return (((token & 1032) << 10) | (array[offset + 1] & 1023)) + 65536;
+		if (value == 55296) return (((token & 1023) << 10) | (array[offset + 1] & 1023)) + 65536;
 		if (value != 56320) return token;
 		throw new IllegalArgumentException();
 	}
@@ -1196,6 +1196,18 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	@Override
 	public final FEMType<FEMString> type() {
 		return FEMString.TYPE;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMString result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMString result(final boolean recursive) {
+		return this;
 	}
 
 	/** {@inheritDoc} */

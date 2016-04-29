@@ -143,6 +143,18 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMInteger result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMInteger result(boolean recursive) {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final int hashCode() {
 		return this.hash();
 	}

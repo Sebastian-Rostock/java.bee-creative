@@ -1284,6 +1284,18 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMDatetime result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMDatetime result(final boolean recursive) {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final boolean equals(Object object) {
 		if (object == this) return true;
 		if (!(object instanceof FEMDatetime)) {

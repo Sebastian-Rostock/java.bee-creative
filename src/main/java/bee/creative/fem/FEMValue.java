@@ -22,11 +22,20 @@ public interface FEMValue {
 	 * @return Nutzdaten. */
 	public Object data();
 
+	/** Diese Methode ist eine Abkürzung für {@code this.result(false)}.
+	 * 
+	 * @see #result(boolean)
+	 * @return Ergebniswert. */
+	public FEMValue result();
+
 	/** Diese Methode gibt diesen Wert evaluiert zurück.<br>
 	 * Wenn dieser Wert aus der <em>call-by-value</em>- bzw. <em>return-by-value</em>-Semantik angehört, wird {@code this} geliefert.
 	 * 
+	 * @param recursive {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls evaluiert werden sollen.<br>
+	 *        {@code false}, wenn nur dieser Wert evaluiert werden soll.
+	 * @see FEMFrame#get(int)
 	 * @see FEMFunction#invoke(FEMFrame)
 	 * @return Ergebniswert. */
-	public FEMValue result();
+	public FEMValue result(boolean recursive);
 
 }

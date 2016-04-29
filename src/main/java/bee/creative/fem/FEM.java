@@ -73,13 +73,19 @@ public class FEM {
 			return context.dataFrom(this, type);
 		}
 
+		{}
+
 		/** {@inheritDoc} */
 		@Override
 		public FEMValue result() {
-			return this;
+			return this.result(false);
 		}
 
-		{}
+		/** {@inheritDoc} */
+		@Override
+		public FEMValue result(final boolean recursive) {
+			return this;
+		}
 
 		/** {@inheritDoc} */
 		@Override
@@ -3604,7 +3610,27 @@ public class FEM {
 
 		@Override
 		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("APPLY_FUNCTION");
+			target.put("INVOKE_FUNCTION");
+		}
+
+	};
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert entspricht. */
+	public static final BaseFunction PARAM_FUNCTION = new BaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() <> 1");
+			final FEMValue value = frame.get(0);
+			final long index = FEMInteger.from(value, frame.context()).value();
+			if ((index < 0) || (index > Integer.MAX_VALUE)) throw new IndexOutOfBoundsException();
+			final FEMValue result = frame.get((int)index);
+			return result;
+		}
+
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("PARAM_FUNCTION");
 		}
 
 	};
@@ -3618,7 +3644,7 @@ public class FEM {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
-			return FEMArray.from(frame.params().value());
+			return frame.params().result(true);
 		}
 
 		@Override

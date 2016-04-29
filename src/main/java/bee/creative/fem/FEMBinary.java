@@ -650,6 +650,18 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMBinary result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMBinary result(boolean recursive) {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final int hashCode() {
 		return this.hash();
 	}

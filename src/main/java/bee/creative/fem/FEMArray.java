@@ -426,6 +426,20 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return target.array;
 	}
 
+	/** Diese Methode gibt die {@link FEMValue#result() Ergebniswerten} dieser Wertliste als Array zurück.
+	 * 
+	 * @see #get(int)
+	 * @see FEMValue#result()
+	 * @return Array mit den {@link FEMValue#result() Ergebniswerten} dieser Wertliste. */
+	final public FEMValue[] resultValue() {
+		final int length = this._length_;
+		final FEMValue[] result = new FEMValue[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = this._get_(i).result();
+		}
+		return result;
+	}
+
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
 	 * 
 	 * @return Länge der Bytefolge. */

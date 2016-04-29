@@ -34,7 +34,9 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this._params_._length_;
 			if (index2 >= 0) return this._parent_.get(index2);
-			return this._params_._get_(index);
+			FEMValue result = this._params_._get_(index);
+			result = result.result();
+			return result;
 		}
 
 		@Override
@@ -119,11 +121,15 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				if (index2 >= 0) return this._frame_.get(index2);
 				synchronized (this._values_) {
 					FEMValue result = this._values_[index];
-					if (result != null) return result;
+					if (result != null) {
+						result = result.result();
+						return result;
+					}
 					final FEMFunction param = this._params_[index];
 					if (param == null) throw new NullPointerException("params[index] = null");
 					result = param.invoke(this._frame_);
 					if (result == null) throw new NullPointerException("params[index].invoke(frame) = null");
+					result = result.result();
 					this._values_[index] = result;
 					return result;
 				}
@@ -225,8 +231,8 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this._parent_;
 	}
 
-	/** Diese Methode gibt die Wertliste der zugesicherten Parameterwerte zurück.<br>
-	 * Die Elemente dieser Wertliste können der <em>return-by-reference</em>-Semantik angehören.
+	/** Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück.<br>
+	 * Die Elemente dieser Wertliste können der {@link FEMResult <em>return-by-reference</em>}-Semantik angehören.
 	 * 
 	 * @see #get(int)
 	 * @see #size()
@@ -333,7 +339,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 	{}
 
-	/** Diese Methode gibt den {@code index}-ten Parameterwert zurück.<br>
+	/** Diese Methode gibt den {@link FEMValue#result() Ergebniswert} des {@code index}-ten Parameters zurück.<br>
 	 * Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten
 	 * Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()} der Parameterwert {@code this.parent().get(index - this.size())}
 	 * des übergeordneten Stapelrahmens geliefert.

@@ -3,8 +3,11 @@ package bee.creative.iam;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
+import bee.creative.fem.FEMString;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
@@ -322,9 +325,10 @@ public final class IAMCodec {
 				if ((length & 1) != 0) throw new IllegalArgumentException();
 				final int[] result = new int[length >> 1];
 				for (int i = 0; i < length;) {
+					int x = i >> 1;
 					final int hi = FEMBinary.toDigit(source[i++]);
 					final int lo = FEMBinary.toDigit(source[i++]);
-					result[i] = (byte)((hi << 4) | (lo << 0));
+					result[x] = (byte)((hi << 4) | (lo << 0));
 				}
 				return result;
 			}
@@ -345,31 +349,101 @@ public final class IAMCodec {
 
 		STRING_UTF_8 {
 
+			final Charset charset = Charset.forName("UTF-8");
+
+			@Override
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+			}
+
+			@Override
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(IAMCodec._formatBytes_(array), this.charset);
+			}
+
 		},
 
 		STRING_UTF_16 {
+
+			@Override
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMCodec._parseChars_(string.toCharArray());
+			}
+
+			@Override
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(IAMCodec._formatChars_(array));
+			}
 
 		},
 
 		STRING_UTF_32 {
 
+			@Override
+			public int[] parse(String string) throws NullPointerException, IllegalArgumentException {
+				int length = string.codePointCount(0, string.length());
+				final int[] result = new int[length];
+				for (int i = 0, j = 0; i < length; i++) {
+					result[i] = string.codePointAt(j);
+					j = string.offsetByCodePoints(j, 1);
+				}
+				return result;
+			}
+
+			@Override
+			public String format(int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(array, 0, array.length);
+			}
+
 		},
 
 		STRING_CP_1252 {
+
+			final Charset charset = Charset.forName("CP1252");
+
+			@Override
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+			}
+
+			@Override
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(IAMCodec._formatBytes_(array), this.charset);
+			}
 
 		},
 
 		STRING_ISO_8859_1 {
 
+			final Charset charset = Charset.forName("ISO-8859-1");
+
+			@Override
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+			}
+
+			@Override
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(IAMCodec._formatBytes_(array), this.charset);
+			}
+
 		},
 
 		STRING_ISO_8859_15 {
 
-		},
+			final Charset charset = Charset.forName("ISO-8859-15");
 
-		// «"CP-1252"», «"ISO-8859-1"» und «"ISO-8859-15"»
+			@Override
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				return IAMCodec._parseBytes_(string.getBytes(this.charset));
+			}
 
-		df;
+			@Override
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
+				return new String(IAMCodec._formatBytes_(array), this.charset);
+			}
+
+		};
 
 		@SuppressWarnings ("javadoc")
 		static final Map<?, IAMArrayFormat> _values_ = new HashMapBuilder<Object, IAMArrayFormat>() //
@@ -423,13 +497,9 @@ public final class IAMCodec {
 
 		{}
 
-		public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
-			return null;
-		}
+		public abstract int[] parse(final String string) throws NullPointerException, IllegalArgumentException;
 
-		public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-			return null;
-		}
+		public abstract String format(final int[] array) throws NullPointerException, IllegalArgumentException;
 
 		{}
 
@@ -443,25 +513,43 @@ public final class IAMCodec {
 
 	{}
 
-	static int _checkRange_(int value, final int length) throws IllegalArgumentException {
+	static int _checkRange_(final int value, final int length) throws IllegalArgumentException {
 		if ((value >= 0) && (value < length)) return value;
 		throw new IllegalArgumentException("illegal integer: " + value);
 	}
 
-	static int[] _parseBytes_(final byte[] bytes) {
-		final int length = bytes.length;
+	static int[] _parseBytes_(final byte[] source) {
+		final int length = source.length;
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
-			result[i] = bytes[i];
+			result[i] = source[i];
 		}
 		return result;
 	}
 
-	static int[] _parseChars_(final char[] chars) {
-		final int length = chars.length;
+	static byte[] _formatBytes_(final int[] source) {
+		final int length = source.length;
+		final byte[] result = new byte[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = (byte)source[i];
+		}
+		return result;
+	}
+
+	static int[] _parseChars_(final char[] source) {
+		final int length = source.length;
 		final int[] result = new int[length];
 		for (int i = 0; i < length; i++) {
-			result[i] = (short)chars[i];
+			result[i] = (short)source[i];
+		}
+		return result;
+	}
+
+	static char[] _formatChars_(final int[] source) {
+		final int length = source.length;
+		final char[] result = new char[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = (char)source[i];
 		}
 		return result;
 	}
@@ -485,8 +573,7 @@ public final class IAMCodec {
 
 	/** Dieser Konstruktor initialisiert einen neuen {@link IAMCodec} mit:
 	 * <p>
-	 * {@code useByteOrder(IAMByteOrder.AUTO)}<br>
-	 *  */
+	 * {@code useByteOrder(IAMByteOrder.AUTO)}<br> */
 	public IAMCodec() {
 	}
 
@@ -616,6 +703,19 @@ public final class IAMCodec {
 		if (format == null) throw new IllegalStateException();
 		if (this.getByteOrder() == null) throw new IllegalStateException();
 		format.encode(this, index);
+	}
+
+	public static void main(final String[] args) throws Exception {
+
+		System.out.println(Arrays.toString(IAMArrayFormat.ARRAY.parse("123 45 6")));
+		System.out.println(Arrays.toString(IAMArrayFormat.BINARY.parse("0A01")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_8.parse("€")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_16.parse("€")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_32.parse("€")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_CP_1252.parse("€")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_ISO_8859_1.parse("€")));
+		System.out.println(Arrays.toString(IAMArrayFormat.STRING_ISO_8859_15.parse("€")));
+
 	}
 
 }

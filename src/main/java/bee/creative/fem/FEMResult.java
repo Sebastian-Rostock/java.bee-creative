@@ -55,24 +55,6 @@ public final class FEMResult extends BaseValue {
 
 	{}
 
-	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
-	 * zurück.
-	 * 
-	 * @see FEMFunction#invoke(FEMFrame)
-	 * @return Ergebniswert.
-	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
-	@Override
-	public final synchronized FEMValue result() throws NullPointerException {
-		FEMValue result = this._result_;
-		if (result != null) return result;
-		result = this._function_.invoke(this._frame_);
-		if (result == null) throw new NullPointerException("this.function().invoke(this.frame()) = null");
-		this._result_ = result;
-		this._frame_ = null;
-		this._function_ = null;
-		return result;
-	}
-
 	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
 	 * Der erste Aufruf von {@link #result()} setzt die Stapelrahmen auf {@code null}.
 	 * 
@@ -93,14 +75,41 @@ public final class FEMResult extends BaseValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMType<?> type() {
-		return this.result().type();
+	public final Object data() {
+		return this.result().data();
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final Object data() {
-		return this.result().data();
+	public final FEMType<?> type() {
+		return this.result().type();
+	}
+
+	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
+	 * zurück.
+	 * 
+	 * @see #frame()
+	 * @see #function()
+	 * @see FEMFunction#invoke(FEMFrame)
+	 * @return Ergebniswert.
+	 * @throws NullPointerException Wenn der berechnete Ergebniswert {@code null} ist. */
+	@Override
+	public final synchronized FEMValue result(final boolean recursive) throws NullPointerException {
+		FEMValue result = this._result_;
+		if (result != null) {
+			if (!recursive) return result;
+			final FEMValue result2 = result.result(true);
+			if (result == result2) return result;
+			this._result_ = result2;
+			return result;
+		}
+		result = this._function_.invoke(this._frame_);
+		if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
+		result = recursive ? result.result(true) : result;
+		this._result_ = result;
+		this._frame_ = null;
+		this._function_ = null;
+		return result;
 	}
 
 	/** {@inheritDoc} */
