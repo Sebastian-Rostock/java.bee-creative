@@ -34,8 +34,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		public FEMValue get(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this._params_._length_;
 			if (index2 >= 0) return this._parent_.get(index2);
-			FEMValue result = this._params_._get_(index);
-			result = result.result();
+			final FEMValue result = this._params_._get_(index);
 			return result;
 		}
 
@@ -121,15 +120,11 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 				if (index2 >= 0) return this._frame_.get(index2);
 				synchronized (this._values_) {
 					FEMValue result = this._values_[index];
-					if (result != null) {
-						result = result.result();
-						return result;
-					}
+					if (result != null) return result;
 					final FEMFunction param = this._params_[index];
-					if (param == null) throw new NullPointerException("params[index] = null");
+					if (param == null) throw new NullPointerException("params().get(index) = null");
 					result = param.invoke(this._frame_);
-					if (result == null) throw new NullPointerException("params[index].invoke(frame) = null");
-					result = result.result();
+					if (result == null) throw new NullPointerException("params().get(index).invoke(frame) = null");
 					this._values_[index] = result;
 					return result;
 				}
@@ -339,7 +334,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 	{}
 
-	/** Diese Methode gibt den {@link FEMValue#result() Ergebniswert} des {@code index}-ten Parameters zurück.<br>
+	/** Diese Methode gibt den Wert des {@code index}-ten Parameters zurück.<br>
 	 * Über die {@link #size() Anzahl der zugesicherten Parameterwerte} hinaus, können auch zusätzliche Parameterwerte des {@link #parent() übergeordneten
 	 * Stapelrahmens} bereitgestellt werden. Genauer wird für einen {@code index >= this.size()} der Parameterwert {@code this.parent().get(index - this.size())}
 	 * des übergeordneten Stapelrahmens geliefert.

@@ -148,12 +148,6 @@ public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMDecimal result() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final FEMDecimal result(boolean recursive) {
 		return this;
 	}

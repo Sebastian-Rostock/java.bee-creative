@@ -66,12 +66,6 @@ public final class FEMNative extends BaseValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMNative result() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final FEMNative result(final boolean recursive) {
 		if (this._data_ instanceof FEMValue) return new FEMNative(((FEMValue)this._data_).result(recursive));
 		return this;

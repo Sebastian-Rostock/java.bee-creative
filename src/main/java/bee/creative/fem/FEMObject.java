@@ -260,12 +260,6 @@ public final class FEMObject extends BaseValue implements Comparable<FEMObject> 
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMObject result() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final FEMObject result(final boolean recursive) {
 		return this;
 	}

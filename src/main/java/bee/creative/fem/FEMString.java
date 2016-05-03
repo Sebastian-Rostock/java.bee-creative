@@ -53,7 +53,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		public boolean push(final int value) {
+		public final boolean push(final int value) {
 			this.hash = (this.hash * 0x01000193) ^ value;
 			return true;
 		}
@@ -73,7 +73,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 		{}
 
-		public void push(final byte value) {
+		public final void push(final byte value) {
 			final int index = this.index;
 			byte[] array = this.array;
 			if (index >= array.length) {
@@ -87,7 +87,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		public boolean push(final int value) {
+		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			if (value < 128) {
 				this.push((byte)value);
@@ -122,7 +122,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 		{}
 
-		public void push(final char value) {
+		public final void push(final char value) {
 			final int index = this.index;
 			char[] array = this.array;
 			if (index >= array.length) {
@@ -136,7 +136,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		public boolean push(final int value) {
+		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			final int value2 = value - 65536;
 			if (value2 < 0) {
@@ -164,7 +164,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		public boolean push(final int value) {
+		public final boolean push(final int value) {
 			if (value < 0) throw new IllegalArgumentException();
 			this.array[this.index++] = value;
 			return true;
@@ -185,7 +185,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(int index) throws IndexOutOfBoundsException {
+		protected final int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -195,7 +195,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -224,12 +224,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
 		@Override
-		public byte[] toBytes() {
+		public final byte[] toBytes() {
 			return this._array_.toBytes();
 		}
 
@@ -248,7 +248,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(int index) throws IndexOutOfBoundsException {
+		protected final int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -258,7 +258,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -301,12 +301,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			return this._array_.get(index);
 		}
 
 		@Override
-		public int[] value() {
+		public final int[] value() {
 			return this._array_.toArray();
 		}
 
@@ -325,7 +325,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(int index) throws IndexOutOfBoundsException {
+		protected final int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -335,7 +335,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -364,12 +364,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
 		@Override
-		public byte[] toBytes() {
+		public final byte[] toBytes() {
 			return this._bytes_.clone();
 		}
 
@@ -388,7 +388,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(int index) throws IndexOutOfBoundsException {
+		protected final int _get_(int index) throws IndexOutOfBoundsException {
 			int offset = 0;
 			while (index > 0) {
 				index--;
@@ -398,7 +398,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, int offset, int length, final boolean foreward) {
 			if (foreward) {
 				int index = 0;
 				while (offset > 0) {
@@ -427,12 +427,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
 		@Override
-		public char[] toChars() {
+		public final char[] toChars() {
 			return this._chars_.clone();
 		}
 
@@ -451,17 +451,17 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			return this._values_[index];
 		}
 
 		@Override
-		public int[] value() {
+		public final int[] value() {
 			return this._values_.clone();
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
@@ -477,12 +477,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		public FEMString reverse() {
+		public final FEMString reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
@@ -504,13 +504,13 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this._string1_._length_;
 			return index2 < 0 ? this._string1_._get_(index) : this._string2_._get_(index2);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
 			final int offset2 = offset - this._string1_._length_, length2 = offset2 + length;
 			if (offset2 >= 0) return this._string2_._export_(target, offset2, length, foreward);
 			if (length2 <= 0) return this._string1_._export_(target, offset, length, foreward);
@@ -524,7 +524,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		public FEMString section(final int offset, final int length) throws IllegalArgumentException {
+		public final FEMString section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this._string1_._length_, length2 = offset2 + length;
 			if (offset2 >= 0) return this._string2_.section(offset2, length);
 			if (length2 <= 0) return this._string1_.section(offset, length);
@@ -549,17 +549,17 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			return this._string_._get_(index + this._offset_);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this._string_._export_(target, this._offset_ + offset2, length2, foreward);
 		}
 
 		@Override
-		public FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
+		public final FEMString section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this._string_.section(this._offset_ + offset2, length2);
 		}
 
@@ -578,27 +578,27 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			return this._string_._get_(this._length_ - index - 1);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this._string_._export_(target, offset, length, !foreward);
 		}
 
 		@Override
-		public FEMString concat(final FEMString value) throws NullPointerException {
+		public final FEMString concat(final FEMString value) throws NullPointerException {
 			return value.reverse().concat(this._string_).reverse();
 		}
 
 		@Override
-		public FEMString section(final int offset, final int length2) throws IllegalArgumentException {
+		public final FEMString section(final int offset, final int length2) throws IllegalArgumentException {
 			return this._string_.section(this._length_ - offset - length2, length2).reverse();
 		}
 
 		@Override
-		public FEMString reverse() {
+		public final FEMString reverse() {
 			return this._string_;
 		}
 
@@ -617,12 +617,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		{}
 
 		@Override
-		protected int _get_(final int index) throws IndexOutOfBoundsException {
+		protected final int _get_(final int index) throws IndexOutOfBoundsException {
 			return this._value_;
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this._value_)) return false;
 				length--;
@@ -631,12 +631,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		}
 
 		@Override
-		public FEMString reverse() {
+		public final FEMString reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMString compact() {
+		public final FEMString compact() {
 			return this;
 		}
 
@@ -1196,12 +1196,6 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	@Override
 	public final FEMType<FEMString> type() {
 		return FEMString.TYPE;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMString result() {
-		return this;
 	}
 
 	/** {@inheritDoc} */

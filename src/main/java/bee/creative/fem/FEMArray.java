@@ -57,7 +57,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		public boolean push(final FEMValue value) {
+		public final boolean push(final FEMValue value) {
 			this.hash = (this.hash * 0x01000193) ^ value.hashCode();
 			return true;
 		}
@@ -78,7 +78,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		public boolean push(final FEMValue value) {
+		public final boolean push(final FEMValue value) {
 			this.array[this.index++] = value;
 			return true;
 		}
@@ -95,12 +95,12 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		public FEMArray reverse() {
+		public final FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMArray compact() {
+		public final FEMArray compact() {
 			return this;
 		}
 
@@ -122,13 +122,13 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		protected FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
 			final int index2 = index - this._array1_._length_;
 			return index2 < 0 ? this._array1_._get_(index) : this._array2_._get_(index2);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
 			final int offset2 = offset - this._array1_._length_, length2 = offset2 + length;
 			if (offset2 >= 0) return this._array2_._export_(target, offset2, length, foreward);
 			if (length2 <= 0) return this._array1_._export_(target, offset, length, foreward);
@@ -142,7 +142,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		}
 
 		@Override
-		public FEMArray section(final int offset, final int length) throws IllegalArgumentException {
+		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
 			final int offset2 = offset - this._array1_._length_, length2 = offset2 + length;
 			if (offset2 >= 0) return this._array2_.section(offset2, length);
 			if (length2 <= 0) return this._array1_.section(offset, length);
@@ -166,17 +166,17 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		protected FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
 			return this._array_._get_(index + this._offset_);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
 			return this._array_._export_(target, this._offset_ + offset2, length2, foreward);
 		}
 
 		@Override
-		public FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
+		public final FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
 			return this._array_.section(this._offset_ + offset2, length2);
 		}
 
@@ -195,27 +195,27 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		protected FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
 			return this._array_._get_(this._length_ - index - 1);
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
 			return this._array_._export_(target, offset, length, !foreward);
 		}
 
 		@Override
-		public FEMArray concat(final FEMArray value) throws NullPointerException {
+		public final FEMArray concat(final FEMArray value) throws NullPointerException {
 			return value.reverse().concat(this._array_).reverse();
 		}
 
 		@Override
-		public FEMArray section(final int offset, final int length2) throws IllegalArgumentException {
+		public final FEMArray section(final int offset, final int length2) throws IllegalArgumentException {
 			return this._array_.section(this._length_ - offset - length2, length2).reverse();
 		}
 
 		@Override
-		public FEMArray reverse() {
+		public final FEMArray reverse() {
 			return this._array_;
 		}
 
@@ -234,12 +234,12 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		protected FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
 			return this._value_;
 		}
 
 		@Override
-		protected boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
+		protected final boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
 				if (!target.push(this._value_)) return false;
 				length--;
@@ -248,19 +248,19 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		}
 
 		@Override
-		public FEMArray reverse() {
+		public final FEMArray reverse() {
 			return this;
 		}
 
 		@Override
-		public FEMArray compact() {
+		public final FEMArray compact() {
 			return this;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompactArray extends FEMArray {
+	static class CompactArray extends FEMArray {
 
 		final FEMValue[] _values_;
 
@@ -272,17 +272,31 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		{}
 
 		@Override
-		protected FEMValue _get_(final int index) throws IndexOutOfBoundsException {
+		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
 			return this._values_[index];
 		}
 
 		@Override
-		public FEMValue[] value() {
+		public final FEMValue[] value() {
 			return this._values_.clone();
 		}
 
 		@Override
-		public FEMArray compact() {
+		public final FEMArray compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ResultArray extends CompactArray {
+
+		ResultArray(final FEMValue[] values) throws IllegalArgumentException {
+			super(values);
+		}
+
+		@Override
+		public final FEMArray result(final boolean recursive) {
 			return this;
 		}
 
@@ -424,20 +438,6 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		final ValueCollector target = new ValueCollector(this._length_);
 		this.export(target);
 		return target.array;
-	}
-
-	/** Diese Methode gibt die {@link FEMValue#result() Ergebniswerten} dieser Wertliste als Array zurück.
-	 * 
-	 * @see #get(int)
-	 * @see FEMValue#result()
-	 * @return Array mit den {@link FEMValue#result() Ergebniswerten} dieser Wertliste. */
-	final public FEMValue[] resultValue() {
-		final int length = this._length_;
-		final FEMValue[] result = new FEMValue[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = this._get_(i).result();
-		}
-		return result;
 	}
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
@@ -598,6 +598,18 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	@Override
 	public final FEMType<FEMArray> type() {
 		return FEMArray.TYPE;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public FEMArray result(final boolean recursive) {
+		if (!recursive) return this;
+		final FEMValue[] result = this.value();
+		final int length = result.length;
+		for (int i = 0; i < length; i++) {
+			result[i] = result[i].result(true);
+		}
+		return new ResultArray(result);
 	}
 
 	/** {@inheritDoc} */

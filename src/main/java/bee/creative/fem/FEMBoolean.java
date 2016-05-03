@@ -141,12 +141,6 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMBoolean result() {
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public final FEMBoolean result(boolean recursive) {
 		return this;
 	}

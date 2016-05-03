@@ -3,18 +3,20 @@ package bee.creative.fem;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 
-/** Diese Klasse implementiert den Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik, welcher eine gegebene Funktion erst dann mit einem
- * gegebenen Stapelrahmen einmalig auswertet, wenn {@link #type() Datentyp} oder {@link #data() Nutzdaten} {@link #result() gelesen} werden.<br>
- * Der von der {@link #function() Funktion} berechnete {@link #result() Ergebniswert} wird zur Wiederverwendung zwischengespeichert. Nach der einmaligen
- * Auswertung der Funktion werden die Verweise auf {@link #frame() Stapelrahmen} und Funktion aufgelöst.
+/** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
+ * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann.<br>
+ * Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit
+ * dem diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data() Nutzdaten} {@link #result(boolean) zugegriffen} wird.<br>
+ * Der von der Funktion berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
+ * Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMResult extends BaseValue {
 
-	/** Diese Methode den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen mit
-	 * {@code call-by-reference}-Semantik zurück.<br>
-	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten Lesen seines {@link #type() Datentyp} bzw. seiner {@link #data()
-	 * Nutzdaten}.
+	/** Diese Methode gibt den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen als Wert mit
+	 * <em>call-by-reference</em>-Semantik zurück.<br>
+	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten {@link #result(boolean) Zugriff} auf seinen {@link #type() Datentyp} bzw.
+	 * seine {@link #data() Nutzdaten}.
 	 * 
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion.
@@ -46,9 +48,8 @@ public final class FEMResult extends BaseValue {
 	/** Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
 	 * 
 	 * @param frame Stapelrahmen.
-	 * @param function Funktion.
-	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
-	FEMResult(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
+	 * @param function Funktion. */
+	FEMResult(final FEMFrame frame, final FEMFunction function) {
 		this._frame_ = frame;
 		this._function_ = function;
 	}
@@ -56,7 +57,7 @@ public final class FEMResult extends BaseValue {
 	{}
 
 	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
-	 * Der erste Aufruf von {@link #result()} setzt die Stapelrahmen auf {@code null}.
+	 * Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
 	 * 
 	 * @return Stapelrahmen oder {@code null}. */
 	public final synchronized FEMFrame frame() {
@@ -64,7 +65,7 @@ public final class FEMResult extends BaseValue {
 	}
 
 	/** Diese Methode gibt die Funktion oder {@code null} zurück.<br>
-	 * Der erste Aufruf von {@link #result()} setzt die Funktion auf {@code null}.
+	 * Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf {@code null}.
 	 * 
 	 * @return Funktion oder {@code null}. */
 	public final synchronized FEMFunction function() {
@@ -76,18 +77,21 @@ public final class FEMResult extends BaseValue {
 	/** {@inheritDoc} */
 	@Override
 	public final Object data() {
-		return this.result().data();
+		return this.result(false).data();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public final FEMType<?> type() {
-		return this.result().type();
+		return this.result(false).type();
 	}
 
 	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
-	 * zurück.
+	 * zurück.<br>
+	 * Dieser Ergebniwert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
+	 * Stapelrahmen und Funktion aufgelöst.
 	 * 
+	 * @see FEMResult
 	 * @see #frame()
 	 * @see #function()
 	 * @see FEMFunction#invoke(FEMFrame)
@@ -102,14 +106,15 @@ public final class FEMResult extends BaseValue {
 			if (result == result2) return result;
 			this._result_ = result2;
 			return result;
+		} else {
+			result = this._function_.invoke(this._frame_);
+			if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
+			result = result.result(recursive);
+			this._result_ = result;
+			this._frame_ = null;
+			this._function_ = null;
+			return result;
 		}
-		result = this._function_.invoke(this._frame_);
-		if (result == null) throw new NullPointerException("function().invoke(frame()) = null");
-		result = recursive ? result.result(true) : result;
-		this._result_ = result;
-		this._frame_ = null;
-		this._function_ = null;
-		return result;
 	}
 
 	/** {@inheritDoc} */
