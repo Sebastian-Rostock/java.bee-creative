@@ -83,6 +83,12 @@ public class FEM {
 
 		/** {@inheritDoc} */
 		@Override
+		public final FEMValue invoke(final FEMFrame frame) {
+			return this;
+		}
+
+		/** {@inheritDoc} */
+		@Override
 		public int hashCode() {
 			return Objects.hash(this.data());
 		}
@@ -94,12 +100,6 @@ public class FEM {
 			if (!(object instanceof FEMValue)) return false;
 			final FEMValue that = (FEMValue)object;
 			return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public final FEMValue invoke(final FEMFrame frame) {
-			return this;
 		}
 
 		/** {@inheritDoc} */

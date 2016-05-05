@@ -88,7 +88,7 @@ public final class FEMResult extends BaseValue {
 
 	/** Diese Methode gibt das Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} der {@link #function() Funktion} mit den {@link #frame() Stapelrahmen}
 	 * zurück.<br>
-	 * Dieser Ergebniwert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
+	 * Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
 	 * Stapelrahmen und Funktion aufgelöst.
 	 * 
 	 * @see FEMResult

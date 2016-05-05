@@ -24,21 +24,21 @@ public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
 	 * 
-	 * @param value Wert.
+	 * @param data Wert.
 	 * @return Wahrheitswert. */
-	public static FEMBoolean from(final boolean value) {
-		return value ? FEMBoolean.TRUE : FEMBoolean.FALSE;
+	public static FEMBoolean from(final boolean data) {
+		return data ? FEMBoolean.TRUE : FEMBoolean.FALSE;
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
 	 * 
 	 * @see #from(boolean)
 	 * @see Boolean#booleanValue()
-	 * @param value Wert.
+	 * @param data Wert.
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMBoolean from(final Boolean value) throws NullPointerException {
-		return FEMBoolean.from(value.booleanValue());
+	public static FEMBoolean from(final Boolean data) throws NullPointerException {
+		return FEMBoolean.from(data.booleanValue());
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem in der gegebenen Zeichenkette kodierten Wert zurück.
