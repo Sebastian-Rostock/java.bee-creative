@@ -6,7 +6,7 @@ import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
+/** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
  * Intern wird die Zeitspanne als ein {@code long} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -631,7 +631,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 		return this._valueH_ ^ this._valueL_;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspannen effektiv gleich der gegebenen ist.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitspanne effektiv gleich der gegebenen ist.
 	 * 
 	 * @see #compare(FEMDuration, int)
 	 * @param that Zeitspannen.

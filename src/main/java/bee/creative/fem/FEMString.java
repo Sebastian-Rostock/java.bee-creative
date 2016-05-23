@@ -709,7 +709,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den gegebenen Zahlen zurück.<br>
-	 * Abhängig davon, ob die Zahlenliste aus {@link MMFArray#mode() INT8/UINT8}-, {@link MMFArray#mode() INT16/UINT16)} oder {@link MMFArray#mode() INT31}-Zahlen
+	 * Abhängig davon, ob die Zahlenliste aus {@link MMFArray#mode() INT8/UINT8}-, {@link MMFArray#mode() INT16/UINT16)} oder {@link MMFArray#mode() INT32}-Zahlen
 	 * besteht, werden diese als UTF8-, UTF16- bzw. UTF32-kodierte Codepoints interpretiert.
 	 * 
 	 * @param data Zahlenfolge.
@@ -1069,7 +1069,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn das Zeichen nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchtes Zeichen.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -1084,7 +1084,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Zeichenkette innerhalb dieser Zeichenkette zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn die Zeichenkette nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchte Zeichenkette.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).

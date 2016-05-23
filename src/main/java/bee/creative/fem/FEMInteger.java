@@ -3,7 +3,7 @@ package bee.creative.fem;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine Dezimalzahl.<br>
+/** Diese Klasse implementiert eine unveränderliche Dezimalzahl.<br>
  * Intern wird die Dezimalzahl als {@code long} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

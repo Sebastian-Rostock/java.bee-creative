@@ -5,8 +5,8 @@ import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.fem.FEM.ScriptTracer;
 import bee.creative.fem.FEM.ScriptTracerInput;
 
-/** Diese Klasse implementiert einen Funktionszeiger, d.h. eine als {@link FEMValue} verpackte Funktion.<br>
- * Intern wird der Wahrheitswert als {@link FEMFunction} dargestellt.
+/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. eine als {@link FEMValue} verpackte Funktion.<br>
+ * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMHandler extends BaseValue implements ScriptTracerInput {

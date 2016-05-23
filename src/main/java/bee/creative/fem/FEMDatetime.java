@@ -16,13 +16,13 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * </p>
  * <h5><a name="year">Jahr</a></h5>
  * <p>
- * Der Zahlenwert für das {@link #yearValue() Jahr} entspricht der Anzahl der Jahre seit dem beginn des Gregorianischen Kalenders erhöht um {@code 1582}.
+ * Der Zahlenwert für das {@link #yearValue() Jahr} entspricht der Anzahl der Jahre seit dem Beginn des Gregorianischen Kalenders erhöht um {@code 1582}.
  * Unterstützte Zahlenwerte für das Jahr sind {@code 1582..9999}.<br>
  * Ein reguläres Jahr hat 365 Tage, ein {@link #leapOf(int) Schaltjahr} hat 366 Tage.
  * </p>
  * <h5><a name="month">Monat</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #monthValue() Monat} entspricht der Anzahl der Monate seit beginn des Jahres erhöht um {@code 1}. Unterstützte Zahlenwerte für
+ * Der Zahlenwert für den {@link #monthValue() Monat} entspricht der Anzahl der Monate seit Beginn des Jahres erhöht um {@code 1}. Unterstützte Zahlenwerte für
  * den Monat sind {@code 1..12}.
  * <ol>
  * <li>Januar = {@link Calendar#JANUARY} + 1</li>
@@ -33,7 +33,7 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * <li>Juni = {@link Calendar#JUNE} + 1</li>
  * <li>Juli = {@link Calendar#JULY} + 1</li>
  * <li>August = {@link Calendar#AUGUST} + 1</li>
- * <li>Sptember = {@link Calendar#SEPTEMBER} + 1</li>
+ * <li>September = {@link Calendar#SEPTEMBER} + 1</li>
  * <li>Oktober = {@link Calendar#OCTOBER} + 1</li>
  * <li>November = {@link Calendar#NOVEMBER} + 1</li>
  * <li>Dezember = {@link Calendar#DECEMBER} + 1</li>
@@ -41,18 +41,18 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * </p>
  * <h5><a name="date">Tag (Tag in einem Monat)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #dateValue() Tag} entspricht der Anzahl der Tage seit beginn des Monats erhöht um {@code 1}. Unterstützte Zahlenwerte für den
+ * Der Zahlenwert für den {@link #dateValue() Tag} entspricht der Anzahl der Tage seit Beginn des Monats erhöht um {@code 1}. Unterstützte Zahlenwerte für den
  * Monat sind {@code 1..31}, wobei einige Monate auch abhängig von Schaltjahren geringere {@link #lengthOf(int, boolean) Obergrenzen} besitzen.
  * </p>
  * <h5><a name="yearday">Jahrestag (Tag in einem Jahr)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #yeardayValue() Jahrestag} entspricht der Anzahl der Tages seit dem Beginn des Jahres erhöht um {@code 1}. Unterstützte
+ * Der Zahlenwert für den {@link #yeardayValue() Jahrestag} entspricht der Anzahl der Tage seit dem Beginn des Jahres erhöht um {@code 1}. Unterstützte
  * Zahlenwerte für den Jahrestag sind {@code 1..366}.
  * </p>
  * <h5><a name="weekday">Wochentag (Tag in einer Woche)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #weekdayValue() Wochentag} entspricht der Anzahl der Tage seit beginn der Woche erhöht um {@code 1}. Unterstützte Zahlenwerte
- * für den Wochentag sind {@code 1..12}.
+ * Der Zahlenwert für den {@link #weekdayValue() Wochentag} entspricht der Anzahl der Tage seit Beginn der Woche erhöht um {@code 1}. Unterstützte Zahlenwerte
+ * für den Wochentag sind {@code 1..7}.
  * <ol>
  * <li>Sonntag = {@link Calendar#SUNDAY}</li>
  * <li>Montag = {@link Calendar#MONDAY}</li>
@@ -65,7 +65,7 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * </p>
  * <h5><a name="calendarday">Kalendertag (Tag im Kalender)</a></h5>
  * <p>
- * Der Zahlenwert für den {@link #calendardayValue() Kalendertag} entspricht der Anzahl der Tages seit dem Beginn des Gregorianischen Kalenders am Freitag dem
+ * Der Zahlenwert für den {@link #calendardayValue() Kalendertag} entspricht der Anzahl der Tage seit dem Beginn des Gregorianischen Kalenders am Freitag dem
  * {@code 15.10.1582}. Unterstützte Zahlenwerte für den Kalendertag sind {@code 0..3074323}.
  * </p>
  * <h5><a name="daymillis">Tagesmillis (Millisekunden am Tag)</a></h5>
@@ -240,11 +240,11 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
 	 * @param second Sekunde ({@code 0..59}).
-	 * @param millis Millisekunde ({@code 0..999}).
+	 * @param millisecond Millisekunde ({@code 0..999}).
 	 * @return Zeitangabe mit Uhrzeit.
 	 * @throws IllegalArgumentException Wenn {@link #withTime(int, int, int, int)} eine entsprechende Ausnahme auslöst. */
-	public static FEMDatetime fromTime(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
-		return FEMDatetime.EMPTY.withTime(hour, minute, second, millis);
+	public static FEMDatetime fromTime(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
+		return FEMDatetime.EMPTY.withTime(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -436,12 +436,12 @@ public final class FEMDatetime extends BaseValue implements Comparable<FEMDateti
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
 	 * @param second Sekunde ({@code 0..59}).
-	 * @param millis Millisekunde ({@code 0..999}).
+	 * @param millisecond Millisekunde ({@code 0..999}).
 	 * @return Anzahl der Millisekunden zwischen {@code 00:00:00.000} und der gegebenen Uhrzeit ({@code 0..86400000}).
 	 * @throws IllegalArgumentException Wenn die gegebene Uhrzeit ungültig ist. */
-	public static int daymillisOf(final int hour, final int minute, final int second, final int millis) throws IllegalArgumentException {
-		FEMDatetime._checkTime_(hour, minute, second, millis);
-		return FEMDatetime._daymillisOf_(hour, minute, second, millis);
+	public static int daymillisOf(final int hour, final int minute, final int second, final int millisecond) throws IllegalArgumentException {
+		FEMDatetime._checkTime_(hour, minute, second, millisecond);
+		return FEMDatetime._daymillisOf_(hour, minute, second, millisecond);
 	}
 
 	@SuppressWarnings ("javadoc")

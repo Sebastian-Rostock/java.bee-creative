@@ -4,7 +4,8 @@ import java.util.Iterator;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.mmf.MMFArray;
 
-/** Diese Klasse implementiert eine Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen realisiert sind.
+/** Diese Klasse implementiert eine unveränderliche Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen
+ * realisiert sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
@@ -12,7 +13,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}. */
 	public static interface Collector {
 
-		/** Diese Methode fügt das gegebene Byte an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
+		/** Diese Methode fügt den gegebenen Bytewert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
 		 * 
 		 * @param value Byte.
 		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
@@ -322,13 +323,13 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
 	 * Das gegebene Array wird hierbei kopiert.
 	 * 
-	 * @param value Bytes.
+	 * @param values Bytes.
 	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMBinary from(final byte[] value) throws NullPointerException {
-		if (value.length == 0) return FEMBinary.EMPTY;
-		if (value.length == 1) return FEMBinary.from(value[0], 1);
-		return new CompactBinary(value.clone());
+	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
+	public static FEMBinary from(final byte[] values) throws NullPointerException {
+		if (values.length == 0) return FEMBinary.EMPTY;
+		if (values.length == 1) return FEMBinary.from(values[0], 1);
+		return new CompactBinary(values.clone());
 	}
 
 	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
@@ -470,7 +471,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt diese zurück.
+	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt dieses zurück.
 	 * 
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
@@ -539,7 +540,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytewerts innerhalb dieser Bytefolge zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn der Bytewert nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchter Bytewert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -554,7 +555,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Bytefolge innerhalb dieser Bytefolge zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn die Bytefolge nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchte Bytefolge.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -620,7 +621,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die der
-	 * gegebenen Bytefolge ist.
+	 * gegebenen Bytefolge ist. Die Bytewerte werden als {@code UINT8} verglichen.
 	 * 
 	 * @param that Bytefolge.
 	 * @return Vergleichswert.

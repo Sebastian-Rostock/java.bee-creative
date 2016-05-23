@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 
-/** Diese Klasse implementiert eine Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue() Objektschlüssel}
- * identifiziert wird.<br>
+/** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
+ * Objektschlüssel} identifiziert wird.<br>
  * Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue() Besitzerkennung} angegeben. Die Besitzerkennung
  * kann beispielsweise eine über den {@link FEMContext} erreichbare Objektliste identifizieren, deren Elemente die referenzierten Objekte darstellen. Der
  * Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur Besitzerkennung könnte hierbei auch die Typkennung

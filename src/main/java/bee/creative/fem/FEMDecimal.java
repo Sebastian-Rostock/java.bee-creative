@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 import bee.creative.fem.FEM.BaseValue;
 
-/** Diese Klasse implementiert einen Dezimalbruch.<br>
+/** Diese Klasse implementiert einen unveränderlichen Dezimalbruch.<br>
  * Intern wird der Dezimalbruch als {@code double} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */

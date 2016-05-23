@@ -3,6 +3,7 @@ package bee.creative.fem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import bee.creative.fem.FEM.BaseValue;
@@ -11,7 +12,7 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 
-/** Diese Klasse implementiert eine unmodifizierbare Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
+/** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Iterable<FEMValue> {
@@ -316,7 +317,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	{}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
-	 * Das gegebene Array wird Kopiert, sodass spätere änderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
+	 * Das gegebene Array wird Kopiert, sodass spätere Anderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
 	 * 
 	 * @param values Werte.
 	 * @return Wertliste.
@@ -431,7 +432,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return true;
 	}
 
-	/** Diese Methode konvertiert diese Wertliste in ein Array und gibt diese zurück.
+	/** Diese Methode konvertiert diese Wertliste in ein {@code FEMValue[]} und gibt dieses zurück.
 	 * 
 	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
@@ -442,7 +443,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
 	 * 
-	 * @return Länge der Bytefolge. */
+	 * @return Länge der Wertliste. */
 	public final int length() {
 		return this._length_;
 	}
@@ -490,7 +491,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	}
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn der Wert nicht gefunden wird, liefert diese Methode {@code -1}.
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchter Wert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -504,8 +505,8 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 		return collector.index + offset;
 	}
 
-	/** Diese Methode gibt die Position des ersten Vorkommens der gegebene Wertliste innerhalb dieser Wertliste zurück.<br>
-	 * Die Suche beginnt an der gegebenen Position. Wenn die Wertliste nicht gefunden wird, liefert diese Methode {@code -1}.
+	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück.<br>
+	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
 	 * 
 	 * @param that gesuchte Wertliste.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
@@ -532,7 +533,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	}
 
 	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
-	 * Das Anfügen wird vorzeitig abgebrochen , wenn {@link Collector#push(FEMValue)} {@code false} liefert.
+	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
 	 * 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
@@ -569,6 +570,22 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 			if (this._get_(i).equals(that._get_(i))) return false;
 		}
 		return true;
+	}
+
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die der
+	 * gegebenen Wertliste ist. Die Werte werden über den gegebenen {@link Comparator} verglichen.
+	 * 
+	 * @param that Wertliste.
+	 * @param order {@link Comparator} zum Vergleichen der Werte.
+	 * @return Vergleichswert.
+	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
+	public final int compare(final FEMArray that, Comparator<FEMValue> order) throws NullPointerException {
+		final int length = Math.min(this._length_, that._length_);
+		for (int i = 0; i < length; i++) {
+			final int result = order.compare(this._get_(i), that._get_(i));
+			if (result != 0) return result;
+		}
+		return this._length_ - that._length_;
 	}
 
 	/** Diese Methode gibt diese Wertliste als {@link List} zurück.

@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 import bee.creative.fem.FEM.BaseValue;
 
-/** Diese Klasse implementiert einen Leerwert.
+/** Diese Klasse implementiert den unveränderlichen Leerwert.
  * 
  * @author Sebastian Rostock 2015. */
 public final class FEMVoid extends BaseValue {
