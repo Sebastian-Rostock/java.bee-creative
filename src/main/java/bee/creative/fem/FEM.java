@@ -401,17 +401,17 @@ public class FEM {
 	 * @see FEMResult
 	 * @see #invoke(FEMFrame)
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class VirtualFunction extends BaseFunction {
+	public static final class ResultFunction extends BaseFunction {
 
-		/** Diese Methode gibt die gegebene Funktion als {@link VirtualFunction} zurück.<br>
-		 * Wenn diese bereits eine {@link VirtualFunction} ist, wird sie unverändert zurück gegeben.
+		/** Diese Methode gibt die gegebene Funktion als {@link ResultFunction} zurück.<br>
+		 * Wenn diese bereits eine {@link ResultFunction} ist, wird sie unverändert zurück gegeben.
 		 * 
 		 * @param function Funktion.
-		 * @return {@link VirtualFunction}.
+		 * @return {@link ResultFunction}.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-		public static VirtualFunction from(final FEMFunction function) throws NullPointerException {
-			if (function instanceof VirtualFunction) return (VirtualFunction)function;
-			return new VirtualFunction(function);
+		public static ResultFunction from(final FEMFunction function) throws NullPointerException {
+			if (function instanceof ResultFunction) return (ResultFunction)function;
+			return new ResultFunction(function);
 		}
 
 		{}
@@ -423,7 +423,7 @@ public class FEM {
 		 * 
 		 * @param function auszuwertende Funktion.
 		 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-		public VirtualFunction(final FEMFunction function) throws NullPointerException {
+		public ResultFunction(final FEMFunction function) throws NullPointerException {
 			if (function == null) throw new NullPointerException("function = null");
 			this._function_ = function;
 		}
@@ -921,16 +921,16 @@ public class FEM {
 		}
 
 		/** Diese Methode gibt eine zu dieser Funktion gleichwertige {@link InvokeFunction} zurück, bei welcher {@link #function()} und jede Parameterfunktion in
-		 * {@link #params()} in eine {@link VirtualFunction} konvertiert wurde.
+		 * {@link #params()} in eine {@link ResultFunction} konvertiert wurde.
 		 * 
-		 * @see VirtualFunction#from(FEMFunction)
-		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link VirtualFunction} sind. */
+		 * @see ResultFunction#from(FEMFunction)
+		 * @return neue {@link InvokeFunction} Funktion mit Parameterfunktionen, die {@link ResultFunction} sind. */
 		public final InvokeFunction toVirtual() {
 			final FEMFunction[] functions = this._params_.clone();
 			for (int i = 0, size = functions.length; i < size; i++) {
-				functions[i] = VirtualFunction.from(functions[i]);
+				functions[i] = ResultFunction.from(functions[i]);
 			}
-			return InvokeFunction.from(VirtualFunction.from(this._function_), this._direct_, functions);
+			return InvokeFunction.from(ResultFunction.from(this._function_), this._direct_, functions);
 		}
 
 		{}
