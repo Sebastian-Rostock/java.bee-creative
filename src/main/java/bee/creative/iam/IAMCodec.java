@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
-import bee.creative.fem.FEMString;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
@@ -325,7 +324,7 @@ public final class IAMCodec {
 				if ((length & 1) != 0) throw new IllegalArgumentException();
 				final int[] result = new int[length >> 1];
 				for (int i = 0; i < length;) {
-					int x = i >> 1;
+					final int x = i >> 1;
 					final int hi = FEMBinary.toDigit(source[i++]);
 					final int lo = FEMBinary.toDigit(source[i++]);
 					result[x] = (byte)((hi << 4) | (lo << 0));
@@ -380,8 +379,8 @@ public final class IAMCodec {
 		STRING_UTF_32 {
 
 			@Override
-			public int[] parse(String string) throws NullPointerException, IllegalArgumentException {
-				int length = string.codePointCount(0, string.length());
+			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
+				final int length = string.codePointCount(0, string.length());
 				final int[] result = new int[length];
 				for (int i = 0, j = 0; i < length; i++) {
 					result[i] = string.codePointAt(j);
@@ -391,7 +390,7 @@ public final class IAMCodec {
 			}
 
 			@Override
-			public String format(int[] array) throws NullPointerException, IllegalArgumentException {
+			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
 				return new String(array, 0, array.length);
 			}
 
@@ -703,19 +702,6 @@ public final class IAMCodec {
 		if (format == null) throw new IllegalStateException();
 		if (this.getByteOrder() == null) throw new IllegalStateException();
 		format.encode(this, index);
-	}
-
-	public static void main(final String[] args) throws Exception {
-
-		System.out.println(Arrays.toString(IAMArrayFormat.ARRAY.parse("123 45 6")));
-		System.out.println(Arrays.toString(IAMArrayFormat.BINARY.parse("0A01")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_8.parse("€")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_16.parse("€")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_UTF_32.parse("€")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_CP_1252.parse("€")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_ISO_8859_1.parse("€")));
-		System.out.println(Arrays.toString(IAMArrayFormat.STRING_ISO_8859_15.parse("€")));
-
 	}
 
 }

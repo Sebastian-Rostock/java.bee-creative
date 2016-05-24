@@ -414,10 +414,10 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	 * @return hexadezimale Ziffer ({@code 0..15}).
 	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
 	public static int toDigit(final int hexChar) throws IllegalArgumentException {
-		int number = hexChar - '0';
+		final int number = hexChar - '0';
 		if (number < 0) throw new IllegalArgumentException("hexChar < '0'");
 		if (number <= 9) return number;
-		int letter = hexChar - 'A';
+		final int letter = hexChar - 'A';
 		if (letter < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
 		if (letter <= 5) return letter + 10;
 		throw new IllegalArgumentException("hexChar > 'F'");
@@ -651,7 +651,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMBinary result(boolean recursive) {
+	public final FEMBinary result(final boolean recursive) {
 		return this;
 	}
 

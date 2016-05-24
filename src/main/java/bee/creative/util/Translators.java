@@ -103,8 +103,7 @@ public class Translators {
 	 * @param translator {@link Translator}.
 	 * @return {@code reverse}-{@link Translator}.
 	 * @throws NullPointerException Wenn {@code translator} {@code null} ist. */
-	public static <GSource, GTarget> Translator<GSource, GTarget> reverseTranslator(final Translator<GTarget, GSource> translator)
-		throws NullPointerException {
+	public static <GSource, GTarget> Translator<GSource, GTarget> reverseTranslator(final Translator<GTarget, GSource> translator) throws NullPointerException {
 		if (translator == null) throw new NullPointerException("translator = null");
 		return new Translator<GSource, GTarget>() {
 

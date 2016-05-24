@@ -88,8 +88,7 @@ public class Strings {
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist. */
-	static List<List<String>> _applyAll_(final String regex, final CharSequence string, final boolean split, final boolean match)
-		throws NullPointerException {
+	static List<List<String>> _applyAll_(final String regex, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
 		if (regex == null) throw new NullPointerException("regex = null");
 		if (string == null) throw new NullPointerException("string = null");
 		return Strings._applyAll_(Strings.PATTERN_COMPILER.convert(regex), string, split, match);
@@ -105,8 +104,7 @@ public class Strings {
 	 * @param match {@code true}, wenn die getroffen getroffenen Zeichenkette eingetragen werden sollen.
 	 * @return Liste der Listen der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist. */
-	static List<List<String>> _applyAll_(final Pattern pattern, final CharSequence string, final boolean split, final boolean match)
-		throws NullPointerException {
+	static List<List<String>> _applyAll_(final Pattern pattern, final CharSequence string, final boolean split, final boolean match) throws NullPointerException {
 		if (pattern == null) throw new NullPointerException("pattern = null");
 		if (string == null) throw new NullPointerException("string = null");
 		final Matcher matcher = pattern.matcher(string);
@@ -269,8 +267,7 @@ public class Strings {
 	 * @return Liste der nicht getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static List<String> split(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
-		IllegalArgumentException {
+	public static List<String> split(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, true, false);
 	}
 
@@ -362,8 +359,7 @@ public class Strings {
 	 * @return Liste der getroffenen Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static List<String> match(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
-		IllegalArgumentException {
+	public static List<String> match(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, false, true);
 	}
 
@@ -425,8 +421,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code regex} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static List<String> splatch(final String regex, final CharSequence string, final int index) throws NullPointerException,
-		IllegalArgumentException {
+	public static List<String> splatch(final String regex, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(regex, string, index, true, true);
 	}
 
@@ -456,8 +451,7 @@ public class Strings {
 	 * @return Liste der Zeichenketten.
 	 * @throws NullPointerException Wenn {@code pattern} bzw. {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code index < 0} ist. */
-	public static List<String> splatch(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException,
-		IllegalArgumentException {
+	public static List<String> splatch(final Pattern pattern, final CharSequence string, final int index) throws NullPointerException, IllegalArgumentException {
 		return Strings._apply_(pattern, string, index, true, true);
 	}
 

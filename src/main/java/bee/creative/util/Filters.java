@@ -292,8 +292,8 @@ public class Filters {
 	 * @param filter {@link Field}.
 	 * @return {@code navigated}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code field} bzw. {@code filter} {@code null} ist. */
-	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field,
-		final Filter<? super GOutput> filter) throws NullPointerException {
+	public static <GInput, GOutput> Filter<GInput> navigatedFilter(final Field<? super GInput, ? extends GOutput> field, final Filter<? super GOutput> filter)
+		throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
 		if (filter == null) throw new NullPointerException("filter = null");
 		return new Filter<GInput>() {

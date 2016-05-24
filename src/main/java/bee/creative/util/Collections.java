@@ -530,9 +530,8 @@ public class Collections {
 	 * @param valueTranslator {@link Translator} zur Übersetzung der Werte.
 	 * @return {@code translated}-{@link Map}.
 	 * @throws NullPointerException Wenn {@code entries}, {@code keyTranslator} bzw. {@code valueTranslator} {@code null} ist. */
-	public static <GSourceKey, GSourceValue, GTargetKey, GTargetValue> Map<GTargetKey, GTargetValue> translatedMap(
-		final Map<GSourceKey, GSourceValue> entries, final Translator<GSourceKey, GTargetKey> keyTranslator,
-		final Translator<GSourceValue, GTargetValue> valueTranslator) throws NullPointerException {
+	public static <GSourceKey, GSourceValue, GTargetKey, GTargetValue> Map<GTargetKey, GTargetValue> translatedMap(final Map<GSourceKey, GSourceValue> entries,
+		final Translator<GSourceKey, GTargetKey> keyTranslator, final Translator<GSourceValue, GTargetValue> valueTranslator) throws NullPointerException {
 		if (entries == null) throw new NullPointerException("entries = null");
 		if (keyTranslator == null) throw new NullPointerException("keyTranslator = null");
 		if (valueTranslator == null) throw new NullPointerException("valueTranslator = null");

@@ -143,7 +143,7 @@ public final class FEMInteger extends BaseValue implements Comparable<FEMInteger
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMInteger result(boolean recursive) {
+	public final FEMInteger result(final boolean recursive) {
 		return this;
 	}
 

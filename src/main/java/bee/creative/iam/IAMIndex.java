@@ -312,7 +312,7 @@ public abstract class IAMIndex {
 	 * @return {@link IAMIndexLoader}.
 	 * @throws IOException Wenn {@link MMFArray#from(Object)} eine entsprechende Ausnahme auslöst.
 	 * @throws IAMException Wenn {@link IAMIndexLoader#IAMIndexLoader(MMFArray)} eine entsprechende Ausnahme auslöst. */
-	public static IAMIndexLoader from(Object object) throws IOException, IAMException {
+	public static IAMIndexLoader from(final Object object) throws IOException, IAMException {
 		return new IAMIndexLoader(MMFArray.from(object));
 	}
 

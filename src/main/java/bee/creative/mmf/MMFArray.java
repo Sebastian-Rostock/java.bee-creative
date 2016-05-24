@@ -33,6 +33,7 @@ public class MMFArray extends IAMArray {
 	 * @return {@link MMFArray}.
 	 * @throws IOException Wenn das {@link MMFArray} nicht erzeugt werden kann. */
 	public static MMFArray from(final Object object) throws IOException {
+		if (object instanceof MMFArray) return (MMFArray)object;
 		return new MMFArray(IO.inputBufferFrom(object));
 	}
 

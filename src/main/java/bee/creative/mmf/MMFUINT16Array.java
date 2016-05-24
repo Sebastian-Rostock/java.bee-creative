@@ -29,7 +29,7 @@ class MMFUINT16Array extends MMFINT16Array {
 
 	/** {@inheritDoc} */
 	@Override
-	public MMFArray withOrder(ByteOrder order) {
+	public MMFArray withOrder(final ByteOrder order) {
 		return new MMFUINT16Array(this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
 	}
 

@@ -120,8 +120,8 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #staticConversion(Object, Object)}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> staticConversion(final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Converter<GInput, Conversion<GInput, GOutput>>() {
 
@@ -188,8 +188,8 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Conversion<GInput, GOutput>() {
 
@@ -219,8 +219,8 @@ public class Conversions {
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter} zu {@link #dynamicConversion(Object, Converter)}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(
-		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
+	public static <GInput, GOutput> Converter<GInput, Conversion<GInput, GOutput>> dynamicConversion(final Converter<? super GInput, ? extends GOutput> converter)
+		throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Converter<GInput, Conversion<GInput, GOutput>>() {
 

@@ -302,8 +302,8 @@ public class Iterators {
 	 * @return {@link Items}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
-	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
-		throws NullPointerException, IllegalArgumentException {
+	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException,
+		IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
 		Comparables._check_(fromIndex, toIndex);
 		return new BaseIterator<GItem>() {

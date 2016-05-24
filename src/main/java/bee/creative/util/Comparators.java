@@ -222,8 +222,8 @@ public class Comparators {
 
 	{}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
-	 * ist. Der berechnete Vergleichswert entspricht:
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
+	 * berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
@@ -234,8 +234,8 @@ public class Comparators {
 		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
-	 * ist. Der berechnete Vergleichswert entspricht:
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
+	 * berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
@@ -246,8 +246,8 @@ public class Comparators {
 		return (item1 < item2 ? -1 : (item1 > item2 ? 1 : 0));
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
-	 * ist. Der berechnete Vergleichswert entspricht:
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
+	 * berechnete Vergleichswert entspricht:
 	 * 
 	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
 	 * 
@@ -327,8 +327,8 @@ public class Comparators {
 	 * @param comparator {@link Comparator} für die Elemente der {@link Iterable}.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code comparator} {@code null} ist. */
-	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2,
-		final Comparator<? super GItem> comparator) throws NullPointerException {
+	public static <GItem> int compare(final Iterable<? extends GItem> item1, final Iterable<? extends GItem> item2, final Comparator<? super GItem> comparator)
+		throws NullPointerException {
 		if (comparator == null) throw new NullPointerException("comparator = null");
 		final Iterator<? extends GItem> iter1 = Iterators.iterator(item1), iter2 = Iterators.iterator(item2);
 		while (true) {

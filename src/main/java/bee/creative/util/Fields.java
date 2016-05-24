@@ -689,8 +689,8 @@ public final class Fields {
 	 * @param mixedValue Mischwert.
 	 * @return {@code aggregated}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field,
-		final GValue emptyValue, final GValue mixedValue) throws NullPointerException {
+	public static <GItem, GValue> Field<Iterable<? extends GItem>, GValue> aggregatedField(final Field<? super GItem, GValue> field, final GValue emptyValue,
+		final GValue mixedValue) throws NullPointerException {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
 	}
 
@@ -790,8 +790,8 @@ public final class Fields {
 	 * @param reject {@code reject}-{@link Field}.
 	 * @return {@code conditional}-{@link Field}.
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
-	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition,
-		final Field<? super GInput, GValue> accept, final Field<? super GInput, GValue> reject) throws NullPointerException {
+	public static <GInput, GValue> Field<GInput, GValue> conditionalField(final Filter<? super GInput> condition, final Field<? super GInput, GValue> accept,
+		final Field<? super GInput, GValue> reject) throws NullPointerException {
 		if (condition == null) throw new NullPointerException("condition = null");
 		if (accept == null) throw new NullPointerException("accept = null");
 		if (reject == null) throw new NullPointerException("reject = null");

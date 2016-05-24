@@ -165,8 +165,8 @@ public class Comparables {
 	 * @return Auswahl der Elemente.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
-	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
-		throws NullPointerException, IllegalArgumentException {
+	public static <GItem> Items<GItem> itemsSection(final Items<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException,
+		IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
 		Comparables._check_(fromIndex, toIndex);
 		return new Items<GItem>() {
@@ -394,8 +394,8 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen der gegebenen {@link List} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn {@code fromIndex < 0} oder {@code toIndex > list.size()}. */
-	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <GItem> int binarySearch(final List<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		Comparables._check_(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
@@ -423,8 +423,8 @@ public class Comparables {
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen {@link Items} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}.
 	 * @throws IndexOutOfBoundsException Wenn das gegebene {@link Items} eine {@link IndexOutOfBoundsException} auslöst. */
-	public static <GItem> int binarySearch(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex,
-		final int toIndex) throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
+	public static <GItem> int binarySearch(final Items<? extends GItem> items, final Comparable<? super GItem> comparable, final int fromIndex, final int toIndex)
+		throws NullPointerException, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException {
 		Comparables._check_(items, comparable, fromIndex, toIndex);
 		int from = fromIndex, last = toIndex;
 		while (from < last) {
@@ -449,8 +449,7 @@ public class Comparables {
 	 * @return kleinste Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist. */
-	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException,
-		ClassCastException {
+	public static <GItem> int binarySearchFirst(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
 		return Comparables.binarySearchFirst(items, comparable, 0, items.length);
 	}
 
@@ -571,8 +570,7 @@ public class Comparables {
 	 * @return größte Position eines Treffers oder <code>(-(<em>Einfügeposition</em>)-1)</code>.
 	 * @throws NullPointerException Wenn {@code items} bzw. {@code comparable} {@code null} ist.
 	 * @throws ClassCastException Wenn der gegebene {@link Comparable} inkompatibel mit den Elementen des gegebenen Arrays ist. */
-	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException,
-		ClassCastException {
+	public static <GItem> int binarySearchLast(final GItem[] items, final Comparable<? super GItem> comparable) throws NullPointerException, ClassCastException {
 		return Comparables.binarySearchLast(items, comparable, 0, items.length);
 	}
 

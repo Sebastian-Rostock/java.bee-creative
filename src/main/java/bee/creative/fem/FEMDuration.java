@@ -687,7 +687,7 @@ public final class FEMDuration extends BaseValue implements Comparable<FEMDurati
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMDuration result(boolean recursive) {
+	public final FEMDuration result(final boolean recursive) {
 		return this;
 	}
 

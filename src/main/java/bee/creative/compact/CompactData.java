@@ -482,8 +482,8 @@ public abstract class CompactData {
 		this._items_.compact();
 	}
 
-	/** Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em>
-	 * ist der Index, bei dem der Eintrag eingefügt werden müsste.
+	/** Diese Methode sucht nach dem gegebenen Objekt und gibt dessen Index oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die
+	 * <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
 	 * 
 	 * @see CompactData#_itemIndexEquals_(Object, int)
 	 * @see CompactData#_itemIndexCompare_(Object, int)
@@ -492,8 +492,8 @@ public abstract class CompactData {
 	protected abstract int _itemIndex_(final Object item);
 
 	/** Diese Methode sucht zuerst binär und danach linear nach einem Element, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses
-	 * Elements oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
-	 * Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
+	 * Elements oder <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden
+	 * müsste. Ein Element {@code element} ist dann zum gegebenen Schlüssel gleich, wenn:
 	 * 
 	 * <pre>(customItemCompare(key, hash, element) == 0) && customItemEquals(key, hash, element)</pre>
 	 * 

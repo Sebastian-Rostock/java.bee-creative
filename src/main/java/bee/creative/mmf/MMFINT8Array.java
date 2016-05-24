@@ -35,7 +35,7 @@ class MMFINT8Array extends MMFArray {
 
 	/** {@inheritDoc} */
 	@Override
-	public MMFArray withOrder(ByteOrder order) {
+	public MMFArray withOrder(final ByteOrder order) {
 		return new MMFINT8Array(this._byteBuffer_.duplicate().order(order), this._byteOffset_, this._byteLength_);
 	}
 

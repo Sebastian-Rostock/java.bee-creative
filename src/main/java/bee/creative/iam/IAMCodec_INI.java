@@ -13,7 +13,8 @@ import bee.creative.ini.INIWriter;
 
 @SuppressWarnings ("javadoc")
 final class IAMCodec_INI {
- // TODO stateless
+
+	// TODO stateless
 	IAMByteOrder _order_;
 
 	INIReader _reader_;

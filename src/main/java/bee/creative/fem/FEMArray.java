@@ -579,7 +579,7 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 	 * @param order {@link Comparator} zum Vergleichen der Werte.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} bzw. {@code order} {@code null} ist. */
-	public final int compare(final FEMArray that, Comparator<FEMValue> order) throws NullPointerException {
+	public final int compare(final FEMArray that, final Comparator<FEMValue> order) throws NullPointerException {
 		final int length = Math.min(this._length_, that._length_);
 		for (int i = 0; i < length; i++) {
 			final int result = order.compare(this._get_(i), that._get_(i));
