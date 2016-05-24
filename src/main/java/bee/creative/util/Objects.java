@@ -478,6 +478,22 @@ public class Objects {
 		return Objects._format_(format, false, object);
 	}
 
+	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
+	 * 
+	 * @param string Textdarstelung oder {@code null}.
+	 * @return Textdarstelung-Objekt. */
+	public static Object toStringObject(final String string) {
+		if (string == null) return "null";
+		return new Object() {
+
+			@Override
+			public String toString() {
+				return string;
+			}
+
+		};
+	}
+
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
 	 * Textdarstelung des gegebenen Objekts entspricht.
 	 * 
