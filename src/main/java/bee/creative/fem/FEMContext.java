@@ -157,7 +157,8 @@ public abstract class FEMContext {
 	 * geliefert.</li>
 	 * <li>Wenn es eine {@link Collection} ist, wird diese in ein natives Array überführt, welches anschließend in eine Wertliste umgewandelt wird.</li>
 	 * <li>Wenn es ein {@link Iterable} ist, wird dieses in eine {@link Collection} überführt, welche anschließend in eine Wertliste umgewandelt wird.</li>
-	 * <li>Andernfalls wird eine Ausnahme ausgelöst.</li> </ul>
+	 * <li>Andernfalls wird eine Ausnahme ausgelöst.</li>
+	 * </ol>
 	 * 
 	 * @see Array#get(Object, int)
 	 * @see Array#getLength(Object)
