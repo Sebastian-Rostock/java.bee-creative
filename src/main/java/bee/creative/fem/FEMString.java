@@ -439,7 +439,7 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UTF32CompactString extends FEMString {
+	static class UTF32CompactString extends FEMString {
 
 		final int[] _values_;
 
@@ -463,6 +463,12 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 		@Override
 		public final FEMString compact() {
 			return this;
+		}
+
+		@Override
+		public FEMString result(final boolean recursive) {
+			if (!recursive) return this;
+			return new ResultString(this._values_);
 		}
 
 	}
@@ -637,6 +643,20 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 		@Override
 		public final FEMString compact() {
+			return this;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ResultString extends UTF32CompactString {
+
+		ResultString(final int[] values) throws IllegalArgumentException {
+			super(values);
+		}
+
+		@Override
+		public final FEMString result(final boolean recursive) {
 			return this;
 		}
 
@@ -1200,8 +1220,15 @@ public abstract class FEMString extends BaseValue implements Iterable<Integer> {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMString result(final boolean recursive) {
+	public final FEMString result() {
 		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public FEMString result(final boolean recursive) {
+		if (!recursive) return this;
+		return new ResultString(this.value());
 	}
 
 	/** {@inheritDoc} */

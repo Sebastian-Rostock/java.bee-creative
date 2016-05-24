@@ -619,6 +619,12 @@ public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Ite
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMArray result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public FEMArray result(final boolean recursive) {
 		if (!recursive) return this;
 		final FEMValue[] result = this.value();

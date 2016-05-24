@@ -279,7 +279,7 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class CompactBinary extends FEMBinary {
+	static class CompactBinary extends FEMBinary {
 
 		final byte[] _values_;
 
@@ -302,6 +302,26 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 		@Override
 		public final FEMBinary compact() {
+			return this;
+		}
+
+		@Override
+		public FEMBinary result(final boolean recursive) {
+			if (!recursive) return this;
+			return new ResultArray(this._values_);
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class ResultArray extends CompactBinary {
+
+		ResultArray(final byte[] values) throws IllegalArgumentException {
+			super(values);
+		}
+
+		@Override
+		public final FEMBinary result(final boolean recursive) {
 			return this;
 		}
 
@@ -651,8 +671,15 @@ public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMBinary result(final boolean recursive) {
+	public final FEMBinary result() {
 		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public FEMBinary result(final boolean recursive) {
+		if (!recursive) return this;
+		return new ResultArray(this.value());
 	}
 
 	/** {@inheritDoc} */

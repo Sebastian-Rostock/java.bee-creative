@@ -20,6 +20,12 @@ public interface FEMValue {
 	 * @return Nutzdaten. */
 	public Object data();
 
+	/** Diese Methode ist eine Abkürzung für {@code result(false)}.
+	 * 
+	 * @see #result(boolean)
+	 * @return ausgewerteter Ergebniswert. */
+	public FEMValue result();
+
 	/** Diese Methode gibt diesen Wert als ausgewerteten Ergebniswert zurück.
 	 * 
 	 * @see FEMArray#result(boolean)

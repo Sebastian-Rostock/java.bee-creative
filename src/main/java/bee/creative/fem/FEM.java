@@ -77,6 +77,12 @@ public class FEM {
 
 		/** {@inheritDoc} */
 		@Override
+		public FEMValue result() {
+			return this.result(false);
+		}
+
+		/** {@inheritDoc} */
+		@Override
 		public FEMValue result(final boolean recursive) {
 			return this;
 		}

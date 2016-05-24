@@ -102,6 +102,12 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMHandler result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final FEMHandler result(final boolean recursive) {
 		return this;
 	}

@@ -70,6 +70,12 @@ public final class FEMVoid extends BaseValue {
 
 	/** {@inheritDoc} */
 	@Override
+	public final FEMVoid result() {
+		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
 	public final FEMVoid result(final boolean recursive) {
 		return this;
 	}
