@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
@@ -96,7 +95,7 @@ public abstract class FEMContext {
 	{}
 
 	/** Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataFrom(FEMValue) Datentypumwandlungen} genutzt wird.<br>
-	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueFrom(Object)}, {@link BaseValue#data(FEMType)} und {@link FEMType#dataFrom(FEMValue)}
+	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueFrom(Object)}, {@link FEMBaseValue#data(FEMType)} und {@link FEMType#dataFrom(FEMValue)}
 	 * verwendet.
 	 * 
 	 * @return Rückfallkontextobjekt */

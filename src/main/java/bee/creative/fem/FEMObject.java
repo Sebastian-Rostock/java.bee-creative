@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
@@ -13,7 +12,7 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * genutzt werden.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMObject extends BaseValue implements Comparable<FEMObject> {
+public final class FEMObject extends FEMBaseValue implements Comparable<FEMObject> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 10;

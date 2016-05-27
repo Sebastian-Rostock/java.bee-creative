@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
@@ -10,7 +9,7 @@ import bee.creative.util.Comparators;
  * Intern wird die Zeitspanne als ein {@code long} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDuration extends BaseValue implements Comparable<FEMDuration> {
+public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDuration> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 8;

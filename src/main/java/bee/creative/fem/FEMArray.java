@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterables;
@@ -15,7 +14,7 @@ import bee.creative.util.Iterators;
 /** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMArray extends BaseValue implements Items<FEMValue>, Iterable<FEMValue> {
+public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, Iterable<FEMValue> {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#export(Collector)}. */
 	public static interface Collector {

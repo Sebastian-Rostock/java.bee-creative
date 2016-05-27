@@ -1,12 +1,10 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.BaseValue;
-
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch.<br>
  * Intern wird der Dezimalbruch als {@code double} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDecimal extends BaseValue implements Comparable<FEMDecimal> {
+public final class FEMDecimal extends FEMBaseValue implements Comparable<FEMDecimal> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 7;

@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
@@ -10,7 +9,7 @@ import bee.creative.mmf.MMFArray;
 /** Diese Klasse implementiert eine Zeichenkette, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Zeichenkette realisiert sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMString extends BaseValue implements Iterable<Integer> {
+public abstract class FEMString extends FEMBaseValue implements Iterable<Integer> {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#export(Collector)}. */
 	public static interface Collector {

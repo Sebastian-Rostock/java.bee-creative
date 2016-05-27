@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
 
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
@@ -11,7 +10,7 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMResult extends BaseValue {
+public final class FEMResult extends FEMBaseValue {
 
 	/** Diese Methode gibt den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen als Wert mit
 	 * <em>call-by-reference</em>-Semantik zurück.<br>

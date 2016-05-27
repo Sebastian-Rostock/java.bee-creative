@@ -1,11 +1,9 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.BaseValue;
-
 /** Diese Klasse implementiert den unveränderlichen Leerwert.
  * 
  * @author Sebastian Rostock 2015. */
-public final class FEMVoid extends BaseValue {
+public final class FEMVoid extends FEMBaseValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 0;

@@ -1,12 +1,10 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.BaseValue;
-
 /** Diese Klasse implementiert einen unveränderlichen Wahrheitswert.<br>
  * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMBoolean extends BaseValue implements Comparable<FEMBoolean> {
+public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBoolean> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 3;

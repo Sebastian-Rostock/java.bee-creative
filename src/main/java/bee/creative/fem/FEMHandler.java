@@ -1,15 +1,14 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.fem.FEM.ScriptFormatter;
-import bee.creative.fem.FEM.ScriptTracer;
-import bee.creative.fem.FEM.ScriptTracerInput;
+import bee.creative.fem.FEMTraceFunction.Tracer;
+import bee.creative.fem.FEMTraceFunction.TracerInput;
 
 /** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. eine als {@link FEMValue} verpackte Funktion.<br>
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMHandler extends BaseValue implements ScriptTracerInput {
+public final class FEMHandler extends FEMBaseValue implements TracerInput {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 2;
@@ -132,7 +131,7 @@ public final class FEMHandler extends BaseValue implements ScriptTracerInput {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction toTrace(final ScriptTracer tracer) throws NullPointerException {
+	public final FEMFunction toTrace(final Tracer tracer) throws NullPointerException {
 		return FEMHandler.from(tracer.trace(this._value_));
 	}
 

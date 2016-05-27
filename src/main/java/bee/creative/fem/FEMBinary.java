@@ -1,14 +1,13 @@
 package bee.creative.fem;
 
 import java.util.Iterator;
-import bee.creative.fem.FEM.BaseValue;
 import bee.creative.mmf.MMFArray;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen
  * realisiert sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary extends BaseValue implements Iterable<Byte> {
+public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 
 	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}. */
 	public static interface Collector {

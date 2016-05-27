@@ -26,7 +26,7 @@ public interface FEMValue {
 	 * @return ausgewerteter Ergebniswert. */
 	public FEMValue result();
 
-	/** Diese Methode gibt diesen Wert als ausgewerteten Ergebniswert zurück.
+	/** Diese Methode gibt diesen Wert als ausgewerteten und optimierten Ergebniswert zurück.
 	 * 
 	 * @see FEMArray#result(boolean)
 	 * @see FEMResult#result(boolean)
