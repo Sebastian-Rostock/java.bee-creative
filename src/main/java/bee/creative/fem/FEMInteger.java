@@ -86,7 +86,7 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 
 	{}
 
-	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück. Diese ist ein {@code long}.
+	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.
 	 * 
 	 * @return interne Darstellung der Dezimalzahl. */
 	public final long value() {
@@ -128,13 +128,13 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMInteger data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMInteger> type() {
 		return FEMInteger.TYPE;

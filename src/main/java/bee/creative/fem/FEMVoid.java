@@ -54,13 +54,13 @@ public final class FEMVoid extends FEMBaseValue {
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMVoid data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMVoid> type() {
 		return FEMVoid.TYPE;

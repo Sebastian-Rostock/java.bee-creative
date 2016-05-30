@@ -10,7 +10,7 @@ package bee.creative.fem;
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface FEMFunction {
 
-	/** Diese Methode führt Berechnungen im gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
+	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 * 
 	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert. */

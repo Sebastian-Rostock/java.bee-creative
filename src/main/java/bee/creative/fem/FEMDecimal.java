@@ -84,7 +84,7 @@ public final class FEMDecimal extends FEMBaseValue implements Comparable<FEMDeci
 
 	{}
 
-	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück. Diese ist ein {@code double}.
+	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück.
 	 * 
 	 * @return interne Darstellung des Dezimalbruchs. */
 	public final double value() {
@@ -132,13 +132,13 @@ public final class FEMDecimal extends FEMBaseValue implements Comparable<FEMDeci
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMDecimal data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMDecimal> type() {
 		return FEMDecimal.TYPE;

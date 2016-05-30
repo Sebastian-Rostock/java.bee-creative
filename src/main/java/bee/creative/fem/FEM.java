@@ -3,7 +3,6 @@ package bee.creative.fem;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -465,7 +464,7 @@ public class FEM {
 	 * aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu
 	 * genau einer Funktion kompiliert werden.</li>
 	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link FEMParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEM#PARAMS_VIEW_FUNCTION}.</li>
+	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEMParamFunction#VIEW}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler)} in Parameterfunktionen überführt.</li>
 	 * </ul>
 	 * <p>
@@ -706,7 +705,7 @@ public class FEM {
 		 * 
 		 * @see FEMValueFunction
 		 * @see FEMInvokeFunction
-		 * @see FEM#PARAMS_VIEW_FUNCTION
+		 * @see FEMParamFunction#VIEW
 		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist. */
 		final FEMFunction _compileArrayAsFunction_() throws ScriptException {
@@ -732,7 +731,7 @@ public class FEM {
 						this.skip();
 						final int size = list.size();
 						if (!value) {
-							final FEMFunction result = FEM.PARAMS_VIEW_FUNCTION.withParams(list.toArray(new FEMFunction[size]));
+							final FEMFunction result = FEMParamFunction.VIEW.withParams(list.toArray(new FEMFunction[size]));
 							return result;
 						}
 						final FEMValue[] values = new FEMValue[size];
@@ -820,7 +819,7 @@ public class FEM {
 				case '$': {
 					this.skip();
 					final String name = this._compileName_();
-					if (name == null) return FEM.PARAMS_VIEW_FUNCTION;
+					if (name == null) return FEMParamFunction.VIEW;
 					int index = this._compileIndex_(name);
 					if (index < 0) {
 						index = this._params_.indexOf(name);
@@ -1305,9 +1304,9 @@ public class FEM {
 				String section = compiler.section();
 				switch (compiler.symbol()) {
 					case '"':
-						return FEMNative.from(FEM.parseString(section));
+						return new FEMNative(FEM.parseString(section));
 					case '\'':
-						return FEMNative.from(new Character(FEM.parseString(section).charAt(0)));
+						return new FEMNative(new Character(FEM.parseString(section).charAt(0)));
 					case '!':
 						section = FEM.parseValue(section);
 					default: {
@@ -1315,7 +1314,7 @@ public class FEM {
 						if (section.equals("true")) return FEMNative.TRUE;
 						if (section.equals("false")) return FEMNative.FALSE;
 						try {
-							return FEMNative.from(new BigDecimal(section));
+							return new FEMNative(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {}
 						try {
 							return FEMNativeFunction.from(section);
@@ -1601,19 +1600,16 @@ public class FEM {
 				final Object item = items.get(i);
 				if (item == Mark.EMPTY) {
 					final Mark token = (Mark)items.get(i + 1);
-					if (token.level() <= value) {
+					if (token.level() <= value) { // ALTERNATIV: else if (token.level() < value) return this;
 						if (token.isEnabled()) return this;
 						token.enable();
-					} // ALTERNATIV: else if (token.level() < value) return this;
+					}
 					i--;
 				}
 			}
 			return this;
 		}
 
-		// * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
-		// * seine {@link Object#toString() Textdarstellung} angefügt.
-		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
 		 * 
 		 * @see Object#toString()
@@ -1624,17 +1620,10 @@ public class FEM {
 		public final ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
 			if (part == null) throw new NullPointerException("part = null");
 			this._check_(false);
-			// if (part instanceof ScriptFormatterInput) {
-			// ((ScriptFormatterInput)part).toScript(this);
-			// } else {
 			this._items_.add(part.toString());
-			// }
 			return this;
 		}
 
-		// * Wenn das Objekt ein {@link ScriptFormatterInput} ist, wird es über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird es
-		// * über {@link ScriptFormatterHelper#formatData(ScriptFormatter, Object)} angefügt.
-		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
 		 * 
 		 * @see ScriptFormatterHelper#formatData(ScriptFormatter, Object)
@@ -1646,11 +1635,7 @@ public class FEM {
 		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (data == null) throw new NullPointerException("data = null");
 			this._check_(false);
-			// if (data instanceof ScriptFormatterInput) {
-			// ((ScriptFormatterInput)data).toScript(this);
-			// } else {
 			this._helper_.formatData(this, data);
-			// }
 			return this;
 		}
 
@@ -1693,9 +1678,6 @@ public class FEM {
 			return this;
 		}
 
-		// * Wenn der Wert ein {@link ScriptFormatterInput} ist, wird er über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird er
-		// * über {@link ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)} angefügt.
-		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.<br>
 		 * 
 		 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)
@@ -1707,11 +1689,7 @@ public class FEM {
 		public final ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (value == null) throw new NullPointerException("value = null");
 			this._check_(false);
-			// if (value instanceof ScriptFormatterInput) {
-			// ((ScriptFormatterInput)value).toScript(this);
-			// } else {
 			this._helper_.formatValue(this, value);
-			// }
 			return this;
 		}
 
@@ -1811,9 +1789,6 @@ public class FEM {
 			return this.put("{: ").putFunction(function).put("}");
 		}
 
-		// * Wenn die Funktion ein {@link ScriptFormatterInput} ist, wird sie über {@link ScriptFormatterInput#toScript(ScriptFormatter)} angefügt. Andernfalls wird
-		// * sie über {@link ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)} angefügt.
-		// * @see ScriptFormatterInput#toScript(ScriptFormatter)
 		/** Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
 		 * 
 		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)
@@ -1825,11 +1800,7 @@ public class FEM {
 		public final ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
 			if (function == null) throw new NullPointerException("function = null");
 			this._check_(false);
-			// if (function instanceof ScriptFormatterInput) {
-			// ((ScriptFormatterInput)function).toScript(this);
-			// } else {
 			this._helper_.formatFunction(this, function);
-			// }
 			return this;
 		}
 
@@ -2263,119 +2234,18 @@ public class FEM {
 		public final String getMessage() {
 			return (this._range_ == Range.EMPTY //
 				? "Unerwartetes Ende der Zeichenkette." //
-				: "Unerwartete Zeichenkette «" + this._range_.extract(this._script_.__source) + "» an Position " + this._range_.__start + ".") //
+				: "Unerwartete Zeichenkette «" + this._range_.extract(this._script_._source_) + "» an Position " + this._range_._offset_ + ".") //
 				+ this._hint_;
 		}
+
 	}
-
-	{}
-
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: Function, params: Array): Value}, deren Ergebniswert via
-	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameterwerte des Stapelrahmens gegeben Funktion mit den im
-	 * zweiten Parameterwert gegebenen Parameterwertliste. */
-	public static final FEMBaseFunction CALL_FUNCTION = new FEMBaseFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
-			final FEMContext context = frame._context_;
-			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
-			final FEMFrame params = frame.withParams(FEMArray.from(frame.get(1), context));
-			return method.invoke(params);
-		}
-
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("CALL_FUNCTION");
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (params1: Value, ..., paramN: Value, method: Function): Value}, deren Ergebniswert via
-	 * {@code method(params1, ..., paramsN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameterwert des Stapelrahmens gegeben Funktion mit den davor
-	 * liegenden Parameterwerten. */
-	public static final FEMBaseFunction INVOKE_FUNCTION = new FEMBaseFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			final int index = frame.size() - 1;
-			if (index < 0) throw new IllegalArgumentException("frame.size() < 1");
-			final FEMContext context = frame._context_;
-			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
-			final FEMFrame params = frame.withParams(frame.params().section(0, index));
-			return method.invoke(params);
-		}
-
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("INVOKE_FUNCTION");
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert entspricht. */
-	public static final FEMBaseFunction PARAM_FUNCTION = new FEMBaseFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() <> 1");
-			final FEMValue value = frame.get(0);
-			final long index = FEMInteger.from(value, frame.context()).value();
-			if ((index < 0) || (index > Integer.MAX_VALUE)) throw new IndexOutOfBoundsException();
-			final FEMValue result = frame.get((int)index);
-			return result;
-		}
-
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("PARAM_FUNCTION");
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte eines gegebenen Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code frame.params().result(true)}.
-	 * 
-	 * @see FEMArray#from(FEMValue...)
-	 * @see FEMFrame#params() */
-	public static final FEMBaseFunction PARAMS_COPY_FUNCTION = new FEMBaseFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			return frame.params().result(true);
-		}
-
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("$");
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte eines gegebenen Stapelrahmens {@code frame} entspricht, d.h.
-	 * {@code frame.params()}.
-	 * 
-	 * @see FEMFrame#params() */
-	public static final FEMBaseFunction PARAMS_VIEW_FUNCTION = new FEMBaseFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			return frame.params();
-		}
-
-		@Override
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-			target.put("$");
-		}
-
-	};
 
 	{}
 
 	/** Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().arrayFrom(data)}.
 	 * 
 	 * @see FEMContext#arrayFrom(Object)
-	 * @param data Wertliste, natives Array, {@link Iterable} oder {@link Collection}.
+	 * @param data Wertliste, natives Array oder {@link Iterable}.
 	 * @return Wertliste.
 	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
 	public static FEMArray arrayFrom(final Object data) throws IllegalArgumentException {

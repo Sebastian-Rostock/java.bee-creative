@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparables.Items;
+import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 
@@ -109,75 +110,75 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	@SuppressWarnings ("javadoc")
 	static final class ConcatArray extends FEMArray {
 
-		final FEMArray _array1_;
+		public final FEMArray array1;
 
-		final FEMArray _array2_;
+		public final FEMArray array2;
 
 		ConcatArray(final FEMArray array1, final FEMArray array2) throws IllegalArgumentException {
 			super(array1._length_ + array2._length_);
-			this._array1_ = array1;
-			this._array2_ = array2;
+			this.array1 = array1;
+			this.array2 = array2;
 		}
 
 		{}
 
 		@Override
 		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			final int index2 = index - this._array1_._length_;
-			return index2 < 0 ? this._array1_._get_(index) : this._array2_._get_(index2);
+			final int index2 = index - this.array1._length_;
+			return index2 < 0 ? this.array1._get_(index) : this.array2._get_(index2);
 		}
 
 		@Override
 		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
-			final int offset2 = offset - this._array1_._length_, length2 = offset2 + length;
-			if (offset2 >= 0) return this._array2_._export_(target, offset2, length, foreward);
-			if (length2 <= 0) return this._array1_._export_(target, offset, length, foreward);
+			final int offset2 = offset - this.array1._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this.array2._export_(target, offset2, length, foreward);
+			if (length2 <= 0) return this.array1._export_(target, offset, length, foreward);
 			if (foreward) {
-				if (!this._array1_._export_(target, offset, -offset2, foreward)) return false;
-				return this._array2_._export_(target, 0, length2, foreward);
+				if (!this.array1._export_(target, offset, -offset2, foreward)) return false;
+				return this.array2._export_(target, 0, length2, foreward);
 			} else {
-				if (!this._array2_._export_(target, 0, length2, foreward)) return false;
-				return this._array1_._export_(target, offset, -offset2, foreward);
+				if (!this.array2._export_(target, 0, length2, foreward)) return false;
+				return this.array1._export_(target, offset, -offset2, foreward);
 			}
 		}
 
 		@Override
 		public final FEMArray section(final int offset, final int length) throws IllegalArgumentException {
-			final int offset2 = offset - this._array1_._length_, length2 = offset2 + length;
-			if (offset2 >= 0) return this._array2_.section(offset2, length);
-			if (length2 <= 0) return this._array1_.section(offset, length);
-			return super.section(offset, -offset2).concat(this._array2_.section(0, length2));
+			final int offset2 = offset - this.array1._length_, length2 = offset2 + length;
+			if (offset2 >= 0) return this.array2.section(offset2, length);
+			if (length2 <= 0) return this.array1.section(offset, length);
+			return super.section(offset, -offset2).concat(this.array2.section(0, length2));
 		}
 	}
 
 	@SuppressWarnings ("javadoc")
 	static final class SectionArray extends FEMArray {
 
-		final FEMArray _array_;
+		public final FEMArray array;
 
-		final int _offset_;
+		public final int offset;
 
 		SectionArray(final FEMArray array, final int offset, final int length) throws IllegalArgumentException {
 			super(length);
-			this._array_ = array;
-			this._offset_ = offset;
+			this.array = array;
+			this.offset = offset;
 		}
 
 		{}
 
 		@Override
 		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this._array_._get_(index + this._offset_);
+			return this.array._get_(index + this.offset);
 		}
 
 		@Override
 		protected final boolean _export_(final Collector target, final int offset2, final int length2, final boolean foreward) {
-			return this._array_._export_(target, this._offset_ + offset2, length2, foreward);
+			return this.array._export_(target, this.offset + offset2, length2, foreward);
 		}
 
 		@Override
 		public final FEMArray section(final int offset2, final int length2) throws IllegalArgumentException {
-			return this._array_.section(this._offset_ + offset2, length2);
+			return this.array.section(this.offset + offset2, length2);
 		}
 
 	}
@@ -185,63 +186,63 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	@SuppressWarnings ("javadoc")
 	static final class ReverseArray extends FEMArray {
 
-		final FEMArray _array_;
+		public final FEMArray array;
 
 		ReverseArray(final FEMArray array) throws IllegalArgumentException {
 			super(array._length_);
-			this._array_ = array;
+			this.array = array;
 		}
 
 		{}
 
 		@Override
 		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this._array_._get_(this._length_ - index - 1);
+			return this.array._get_(this._length_ - index - 1);
 		}
 
 		@Override
 		protected final boolean _export_(final Collector target, final int offset, final int length, final boolean foreward) {
-			return this._array_._export_(target, offset, length, !foreward);
+			return this.array._export_(target, offset, length, !foreward);
 		}
 
 		@Override
-		public final FEMArray concat(final FEMArray value) throws NullPointerException {
-			return value.reverse().concat(this._array_).reverse();
+		public final FEMArray concat(final FEMArray that) throws NullPointerException {
+			return that.reverse().concat(this.array).reverse();
 		}
 
 		@Override
 		public final FEMArray section(final int offset, final int length2) throws IllegalArgumentException {
-			return this._array_.section(this._length_ - offset - length2, length2).reverse();
+			return this.array.section(this._length_ - offset - length2, length2).reverse();
 		}
 
 		@Override
 		public final FEMArray reverse() {
-			return this._array_;
+			return this.array;
 		}
 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class UniformArray extends FEMArray {
+	static class UniformArray extends FEMArray {
 
-		final FEMValue _value_;
+		public final FEMValue item;
 
-		UniformArray(final int length, final FEMValue value) throws IllegalArgumentException {
+		UniformArray(final int length, final FEMValue item) throws IllegalArgumentException {
 			super(length);
-			this._value_ = value;
+			this.item = item;
 		}
 
 		{}
 
 		@Override
 		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this._value_;
+			return this.item;
 		}
 
 		@Override
 		protected final boolean _export_(final Collector target, final int offset, int length, final boolean foreward) {
 			while (length > 0) {
-				if (!target.push(this._value_)) return false;
+				if (!target.push(this.item)) return false;
 				length--;
 			}
 			return true;
@@ -257,28 +258,50 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 			return this;
 		}
 
+		@Override
+		public FEMArray result(final boolean recursive) {
+			if (!recursive) return this;
+			return new UniformResultArray(this._length_, this.item.result(true));
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class UniformResultArray extends UniformArray {
+
+		UniformResultArray(final int length, final FEMValue item) throws IllegalArgumentException {
+			super(length, item);
+		}
+
+		{}
+
+		@Override
+		public final FEMArray result(final boolean recursive) {
+			return this;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
 	static class CompactArray extends FEMArray {
 
-		final FEMValue[] _values_;
+		public final FEMValue[] items;
 
-		CompactArray(final FEMValue[] values) throws IllegalArgumentException {
-			super(values.length);
-			this._values_ = values;
+		CompactArray(final FEMValue[] items) throws IllegalArgumentException {
+			super(items.length);
+			this.items = items;
 		}
 
 		{}
 
 		@Override
 		protected final FEMValue _get_(final int index) throws IndexOutOfBoundsException {
-			return this._values_[index];
+			return this.items[index];
 		}
 
 		@Override
 		public final FEMValue[] value() {
-			return this._values_.clone();
+			return this.items.clone();
 		}
 
 		@Override
@@ -289,10 +312,10 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class ResultArray extends CompactArray {
+	static final class CompactResultArray extends CompactArray {
 
-		ResultArray(final FEMValue[] values) throws IllegalArgumentException {
-			super(values);
+		CompactResultArray(final FEMValue[] items) throws IllegalArgumentException {
+			super(items);
 		}
 
 		@Override
@@ -310,7 +333,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
 	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID, "ARRAY");
 
-	/** Dieses Feld speichert eine leere Wertliste. */
+	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new EmptyArray();
 
 	{}
@@ -318,37 +341,37 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
 	 * Das gegebene Array wird Kopiert, sodass spätere Anderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
 	 * 
-	 * @param values Werte.
+	 * @param items Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static FEMArray from(final FEMValue... values) throws NullPointerException {
-		if (values.length == 0) return FEMArray.EMPTY;
-		if (values.length == 1) return FEMArray.from(values[0], 1);
-		return new CompactArray(values.clone());
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMArray from(final FEMValue... items) throws NullPointerException {
+		if (items.length == 0) return FEMArray.EMPTY;
+		if (items.length == 1) return FEMArray.from(items[0], 1);
+		return new CompactArray(items.clone());
 	}
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
 	 * 
-	 * @param value Wert.
+	 * @param item Wert.
 	 * @param length Länge.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
+	 * @throws NullPointerException Wenn {@code item} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
-	public static FEMArray from(final FEMValue value, final int length) throws NullPointerException, IllegalArgumentException {
+	public static FEMArray from(final FEMValue item, final int length) throws NullPointerException, IllegalArgumentException {
 		if (length == 0) return FEMArray.EMPTY;
-		if (value == null) throw new NullPointerException("value = null");
-		return new UniformArray(length, value);
+		if (item == null) throw new NullPointerException("value = null");
+		return new UniformArray(length, item);
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
 	 * 
 	 * @see #from(Collection)
-	 * @param values Werte.
+	 * @param items Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static FEMArray from(final Iterable<? extends FEMValue> values) throws NullPointerException {
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMArray from(final Iterable<? extends FEMValue> items) throws NullPointerException {
 		final ArrayList<FEMValue> result = new ArrayList<>();
-		Iterables.appendAll(result, values);
+		Iterables.appendAll(result, items);
 		return FEMArray.from(result);
 	}
 
@@ -356,12 +379,12 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	 * 
 	 * @see Collection#toArray(Object[])
 	 * @see #from(FEMValue...)
-	 * @param values Werte.
+	 * @param items Werte.
 	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist. */
-	public static FEMArray from(final Collection<? extends FEMValue> values) throws NullPointerException {
-		if (values.size() == 0) return FEMArray.EMPTY;
-		return FEMArray.from(values.toArray(new FEMValue[values.size()]));
+	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
+	public static FEMArray from(final Collection<? extends FEMValue> items) throws NullPointerException {
+		if (items.size() == 0) return FEMArray.EMPTY;
+		return FEMArray.from(items.toArray(new FEMValue[items.size()]));
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMArray.TYPE)}.
@@ -582,9 +605,10 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 		final int length = Math.min(this._length_, that._length_);
 		for (int i = 0; i < length; i++) {
 			final int result = order.compare(this._get_(i), that._get_(i));
-			if (result != 0) return result;
+			if (result < 0) return -1;
+			if (result > 0) return +1;
 		}
-		return this._length_ - that._length_;
+		return Comparators.compare(this._length_, that._length_);
 	}
 
 	/** Diese Methode gibt diese Wertliste als {@link List} zurück.
@@ -604,13 +628,13 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 		return this._get_(index);
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMArray data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMArray> type() {
 		return FEMArray.TYPE;
@@ -631,7 +655,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 		for (int i = 0; i < length; i++) {
 			result[i] = result[i].result(true);
 		}
-		return new ResultArray(result);
+		return new CompactResultArray(result);
 	}
 
 	/** {@inheritDoc} */
@@ -658,6 +682,13 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	@Override
 	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
 		target.putArray(this);
+	}
+
+	/** Diese Methode gibt die Textdarstellung zurück. Diese Besteht aus den in eckige Klammern eingeschlossenen und mit Semikolon separierten Textdarstellungen
+	 * der Elemente. */
+	@Override
+	public final String toString() {
+		return super.toString();
 	}
 
 }

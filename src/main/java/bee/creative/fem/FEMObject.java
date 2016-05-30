@@ -3,13 +3,15 @@ package bee.creative.fem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.fem.FEM.ScriptFormatter;
+import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
  * Objektschlüssel} identifiziert wird.<br>
  * Datentyp und Besitzer des Objekts werden über eine {@link #typeValue() Typkennung} bzw. {@link #ownerValue() Besitzerkennung} angegeben. Die Besitzerkennung
  * kann beispielsweise eine über den {@link FEMContext} erreichbare Objektliste identifizieren, deren Elemente die referenzierten Objekte darstellen. Der
  * Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur Besitzerkennung könnte hierbei auch die Typkennung
- * genutzt werden.
+ * genutzt werden.<br>
+ * Die Wertebereiche für Objektschlüssel, Typkennungen und Besitzerkennungen sind {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMObject extends FEMBaseValue implements Comparable<FEMObject> {
@@ -236,22 +238,22 @@ public final class FEMObject extends FEMBaseValue implements Comparable<FEMObjec
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final int compare(final FEMObject that) {
-		int result = this.refValue() - that.refValue();
+		int result = Comparators.compare(this.refValue(), that.refValue());
 		if (result != 0) return result;
-		result = this.ownerValue() - that.ownerValue();
+		result = Comparators.compare(this.ownerValue(), that.ownerValue());
 		if (result != 0) return result;
-		return this.typeValue() - that.typeValue();
+		return Comparators.compare(this.typeValue(), that.typeValue());
 	}
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMObject data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMObject> type() {
 		return FEMObject.TYPE;

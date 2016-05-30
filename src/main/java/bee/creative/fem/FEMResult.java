@@ -73,13 +73,13 @@ public final class FEMResult extends FEMBaseValue {
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this.result().data()} zurück. */
 	@Override
 	public final Object data() {
 		return this.result(false).data();
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this.result().type()} zurück. */
 	@Override
 	public final FEMType<?> type() {
 		return this.result(false).type();

@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.fem.FEM.ScriptFormatter;
+import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein {@code long} dargestellt.
@@ -71,6 +72,15 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * <p>
  * Der Zahlenwert für die {@link #daymillisValue() Tagesmillis} entspricht der Anzahl der Millisekunden seit {@code 00:00:00.000}. Unterstützte Zahlenwerte für
  * die Tagesmillis sind {@code 0..86400000}.
+ * </p>
+ * <h5><a name="datum">Datum</a></h5>
+ * <p>
+ * Das Datum einer Zeitangabe kann entweder als Kalendertag oder als Kombination von Jahr, Monat und Tag angegeben werden.
+ * </p>
+ * <h5><a name="uhrzeit">Uhrzeit</a></h5>
+ * <p>
+ * Die Uhrzeit einer Zeitangabe kann als Tagesmillis oder als Kombination von Stunden, Minuten, Sekunden und Millisekunden angegeben werden. Unterstützte
+ * Zahlenwerte für Stunden, Minuten, Sekunden und Millisekunden sind «0…24», «0…59», «0…59» bzw. «0…999».
  * </p>
  * <h5><a name="zone">Zeitzone (Zeitzonenverschiebung)</a></h5>
  * <p>
@@ -771,7 +781,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 		return this.withDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
 	}
 
-	/** Diese Methode gibt diese Zeitangabe mit dem Datum der gegebnene Zeitangabe zurück.<br>
+	/** Diese Methode gibt diese Zeitangabe mit dem Datum der gegebenen Zeitangabe zurück.<br>
 	 * Wenn die gegebene Zeitangabe kein Datum {@link #hasDate() besitzt}, hat die gelieferte Zeitangabe auch kein Datum.
 	 * 
 	 * @see #withoutDate()
@@ -830,7 +840,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 		return this.withTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), calendar.get(Calendar.MILLISECOND));
 	}
 
-	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit der gegebnene Zeitangabe zurück.<br>
+	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit der gegebenen Zeitangabe zurück.<br>
 	 * Wenn die gegebene Zeitangabe keine Uhrzeit {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Uhrzeit.
 	 * 
 	 * @see #withoutTime()
@@ -1144,19 +1154,18 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 		return ((this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_)) || (this.compare(that, 1) == 0);
 	}
 
-	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn diese Zeitangabe früger, gleich bzw. später als die gegebene Zeitangabe
-	 * ist. Wenn die Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitangabe früher, gleich bzw. später als die gegebene Zeitangabe ist. Wenn die
+	 * Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * <p>
 	 * Der Vergleich erfolgt für Zeitangaben mit Datum und/oder Uhrzeit gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime-order">XML
 	 * Schema Part 2: 3.2.7.3 Order relation on dateTime</a>:
 	 * <ul>
-	 * <li>Verscheiben beider Zeitangaben auf Zeitzone {@code 00:00}. Zeitangaben mit Datum und ohne Uhrzeit werden hierbei so behandelt, als hätten sie die
+	 * <li>Verschieben beider Zeitangaben auf Zeitzone {@code 00:00}. Zeitangaben mit Datum und ohne Uhrzeit werden hierbei so behandelt, als hätten sie die
 	 * Uhrzeit {@code 00:00:00}. Damit sinkt der {@link #calendardayValue()} nur dann um {@code 1}, wenn der {@link #zoneValue()} größer als {@code 0} ist.</li>
 	 * <li>Wenn nur eine der Zeitangaben ein Datum besitzt, wird {@code undefined} geliefert.</li>
-	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird diese Differenz (oder ihr Vorzeichen)
-	 * geliefert.</li>
+	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird das Vorzeichen dieser Differenz geliefert.</li>
 	 * <li>Wenn nur eine der Zeitangaben eine Uhrzeit besitzt, wird {@code undefined} geliefert.</li>
-	 * <li>Wenn beide eine Uhrzeit besitzen, wird die Differenz von {@link #daymillisValue()} (oder ihr Vorzeichen) geliefert.</li>
+	 * <li>Wenn beide eine Uhrzeit besitzen, wird das Vorzeichen der Differenz von {@link #daymillisValue()} geliefert.</li>
 	 * <li>Andernfalls wird {@code 0} geliefert.</li>
 	 * </ul>
 	 * </p>
@@ -1164,7 +1173,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 	 * Der Vergleich für Zeitangaben ohne Datum und ohne Uhrzeit erfolgt über folgende Schritte:
 	 * <ul>
 	 * <li>Wenn nur eine der Zeitangaben eine Zeitzone besitzt, wird {@code undefined} geliefert.</li>
-	 * <li>Wenn beide eine Zeitzone besitzen, wird die Differenz von {@link #zoneValue()} (oder ihr Vorzeichen) geliefert.</li>
+	 * <li>Wenn beide eine Zeitzone besitzen, wird das Vorzeichen der Differenz von {@link #zoneValue()} geliefert.</li>
 	 * <li>Andernfalls wird {@code 0} geliefert.</li>
 	 * </ul>
 	 * </p>
@@ -1178,13 +1187,13 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 		if (this.hasDate()) {
 			if (!that.hasDate()) return undefined;
 			result = this._calendardayValue_() - that._calendardayValue_();
-			if ((result < -2) || (result > 2)) return result;
+			if ((result < -2) || (result > 2)) return Comparators.compare(result, 0);
 			if (this.hasTime()) {
 				if (that.hasTime()) {
 					result *= 86400000;
 					result += (this._daymillisValue_() - that._daymillisValue_());
 					result += (this._zoneValue_() - that._zoneValue_()) * -60000;
-					return result;
+					return Comparators.compare(result, 0);
 				} else {
 					if (that._zoneValue_() > 0) {
 						result++;
@@ -1214,7 +1223,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 					if (that._zoneValue_() > 0) {
 						result++;
 					}
-					return result;
+					return Comparators.compare(result, 0);
 				}
 			}
 		} else {
@@ -1223,13 +1232,13 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 				if (!that.hasTime()) return undefined;
 				result = this._daymillisValue_() - that._daymillisValue_();
 				result += (this._zoneValue_() - that._zoneValue_()) * -60000;
-				return result;
+				return Comparators.compare(result, 0);
 			} else {
 				if (that.hasTime()) return undefined;
 				if (this.hasZone()) {
 					if (!that.hasZone()) return undefined;
 					result = that._zoneValue_() - this._zoneValue_();
-					return result;
+					return Comparators.compare(result, 0);
 				} else {
 					if (that.hasZone()) return undefined;
 					return 0;
@@ -1263,13 +1272,13 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMDatetime data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMDatetime> type() {
 		return FEMDatetime.TYPE;

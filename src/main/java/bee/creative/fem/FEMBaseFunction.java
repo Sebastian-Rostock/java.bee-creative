@@ -3,7 +3,7 @@ package bee.creative.fem;
 import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.fem.FEM.ScriptFormatterInput;
 
-/** Diese Klasse implementiert eine abstakte Funktion als {@link ScriptFormatterInput}.<br>
+/** Diese Klasse implementiert eine abstrakte Funktion mit einigen Methoden zur Umwandlung in einen Wert oder Funktionsaufruf. <br>
  * Die {@link #toString() Textdarstellung} der Funktion wird über {@link #toScript(ScriptFormatter)} ermittelt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -16,7 +16,8 @@ public abstract class FEMBaseFunction implements FEMFunction, ScriptFormatterInp
 		return new FEMHandler(this);
 	}
 
-	/** Diese Methode gibt eine neue {@link FEMInvokeFunction} zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft.
+	/** Diese Methode gibt eine neue {@link FEMInvokeFunction} zurück, welche diese Funktion direkt mit den gegebenen Parameterfunktionen aufruft und deren
+	 * Ergebniswert liefert.
 	 * 
 	 * @see FEMInvokeFunction
 	 * @see FEMFrame#withParams(FEMFunction[])
@@ -24,7 +25,7 @@ public abstract class FEMBaseFunction implements FEMFunction, ScriptFormatterInp
 	 * @return {@link FEMInvokeFunction}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
 	public final FEMInvokeFunction withParams(final FEMFunction... params) throws NullPointerException {
-		return FEMInvokeFunction.from(this, true, params);
+		return new FEMInvokeFunction(this, true, params);
 	}
 
 	{}

@@ -4,7 +4,7 @@ import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.fem.FEMTraceFunction.Tracer;
 import bee.creative.fem.FEMTraceFunction.TracerInput;
 
-/** Diese Klasse implementiert eine Funktion, welche die zusätzlichen Parameterwerte von Stapelrahmen an eine gegebene Funktion bindet und diese gebundene
+/** Diese Klasse implementiert eine Funktion, welche die zusätzlichen Parameterwerte des Stapelrahmens an eine gegebene Funktion bindet und diese gebundene
  * Funktion anschließend als {@link FEMHandler} liefert.
  * 
  * @see #invoke(FEMFrame)
@@ -12,7 +12,7 @@ import bee.creative.fem.FEMTraceFunction.TracerInput;
 public final class FEMClosureFunction extends FEMBaseFunction implements TracerInput {
 
 	/** Diese Methode gibt die gegebene Funktion als {@link FEMClosureFunction} zurück.<br>
-	 * Wenn diese bereits eine {@link FEMClosureFunction} ist, wird sie unverändert zurück gegeben.
+	 * Wenn diese bereits eine {@link FEMClosureFunction} ist, wird sie unverändert geliefert.
 	 * 
 	 * @param function Funktion.
 	 * @return {@link FEMClosureFunction}.
@@ -24,14 +24,13 @@ public final class FEMClosureFunction extends FEMBaseFunction implements TracerI
 
 	{}
 
-	/** Dieses Feld speichert die gebundenen Stapelrahmen, deren zusätzliche Parameterwerte genutzt werden. */
+	/** Dieses Feld speichert den gebundenen Stapelrahmen, dessen zusätzliche Parameterwerte genutzt werden. */
 	final FEMFrame _frame_;
 
 	/** Dieses Feld speichert die auszuwertende Funktion. */
 	final FEMFunction _function_;
 
-	/** Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #invoke(FEMFrame)} die die zusätzlichen Parameterwerte der Stapelrahmen gebunden
-	 * werden.
+	/** Dieser Konstruktor initialisiert die Funktion, an welchen in {@link #invoke(FEMFrame)} die zusätzlichen Parameterwerte des Stapelrahmens gebunden werden.
 	 * 
 	 * @see #invoke(FEMFrame)
 	 * @param function zu bindende Funktion.
@@ -42,10 +41,10 @@ public final class FEMClosureFunction extends FEMBaseFunction implements TracerI
 		this._function_ = function;
 	}
 
-	/** Dieser Konstruktor initialisiert die Stapelrahmen sowie die gebundene Funktion und sollte nur von {@link FEMClosureFunction#invoke(FEMFrame)} genutzt
+	/** Dieser Konstruktor initialisiert den Stapelrahmen sowie die gebundene Funktion und sollte nur von {@link FEMClosureFunction#invoke(FEMFrame)} genutzt
 	 * werden.<br>
-	 * Die {@link #invoke(FEMFrame)}-Methode delegiert die zugesicherten Parameterwerte der ihr übergebenen Stapelrahmen zusammen mit den zusätzlichen
-	 * Parameterwerten der gebundenen Stapelrahmen an die gegebene Funktion und liefert deren Ergebniswert.
+	 * Die {@link #invoke(FEMFrame)}-Methode delegiert die zugesicherten Parameterwerte des ihr übergebenen Stapelrahmens zusammen mit den zusätzlichen
+	 * Parameterwerten des gebundenen Stapelrahmens an die gegebene Funktion und liefert deren Ergebniswert.
 	 * 
 	 * @see #invoke(FEMFrame)
 	 * @param frame Stapelrahmen mit den zusätzlichen Parameterwerten.
@@ -60,13 +59,13 @@ public final class FEMClosureFunction extends FEMBaseFunction implements TracerI
 
 	{}
 
-	/** Diese Methode gibt die gebundene Stapelrahmen oder {@code null} zurück.<br>
-	 * Die Stapelrahmen sind {@code null}, wenn diese {@link FEMClosureFunction} über dem Konstruktor {@link #FEMClosureFunction(FEMFunction)} erzeugt wurde.
+	/** Diese Methode gibt den gebundenen Stapelrahmen oder {@code null} zurück.<br>
+	 * Der Stapelrahmen ist {@code null}, wenn diese {@link FEMClosureFunction} über dem Konstruktor {@link #FEMClosureFunction(FEMFunction)} erzeugt wurde.
 	 * 
 	 * @see #FEMClosureFunction(FEMFunction)
 	 * @see #FEMClosureFunction(FEMFrame, FEMFunction)
 	 * @see #invoke(FEMFrame)
-	 * @return gebundene Stapelrahmen oder {@code null}. */
+	 * @return gebundener Stapelrahmen oder {@code null}. */
 	public final FEMFrame frame() {
 		return this._frame_;
 	}
@@ -83,12 +82,13 @@ public final class FEMClosureFunction extends FEMBaseFunction implements TracerI
 	/** {@inheritDoc}
 	 * <p>
 	 * Wenn diese Funktion über {@link #FEMClosureFunction(FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
-	 * {@code functionValue(new ClosureFunction(frame, this.function()))}. Damit werden die gegebenen Stapelrahmen an die Funktion {@link #function()} gebunden und
-	 * als {@link FEMHandler} zurück gegeben.
+	 * {@code new FEMClosureFunction(frame, this.function()).toValue()}.<br>
+	 * Damit werden der gegebene Stapelrahmen an die Funktion {@link #function()} gebunden und als {@link FEMHandler} geliefert.
 	 * <p>
 	 * Wenn sie dagegen über {@link #FEMClosureFunction(FEMFrame, FEMFunction)} erzeugt wurde, entspricht der Ergebniswert:<br>
-	 * {@code this.function().invoke(this.frame().withParams(frame.params()))}. Damit werden die gebundene Funktion mit den zugesicherten Parameterwerten der
-	 * gegebenen sowie den zusätzlichen Parameterwerten der gebundenen Stapelrahmen ausgewertet und der so ermittelte Ergebniswert geliefert. */
+	 * {@code this.function().invoke(this.frame().withParams(frame.params()))}.<br>
+	 * Damit werden die gebundene Funktion mit den zugesicherten Parameterwerten des gegebenen sowie den zusätzlichen Parameterwerten des gebundenen Stapelrahmens
+	 * ausgewertet und der so ermittelte Ergebniswert geliefert. */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) {
 		if (this._frame_ == null) return FEMHandler.from(new FEMClosureFunction(frame, this._function_));

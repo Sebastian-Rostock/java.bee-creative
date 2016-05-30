@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 import bee.creative.fem.FEM.ScriptFormatter;
 
-/** Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte der Stapelrahmen entspricht.
+/** Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte des Stapelrahmens entspricht.
  * 
  * @see #index()
  * @see #invoke(FEMFrame)
@@ -12,6 +12,63 @@ public final class FEMParamFunction extends FEMBaseFunction {
 	/** Dieses Feld speichert die projezierenden Funktionen für die Indizes {@code 0..9}. */
 	static final FEMParamFunction[] _cache_ = {new FEMParamFunction(0), new FEMParamFunction(1), new FEMParamFunction(2), new FEMParamFunction(3),
 		new FEMParamFunction(4), new FEMParamFunction(5), new FEMParamFunction(6), new FEMParamFunction(7), new FEMParamFunction(8), new FEMParamFunction(9)};
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (index: Integer): Value}, deren Ergebniswert dem {@code index}-ten Parameterwert des
+	 * Stapelrahmens entspricht. */
+	public static final FEMBaseFunction ITEM = new FEMBaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() <> 1");
+			final long integer = FEMInteger.from(frame.get(0), frame.context()).value();
+			final int index = integer < Integer.MIN_VALUE ? Integer.MIN_VALUE : integer > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)integer;
+			final FEMValue result = frame.get(index);
+			return result;
+		}
+
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("ITEM");
+		}
+
+	};
+
+	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
+	 * {@code frame.params().result(true)}.
+	 * 
+	 * @see FEMArray#from(FEMValue...)
+	 * @see FEMFrame#params() */
+	public static final FEMBaseFunction COPY = new FEMBaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			return frame.params().result(true);
+		}
+
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("$");
+		}
+
+	};
+
+	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
+	 * {@code frame.params()}.
+	 * 
+	 * @see FEMFrame#params() */
+	public static final FEMBaseFunction VIEW = new FEMBaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			return frame.params();
+		}
+
+		@Override
+		public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+			target.put("$");
+		}
+
+	};
 
 	{}
 

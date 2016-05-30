@@ -243,7 +243,7 @@ public class Natives {
 		return Natives._formatMethod_(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
 	}
 
-	/** /** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück.<br>
+	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück.<br>
 	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .new}{@link #formatParams(Class...)
 	 * (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
 	 * 

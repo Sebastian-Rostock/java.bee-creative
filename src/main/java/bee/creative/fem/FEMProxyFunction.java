@@ -3,7 +3,7 @@ package bee.creative.fem;
 import bee.creative.fem.FEM.ScriptCompiler;
 import bee.creative.fem.FEM.ScriptFormatter;
 
-/** Diese Klasse implementiert den benannten Platzhalter einer Funktione, dessen {@link #invoke(FEMFrame)}-Methoden an eine {@link #set(FEMFunction) gegebene
+/** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
  * 
  * @see ScriptCompiler#proxy(String)
@@ -48,7 +48,7 @@ public final class FEMProxyFunction extends FEMBaseFunction {
 		this._function_ = function;
 	}
 
-	/** Diese Methode gibt den Namen.
+	/** Diese Methode gibt den Namen des Platzhalters zurück.
 	 * 
 	 * @return Name. */
 	public final String name() {

@@ -87,13 +87,13 @@ public final class FEMHandler extends FEMBaseValue implements TracerInput {
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMHandler data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMHandler> type() {
 		return FEMHandler.TYPE;

@@ -51,13 +51,13 @@ public final class FEMNative extends FEMBaseValue {
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt das native Objekt zurück. */
 	@Override
 	public final Object data() {
 		return this._data_;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<Object> type() {
 		return FEMNative.TYPE;

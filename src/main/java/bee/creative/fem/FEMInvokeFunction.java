@@ -12,6 +12,52 @@ import bee.creative.fem.FEMTraceFunction.TracerInput;
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMInvokeFunction extends FEMBaseFunction implements TracerInput {
 
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMFunction, params: FEMArray): FEMValue}, deren Ergebniswert via
+	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameter gegeben Funktion mit den im zweiten Parameter
+	 * gegebenen Parameterwertliste. */
+	public static final FEMBaseFunction CALL = new FEMBaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
+			final FEMContext context = frame.context();
+			final FEMArray array = FEMArray.from(frame.get(1), context);
+			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
+			final FEMFrame params = frame.withParams(array);
+			return method.invoke(params);
+		}
+
+		@Override
+		public void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
+			target.put("CALL");
+		}
+
+	};
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (param1, ..., paramN: FEMValue, method: FEMFunction): FEMValue}, deren Ergebniswert via
+	 * {@code method(param1, ..., paramN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameter gegeben Funktion mit den davor liegenden Parametern. */
+	public static final FEMBaseFunction APPLY = new FEMBaseFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			final int index = frame.size() - 1;
+			if (index < 0) throw new IllegalArgumentException("frame.size() < 1");
+			final FEMContext context = frame.context();
+			final FEMArray array = frame.params().section(0, index);
+			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
+			final FEMFrame params = frame.withParams(array);
+			return method.invoke(params);
+		}
+
+		@Override
+		public void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
+			target.put("APPLY");
+		}
+
+	};
+
+	{}
+
 	/** Diese Methode gibt eine neue {@link FEMInvokeFunction} mit den gegebenen Parametern zurück.
 	 * 
 	 * @param function aufzurufende Funktion.
@@ -36,7 +82,7 @@ public final class FEMInvokeFunction extends FEMBaseFunction implements TracerIn
 	/** Dieses Feld speichert die Parameterfunktionen, deren Ergebniswerte als Parameterwerte verwendet werden sollen. */
 	final FEMFunction[] _params_;
 
-	/** Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verketung und die Parameterfunktionen.
+	/** Dieser Konstruktor initialisiert die aufzurufende Funktion, die Verkettung und die Parameterfunktionen.
 	 * 
 	 * @param function aufzurufende Funktion.
 	 * @param direct {@code true}, wenn die aufzurufende Funktion direkt mit den Ergebnissen der Parameterfunktionen ausgewertet werden soll, und {@code false},
@@ -85,7 +131,7 @@ public final class FEMInvokeFunction extends FEMBaseFunction implements TracerIn
 	 * 
 	 * @see FEMResultFunction#from(FEMFunction)
 	 * @return neue {@link FEMInvokeFunction} Funktion mit Parameterfunktionen, die {@link FEMResultFunction} sind. */
-	public final FEMInvokeFunction toVirtual() {
+	public final FEMInvokeFunction toResult() {
 		final FEMFunction[] functions = this._params_.clone();
 		for (int i = 0, size = functions.length; i < size; i++) {
 			functions[i] = FEMResultFunction.from(functions[i]);
@@ -95,10 +141,13 @@ public final class FEMInvokeFunction extends FEMBaseFunction implements TracerIn
 
 	{}
 
-	/** {@inheritDoc}
-	 * <p>
-	 * Der Ergebniswert entspricht
-	 * {@code (this.direct() ? this.function() : frame.context().dataFrom(this.function().invoke(frame), FUNCTION_TYPE)).invoke(frame.newFrame(this.params()))}.
+	/** {@inheritDoc} <br>
+	 * Bei der direkten Aufrufart entspricht der Ergebniswert:<br>
+	 * {@code this.function().invoke(frame.newFrame(this.params())}.<br>
+	 * Damit wird die aufzurufende Funktion direkt mit den Parameterfunktionen aufgerufen. Andernfalls entspricht der Ergebniswert:<br>
+	 * {@code FEMHandler.from(this.function().invoke(frame), frame.context()).value().invoke(frame.newFrame(this.params())}.<br>
+	 * Damit wird die aufzurufende Funktion mit dem gegebenen Stapelrahmen in eine Funktion ausgewertet, die anschließend mit den Parameterfunktionen aufgerufen
+	 * wird.
 	 * 
 	 * @see #direct()
 	 * @see #params()

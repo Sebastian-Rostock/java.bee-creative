@@ -6,7 +6,20 @@ import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
- * Intern wird die Zeitspanne als ein {@code long} dargestellt.
+ * Intern wird die Zeitspanne als ein {@code long} dargestellt.<br>
+ * <h5><a name="durationmonths">Gesamtanzahl der Monate</a></h5>
+ * <p>
+ * Der relative Anteil einer Zeitspanne ist durch die {@link #yearsValue() Jahre} und {@link #monthsValue() Monate} gegeben, welche zur
+ * {@link #durationmonthsValue() Gesamtanzahl an Monaten} zusammengefasst werden können. Diese Gesamtanzahl liegt im Bereich {@code -101006..101006}. Wenn ein
+ * Datum um diese Monatsanzahl verschoben werden soll, entscheidet erst dieses Datum über die konkrete Anzahl an Tagen, um die das Datum verschoben wird. Man
+ * kann zu einer Monatsanzahl jedoch ermitteln, zu wie vielen Tagen diese {@link #minLengthOf(int) minimal} bzw. {@link #maxLengthOf(int) maximal} führen kann.
+ * </p>
+ * <h5><a name="durationmillis">Gesamtanzahl der Millisekunden</a></h5>
+ * <p>
+ * Der absolute Anteil einer Zeitspanne ist durch {@link #daysValue() Tage}, {@link #hoursValue() Stunden}, {@link #minutesValue() Minuten},
+ * {@link #secondsValue() Sekunden} und {@link #millisecondsValue() Millisekunden} gegeben, welche zur {@link #durationmillisValue() Gesamtanzahl an
+ * Millisekunden} zusammengefasst werden können. Diese Gesamtanzahl liegt im Bereich {@code -265621593600000..265621593600000}.
+ * </p>
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDuration> {
@@ -557,7 +570,8 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 		return FEMDuration._durationmillisOf_(this.daysValue(), this.hoursValue(), this.minutesValue(), this.secondsValue(), this.millisecondsValue());
 	}
 
-	/** Diese Methode gibt die Gesamtanzahl der Monate zurück. Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
+	/** Diese Methode gibt die Gesamtanzahl der Monate zurück.<br>
+	 * Diese fassen {@link #yearsValue()} und {@link #monthsValue()} zusammen.
 	 * 
 	 * @return Gesamtanzahl der Monate ({@code 0..101006}). */
 	public final int durationmonthsValue() {
@@ -672,13 +686,13 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMDuration data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMDuration> type() {
 		return FEMDuration.TYPE;

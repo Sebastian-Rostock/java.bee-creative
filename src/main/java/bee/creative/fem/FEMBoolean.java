@@ -78,7 +78,7 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 	/** Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
 	 * 
 	 * @param value interne Darstellung des Wahrheitswerts. */
-	public FEMBoolean(final boolean value) {
+	FEMBoolean(final boolean value) {
 		this._value_ = value;
 	}
 
@@ -125,13 +125,13 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 
 	{}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@code this} zurück. */
 	@Override
 	public final FEMBoolean data() {
 		return this;
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt {@link #TYPE} zurück. */
 	@Override
 	public final FEMType<FEMBoolean> type() {
 		return FEMBoolean.TYPE;
