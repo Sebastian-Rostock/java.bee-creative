@@ -12,7 +12,7 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 	public static final int ID = 6;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMInteger> TYPE = FEMType.from(FEMInteger.ID, "INTEGER");
+	public static final FEMType<FEMInteger> TYPE = FEMType.from(FEMInteger.ID);
 
 	/** Dieses Feld speichert die Dezimalzahl {@code 0}. */
 	public static final FEMInteger EMPTY = new FEMInteger(0);

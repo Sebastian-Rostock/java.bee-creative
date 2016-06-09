@@ -8,7 +8,7 @@ import bee.creative.util.Objects;
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GData> Typ der von {@link #dataFrom(FEMValue)} bzw. {@link #dataFrom(FEMValue, FEMContext)} gelieferten Nutzdaten. */
-public abstract class FEMType<GData> {
+public class FEMType<GData> {
 
 	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
 	 * 
@@ -17,32 +17,17 @@ public abstract class FEMType<GData> {
 	 * @param id Identifikator für {@link #id()}.
 	 * @return {@code simple}-{@link FEMType}. */
 	public static <GData> FEMType<GData> from(final int id) {
-		return FEMType.from(id, Objects.toInvokeString("simpleType", id));
+		return new FEMType<>(id);
 	}
 
-	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator und der gegebenen Textdarstellung zurück.
+	/** Dieses Feld speichert den Identifikator. */
+	final int _id_;
+
+	/** Dieser Konstruktor initialisiert den Identifikator.
 	 * 
-	 * @see #id()
-	 * @param <GData> Typ des Werts.
-	 * @param id Identifikator für {@link #id()}.
-	 * @param toString Textdarstellung für {@link #toString()}.
-	 * @return {@code simple}-{@link FEMType}.
-	 * @throws NullPointerException Wenn {@code toString} {@code null} ist. */
-	public static <GData> FEMType<GData> from(final int id, final String toString) throws NullPointerException {
-		if (toString == null) throw new NullPointerException("toString = null");
-		return new FEMType<GData>() {
-
-			@Override
-			public int id() {
-				return id;
-			}
-
-			@Override
-			public String toString() {
-				return toString;
-			}
-
-		};
+	 * @param id Identifikator. */
+	FEMType(final int id) {
+		this._id_ = id;
 	}
 
 	{}
@@ -51,7 +36,9 @@ public abstract class FEMType<GData> {
 	 * einem {@code switch}-Statement umsetzen zu können.
 	 * 
 	 * @return Identifikator dieses Datentyps. */
-	public abstract int id();
+	public final int id() {
+		return this._id_;
+	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. Dies kann der Fall sein, wenn der gegebene
 	 * Datentyp gleich zu diesem oder ein Vorfahre dieses Datentyps ist. Wenn der gegebene Datentyp {@code null} ist, wird {@code false} geliefert.
@@ -60,7 +47,7 @@ public abstract class FEMType<GData> {
 	 * @param type Datentyp.
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. */
 	public boolean is(final FEMType<?> type) {
-		return (type == this) || ((type != null) && (type.id() == this.id()));
+		return (type == this) || ((type != null) && (type._id_ == this._id_));
 	}
 
 	/** Diese Methode gibt die in den Datentyp {@code GData} kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
@@ -98,7 +85,7 @@ public abstract class FEMType<GData> {
 	 * @see #id() */
 	@Override
 	public final int hashCode() {
-		return this.id();
+		return this._id_;
 	}
 
 	/** {@inheritDoc}
@@ -109,7 +96,13 @@ public abstract class FEMType<GData> {
 		if (object == this) return true;
 		if (!(object instanceof FEMType<?>)) return false;
 		final FEMType<?> data = (FEMType<?>)object;
-		return this.id() == data.id();
+		return this._id_ == data._id_;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return Objects.toInvokeString(this, this._id_);
 	}
 
 }

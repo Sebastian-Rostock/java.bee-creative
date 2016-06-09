@@ -95,7 +95,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 	public static final int ID = 9;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDatetime> TYPE = FEMType.from(FEMDatetime.ID, "DATETIME");
+	public static final FEMType<FEMDatetime> TYPE = FEMType.from(FEMDatetime.ID);
 
 	/** Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone. */
 	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
@@ -913,8 +913,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 	public final FEMDatetime withZone(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		if (!calendar.isSet(Calendar.ZONE_OFFSET)) return this.withoutZone();
 		final int zone = calendar.get(Calendar.ZONE_OFFSET) / 60000;
-		if (!this.hasZone()) return this._withZone_(zone);
-		return this._moveZone_(zone - this._zoneValue_());
+		return this.withZone(zone);
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone der gegebenen Zeitangabe zurück.<br>
@@ -1132,9 +1131,14 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 
 	@SuppressWarnings ("javadoc")
 	final FEMDatetime _moveZone_(final int zoneAdd) {
-		final int zoneOld = this._zoneValue_(), zoneNew = zoneAdd + zoneOld;
+		if (zoneAdd == 0) return this;
+		final int zoneNew = zoneAdd + this._zoneValue_();
 		FEMDatetime._checkZone_(zoneNew);
-		return ((zoneAdd != 0) && this.hasTime() ? this._moveTime_(zoneAdd * -60000) : this)._withZone_(zoneNew);
+		if (this.hasTime()) return this._moveTime_(zoneAdd * -60000)._withZone_(zoneNew);
+		if (!this.hasDate()) return this._withZone_(zoneNew);
+		final int daysAdd = (zoneAdd - 1439) / 1440;
+		if (daysAdd != 0) return this._moveDate_(0, daysAdd)._withZone_(zoneNew);
+		return this._withZone_(zoneNew);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.

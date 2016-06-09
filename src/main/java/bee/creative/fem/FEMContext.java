@@ -11,65 +11,12 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
- * in Funktionen zur Umwandlung von Werten genutzt werden kann.
+ * in Funktionen zur Umwandlung von Werten genutzt werden kann. Nachfahren sollten die Methoden {@link #dataFrom(FEMValue, FEMType)}, {@link #arrayFrom(Object)}
+ * , {@link #valueFrom(Object)} und {@link #objectFrom(FEMValue)}.
  * 
  * @see FEMFrame#context()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMContext {
-
-	@SuppressWarnings ("javadoc")
-	static final class EmptyContext extends FEMContext {
-
-		@Override
-		@SuppressWarnings ("unchecked")
-		public <GData> GData dataFrom(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
-			if (value.type().is(type)) return (GData)value.data();
-			throw new IllegalArgumentException();
-		}
-
-		@Override
-		public FEMValue valueFrom(final Object data) throws IllegalArgumentException {
-			if (data == null) return FEMVoid.INSTANCE;
-			if (data instanceof FEMValue) return (FEMValue)data;
-			if (data instanceof char[]) return FEMString.from((char[])data);
-			if (data instanceof String) return FEMString.from((String)data);
-			if (data instanceof byte[]) return FEMBinary.from((byte[])data);
-			if (data instanceof Float) return FEMDecimal.from((Number)data);
-			if (data instanceof Double) return FEMDecimal.from((Number)data);
-			if (data instanceof BigDecimal) return FEMDecimal.from((Number)data);
-			if (data instanceof Number) return FEMInteger.from((Number)data);
-			if (data instanceof Boolean) return FEMBoolean.from((Boolean)data);
-			if (data instanceof Calendar) return FEMDatetime.from((Calendar)data);
-			if (data instanceof FEMFunction) return FEMHandler.from((FEMFunction)data);
-			return this.arrayFrom(data);
-		}
-
-		@Override
-		public Object objectFrom(final FEMValue value) throws NullPointerException, IllegalArgumentException {
-			switch (value.type().id()) {
-				case FEMVoid.ID:
-					return null;
-				case FEMArray.ID:
-					return this._objectFrom_((FEMArray)value.data());
-				case FEMBinary.ID:
-					return ((FEMBinary)value.data()).value();
-				case FEMString.ID:
-					return ((FEMString)value.data()).toString();
-				case FEMInteger.ID:
-					return ((FEMInteger)value.data()).toNumber();
-				case FEMDecimal.ID:
-					return ((FEMDecimal)value.data()).toNumber();
-				case FEMDatetime.ID:
-					return ((FEMDatetime)value.data()).toCalendar();
-				case FEMBoolean.ID:
-					return ((FEMBoolean)value.data()).toBoolean();
-			}
-			return value.data();
-		}
-
-	}
-
-	{}
+public class FEMContext {
 
 	/** Dieses Feld speichert das leere Kontextobjekt.
 	 * <p>
@@ -87,7 +34,7 @@ public abstract class FEMContext {
 	 * Werte rekursiv zu {@code Object[]}, {@link FEMBinary} zu {@code byte[]}, {@link FEMString} zu {@link String}, {@link FEMInteger} und {@link FEMDecimal} zu
 	 * {@link Number}, {@link FEMDatetime} zu {@link Calendar}, {@link FEMBoolean} zu {@link Boolean} und alle anderen Werte ihren {@link FEMValue#data()
 	 * Nutzdatensatz}. */
-	public static final FEMContext EMPTY = new EmptyContext();
+	public static final FEMContext EMPTY = new FEMContext();
 
 	/** Dieses Feld speichert das Rückfallkontextobjekt. */
 	static FEMContext _default_ = FEMContext.EMPTY;
@@ -147,7 +94,12 @@ public abstract class FEMContext {
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code type} {@code null} ist.
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können. */
-	public abstract <GData> GData dataFrom(FEMValue value, FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException;
+	public <GData> GData dataFrom(final FEMValue value, final FEMType<GData> type) throws NullPointerException, ClassCastException, IllegalArgumentException {
+		if (!value.type().is(type)) throw new IllegalArgumentException();
+		@SuppressWarnings ("unchecked")
+		final GData result = (GData)value.data();
+		return result;
+	}
 
 	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
 	 * <ol>
@@ -229,7 +181,21 @@ public abstract class FEMContext {
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
-	public abstract FEMValue valueFrom(Object object) throws IllegalArgumentException;
+	public FEMValue valueFrom(Object object) throws IllegalArgumentException {
+		if (object == null) return FEMVoid.INSTANCE;
+		if (object instanceof FEMValue) return (FEMValue)object;
+		if (object instanceof char[]) return FEMString.from((char[])object);
+		if (object instanceof String) return FEMString.from((String)object);
+		if (object instanceof byte[]) return FEMBinary.from((byte[])object);
+		if (object instanceof Float) return FEMDecimal.from((Number)object);
+		if (object instanceof Double) return FEMDecimal.from((Number)object);
+		if (object instanceof BigDecimal) return FEMDecimal.from((Number)object);
+		if (object instanceof Number) return FEMInteger.from((Number)object);
+		if (object instanceof Boolean) return FEMBoolean.from((Boolean)object);
+		if (object instanceof Calendar) return FEMDatetime.from((Calendar)object);
+		if (object instanceof FEMFunction) return FEMHandler.from((FEMFunction)object);
+		return this.arrayFrom(object);
+	}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
@@ -259,7 +225,27 @@ public abstract class FEMContext {
 	 * @return Objekt
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
-	public abstract Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException;
+	public Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException {
+		switch (value.type().id()) {
+			case FEMVoid.ID:
+				return null;
+			case FEMArray.ID:
+				return this._objectFrom_((FEMArray)value.data());
+			case FEMBinary.ID:
+				return ((FEMBinary)value.data()).value();
+			case FEMString.ID:
+				return ((FEMString)value.data()).toString();
+			case FEMInteger.ID:
+				return ((FEMInteger)value.data()).toNumber();
+			case FEMDecimal.ID:
+				return ((FEMDecimal)value.data()).toNumber();
+			case FEMDatetime.ID:
+				return ((FEMDatetime)value.data()).toCalendar();
+			case FEMBoolean.ID:
+				return ((FEMBoolean)value.data()).toBoolean();
+		}
+		return value.data();
+	}
 
 	@SuppressWarnings ("javadoc")
 	final Object[] _objectFrom_(final FEMArray array) {

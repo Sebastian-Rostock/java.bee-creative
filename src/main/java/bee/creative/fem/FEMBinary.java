@@ -313,7 +313,7 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 	public static final int ID = 5;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMBinary> TYPE = FEMType.from(FEMBinary.ID, "BINARY");
+	public static final FEMType<FEMBinary> TYPE = FEMType.from(FEMBinary.ID);
 
 	/** Dieses Feld speichert die leere Bytefolge. */
 	public static final FEMBinary EMPTY = new EmptyBinary();

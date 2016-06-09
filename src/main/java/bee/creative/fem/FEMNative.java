@@ -11,7 +11,7 @@ public final class FEMNative extends FEMBaseValue {
 	public static final int ID = -1;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<Object> TYPE = FEMType.from(FEMNative.ID, "NATIVE");
+	public static final FEMType<Object> TYPE = FEMType.from(FEMNative.ID);
 
 	/** Dieses Feld speichert den Wert zu {@code null}. */
 	public static final FEMNative NULL = new FEMNative(null);

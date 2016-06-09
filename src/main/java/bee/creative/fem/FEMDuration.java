@@ -28,7 +28,7 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 	public static final int ID = 8;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMDuration> TYPE = FEMType.from(FEMDuration.ID, "DURATION");
+	public static final FEMType<FEMDuration> TYPE = FEMType.from(FEMDuration.ID);
 
 	/** Dieses Feld speichert die leere Zeitspanne, deren Komponenten {@code 0} sind. */
 	public static final FEMDuration EMPTY = new FEMDuration(0, 0);
@@ -205,15 +205,22 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 		FEMDuration._checkMonths_(-durationmonths);
 		FEMDuration._checkMilliseconds_(+durationmillis);
 		FEMDuration._checkMilliseconds_(-durationmillis);
-		int negate, years, months, days, hours, minutes, seconds, milliseconds;
-		if ((durationmonths < 0) || (durationmillis < 0)) {
-			if ((durationmonths > 0) || (durationmillis > 0)) throw new IllegalArgumentException();
-			negate = 1;
+		int negate = 0, years, months, days, hours, minutes, seconds, milliseconds;
+		if (durationmillis < 0) {
 			durationmonths = -durationmonths;
 			durationmillis = -durationmillis;
-		} else {
-			negate = 0;
+			negate = 1;
 		}
+		// "durationmillis" auf "durationmonths" übertragen
+		durationmonths += (int)(durationmillis / 12622780800000L) * 4800;
+		durationmillis = durationmillis % 12622780800000L;
+		// Vorzeichen prüfen
+		if (durationmillis > 0) {
+			if (durationmonths < 0) throw new IllegalArgumentException();
+		} else if (durationmonths < 0) {
+			negate ^= 1;
+			durationmonths = -durationmonths;
+		} else if (durationmonths == 0) return FEMDuration.EMPTY;
 		days = (int)(durationmillis / 86400000);
 		milliseconds = (int)(durationmillis % 86400000);
 		hours = milliseconds / 3600000;
@@ -223,8 +230,7 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 		seconds = milliseconds / 1000;
 		milliseconds = milliseconds % 1000;
 		months = durationmonths % 12;
-		years = (durationmonths / 12) + ((days / 146097) * 400);
-		days = days % 146097;
+		years = durationmonths / 12;
 		FEMDuration._checkYears_(years);
 		return new FEMDuration( //
 			(years << 18) | (negate << 17) | (hours << 12) | (minutes << 6) | (seconds << 0), //

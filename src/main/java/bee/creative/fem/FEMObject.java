@@ -20,7 +20,7 @@ public final class FEMObject extends FEMBaseValue implements Comparable<FEMObjec
 	public static final int ID = 10;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMObject> TYPE = FEMType.from(FEMObject.ID, "OBJECT");
+	public static final FEMType<FEMObject> TYPE = FEMType.from(FEMObject.ID);
 
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
 	public static final FEMObject EMPTY = new FEMObject(0, 0);

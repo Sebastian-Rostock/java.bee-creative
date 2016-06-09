@@ -648,7 +648,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	public static final int ID = 4;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMString> TYPE = FEMType.from(FEMString.ID, "STRING");
+	public static final FEMType<FEMString> TYPE = FEMType.from(FEMString.ID);
 
 	/** Dieses Feld speichert die leere Zeichenkette. */
 	public static final FEMString EMPTY = new EmptyString();

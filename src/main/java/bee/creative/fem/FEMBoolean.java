@@ -10,7 +10,7 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 	public static final int ID = 3;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMBoolean> TYPE = FEMType.from(FEMBoolean.ID, "BOOLEAN");
+	public static final FEMType<FEMBoolean> TYPE = FEMType.from(FEMBoolean.ID);
 
 	/** Dieses Feld speichert den Wahrheitswert {@code true}. */
 	public static final FEMBoolean TRUE = new FEMBoolean(true);

@@ -331,7 +331,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	public static final int ID = 1;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID, "ARRAY");
+	public static final FEMType<FEMArray> TYPE = FEMType.from(FEMArray.ID);
 
 	/** Dieses Feld speichert die leere Wertliste. */
 	public static final FEMArray EMPTY = new EmptyArray();

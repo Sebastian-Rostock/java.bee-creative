@@ -9,7 +9,7 @@ public final class FEMVoid extends FEMBaseValue {
 	public static final int ID = 0;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMVoid> TYPE = FEMType.from(FEMVoid.ID, "VOID");
+	public static final FEMType<FEMVoid> TYPE = FEMType.from(FEMVoid.ID);
 
 	/** Dieses Feld speichert den Leerwert. */
 	public static final FEMVoid INSTANCE = new FEMVoid();

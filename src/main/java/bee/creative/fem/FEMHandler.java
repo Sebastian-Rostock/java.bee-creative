@@ -14,7 +14,7 @@ public final class FEMHandler extends FEMBaseValue implements TracerInput {
 	public static final int ID = 2;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMHandler> TYPE = FEMType.from(FEMHandler.ID, "HANDLER");
+	public static final FEMType<FEMHandler> TYPE = FEMType.from(FEMHandler.ID);
 
 	{}
 

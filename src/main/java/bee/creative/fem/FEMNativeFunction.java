@@ -79,6 +79,74 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class NativeStaticMethod extends FEMNativeFunction {
+
+		public final Method method;
+
+		NativeStaticMethod(final Method method) {
+			this.method = method;
+		}
+
+		{}
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			try {
+				final Object[] params = FEMNativeFunction._params_(frame, false);
+				final Object result = this.method.invoke(null, params);
+				return new FEMNative(result);
+			} catch (final Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Method member() {
+			return this.method;
+		}
+
+		@Override
+		public final String toString() {
+			return Natives.formatMethod(this.member());
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
+	static final class NativeStaticConstructor extends FEMNativeFunction {
+
+		public final Constructor<?> constructor;
+
+		NativeStaticConstructor(final Constructor<?> constructor) {
+			this.constructor = constructor;
+		}
+
+		{}
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) {
+			try {
+				final Object[] params = FEMNativeFunction._params_(frame, false);
+				final Object result = this.constructor.newInstance(params);
+				return new FEMNative(result);
+			} catch (final Exception cause) {
+				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
+			}
+		}
+
+		@Override
+		public Constructor<?> member() {
+			return this.constructor;
+		}
+
+		@Override
+		public final String toString() {
+			return Natives.formatConstructor(this.member());
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class NativeObjectField extends FEMNativeFunction {
 
 		public final Field field;
@@ -122,40 +190,6 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeStaticMethod extends FEMNativeFunction {
-
-		public final Method method;
-
-		NativeStaticMethod(final Method method) {
-			this.method = method;
-		}
-
-		{}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			try {
-				final Object[] params = FEMNativeFunction._params_(frame, false);
-				final Object result = this.method.invoke(null, params);
-				return new FEMNative(result);
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public Method member() {
-			return this.method;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.formatMethod(this.member());
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
 	static final class NativeObjectMethod extends FEMNativeFunction {
 
 		public final Method method;
@@ -186,40 +220,6 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 		@Override
 		public final String toString() {
 			return Natives.formatMethod(this.member());
-		}
-
-	}
-
-	@SuppressWarnings ("javadoc")
-	static final class NativeConstructor extends FEMNativeFunction {
-
-		public final Constructor<?> constructor;
-
-		NativeConstructor(final Constructor<?> constructor) {
-			this.constructor = constructor;
-		}
-
-		{}
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			try {
-				final Object[] params = FEMNativeFunction._params_(frame, false);
-				final Object result = this.constructor.newInstance(params);
-				return new FEMNative(result);
-			} catch (final Exception cause) {
-				throw FEMException.from(cause).useContext(frame.context()).push(this.toString());
-			}
-		}
-
-		@Override
-		public Constructor<?> member() {
-			return this.constructor;
-		}
-
-		@Override
-		public final String toString() {
-			return Natives.formatConstructor(this.member());
 		}
 
 	}
@@ -283,7 +283,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
 	public static FEMNativeFunction from(final Constructor<?> constructor) throws NullPointerException {
 		if (constructor == null) throw new NullPointerException("constructor = null");
-		return new NativeConstructor(constructor);
+		return new NativeStaticConstructor(constructor);
 	}
 
 	@SuppressWarnings ("javadoc")
