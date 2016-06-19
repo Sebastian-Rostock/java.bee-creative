@@ -111,7 +111,7 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 	 * 
 	 * @param that Wahrheitswert.
 	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMBoolean that) throws NullPointerException {
 		return Boolean.compare(this._value_, that._value_);
 	}

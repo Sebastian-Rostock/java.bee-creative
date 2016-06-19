@@ -181,7 +181,7 @@ public class FEMContext {
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
-	public FEMValue valueFrom(Object object) throws IllegalArgumentException {
+	public FEMValue valueFrom(final Object object) throws IllegalArgumentException {
 		if (object == null) return FEMVoid.INSTANCE;
 		if (object instanceof FEMValue) return (FEMValue)object;
 		if (object instanceof char[]) return FEMString.from((char[])object);
@@ -225,7 +225,7 @@ public class FEMContext {
 	 * @return Objekt
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
-	public Object objectFrom(FEMValue value) throws NullPointerException, IllegalArgumentException {
+	public Object objectFrom(final FEMValue value) throws NullPointerException, IllegalArgumentException {
 		switch (value.type().id()) {
 			case FEMVoid.ID:
 				return null;

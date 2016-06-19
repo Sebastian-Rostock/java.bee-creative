@@ -105,7 +105,7 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 	 * 
 	 * @param that Dezimalzahl.
 	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMInteger that) throws NullPointerException {
 		return this._value_ == that._value_;
 	}
@@ -114,7 +114,7 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 	 * 
 	 * @param that Dezimalzahl.
 	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final int compare(final FEMInteger that) throws NullPointerException {
 		return Comparators.compare(this._value_, that._value_);
 	}

@@ -236,8 +236,8 @@ public final class FEMObject extends FEMBaseValue implements Comparable<FEMObjec
 	 * 
 	 * @param that Referenz.
 	 * @return Vergleichswert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final int compare(final FEMObject that) {
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public final int compare(final FEMObject that) throws NullPointerException {
 		int result = Comparators.compare(this.refValue(), that.refValue());
 		if (result != 0) return result;
 		result = Comparators.compare(this.ownerValue(), that.ownerValue());
