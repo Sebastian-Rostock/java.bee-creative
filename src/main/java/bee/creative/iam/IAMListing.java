@@ -118,6 +118,20 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	 * @return Anzahl der Elemente. */
 	public abstract int itemCount();
 
+	/** Diese Methode gibt den Index des Elements zurück, das äquivalenten zum gegebenen ist. Die Suche erfolgt linear vom ersten zum letzten Element. Bei
+	 * erfolgloser Suche wird {@code -1} geliefert.
+	 * 
+	 * @param item Element.
+	 * @return Index des Elements.
+	 * @throws NullPointerException Wenn {@code item} {@code null} ist. */
+	public final int find(final IAMArray item) throws NullPointerException {
+		item.length();
+		for (int i = 0, count = this.itemCount(); i < count; i++) {
+			if (item.equals(this.item(i))) return i;
+		}
+		return -1;
+	}
+
 	/** Diese Methode gibt {@link List}-Sicht auf die Elemente zurück.
 	 * 
 	 * @see #item(int)

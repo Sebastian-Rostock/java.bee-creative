@@ -24,7 +24,7 @@ final class IAMCodec_XML {
 
 	@XmlType (name = "IAM_ITEM_TYPE")
 	@XmlAccessorType (XmlAccessType.FIELD)
-	public static class IAMITEMTYPE {
+	public static final class IAMITEMTYPE {
 
 		@XmlAttribute (name = "data", required = true)
 		public String data;
@@ -33,7 +33,7 @@ final class IAMCodec_XML {
 
 	@XmlType (name = "IAM_ENTRY_TYPE")
 	@XmlAccessorType (XmlAccessType.FIELD)
-	public static class IAMENTRYTYPE {
+	public static final class IAMENTRYTYPE {
 
 		@XmlAttribute (name = "key", required = true)
 		public String key;
@@ -46,7 +46,7 @@ final class IAMCodec_XML {
 	@XmlType (name = "IAM_INDEX_TYPE", propOrder = {"mappingOrListing"})
 	@XmlRootElement (name = "index")
 	@XmlAccessorType (XmlAccessType.FIELD)
-	public static class IAMINDEXTYPE {
+	public static final class IAMINDEXTYPE {
 
 		@XmlElements ({@XmlElement (name = "mapping", type = IAMMAPPINGTYPE.class), @XmlElement (name = "listing", type = IAMLISTINGTYPE.class)})
 		public List<Object> mappingOrListing = new ArrayList<>();
@@ -64,7 +64,7 @@ final class IAMCodec_XML {
 
 	@XmlType (name = "IAM_LISTING_TYPE", propOrder = {"item"})
 	@XmlAccessorType (XmlAccessType.FIELD)
-	public static class IAMLISTINGTYPE {
+	public static final class IAMLISTINGTYPE {
 
 		@XmlElement (required = true)
 		public List<IAMITEMTYPE> item = new ArrayList<>();
@@ -79,7 +79,7 @@ final class IAMCodec_XML {
 
 	@XmlType (name = "IAM_MAPPING_TYPE", propOrder = {"entry"})
 	@XmlAccessorType (XmlAccessType.FIELD)
-	public static class IAMMAPPINGTYPE {
+	public static final class IAMMAPPINGTYPE {
 
 		@XmlElement (required = true)
 		public List<IAMENTRYTYPE> entry = new ArrayList<>();

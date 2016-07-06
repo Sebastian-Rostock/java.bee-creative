@@ -199,8 +199,8 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 		return new Entries(this);
 	}
 
-	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Bei erfolgloser Suche wird {@code -1}
-	 * geliefert.
+	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Die Suche erfolgt ordnungs- oder
+	 * streuwertbasiert, d.h. indiziert. Bei erfolgloser Suche wird {@code -1} geliefert.
 	 * 
 	 * @param key Schlüssel.
 	 * @return Index des Entrags.
