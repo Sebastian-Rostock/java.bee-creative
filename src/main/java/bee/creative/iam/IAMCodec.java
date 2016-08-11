@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
@@ -14,6 +13,11 @@ import bee.creative.mmf.MMFArray;
 import bee.creative.util.Builders.HashMapBuilder;
 import bee.creative.util.IO;
 
+/** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
+ * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()
+ * Ausgabedaten} unterschiedlicher {@link #getTargetFormat() Ausgabeformate} überführt werden.
+ * 
+ * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class IAMCodec {
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten Ein- und Ausgabedatenformate eines {@link IAMCodec}.
@@ -134,7 +138,7 @@ public final class IAMCodec {
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMFindMode {
 
-		/** Dieses Feld identifiziert den automatisch gewählten {@link IAMMapping#mode() Suchmodus}. Dieser ist bei mehr al {@code 8} Einträgen
+		/** Dieses Feld identifiziert den automatisch gewählten {@link IAMMapping#mode() Suchmodus}. Dieser ist bei mehr als {@code 8} Einträgen
 		 * {@link IAMMapping#MODE_HASHED} und sonst {@link IAMMapping#MODE_SORTED}. */
 		AUTO {
 
@@ -282,8 +286,13 @@ public final class IAMCodec {
 
 	}
 
+	/** Diese Klasse implementiert die Aufzählung der unterstützten Zahlenfolgenformaten eines {@link IAMCodec}.
+	 * 
+	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMArrayFormat {
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen als Dezimalzahlen mit optionalem Vorzeichen
+		 * leerzeichensepariert angegeben werden, z.B. {@code ""}, {@code "12"}, {@code "12 -34 5 -6"}. */
 		ARRAY {
 
 			@Override
@@ -315,6 +324,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen als zweistellige hexadezimale Zahlen in großen Buchstaben und
+		 * ohne Trennzeichen angegeben werden, z.B. {@code ""}, {@code "12"}, {@code "12ABF0"}. */
 		BINARY {
 
 			@Override
@@ -346,6 +357,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Token des <em>8-Bit UCS Transformation Format</em>
+		 * stehen und ein Codepoint mit bis zu vier Token kodiert sein kann. */
 		STRING_UTF_8 {
 
 			final Charset charset = Charset.forName("UTF-8");
@@ -362,6 +375,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Token des <em>16-Bit UCS Transformation Format</em>
+		 * stehen und ein Codepoint mit bis zu zwei Token kodiert sein kann. */
 		STRING_UTF_16 {
 
 			@Override
@@ -376,6 +391,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des
+		 * <em>32-Bit UCS Transformation Format</em> stehen. */
 		STRING_UTF_32 {
 
 			@Override
@@ -396,6 +413,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des 8-Bit Textformat <em>CP-1252</em>
+		 * stehen. */
 		STRING_CP_1252 {
 
 			final Charset charset = Charset.forName("CP1252");
@@ -412,6 +431,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des 8-Bit Textformat <em>ISO-8859-1</em>
+		 * stehen. */
 		STRING_ISO_8859_1 {
 
 			final Charset charset = Charset.forName("ISO-8859-1");
@@ -428,6 +449,8 @@ public final class IAMCodec {
 
 		},
 
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des 8-Bit Textformat <em>ISO-8859-15</em>
+		 * stehen. */
 		STRING_ISO_8859_15 {
 
 			final Charset charset = Charset.forName("ISO-8859-15");
@@ -496,9 +519,21 @@ public final class IAMCodec {
 
 		{}
 
-		public abstract int[] parse(final String string) throws NullPointerException, IllegalArgumentException;
+		/** Diese Methode parst die gegebene Zeichenkette in eine Zahlenfolge und gibt diese zurück.
+		 * 
+		 * @param source Zeichenkette.
+		 * @return Zahlenfolge.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
+		public abstract int[] parse(final String source) throws NullPointerException, IllegalArgumentException;
 
-		public abstract String format(final int[] array) throws NullPointerException, IllegalArgumentException;
+		/** Diese Methode formatiert die gegebene Zahlenfolge in eine Zeichenkette und gibt diese zurück.
+		 * 
+		 * @param source Zahlenfolge.
+		 * @return Zeichenkette.
+		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
+		 * @throws IllegalArgumentException Wenn die Zahlenfolge ungültig ist. */
+		public abstract String format(final int[] source) throws NullPointerException, IllegalArgumentException;
 
 		{}
 
@@ -512,11 +547,13 @@ public final class IAMCodec {
 
 	{}
 
+	@SuppressWarnings ("javadoc")
 	static int _checkRange_(final int value, final int length) throws IllegalArgumentException {
 		if ((value >= 0) && (value < length)) return value;
 		throw new IllegalArgumentException("illegal integer: " + value);
 	}
 
+	@SuppressWarnings ("javadoc")
 	static int[] _parseBytes_(final byte[] source) {
 		final int length = source.length;
 		final int[] result = new int[length];
@@ -526,6 +563,7 @@ public final class IAMCodec {
 		return result;
 	}
 
+	@SuppressWarnings ("javadoc")
 	static byte[] _formatBytes_(final int[] source) {
 		final int length = source.length;
 		final byte[] result = new byte[length];
@@ -535,6 +573,7 @@ public final class IAMCodec {
 		return result;
 	}
 
+	@SuppressWarnings ("javadoc")
 	static int[] _parseChars_(final char[] source) {
 		final int length = source.length;
 		final int[] result = new int[length];
@@ -544,6 +583,7 @@ public final class IAMCodec {
 		return result;
 	}
 
+	@SuppressWarnings ("javadoc")
 	static char[] _formatChars_(final int[] source) {
 		final int length = source.length;
 		final char[] result = new char[length];
@@ -570,9 +610,7 @@ public final class IAMCodec {
 	/** Dieses Feld speichert das Ausgabeformat. */
 	IAMDataType _targetFormat_;
 
-	/** Dieser Konstruktor initialisiert einen neuen {@link IAMCodec} mit:
-	 * <p>
-	 * {@code useByteOrder(IAMByteOrder.AUTO)}<br> */
+	/** Dieser Konstruktor initialisiert einen neuen {@link IAMCodec} mit Bytereihenfolge {@link IAMByteOrder#AUTO}) */
 	public IAMCodec() {
 	}
 
@@ -687,20 +725,42 @@ public final class IAMCodec {
 		return this;
 	}
 
+	/** Diese Methode liest die {@link #getSourceData() Eingabedaten}, erstellt daraus einen {@link IAMIndex} und schreibt diesen in die {@link #getTargetData()
+	 * Ausgabedaten}.
+	 * 
+	 * @see #decodeSource()
+	 * @see #encodeTarget(IAMIndex)
+	 * @throws IOException Wenn die Eingabedaten nicht gelesen bzw. die Ausgabedaten nicht geschrieben werden können.
+	 * @throws IllegalStateException Wenn kein Eingabeformat, kein Ausgabeformat oder keine Bytereihenfolge eingestellt ist.
+	 * @throws IllegalArgumentException Wenn die Eingabedaten bzw. die Ausgabedaten ungültig sind. */
 	public final synchronized void run() throws IOException, IllegalStateException, IllegalArgumentException {
 		this.encodeTarget(this.decodeSource());
 	}
 
+	/** Diese Methode liest die {@link #getSourceData() Eingabedaten} und gibt den daraus erstellten {@link IAMIndex} zurück.
+	 * 
+	 * @see IAMDataType#decode(IAMCodec)
+	 * @return {@link IAMIndex}.
+	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
+	 * @throws IllegalStateException Wenn kein Eingabeformat eingestellt ist.
+	 * @throws IllegalArgumentException Wenn die Eingabedaten ungültig sind. */
 	public final synchronized IAMIndex decodeSource() throws IOException, IllegalStateException, IllegalArgumentException {
 		final IAMDataType format = this._sourceFormat_;
 		if (format == null) throw new IllegalStateException();
 		return format.decode(this);
 	}
 
+	/** Diese Methode schreibt den gegebenen {@link IAMIndex} in die {@link #getTargetData() Ausgabedaten}.
+	 * 
+	 * @see IAMDataType#encode(IAMCodec, IAMIndex)
+	 * @param index {@link IAMIndex}.
+	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
+	 * @throws IllegalStateException Wenn kein Ausgabeformat oder keine Bytereihenfolge eingestellt ist.
+	 * @throws IllegalArgumentException Wenn die Ausgabedaten ungültig sind. */
 	public final synchronized void encodeTarget(final IAMIndex index) throws IOException, IllegalStateException, IllegalArgumentException {
 		final IAMDataType format = this._targetFormat_;
 		if (format == null) throw new IllegalStateException();
-		if (this.getByteOrder() == null) throw new IllegalStateException();
+		if (this._byteOrder_ == null) throw new IllegalStateException();
 		format.encode(this, index);
 	}
 

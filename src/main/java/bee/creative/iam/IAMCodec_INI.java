@@ -11,15 +11,11 @@ import bee.creative.ini.INIReader;
 import bee.creative.ini.INIToken;
 import bee.creative.ini.INIWriter;
 
+/** @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
 final class IAMCodec_INI {
 
-	// TODO stateless
-	IAMByteOrder _order_;
-
 	INIReader _reader_;
-
-	INIWriter _writer_;
 
 	{}
 
@@ -172,71 +168,64 @@ final class IAMCodec_INI {
 		}
 	}
 
-	final void _writeSection_(final String name) throws IOException {
-		this._writer_.writeSection(name);
+	static void _writeSection_(final INIWriter writer, final String name) throws IOException {
+		writer.writeSection(name);
 	}
 
-	final void _writeProperty_(final String key, final String value) throws IOException {
-		this._writer_.writeProperty(key, value);
+	static void _writeProperty_(final INIWriter writer, final String key, final String value) throws IOException {
+		writer.writeProperty(key, value);
 	}
 
-	final void _writeIndex_(final IAMIndex source) throws IOException, IllegalArgumentException {
-
-		final int mappingCount = source.mappingCount();
-		final int listingCount = source.listingCount();
-
-		this._writeSection_("IAM_INDEX");
-		this._writeProperty_("byteOrder", this._order_.toString());
-		this._writeProperty_("mappingCount", Integer.toString(mappingCount));
-		this._writeProperty_("listingCount", Integer.toString(listingCount));
-
-		for (int i = 0; i < mappingCount; i++) {
-			this._writeMapping_(source.mapping(i), i);
-		}
-
-		for (int i = 0; i < listingCount; i++) {
-			this._writeListing_(source.listing(i), i);
-		}
-
-	}
-
-	final void _writeListing_(final IAMListing source, final int index) throws IOException, IllegalArgumentException {
+	static void _writeListing_(final INIWriter writer, final IAMListing source, final int index) throws IOException, IllegalArgumentException {
 
 		final int itemCount = source.itemCount();
 		if (itemCount == 0) return;
 
-		this._writeSection_("IAM_LISTING");
-		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("itemFormat", IAMArrayFormat.ARRAY.toString());
+		IAMCodec_INI._writeSection_(writer, "IAM_LISTING");
+		IAMCodec_INI._writeProperty_(writer, "index", Integer.toString(index));
+		IAMCodec_INI._writeProperty_(writer, "itemFormat", IAMArrayFormat.ARRAY.toString());
 
 		for (int i = 0; i < itemCount; i++) {
-			this._writeProperty_(Integer.toString(i), IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
+			IAMCodec_INI._writeProperty_(writer, Integer.toString(i), IAMArrayFormat.ARRAY.format(source.item(i).toArray()));
 		}
 
 	}
 
-	final void _writeMapping_(final IAMMapping source, final int index) throws IOException, IllegalArgumentException {
+	static void _writeMapping_(final INIWriter writer, final IAMMapping source, final int index) throws IOException, IllegalArgumentException {
 
 		final int entryCount = source.entryCount();
 		if (entryCount == 0) return;
 
-		this._writeSection_("IAM_MAPPING");
-		this._writeProperty_("index", Integer.toString(index));
-		this._writeProperty_("findMode", IAMFindMode.from(source.mode()).toString());
-		this._writeProperty_("keyFormat", IAMArrayFormat.ARRAY.toString());
-		this._writeProperty_("valueFormat", IAMArrayFormat.ARRAY.toString());
+		IAMCodec_INI._writeSection_(writer, "IAM_MAPPING");
+		IAMCodec_INI._writeProperty_(writer, "index", Integer.toString(index));
+		IAMCodec_INI._writeProperty_(writer, "findMode", IAMFindMode.from(source.mode()).toString());
+		IAMCodec_INI._writeProperty_(writer, "keyFormat", IAMArrayFormat.ARRAY.toString());
+		IAMCodec_INI._writeProperty_(writer, "valueFormat", IAMArrayFormat.ARRAY.toString());
 
 		for (int i = 0; i < entryCount; i++) {
-			this._writeProperty_(IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
+			IAMCodec_INI._writeProperty_(writer, IAMArrayFormat.ARRAY.format(source.key(i).toArray()), IAMArrayFormat.ARRAY.format(source.value(i).toArray()));
 		}
 
 	}
 
 	public final void encode(final IAMCodec codec, final IAMIndex source) throws IOException, IllegalStateException, IllegalArgumentException {
 		try (final INIWriter writer = INIWriter.from(codec.getTargetData())) {
-			this._order_ = codec.getByteOrder();
-			this._writer_ = writer;
-			this._writeIndex_(source);
+			final int mappingCount = source.mappingCount();
+			final int listingCount = source.listingCount();
+
+			IAMCodec_INI._writeSection_(writer, "IAM_INDEX");
+			IAMCodec_INI._writeProperty_(writer, "byteOrder", codec.getByteOrder().toString());
+			IAMCodec_INI._writeProperty_(writer, "mappingCount", Integer.toString(mappingCount));
+			IAMCodec_INI._writeProperty_(writer, "listingCount", Integer.toString(listingCount));
+
+			for (int i = 0; i < mappingCount; i++) {
+				IAMCodec_INI._writeMapping_(writer, source.mapping(i), i);
+			}
+
+			for (int i = 0; i < listingCount; i++) {
+				IAMCodec_INI._writeListing_(writer, source.listing(i), i);
+			}
+
 		}
 	}
 

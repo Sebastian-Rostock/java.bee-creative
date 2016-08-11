@@ -19,6 +19,7 @@ import bee.creative.iam.IAMCodec.IAMByteOrder;
 import bee.creative.iam.IAMCodec.IAMFindMode;
 import bee.creative.util.IO;
 
+/** @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 @SuppressWarnings ("javadoc")
 final class IAMCodec_XML {
 
