@@ -6,7 +6,7 @@ import bee.creative.util.Comparators;
  * Intern wird die Dezimalzahl als {@code long} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInteger> {
+public final class FEMInteger extends FEMValue implements Comparable<FEMInteger> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 6;
@@ -51,15 +51,6 @@ public final class FEMInteger extends FEMBaseValue implements Comparable<FEMInte
 		} catch (final NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMInteger.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Dezimalzahl.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMInteger from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMInteger.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMInteger.TYPE)}.

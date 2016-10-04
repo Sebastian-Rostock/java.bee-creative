@@ -4,24 +4,22 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import bee.creative.fem.FEMFormatter.FEMFormatterHelper;
 import bee.creative.fem.FEMScript.Range;
-import bee.creative.util.Converter;
-import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 import bee.creative.util.Parser;
 
 /** FEM - Function Evaluation Model
  * <p>
- * Diese Klasse implementiert grundlegende {@link FEMValue Werte} und {@link FEMFunction Funktionen} sowie {@link ScriptParser Parser}, {@link ScriptFormatter
+ * Diese Klasse implementiert grundlegende {@link FEMValue Werte} und {@link FEMFunction Funktionen} sowie {@link ScriptParser Parser}, {@link FEMFormatter
  * Formatter} und {@link ScriptCompiler Compiler} für {@link FEMScript Queltexte}.
  * 
  * @see ScriptParser
- * @see ScriptFormatter
+ * @see FEMFormatter
  * @see ScriptCompiler
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEM {
@@ -448,7 +446,7 @@ public class FEM {
 	}
 
 	/** Diese Klasse implementiert einen Kompiler, der {@link FEMScript aufbereitete Quelltexte} in {@link FEMValue Werte} sowie {@link FEMFunction Funktionen}
-	 * überführen und diese im Rahmen eines {@link ScriptFormatter} auch formatieren kann.
+	 * überführen und diese im Rahmen eines {@link FEMFormatter} auch formatieren kann.
 	 * <p>
 	 * Die Bereichestypen der Quelltexte haben folgende Bedeutung:
 	 * <ul>
@@ -463,14 +461,14 @@ public class FEM {
 	 * abgeschlossen werden muss. Ein Parametername muss durch einen Bereich gegeben sein, der über {@link ScriptCompilerHelper#compileName(ScriptCompiler)}
 	 * aufgelöst werden kann. Für Parameternamen gilt die Überschreibung der Sichtbarkeit analog zu Java. Nach der Parameterliste folgen dann die Bereiche, die zu
 	 * genau einer Funktion kompiliert werden.</li>
-	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link FEMParamFunction} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines
-	 * Parameters folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEMParamFunction#VIEW}.</li>
+	 * <li>Der Bereich vom Typ {@code '$'} zeigt eine {@link FEMParam} an, wenn danach ein Bereich mit dem Namen bzw. der 1-basierenden Nummer eines Parameters
+	 * folgen ({@code $1} wird zu {@code ParamFunction.from(0)}). Andernfalls steht der Bereich für {@link FEMParam#VIEW}.</li>
 	 * <li>Alle restlichen Bereiche werden über {@link ScriptCompilerHelper#compileParam(ScriptCompiler)} in Parameterfunktionen überführt.</li>
 	 * </ul>
 	 * <p>
 	 * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
 	 * 
-	 * @see #formatScript(ScriptFormatter)
+	 * @see #formatScript(FEMFormatter)
 	 * @see #compileValue()
 	 * @see #compileFunction()
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -486,7 +484,7 @@ public class FEM {
 		FEMScript _script_ = FEMScript.EMPTY;
 
 		/** Dieses Feld speichert die über {@link #proxy(String)} erzeugten Platzhalter. */
-		final Map<String, FEMProxyFunction> _proxies_ = Collections.synchronizedMap(new LinkedHashMap<String, FEMProxyFunction>());
+		final Map<String, FEMProxy> _proxies_ = Collections.synchronizedMap(new LinkedHashMap<String, FEMProxy>());
 
 		/** Dieses Feld speichert die Parameternamen. */
 		final List<String> _params_ = Collections.synchronizedList(new LinkedList<String>());
@@ -501,7 +499,7 @@ public class FEM {
 		boolean _chainingEnabled_ = true;
 
 		/** Dieses Feld speichert den Formatierer. */
-		ScriptFormatter _formatter_;
+		FEMFormatter _formatter_;
 
 		{}
 
@@ -527,7 +525,7 @@ public class FEM {
 
 		/** Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen. */
 		final void _format_() {
-			final ScriptFormatter formatter = this._formatter_;
+			final FEMFormatter formatter = this._formatter_;
 			while (true) {
 				this._formatSequence_(false);
 				if (this.symbol() < 0) return;
@@ -538,7 +536,7 @@ public class FEM {
 
 		/** Diese Methode formatiert die aktuelle Wertliste. */
 		final void _formatArray_() {
-			final ScriptFormatter formatter = this._formatter_;
+			final FEMFormatter formatter = this._formatter_;
 			formatter.put("[").putBreakInc();
 			this.skip();
 			this._formatSequence_(false);
@@ -550,7 +548,7 @@ public class FEM {
 
 		/** Diese Methode formatiert die aktuelle Parameterliste. */
 		final void _formatParam_() {
-			final ScriptFormatter formatter = this._formatter_;
+			final FEMFormatter formatter = this._formatter_;
 			formatter.put("(").putBreakInc();
 			this.skip();
 			this._formatSequence_(false);
@@ -562,7 +560,7 @@ public class FEM {
 
 		/** Diese Methode formatiert die aktuelle parametrisierte Funktion. */
 		final void _formatFrame_() {
-			final ScriptFormatter formatter = this._formatter_;
+			final FEMFormatter formatter = this._formatter_;
 			formatter.put("{");
 			this.skip();
 			this._formatSequence_(true);
@@ -581,7 +579,7 @@ public class FEM {
 		 * 
 		 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll. */
 		final void _formatSequence_(final boolean space) {
-			final ScriptFormatter formatter = this._formatter_;
+			final FEMFormatter formatter = this._formatter_;
 			int count = 0;
 			while (true) {
 				switch (this.symbol()) {
@@ -704,8 +702,8 @@ public class FEM {
 		/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMFunction} und gibt diesen zurück.
 		 * 
 		 * @see FEMValueFunction
-		 * @see FEMInvokeFunction
-		 * @see FEMParamFunction#VIEW
+		 * @see FEMCompositeFunction
+		 * @see FEMParam#VIEW
 		 * @return Wertliste als {@link FEMFunction}.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist. */
 		final FEMFunction _compileArrayAsFunction_() throws ScriptException {
@@ -731,7 +729,7 @@ public class FEM {
 						this.skip();
 						final int size = list.size();
 						if (!value) {
-							final FEMFunction result = FEMParamFunction.VIEW.withParams(list.toArray(new FEMFunction[size]));
+							final FEMFunction result = FEMParam.VIEW.compose(list.toArray(new FEMFunction[size]));
 							return result;
 						}
 						final FEMValue[] values = new FEMValue[size];
@@ -805,7 +803,7 @@ public class FEM {
 		 * @throws ScriptException Wenn der Quelltext ungültig ist. */
 		final FEMFunction _compileParamAsFunction_() throws ScriptException {
 			FEMFunction result;
-			boolean indirect = false;
+			boolean concat = false;
 			switch (this._compileType_()) {
 				case -1:
 				case ';':
@@ -819,7 +817,7 @@ public class FEM {
 				case '$': {
 					this.skip();
 					final String name = this._compileName_();
-					if (name == null) return FEMParamFunction.VIEW;
+					if (name == null) return FEMParam.VIEW;
 					int index = this._compileIndex_(name);
 					if (index < 0) {
 						index = this._params_.indexOf(name);
@@ -827,12 +825,12 @@ public class FEM {
 					} else if (index > 0) {
 						index--;
 					} else throw new ScriptException().useSender(this).useHint(" Parameterindex «%s» ist unzulässig.", index);
-					return FEMParamFunction.from(index);
+					return FEMParam.from(index);
 				}
 				case '{': {
 					result = this._compileFrame_();
 					if (this._compileType_() != '(') {
-						if (this._closureEnabled_) return FEMClosureFunction.from(result);
+						if (this._closureEnabled_) return FEMClosure.from(result);
 						return FEMHandler.from(result);
 					}
 					if (!this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
@@ -847,13 +845,14 @@ public class FEM {
 				}
 			}
 			do {
-				if (indirect && !this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
+				if (concat && !this._chainingEnabled_) throw new ScriptException().useSender(this).useHint(" Funktionsverkettungen ist nicht zulässsig.");
 				this.skip(); // '('
 				final List<FEMFunction> list = new ArrayList<>();
 				while (true) {
 					if (this._compileType_() == ')') {
 						this.skip();
-						result = FEMInvokeFunction.from(result, !indirect, list.toArray(new FEMFunction[list.size()]));
+						final FEMFunction[] params = list.toArray(new FEMFunction[list.size()]);
+						result = concat ? result.concat(params) : result.compose(params);
 						break;
 					}
 					final FEMFunction item = this._compileParamAsFunction_();
@@ -866,7 +865,7 @@ public class FEM {
 						case ')':
 					}
 				}
-				indirect = true;
+				concat = true;
 			} while (this._compileType_() == '(');
 			return result;
 		}
@@ -875,10 +874,10 @@ public class FEM {
 		 * 
 		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist. */
-		final FEMProxyFunction _compileProxy_() throws ScriptException {
+		final FEMProxy _compileProxy_() throws ScriptException {
 			final String name = this._compileName_();
 			if ((name == null) || (this._compileIndex_(name) >= 0)) throw new ScriptException().useSender(this).useHint(" Funktionsname erwartet.");
-			final FEMProxyFunction result = this.proxy(name);
+			final FEMProxy result = this.proxy(name);
 			if (this._compileType_() != '{') throw new ScriptException().useSender(this).useHint(" Parametrisierter Funktionsaufruf erwartet.");
 			result.set(this._compileFrame_());
 			return result;
@@ -953,13 +952,12 @@ public class FEM {
 			}
 		}
 
-		/** Diese Methode gibt den Ergebniswert der gegebenen Funktion zurück, sofer diese ein {@link FEMBaseValue} oder eine {@link FEMValueFunction} ist.<br>
-		 * Andernfalls wird {@code null} geliefert.
+		/** Diese Methode gibt den Ergebniswert der gegebenen Funktion zurück, sofer diese ein {@link FEMValue} ist. Andernfalls wird {@code null} geliefert.
 		 * 
 		 * @param function Funktion.
 		 * @return Ergebniswert oder {@code null}. */
 		final FEMValue _functionToValue(final FEMFunction function) {
-			if ((function instanceof FEMBaseValue) || (function instanceof FEMValueFunction)) return function.invoke(FEMFrame.EMPTY);
+			if (function instanceof FEMValue) return function.invoke(FEMFrame.EMPTY);
 			return null;
 		}
 
@@ -968,11 +966,11 @@ public class FEM {
 		 * @param name Name des Platzhalters.
 		 * @return Platzhalterfunktion.
 		 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-		public final FEMProxyFunction proxy(final String name) throws NullPointerException {
+		public final FEMProxy proxy(final String name) throws NullPointerException {
 			synchronized (this._proxies_) {
-				FEMProxyFunction result = this._proxies_.get(name);
+				FEMProxy result = this._proxies_.get(name);
 				if (result != null) return result;
-				this._proxies_.put(name, result = new FEMProxyFunction(name));
+				this._proxies_.put(name, result = new FEMProxy(name));
 				return result;
 			}
 		}
@@ -1002,7 +1000,7 @@ public class FEM {
 		 * Die gelieferte Abbildung wird vor jeder Kompilation geleert.
 		 * 
 		 * @return Abbildung von Namen auf Platzhalter. */
-		public final Map<String, FEMProxyFunction> proxies() {
+		public final Map<String, FEMProxy> proxies() {
 			return this._proxies_;
 		}
 
@@ -1029,7 +1027,7 @@ public class FEM {
 			return this._arrayEnabled_;
 		}
 
-		/** Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link FEMClosureFunction}s kompiliert werden.
+		/** Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen zu {@link FEMClosure}s kompiliert werden.
 		 * 
 		 * @see #compileFunction()
 		 * @return Zulässigkeit der Bindung des Stapelrahmens. */
@@ -1041,8 +1039,8 @@ public class FEM {
 		 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
 		 * 
 		 * @see #compileFunction()
-		 * @see FEMInvokeFunction#direct()
-		 * @see FEMInvokeFunction#invoke(FEMFrame)
+		 * @see FEMCompositeFunction#direct()
+		 * @see FEMCompositeFunction#invoke(FEMFrame)
 		 * @return Zulässigkeit der Verkettung von Funktionen. */
 		public final boolean isChainingEnabled() {
 			return this._chainingEnabled_;
@@ -1139,7 +1137,7 @@ public class FEM {
 		 * @param target Formatierer.
 		 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-		public final void formatScript(final ScriptFormatter target) throws NullPointerException, IllegalStateException {
+		public final void formatScript(final FEMFormatter target) throws NullPointerException, IllegalStateException {
 			this._start_();
 			if (target == null) throw new NullPointerException("target = null");
 			this._formatter_ = target;
@@ -1206,16 +1204,16 @@ public class FEM {
 		 * @return Funktionen.
 		 * @throws ScriptException Wenn der Quelltext ungültig ist.
 		 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
-		public final FEMProxyFunction[] compileProxies() throws ScriptException, IllegalStateException {
+		public final FEMProxy[] compileProxies() throws ScriptException, IllegalStateException {
 			this._start_();
 			try {
-				final List<FEMProxyFunction> result = new ArrayList<FEMProxyFunction>();
-				if (this._compileType_() < 0) return new FEMProxyFunction[0];
+				final List<FEMProxy> result = new ArrayList<FEMProxy>();
+				if (this._compileType_() < 0) return new FEMProxy[0];
 				while (true) {
 					result.add(this._compileProxy_());
 					switch (this._compileType_()) {
 						case -1: {
-							return result.toArray(new FEMProxyFunction[result.size()]);
+							return result.toArray(new FEMProxy[result.size()]);
 						}
 						case ';': {
 							this.skip();
@@ -1289,8 +1287,8 @@ public class FEM {
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static interface ScriptCompilerHelper {
 
-		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich den Typ {@link FEMNative} mit
-		 * Nutzdaten {@code null}, {@code true}, {@code false}, {@link String} und {@link Character} sowie {@link FEMNativeFunction} nutzt und andernfalls einen
+		/** Dieses Feld speichert den {@link FEMFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich den Typ {@link FEMNative} mit Nutzdaten
+		 * {@code null}, {@code true}, {@code false}, {@link String} und {@link Character} sowie {@link FEMReflection} nutzt und andernfalls einen
 		 * {@link ScriptCompiler#proxy(String)} liefert. */
 		static ScriptCompilerHelper NATIVE = new ScriptCompilerHelper() {
 
@@ -1317,7 +1315,7 @@ public class FEM {
 							return new FEMNative(new BigDecimal(section));
 						} catch (final NumberFormatException cause) {}
 						try {
-							return FEMNativeFunction.from(section);
+							return FEMReflection.from(section);
 						} catch (final Exception cause) {}
 						return compiler.proxy(section);
 					}
@@ -1331,7 +1329,7 @@ public class FEM {
 
 		};
 
-		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich die Typen {@link FEMVoid},
+		/** Dieses Feld speichert den {@link FEMFormatterHelper}, der in {@link #compileParam(ScriptCompiler)} sofern möglich die Typen {@link FEMVoid},
 		 * {@link FEMBoolean}, {@link FEMString}, {@link FEMBinary}, {@link FEMInteger}, {@link FEMDecimal}, {@link FEMDatetime} und {@link FEMDuration} nutzt und
 		 * andernfalls einen {@link ScriptCompiler#proxy(String)} liefert. */
 		static ScriptCompilerHelper DEFAULT = new ScriptCompilerHelper() {
@@ -1397,8 +1395,8 @@ public class FEM {
 
 		/** Diese Methode gibt den im {@link ScriptCompiler#section() aktuellen Bereich} des gegebenen Kompilers angegebene Parameter als Funktion zurück.<br>
 		 * Der Wert des Parameters entspricht hierbei dem Ergebniswert der gelieferten Funktion.<br>
-		 * Konstante Parameterwerte können als {@link FEMBaseValue}, {@link FEMValueFunction} oder {@link FEMProxyFunction} geliefert werden. Funktion als
-		 * Parameterwert können als {@link FEMHandler} geliefert werden.
+		 * Konstante Parameterwerte können als {@link FEMValue}, {@link FEMValueFunction} oder {@link FEMProxy} geliefert werden. Funktion als Parameterwert können
+		 * als {@link FEMHandler} geliefert werden.
 		 * 
 		 * @see ScriptCompiler#proxy(String)
 		 * @see ScriptCompiler#range()
@@ -1407,709 +1405,6 @@ public class FEM {
 		 * @return Parameterfunktion.
 		 * @throws ScriptException Wenn der Bereich keinen gültigen Funktionsnamen oder Wert enthält. */
 		public FEMFunction compileParam(ScriptCompiler compiler) throws ScriptException;
-
-	}
-
-	/** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann.<br>
-	 * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link ScriptParser} und {@link ScriptCompiler}.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static final class ScriptFormatter {
-
-		/** Diese Klasse implementiert eine Markierung, mit welcher die Tiefe und Aktivierung der Einrückung definiert werden kann.
-		 * 
-		 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-		static final class Mark {
-
-			/** Dieses Feld speichert das Objekt, dass in {@link #_items_} vor jeder Markierung eingefügt wird. */
-			static final Mark EMPTY = new ScriptFormatter.Mark(0, false, false, false);
-
-			{}
-
-			/** Dieses Feld speichert die Eigenschaften dieser Markierung. */
-			int _data_;
-
-			/** Dieser Konstruktor initialisiert die Markierung.
-			 * 
-			 * @param level Einrücktiefe ({@link #level()}).
-			 * @param last Endmarkierung ({@link #isLast()}).
-			 * @param space Leerzeichen ({@link #isSpace()}).
-			 * @param enabled Aktivierung ({@link #isEnabled()}). */
-			public Mark(final int level, final boolean last, final boolean space, final boolean enabled) {
-				this._data_ = (level << 3) | (last ? 1 : 0) | (enabled ? 2 : 0) | (space ? 4 : 0);
-			}
-
-			{}
-
-			/** Diese Methode gibt die Tiefe der Einrückung zurück.
-			 * 
-			 * @return Tiefe der Einrückung. */
-			public final int level() {
-				return this._data_ >> 3;
-			}
-
-			/** Diese Methode aktiviert die Einrückung. */
-			public final void enable() {
-				this._data_ |= 2;
-			}
-
-			/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt das Ende einer Einrückungsebene markiert.
-			 * 
-			 * @return {@code true} bei einer Endmarkierung. */
-			public final boolean isLast() {
-				return (this._data_ & 1) != 0;
-			}
-
-			/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt ein bedingtes Leerzeichen markiert.
-			 * 
-			 * @return {@code true} bei einem bedingten Leerzeichen. */
-			public final boolean isSpace() {
-				return (this._data_ & 4) != 0;
-			}
-
-			/** Diese Methode gibt nur dann {@code true} zurück, wenn die Einrückung aktiviert ist.
-			 * 
-			 * @return Aktivierung. */
-			public final boolean isEnabled() {
-				return (this._data_ & 2) != 0;
-			}
-
-			{}
-
-			/** {@inheritDoc} */
-			@Override
-			public final String toString() {
-				return "M" + (this.level() == 0 ? "" : (this.isLast() ? "D" : this.isSpace() ? "S" : "I") + (this.isEnabled() ? "E" : ""));
-			}
-
-		}
-
-		{}
-
-		/** Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen. */
-		final List<Object> _items_ = new ArrayList<Object>();
-
-		/** Dieses Feld speichert den Puffer für {@link #_format_()}. */
-		final StringBuilder _string_ = new StringBuilder();
-
-		/** Dieses Feld speichert den Stack der Hierarchieebenen. */
-		final LinkedList<Boolean> _indents_ = new LinkedList<Boolean>();
-
-		/** Dieses Feld speichert die Zeichenkette zur Einrückung, z.B. {@code "\t"} oder {@code "  "}. */
-		String _indent_;
-
-		/** Dieses Feld speichert die Formatierungsmethoden. */
-		ScriptFormatterHelper _helper_ = ScriptFormatterHelper.EMPTY;
-
-		{}
-
-		/** Diese Methode beginnt das Parsen und sollte nur in Verbindung mit {@link #_stop_()} verwendet werden.
-		 * 
-		 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-		synchronized final void _start_() throws IllegalStateException {
-			this._check_(true);
-			this._indents_.addLast(Boolean.FALSE);
-		}
-
-		@SuppressWarnings ("javadoc")
-		synchronized final void _stop_() {
-			this._items_.clear();
-			this._string_.setLength(0);
-			this._indents_.clear();
-		}
-
-		@SuppressWarnings ("javadoc")
-		final void _check_(final boolean idling) throws IllegalStateException {
-			if (this._indents_.isEmpty() != idling) throw new IllegalStateException();
-		}
-
-		/** Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
-		 * 
-		 * @param object Markierung.
-		 * @return {@code this}. */
-		final ScriptFormatter _putMark_(final Mark object) {
-			this._items_.add(object);
-			return this;
-		}
-
-		/** Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
-		 * {@link #putIndent()} die Einrückung für diese Hierarchieebene aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung
-		 * angefügt.
-		 * 
-		 * @see #putBreakDec()
-		 * @see #putBreakSpace()
-		 * @see #putIndent()
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-		public final ScriptFormatter putBreakInc() throws IllegalStateException {
-			this._check_(false);
-			final LinkedList<Boolean> indents = this._indents_;
-			indents.addLast(Boolean.FALSE);
-			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, false, false));
-		}
-
-		/** Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
-		 * {@link #putIndent()} die Einrückung für eine der tieferen Hierarchieebenen aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur aktuellen Ebene
-		 * passenden Einrückung angefügt.
-		 * 
-		 * @see #putBreakInc()
-		 * @see #putBreakSpace()
-		 * @see #putIndent()
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde oder aktuell nicht formatiert wird. */
-		public final ScriptFormatter putBreakDec() throws IllegalStateException {
-			this._check_(false);
-			final LinkedList<Boolean> indents = this._indents_;
-			final int value = indents.size();
-			if (value <= 1) throw new IllegalStateException();
-			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(value, true, false, indents.removeLast().booleanValue()));
-		}
-
-		/** Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #putIndent()} die Einrückung für die aktuelle
-		 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
-		 * 
-		 * @see #putBreakInc()
-		 * @see #putBreakDec()
-		 * @see #putIndent()
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-		public final ScriptFormatter putBreakSpace() throws IllegalStateException {
-			this._check_(false);
-			final LinkedList<Boolean> indents = this._indents_;
-			return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
-		}
-
-		/** Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
-		 * Hierarchieebene werden über {@link #putBreakInc()} und {@link #putBreakDec()} markiert.
-		 * 
-		 * @see #putBreakSpace()
-		 * @see #putBreakInc()
-		 * @see #putBreakDec()
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-		public final ScriptFormatter putIndent() throws IllegalStateException {
-			this._check_(false);
-			final LinkedList<Boolean> indents = this._indents_;
-			if (this._indents_.getLast().booleanValue()) return this;
-			final int value = indents.size();
-			for (int i = 0; i < value; i++) {
-				indents.set(i, Boolean.TRUE);
-			}
-			final List<Object> items = this._items_;
-			for (int i = items.size() - 2; i >= 0; i--) {
-				final Object item = items.get(i);
-				if (item == Mark.EMPTY) {
-					final Mark token = (Mark)items.get(i + 1);
-					if (token.level() <= value) { // ALTERNATIV: else if (token.level() < value) return this;
-						if (token.isEnabled()) return this;
-						token.enable();
-					}
-					i--;
-				}
-			}
-			return this;
-		}
-
-		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-		 * 
-		 * @see Object#toString()
-		 * @param part Objekt.
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code part} nicht formatiert werden kann. */
-		public final ScriptFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
-			if (part == null) throw new NullPointerException("part = null");
-			this._check_(false);
-			this._items_.add(part.toString());
-			return this;
-		}
-
-		/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-		 * 
-		 * @see ScriptFormatterHelper#formatData(ScriptFormatter, Object)
-		 * @param data Objekt.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
-		public final ScriptFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (data == null) throw new NullPointerException("data = null");
-			this._check_(false);
-			this._helper_.formatData(this, data);
-			return this;
-		}
-
-		/** Diese Methode fügt die gegebenen Wertliste an und gibt {@code this} zurück.<br>
-		 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
-		 * separiert über {@link #putValue(FEMValue)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor
-		 * der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
-		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-		 * 
-		 * @see #putValue(FEMValue)
-		 * @see #putBreakInc()
-		 * @see #putBreakDec()
-		 * @see #putBreakSpace()
-		 * @see #putIndent()
-		 * @param array Wertliste.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann. */
-		public final ScriptFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			if (array == null) throw new NullPointerException("array = null");
-			this._check_(false);
-			final Iterator<? extends FEMValue> iter = array.iterator();
-			if (iter.hasNext()) {
-				FEMValue item = iter.next();
-				if (iter.hasNext()) {
-					this.putIndent().put("[").putBreakInc().putValue(item);
-					do {
-						item = iter.next();
-						this.put(";").putBreakSpace().putValue(item);
-					} while (iter.hasNext());
-					this.putBreakDec().put("]");
-				} else {
-					this.put("[").putBreakInc().putValue(item).putBreakDec().put("]");
-				}
-			} else {
-				this.put("[]");
-			}
-			return this;
-		}
-
-		/** Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.<br>
-		 * 
-		 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)
-		 * @param value Wert.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann. */
-		public final ScriptFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (value == null) throw new NullPointerException("value = null");
-			this._check_(false);
-			this._helper_.formatValue(this, value);
-			return this;
-		}
-
-		/** Diese Methode fügt den Quelltext der Liste der gegebenen zugesicherten Parameterwerte eines Stapelrahmens an und gibt {@code this} zurück.<br>
-		 * Wenn diese Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die nummerierten Parameterwerte in {@code "("} und {@code ")"} eingeschlossen,
-		 * sowie mit {@code ";"} separiert über {@link #putValue(FEMValue)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als
-		 * {@code "$i: "} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der schließenden Klammer
-		 * {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
-		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-		 * 
-		 * @see #putFunction(FEMFunction)
-		 * @see #putBreakInc()
-		 * @see #putBreakDec()
-		 * @see #putBreakSpace()
-		 * @see #putIndent()
-		 * @param params Stapelrahmen.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
-		public final ScriptFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			if (params == null) throw new NullPointerException("params = null");
-			this._check_(false);
-			final Iterator<? extends FEMValue> iter = params.iterator();
-			if (iter.hasNext()) {
-				FEMValue item = iter.next();
-				if (iter.hasNext()) {
-					this.putIndent().put("(").putBreakInc().put("$1: ").putValue(item);
-					int index = 2;
-					do {
-						item = iter.next();
-						this.put(";").putBreakSpace().put("$").put(new Integer(index)).put(": ").putValue(item);
-						index++;
-					} while (iter.hasNext());
-					this.putBreakDec().put(")");
-				} else {
-					this.put("(").putBreakInc().put("$1: ").putValue(item).putBreakDec().put(")");
-				}
-			} else {
-				this.put("()");
-			}
-			return this;
-		}
-
-		/** Diese Methode fügt den Quelltext der Liste der gegebenen Parameterfunktionen an und gibt {@code this} zurück.<br>
-		 * Wenn die Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die Parameterfunktionen in {@code "("} und {@code ")"} eingeschlossen sowie mit
-		 * {@code ";"} separiert über {@link #putFunction(FEMFunction)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue
-		 * Hierarchieebene, die vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes
-		 * Leerzeichen} eingefügt.<br>
-		 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Funktionsliste mehr als ein Element enthält.
-		 * 
-		 * @see #putFunction(FEMFunction)
-		 * @see #putBreakInc()
-		 * @see #putBreakDec()
-		 * @see #putBreakSpace()
-		 * @see #putIndent()
-		 * @param params Funktionsliste.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
-		public final ScriptFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			if (params == null) throw new NullPointerException("params = null");
-			this._check_(false);
-			final Iterator<? extends FEMFunction> iter = params.iterator();
-			if (iter.hasNext()) {
-				FEMFunction item = iter.next();
-				if (iter.hasNext()) {
-					this.putIndent().put("(").putBreakInc().putFunction(item);
-					do {
-						item = iter.next();
-						this.put(";").putBreakSpace().putFunction(item);
-					} while (iter.hasNext());
-					this.putBreakDec().put(")");
-				} else {
-					this.put("(").putBreakInc().putFunction(item).putBreakDec().put(")");
-				}
-			} else {
-				this.put("()");
-			}
-			return this;
-		}
-
-		/** Diese Methode fügt die gegebenen, parametrisierte Funktion an und gibt {@code this} zurück.<br>
-		 * Die parametrisierte Funktion wird dabei in <code>"{: "</code> und <code>"}"</code> eingeschlossen und über {@link #putFunction(FEMFunction)} angefügt.
-		 * 
-		 * @see #putFunction(FEMFunction)
-		 * @param function parametrisierte Funktion.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-		public final ScriptFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (function == null) throw new NullPointerException("function = null");
-			return this.put("{: ").putFunction(function).put("}");
-		}
-
-		/** Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
-		 * 
-		 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)
-		 * @param function Funktion.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-		public final ScriptFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			if (function == null) throw new NullPointerException("function = null");
-			this._check_(false);
-			this._helper_.formatFunction(this, function);
-			return this;
-		}
-
-		/** Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück. Diese ist {@code null}, wenn nicht eingerückt wird.
-		 * 
-		 * @return Zeichenkette zur Einrückung oder {@code null}. */
-		public final String getIndent() {
-			return this._indent_;
-		}
-
-		/** Diese Methode gibt die genutzten Formatierungsmethoden zurück.
-		 * 
-		 * @return Formatierungsmethoden. */
-		public final ScriptFormatterHelper getHelper() {
-			return this._helper_;
-		}
-
-		/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
-		 * Wenn diese {@code null} ist, wird nicht eingerückt.
-		 * 
-		 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
-		 * @return {@code this}.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-		public synchronized final ScriptFormatter useIndent(final String indent) throws IllegalStateException {
-			this._check_(true);
-			this._indent_ = indent;
-			return this;
-		}
-
-		/** Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt {@code this} zurück.
-		 * 
-		 * @param helper Formatierungsmethoden.
-		 * @return {@code this}.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-		public synchronized final ScriptFormatter useHelper(final ScriptFormatterHelper helper) throws NullPointerException, IllegalStateException {
-			if (helper == null) throw new NullPointerException("helper = null");
-			this._check_(true);
-			this._helper_ = helper;
-			return this;
-		}
-
-		/** Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
-		 * 
-		 * @see #put(Object)
-		 * @return Quelltext. */
-		final String _format_() {
-			final String indent = this._indent_;
-			final List<Object> items = this._items_;
-			final StringBuilder string = this._string_;
-			final int size = items.size();
-			for (int i = 0; i < size;) {
-				final Object item = items.get(i++);
-				if (item == Mark.EMPTY) {
-					final Mark token = (Mark)items.get(i++);
-					if (token.isEnabled() && (indent != null)) {
-						string.append('\n');
-						for (int count = token.level() - (token.isLast() ? 2 : 1); count > 0; count--) {
-							string.append(indent);
-						}
-					} else if (token.isSpace()) {
-						string.append(' ');
-					}
-				} else {
-					string.append(item);
-				}
-			}
-			return string.toString();
-		}
-
-		/** Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
-		 * hierfür {@link #putData(Object)}, {@link #putValue(FEMValue)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
-		 * 
-		 * @see #formatDatas(Iterable)
-		 * @see #formatValues(Iterable)
-		 * @see #formatFunctions(Iterable)
-		 * @param <GItem> Typ der Elemente.
-		 * @param items Elemente.
-		 * @param formatter {@link Converter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-		final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
-			IllegalStateException, IllegalArgumentException {
-			this._start_();
-			try {
-				final Iterator<? extends GItem> iter = items.iterator();
-				if (!iter.hasNext()) return "";
-				GItem item = iter.next();
-				if (iter.hasNext()) {
-					this.putIndent();
-					formatter.convert(item);
-					do {
-						item = iter.next();
-						this.put(";").putBreakSpace();
-						formatter.convert(item);
-					} while (iter.hasNext());
-				} else {
-					formatter.convert(item);
-				}
-				return this._format_();
-			} finally {
-				this._stop_();
-			}
-		}
-
-		/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatDatas(Iterables.itemIterable(object))}.
-		 * 
-		 * @see #formatDatas(Iterable)
-		 * @param object Objekt.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code object} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn das Object nicht formatiert werden kann. */
-		public final String formatData(final Object object) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			return this.formatDatas(Iterables.itemIterable(object));
-		}
-
-		/** Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Objekt werden über {@link #putData(Object)} angefügt und mit {@code ';'} separiert.
-		 * 
-		 * @see #putData(Object)
-		 * @param objects Objekte.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code objects} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann. */
-		public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			return this._format_(objects, new Converter<Object, Object>() {
-
-				@Override
-				public Object convert(final Object input) {
-					return ScriptFormatter.this.putData(input);
-				}
-
-			});
-		}
-
-		/** Diese Methode formatiert den gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatValue(Iterables.itemIterable(value))}.
-		 * 
-		 * @see #formatValues(Iterable)
-		 * @param value Wert.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann. */
-		public final String formatValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			return this.formatValues(Iterables.itemIterable(value));
-		}
-
-		/** Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Werte werden über {@link #putValue(FEMValue)} angefügt und mit {@code ';'} separiert.
-		 * 
-		 * @see #putValue(FEMValue)
-		 * @param values Werte.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann. */
-		public final String formatValues(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			return this._format_(values, new Converter<FEMValue, Object>() {
-
-				@Override
-				public Object convert(final FEMValue input) {
-					return ScriptFormatter.this.putValue(input);
-				}
-
-			});
-		}
-
-		/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und gibt diesen zurück.<br>
-		 * Der Rückgabewert entspricht {@code this.formatFunction(Iterables.itemIterable(function))}.
-		 * 
-		 * @see #formatFunctions(Iterable)
-		 * @param function Funktion.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann. */
-		public final String formatFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-			return this.formatFunctions(Iterables.itemIterable(function));
-		}
-
-		/** Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
-		 * Die Funktionen werden über {@link #putFunction(FEMFunction)} angefügt und mit {@code ';'} separiert.
-		 * 
-		 * @see #putFunction(FEMFunction)
-		 * @param functions Funktionen.
-		 * @return formatierter Quelltext.
-		 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
-		 * @throws IllegalStateException Wenn aktuell formatiert wird.
-		 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
-		public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
-			IllegalArgumentException {
-			return this._format_(functions, new Converter<FEMFunction, Object>() {
-
-				@Override
-				public Object convert(final FEMFunction input) {
-					return ScriptFormatter.this.putFunction(input);
-				}
-
-			});
-		}
-
-		{}
-
-		/** {@inheritDoc} */
-		@Override
-		public final String toString() {
-			return Objects.toInvokeString(this, this._helper_, this._indent_, this._items_);
-		}
-
-	}
-
-	/** Diese Schnittstelle definiert ein Objekt, welches sich selbst in seine Quelltextdarstellung überführen und diese an einen {@link ScriptFormatter} anfügen
-	 * kann.
-	 * 
-	 * @see ScriptFormatterHelper#formatData(ScriptFormatter, Object)
-	 * @see ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)
-	 * @see ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static interface ScriptFormatterInput {
-
-		/** Diese Methode formatiert dieses Objekt in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.<br>
-		 * Sie kann von einem {@link ScriptFormatterHelper} im Rahmen folgender Methoden aufgerufen:
-		 * <ul>
-		 * <li>{@link ScriptFormatterHelper#formatData(ScriptFormatter, Object)}</li>
-		 * <li>{@link ScriptFormatterHelper#formatValue(ScriptFormatter, FEMValue)}</li>
-		 * <li>{@link ScriptFormatterHelper#formatFunction(ScriptFormatter, FEMFunction)}</li>
-		 * </ul>
-		 * 
-		 * @param target {@link ScriptFormatter}.
-		 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
-		public void toScript(final ScriptFormatter target) throws IllegalArgumentException;
-
-	}
-
-	/** Diese Schnittstelle definiert Formatierungsmethoden, die in den Methoden {@link ScriptFormatter#putValue(FEMValue)} und
-	 * {@link ScriptFormatter#putFunction(FEMFunction)} zur Übersetzung von Werten und Funktionen in Quelltexte genutzt werden.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static interface ScriptFormatterHelper {
-
-		/** Dieses Feld speichert den {@link ScriptFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
-		 * {@link FEMScript Aufbereitete Quelltexte} werden in {@link #formatData(ScriptFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
-		 * formatiert. Daten, Werte und Funktionen mit der Schnittstelle {@link ScriptFormatterInput} werden über deren
-		 * {@link ScriptFormatterInput#toScript(ScriptFormatter)}-Methode formatiert. */
-		static ScriptFormatterHelper EMPTY = new ScriptFormatterHelper() {
-
-			@Override
-			public void formatData(final ScriptFormatter target, final Object data) throws IllegalArgumentException {
-				if (data instanceof FEMScript) {
-					FEM.scriptCompiler().useScript((FEMScript)data).formatScript(target);
-				} else if (data instanceof ScriptFormatterInput) {
-					((ScriptFormatterInput)data).toScript(target);
-				} else {
-					target.put(String.valueOf(data));
-				}
-			}
-
-			@Override
-			public void formatValue(final ScriptFormatter target, final FEMValue value) throws IllegalArgumentException {
-				if (value instanceof ScriptFormatterInput) {
-					((ScriptFormatterInput)value).toScript(target);
-				} else {
-					target.put(String.valueOf(value));
-				}
-			}
-
-			@Override
-			public void formatFunction(final ScriptFormatter target, final FEMFunction function) throws IllegalArgumentException {
-				if (function instanceof ScriptFormatterInput) {
-					((ScriptFormatterInput)function).toScript(target);
-				} else {
-					target.put(String.valueOf(function));
-				}
-			}
-
-			@Override
-			public String toString() {
-				return "EMPTY";
-			}
-
-		};
-
-		/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
-		 * 
-		 * @param target {@link ScriptFormatter}.
-		 * @param data Objekt.
-		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
-		public void formatData(ScriptFormatter target, Object data) throws IllegalArgumentException;
-
-		/** Diese Methode formatiert den gegebenen Wert in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
-		 * 
-		 * @param target {@link ScriptFormatter}.
-		 * @param value Wert.
-		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann. */
-		public void formatValue(ScriptFormatter target, FEMValue value) throws IllegalArgumentException;
-
-		/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link ScriptFormatter} an.
-		 * 
-		 * @param target {@link ScriptFormatter}.
-		 * @param function Funktion.
-		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-		public void formatFunction(ScriptFormatter target, FEMFunction function) throws IllegalArgumentException;
 
 	}
 
@@ -2242,25 +1537,14 @@ public class FEM {
 
 	{}
 
-	/** Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().arrayFrom(data)}.
-	 * 
-	 * @see FEMContext#arrayFrom(Object)
-	 * @param data Wertliste, natives Array oder {@link Iterable}.
-	 * @return Wertliste.
-	 * @throws IllegalArgumentException Wenn das gegebene Objekt bzw. eines der Elemente nicht umgewandelt werden kann. */
-	public static FEMArray arrayFrom(final Object data) throws IllegalArgumentException {
-		return FEMContext._default_.arrayFrom(data);
-	}
+	public static final FEMFunction IF = new FEMFunction() {
 
-	/** Diese Methode ist eine Abkürzung für {@code Context.DEFAULT().valueFrom(data)}.
-	 * 
-	 * @see FEMContext#valueFrom(Object)
-	 * @param data Nutzdaten.
-	 * @return Wert mit den gegebenen Nutzdaten.
-	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
-	public static FEMValue valueFrom(final Object data) throws IllegalArgumentException {
-		return FEMContext._default_.valueFrom(data);
-	}
+		@Override
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+			return frame.get(frame.get(0).data() == FEMBoolean.TRUE ? 1 : 2);
+		}
+
+	};
 
 	/** Diese Methode erzeugt einen neuen {@link ScriptParser} und gibt diesen zurück.
 	 * 
@@ -2280,13 +1564,13 @@ public class FEM {
 		return new ScriptCompiler();
 	}
 
-	/** Diese Methode erzeugt einen neuen {@link ScriptFormatter} und gibt diesen zurück.<br>
-	 * Der gelieferte {@link ScriptFormatter} nutzt {@link ScriptFormatterHelper#EMPTY} und keine {@link ScriptFormatter#useIndent(String) Einrückung}.
+	/** Diese Methode erzeugt einen neuen {@link FEMFormatter} und gibt diesen zurück.<br>
+	 * Der gelieferte {@link FEMFormatter} nutzt {@link FEMFormatterHelper#EMPTY} und keine {@link FEMFormatter#useIndent(String) Einrückung}.
 	 * 
-	 * @see ScriptFormatter
-	 * @return {@link ScriptFormatter}. */
-	public static ScriptFormatter scriptFormatter() {
-		return new ScriptFormatter();
+	 * @see FEMFormatter
+	 * @return {@link FEMFormatter}. */
+	public static FEMFormatter scriptFormatter() {
+		return new FEMFormatter();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code scriptParser().useSource(source).parseValue()}.

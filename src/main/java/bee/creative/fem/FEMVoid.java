@@ -3,7 +3,7 @@ package bee.creative.fem;
 /** Diese Klasse implementiert den unveränderlichen Leerwert.
  * 
  * @author Sebastian Rostock 2015. */
-public final class FEMVoid extends FEMBaseValue {
+public final class FEMVoid extends FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 0;
@@ -25,15 +25,6 @@ public final class FEMVoid extends FEMBaseValue {
 	public static FEMVoid from(final String value) throws NullPointerException, IllegalArgumentException {
 		if (value.equals("void")) return FEMVoid.INSTANCE;
 		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMVoid.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Leerwert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMVoid from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMVoid.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVoid.TYPE)}.

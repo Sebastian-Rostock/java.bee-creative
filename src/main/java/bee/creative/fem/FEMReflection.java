@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Natives;
 
 /** Diese Funktion kann zum Lesen und Schreiben von {@link Field nativen Datenfeldern} sowie zum Aufrufen von {@link Method nativen Methoden} und
@@ -35,21 +34,21 @@ import bee.creative.util.Natives;
  * Diese Klasse stellt {@link FEMFunction Funktionen} zum Lesen und Schreiben von sowie zum Aufrufen von und bereit.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMNativeFunction extends FEMBaseFunction {
+public abstract class FEMReflection extends FEMFunction {
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeStaticField extends FEMNativeFunction {
+	static final class StaticField extends FEMReflection {
 
 		public final Field field;
 
-		NativeStaticField(final Field field) {
+		StaticField(final Field field) {
 			this.field = field;
 		}
 
 		{}
 
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			try {
 				switch (frame.size()) {
 					case 0:
@@ -79,20 +78,20 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeStaticMethod extends FEMNativeFunction {
+	static final class StaticMethod extends FEMReflection {
 
 		public final Method method;
 
-		NativeStaticMethod(final Method method) {
+		StaticMethod(final Method method) {
 			this.method = method;
 		}
 
 		{}
 
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMNativeFunction._params_(frame, false);
+				final Object[] params = FEMReflection._params_(frame, false);
 				final Object result = this.method.invoke(null, params);
 				return new FEMNative(result);
 			} catch (final Exception cause) {
@@ -101,7 +100,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 		}
 
 		@Override
-		public Method member() {
+		public final Method member() {
 			return this.method;
 		}
 
@@ -113,20 +112,20 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeStaticConstructor extends FEMNativeFunction {
+	static final class StaticConstructor extends FEMReflection {
 
 		public final Constructor<?> constructor;
 
-		NativeStaticConstructor(final Constructor<?> constructor) {
+		StaticConstructor(final Constructor<?> constructor) {
 			this.constructor = constructor;
 		}
 
 		{}
 
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMNativeFunction._params_(frame, false);
+				final Object[] params = FEMReflection._params_(frame, false);
 				final Object result = this.constructor.newInstance(params);
 				return new FEMNative(result);
 			} catch (final Exception cause) {
@@ -135,7 +134,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 		}
 
 		@Override
-		public Constructor<?> member() {
+		public final Constructor<?> member() {
 			return this.constructor;
 		}
 
@@ -147,18 +146,18 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeObjectField extends FEMNativeFunction {
+	static final class InstanceField extends FEMReflection {
 
 		public final Field field;
 
-		NativeObjectField(final Field field) {
+		InstanceField(final Field field) {
 			this.field = field;
 		}
 
 		{}
 
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			try {
 				switch (frame.size()) {
 					case 1:
@@ -178,7 +177,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 		}
 
 		@Override
-		public Field member() {
+		public final Field member() {
 			return this.field;
 		}
 
@@ -190,20 +189,20 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static final class NativeObjectMethod extends FEMNativeFunction {
+	static final class InstanceMethod extends FEMReflection {
 
 		public final Method method;
 
-		NativeObjectMethod(final Method method) {
+		InstanceMethod(final Method method) {
 			this.method = method;
 		}
 
 		{}
 
 		@Override
-		public FEMValue invoke(final FEMFrame frame) {
+		public final FEMValue invoke(final FEMFrame frame) {
 			try {
-				final Object[] params = FEMNativeFunction._params_(frame, true);
+				final Object[] params = FEMReflection._params_(frame, true);
 				final Object input = frame.get(0).data();
 				final Object result = this.method.invoke(input, params);
 				return new FEMNative(result);
@@ -213,7 +212,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 		}
 
 		@Override
-		public Method member() {
+		public final Method member() {
 			return this.method;
 		}
 
@@ -245,7 +244,7 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 * @see #from(Method)
 	 * @see #from(Constructor)
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
-	 * @return {@link FEMNativeFunction}.
+	 * @return {@link FEMReflection}.
 	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} oder {@link Natives#parseConstructor(String)} eine entsprechende Ausnahme
 	 *         auslöst.
@@ -253,9 +252,9 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 *         oder {@link Natives#parseClass(String)} eine entsprechende Ausnahme auslöst. */
 	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
 		if (memberPath.endsWith(".class")) return new FEMNative(Natives.parseClass(memberPath.substring(0, memberPath.length() - 6)));
-		if (memberPath.contains(".new(")) return FEMNativeFunction.from(Natives.parseConstructor(memberPath));
-		if (memberPath.contains("(")) return FEMNativeFunction.from(Natives.parseMethod(memberPath));
-		return FEMNativeFunction.from(Natives.parseField(memberPath));
+		if (memberPath.contains(".new(")) return FEMReflection.from(Natives.parseConstructor(memberPath));
+		if (memberPath.contains("(")) return FEMReflection.from(Natives.parseMethod(memberPath));
+		return FEMReflection.from(Natives.parseField(memberPath));
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.
@@ -263,8 +262,8 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 * @param field Datenfeld.
 	 * @return Funktion zum gegebenen Datenfeld.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static FEMNativeFunction from(final Field field) throws NullPointerException {
-		return Modifier.isStatic(field.getModifiers()) ? new NativeStaticField(field) : new NativeObjectField(field);
+	public static FEMReflection from(final Field field) throws NullPointerException {
+		return Modifier.isStatic(field.getModifiers()) ? new StaticField(field) : new InstanceField(field);
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
@@ -272,8 +271,8 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 * @param method Methode.
 	 * @return Funktion zur gegebenen Methode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
-	public static FEMNativeFunction from(final Method method) throws NullPointerException {
-		return Modifier.isStatic(method.getModifiers()) ? new NativeStaticMethod(method) : new NativeObjectMethod(method);
+	public static FEMReflection from(final Method method) throws NullPointerException {
+		return Modifier.isStatic(method.getModifiers()) ? new StaticMethod(method) : new InstanceMethod(method);
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, die an den gegebenen Konstruktor delegiert.
@@ -281,9 +280,9 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 	 * @param constructor Konstruktor.
 	 * @return Funktion zum gegebenen Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
-	public static FEMNativeFunction from(final Constructor<?> constructor) throws NullPointerException {
+	public static FEMReflection from(final Constructor<?> constructor) throws NullPointerException {
 		if (constructor == null) throw new NullPointerException("constructor = null");
-		return new NativeStaticConstructor(constructor);
+		return new StaticConstructor(constructor);
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -335,8 +334,8 @@ public abstract class FEMNativeFunction extends FEMBaseFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public void toScript(final ScriptFormatter target) throws IllegalArgumentException {
-		target.put(this.toString());
+	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
+		target.put(FEM.formatValue(this.toString()));
 	}
 
 }

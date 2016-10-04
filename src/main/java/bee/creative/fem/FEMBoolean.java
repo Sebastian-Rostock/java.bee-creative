@@ -4,7 +4,7 @@ package bee.creative.fem;
  * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBoolean> {
+public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 3;
@@ -49,15 +49,6 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 		if (value.equals("true")) return FEMBoolean.TRUE;
 		if (value.equals("false")) return FEMBoolean.FALSE;
 		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBoolean.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Wahrheitswert.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMBoolean from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMBoolean.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBoolean.TYPE)}.
@@ -161,7 +152,7 @@ public final class FEMBoolean extends FEMBaseValue implements Comparable<FEMBool
 		if (object == this) return true;
 		if (!(object instanceof FEMBoolean)) {
 			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
+			object = ((FEMValue)object).result().data();
 			if (!(object instanceof FEMBoolean)) return false;
 		}
 		return this.equals((FEMBoolean)object);

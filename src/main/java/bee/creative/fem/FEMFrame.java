@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
 import java.util.Iterator;
-import bee.creative.fem.FEM.ScriptFormatterInput;
+import bee.creative.fem.FEMFormatter.FEMFormatterInput;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects.UseToString;
@@ -16,7 +16,7 @@ import bee.creative.util.Objects.UseToString;
  * @see FEMValue
  * @see FEMFunction
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString, ScriptFormatterInput {
+public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString, FEMFormatterInput {
 
 	@SuppressWarnings ("javadoc")
 	static final class ArrayFrame extends FEMFrame {
@@ -109,7 +109,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 					if (result != null) return result;
 					final FEMFunction param = this._params_[index];
 					if (param == null) throw new NullPointerException("params[index] = null");
-					result = new FEMResult(this._frame_, param);
+					result = new FEMFuture(this._frame_, param);
 					this._values_[index] = result;
 					return result;
 				}
@@ -227,7 +227,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	}
 
 	/** Diese Methode gibt eine Wertliste als Sicht auf die zugesicherten Parameterwerte zurück.<br>
-	 * Die Elemente dieser Wertliste können der {@link FEMResult <em>return-by-reference</em>}-Semantik angehören.
+	 * Die Elemente dieser Wertliste können der {@link FEMFuture <em>return-by-reference</em>}-Semantik angehören.
 	 * 
 	 * @see #get(int)
 	 * @see #size()
@@ -280,7 +280,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	 * Ermittlung eines Parameterwerts einmalig mit diesem Stapelrahmen {@link FEMFunction#invoke(FEMFrame) ausgewertet}. Genauer entspricht der {@code index}-te
 	 * zugesicherte Parameterwert dem Ergebnis von {@code params[index].invoke(this)}. Der Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
 	 * Die über {@link #params()} bereitgestellte Liste der Parameterwerte des erzeugten Stapelrahmen liefert die noch nicht über {@link #get(int)} ermittelten
-	 * Parameterwerte als {@link FEMResult}.
+	 * Parameterwerte als {@link FEMFuture}.
 	 * 
 	 * @param params Parameterfunktionen zur Berechnung der zugesicherten Parameterwerte.
 	 * @return neuer Stapelrahmen.
@@ -354,7 +354,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** {@inheritDoc} */
 	@Override
 	public final int hashCode() {
-		return this.params().hashCode();
+		return this.params().hash();
 	}
 
 	/** {@inheritDoc} */
@@ -368,7 +368,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final FEM.ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putFrame(this.params());
 	}
 

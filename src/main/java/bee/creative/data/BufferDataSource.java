@@ -14,7 +14,7 @@ import bee.creative.util.Bytes;
 public class BufferDataSource extends BaseDataSource {
 
 	/** Dieses Feld speichert die Nutzdaten. */
-	final ByteBuffer __data;
+	final ByteBuffer _data_;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
 	 * 
@@ -30,7 +30,7 @@ public class BufferDataSource extends BaseDataSource {
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final ByteBuffer data) throws NullPointerException {
 		if (data == null) throw new NullPointerException("data = null");
-		this.__data = data.slice().order(ByteOrder.BIG_ENDIAN);
+		this._data_ = data.slice().order(ByteOrder.BIG_ENDIAN);
 	}
 
 	{}
@@ -38,14 +38,14 @@ public class BufferDataSource extends BaseDataSource {
 	/** {@inheritDoc} */
 	@Override
 	public final ByteBuffer data() {
-		return this.__data;
+		return this._data_;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void readFully(final byte[] array, final int offset, final int length) throws IOException {
 		try {
-			this.__data.get(array, offset, length);
+			this._data_.get(array, offset, length);
 		} catch (final BufferUnderflowException e) {
 			throw new EOFException();
 		} catch (final IndexOutOfBoundsException e) {
@@ -62,37 +62,37 @@ public class BufferDataSource extends BaseDataSource {
 	/** {@inheritDoc} */
 	@Override
 	public byte readByte() throws IOException {
-		return this.__data.get();
+		return this._data_.get();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedByte() throws IOException {
-		return this.__data.get() & 0xFF;
+		return this._data_.get() & 0xFF;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public short readShort() throws IOException {
-		return this.__data.getShort();
+		return this._data_.getShort();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int readUnsignedShort() throws IOException {
-		return this.__data.getShort() & 0xFFFF;
+		return this._data_.getShort() & 0xFFFF;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public char readChar() throws IOException {
-		return this.__data.getChar();
+		return this._data_.getChar();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public int readInt() throws IOException {
-		return this.__data.getInt();
+		return this._data_.getInt();
 	}
 
 	/** {@inheritDoc} */
@@ -102,14 +102,14 @@ public class BufferDataSource extends BaseDataSource {
 			case 0:
 				return 0;
 			case 1:
-				return this.__data.get() & 0xFF;
+				return this._data_.get() & 0xFF;
 			case 2:
-				return this.__data.getShort() & 0xFFFF;
+				return this._data_.getShort() & 0xFFFF;
 			case 3:
-				this.__data.get(this.array, 0, 3);
+				this._data_.get(this.array, 0, 3);
 				return Bytes.getInt3BE(this.array, 0);
 			case 4:
-				return this.__data.getInt();
+				return this._data_.getInt();
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -118,7 +118,7 @@ public class BufferDataSource extends BaseDataSource {
 	/** {@inheritDoc} */
 	@Override
 	public long readLong() throws IOException {
-		return this.__data.getLong();
+		return this._data_.getLong();
 	}
 
 	/** {@inheritDoc} */
@@ -128,25 +128,25 @@ public class BufferDataSource extends BaseDataSource {
 			case 0:
 				return 0;
 			case 1:
-				return this.__data.get() & 0xFF;
+				return this._data_.get() & 0xFF;
 			case 2:
-				return this.__data.getShort() & 0xFFFF;
+				return this._data_.getShort() & 0xFFFF;
 			case 3:
-				this.__data.get(this.array, 0, 3);
+				this._data_.get(this.array, 0, 3);
 				return Bytes.getInt3BE(this.array, 0);
 			case 4:
-				return this.__data.getInt();
+				return this._data_.getInt();
 			case 5:
-				this.__data.get(this.array, 0, 5);
+				this._data_.get(this.array, 0, 5);
 				return Bytes.getLong5BE(this.array, 0);
 			case 6:
-				this.__data.get(this.array, 0, 6);
+				this._data_.get(this.array, 0, 6);
 				return Bytes.getLong6BE(this.array, 0);
 			case 7:
-				this.__data.get(this.array, 0, 7);
+				this._data_.get(this.array, 0, 7);
 				return Bytes.getLong7BE(this.array, 0);
 			case 8:
-				return this.__data.getLong();
+				return this._data_.getLong();
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -155,31 +155,31 @@ public class BufferDataSource extends BaseDataSource {
 	/** {@inheritDoc} */
 	@Override
 	public float readFloat() throws IOException {
-		return this.__data.getFloat();
+		return this._data_.getFloat();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public double readDouble() throws IOException {
-		return this.__data.getDouble();
+		return this._data_.getDouble();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void seek(final long index) throws IOException {
-		this.__data.position((int)index);
+		this._data_.position((int)index);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long index() throws IOException {
-		return this.__data.position();
+		return this._data_.position();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public long length() throws IOException {
-		return this.__data.limit();
+		return this._data_.limit();
 	}
 
 	/** {@inheritDoc} */

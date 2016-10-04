@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
@@ -89,7 +88,7 @@ import bee.creative.util.Comparators;
  * </p>
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDatetime> {
+public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetime> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 9;
@@ -186,15 +185,6 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 	 *         auslöst. */
 	public static FEMDatetime from(final Calendar calendar) throws NullPointerException, IllegalArgumentException {
 		return FEMDatetime.EMPTY.withDate(calendar).withTime(calendar).withZone(calendar);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDatetime.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Zeitangabe.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMDatetime from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMDatetime.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDatetime.TYPE)}.
@@ -1326,7 +1316,7 @@ public final class FEMDatetime extends FEMBaseValue implements Comparable<FEMDat
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatValue(this.toString()));
 	}
 

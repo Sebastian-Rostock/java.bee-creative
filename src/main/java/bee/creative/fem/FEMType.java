@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
  * 
  * @see FEMValue#type()
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
- * @param <GData> Typ der von {@link #dataFrom(FEMValue)} bzw. {@link #dataFrom(FEMValue, FEMContext)} gelieferten Nutzdaten. */
+ * @param <GData> Typ der von {@link #dataFrom(FEMValue, FEMContext)} gelieferten Nutzdaten. */
 public class FEMType<GData> {
 
 	/** Diese Methode gibt einen einfachen Datentyp mit dem gegebenen Identifikator zurück.
@@ -48,20 +48,6 @@ public class FEMType<GData> {
 	 * @return {@code true}, wenn ein {@code cast} in den gegebenen Datentyp zulässig ist. */
 	public boolean is(final FEMType<?> type) {
 		return (type == this) || ((type != null) && (type._id_ == this._id_));
-	}
-
-	/** Diese Methode gibt die in den Datentyp {@code GData} kontextfreie konvertierten Nutzdaten des gegebenen Werts zurück.<br>
-	 * Der Rückgabewert entspricht {@code Context.DEFAULT().dataFrom(value, this)}.
-	 * 
-	 * @see FEMContext#DEFAULT()
-	 * @see FEMContext#dataFrom(FEMValue, FEMType)
-	 * @param value gegebener Wert.
-	 * @return Nutzdaten.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
-	 * @throws IllegalArgumentException Wenn die Nutzdaten des Werts nicht konvertiert werden können. */
-	public final GData dataFrom(final FEMValue value) throws NullPointerException, ClassCastException, IllegalArgumentException {
-		return FEMContext._default_.dataFrom(value, this);
 	}
 
 	/** Diese Methode gibt die in den Datentyp {@code GData} kontextsensitiv konvertierten Nutzdaten des gegebenen Werts zurück.<br>

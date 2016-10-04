@@ -8,9 +8,9 @@ import bee.creative.util.Comparators;
  * realisiert sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
+public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
-	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#export(Collector)}. */
+	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Bytes einer Bytefolge in der Methode {@link FEMBinary#extract(Collector)}. */
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Bytewert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
@@ -376,15 +376,6 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMBinary.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMBinary from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMBinary.TYPE);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
@@ -476,7 +467,7 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
-		this.export(target);
+		this.extract(target);
 		return target.array;
 	}
 
@@ -586,7 +577,7 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	public final boolean export(final Collector target) throws NullPointerException {
+	public final boolean extract(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
 		if (this._length_ == 0) return true;
 		return this._export_(target, 0, this._length_, true);
@@ -674,7 +665,7 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 		if (object == this) return true;
 		if (!(object instanceof FEMBinary)) {
 			if (!(object instanceof FEMValue)) return false;
-			object = ((FEMValue)object).data();
+			object = ((FEMValue)object).result().data();
 			if (!(object instanceof FEMBinary)) return false;
 		}
 		return this.equals((FEMBinary)object);
@@ -685,16 +676,16 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 	public final Iterator<Byte> iterator() {
 		return new Iterator<Byte>() {
 
-			int __index = 0;
+			int _index_ = 0;
 
 			@Override
 			public Byte next() {
-				return new Byte(FEMBinary.this._get_(this.__index++));
+				return new Byte(FEMBinary.this._get_(this._index_++));
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.__index < FEMBinary.this._length_;
+				return this._index_ < FEMBinary.this._length_;
 			}
 
 			@Override
@@ -712,9 +703,10 @@ public abstract class FEMBinary extends FEMBaseValue implements Iterable<Byte> {
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		final StringBuilder result = new StringBuilder();
+		final int length = this._length_;
+		final StringBuilder result = new StringBuilder(2 + (length * 2));
 		result.append("0x");
-		for (int i = 0, length = this._length_; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			final int value = this._get_(i);
 			result.append(FEMBinary.toChar((value >> 4) & 0xF)).append(FEMBinary.toChar((value >> 0) & 0xF));
 		}

@@ -1,11 +1,9 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.ScriptFormatter;
-
 /** Diese Klasse implementiert einen Wert mit einem beliebigen nativen Objekt als {@link #data() Nutzdaten}.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMNative extends FEMBaseValue {
+public final class FEMNative extends FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = -1;
@@ -72,7 +70,7 @@ public final class FEMNative extends FEMBaseValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putData(this._data_);
 	}
 

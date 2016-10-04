@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
@@ -15,9 +14,9 @@ import bee.creative.util.Iterators;
 /** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, Iterable<FEMValue> {
+public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iterable<FEMValue> {
 
-	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#export(Collector)}. */
+	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Werten einer Wertliste in der Methode {@link FEMArray#extract(Collector)}. */
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammeln fortgeführt werden soll.
@@ -387,15 +386,6 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 		return FEMArray.from(items.toArray(new FEMValue[items.size()]));
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMArray.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Wertliste.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMArray from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMArray.TYPE);
-	}
-
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
@@ -459,7 +449,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
-		this.export(target);
+		this.extract(target);
 		return target.array;
 	}
 
@@ -560,7 +550,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	public final boolean export(final Collector target) throws NullPointerException {
+	public final boolean extract(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
 		if (this._length_ == 0) return true;
 		return this._export_(target, 0, this._length_, true);
@@ -666,9 +656,13 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 
 	/** {@inheritDoc} */
 	@Override
-	public final boolean equals(final Object object) {
+	public final boolean equals(Object object) {
 		if (object == this) return true;
-		if (!(object instanceof FEMArray)) return false;
+		if (!(object instanceof FEMArray)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMArray)) return false;
+		}
 		return this.equals((FEMArray)object);
 	}
 
@@ -680,7 +674,7 @@ public abstract class FEMArray extends FEMBaseValue implements Items<FEMValue>, 
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putArray(this);
 	}
 

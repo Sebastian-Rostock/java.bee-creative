@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
@@ -22,7 +21,7 @@ import bee.creative.util.Comparators;
  * </p>
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDuration> {
+public final class FEMDuration extends FEMValue implements Comparable<FEMDuration> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 8;
@@ -254,15 +253,6 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 	public static FEMDuration from(final int years, final int months, final int days, final int hours, final long minutes, final long seconds,
 		final long milliseconds) throws IllegalArgumentException {
 		return FEMDuration.EMPTY.move(years, months, days, hours, minutes, seconds, milliseconds);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDuration.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Zeitspanne.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMDuration from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMDuration.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDuration.TYPE)}.
@@ -742,7 +732,7 @@ public final class FEMDuration extends FEMBaseValue implements Comparable<FEMDur
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatValue(this.toString()));
 	}
 

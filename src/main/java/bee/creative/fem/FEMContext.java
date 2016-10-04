@@ -36,28 +36,6 @@ public class FEMContext {
 	 * Nutzdatensatz}. */
 	public static final FEMContext EMPTY = new FEMContext();
 
-	/** Dieses Feld speichert das Rückfallkontextobjekt. */
-	static FEMContext _default_ = FEMContext.EMPTY;
-
-	{}
-
-	/** Diese Methode gibt das Kontextobjekt zurück, das als Rückfallebene für kontextfeie {@link FEMType#dataFrom(FEMValue) Datentypumwandlungen} genutzt wird.<br>
-	 * Dieses Rückfallkontextobjekt wird in den Methoden {@link FEM#valueFrom(Object)}, {@link FEMBaseValue#data(FEMType)} und {@link FEMType#dataFrom(FEMValue)}
-	 * verwendet.
-	 * 
-	 * @return Rückfallkontextobjekt */
-	public static FEMContext DEFAULT() {
-		return FEMContext._default_;
-	}
-
-	/** Diese Methode setzt den {@link #DEFAULT() Rückfallkontextobjekt}.<br>
-	 * Wenn das gegebene Kontextobjekt {@code null} ist, wird {@link #EMPTY} verwendet.
-	 * 
-	 * @param context Rückfallkontextobjekt oder {@code null}. */
-	public static void DEFAULT(final FEMContext context) {
-		FEMContext._default_ = context != null ? context : FEMContext.EMPTY;
-	}
-
 	{}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine

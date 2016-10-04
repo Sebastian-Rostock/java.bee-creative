@@ -1,7 +1,6 @@
 package bee.creative.fem;
 
 import bee.creative.fem.FEM.ScriptCompiler;
-import bee.creative.fem.FEM.ScriptFormatter;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
@@ -9,15 +8,15 @@ import bee.creative.fem.FEM.ScriptFormatter;
  * @see ScriptCompiler#proxy(String)
  * @see ScriptCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMProxyFunction extends FEMBaseFunction {
+public final class FEMProxy extends FEMFunction {
 
-	/** Diese Methode gibt eine neue {@link FEMProxyFunction} mit dem gegebenen Namen zurück.
+	/** Diese Methode gibt eine neue {@link FEMProxy} mit dem gegebenen Namen zurück.
 	 * 
 	 * @param name Name.
-	 * @return {@link FEMProxyFunction}.
+	 * @return {@link FEMProxy}.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public static FEMProxyFunction from(final String name) throws NullPointerException {
-		return new FEMProxyFunction(name);
+	public static FEMProxy from(final String name) throws NullPointerException {
+		return new FEMProxy(name);
 	}
 
 	{}
@@ -32,7 +31,7 @@ public final class FEMProxyFunction extends FEMBaseFunction {
 	 * 
 	 * @param name Name.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
-	public FEMProxyFunction(final String name) throws NullPointerException {
+	public FEMProxy(final String name) throws NullPointerException {
 		if (name == null) throw new NullPointerException("name = null");
 		this._name_ = name;
 	}
@@ -41,10 +40,8 @@ public final class FEMProxyFunction extends FEMBaseFunction {
 
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
 	 * 
-	 * @param function Funktion.
-	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
-	public final void set(final FEMFunction function) throws NullPointerException {
-		if (function == null) throw new NullPointerException("function = null");
+	 * @param function Funktion oder {@code null}. */
+	public final void set(final FEMFunction function) {
 		this._function_ = function;
 	}
 
@@ -73,14 +70,14 @@ public final class FEMProxyFunction extends FEMBaseFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatValue(this._name_));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return this._name_ + ":" + this._function_;
+		return new FEMFormatter().start().put(FEM.formatValue(this._name_)).putHandler(this._function_).format();
 	}
 
 }

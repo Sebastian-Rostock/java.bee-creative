@@ -1,16 +1,15 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.ScriptFormatter;
-
 /** Diese Klasse implementiert einen Wert, der als Ergebniswert einer Funktion mit <em>return-by-reference</em>-Semantik sowie als Parameterwert eines Aufrufs
  * mit <em>call-by-reference</em>-Semantik eingesetzt werden kann.<br>
  * Der Wert kapselt dazu eine gegebene {@link #function() Funktion} sowie einen gegebenen {@link #frame() Stapelrahmen} und wertet diese Funktion erst dann mit
- * dem diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data() Nutzdaten} {@link #result(boolean) zugegriffen} wird.<br>
+ * diesem Stapelrahmen einmalig aus, wenn auf {@link #type() Datentyp} oder {@link #data() Nutzdaten} {@link #result(boolean) zugegriffen} wird, d.h. bei einem
+ * Aufruf von {@link #result(boolean)}.<br>
  * Der von der Funktion berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
  * Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
  * 
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMResult extends FEMBaseValue {
+public final class FEMFuture extends FEMValue {
 
 	/** Diese Methode gibt den Ergebniswert des {@link FEMFunction#invoke(FEMFrame) Aufrufs} der gegebenen Funktion mit dem gegebenen Stapelrahmen als Wert mit
 	 * <em>call-by-reference</em>-Semantik zurück.<br>
@@ -21,10 +20,10 @@ public final class FEMResult extends FEMBaseValue {
 	 * @param function Funktion.
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} bzw. {@code function} {@code null} ist. */
-	public static FEMResult from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
+	public static FEMFuture from(final FEMFrame frame, final FEMFunction function) throws NullPointerException {
 		if (frame == null) throw new NullPointerException("frame = null");
 		if (function == null) throw new NullPointerException("function = null");
-		return new FEMResult(frame, function);
+		return new FEMFuture(frame, function);
 	}
 
 	{}
@@ -48,7 +47,7 @@ public final class FEMResult extends FEMBaseValue {
 	 * 
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion. */
-	FEMResult(final FEMFrame frame, final FEMFunction function) {
+	FEMFuture(final FEMFrame frame, final FEMFunction function) {
 		this._frame_ = frame;
 		this._function_ = function;
 	}
@@ -71,6 +70,8 @@ public final class FEMResult extends FEMBaseValue {
 		return this._function_;
 	}
 
+	
+	
 	{}
 
 	/** Diese Methode gibt {@code this.result().data()} zurück. */
@@ -90,7 +91,7 @@ public final class FEMResult extends FEMBaseValue {
 	 * Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
 	 * Stapelrahmen und Funktion aufgelöst.
 	 * 
-	 * @see FEMResult
+	 * @see FEMFuture
 	 * @see #frame()
 	 * @see #function()
 	 * @see FEMFunction#invoke(FEMFrame)
@@ -118,7 +119,7 @@ public final class FEMResult extends FEMBaseValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final synchronized void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final synchronized void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		if (this._result_ != null) {
 			target.putValue(this._result_);
 		} else {

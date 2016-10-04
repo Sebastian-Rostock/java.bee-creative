@@ -22,10 +22,10 @@ public class Assignments {
 	public static final class ChildAssignment<GSource> implements Assignment<GSource> {
 
 		/** Dieses Feld speichert das {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet. */
-		final Assignment<?> __parent;
+		final Assignment<?> _parent_;
 
 		/** Dieses Feld speichert das Quellobjekt. */
-		final GSource __source;
+		final GSource _source_;
 
 		/** Dieser Konstruktor initialisiert {@link Assignment} und Quellobjekt.
 		 * 
@@ -34,8 +34,8 @@ public class Assignments {
 		 * @throws NullPointerException Wenn {@code parent} {@code null} ist. */
 		public ChildAssignment(final Assignment<?> parent, final GSource source) throws NullPointerException {
 			if (parent == null) throw new NullPointerException();
-			this.__parent = parent;
-			this.__source = source;
+			this._parent_ = parent;
+			this._source_ = source;
 		}
 
 		{}
@@ -43,64 +43,64 @@ public class Assignments {
 		/** {@inheritDoc} */
 		@Override
 		public final GSource value() {
-			return this.__source;
+			return this._source_;
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> GObject get(final GObject source) {
-			return this.__parent.get(source);
+			return this._parent_.get(source);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void set(final GObject source, final GObject target) {
-			this.__parent.set(source, target);
+			this._parent_.set(source, target);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target) throws NullPointerException, IllegalArgumentException {
-			this.__parent.assign(source, target);
+			this._parent_.assign(source, target);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
 			IllegalArgumentException {
-			this.__parent.assign(source, target, commit);
+			this._parent_.assign(source, target, commit);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner)
 			throws NullPointerException, IllegalArgumentException {
-			this.__parent.assign(source, target, assigner);
+			this._parent_.assign(source, target, assigner);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> void assign(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner,
 			final boolean commit) throws NullPointerException, IllegalArgumentException {
-			this.__parent.assign(source, target, assigner, commit);
+			this._parent_.assign(source, target, assigner, commit);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final void commit() throws IllegalArgumentException {
-			this.__parent.commit();
+			this._parent_.commit();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final <GObject> Assignment<GObject> assignment(final GObject source) {
-			return this.__parent.assignment(source);
+			return this._parent_.assignment(source);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toInvokeString(this, this.__source);
+			return Objects.toInvokeString(this, this._source_);
 		}
 
 	}
@@ -112,11 +112,11 @@ public class Assignments {
 	public static final class ParentAssignment implements Assignment<Object> {
 
 		/** Dieses Feld speichert die {@link Map} zur Abbildung der Quellobjekte auf die Zielobjekte. */
-		final Map<Object, Object> __map = new HashMap<>();
+		final Map<Object, Object> _map_ = new HashMap<>();
 
 		/** Dieses Feld speichert die in {@link #assign(Object, Assignable, boolean)} und {@link #assign(Object, Object, Assigner, boolean)} gesammelten
 		 * {@link Entry}s. */
-		final List<Assignable<Object>> __assignables = new LinkedList<>();
+		final List<Assignable<Object>> _assignables_ = new LinkedList<>();
 
 		{}
 
@@ -131,7 +131,7 @@ public class Assignments {
 		public final <GObject> GObject get(final GObject source) {
 			if (source == null) return null;
 			@SuppressWarnings ("unchecked")
-			final GObject target = (GObject)this.__map.get(source);
+			final GObject target = (GObject)this._map_.get(source);
 			return target == null ? source : target;
 		}
 
@@ -140,9 +140,9 @@ public class Assignments {
 		public final <GObject> void set(final GObject source, final GObject target) throws NullPointerException {
 			if (source == null) throw new NullPointerException();
 			if (target == null) {
-				this.__map.remove(source);
+				this._map_.remove(source);
 			} else {
-				this.__map.put(source, target);
+				this._map_.put(source, target);
 			}
 		}
 
@@ -161,7 +161,7 @@ public class Assignments {
 			if (commit) {
 				target.assign(this.assignment(source));
 			} else {
-				this.__assignables.add(Assignments.__assignable(source, target));
+				this._assignables_.add(Assignments._assignable_(source, target));
 			}
 		}
 
@@ -182,15 +182,15 @@ public class Assignments {
 			if (commit) {
 				assigner.assign(target, this.assignment(source));
 			} else {
-				this.__assignables.add(Assignments.__assignable(source, target, assigner));
+				this._assignables_.add(Assignments._assignable_(source, target, assigner));
 			}
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public final void commit() throws IllegalArgumentException {
-			while (!this.__assignables.isEmpty()) {
-				this.__assignables.remove(0).assign(this);
+			while (!this._assignables_.isEmpty()) {
+				this._assignables_.remove(0).assign(this);
 			}
 		}
 
@@ -203,7 +203,7 @@ public class Assignments {
 		/** {@inheritDoc} */
 		@Override
 		public final String toString() {
-			return Objects.toInvokeString(this, this.__map);
+			return Objects.toInvokeString(this, this._map_);
 		}
 
 	}
@@ -211,7 +211,7 @@ public class Assignments {
 	{}
 
 	@SuppressWarnings ("javadoc")
-	static <GObject> Assignable<Object> __assignable(final GObject source, final Assignable<? super GObject> target) {
+	static <GObject> Assignable<Object> _assignable_(final GObject source, final Assignable<? super GObject> target) {
 		return new Assignable<Object>() {
 
 			@Override
@@ -223,7 +223,7 @@ public class Assignments {
 	}
 
 	@SuppressWarnings ("javadoc")
-	static <GObject> Assignable<Object> __assignable(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
+	static <GObject> Assignable<Object> _assignable_(final GObject source, final GObject target, final Assigner<? super GObject, ? super GObject> assigner) {
 		return new Assignable<Object>() {
 
 			@Override

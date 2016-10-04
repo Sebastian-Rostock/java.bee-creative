@@ -4,7 +4,7 @@ package bee.creative.fem;
  * Intern wird der Dezimalbruch als {@code double} dargestellt.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMDecimal extends FEMBaseValue implements Comparable<FEMDecimal> {
+public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 7;
@@ -49,15 +49,6 @@ public final class FEMDecimal extends FEMBaseValue implements Comparable<FEMDeci
 		} catch (final NumberFormatException cause) {
 			throw new IllegalArgumentException(cause);
 		}
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMDecimal.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Dezimalbruch.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMDecimal from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMDecimal.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDecimal.TYPE)}.

@@ -1,14 +1,10 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.ScriptFormatter;
-import bee.creative.fem.FEMTraceFunction.Tracer;
-import bee.creative.fem.FEMTraceFunction.TracerInput;
-
-/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. eine als {@link FEMValue} verpackte Funktion.<br>
+/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction Funktion}.<br>
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMHandler extends FEMBaseValue implements TracerInput {
+public final class FEMHandler extends FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 2;
@@ -20,20 +16,12 @@ public final class FEMHandler extends FEMBaseValue implements TracerInput {
 
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 * 
-	 * @param data Funktion.
+	 * @see FEMFunction#toHandler()
+	 * @param function Funktion.
 	 * @return Funktionszeiger.
-	 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
-	public static FEMHandler from(final FEMFunction data) throws NullPointerException {
-		return new FEMHandler(data);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMMethod.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Funktionszeiger.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMHandler from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMHandler.TYPE);
+	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
+	public static FEMHandler from(final FEMFunction function) throws NullPointerException {
+		return function.toHandler();
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.
@@ -51,12 +39,8 @@ public final class FEMHandler extends FEMBaseValue implements TracerInput {
 	/** Dieses Feld speichert die Nutzdaten. */
 	final FEMFunction _value_;
 
-	/** Dieser Konstruktor initialisiert die Funktion.
-	 * 
-	 * @param value Funktion.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public FEMHandler(final FEMFunction value) throws NullPointerException {
-		if (value == null) throw new NullPointerException("value = null");
+	@SuppressWarnings ("javadoc")
+	FEMHandler(final FEMFunction value) throws NullPointerException {
 		this._value_ = value;
 	}
 
@@ -126,18 +110,19 @@ public final class FEMHandler extends FEMBaseValue implements TracerInput {
 			object = ((FEMValue)object).data();
 			if (!(object instanceof FEMHandler)) return false;
 		}
+		if (object == null) return false;
 		return this.equals((FEMHandler)object);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction toTrace(final Tracer tracer) throws NullPointerException {
-		return FEMHandler.from(tracer.trace(this._value_));
+	public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+		return FEMHandler.from(this._value_.withTracer(tracer));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putFunction(this._value_);
 	}
 

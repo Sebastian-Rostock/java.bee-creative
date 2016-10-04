@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Referenz auf ein logisches Objekt, welches im Rahmen seines Besitzers über einen {@link #refValue()
@@ -14,7 +13,7 @@ import bee.creative.util.Comparators;
  * Die Wertebereiche für Objektschlüssel, Typkennungen und Besitzerkennungen sind {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMObject extends FEMBaseValue implements Comparable<FEMObject> {
+public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
 	public static final int ID = 10;
@@ -63,15 +62,6 @@ public final class FEMObject extends FEMBaseValue implements Comparable<FEMObjec
 		FEMObject._checkType_(type);
 		FEMObject._checkOwner_(owner);
 		return FEMObject._from_(ref, type, owner);
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMObject.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Referenz.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMObject from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMObject.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
@@ -297,7 +287,7 @@ public final class FEMObject extends FEMBaseValue implements Comparable<FEMObjec
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatValue(this.toString()));
 	}
 

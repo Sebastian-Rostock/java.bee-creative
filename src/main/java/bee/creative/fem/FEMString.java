@@ -2,7 +2,6 @@ package bee.creative.fem;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import bee.creative.fem.FEM.ScriptFormatter;
 import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
@@ -10,9 +9,9 @@ import bee.creative.util.Comparators;
 /** Diese Klasse implementiert eine Zeichenkette, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Zeichenketten realisiert sind.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMString extends FEMBaseValue implements Iterable<Integer> {
+public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
-	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#export(Collector)}. */
+	/** Diese Schnittstelle definiert ein Objekt zum geordneten Sammeln von Codepoints einer Zeichenkette in der Methode {@link FEMString#extract(Collector)}. */
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Codepoint an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammeln fortgeführt werden soll.
@@ -439,7 +438,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class UTF32CompactString extends FEMString {
+	static final class UTF32CompactString extends FEMString {
 
 		public final int[] items;
 
@@ -605,7 +604,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	}
 
 	@SuppressWarnings ("javadoc")
-	static class UniformString extends FEMString {
+	static final class UniformString extends FEMString {
 
 		public final int item;
 
@@ -730,15 +729,6 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 				return new UTF32ArrayString(array);
 		}
 		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode ist eine Abkürzung für {@code FEMContext.DEFAULT().dataFrom(value, FEMString.TYPE)}.
-	 * 
-	 * @param value {@link FEMValue}.
-	 * @return Zeichenkette.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public static FEMString from(final FEMValue value) throws NullPointerException {
-		return FEMContext._default_.dataFrom(value, FEMString.TYPE);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMString.TYPE)}.
@@ -1005,7 +995,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	 * @return Array mit den Codepoints in UTF32-Kodierung. */
 	public int[] value() {
 		final UTF32Collector target = new UTF32Collector(this._length_);
-		this.export(target);
+		this.extract(target);
 		return target.array;
 	}
 
@@ -1115,7 +1105,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	 * @param target {@link Collector}, an den die Codepoints geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
-	public final boolean export(final Collector target) throws NullPointerException {
+	public final boolean extract(final Collector target) throws NullPointerException {
 		if (target == null) throw new NullPointerException("target = null");
 		if (this._length_ == 0) return true;
 		return this._export_(target, 0, this._length_, true);
@@ -1234,16 +1224,16 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 	public final Iterator<Integer> iterator() {
 		return new Iterator<Integer>() {
 
-			int __index = 0;
+			int _index_ = 0;
 
 			@Override
 			public Integer next() {
-				return new Integer(FEMString.this._get_(this.__index++));
+				return new Integer(FEMString.this._get_(this._index_++));
 			}
 
 			@Override
 			public boolean hasNext() {
-				return this.__index < FEMString.this._length_;
+				return this._index_ < FEMString.this._length_;
 			}
 
 			@Override
@@ -1256,7 +1246,7 @@ public abstract class FEMString extends FEMBaseValue implements Iterable<Integer
 
 	/** {@inheritDoc} */
 	@Override
-	public final void toScript(final ScriptFormatter target) throws IllegalArgumentException {
+	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(FEM.formatString(this.toString()));
 	}
 
