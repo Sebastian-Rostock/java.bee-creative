@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import bee.creative.fem.FEM.ScriptCompiler;
-import bee.creative.fem.FEM.ScriptParser;
 import bee.creative.util.Converter;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann.<br>
- * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link ScriptParser} und {@link ScriptCompiler}.
+ * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.
  * 
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFormatter {
@@ -84,92 +82,6 @@ public final class FEMFormatter {
 
 	}
 
-	/** Diese Schnittstelle definiert ein Objekt, welches sich selbst in seine Quelltextdarstellung überführen und diese an einen {@link FEMFormatter} anfügen
-	 * kann.
-	 * 
-	 * @see FEMFormatterHelper#formatData(FEMFormatter, Object)
-	 * @see FEMFormatterHelper#formatValue(FEMFormatter, FEMValue)
-	 * @see FEMFormatterHelper#formatFunction(FEMFormatter, FEMFunction)
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static interface FEMFormatterInput {
-
-		/** Diese Methode formatiert dieses Objekt in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.<br>
-		 * Sie kann von einem {@link FEMFormatterHelper} im Rahmen folgender Methoden aufgerufen:
-		 * <ul>
-		 * <li>{@link FEMFormatterHelper#formatData(FEMFormatter, Object)}</li>
-		 * <li>{@link FEMFormatterHelper#formatValue(FEMFormatter, FEMValue)}</li>
-		 * <li>{@link FEMFormatterHelper#formatFunction(FEMFormatter, FEMFunction)}</li>
-		 * </ul>
-		 * 
-		 * @param target {@link FEMFormatter}.
-		 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException;
-
-	}
-
-	/** Diese Schnittstelle definiert Formatierungsmethoden, die in den Methoden {@link FEMFormatter#putValue(FEMValue)} und
-	 * {@link FEMFormatter#putFunction(FEMFunction)} zur Übersetzung von Werten und Funktionen in Quelltexte genutzt werden.
-	 * 
-	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-	public static interface FEMFormatterHelper {
-
-		/** Dieses Feld speichert den {@link FEMFormatterHelper}, dessen Methoden ihre Eingeben über {@link String#valueOf(Object)} formatieren.<br>
-		 * {@link FEMScript Aufbereitete Quelltexte} werden in {@link #formatData(FEMFormatter, Object)} analog zur Interpretation des {@link ScriptCompiler}
-		 * formatiert. Daten, Werte und Funktionen mit der Schnittstelle {@link FEMFormatterInput} werden über deren
-		 * {@link FEMFormatterInput#toScript(FEMFormatter)}-Methode formatiert. */
-		static FEMFormatter.FEMFormatterHelper EMPTY = new FEMFormatterHelper() {
-
-			@Override
-			public void formatData(final FEMFormatter target, final Object data) throws IllegalArgumentException {
-				if (data instanceof FEMScript) {
-					FEM.scriptCompiler().useScript((FEMScript)data).formatScript(target);
-				} else if (data instanceof FEMFormatter.FEMFormatterInput) {
-					((FEMFormatter.FEMFormatterInput)data).toScript(target);
-				} else {
-					target.put(String.valueOf(data));
-				}
-			}
-
-			@Override
-			public void formatValue(final FEMFormatter target, final FEMValue value) throws IllegalArgumentException {
-				value.toScript(target);
-			}
-
-			@Override
-			public void formatFunction(final FEMFormatter target, final FEMFunction function) throws IllegalArgumentException {
-				function.toScript(target);
-			}
-
-			@Override
-			public String toString() {
-				return "EMPTY";
-			}
-
-		};
-
-		/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-		 * 
-		 * @param target {@link FEMFormatter}.
-		 * @param data Objekt.
-		 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
-		public void formatData(FEMFormatter target, Object data) throws IllegalArgumentException;
-
-		/** Diese Methode formatiert den gegebenen Wert in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-		 * 
-		 * @param target {@link FEMFormatter}.
-		 * @param value Wert.
-		 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann. */
-		public void formatValue(FEMFormatter target, FEMValue value) throws IllegalArgumentException;
-
-		/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-		 * 
-		 * @param target {@link FEMFormatter}.
-		 * @param function Funktion.
-		 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-		public void formatFunction(FEMFormatter target, FEMFunction function) throws IllegalArgumentException;
-
-	}
-
 	{}
 
 	/** Dieses Feld speichert die bisher gesammelten Zeichenketten und Markierungen. */
@@ -185,33 +97,25 @@ public final class FEMFormatter {
 	String _indent_;
 
 	/** Dieses Feld speichert die Formatierungsmethoden. */
-	FEMFormatter.FEMFormatterHelper _helper_ = FEMFormatterHelper.EMPTY;
+	FEMDomain _helper_ = FEMDomain.NORMAL;
 
 	{}
 
-	/** Diese Methode beginnt das Formatieren und sollte nur in Verbindung mit {@link #stop()} verwendet werden.
-	 * 
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-	public synchronized final FEMFormatter start() throws IllegalStateException {
-		this._check_(true);
-		this._indents_.addLast(Boolean.FALSE);
-		return this;
+	/** Dieser Konstruktor initialisiert einen neuen Formetter, welcher {@link FEMDomain#NORMAL} sowie keine {@link FEMFormatter#useIndent(String) Einrückung}
+	 * nutzt und über. {@link #reset()} zurückgesetzt wurde. */
+	public FEMFormatter() {
+		this.reset();
 	}
 
-	/** Diese Methode beendet das Formatieren und sollte nur in Verbindung mit {@link #start()} verwendet werden.
+	/** Diese Methode setzt den Formatieren zurück und gibt {@code this} zurück.
 	 * 
 	 * @return {@code this}. */
-	public synchronized final FEMFormatter stop() {
+	public synchronized final FEMFormatter reset() {
 		this._items_.clear();
 		this._string_.setLength(0);
 		this._indents_.clear();
+		this._indents_.addLast(Boolean.FALSE);
 		return this;
-	}
-
-	@SuppressWarnings ("javadoc")
-	final void _check_(final boolean idling) throws IllegalStateException {
-		if (this._indents_.isEmpty() != idling) throw new IllegalStateException();
 	}
 
 	/** Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
@@ -230,10 +134,8 @@ public final class FEMFormatter {
 	 * @see #putBreakDec()
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-	public final FEMFormatter putBreakInc() throws IllegalStateException {
-		this._check_(false);
+	 * @return {@code this}. */
+	public final FEMFormatter putBreakInc() {
 		final LinkedList<Boolean> indents = this._indents_;
 		indents.addLast(Boolean.FALSE);
 		return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, false, false));
@@ -247,9 +149,8 @@ public final class FEMFormatter {
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
 	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde oder aktuell nicht formatiert wird. */
+	 * @throws IllegalStateException Wenn zuvor keine Hierarchieebene begonnen wurde. */
 	public final FEMFormatter putBreakDec() throws IllegalStateException {
-		this._check_(false);
 		final LinkedList<Boolean> indents = this._indents_;
 		final int value = indents.size();
 		if (value <= 1) throw new IllegalStateException();
@@ -262,10 +163,8 @@ public final class FEMFormatter {
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
 	 * @see #putIndent()
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-	public final FEMFormatter putBreakSpace() throws IllegalStateException {
-		this._check_(false);
+	 * @return {@code this}. */
+	public final FEMFormatter putBreakSpace() {
 		final LinkedList<Boolean> indents = this._indents_;
 		return this._putMark_(Mark.EMPTY)._putMark_(new Mark(indents.size(), false, true, indents.getLast().booleanValue()));
 	}
@@ -276,10 +175,8 @@ public final class FEMFormatter {
 	 * @see #putBreakSpace()
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird. */
-	public final FEMFormatter putIndent() throws IllegalStateException {
-		this._check_(false);
+	 * @return {@code this}. */
+	public final FEMFormatter putIndent() {
 		final LinkedList<Boolean> indents = this._indents_;
 		if (this._indents_.getLast().booleanValue()) return this;
 		final int value = indents.size();
@@ -306,37 +203,32 @@ public final class FEMFormatter {
 	 * @see Object#toString()
 	 * @param part Objekt.
 	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code part} nicht formatiert werden kann. */
-	public final FEMFormatter put(final Object part) throws IllegalStateException, IllegalArgumentException {
-		if (part == null) throw new NullPointerException("part = null");
-		this._check_(false);
+	public final FEMFormatter put(final Object part) throws IllegalArgumentException {
 		this._items_.add(part.toString());
 		return this;
 	}
 
 	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
 	 * 
-	 * @see FEMFormatterHelper#formatData(FEMFormatter, Object)
+	 * @see FEMDomain#formatData(FEMFormatter, Object)
 	 * @param data Objekt.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code data} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
-	public final FEMFormatter putData(final Object data) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final FEMFormatter putData(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data == null) throw new NullPointerException("data = null");
-		this._check_(false);
 		this._helper_.formatData(this, data);
 		return this;
 	}
 
 	/** Diese Methode fügt die gegebenen Wertliste an und gibt {@code this} zurück.<br>
 	 * Wenn die Liste leer ist, wird {@code "[]"} angefügt. Andernfalls werden die Werte in {@code "["} und {@code "]"} eingeschlossen sowie mit {@code ";"}
-	 * separiert über {@link #putValue(FEMValue)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der
-	 * schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
+	 * separiert über {@link #putFunction(FEMFunction)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die
+	 * vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 	 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
 	 * 
-	 * @see #putValue(FEMValue)
+	 * @see #putFunction(FEMFunction)
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
 	 * @see #putBreakSpace()
@@ -344,23 +236,20 @@ public final class FEMFormatter {
 	 * @param array Wertliste.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code array} nicht formatiert werden kann. */
-	public final FEMFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		if (array == null) throw new NullPointerException("array = null");
-		this._check_(false);
+	public final FEMFormatter putArray(final Iterable<? extends FEMValue> array) throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends FEMValue> iter = array.iterator();
 		if (iter.hasNext()) {
 			FEMValue item = iter.next();
 			if (iter.hasNext()) {
-				this.putIndent().put("[").putBreakInc().putValue(item);
+				this.putIndent().put("[").putBreakInc().putFunction(item);
 				do {
 					item = iter.next();
-					this.put(";").putBreakSpace().putValue(item);
+					this.put(";").putBreakSpace().putFunction(item);
 				} while (iter.hasNext());
 				this.putBreakDec().put("]");
 			} else {
-				this.put("[").putBreakInc().putValue(item).putBreakDec().put("]");
+				this.put("[").putBreakInc().putFunction(item).putBreakDec().put("]");
 			}
 		} else {
 			this.put("[]");
@@ -368,24 +257,9 @@ public final class FEMFormatter {
 		return this;
 	}
 
-	/** Diese Methode fügt den Quelltext des gegebenen Werts an und gibt {@code this} zurück.<br>
-	 * 
-	 * @see FEMFormatterHelper#formatValue(FEMFormatter, FEMValue)
-	 * @param value Wert.
-	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
-	 * @throws IllegalArgumentException Wenn {@code value} nicht formatiert werden kann. */
-	public final FEMFormatter putValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		if (value == null) throw new NullPointerException("value = null");
-		this._check_(false);
-		this._helper_.formatValue(this, value);
-		return this;
-	}
-
 	/** Diese Methode fügt den Quelltext der Liste der gegebenen zugesicherten Parameterwerte eines Stapelrahmens an und gibt {@code this} zurück.<br>
 	 * Wenn diese Liste leer ist, wird {@code "()"} angefügt. Andernfalls werden die nummerierten Parameterwerte in {@code "("} und {@code ")"} eingeschlossen,
-	 * sowie mit {@code ";"} separiert über {@link #putValue(FEMValue)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als
+	 * sowie mit {@code ";"} separiert über {@link #putFunction(FEMFunction)} angefügt. Vor jedem Parameterwert wird dessen logische Position {@code i} als
 	 * {@code "$i: "} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der schließenden Klammer
 	 * {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 	 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
@@ -398,25 +272,22 @@ public final class FEMFormatter {
 	 * @param params Stapelrahmen.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
-	public final FEMFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		if (params == null) throw new NullPointerException("params = null");
-		this._check_(false);
+	public final FEMFormatter putFrame(final Iterable<? extends FEMValue> params) throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends FEMValue> iter = params.iterator();
 		if (iter.hasNext()) {
 			FEMValue item = iter.next();
 			if (iter.hasNext()) {
-				this.putIndent().put("(").putBreakInc().put("$1: ").putValue(item);
+				this.putIndent().put("(").putBreakInc().put("$1: ").putFunction(item);
 				int index = 2;
 				do {
 					item = iter.next();
-					this.put(";").putBreakSpace().put("$").put(new Integer(index)).put(": ").putValue(item);
+					this.put(";").putBreakSpace().put("$").put(new Integer(index)).put(": ").putFunction(item);
 					index++;
 				} while (iter.hasNext());
 				this.putBreakDec().put(")");
 			} else {
-				this.put("(").putBreakInc().put("$1: ").putValue(item).putBreakDec().put(")");
+				this.put("(").putBreakInc().put("$1: ").putFunction(item).putBreakDec().put(")");
 			}
 		} else {
 			this.put("()");
@@ -439,12 +310,8 @@ public final class FEMFormatter {
 	 * @param params Funktionsliste.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code params} nicht formatiert werden kann. */
-	public final FEMFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalStateException,
-		IllegalArgumentException {
-		if (params == null) throw new NullPointerException("params = null");
-		this._check_(false);
+	public final FEMFormatter putParams(final Iterable<? extends FEMFunction> params) throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends FEMFunction> iter = params.iterator();
 		if (iter.hasNext()) {
 			FEMFunction item = iter.next();
@@ -471,24 +338,21 @@ public final class FEMFormatter {
 	 * @param function parametrisierte Funktion.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-	public final FEMFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final FEMFormatter putHandler(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		if (function == null) throw new NullPointerException("function = null");
 		return this.put("{: ").putFunction(function).put("}");
 	}
 
 	/** Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
 	 * 
-	 * @see FEMFormatterHelper#formatFunction(FEMFormatter, FEMFunction)
+	 * @see FEMDomain#formatFunction(FEMFormatter, FEMFunction)
 	 * @param function Funktion.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell nicht formatiert wird.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
-	public final FEMFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final FEMFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		if (function == null) throw new NullPointerException("function = null");
-		this._check_(false);
 		this._helper_.formatFunction(this, function);
 		return this;
 	}
@@ -503,7 +367,7 @@ public final class FEMFormatter {
 	/** Diese Methode gibt die genutzten Formatierungsmethoden zurück.
 	 * 
 	 * @return Formatierungsmethoden. */
-	public final FEMFormatter.FEMFormatterHelper getHelper() {
+	public final FEMDomain getHelper() {
 		return this._helper_;
 	}
 
@@ -511,10 +375,8 @@ public final class FEMFormatter {
 	 * Wenn diese {@code null} ist, wird nicht eingerückt.
 	 * 
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
-	 * @return {@code this}.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-	public synchronized final FEMFormatter useIndent(final String indent) throws IllegalStateException {
-		this._check_(true);
+	 * @return {@code this}. */
+	public synchronized final FEMFormatter useIndent(final String indent) {
 		this._indent_ = indent;
 		return this;
 	}
@@ -523,11 +385,9 @@ public final class FEMFormatter {
 	 * 
 	 * @param helper Formatierungsmethoden.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird. */
-	public synchronized final FEMFormatter useHelper(final FEMFormatter.FEMFormatterHelper helper) throws NullPointerException, IllegalStateException {
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public synchronized final FEMFormatter useHelper(final FEMDomain helper) throws NullPointerException {
 		if (helper == null) throw new NullPointerException("helper = null");
-		this._check_(true);
 		this._helper_ = helper;
 		return this;
 	}
@@ -562,40 +422,33 @@ public final class FEMFormatter {
 
 	/** Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
 	 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
-	 * hierfür {@link #putData(Object)}, {@link #putValue(FEMValue)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
+	 * hierfür {@link #putData(Object)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
 	 * 
 	 * @see #formatDatas(Iterable)
-	 * @see #formatValues(Iterable)
 	 * @see #formatFunctions(Iterable)
 	 * @param <GItem> Typ der Elemente.
 	 * @param items Elemente.
 	 * @param formatter {@link Converter} zur Aufruf der spetifischen Formatierungsmethoden je Element.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
 	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException, IllegalStateException,
+	final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
 		IllegalArgumentException {
-		this.start();
-		try {
-			final Iterator<? extends GItem> iter = items.iterator();
-			if (!iter.hasNext()) return "";
-			GItem item = iter.next();
-			if (iter.hasNext()) {
-				this.putIndent();
+		final Iterator<? extends GItem> iter = items.iterator();
+		if (!iter.hasNext()) return "";
+		GItem item = iter.next();
+		if (iter.hasNext()) {
+			this.putIndent();
+			formatter.convert(item);
+			do {
+				item = iter.next();
+				this.put(";").putBreakSpace();
 				formatter.convert(item);
-				do {
-					item = iter.next();
-					this.put(";").putBreakSpace();
-					formatter.convert(item);
-				} while (iter.hasNext());
-			} else {
-				formatter.convert(item);
-			}
-			return this.format();
-		} finally {
-			this.stop();
+			} while (iter.hasNext());
+		} else {
+			formatter.convert(item);
 		}
+		return this.format();
 	}
 
 	/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und gibt diesen zurück.<br>
@@ -605,9 +458,8 @@ public final class FEMFormatter {
 	 * @param object Objekt.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code object} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
 	 * @throws IllegalArgumentException Wenn das Object nicht formatiert werden kann. */
-	public final String formatData(final Object object) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final String formatData(final Object object) throws NullPointerException, IllegalArgumentException {
 		return this.formatDatas(Iterables.itemIterable(object));
 	}
 
@@ -618,47 +470,13 @@ public final class FEMFormatter {
 	 * @param objects Objekte.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code objects} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
 	 * @throws IllegalArgumentException Wenn ein Objekt nicht formatiert werden kann. */
-	public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final String formatDatas(final Iterable<?> objects) throws NullPointerException, IllegalArgumentException {
 		return this._format_(objects, new Converter<Object, Object>() {
 
 			@Override
 			public Object convert(final Object input) {
 				return FEMFormatter.this.putData(input);
-			}
-
-		});
-	}
-
-	/** Diese Methode formatiert den gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-	 * Der Rückgabewert entspricht {@code this.formatValue(Iterables.itemIterable(value))}.
-	 * 
-	 * @see #formatValues(Iterable)
-	 * @param value Wert.
-	 * @return formatierter Quelltext.
-	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
-	 * @throws IllegalArgumentException Wenn der Wert nicht formatiert werden kann. */
-	public final String formatValue(final FEMValue value) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		return this.formatValues(Iterables.itemIterable(value));
-	}
-
-	/** Diese Methode formatiert die gegebenen Wert in einen Quelltext und gibt diesen zurück.<br>
-	 * Die Werte werden über {@link #putValue(FEMValue)} angefügt und mit {@code ';'} separiert.
-	 * 
-	 * @see #putValue(FEMValue)
-	 * @param values Werte.
-	 * @return formatierter Quelltext.
-	 * @throws NullPointerException Wenn {@code values} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
-	 * @throws IllegalArgumentException Wenn ein Wert nicht formatiert werden kann. */
-	public final String formatValues(final Iterable<? extends FEMValue> values) throws NullPointerException, IllegalStateException, IllegalArgumentException {
-		return this._format_(values, new Converter<FEMValue, Object>() {
-
-			@Override
-			public Object convert(final FEMValue input) {
-				return FEMFormatter.this.putValue(input);
 			}
 
 		});
@@ -671,9 +489,8 @@ public final class FEMFormatter {
 	 * @param function Funktion.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
 	 * @throws IllegalArgumentException Wenn die Funktion nicht formatiert werden kann. */
-	public final String formatFunction(final FEMFunction function) throws NullPointerException, IllegalStateException, IllegalArgumentException {
+	public final String formatFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		return this.formatFunctions(Iterables.itemIterable(function));
 	}
 
@@ -684,10 +501,8 @@ public final class FEMFormatter {
 	 * @param functions Funktionen.
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code functions} {@code null} ist oder enthält.
-	 * @throws IllegalStateException Wenn aktuell formatiert wird.
 	 * @throws IllegalArgumentException Wenn eine Funktion nicht formatiert werden kann. */
-	public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalStateException,
-		IllegalArgumentException {
+	public final String formatFunctions(final Iterable<? extends FEMFunction> functions) throws NullPointerException, IllegalArgumentException {
 		return this._format_(functions, new Converter<FEMFunction, Object>() {
 
 			@Override

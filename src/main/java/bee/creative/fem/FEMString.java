@@ -1247,7 +1247,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatString(this.toString()));
+		target.put(FEMParser.formatString(this.toString()));
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.

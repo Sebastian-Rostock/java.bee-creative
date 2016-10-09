@@ -1,10 +1,9 @@
 package bee.creative.fem;
 
 import java.util.Arrays;
-import bee.creative.fem.FEMFormatter.FEMFormatterInput;
 
-/** Diese Klasse implementiert eine abstrakte Funktion, deren {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen}
- * aufgerufen werden kann, um einen Ergebniswert zu ermitteln.<br>
+/** Diese Klasse implementiert eine abstrakte Funktion, deren {@link #invoke(FEMFrame) Berechnungsmethode} mit einem {@link FEMFrame Stapelrahmen} aufgerufen
+ * werden kann, um einen Ergebniswert zu ermitteln.<br>
  * Aus den {@link FEMFrame#params() Parameterwerten} sowie dem {@link FEMFrame#context() Kontextobjekt} der Stapelrahmens können hierbei Informationen für die
  * Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * <p>
@@ -13,7 +12,7 @@ import bee.creative.fem.FEMFormatter.FEMFormatterInput;
  * @see FEMValue
  * @see FEMFrame
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMFunction implements FEMFormatterInput {
+public abstract class FEMFunction {
 
 	@SuppressWarnings ("javadoc")
 	static final class TraceFunction extends FEMFunction {
@@ -154,8 +153,13 @@ public abstract class FEMFunction implements FEMFormatterInput {
 		}
 
 		@Override
-		public FEMFunction toFuture() {
+		public final FEMFunction toFuture() {
 			return this;
+		}
+
+		@Override
+		public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
+			return this._function_.toFuture(frame);
 		}
 
 	}
@@ -250,52 +254,6 @@ public abstract class FEMFunction implements FEMFormatterInput {
 
 	{}
 
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMFunction, params: FEMArray): FEMValue}, deren Ergebniswert via
-	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameter gegeben Funktion mit den im zweiten Parameter
-	 * gegebenen Parameterwertliste. */
-	public static final FEMFunction CALL = new FEMFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
-			final FEMContext context = frame.context();
-			final FEMArray array = FEMArray.from(frame.get(1), context);
-			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
-			final FEMFrame params = frame.withParams(array);
-			return method.invoke(params);
-		}
-
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("CALL");
-		}
-
-	};
-
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (param1, ..., paramN: FEMValue, method: FEMFunction): FEMValue}, deren Ergebniswert via
-	 * {@code method(param1, ..., paramN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameter gegeben Funktion mit den davor liegenden Parametern. */
-	public static final FEMFunction APPLY = new FEMFunction() {
-
-		@Override
-		public FEMValue invoke(final FEMFrame frame) {
-			final int index = frame.size() - 1;
-			if (index < 0) throw new IllegalArgumentException("frame.size() < 1");
-			final FEMContext context = frame.context();
-			final FEMArray array = frame.params().section(0, index);
-			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
-			final FEMFrame params = frame.withParams(array);
-			return method.invoke(params);
-		}
-
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("APPLY");
-		}
-
-	};
-
-	{}
-
 	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
 	 * 
 	 * @param frame Stapelrahmen.
@@ -314,13 +272,11 @@ public abstract class FEMFunction implements FEMFormatterInput {
 		return new ConcatFunction(this, params.clone());
 	}
 
-
 	// * @param direct {@code true}, wenn die aufzurufende Funktion direkt mit den Ergebnissen der Parameterfunktionen ausgewertet werden soll, und {@code false},
 	// * wenn die aufzurufende Funktion mit den Stapelrahmen zu einer Funktion ausgewertet werden soll, welche dann mit den Ergebnissen der
 	// * Parameterfunktionen ausgewertet werden soll.
 	// * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
 	// * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist. */
-
 
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert der gelieferten
 	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht:<br>
@@ -398,6 +354,17 @@ public abstract class FEMFunction implements FEMFormatterInput {
 		return new FutureFunction(this);
 	}
 
+	/** Diese Methode gibt das Ergebnis dieser Funktion als {@link FEMFuture} zurück. Wenn der Ergebniswert der funktion vom gegebenen Stapelrahmen unabhängig ist,
+	 * wird dieses direkt geliefert.
+	 * 
+	 * @param frame Stapelrahmen.
+	 * @return Ergebniswert ggf. als {@link FEMFuture}.
+	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
+	public FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
+		if (frame == null) throw new NullPointerException("frame = null");
+		return new FEMFuture(frame, this);
+	}
+
 	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapalrahmen} {@code frame}
 	 * einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapalrahmen entspricht, d.h.
 	 * {@code this.withFrame(frame).toHandler()}.
@@ -417,8 +384,12 @@ public abstract class FEMFunction implements FEMFormatterInput {
 
 	{}
 
-	/** {@inheritDoc} */
-	@Override
+	/** Diese Methode formatiert diese Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.<br>
+	 * Sie kann von einem {@link FEMDomain} im Rahmen der Methoden {@link FEMDomain#formatData(FEMFormatter, Object)} bzw.
+	 * {@link FEMDomain#formatFunction(FEMFormatter, FEMFunction)} eingesetzt werden.
+	 * 
+	 * @param target {@link FEMFormatter}.
+	 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
 	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(this.getClass().getName());
 	}
@@ -426,7 +397,7 @@ public abstract class FEMFunction implements FEMFormatterInput {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return FEM.scriptFormatter().formatFunction(this);
+		return new FEMFormatter().formatFunction(this);
 	}
 
 }

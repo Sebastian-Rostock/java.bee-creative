@@ -733,7 +733,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatValue(this.toString()));
+		target.put(FEMParser.formatValue(this.toString()));
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>

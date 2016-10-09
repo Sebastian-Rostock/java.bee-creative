@@ -1,12 +1,11 @@
 package bee.creative.fem;
 
-import bee.creative.fem.FEM.ScriptCompiler;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
  * 
- * @see ScriptCompiler#proxy(String)
- * @see ScriptCompiler#proxies()
+ * @see FEMCompiler#proxy(String)
+ * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction {
 
@@ -71,13 +70,13 @@ public final class FEMProxy extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatValue(this._name_));
+		target.put(FEMParser.formatValue(this._name_));
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return new FEMFormatter().start().put(FEM.formatValue(this._name_)).putHandler(this._function_).format();
+		return new FEMFormatter().reset().put(FEMParser.formatValue(this._name_)).putHandler(this._function_).format();
 	}
 
 }

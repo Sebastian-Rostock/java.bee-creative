@@ -22,14 +22,14 @@ import bee.creative.util.Natives;
  * <h4>Methoden</h4>
  * <p>
  * Native Funktionen zu klassengebundenen Methoden haben die Signatur {@code (param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
- * {@code new FEMNative(this.member().invoke(null, param1.data(), …, paramN.data()))}. Analog dazu haben die Funktionen zu instanzgebundenen Methoden die
+ * {@code new FEMNative(this.member().invoke(null, param1.data(), ..., paramN.data()))}. Analog dazu haben die Funktionen zu instanzgebundenen Methoden die
  * Signatur {@code (object, param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
- * {@code new FEMNative-(this.member().invoke(object.data(), param1.data(), …, paramN.data()))}.
+ * {@code new FEMNative-(this.member().invoke(object.data(), param1.data(), ..., paramN.data()))}.
  * <p>
  * <h4>Konstruktoren</h4>
  * <p>
  * Native Funktionen zu Konstruktoren haben die Signatur {@code (param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
- * {@code new FEMNative(this.member().newInstance(param1.data(), …, paramN.data()))}.
+ * {@code new FEMNative(this.member().newInstance(param1.data(), ..., paramN.data()))}.
  * <p>
  * Diese Klasse stellt {@link FEMFunction Funktionen} zum Lesen und Schreiben von sowie zum Aufrufen von und bereit.
  * 
@@ -335,7 +335,7 @@ public abstract class FEMReflection extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatValue(this.toString()));
+		target.put(FEMParser.formatValue(this.toString()));
 	}
 
 }

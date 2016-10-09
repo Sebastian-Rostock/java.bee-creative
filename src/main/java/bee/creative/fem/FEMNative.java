@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert einen Wert mit einem beliebigen nativen Objekt als {@link #data() Nutzdaten}.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -47,6 +49,24 @@ public final class FEMNative extends FEMValue {
 		this._data_ = data;
 	}
 
+	/** Diese Methode gibt den Streuwert zurück.
+	 * 
+	 * @return Streuwert. */
+	public final int hash() {
+		return Objects.hash(this._data_);
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist.<br>
+	 * Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten} einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
+	 * 
+	 * @param that Wert.
+	 * @return Gleichheit.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public final boolean equals(final FEMNative that) throws NullPointerException {
+		if (this == that) return true;
+		return Objects.equals(this._data_, that._data_);
+	}
+
 	{}
 
 	/** Diese Methode gibt das native Objekt zurück. */
@@ -66,6 +86,24 @@ public final class FEMNative extends FEMValue {
 	public final FEMNative result(final boolean recursive) {
 		if (this._data_ instanceof FEMValue) return new FEMNative(((FEMValue)this._data_).result(recursive));
 		return this;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final int hashCode() {
+		return this.hash();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final boolean equals(Object object) {
+		if (object == this) return true;
+		if (!(object instanceof FEMNative)) {
+			if (!(object instanceof FEMValue)) return false;
+			object = ((FEMValue)object).data();
+			if (!(object instanceof FEMNative)) return false;
+		}
+		return this.equals((FEMNative)object);
 	}
 
 	/** {@inheritDoc} */

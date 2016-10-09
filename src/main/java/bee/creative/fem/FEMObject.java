@@ -288,7 +288,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.put(FEM.formatValue(this.toString()));
+		target.put(FEMParser.formatValue(this.toString()));
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>

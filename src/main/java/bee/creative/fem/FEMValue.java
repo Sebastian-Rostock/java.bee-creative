@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion}
  * oder als {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
@@ -64,18 +63,6 @@ public abstract class FEMValue extends FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist.<br>
-	 * Dies ist nur dann der Fall, wenn {@link #type() Datentyp} und {@link #data() Nutzdaten} einander gleichen, d.h.
-	 * {@code Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data())}.
-	 * 
-	 * @param that Wert.
-	 * @return Gleichheit.
-	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
-	public final boolean equals(final FEMValue that) throws NullPointerException {
-		if (this == that) return true;
-		return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
-	}
-
 	{}
 
 	/** {@inheritDoc} */
@@ -99,33 +86,20 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public int hashCode() {
-		return Objects.hash(this.data());
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(final Object object) {
-		if (object == this) return true;
-		if (!(object instanceof FEMValue)) return false;
-		return this.equals((FEMValue)object);
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.put(this.toString());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public String toString() {
-		return FEM.scriptFormatter().formatValue(this);
+	public final FEMFunction toFuture() {
+		return this;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction toFuture() {
+	public final FEMValue toFuture(final FEMFrame frame) throws NullPointerException {
+		if (frame == null) throw new NullPointerException("frame = null");
 		return this;
 	}
 

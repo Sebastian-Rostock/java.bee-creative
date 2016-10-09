@@ -1,7 +1,6 @@
 package bee.creative.fem;
 
 import java.util.Iterator;
-import bee.creative.fem.FEMFormatter.FEMFormatterInput;
 import bee.creative.util.Comparables.Items;
 import bee.creative.util.Iterators;
 import bee.creative.util.Objects.UseToString;
@@ -16,7 +15,7 @@ import bee.creative.util.Objects.UseToString;
  * @see FEMValue
  * @see FEMFunction
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString, FEMFormatterInput {
+public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, UseToString {
 
 	@SuppressWarnings ("javadoc")
 	static final class ArrayFrame extends FEMFrame {
@@ -325,6 +324,16 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return new InvokeFrame(this._parent_, params, this._context_);
 	}
 
+	/** Diese Methode gibt diesen Stapelrahmen ohne {@link #params() zugesicherte Parameterwerte} zurück.<br>
+	 * Sie ist eine Abkürzung für {@code this.parent().newFrame().withContext(this.context())}.
+	 * 
+	 * @see #newFrame()
+	 * @see #withContext(FEMContext)
+	 * @return neuer Stapelrahmen. */
+	public final FEMFrame withoutParams() {
+		return new ArrayFrame(this._parent_, FEMArray.EMPTY, this._context_);
+	}
+
 	/** Diese Methode gibt diesen Stapelrahmen mit dem gegebenen {@link #context() Kontextobjekt} zurück.
 	 * 
 	 * @param context Kontextobjekt.
@@ -366,8 +375,11 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 		return this.params().equals(that.params());
 	}
 
-	/** {@inheritDoc} */
-	@Override
+	/** Diese Methode formatiert diesen Stapelrahmen in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an. Sie kann von einem
+	 * {@link FEMDomain} im Rahmen der Methode {@link FEMDomain#formatData(FEMFormatter, Object)} eingesetzt werden.
+	 * 
+	 * @param target {@link FEMFormatter}.
+	 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putFrame(this.params());
 	}
@@ -375,7 +387,7 @@ public abstract class FEMFrame implements Items<FEMValue>, Iterable<FEMValue>, U
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return FEM.scriptFormatter().formatData(this);
+		return new FEMFormatter().formatData(this);
 	}
 
 }
