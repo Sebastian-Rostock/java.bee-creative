@@ -1,51 +1,95 @@
 package bee.creative.fem;
 
-/** Diese Klasse implementiert allgemeinen Hilfsfunktionen.
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/** Diese Klasse implementiert mit {@link #INSTANCES} eine statische Abbildung zur Verwaltung benannter Funktionen sowie einige generische Funktionen zur
+ * Steuerung von Kontrollfluss und Variablen.
  * 
  * @see FEMFunction
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public class FEMUtil {
+public abstract class FEMUtil {
+
+	/** Dieses Feld bildet von Namen auf Funktionen ab, die auch bequem über {@link #put(FEMFunction, String...)} modifiziert und über {@link #get(String)} gelesen
+	 * werden können. */
+	public static final Map<String, FEMFunction> INSTANCES = Collections.synchronizedMap(new HashMap<String, FEMFunction>());
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (condition: FEMBoolean; trueResult: FEMValue; falseResult: FEMValue): FEMValue}, deren
 	 * Ergebniswert via {@code (condition ? trueResult : falseResult)} ermittelt wird. */
-	public static final FEMFunction IF = new FEMFunction() {
-	
+	public static final FEMFunction IF = FEMUtil.put(new FEMFunction() {
+
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			if (frame.size() != 3) throw new IllegalArgumentException("frame.size() != 3");
 			return frame.get(FEMBoolean.from(frame.get(0), frame.context()).value() ? 1 : 2).result();
 		}
-	
+
+	}, "if", "IF");
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable; value: FEMValue): FEMValue}, welche über {@code variable.set(value)}
+	 * den Wert einer gegebenen {@link FEMVariable} setzt und den gegebenen Ergebniswert {@code value} liefert. */
+	public static final FEMFunction SET = FEMUtil.put(new FEMFunction() {
+
 		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("IF");
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
+			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
+			final FEMValue value = frame.get(1);
+			variable.set(value);
+			return value;
 		}
-	
-	};
+
+	}, "set", "SET");
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable): FEMValue}, deren Ergebniswert via {@code variable.get()} ermittelt
+	 * wird. */
+	public static final FEMFunction GET = FEMUtil.put(new FEMFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
+			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
+			return variable.get();
+		}
+
+	}, "get", "GET");
+
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (value: FEMValue): FEMVariable}, deren Ergebniswert via {@code FEMVariable.from(value)}
+	 * ermittelt wird. */
+	public static final FEMFunction VAR = FEMUtil.put(new FEMFunction() {
+
+		@Override
+		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
+			final FEMVariable variable = FEMVariable.from(frame.get(0));
+			return variable;
+		}
+
+	}, "var", "VAR");
+
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (param1; ...; paramN; result: FEMValue): FEMValue}, welche die gegebenen Parameter in der
 	 * gegebenen Reigenfolge {@link FEMValue#result(boolean) rekursiv auswertet} und den letzten als Ergebniswert liefert. */
-	public static final FEMFunction EVAL = new FEMFunction() {
-	
+	public static final FEMFunction EVAL = FEMUtil.put(new FEMFunction() {
+
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			final int size = frame.size() - 1;
+			if (size < 0) throw new IllegalArgumentException("frame.size() < 1");
 			for (int i = 0; i < size; i++) {
 				frame.get(i).result();
 			}
 			return frame.get(size).result();
 		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("EVAL");
-		}
-	
-	};
+
+	}, "eval", "EVAL");
+
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMHandler; params: FEMArray): FEMValue}, deren Ergebniswert via
 	 * {@code method(params[0], params[1], ...)} ermittelt wird, d.h. über den Aufruf der als ersten Parameter gegeben Funktion mit den im zweiten Parameter
 	 * gegebenen Parameterwertliste. */
-	public static final FEMFunction CALL = new FEMFunction() {
-	
+	public static final FEMFunction CALL = FEMUtil.put(new FEMFunction() {
+
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
@@ -55,17 +99,13 @@ public class FEMUtil {
 			final FEMFrame params = frame.withParams(array);
 			return method.invoke(params);
 		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("CALL");
-		}
-	
-	};
+
+	}, "call", "CALL");
+
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (param1; ...; paramN: FEMValue; method: FEMHandler): FEMValue}, deren Ergebniswert via
 	 * {@code method(param1, ..., paramN)} ermittelt wird, d.h. über den Aufruf der als letzten Parameter gegeben Funktion mit den davor liegenden Parametern. */
-	public static final FEMFunction APPLY = new FEMFunction() {
-	
+	public static final FEMFunction APPLY = FEMUtil.put(new FEMFunction() {
+
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
 			final int index = frame.size() - 1;
@@ -76,19 +116,15 @@ public class FEMUtil {
 			final FEMFrame params = frame.withParams(array);
 			return method.invoke(params);
 		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("APPLY");
-		}
-	
-	};
+
+	}, "apply", "APPLY");
+
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMHandler): FEMInteger}, deren Ergebniswert der Anzahl der parameterlosen Aufrufe der
 	 * gegebenen Methode entspricht. Die Methode wird mindestens ein Mal aufgerufen und muss immer einen {@link FEMBoolean} liefern. Sie wird nur dann wiederholt
 	 * aufgerufen, wenn sie {@link FEMBoolean#TRUE} liefert. Die Ermittlung des Ergebniswerts {@code result} entspricht damit in etwa
 	 * {@code for(result = 1; method(); result++);} */
-	public static final FEMFunction REPEAT = new FEMFunction() {
-	
+	public static final FEMFunction REPEAT = FEMUtil.put(new FEMFunction() {
+
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
@@ -99,47 +135,65 @@ public class FEMUtil {
 				if (!repeat.value()) return FEMInteger.from(count);
 			}
 		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("REPEAT");
+
+	}, "repeat", "REPEAT");
+
+	{}
+
+	/** Diese Methode gibt die via {@link #put(FEMFunction, String...)} unter dem gegebenen Namen registrierte Funktion bzw. {@code null} zurück.<br>
+	 * Sie ist eine Abkürzung für {@code INSTANCES.get(name)}.
+	 * 
+	 * @param name Name.
+	 * @return Funktion oder {@code null}. */
+	public static FEMFunction get(final String name) {
+		return FEMUtil.INSTANCES.get(name);
+	}
+
+	/** Diese Methode registriert die gegebene Funktion unter den gegebenen Namen in {@link #INSTANCES} und gibt die Funktion zurück.
+	 * 
+	 * @param function Funktion.
+	 * @param names Namen.
+	 * @return {@code function}.
+	 * @throws NullPointerException Wenn {@code names} {@code null} ist. */
+	public static FEMFunction put(final FEMFunction function, final String... names) throws NullPointerException {
+		for (final String name: names) {
+			FEMUtil.INSTANCES.put(name, function);
 		}
-	
-	};
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (pointer: FEMPointer): FEMValue}, deren Ergebniswert via {@code pointer.get()} ermittelt wird. */
-	public static final FEMFunction GETVALUE = new FEMFunction() {
-	
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
-			final FEMPointer pointer = FEMPointer.from(frame.get(0), frame.context());
-			return pointer.get().result();
+		return function;
+	}
+
+	/** Diese Methode setzt die {@link FEMProxy#set(FEMFunction) aufzurufende Funktion} des gegebenen {@link FEMProxy}, wenn diesem noch keinen zugeordnet ist,
+	 * d.h. wenn {@link FEMProxy#get()} {@code null} liefert. Die aufzurufende Funktion des {@link FEMProxy} wird dazu über dessen {@link FEMProxy#name() Namen}
+	 * ermittelt, d.h. {@link #get(String) FEMUtil.get(proxy.name())}.
+	 * 
+	 * @see #get(String)
+	 * @see FEMProxy#get()
+	 * @see FEMProxy#set(FEMFunction)
+	 * @param proxy Platzhalter.
+	 * @throws NullPointerException Wenn {@code proxy} {@code null} ist. */
+	public static void update(final FEMProxy proxy) throws NullPointerException {
+		if (proxy.get() != null) return;
+		proxy.set(FEMUtil.get(proxy.name()));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code updateAll(Arrays.asList(proxies))}.
+	 * 
+	 * @see #updateAll(Iterable)
+	 * @param proxies Platzhalter.
+	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist. */
+	public static void updateAll(final FEMProxy... proxies) throws NullPointerException {
+		FEMUtil.updateAll(Arrays.asList(proxies));
+	}
+
+	/** Diese Methode setzt über {@link #update(FEMProxy)} die {@link FEMProxy#set(FEMFunction) aufzurufende Funktionen} der gegebenen {@link FEMProxy}.
+	 * 
+	 * @see #update(FEMProxy)
+	 * @param proxies Platzhalter.
+	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist. */
+	public static void updateAll(final Iterable<FEMProxy> proxies) throws NullPointerException {
+		for (final FEMProxy proxy: proxies) {
+			FEMUtil.update(proxy);
 		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("GETVALUE");
-		}
-	
-	};
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (pointer: FEMPointer; value: FEMValue): FEMValue}, welche über {@code pointer.set(value)} den
-	 * Wert des gegebenen {@link FEMPointer} setzt und den gegebenen Ergebniswert {@code value} liefert. */
-	public static final FEMFunction SETVALUE = new FEMFunction() {
-	
-		@Override
-		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
-			final FEMPointer pointer = FEMPointer.from(frame.get(0), frame.context());
-			final FEMValue value = frame.get(1).result();
-			pointer.set(value);
-			return value;
-		}
-	
-		@Override
-		public void toScript(final FEMFormatter target) throws IllegalArgumentException {
-			target.put("SETVALUE");
-		}
-	
-	};
+	}
 
 }

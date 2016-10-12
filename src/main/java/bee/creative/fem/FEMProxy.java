@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
  * 
@@ -37,6 +36,14 @@ public final class FEMProxy extends FEMFunction {
 
 	{}
 
+	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
+	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
+	 * 
+	 * @return Funktion oder {@code null}. */
+	public final FEMFunction get() {
+		return this._function_;
+	}
+
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
 	 * 
 	 * @param function Funktion oder {@code null}. */
@@ -49,14 +56,6 @@ public final class FEMProxy extends FEMFunction {
 	 * @return Name. */
 	public final String name() {
 		return this._name_;
-	}
-
-	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
-	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
-	 * 
-	 * @return Funktion oder {@code null}. */
-	public final FEMFunction function() {
-		return this._function_;
 	}
 
 	{}
@@ -76,7 +75,9 @@ public final class FEMProxy extends FEMFunction {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return new FEMFormatter().reset().put(FEMParser.formatValue(this._name_)).putHandler(this._function_).format();
+		final FEMFunction function = this._function_;
+		if (function != null) return new FEMFormatter().put(FEMParser.formatValue(this._name_)).putHandler(this._function_).format();
+		return FEMParser.formatValue(this._name_);
 	}
 
 }

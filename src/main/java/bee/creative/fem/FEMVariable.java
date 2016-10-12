@@ -1,26 +1,35 @@
 package bee.creative.fem;
 
-/** Diese Klasse implementiert einen veränderlichen Verweis auf einen Wert.
+/** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
  * 
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
-public final class FEMPointer extends FEMValue {
+public final class FEMVariable extends FEMValue {
 
 	/** Dieses Feld speichert den Identifikator von {@link #TYPE}. */
-	public static final int ID = 11;
+	public static final int ID = -2;
 
 	/** Dieses Feld speichert den {@link #type() Datentyp}. */
-	public static final FEMType<FEMPointer> TYPE = FEMType.from(FEMPointer.ID);
+	public static final FEMType<FEMVariable> TYPE = FEMType.from(FEMVariable.ID);
 
 	{}
 
-	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMPointer.TYPE)}.
+	/** Diese Methode gibt eine neue Variable mit dem gegebenen Initialwert zurück.
+	 * 
+	 * @param value Initialwert.
+	 * @return {@link FEMVariable}.
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public static FEMVariable from(final FEMValue value) throws NullPointerException {
+		return new FEMVariable(value);
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVariable.TYPE)}.
 	 * 
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} bzw. {@code context} {@code null} ist. */
-	public static FEMPointer from(final FEMValue value, final FEMContext context) throws NullPointerException {
-		return context.dataFrom(value, FEMPointer.TYPE);
+	public static FEMVariable from(final FEMValue value, final FEMContext context) throws NullPointerException {
+		return context.dataFrom(value, FEMVariable.TYPE);
 	}
 
 	{}
@@ -28,11 +37,11 @@ public final class FEMPointer extends FEMValue {
 	/** Dieses Feld speichert den Wert. */
 	FEMValue _value_;
 
-	/** Dieser Konstruktor initialisiert den Wert.
+	/** Dieser Konstruktor initialisiert den Wert dieser Variablen.
 	 * 
 	 * @param value initialier Wert, der z.B. als {@link FEMFuture} gegeben sein kann.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public FEMPointer(final FEMValue value) throws NullPointerException {
+	public FEMVariable(final FEMValue value) throws NullPointerException {
 		this.set(value);
 	}
 
@@ -46,7 +55,7 @@ public final class FEMPointer extends FEMValue {
 		return this._value_;
 	}
 
-	/** Diese Methode setzt den aktuellen Wert.
+	/** Diese Methode setzt den aktuellen Wert, der über {@link #get()} gelesen werden kann.
 	 * 
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -59,13 +68,13 @@ public final class FEMPointer extends FEMValue {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMType<FEMPointer> type() {
-		return FEMPointer.TYPE;
+	public final FEMType<FEMVariable> type() {
+		return FEMVariable.TYPE;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMPointer data() {
+	public final FEMVariable data() {
 		return this;
 	}
 

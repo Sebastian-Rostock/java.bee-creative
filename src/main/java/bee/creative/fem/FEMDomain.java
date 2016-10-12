@@ -2,8 +2,8 @@ package bee.creative.fem;
 
 import java.math.BigDecimal;
 
-/** Diese Schnittstelle definiert Kompilations- und Formatierungsmethoden, die von einem {@link FEMCompiler Kompiler} zur Übersetzung von Quelltexten in Werte,
- * Funktionen und Parameternamen bzw. von eimem {@link FEMFormatter} Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.
+/** Diese Schnittstelle definiert domänenspezifische Kompilations- und Formatierungsmethoden, die von einem {@link FEMCompiler} zur Übersetzung von Quelltexten
+ * in Werte, Funktionen und Parameternamen bzw. von eimem {@link FEMFormatter} Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain {
@@ -34,7 +34,7 @@ public class FEMDomain {
 					return new FEMNative(new Character(FEMParser.parseString(section).charAt(0)));
 				case '!':
 					section = FEMParser.parseValue(section);
-				default: {
+				default:
 					if (section.equals("null")) return FEMNative.NULL;
 					if (section.equals("true")) return FEMNative.TRUE;
 					if (section.equals("false")) return FEMNative.FALSE;
@@ -45,7 +45,6 @@ public class FEMDomain {
 						return FEMReflection.from(section);
 					} catch (final Exception cause) {}
 					return compiler.proxy(section);
-				}
 			}
 		}
 
@@ -87,7 +86,7 @@ public class FEMDomain {
 		} else if (data instanceof FEMFrame) {
 			((FEMFrame)data).toScript(target);
 		} else if (data instanceof FEMFunction) {
-			this.formatFunction(target, (FEMFunction)data);
+			((FEMFunction)data).toScript(target);
 		} else {
 			target.put(String.valueOf(data));
 		}
@@ -129,13 +128,11 @@ public class FEMDomain {
 		String section = compiler.section();
 		switch (compiler.symbol()) {
 			case '"':
-			case '\'': {
+			case '\'':
 				return FEMString.from(FEMParser.parseString(section));
-			}
-			case '!': {
+			case '!':
 				section = FEMParser.parseValue(section);
-			}
-			default: {
+			default:
 				try {
 					return FEMVoid.from(section);
 				} catch (final IllegalArgumentException cause) {}
@@ -158,7 +155,6 @@ public class FEMDomain {
 					return FEMBinary.from(section);
 				} catch (final IllegalArgumentException cause) {}
 				return compiler.proxy(section);
-			}
 		}
 	}
 
