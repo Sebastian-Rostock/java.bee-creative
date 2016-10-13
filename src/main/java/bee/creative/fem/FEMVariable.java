@@ -42,24 +42,24 @@ public final class FEMVariable extends FEMValue {
 	 * @param value initialier Wert, der z.B. als {@link FEMFuture} gegeben sein kann.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMVariable(final FEMValue value) throws NullPointerException {
-		this.set(value);
+		this.update(value);
 	}
 
 	{}
 
-	/** Diese Methode gibt den aktuellen Wert das zurück, der über {@link #set(FEMValue)} geändert werden kann.
+	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #update(FEMValue)} geändert werden kann.
 	 * 
-	 * @see #set(FEMValue)
+	 * @see #update(FEMValue)
 	 * @return aktueller Wert. */
-	public final synchronized FEMValue get() {
+	public final synchronized FEMValue value() {
 		return this._value_;
 	}
 
-	/** Diese Methode setzt den aktuellen Wert, der über {@link #get()} gelesen werden kann.
+	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #value()} gelesen werden kann.
 	 * 
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
-	public final synchronized void set(final FEMValue value) throws NullPointerException {
+	public final synchronized void update(final FEMValue value) throws NullPointerException {
 		if (value == null) throw new NullPointerException("value = null");
 		this._value_ = value;
 	}
@@ -91,7 +91,7 @@ public final class FEMVariable extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		this.get().toScript(target);
+		this.value().toScript(target);
 	}
 
 }

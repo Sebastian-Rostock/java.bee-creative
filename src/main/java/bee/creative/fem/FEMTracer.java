@@ -21,15 +21,15 @@ public final class FEMTracer {
 		public static final Listener EMPTY = new Listener() {
 
 			@Override
-			public void onThrow(final FEMTracer event) {
+			public void onThrow(final FEMTracer tracer) {
 			}
 
 			@Override
-			public void onReturn(final FEMTracer event) {
+			public void onReturn(final FEMTracer tracer) {
 			}
 
 			@Override
-			public void onExecute(final FEMTracer event) {
+			public void onExecute(final FEMTracer tracer) {
 			}
 
 			@Override
@@ -43,23 +43,23 @@ public final class FEMTracer {
 		 * {@link FEMTracer#getException()} kann hierbei angepasst werden.
 		 * 
 		 * @see FEMTracer#useException(RuntimeException)
-		 * @param event {@link FEMTracer}. */
-		public void onThrow(FEMTracer event);
+		 * @param tracer {@link FEMTracer}. */
+		public void onThrow(FEMTracer tracer);
 
 		/** Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
 		 * {@link FEMTracer#getResult()} kann hierbei angepasst werden.
 		 * 
 		 * @see FEMTracer#useResult(FEMValue)
-		 * @param event {@link FEMTracer}. */
-		public void onReturn(FEMTracer event);
+		 * @param tracer {@link FEMTracer}. */
+		public void onReturn(FEMTracer tracer);
 
 		/** Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link FEMTracer#getFrame()} und {@link FEMTracer#getFunction()} können hierbei
 		 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Stapelrahmen durchzuführen.
 		 * 
 		 * @see FEMTracer#useFrame(FEMFrame)
 		 * @see FEMTracer#useFunction(FEMFunction)
-		 * @param event {@link FEMTracer}. */
-		public void onExecute(FEMTracer event);
+		 * @param tracer {@link FEMTracer}. */
+		public void onExecute(FEMTracer tracer);
 
 	}
 
@@ -83,9 +83,9 @@ public final class FEMTracer {
 
 	{}
 
-	/** Diese Methode gibt den {@link Listener} zurück.
+	/** Diese Methode gibt die Überwachungsmethoden zurück.
 	 * 
-	 * @return {@link Listener}. */
+	 * @return Überwachungsmethoden. */
 	public final Listener getListener() {
 		return this._listener_;
 	}

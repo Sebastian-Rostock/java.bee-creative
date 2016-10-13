@@ -124,7 +124,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return new FEMFuture(frame, this._function_);
+			return toFuture(frame);
 		}
 
 		@Override
@@ -262,7 +262,7 @@ public abstract class FEMFunction {
 	public abstract FEMValue invoke(FEMFrame frame) throws NullPointerException;
 
 	/** Diese Methode gibt eine verkette Funktion zurück, welche den Ergebniswert dieser Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert
-	 * der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht:<br>
+	 * der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
 	 * {@code FEMHandler.from(this.invoke(frame), frame.context()).value().invoke(frame.newFrame(this.params())}.
 	 * 
 	 * @param params Parameterfunktionen.
@@ -272,15 +272,8 @@ public abstract class FEMFunction {
 		return new ConcatFunction(this, params.clone());
 	}
 
-	// * @param direct {@code true}, wenn die aufzurufende Funktion direkt mit den Ergebnissen der Parameterfunktionen ausgewertet werden soll, und {@code false},
-	// * wenn die aufzurufende Funktion mit den Stapelrahmen zu einer Funktion ausgewertet werden soll, welche dann mit den Ergebnissen der
-	// * Parameterfunktionen ausgewertet werden soll.
-	// * @param params Parameterfunktionen, deren Ergebniswerte als Parameterwerte beim Aufruf der Funktion verwendet werden sollen.
-	// * @throws NullPointerException Wenn {@code function} bzw. {@code params} {@code null} ist. */
-
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert der gelieferten
-	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht:<br>
-	 * {@code this.invoke(frame.newFrame(params)}. Damit wird diese Funktion direkt mit den Parameterfunktionen aufgerufen.
+	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht {@code this.invoke(frame.newFrame(params)}.
 	 * 
 	 * @see FEMFrame#withParams(FEMFunction[])
 	 * @param params Parameterfunktionen.
@@ -299,14 +292,14 @@ public abstract class FEMFunction {
 	 * Der {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion startet folgenden Ablauf:<br>
 	 * Zuerst werden dem Überwachungsobjekt der gegebene Stapelrahmen sowie die {@link FEMTracer#getFunction() aufzurufenden Funktion} bekannt gegeben und die
 	 * Methode {@link FEMTracer.Listener#onExecute(FEMTracer) tracer.getListener().onExecute(tracer)} aufgerufen.<br>
-	 * Anschließend wird die {@link FEMTracer#getFunction() aktuelle Funktion} des Überwachungsobjekt mit seinem {@link FEMTracer#getFrame() aktuellen
+	 * Anschließend wird die {@link FEMTracer#getFunction() aktuelle Funktion} des Überwachungsobjekts mit seinem {@link FEMTracer#getFrame() aktuellen
 	 * Stapelrahmen} ausgewertet und das Ergebnis im Überwachungsobjekt {@link FEMTracer#useResult(FEMValue) gespeichert}.<br>
 	 * Abschließend wird {@link FEMTracer.Listener#onReturn(FEMTracer) tracer.getListener().onReturn(tracer)} aufgerufen und der {@link FEMTracer#getResult()
-	 * aktuelle Ergebniswert} zurück gegeben.<br>
+	 * aktuelle Ergebniswert} geliefert.<br>
 	 * Wenn eine {@link RuntimeException} auftritt, wird diese im Überwachungsobjekt {@link FEMTracer#useException(RuntimeException) gespeichert},
-	 * {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen und die {@link FEMTracer#getException() altuelle Ausnahme} des
+	 * {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen und die {@link FEMTracer#getException() aktuelle Ausnahme} des
 	 * Überwachungsobjekts ausgelöst.<br>
-	 * In jedem Fall wird der Zustand des Überwachungsobjekt beim Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}.<br>
+	 * In jedem Fall wird der Zustand des Überwachungsobjekts beim Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}.<br>
 	 * Der verwendete {@link FEMTracer.Listener} wird nur einmalig zu Beginn der Auswertung ermittelt.
 	 * 
 	 * @see #withoutTracer()
@@ -331,7 +324,7 @@ public abstract class FEMFunction {
 		return new FrameFunction(params, this);
 	}
 
-	/** Diese Methode gibt diese Funktion ohne dem über {@link #withTracer(FEMTracer)} gebundenen {@link FEMTracer Überwachungsobjekt} zurück.
+	/** Diese Methode gibt diese Funktion ohne das über {@link #withTracer(FEMTracer)} gebundene {@link FEMTracer Überwachungsobjekt} zurück.
 	 * 
 	 * @see #withTracer(FEMTracer)
 	 * @return Funktion ohne {@link FEMTracer Überwachungsobjekt}. */
@@ -347,15 +340,16 @@ public abstract class FEMFunction {
 		return this;
 	}
 
-	/** Diese Methode gibt diese Funktion mit {@code return-by-reference}-Semantik zurück. Der Ergebniswert der gelieferten Funktion ist ein {@link FEMFuture}.
+	/** Diese Methode gibt diese Funktion mit {@code return-by-reference}-Semantik zurück. Der Ergebniswert der gelieferten Funktion wird über
+	 * {@link #toFuture(FEMFrame)} ermittelt.
 	 * 
-	 * @return {@link FutureFunction}. */
+	 * @return {@link FEMFuture}-Funktion. */
 	public FEMFunction toFuture() {
 		return new FutureFunction(this);
 	}
 
-	/** Diese Methode gibt das Ergebnis dieser Funktion als {@link FEMFuture} zurück. Wenn der Ergebniswert der funktion vom gegebenen Stapelrahmen unabhängig ist,
-	 * wird dieses direkt geliefert.
+	/** Diese Methode gibt das Ergebnis dieser Funktion als {@link FEMFuture} zurück, wenn der Ergebniswert dieser Funktion vom gegebenen Stapelrahmen abhängt.
+	 * Andernfalls wird der Ergebniswert direkt geliefert.
 	 * 
 	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
@@ -365,8 +359,8 @@ public abstract class FEMFunction {
 		return new FEMFuture(frame, this);
 	}
 
-	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapalrahmen} {@code frame}
-	 * einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapalrahmen entspricht, d.h.
+	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen} {@code frame}
+	 * einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
 	 * {@code this.withFrame(frame).toHandler()}.
 	 * 
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */
@@ -385,7 +379,7 @@ public abstract class FEMFunction {
 	{}
 
 	/** Diese Methode formatiert diese Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.<br>
-	 * Sie kann von einem {@link FEMDomain} im Rahmen der Methoden {@link FEMDomain#formatData(FEMFormatter, Object)} bzw.
+	 * Sie kann von einer {@link FEMDomain} im Rahmen der Methoden {@link FEMDomain#formatData(FEMFormatter, Object)} bzw.
 	 * {@link FEMDomain#formatFunction(FEMFormatter, FEMFunction)} eingesetzt werden.
 	 * 
 	 * @param target {@link FEMFormatter}.

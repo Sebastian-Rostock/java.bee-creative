@@ -12,14 +12,12 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
- * <p>
- * Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Verarbeitung von aufbereiteten Quelltexten.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMScript implements Items<Range>, Iterable<Range> {
 
-	/** Diese Klasse implementiert ein Objekt, dass einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
-	 * erfolgt gemäß ihrer Startposition.
+	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)} erfolgt
+	 * gemäß ihrer Startposition.
 	 * 
 	 * @see FEMScript
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -106,14 +104,14 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		/** Dieser Konstruktor initialisiert Typ, Startposition und Länge.
 		 * 
 		 * @param type Typ.
-		 * @param start Startposition.
+		 * @param offset Startposition.
 		 * @param length Länge.
 		 * @throws IllegalArgumentException Wenn die Startposition oder die Länge negativ sind. */
-		public Range(final char type, final int start, final int length) throws IllegalArgumentException {
-			if (start < 0) throw new IllegalArgumentException("start < 0");
+		public Range(final char type, final int offset, final int length) throws IllegalArgumentException {
+			if (offset < 0) throw new IllegalArgumentException("offset < 0");
 			if (length < 0) throw new IllegalArgumentException("length < 0");
 			this._type_ = type;
-			this._offset_ = start;
+			this._offset_ = offset;
 			this._length_ = length;
 		}
 
@@ -127,21 +125,21 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 			return this._type_;
 		}
 
-		/** Diese Methode gibt die Position zurück, vord der die {@link Range} endet.
+		/** Diese Methode gibt die Position zurück, vor der dieser Bereich endet.
 		 * 
 		 * @return Endposition. */
 		public final int end() {
 			return this._offset_ + this._length_;
 		}
 
-		/** Diese Methode gibt die Position zurück, an der die {@link Range} beginnt.
+		/** Diese Methode gibt die Position zurück, an der dieser Bereich beginnt.
 		 * 
 		 * @return Startposition. */
 		public final int start() {
 			return this._offset_;
 		}
 
-		/** Diese Methode gibt die Länge des die Position zurück, an der die {@link Range} beginnt.
+		/** Diese Methode gibt die Länge des die Position zurück, an der dieser Bereich beginnt.
 		 * 
 		 * @return Startposition. */
 		public final int length() {
@@ -229,7 +227,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	 * @param ranges Bereiche.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen. */
-	public FEMScript(final String source, final Collection<? extends Range> ranges) throws NullPointerException, IllegalArgumentException {
+	public FEMScript(final String source, final Collection<Range> ranges) throws NullPointerException, IllegalArgumentException {
 		this(source, ranges.toArray(new Range[ranges.size()]));
 	}
 
@@ -256,7 +254,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		return types;
 	}
 
-	/** Diese Methode gibt eine Koppie der Bereiche zurück.
+	/** Diese Methode gibt eine Kopie der Bereiche zurück.
 	 * 
 	 * @see #get(int)
 	 * @see #length()

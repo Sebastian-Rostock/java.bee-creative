@@ -28,8 +28,8 @@ public abstract class FEMUtil {
 
 	}, "if", "IF");
 
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable; value: FEMValue): FEMValue}, welche über {@code variable.set(value)}
-	 * den Wert einer gegebenen {@link FEMVariable} setzt und den gegebenen Ergebniswert {@code value} liefert. */
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable; value: FEMValue): FEMValue}, welche über
+	 * {@link FEMVariable#update(FEMValue)} den Wert einer gegebenen {@link FEMVariable} setzt und den gegebenen Ergebniswert {@code value} liefert. */
 	public static final FEMFunction SET = FEMUtil.put(new FEMFunction() {
 
 		@Override
@@ -37,21 +37,21 @@ public abstract class FEMUtil {
 			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
 			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
 			final FEMValue value = frame.get(1);
-			variable.set(value);
+			variable.update(value);
 			return value;
 		}
 
 	}, "set", "SET");
 
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable): FEMValue}, deren Ergebniswert via {@code variable.get()} ermittelt
-	 * wird. */
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (variable: FEMVariable): FEMValue}, deren Ergebniswert über {@link FEMVariable#value()}
+	 * ermittelt wird. */
 	public static final FEMFunction GET = FEMUtil.put(new FEMFunction() {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
 			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
-			return variable.get();
+			return variable.value();
 		}
 
 	}, "get", "GET");

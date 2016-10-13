@@ -3,7 +3,7 @@ package bee.creative.fem;
 import java.math.BigDecimal;
 
 /** Diese Schnittstelle definiert domänenspezifische Kompilations- und Formatierungsmethoden, die von einem {@link FEMCompiler} zur Übersetzung von Quelltexten
- * in Werte, Funktionen und Parameternamen bzw. von eimem {@link FEMFormatter} Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.
+ * in Werte, Funktionen und Parameternamen bzw. von einem {@link FEMFormatter} Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.
  * 
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain {
@@ -59,8 +59,7 @@ public class FEMDomain {
 	 * <dl>
 	 * <dt>{@link #formatData(FEMFormatter, Object)}</dt>
 	 * <dd>{@link FEMScript Aufbereitete Quelltexte} werden über {@link FEMCompiler#formatScript(FEMFormatter)} formatiert.<br>
-	 * {@link FEMFrame Stapelrahmen} werden über {@link FEMFrame#toScript(FEMFormatter)} formatiert.<br>
-	 * {@link FEMFunction Funktionen} werden über {@link #formatFunction(FEMFormatter, FEMFunction)} formatiert.<br>
+	 * {@link FEMFrame Stapelrahmen} und {@link FEMFunction Funktionen} werden über {@link #formatFunction(FEMFormatter, FEMFunction)} formatiert.<br>
 	 * Alle anderen Objekte werden über {@link String#valueOf(Object)} formatieren.</dd>
 	 * <dt>{@link #formatFunction(FEMFormatter, FEMFunction)}</dt>
 	 * <dd>{@link FEMFunction Funktionen} werden über {@link FEMFunction#toScript(FEMFormatter)} formatiert.</dd>
