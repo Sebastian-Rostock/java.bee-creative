@@ -79,6 +79,26 @@ public class FEMContext {
 		return result;
 	}
 
+	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
+	 * überführt.
+	 * 
+	 * @return {@code arrayFrom}-{@link Converter}. */
+	public final Converter<Object, FEMArray> arrayFrom() {
+		return new Converter<Object, FEMArray>() {
+
+			@Override
+			public FEMArray convert(final Object object) {
+				return FEMContext.this.arrayFrom(object);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("arrayFrom");
+			}
+
+		};
+	}
+
 	/** Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
 	 * <ol>
 	 * <li>Wenn das Objekt ein {@link FEMArray} ist, wird es unverändert zurück gegeben.</li>

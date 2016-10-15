@@ -9218,6 +9218,14 @@ Diese Methode gibt die in <a href='#bee.creative.fem.FEMValue.data():Object'>Nut
 <dt><a>IllegalArgumentException</a></dt><dd>Wenn die Nutzdaten des Werts nicht konvertiert werden können.</dd>
 </dl>
 </div>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMContext.arrayFrom():Converter'><a href='#bee.creative.fem.FEMContext.arrayFrom():Converter'>arrayFrom</a>(): <a href='#bee.creative.util.Converter'>Converter</a>&lt;<a>Object</a>, <a href='#bee.creative.fem.FEMArray'>FEMArray</a>&gt;</a></h3>
+<div>
+Diese Methode gibt einen <a href='#bee.creative.util.Converter'>Converter</a> zurück, der seine Eingabe <code>input</code> via <a href='#bee.creative.fem.FEMContext.arrayFrom(Object):FEMArray'>valueFrom(input)</a> in seine Ausgabe
+ überführt.<h4>returns:</h4>
+<dl>
+<dd><code>arrayFrom</code>-<a href='#bee.creative.util.Converter'>Converter</a>.</dd>
+</dl>
+</div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMContext.arrayFrom(Object):FEMArray'><a href='#bee.creative.fem.FEMContext.arrayFrom(Object):FEMArray'>arrayFrom</a>(<a href='#bee.creative.fem.FEMContext.arrayFrom(Object):FEMArray-data'>data</a>: <a>Object</a>): <a href='#bee.creative.fem.FEMArray'>FEMArray</a></a></h3>
 <div>
 Diese Methode konvertiert das gegebene Objekt in eine Wertliste und gibt diese zurück.<br>
@@ -10696,7 +10704,7 @@ Diese Methode gibt die Textdarstellung dieses Dezimalbruchs zurück.<h4>returns:
 <h3 class='ST AF'>+ <a href='#bee.creative.fem'>bee.creative.fem</a>.<a href='#bee.creative.fem.FEMDomain'>FEMDomain</a></h3>
 <div>
 Diese Schnittstelle definiert domänenspezifische Kompilations- und Formatierungsmethoden, die von einem <a href='#bee.creative.fem.FEMCompiler'>FEMCompiler</a> zur Übersetzung von Quelltexten
- in Werte, Funktionen und Parameternamen bzw. von eimem <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a> Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.</div>
+ in Werte, Funktionen und Parameternamen bzw. von einem <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a> Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.</div>
 <h3 class='ST AF'>+ <a name='bee.creative.fem.FEMDomain.NATIVE:FEMDomain'><a href='#bee.creative.fem.FEMDomain.NATIVE:FEMDomain'>NATIVE</a>: <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a></a></h3>
 <div>
 Dieses Feld speichert die native <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a> mit folgendem Verhalten:
@@ -10719,8 +10727,7 @@ Dieses Feld speichert die normale <a href='#bee.creative.fem.FEMDomain'>FEMDomai
  <dl>
  <dt><a href='#bee.creative.fem.FEMDomain.formatData(FEMFormatter,Object):void'>FEMDomain.formatData(FEMFormatter, Object)</a></dt>
  <dd><a href='#bee.creative.fem.FEMScript'>Aufbereitete Quelltexte</a> werden über <a href='#bee.creative.fem.FEMCompiler.formatScript(FEMFormatter):void'>FEMCompiler.formatScript(FEMFormatter)</a> formatiert.<br>
- <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> werden über <a href='#bee.creative.fem.FEMFrame.toScript(FEMFormatter):void'>FEMFrame.toScript(FEMFormatter)</a> formatiert.<br>
- <a href='#bee.creative.fem.FEMFunction'>Funktionen</a> werden über <a href='#bee.creative.fem.FEMDomain.formatFunction(FEMFormatter,FEMFunction):void'>FEMDomain.formatFunction(FEMFormatter, FEMFunction)</a> formatiert.<br>
+ <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> und <a href='#bee.creative.fem.FEMFunction'>Funktionen</a> werden über <a href='#bee.creative.fem.FEMDomain.formatFunction(FEMFormatter,FEMFunction):void'>FEMDomain.formatFunction(FEMFormatter, FEMFunction)</a> formatiert.<br>
  Alle anderen Objekte werden über <a>String.valueOf(Object)</a> formatieren.</dd>
  <dt><a href='#bee.creative.fem.FEMDomain.formatFunction(FEMFormatter,FEMFunction):void'>FEMDomain.formatFunction(FEMFormatter, FEMFunction)</a></dt>
  <dd><a href='#bee.creative.fem.FEMFunction'>Funktionen</a> werden über <a href='#bee.creative.fem.FEMFunction.toScript(FEMFormatter):void'>FEMFunction.toScript(FEMFormatter)</a> formatiert.</dd>
