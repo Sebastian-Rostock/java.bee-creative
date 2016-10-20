@@ -86,22 +86,17 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
-			return this._function_.withTracer(tracer).withFrame(this._frame_);
-		}
-
-		@Override
-		public final FEMFunction withFrame(final FEMFrame frame) throws NullPointerException {
-			return this._function_.withFrame(frame);
+			return this._function_.withTracer(tracer).toClosure(this._frame_);
 		}
 
 		@Override
 		public final FEMFunction withoutTracer() {
-			return this._function_.withoutTracer().withFrame(this._frame_);
+			return this._function_.withoutTracer().toClosure(this._frame_);
 		}
 
 		@Override
-		public final FEMFunction withoutFrame() {
-			return this._function_.withoutFrame();
+		public final FEMFunction toClosure(final FEMFrame frame) throws NullPointerException {
+			return this._function_.toClosure(frame);
 		}
 
 		@Override
@@ -133,13 +128,8 @@ public abstract class FEMFunction {
 		}
 
 		@Override
-		public final FEMFunction withFrame(final FEMFrame params) {
-			return this._function_.withFrame(params).toFuture();
-		}
-
-		@Override
-		public final FEMFunction withoutFrame() {
-			return this._function_.withoutFrame().toFuture();
+		public final FEMFunction toClosure(final FEMFrame params) {
+			return this._function_.toClosure(params).toFuture();
 		}
 
 		@Override
@@ -166,23 +156,23 @@ public abstract class FEMFunction {
 
 	@SuppressWarnings ("javadoc")
 	static final class ConcatFunction extends FEMFunction {
-
+	
 		final FEMFunction[] _params_;
-
+	
 		final FEMFunction _function_;
-
+	
 		ConcatFunction(final FEMFunction function, final FEMFunction... params) {
 			this._params_ = params;
 			this._function_ = function;
 		}
-
+	
 		{}
-
+	
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) throws NullPointerException {
 			return FEMHandler.from(this._function_.invoke(frame), frame._context_).value().invoke(frame.newFrame(this._params_));
 		}
-
+	
 		@Override
 		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
 			final FEMFunction[] params = this._params_.clone();
@@ -191,7 +181,7 @@ public abstract class FEMFunction {
 			}
 			return new ConcatFunction(this._function_.withTracer(tracer), params);
 		}
-
+	
 		@Override
 		public final FEMFunction withoutTracer() {
 			final FEMFunction[] params = this._params_.clone();
@@ -200,12 +190,49 @@ public abstract class FEMFunction {
 			}
 			return new ConcatFunction(this._function_.withoutTracer(), params);
 		}
-
+	
 		@Override
 		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 			target.putFunction(this._function_).putParams(Arrays.asList(this._params_));
 		}
+	
+	}
 
+	@SuppressWarnings ("javadoc")
+	static final class ClosureFunction extends FEMFunction {
+	
+		{}
+	
+		final FEMFunction _function_;
+	
+		ClosureFunction(final FEMFunction function) throws NullPointerException {
+			this._function_ = function;
+		}
+	
+		{}
+	
+		@Override
+		public final FEMValue invoke(final FEMFrame frame) {
+			return this._function_.toClosure(frame).toHandler();
+		}
+	
+		@Override
+		public final FEMFunction withTracer(final FEMTracer tracer) throws NullPointerException {
+			return this._function_.withTracer(tracer).toClosure();
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public FEMFunction withoutTracer() {
+			return this._function_.withoutTracer().toClosure();
+		}
+	
+		/** {@inheritDoc} */
+		@Override
+		public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
+			target.putHandler(this._function_);
+		}
+	
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -310,33 +337,11 @@ public abstract class FEMFunction {
 		return new TraceFunction(tracer, this);
 	}
 
-	/** Diese Methode gibt diese Funktion an den gegebenen {@link FEMFrame Stapelrahmen} gebunden zurück.
-	 * <p>
-	 * Die zugesicherten Parameterwerte sowie das Kontextobjekt für den {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion entsprechen hierbei denen des in
-	 * der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
-	 * {@code params}, d.h. {@code this.invoke(params.withParams(frame.params()))}.
-	 * 
-	 * @see #withoutFrame()
-	 * @param params {@link FEMFrame Stapelrahmen} mit den zugesicherten Parameterwerten.
-	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame}.
-	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
-	public FEMFunction withFrame(final FEMFrame params) throws NullPointerException {
-		return new FrameFunction(params, this);
-	}
-
 	/** Diese Methode gibt diese Funktion ohne das über {@link #withTracer(FEMTracer)} gebundene {@link FEMTracer Überwachungsobjekt} zurück.
 	 * 
 	 * @see #withTracer(FEMTracer)
 	 * @return Funktion ohne {@link FEMTracer Überwachungsobjekt}. */
 	public FEMFunction withoutTracer() {
-		return this;
-	}
-
-	/** Diese Methode gibt diese Funktion ohne dem über {@link #withFrame(FEMFrame)} gebundenen {@link FEMFrame Stapelrahmen} zurück.
-	 * 
-	 * @see #withFrame(FEMFrame)
-	 * @return Funktion ohne {@link FEMFrame Stapelrahmen}. */
-	public FEMFunction withoutFrame() {
 		return this;
 	}
 
@@ -361,11 +366,24 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen} {@code frame}
 	 * einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
-	 * {@code this.withFrame(frame).toHandler()}.
+	 * {@code this.toClosure(frame).toHandler()}.
 	 * 
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */
-	public final FEMClosure toClosure() {
-		return new FEMClosure(this);
+	public final FEMFunction toClosure() {
+		return new ClosureFunction(this);
+	}
+
+	/** Diese Methode gibt diese Funktion an den gegebenen {@link FEMFrame Stapelrahmen} gebunden zurück.
+	 * <p>
+	 * Die zugesicherten Parameterwerte sowie das Kontextobjekt für den {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion entsprechen hierbei denen des in
+	 * der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
+	 * {@code params}, d.h. {@code this.invoke(params.withParams(frame.params()))}.
+	 * 
+	 * @param params {@link FEMFrame Stapelrahmen} mit den zugesicherten Parameterwerten.
+	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame}.
+	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
+	public FEMFunction toClosure(final FEMFrame params) throws NullPointerException {
+		return new FrameFunction(params, this);
 	}
 
 	/** Diese Methode gibt einen Funktionszeiger auf diese Funktion als Wert zurück.

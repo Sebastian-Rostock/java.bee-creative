@@ -419,8 +419,8 @@ public final class FEMCompiler extends Parser {
 			case '{': {
 				result = this._compileFrame_();
 				if (this._compileType_() != '(') {
-					if (this._closureEnabled_) return FEMClosure.from(result);
-					return FEMHandler.from(result);
+					if (this._closureEnabled_) return result.toClosure();
+					return result.toHandler();
 				}
 				if (!this._concatEnabled_) throw this._illegal_(null, " Funktionsverkettungen ist nicht zulässsig.");
 				break;
@@ -626,7 +626,8 @@ public final class FEMCompiler extends Parser {
 		return this._concatEnabled_;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn parametrisierte Funktionen als {@link FEMClosure} kompiliert werden.
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn Funktionen als Parameter nicht über {@link FEMFunction#toHandler()} sondern über
+	 * {@link FEMFunction#toClosure()} kompiliert werden.
 	 * 
 	 * @see #compileFunction()
 	 * @return Zulässigkeit der Bindung des Stapelrahmens. */

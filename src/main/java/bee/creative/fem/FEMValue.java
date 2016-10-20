@@ -1,6 +1,5 @@
 package bee.creative.fem;
 
-
 /** Diese Klasse implementiert einen abstrakten Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion}
  * oder als {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
  * <p>
@@ -73,14 +72,7 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** {@inheritDoc} */
 	@Override
-	public final FEMFunction withFrame(final FEMFrame frame) {
-		if (frame == null) throw new NullPointerException("frame = null");
-		return this;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public final FEMFunction withoutFrame() {
+	public final FEMFunction toClosure(final FEMFrame frame) {
 		return this;
 	}
 
