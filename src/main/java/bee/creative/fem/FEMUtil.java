@@ -22,8 +22,10 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 3) throw new IllegalArgumentException("frame.size() != 3");
-			return frame.get(FEMBoolean.from(frame.get(0), frame.context()).value() ? 1 : 2).result();
+			FEMUtil.assertSize(frame, 3, 3);
+			final FEMBoolean condition = FEMBoolean.from(frame.get(0), frame.context());
+			final FEMValue result = frame.get(condition.value() ? 1 : 2).result();
+			return result;
 		}
 
 	}, "if", "IF");
@@ -34,7 +36,7 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
+			FEMUtil.assertSize(frame, 2, 2);
 			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
 			final FEMValue value = frame.get(1);
 			variable.update(value);
@@ -49,7 +51,7 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
+			FEMUtil.assertSize(frame, 1, 1);
 			final FEMVariable variable = FEMVariable.from(frame.get(0), frame.context());
 			return variable.value();
 		}
@@ -62,9 +64,10 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
-			final FEMVariable variable = FEMVariable.from(frame.get(0));
-			return variable;
+			FEMUtil.assertSize(frame, 1, 1);
+			final FEMValue value = frame.get(0);
+			final FEMVariable result = FEMVariable.from(value);
+			return result;
 		}
 
 	}, "var", "VAR");
@@ -75,12 +78,13 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
+			FEMUtil.assertSize(frame, 1, Integer.MAX_VALUE);
 			final int size = frame.size() - 1;
-			if (size < 0) throw new IllegalArgumentException("frame.size() < 1");
 			for (int i = 0; i < size; i++) {
 				frame.get(i).result();
 			}
-			return frame.get(size).result();
+			final FEMValue result = frame.get(size).result();
+			return result;
 		}
 
 	}, "eval", "EVAL");
@@ -92,7 +96,7 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
-			if (frame.size() != 2) throw new IllegalArgumentException("frame.size() != 2");
+			FEMUtil.assertSize(frame, 2, 2);
 			final FEMContext context = frame.context();
 			final FEMArray array = FEMArray.from(frame.get(1), context);
 			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
@@ -108,8 +112,8 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) {
+			FEMUtil.assertSize(frame, 1, Integer.MAX_VALUE);
 			final int index = frame.size() - 1;
-			if (index < 0) throw new IllegalArgumentException("frame.size() < 1");
 			final FEMContext context = frame.context();
 			final FEMArray array = frame.params().section(0, index);
 			final FEMFunction method = FEMHandler.from(frame.get(index), context).value();
@@ -127,7 +131,7 @@ public abstract class FEMUtil {
 
 		@Override
 		public FEMValue invoke(final FEMFrame frame) throws NullPointerException {
-			if (frame.size() != 1) throw new IllegalArgumentException("frame.size() != 1");
+			FEMUtil.assertSize(frame, 1, 1);
 			final FEMContext context = frame.context();
 			final FEMFunction method = FEMHandler.from(frame.get(0), context).value();
 			for (int count = 0; true; count++) {
@@ -194,6 +198,18 @@ public abstract class FEMUtil {
 		for (final FEMProxy proxy: proxies) {
 			FEMUtil.update(proxy);
 		}
+	}
+
+	/** Diese Methode prüft die Anzahl der {@link FEMFrame#size() zugesicherten Parameter} des gegebenen {@link FEMFrame Stapelrahmen}.
+	 * 
+	 * @param frame Stapelrahmen.
+	 * @param minSize minimale zulässige Anzahl.
+	 * @param maxSize maximale zulässige Anzahl.
+	 * @throws IllegalArgumentException Wenn die Parameteranzahl ungültig ist. */
+	public static void assertSize(final FEMFrame frame, final int minSize, final int maxSize) throws IllegalArgumentException {
+		final int size = frame.size();
+		if (size < minSize) throw new IllegalArgumentException("frame.size() < " + minSize);
+		if (size > maxSize) throw new IllegalArgumentException("frame.size() > " + maxSize);
 	}
 
 }

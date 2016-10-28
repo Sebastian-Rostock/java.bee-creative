@@ -420,7 +420,7 @@ public final class FEMCompiler extends Parser {
 				result = this._compileFrame_();
 				if (this._compileType_() != '(') {
 					if (this._closureEnabled_) return result.toClosure();
-					return result.toHandler();
+					return result.toValue();
 				}
 				if (!this._concatEnabled_) throw this._illegal_(null, " Funktionsverkettungen ist nicht zulässsig.");
 				break;
@@ -626,7 +626,7 @@ public final class FEMCompiler extends Parser {
 		return this._concatEnabled_;
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn Funktionen als Parameter nicht über {@link FEMFunction#toHandler()} sondern über
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn Funktionen als Parameter nicht über {@link FEMFunction#toValue()} sondern über
 	 * {@link FEMFunction#toClosure()} kompiliert werden.
 	 * 
 	 * @see #compileFunction()

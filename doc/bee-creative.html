@@ -8759,57 +8759,6 @@ Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück.<br>
 </dl>
 </div>
 </div>
-<h2><a name='bee.creative.fem.FEMClosure'>FEMClosure</a></h2>
-<div>
-<h3 class='ST AF'>+ <a href='#bee.creative.fem'>bee.creative.fem</a>.<a href='#bee.creative.fem.FEMClosure'>FEMClosure</a><br>: <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></h3>
-<div>
-Diese Klasse implementiert eine Funktion, welche die zusätzlichen Parameterwerte des in der Methode <a href='#bee.creative.fem.FEMClosure.invoke(FEMFrame):FEMValue'>FEMClosure.invoke(FEMFrame)</a> gegebenen <a href='#bee.creative.fem.FEMFrame'>Stapelrahmens</a> an eine gegebene Funktion <a href='#bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction'>bindet</a> und diese gebundene Funktion anschließend als <a href='#bee.creative.fem.FEMHandler'>FEMHandler</a> liefert.<h4>see:</h4>
-<dl>
-<dt><a href='#bee.creative.fem.FEMClosure.invoke(FEMFrame):FEMValue'>FEMClosure.invoke(FEMFrame)</a></dt><dd></dd>
-</dl>
-</div>
-<h3 class='ST AF'>+ <a name='bee.creative.fem.FEMClosure.from(FEMFunction):FEMClosure'><a href='#bee.creative.fem.FEMClosure.from(FEMFunction):FEMClosure'>from</a>(<a href='#bee.creative.fem.FEMClosure.from(FEMFunction):FEMClosure-function'>function</a>: <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a>): <a href='#bee.creative.fem.FEMClosure'>FEMClosure</a></a></h3>
-<div>
-Diese Methode gibt die gegebene Funktion als <a href='#bee.creative.fem.FEMClosure'>FEMClosure</a> zurück.<h4>params:</h4>
-<dl>
-<dt><a name='bee.creative.fem.FEMClosure.from(FEMFunction):FEMClosure-function'>function</a></dt><dd>Funktion.</dd>
-</dl>
-<h4>returns:</h4>
-<dl>
-<dd><a href='#bee.creative.fem.FEMClosure'>FEMClosure</a>.</dd>
-</dl>
-<h4>throws:</h4>
-<dl>
-<dt><a>NullPointerException</a></dt><dd>Wenn <code>function</code> <code>null</code> ist.</dd>
-</dl>
-<h4>see:</h4>
-<dl>
-<dt><a href='#bee.creative.fem.FEMFunction.toClosure():FEMClosure'>FEMFunction.toClosure()</a></dt><dd></dd>
-</dl>
-</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMClosure.function():FEMFunction'><a href='#bee.creative.fem.FEMClosure.function():FEMFunction'>function</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
-<div>
-Diese Methode gibt die auszuwertende Funktion zurück.<h4>returns:</h4>
-<dl>
-<dd>auszuwertende Funktion.</dd>
-</dl>
-</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMClosure.invoke(FEMFrame):FEMValue'><a href='#bee.creative.fem.FEMClosure.invoke(FEMFrame):FEMValue'>invoke</a>(<a href='#bee.creative.fem.FEMClosure.invoke(FEMFrame):FEMValue-frame'>frame</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMValue'>FEMValue</a></a></h3>
-<div>
-
- <p>
- Der Ergebniswert entspricht <code>this.function().withFrame(frame).toHandler()</code>. Damit wird der gegebene Stapelrahmen an die <a href='#bee.creative.fem.FEMClosure.function():FEMFunction'>Funktion</a>
- gebunden und als <a href='#bee.creative.fem.FEMHandler'>Funktionszeiger</a> geliefert.</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMClosure.withTracer(FEMTracer):FEMFunction'><a href='#bee.creative.fem.FEMClosure.withTracer(FEMTracer):FEMFunction'>withTracer</a>(<a href='#bee.creative.fem.FEMClosure.withTracer(FEMTracer):FEMFunction-tracer'>tracer</a>: <a href='#bee.creative.fem.FEMTracer'>FEMTracer</a>): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
-<div>
-</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMClosure.withoutTracer():FEMFunction'><a href='#bee.creative.fem.FEMClosure.withoutTracer():FEMFunction'>withoutTracer</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
-<div>
-</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMClosure.toScript(FEMFormatter):void'><a href='#bee.creative.fem.FEMClosure.toScript(FEMFormatter):void'>toScript</a>(<a href='#bee.creative.fem.FEMClosure.toScript(FEMFormatter):void-target'>target</a>: <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a>): void</a></h3>
-<div>
-</div>
-</div>
 <h2><a name='bee.creative.fem.FEMCompiler'>FEMCompiler</a></h2>
 <div>
 <h3 class='ST AF'>+ <a href='#bee.creative.fem'>bee.creative.fem</a>.<a href='#bee.creative.fem.FEMCompiler'>FEMCompiler</a><br>: <a href='#bee.creative.util.Parser'>Parser</a></h3>
@@ -8934,7 +8883,8 @@ Diese Methode gibt nur dann <code>true</code> zurück, wenn die Verkettung von F
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMCompiler.isClosureEnabled():boolean'><a href='#bee.creative.fem.FEMCompiler.isClosureEnabled():boolean'>isClosureEnabled</a>(): boolean</a></h3>
 <div>
-Diese Methode gibt nur dann <code>true</code> zurück, wenn parametrisierte Funktionen als <a href='#bee.creative.fem.FEMClosure'>FEMClosure</a> kompiliert werden.<h4>returns:</h4>
+Diese Methode gibt nur dann <code>true</code> zurück, wenn Funktionen als Parameter nicht über <a href='#bee.creative.fem.FEMFunction.toValue():FEMValue'>FEMFunction.toValue()</a> sondern über
+ <a href='#bee.creative.fem.FEMFunction.toClosure():FEMFunction'>FEMFunction.toClosure()</a> kompiliert werden.<h4>returns:</h4>
 <dl>
 <dd>Zulässigkeit der Bindung des Stapelrahmens.</dd>
 </dl>
@@ -10789,8 +10739,8 @@ Diese Methode gibt den im <a href='#bee.creative.fem.FEMCompiler.section():Strin
 <div>
 Diese Methode gibt den im <a href='#bee.creative.fem.FEMCompiler.section():String'>aktuellen Bereich</a> des gegebenen Kompilers angegebene Parameter als Funktion zurück.<br>
  Der Wert des Parameters entspricht dabei dem Ergebniswert der gelieferten Funktion.<br>
- Konstante Parameterwerte können als <a href='#bee.creative.fem.FEMValue'>FEMValue</a> oder <a href='#bee.creative.fem.FEMProxy'>FEMProxy</a> geliefert werden. Funktion als Parameterwert können als <a href='#bee.creative.fem.FEMHandler'>FEMHandler</a> oder
- <a href='#bee.creative.fem.FEMClosure'>FEMClosure</a> geliefert werden.<h4>params:</h4>
+ Konstante Parameterwerte können als <a href='#bee.creative.fem.FEMValue'>FEMValue</a> oder <a href='#bee.creative.fem.FEMProxy'>FEMProxy</a> geliefert werden. Funktion als Parameterwert können über
+ <a href='#bee.creative.fem.FEMFunction.toValue():FEMValue'>FEMFunction.toValue()</a> oder <a href='#bee.creative.fem.FEMFunction.toClosure():FEMFunction'>FEMFunction.toClosure()</a> geliefert werden.<h4>params:</h4>
 <dl>
 <dt><a name='bee.creative.fem.FEMDomain.compileFunction(FEMCompiler):FEMFunction-compiler'>compiler</a></dt><dd>Kompiler mit Bereich und Quelltext.</dd>
 </dl>
@@ -12222,29 +12172,6 @@ Diese Methode gibt diese Funktion mit Verfolgung bzw. Überwachung der Verarbeit
 <dt><a href='#bee.creative.fem.FEMFunction.withoutTracer():FEMFunction'>FEMFunction.withoutTracer()</a></dt><dd></dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction'><a href='#bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction'>withFrame</a>(<a href='#bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction-params'>params</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
-<div>
-Diese Methode gibt diese Funktion an den gegebenen <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> gebunden zurück.
- <p>
- Die zugesicherten Parameterwerte sowie das Kontextobjekt für den <a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>Aufruf</a> der gelieferten Funktion entsprechen hierbei denen des in
- der Methode <a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>FEMFunction.invoke(FEMFrame)</a> übergeben Stapelrahmen <code>frame</code>. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
- <code>params</code>, d.h. <code>this.invoke(params.withParams(frame.params()))</code>.<h4>params:</h4>
-<dl>
-<dt><a name='bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction-params'>params</a></dt><dd><a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> mit den zugesicherten Parameterwerten.</dd>
-</dl>
-<h4>returns:</h4>
-<dl>
-<dd><a href='#bee.creative.fem.FEMFunction'>FEMFunction</a> mit gebundenem <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>.</dd>
-</dl>
-<h4>throws:</h4>
-<dl>
-<dt><a>NullPointerException</a></dt><dd>Wenn <code>params</code> <code>null</code> ist.</dd>
-</dl>
-<h4>see:</h4>
-<dl>
-<dt><a href='#bee.creative.fem.FEMFunction.withoutFrame():FEMFunction'>FEMFunction.withoutFrame()</a></dt><dd></dd>
-</dl>
-</div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.withoutTracer():FEMFunction'><a href='#bee.creative.fem.FEMFunction.withoutTracer():FEMFunction'>withoutTracer</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
 <div>
 Diese Methode gibt diese Funktion ohne das über <a href='#bee.creative.fem.FEMFunction.withTracer(FEMTracer):FEMFunction'>FEMFunction.withTracer(FEMTracer)</a> gebundene <a href='#bee.creative.fem.FEMTracer'>Überwachungsobjekt</a> zurück.<h4>returns:</h4>
@@ -12256,15 +12183,17 @@ Diese Methode gibt diese Funktion ohne das über <a href='#bee.creative.fem.FEMF
 <dt><a href='#bee.creative.fem.FEMFunction.withTracer(FEMTracer):FEMFunction'>FEMFunction.withTracer(FEMTracer)</a></dt><dd></dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.withoutFrame():FEMFunction'><a href='#bee.creative.fem.FEMFunction.withoutFrame():FEMFunction'>withoutFrame</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toValue():FEMValue'><a href='#bee.creative.fem.FEMFunction.toValue():FEMValue'>toValue</a>(): <a href='#bee.creative.fem.FEMValue'>FEMValue</a></a></h3>
 <div>
-Diese Methode gibt diese Funktion ohne dem über <a href='#bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction'>FEMFunction.withFrame(FEMFrame)</a> gebundenen <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> zurück.<h4>returns:</h4>
+Diese Methode gibt einen Funktionszeiger auf diese Funktion als <a href='#bee.creative.fem.FEMValue'>Wert</a> zurück.<br>
+ Ein Wert liefert hierbei sich selbst. Jede andere Funktion liefert einen <a href='#bee.creative.fem.FEMHandler'>FEMHandler</a>, sodass die über <code>this.toValue().toFunction()</code> ermittelte
+ Funktion gleich zu dieser ist.<h4>returns:</h4>
 <dl>
-<dd>Funktion ohne <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a>.</dd>
+<dd>Funktionszeiger.</dd>
 </dl>
 <h4>see:</h4>
 <dl>
-<dt><a href='#bee.creative.fem.FEMFunction.withFrame(FEMFrame):FEMFunction'>FEMFunction.withFrame(FEMFrame)</a></dt><dd></dd>
+<dt><a href='#bee.creative.fem.FEMHandler'>FEMHandler</a></dt><dd></dd>
 </dl>
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toFuture():FEMFunction'><a href='#bee.creative.fem.FEMFunction.toFuture():FEMFunction'>toFuture</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
@@ -12291,24 +12220,32 @@ Diese Methode gibt das Ergebnis dieser Funktion als <a href='#bee.creative.fem.F
 <dt><a>NullPointerException</a></dt><dd>Wenn <code>frame</code> <code>null</code> ist.</dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toClosure():FEMClosure'><a href='#bee.creative.fem.FEMFunction.toClosure():FEMClosure'>toClosure</a>(): <a href='#bee.creative.fem.FEMClosure'>FEMClosure</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toClosure():FEMFunction'><a href='#bee.creative.fem.FEMFunction.toClosure():FEMFunction'>toClosure</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
 <div>
 Diese Methode gibt eine Parameterfunktion zurück, welche bei der <a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>Auswertung</a> mit einem <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> <code>frame</code>
  einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
- <code>this.withFrame(frame).toHandler()</code>.<h4>returns:</h4>
+ <code>this.toClosure(frame).toHandler()</code>.<h4>returns:</h4>
 <dl>
 <dd>Funktionszeiger mit Stapalrahmenbindung.</dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toHandler():FEMHandler'><a href='#bee.creative.fem.FEMFunction.toHandler():FEMHandler'>toHandler</a>(): <a href='#bee.creative.fem.FEMHandler'>FEMHandler</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toClosure(FEMFrame):FEMFunction'><a href='#bee.creative.fem.FEMFunction.toClosure(FEMFrame):FEMFunction'>toClosure</a>(<a href='#bee.creative.fem.FEMFunction.toClosure(FEMFrame):FEMFunction-params'>params</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
 <div>
-Diese Methode gibt einen Funktionszeiger auf diese Funktion als Wert zurück.<h4>returns:</h4>
+Diese Methode gibt diese Funktion an den gegebenen <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> gebunden zurück.
+ <p>
+ Die zugesicherten Parameterwerte sowie das Kontextobjekt für den <a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>Aufruf</a> der gelieferten Funktion entsprechen hierbei denen des in
+ der Methode <a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>FEMFunction.invoke(FEMFrame)</a> übergeben Stapelrahmen <code>frame</code>. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
+ <code>params</code>, d.h. <code>this.invoke(params.withParams(frame.params()))</code>.<h4>params:</h4>
 <dl>
-<dd>Funktionszeiger.</dd>
+<dt><a name='bee.creative.fem.FEMFunction.toClosure(FEMFrame):FEMFunction-params'>params</a></dt><dd><a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a> mit den zugesicherten Parameterwerten.</dd>
 </dl>
-<h4>see:</h4>
+<h4>returns:</h4>
 <dl>
-<dt><a href='#bee.creative.fem.FEMHandler'>FEMHandler</a></dt><dd></dd>
+<dd><a href='#bee.creative.fem.FEMFunction'>FEMFunction</a> mit gebundenem <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>.</dd>
+</dl>
+<h4>throws:</h4>
+<dl>
+<dt><a>NullPointerException</a></dt><dd>Wenn <code>params</code> <code>null</code> ist.</dd>
 </dl>
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFunction.toScript(FEMFormatter):void'><a href='#bee.creative.fem.FEMFunction.toScript(FEMFormatter):void'>toScript</a>(<a href='#bee.creative.fem.FEMFunction.toScript(FEMFormatter):void-target'>target</a>: <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a>): void</a></h3>
@@ -12433,7 +12370,7 @@ Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.<h4>params:
 </dl>
 <h4>see:</h4>
 <dl>
-<dt><a href='#bee.creative.fem.FEMFunction.toHandler():FEMHandler'>FEMFunction.toHandler()</a></dt><dd></dd>
+<dt><a href='#bee.creative.fem.FEMFunction.toValue():FEMValue'>FEMFunction.toValue()</a></dt><dd></dd>
 </dl>
 </div>
 <h3 class='ST AF'>+ <a name='bee.creative.fem.FEMHandler.from(FEMValue,FEMContext):FEMHandler'><a href='#bee.creative.fem.FEMHandler.from(FEMValue,FEMContext):FEMHandler'>from</a>(<a href='#bee.creative.fem.FEMHandler.from(FEMValue,FEMContext):FEMHandler-value'>value</a>: <a href='#bee.creative.fem.FEMValue'>FEMValue</a>, <a href='#bee.creative.fem.FEMHandler.from(FEMValue,FEMContext):FEMHandler-context'>context</a>: <a href='#bee.creative.fem.FEMContext'>FEMContext</a>): <a href='#bee.creative.fem.FEMHandler'>FEMHandler</a></a></h3>
@@ -12503,6 +12440,9 @@ Diese Methode gibt <a href='#bee.creative.fem.FEMHandler.TYPE:FEMType'>FEMHandle
 <div>
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMHandler.toScript(FEMFormatter):void'><a href='#bee.creative.fem.FEMHandler.toScript(FEMFormatter):void'>toScript</a>(<a href='#bee.creative.fem.FEMHandler.toScript(FEMFormatter):void-target'>target</a>: <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a>): void</a></h3>
+<div>
+</div>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMHandler.toFunction():FEMFunction'><a href='#bee.creative.fem.FEMHandler.toFunction():FEMFunction'>toFunction</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
 <div>
 </div>
 </div>
@@ -14624,6 +14564,19 @@ Diese Methode setzt über <a href='#bee.creative.fem.FEMUtil.update(FEMProxy):vo
 <dt><a href='#bee.creative.fem.FEMUtil.update(FEMProxy):void'>FEMUtil.update(FEMProxy)</a></dt><dd></dd>
 </dl>
 </div>
+<h3 class='ST AF'>+ <a name='bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void'><a href='#bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void'>assertSize</a>(<a href='#bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-frame'>frame</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>, <a href='#bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-minSize'>minSize</a>: int, <a href='#bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-maxSize'>maxSize</a>: int): void</a></h3>
+<div>
+Diese Methode prüft die Anzahl der <a href='#bee.creative.fem.FEMFrame.size():int'>zugesicherten Parameter</a> des gegebenen <a href='#bee.creative.fem.FEMFrame'>Stapelrahmen</a>.<h4>params:</h4>
+<dl>
+<dt><a name='bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-frame'>frame</a></dt><dd>Stapelrahmen.</dd>
+<dt><a name='bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-minSize'>minSize</a></dt><dd>minimale zulässige Anzahl.</dd>
+<dt><a name='bee.creative.fem.FEMUtil.assertSize(FEMFrame,int,int):void-maxSize'>maxSize</a></dt><dd>maximale zulässige Anzahl.</dd>
+</dl>
+<h4>throws:</h4>
+<dl>
+<dt><a>IllegalArgumentException</a></dt><dd>Wenn die Parameteranzahl ungültig ist.</dd>
+</dl>
+</div>
 <h3 class='ST AF'>+ <a name='bee.creative.fem.FEMUtil()'><a href='#bee.creative.fem.FEMUtil()'>FEMUtil</a>()</a></h3>
 <div>
 </div>
@@ -14713,13 +14666,47 @@ Diese Methode gibt diesen Wert als ausgewerteten und optimierten Ergebniswert zu
 <dt><a href='#bee.creative.fem.FEMFunction.invoke(FEMFrame):FEMValue'>FEMFunction.invoke(FEMFrame)</a></dt><dd></dd>
 </dl>
 </div>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.equals(FEMValue):boolean'><a href='#bee.creative.fem.FEMValue.equals(FEMValue):boolean'>equals</a>(<a href='#bee.creative.fem.FEMValue.equals(FEMValue):boolean-that'>that</a>: <a href='#bee.creative.fem.FEMValue'>FEMValue</a>): boolean</a></h3>
+<div>
+Diese Methode gibt nur dann <code>true</code> zurück, wenn <a href='#bee.creative.fem.FEMValue.type():FEMType'>Datentyp</a> und <a href='#bee.creative.fem.FEMValue.data():Object'>Nutzdaten</a> dieses Werts
+ <a href='#bee.creative.util.Objects.equals(Object,Object):boolean'>äquivalent</a> zu denen des gegebenen Werts sind.<h4>params:</h4>
+<dl>
+<dt><a name='bee.creative.fem.FEMValue.equals(FEMValue):boolean-that'>that</a></dt><dd>Zeitangabe.</dd>
+</dl>
+<h4>returns:</h4>
+<dl>
+<dd>Gleichheit.</dd>
+</dl>
+<h4>throws:</h4>
+<dl>
+<dt><a>NullPointerException</a></dt><dd>Wenn <code>that</code> <code>null</code> ist.</dd>
+</dl>
+<h4>see:</h4>
+<dl>
+<dt><a href='#bee.creative.fem.FEMValue.type():FEMType'>FEMValue.type()</a></dt><dd></dd>
+<dt><a href='#bee.creative.fem.FEMValue.data():Object'>FEMValue.data()</a></dt><dd></dd>
+<dt><a href='#bee.creative.util.Objects.equals(Object,Object):boolean'>Objects.equals(Object, Object)</a></dt><dd></dd>
+</dl>
+</div>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.toValue():FEMValue'><a href='#bee.creative.fem.FEMValue.toValue():FEMValue'>toValue</a>(): <a href='#bee.creative.fem.FEMValue'>FEMValue</a></a></h3>
+<div>
+</div>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.toFunction():FEMFunction'><a href='#bee.creative.fem.FEMValue.toFunction():FEMFunction'>toFunction</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
+<div>
+Diese Methode gibt die <a href='#bee.creative.fem.FEMFunction'>Funktion</a> dieses Werts zurück.<br>
+ Bei einem <a href='#bee.creative.fem.FEMHandler'>Funktionszeiger</a> ist dies dessen <a href='#bee.creative.fem.FEMHandler.value():FEMFunction'>Funktion</a>. Jeder andere Wert liefert sich selbst.<h4>returns:</h4>
+<dl>
+<dd>Funktion des Werts.</dd>
+</dl>
+<h4>see:</h4>
+<dl>
+<dt><a href='#bee.creative.fem.FEMHandler'>FEMHandler</a></dt><dd></dd>
+</dl>
+</div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.invoke(FEMFrame):FEMValue'><a href='#bee.creative.fem.FEMValue.invoke(FEMFrame):FEMValue'>invoke</a>(<a href='#bee.creative.fem.FEMValue.invoke(FEMFrame):FEMValue-frame'>frame</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMValue'>FEMValue</a></a></h3>
 <div>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.withFrame(FEMFrame):FEMFunction'><a href='#bee.creative.fem.FEMValue.withFrame(FEMFrame):FEMFunction'>withFrame</a>(<a href='#bee.creative.fem.FEMValue.withFrame(FEMFrame):FEMFunction-frame'>frame</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
-<div>
-</div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.withoutFrame():FEMFunction'><a href='#bee.creative.fem.FEMValue.withoutFrame():FEMFunction'>withoutFrame</a>(): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.toClosure(FEMFrame):FEMFunction'><a href='#bee.creative.fem.FEMValue.toClosure(FEMFrame):FEMFunction'>toClosure</a>(<a href='#bee.creative.fem.FEMValue.toClosure(FEMFrame):FEMFunction-frame'>frame</a>: <a href='#bee.creative.fem.FEMFrame'>FEMFrame</a>): <a href='#bee.creative.fem.FEMFunction'>FEMFunction</a></a></h3>
 <div>
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMValue.toScript(FEMFormatter):void'><a href='#bee.creative.fem.FEMValue.toScript(FEMFormatter):void'>toScript</a>(<a href='#bee.creative.fem.FEMValue.toScript(FEMFormatter):void-target'>target</a>: <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a>): void</a></h3>

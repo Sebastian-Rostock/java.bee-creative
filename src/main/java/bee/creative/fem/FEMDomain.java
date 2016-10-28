@@ -114,7 +114,7 @@ public class FEMDomain {
 	/** Diese Methode gibt den im {@link FEMCompiler#section() aktuellen Bereich} des gegebenen Kompilers angegebene Parameter als Funktion zurück.<br>
 	 * Der Wert des Parameters entspricht dabei dem Ergebniswert der gelieferten Funktion.<br>
 	 * Konstante Parameterwerte können als {@link FEMValue} oder {@link FEMProxy} geliefert werden. Funktion als Parameterwert können über
-	 * {@link FEMFunction#toHandler()} oder {@link FEMFunction#toClosure()} geliefert werden.
+	 * {@link FEMFunction#toValue()} oder {@link FEMFunction#toClosure()} geliefert werden.
 	 * 
 	 * @see FEMCompiler#proxy(String)
 	 * @see FEMCompiler#range()

@@ -16,12 +16,13 @@ public final class FEMHandler extends FEMValue {
 
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
 	 * 
-	 * @see FEMFunction#toHandler()
+	 * @see FEMFunction#toValue()
 	 * @param function Funktion.
 	 * @return Funktionszeiger.
 	 * @throws NullPointerException Wenn {@code function} {@code null} ist. */
 	public static FEMHandler from(final FEMFunction function) throws NullPointerException {
-		return function.toHandler();
+		if (function == null) throw new NullPointerException("function = null");
+		return new FEMHandler(function);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.
@@ -124,6 +125,12 @@ public final class FEMHandler extends FEMValue {
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
 		target.putFunction(this._value_);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMFunction toFunction() {
+		return this._value_;
 	}
 
 }

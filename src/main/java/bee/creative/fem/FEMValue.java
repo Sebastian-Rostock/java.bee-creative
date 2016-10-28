@@ -1,5 +1,7 @@
 package bee.creative.fem;
 
+import bee.creative.util.Objects;
+
 /** Diese Klasse implementiert einen abstrakten Wert, der als Ergebnis der {@link FEMFunction#invoke(FEMFrame) Auswertung} einer {@link FEMFunction Funktion}
  * oder als {@link FEMFrame#get(int) Parameterwert} in einem {@link FEMFrame Stapelrahmen} zur Auswertung einer Funktion verwendet werden kann.
  * <p>
@@ -59,6 +61,34 @@ public abstract class FEMValue extends FEMFunction {
 	 * @see FEMFunction#invoke(FEMFrame)
 	 * @return ausgewerteter Ergebniswert. */
 	public FEMValue result(final boolean recursive) {
+		return this;
+	}
+
+	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #type() Datentyp} und {@link #data() Nutzdaten} dieses Werts
+	 * {@link Objects#equals(Object, Object) äquivalent} zu denen des gegebenen Werts sind.
+	 * 
+	 * @see #type()
+	 * @see #data()
+	 * @see Objects#equals(Object, Object)
+	 * @param that Zeitangabe.
+	 * @return Gleichheit.
+	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
+	public final boolean equals(final FEMValue that) throws NullPointerException {
+		return Objects.equals(this.type(), that.type()) && Objects.equals(this.data(), that.data());
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final FEMValue toValue() {
+		return this;
+	}
+
+	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück.<br>
+	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() Funktion}. Jeder andere Wert liefert sich selbst.
+	 * 
+	 * @see FEMHandler
+	 * @return Funktion des Werts. */
+	public FEMFunction toFunction() {
 		return this;
 	}
 
