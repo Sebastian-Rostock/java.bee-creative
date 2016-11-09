@@ -13,14 +13,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Konstruktion und Verarbeitung von {@link Field}s.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Fields {
 
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation eines {@link Set}, welches über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie des {@link Set}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
 	 * wird.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
@@ -31,28 +31,28 @@ public final class Fields {
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link List}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link List}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
 	 * wird.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
 	public static interface ListField<GInput, GItem> extends ItemsField<GInput, GItem>, Field<GInput, List<GItem>> {
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#add(int, Object)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param index Index.
 		 * @param item Element. */
 		public void append(final GInput input, final int index, final GItem item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#addAll(int, Collection)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param index Index.
 		 * @param items Elemente. */
 		public void appendAll(final GInput input, final int index, final Iterable<? extends GItem> items);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link List#remove(int)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param index Index. */
 		public void remove(final GInput input, final int index);
@@ -62,7 +62,7 @@ public final class Fields {
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link #set(Object, Object)} zugewiesen
 	 * wird.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
@@ -74,37 +74,37 @@ public final class Fields {
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Collection}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der Objektsammlung, welche nach ihrer Modifikation über {@link Field#set(Object, Object)}
 	 * zugewiesen wird.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
 	public static interface ItemsField<GInput, GItem> {
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#clear()}.
-		 * 
+		 *
 		 * @param input Eingabe. */
 		public void clear(final GInput input);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#add(Object)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param item Element. */
 		public void append(final GInput input, final GItem item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#addAll(Collection)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param items Elemente. */
 		public void appendAll(final GInput input, final Iterable<? extends GItem> items);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#remove(Object)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param item Element. */
 		public void remove(final GInput input, final Object item);
 
 		/** Diese Methode verändert die Sammlung analog zu {@link Collection#removeAll(Collection)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param items Elemente. */
 		public void removeAll(final GInput input, final Iterable<?> items);
@@ -114,7 +114,7 @@ public final class Fields {
 	/** Diese Schnittstelle definiert einen Adapter zur Modifikation einer {@link Map}, welche über ein {@link Field} einer gegebenen Eingabe gelesen bzw.
 	 * geschrieben wird. Die Modifikation erfolgt an einer Kopie der {@link Map}, welche nach ihrer Modifikation über {@link Field#set(Object, Object)} zugewiesen
 	 * wird.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
@@ -122,31 +122,31 @@ public final class Fields {
 	public static interface EntriesField<GInput, GKey, GValue> {
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#clear()}.
-		 * 
+		 *
 		 * @param input Eingabe. */
 		public void clear(final GInput input);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#put(Object, Object)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param key Schlüssel.
 		 * @param value Wert. */
 		public void append(final GInput input, final GKey key, GValue value);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#putAll(Map)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param entries Elemente. */
 		public void appendAll(final GInput input, final Iterable<? extends Entry<? extends GKey, ? extends GValue>> entries);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#remove(Object)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param key Schlüssel. */
 		public void remove(final GInput input, final Object key);
 
 		/** Diese Methode verändert die {@link Map} analog zu {@link Map#keySet()} mit {@link Set#removeAll(Collection)}.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @param keys Schlüssel. */
 		public void removeAll(final GInput input, final Iterable<?> keys);
@@ -154,7 +154,7 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link Field}, welches das Schreiben ignoriert.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabeobjekts.
 	 * @param <GValue> Typ des Werts der Eigenschaft. */
@@ -168,14 +168,14 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link SetField}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GItem> Typ der Elemente. */
 	public static abstract class BaseSetField<GInput, GItem> extends BaseField<GInput, Set<GItem>> implements SetField<GInput, GItem> {
 
 		/** Diese Methode gibt ein {@link SetField} zurück, welches das {@link Set} über das gegebene {@link Field} liest und schreibt.
-		 * 
+		 *
 		 * @param <GInput> Typ der Eingabe.
 		 * @param <GItem> Typ der Elemente.
 		 * @param field {@link Field} zum Lesen und Schreiben des {@link Set}.
@@ -206,7 +206,7 @@ public final class Fields {
 		{}
 
 		/** Diese Methode gibt eine Bearbeitungskopie des gegebenen {@link Set}s zurück.
-		 * 
+		 *
 		 * @param value {@link Set}.
 		 * @return Bearbeitungskopie. */
 		protected Set<GItem> copy(final Set<GItem> value) {
@@ -259,14 +259,14 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link ListField}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GEntry> Typ der Elemente. */
 	public static abstract class BaseListField<GInput, GEntry> extends BaseField<GInput, List<GEntry>> implements ListField<GInput, GEntry> {
 
 		/** Diese Methode gibt ein {@link ListField} zurück, welches das {@link List} über das gegebene {@link Field} liest und schreibt.
-		 * 
+		 *
 		 * @param <GInput> Typ der Eingabe.
 		 * @param <GItem> Typ der Elemente.
 		 * @param field {@link Field} zum Lesen und Schreiben einer {@link List}.
@@ -298,7 +298,7 @@ public final class Fields {
 		{}
 
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link List} zurück.
-		 * 
+		 *
 		 * @param value {@link List}.
 		 * @return Bearbeitungskopie. */
 		protected List<GEntry> copy(final List<GEntry> value) {
@@ -372,7 +372,7 @@ public final class Fields {
 	}
 
 	/** Diese Klasse implementiert ein abstraktes {@link MapField}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GKey> Typ der Schlüssel.
@@ -380,7 +380,7 @@ public final class Fields {
 	public static abstract class BaseMapField<GInput, GKey, GValue> extends BaseField<GInput, Map<GKey, GValue>> implements MapField<GInput, GKey, GValue> {
 
 		/** Diese Methode gibt ein {@link MapField} zurück, welches die {@link Map} über das gegebene {@link Field} liest und schreibt.
-		 * 
+		 *
 		 * @param <GInput> Typ der Eingabe.
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte.
@@ -413,7 +413,7 @@ public final class Fields {
 		{}
 
 		/** Diese Methode gibt eine Bearbeitungskopie der gegebenen {@link Map} zurück.
-		 * 
+		 *
 		 * @param value {@link Map}.
 		 * @return Bearbeitungskopie. */
 		protected Map<GKey, GValue> copy(final Map<GKey, GValue> value) {
@@ -472,7 +472,7 @@ public final class Fields {
 	{}
 
 	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
-	 * 
+	 *
 	 * @param <GValue> Typ des Werts.
 	 * @param value Wert.
 	 * @return {@code value}-{@link Field}. */
@@ -492,10 +492,24 @@ public final class Fields {
 		};
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseField(fieldText))}.
+	 *
+	 * @see #nativeField(java.lang.reflect.Field)
+	 * @see Natives#parseField(String)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param fieldText Datenfeldtext.
+	 * @return {@code native}-{@link Field}.
+	 * @throws NullPointerException Wenn {@link Natives#parseField(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parseField(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String fieldText) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(Natives.parseField(fieldText));
+	}
+
 	/** Diese Methode gibt ein {@link Field} zum gegebenen {@link java.lang.reflect.Field nativen Datenfeld} zurück.<br>
 	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code field.get(input)}. Das Schreiben eines Werts {@code value}
 	 * erfolgt hierbei über {@code field.set(input, value)}. Bei Klassenfeldern wird die Eingabe ignoriert.
-	 * 
+	 *
 	 * @see java.lang.reflect.Field#get(Object)
 	 * @see java.lang.reflect.Field#set(Object, Object)
 	 * @param <GInput> Typ der Eingabe.
@@ -505,30 +519,6 @@ public final class Fields {
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
 		if (field == null) throw new NullPointerException("field = null");
-		return Fields._nativeField_(field);
-	}
-
-	/** Diese Methode gibt ein {@link Field} zu den gegebenen {@link java.lang.reflect.Method nativen Methoden} zurück.<br>
-	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code getMethod.invoke(input)}. Das Schreiben des Werts {@code value}
-	 * erfolgt hierbei für Klassenmethoden über {@code setMethod.invoke(input, value)}. Bei Klassenmethoden wird die Eingabe ignoriert.
-	 * 
-	 * @see java.lang.reflect.Method#invoke(Object, Object...)
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts der Eigenschaft.
-	 * @param getMethod Methode zum Lesen der Eigenschaft.
-	 * @param setMethod Methode zum Schreiben der Eigenschaft.
-	 * @return {@code native}-{@link Field}.
-	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
-	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
-		throws NullPointerException, IllegalArgumentException {
-		final int getSize = getMethod.getParameterTypes().length, setSize = setMethod.getParameterTypes().length;
-		if ((getSize != 0) || (setSize != 1)) throw new IllegalArgumentException();
-		return Fields._nativeField_(getMethod, setMethod);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Field field) {
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -553,14 +543,51 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeField", field);
+				return Objects.toInvokeString("nativeField", Natives.formatField(field));
 			}
 
 		};
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseMethod(getMethodText), Natives.parseMethod(setMethodText))}.
+	 *
+	 * @see #nativeField(java.lang.reflect.Method, java.lang.reflect.Method)
+	 * @see Natives#parseMethod(String)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param getMethodText Methodentext der Methode zum Lesen der Eigenschaft.
+	 * @param setMethodText Methodentext der Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Field}.
+	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMethodText, final String setMethodText)
+		throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeField(Natives.parseMethod(getMethodText), Natives.parseMethod(setMethodText));
+	}
+
+	/** Diese Methode gibt ein {@link Field} zu den gegebenen {@link java.lang.reflect.Method nativen Methoden} zurück.<br>
+	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code getMethod.invoke(input)}. Das Schreiben des Werts {@code value}
+	 * erfolgt hierbei für Klassenmethoden über {@code setMethod.invoke(input, value)}. Bei Klassenmethoden wird die Eingabe ignoriert.
+	 *
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param getMethod Methode zum Lesen der Eigenschaft.
+	 * @param setMethod Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Field}.
+	 * @throws NullPointerException Wenn {@code getMethod} bzw. {@code setMethod} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
+		throws NullPointerException, IllegalArgumentException {
+		final int getSize = getMethod.getParameterTypes().length, setSize = setMethod.getParameterTypes().length;
+		if ((getSize != 0) || (setSize != 1)) throw new IllegalArgumentException();
+		return Fields._nativeField_(getMethod, setMethod);
+	}
+
 	@SuppressWarnings ("javadoc")
 	static <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod) {
+		if (getMethod == null) throw new NullPointerException("getMethod = null");
+		if (setMethod == null) throw new NullPointerException("setMethod = null");
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -585,7 +612,7 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeField", getMethod, setMethod);
+				return Objects.toInvokeString("nativeField", Natives.formatMethod(getMethod), Natives.formatMethod(setMethod));
 			}
 
 		};
@@ -594,7 +621,7 @@ public final class Fields {
 	/** Diese Methode gibt ein navigiertes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
 	 * {@link Field} navigiert. Das Lesen der Eigenschaft einer Einagbe {@code input} erfolgt damit über {@code field.get(converter.convert(input))} und ein Wert
 	 * {@code value} wird dann via {@code field.set(converter.convert(input), value)} geschrieben.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ des Elements als Ausgabe des {@link Converter}s sowie als Eingabe des {@link Field}s.
 	 * @param <GValue> Typ des Werts.
@@ -632,7 +659,7 @@ public final class Fields {
 	 * Das gelieferte {@link Field} gibt beim Lesen den (externen) Wert zurück, der über den gegebenen {@code formatter} aus dem über das gegebene {@link Field}
 	 * ermittelten (internen) Wert berechnet wird. Beim Schreiben eines (externen) Werts wird dieser über den {@code parser} in einen (internen) Wert überfüght,
 	 * welcher anschließend an das gegebene {@link Field} delegiert wird.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param <GValue2> Typ des internen Werts des {@link Field}s.
@@ -667,7 +694,7 @@ public final class Fields {
 	}
 
 	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie {@code null} als Leer- und Mischwert nutzt.
-	 * 
+	 *
 	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
 	 * @param <GInput> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
@@ -680,7 +707,7 @@ public final class Fields {
 	}
 
 	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches keine Umwandlungen durchführt sowie die gegebenen Leer- und Mischwerte nutzt.
-	 * 
+	 *
 	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
 	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft der Elemente.
@@ -694,10 +721,10 @@ public final class Fields {
 		return Fields.aggregatedField(field, Converters.<GValue>neutralConverter(), Converters.<GValue>neutralConverter(), emptyValue, mixedValue);
 	}
 
-	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie {@code null} als Leer-
-	 * und Mischwert nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen immer
-	 * {@code null} geliefert.
-	 * 
+	/** Diese Methode gibt ein aggregierendes {@link Field} zurück, welches die gegebenen {@link Converter} zum Parsen und Formatieren sowie {@code null} als
+	 * Leer- und Mischwert nutzt. Wenn {@code parser} {@code null} ist, wird das Schreiben ignoriert. Wenn {@code formatter} {@code null} ist, wird beim Lesen
+	 * immer {@code null} geliefert.
+	 *
 	 * @see #aggregatedField(Field, Converter, Converter, Object, Object)
 	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GValue> Typ des Werts dieses {@link Field}s.
@@ -730,7 +757,7 @@ public final class Fields {
 	 * <li>Die Eingabe ist leer oder {@code null}. Hier wird der gegebene Leerwert geliefert.</li>
 	 * <li>Die für jedes Element ermittelten Werte der Eigenschaft unterscheiden sich. Hier wird der gegebene Mischwert geliefert.</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente in der iterierbaren Eingabe.
 	 * @param <GValue> Typ des Werts dieses {@link Field}s.
 	 * @param <GValue2> Typ des Werts der Elemente.
@@ -782,7 +809,7 @@ public final class Fields {
 
 	/** Diese Methode gibt ein bedingtes {@link Field} zurück, welches über die Weiterleitug der Eingabe mit Hilfe eines {@link Filter} entscheiden. Wenn der
 	 * gegebene {@link Filter} eine Eingabe akzeptiert, wird diese an {@code accept} delegiert. Andernfalls wird sie an {@code reject} delegiert.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param condition {@link Filter}.
@@ -820,7 +847,7 @@ public final class Fields {
 	}
 
 	/** Diese Methode gibt ein {@link Field} zurück, welches das gegebene {@link Field} via {@code synchronized(field)} synchronisiert.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts der Eigenschaft.
 	 * @param field {@link Field}.

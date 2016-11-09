@@ -4,7 +4,7 @@ import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Dezimalzahl.<br>
  * Intern wird die Dezimalzahl als {@code long} dargestellt.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMInteger extends FEMValue implements Comparable<FEMInteger> {
 
@@ -20,7 +20,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	{}
 
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Dezimalzahl. */
 	public static FEMInteger from(final long value) {
@@ -28,7 +28,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Dezimalzahl.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -38,7 +38,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 
 	/** Diese Methode gibt eine neue Dezimalzahl mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
-	 * 
+	 *
 	 * @see #toString()
 	 * @see Long#parseLong(String)
 	 * @param value Zeichenkette.
@@ -54,7 +54,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMInteger.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalzahl.
@@ -69,7 +69,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	final long _value_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Dezimalzahl.
-	 * 
+	 *
 	 * @param value interne Darstellung der Dezimalzahl. */
 	public FEMInteger(final long value) {
 		this._value_ = value;
@@ -78,14 +78,14 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	{}
 
 	/** Diese Methode gibt die interne Darstellung der Dezimalzahl zurück.
-	 * 
+	 *
 	 * @return interne Darstellung der Dezimalzahl. */
 	public final long value() {
 		return this._value_;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		final long value = this._value_;
@@ -93,7 +93,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Dezimalzahl gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Dezimalzahl.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -102,7 +102,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Dezimalzahl kleiner, gleich oder größer als die gegebene Dezimalzahl ist.
-	 * 
+	 *
 	 * @param that Dezimalzahl.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -111,7 +111,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode gibt diese Dezimalzahl als {@link Number} zurück.
-	 * 
+	 *
 	 * @return {@link Number}. */
 	public final Number toNumber() {
 		return new Long(this._value_);
@@ -168,7 +168,7 @@ public final class FEMInteger extends FEMValue implements Comparable<FEMInteger>
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Dezimalzahl zurück.
-	 * 
+	 *
 	 * @see Long#toString()
 	 * @return Textdarstellung. */
 	@Override

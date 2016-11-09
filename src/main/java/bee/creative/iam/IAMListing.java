@@ -15,7 +15,7 @@ import bee.creative.util.Objects;
  * <p>
  * Die von {@link #items()} gelieferte {@link List} delegiert an {@link #item(int)} und {@link #itemCount()}.<br>
  * Die Methoden {@link #item(int, int)} und {@link #itemLength(int)} delegieren an {@link #item(int)}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMListing implements Iterable<IAMArray> {
 
@@ -66,7 +66,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	{}
 
 	/** Diese Methode ist eine Abkürzung für {@code new IAMListingLoader(MMFArray.from(object))}.
-	 * 
+	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMListingLoader#IAMListingLoader(MMFArray)
 	 * @param object Objekt.
@@ -80,7 +80,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	{}
 
 	/** Diese Methode gibt das {@code itemIndex}-te Element als Zahlenfolge zurück. Bei einem ungültigen {@code itemIndex} wird eine leere Zahlenfolge geliefert.
-	 * 
+	 *
 	 * @see #item(int, int)
 	 * @see #itemLength(int)
 	 * @see #itemCount()
@@ -90,7 +90,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	/** Diese Methode gibt die {@code index}-te Zahl des {@code itemIndex}-ten Elements zurück. Bei einem ungültigen {@code index} oder {@code itemIndex} wird
 	 * {@code 0} geliefert.
-	 * 
+	 *
 	 * @see #itemLength(int)
 	 * @see #itemCount()
 	 * @param itemIndex Index des Elements.
@@ -101,7 +101,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	}
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des {@code itemIndex}-ten Elements zurück. Bei einem ungültigen {@code itemIndex} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see #item(int)
 	 * @see #item(int, int)
 	 * @see #itemCount()
@@ -112,7 +112,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Elemente zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @see #item(int)
 	 * @see #item(int, int)
 	 * @return Anzahl der Elemente. */
@@ -120,7 +120,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 
 	/** Diese Methode gibt den Index des Elements zurück, das äquivalenten zum gegebenen ist. Die Suche erfolgt linear vom ersten zum letzten Element. Bei
 	 * erfolgloser Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param item Element.
 	 * @return Index des Elements.
 	 * @throws NullPointerException Wenn {@code item} {@code null} ist. */
@@ -133,7 +133,7 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	}
 
 	/** Diese Methode gibt {@link List}-Sicht auf die Elemente zurück.
-	 * 
+	 *
 	 * @see #item(int)
 	 * @see #itemCount()
 	 * @return Elemente. */
@@ -142,14 +142,14 @@ public abstract class IAMListing implements Iterable<IAMArray> {
 	}
 
 	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
-	 * 
+	 *
 	 * @return Binärdatenformat {@code IAM_LISTING}. */
 	public final byte[] toBytes() {
 		return this.toBytes(ByteOrder.nativeOrder());
 	}
 
 	/** Diese Methode kodiert dieses {@link IAMListing} in das binäre optimierte Datenformat {@code IAM_LISTING} und gibt dieses als Bytefolge zurück.
-	 * 
+	 *
 	 * @param order Bytereihenfolge.
 	 * @return {@code IAM_LISTING}. */
 	public final byte[] toBytes(final ByteOrder order) {

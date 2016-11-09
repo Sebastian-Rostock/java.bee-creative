@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Set;
 
 /** Diese Klasse implementiert umordnende, zusammenführende bzw. umwandelnde Sichten für {@link Set}, {@link Map}, {@link List} und {@link Collection}.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Collections {
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Vereinigungsmenge der gegebenen {@link Set} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente der Vereinigungsmenge.
 	 * @param items1 Erstes {@link Set}.
 	 * @param items2 Zweites {@link Set}.
@@ -38,7 +38,7 @@ public class Collections {
 				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
 					? Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(items2)), items1.iterator()), items2.iterator()) //
 					: Iterators.chainedIterator(Iterators.filteredIterator(Filters.negationFilter(Filters.containsFilter(items1)), items2.iterator()), items1.iterator()) //
-					);
+				);
 			}
 
 			@Override
@@ -50,7 +50,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt ein {@link Set} als unveränderliche Sicht auf die Schnittmenge der gegebenen {@link Set} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente der Schnittmenge.
 	 * @param items1 Erstes {@link Set}.
 	 * @param items2 Zweites {@link Set}.
@@ -71,7 +71,7 @@ public class Collections {
 				return Iterators.unmodifiableIterator(items1.size() < items2.size() //
 					? Iterators.filteredIterator(Filters.containsFilter(items2), items1.iterator()) //
 					: Iterators.filteredIterator(Filters.containsFilter(items1), items2.iterator()) //
-					);
+				);
 			}
 
 			@Override
@@ -83,7 +83,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf die gegebene {@link List} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param items {@link List}
 	 * @return {@code reverse}-{@link List}.
@@ -237,7 +237,7 @@ public class Collections {
 	/** Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
 	 * {@link List} eingefügt werden sollen, wird die erste {@link List} erweitert. Der Rückgabewert entspricht
 	 * {@code Collections.chainedList(items1, items2, true)}.
-	 * 
+	 *
 	 * @see #chainedCollection(Collection, Collection, boolean)
 	 * @param <GTarget> Typ der Elemente.
 	 * @param items1 {@link List} der ersten Elemente.
@@ -251,7 +251,7 @@ public class Collections {
 	/** Diese Methode erzeugt eine {@link List} als verkettete Sicht auf die gegebenen {@link List} und gibt diese zurück. Wenn ein Elemente zwischen beiden
 	 * {@link List} eingefügt werden sollen, entscheidet der Erweiterungsmodus, an welcher {@link List} diese Elemente angefügt werden. Ist der Erweiterungsmodus
 	 * {@code true}, wird die erste {@link List} erweitert, bei {@code false} wird die zweite {@link List} erweitert.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param items1 {@link List} der ersten Elemente.
 	 * @param items2 {@link List} der letzten Elemente.
@@ -439,7 +439,7 @@ public class Collections {
 	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
 	 * Wenn Elemente angefügt werden sollen, wird die erste {@link Collection} erweitert. Der Rückgabewert entspricht
 	 * {@code Collections.chainedCollection(items1, items2, true)}.
-	 * 
+	 *
 	 * @see #chainedCollection(Collection, Collection, boolean)
 	 * @param <GItem> Typ der Elemente.
 	 * @param items1 {@link Collection} der ersten Elemente.
@@ -453,7 +453,7 @@ public class Collections {
 	/** Diese Methode gibt eine {@link Collection} als verkettete Sicht auf die gegebenen {@link Collection} zurück.<br>
 	 * Wenn Elemente angefügt werden sollen, entscheidet der Erweiterungsmodus, in welche {@link Collection} diese Elemente angefügt werden. Ist der
 	 * Erweiterungsmodus {@code true}, wird die erste {@link Collection} erweitert, bei {@code false} wird die zweite {@link Collection} erweitert.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param items1 {@link Collection} der ersten Elemente.
 	 * @param items2 {@link Collection} der letzten Elemente.
@@ -520,7 +520,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt eine {@link Map} als übersetzte Sicht auf die gegebene {@link Map} zurück.
-	 * 
+	 *
 	 * @param <GSourceKey> Typ der Schlüssel der gegebenen {@link Map}.
 	 * @param <GSourceValue> Typ der Werte der gegebenen {@link Map}.
 	 * @param <GTargetKey> Typ der Schlüssel der erzeugten {@link Map}.
@@ -659,7 +659,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt eine {@link List} als übersetzte Sicht auf die gegebene {@link List} zurück.
-	 * 
+	 *
 	 * @param <GSource> Typ der Elemente der gegebenen {@link List}.
 	 * @param <GTarget> Typ der Elemente der erzeugten {@link List}.
 	 * @param items Gegebene {@link List}.
@@ -774,7 +774,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt ein {@link Set} als übersetzte Sicht auf das gegebene {@link Set} zurück.
-	 * 
+	 *
 	 * @param <GSource> Typ der Elemente des gegebenen {@link Set}.
 	 * @param <GTarget> Typ der Elemente des erzeugten {@link Set}.
 	 * @param items Gegebenes {@link Set}.
@@ -846,7 +846,7 @@ public class Collections {
 	}
 
 	/** Diese Methode gibt eine {@link Collection} als übersetzte Sicht auf die gegebene {@link Collection} zurück.
-	 * 
+	 *
 	 * @param <GSource> Typ der Elemente der gegebenen {@link Collection}.
 	 * @param <GTarget> Typ der Elemente der erzeugten {@link Collection}.
 	 * @param items Gegebene {@link Collection}.

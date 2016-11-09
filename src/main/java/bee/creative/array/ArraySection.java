@@ -7,22 +7,22 @@ import java.util.Comparator;
  * {@link #finalIndex()}).
  * <p>
  * Die Methoden {@link #hashCode()}, {@link #equals(Object)} und {@link #toString()} reflektieren die Elemente im Abschnitt.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]} oder
  *        {@code boolean[]}). */
 public abstract class ArraySection<GArray> implements Comparable<ArraySection<GArray>> {
 
 	/** Diese Methode validiert die gegebenen {@link ArraySection} und gibt sie zurück.
-	 * 
+	 *
 	 * @param <GSection> Typ der {@link ArraySection}.
 	 * @param section {@link ArraySection}.
 	 * @return {@link ArraySection}.
 	 * @throws NullPointerException Wenn {@code section == null} oder {@code section.array() == null}.
 	 * @throws IndexOutOfBoundsException Wenn {@code section.startIndex() < 0} oder {@code section.finalIndex() > section.arrayLength()}.
 	 * @throws IllegalArgumentException Wenn {@code section.finalIndex() < section.startIndex()}. */
-	public static <GSection extends ArraySection<?>> GSection validate(final GSection section) throws NullPointerException, IndexOutOfBoundsException,
-		IllegalArgumentException {
+	public static <GSection extends ArraySection<?>> GSection validate(final GSection section)
+		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		if (section == null) throw new NullPointerException("section = null");
 		if (section.array() == null) throw new NullPointerException("array = null");
 		if (section.startIndex() < 0) throw new IndexOutOfBoundsException("startIndex < 0");
@@ -34,7 +34,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	{}
 
 	/** Diese Methode gibt die Länge des gegebenen Arrays zurück.
-	 * 
+	 *
 	 * @see ArraySection#arrayLength()
 	 * @param array Array.
 	 * @return Länge des gegebenen Arrays. */
@@ -42,14 +42,14 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des {@code index}-ten Elements des gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#hashCode()} verwendet.
-	 * 
+	 *
 	 * @param array Array.
 	 * @param index Index.
 	 * @return {@link Object#hashCode() Streuwert} des {@code index}-ten Elements. */
 	protected abstract int _hashCode_(GArray array, int index);
 
 	/** Diese Methode implementiert {@link #equals(Object)} ohne {@code null}-Prüfung. Sie sollte von Nachfahren in {@link #equals(Object)} aufgerufen werden.
-	 * 
+	 *
 	 * @param data Abschnitt.
 	 * @return {@code true}, wenn dieser Abschnitt gleich dem das gegebenen ist. */
 	protected boolean _equals_(final ArraySection<GArray> data) {
@@ -66,7 +66,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#equals(Object)} verwendet.
-	 * 
+	 *
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
 	 * @param index1 Index für Array 1.
@@ -76,7 +76,7 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 
 	/** Diese Methode gibt den {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays zurück und wird in
 	 * {@link ArraySection#compareTo(ArraySection)} verwendet.
-	 * 
+	 *
 	 * @param array1 Array 1.
 	 * @param array2 Array 2.
 	 * @param index1 Index für Array 1.
@@ -84,9 +84,9 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	 * @return {@link Comparator#compare(Object, Object) Vergleichswert} der {@code index}-ten Elemente der gegebenen Arrays. */
 	protected abstract int _compareTo_(GArray array1, GArray array2, int index1, int index2);
 
-	/** Diese Methode fügt das {@code index}-ten Element des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in {@link ArraySection#toString()}
-	 * verwendet.
-	 * 
+	/** Diese Methode fügt das {@code index}-ten Element des gegebenen Arrays an den gegebenen {@link StringBuilder} an und wird in
+	 * {@link ArraySection#toString()} verwendet.
+	 *
 	 * @see StringBuilder#append(char)
 	 * @see StringBuilder#append(int)
 	 * @see StringBuilder#append(long)
@@ -99,31 +99,31 @@ public abstract class ArraySection<GArray> implements Comparable<ArraySection<GA
 	protected abstract void _toString_(GArray array, int index, StringBuilder target);
 
 	/** Diese Methode gibt die Anzahl der Elemente im Abschnitt zurück.
-	 * 
+	 *
 	 * @return Anzahl der Elemente im Abschnitt. */
 	public int size() {
 		return this.finalIndex() - this.startIndex();
 	}
 
 	/** Diese Methode gibt das Array zurück.
-	 * 
+	 *
 	 * @return Array. */
 	public abstract GArray array();
 
 	/** Diese Methode gibt die Länge des Arrays zurück.
-	 * 
+	 *
 	 * @return Länge des Arrays. */
 	public int arrayLength() {
 		return this._arrayLength_(this.array());
 	}
 
 	/** Diese Methode gibt den Index des ersten Elements im Abschnitt zurück.
-	 * 
+	 *
 	 * @return Index des ersten Elements im Abschnitt. */
 	public abstract int startIndex();
 
 	/** Diese Methode gibt den Index des ersten Elements nach dem Abschnitt zurück.
-	 * 
+	 *
 	 * @return Index des ersten Elements nach dem Abschnitt. */
 	public abstract int finalIndex();
 

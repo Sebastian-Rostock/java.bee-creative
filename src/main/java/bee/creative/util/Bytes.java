@@ -2,14 +2,14 @@ package bee.creative.util;
 
 import java.nio.ByteOrder;
 
-/** Diese Klasse implementiert Methoden zum konvertierenden Kopieren von {@code byte}-, {@code int} und {@code long}-Arrays in {@link ByteOrder#BIG_ENDIAN} sowie
- * {@link ByteOrder#LITTLE_ENDIAN}.
- * 
+/** Diese Klasse implementiert Methoden zum konvertierenden Kopieren von {@code byte}-, {@code int} und {@code long}-Arrays in {@link ByteOrder#BIG_ENDIAN}
+ * sowie {@link ByteOrder#LITTLE_ENDIAN}.
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class Bytes {
 
 	/** Diese Methode ließt {@code 1 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@code int} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setInt1(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -19,7 +19,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 2 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setInt2BE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -30,8 +30,9 @@ public final class Bytes {
 			| ((array[index + 1] & 0xFF) << 0);
 	}
 
-	/** Diese Methode ließt {@code 2 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	/** Diese Methode ließt {@code 2 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert
+	 * zurück.
+	 *
 	 * @see #setInt2LE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -43,7 +44,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 3 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setInt3BE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -55,8 +56,9 @@ public final class Bytes {
 			| ((array[index + 2] & 0xFF) << 0);
 	}
 
-	/** Diese Methode ließt {@code 3 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	/** Diese Methode ließt {@code 3 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert
+	 * zurück.
+	 *
 	 * @see #setInt3LE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -69,7 +71,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 4 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setInt4BE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -82,8 +84,9 @@ public final class Bytes {
 			| ((array[index + 3] & 0xFF) << 0);
 	}
 
-	/** Diese Methode ließt {@code 4 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert zurück.
-	 * 
+	/** Diese Methode ließt {@code 4 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int} interpretiert
+	 * zurück.
+	 *
 	 * @see #setInt4LE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -98,7 +101,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code int}
 	 * interpretiert zurück.
-	 * 
+	 *
 	 * @see #setIntBE(byte[], int, int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -121,9 +124,9 @@ public final class Bytes {
 		}
 	}
 
-	/** Diese Methode ließt die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code int}
-	 * interpretiert zurück.
-	 * 
+	/** Diese Methode ließt die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN}
+	 * {@code int} interpretiert zurück.
+	 *
 	 * @see #setIntLE(byte[], int, int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -147,7 +150,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 5 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLong5BE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -160,7 +163,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt {@code 5 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert
 	 * zurück.
-	 * 
+	 *
 	 * @see #setLong5LE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -172,7 +175,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 6 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLong6BE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -185,7 +188,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt {@code 6 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert
 	 * zurück.
-	 * 
+	 *
 	 * @see #setLong6LE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -197,7 +200,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 7 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLong7BE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -210,7 +213,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt {@code 7 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert
 	 * zurück.
-	 * 
+	 *
 	 * @see #setLong7LE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -222,7 +225,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode ließt {@code 8 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLong8BE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -235,7 +238,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt {@code 8 byte} aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN} {@code long} interpretiert
 	 * zurück.
-	 * 
+	 *
 	 * @see #setLong8LE(byte[], int, long)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -248,7 +251,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#BIG_ENDIAN} {@code long}
 	 * interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLongBE(byte[], int, long, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -281,7 +284,7 @@ public final class Bytes {
 
 	/** Diese Methode ließt die gegebene Anzahl an {@code byte}s aus dem gegebenen {@code byte}-Array und gib diese als {@link ByteOrder#LITTLE_ENDIAN}
 	 * {@code long} interpretiert zurück.
-	 * 
+	 *
 	 * @see #setLongLE(byte[], int, long, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -313,7 +316,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 1 byte} des gegebenen {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt1(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -323,7 +326,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 2 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt2BE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -334,7 +337,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 2 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt2LE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -345,7 +348,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 3 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt3BE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -357,7 +360,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 3 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt3LE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -369,7 +372,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 4 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt4BE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -382,7 +385,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 4 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getInt4LE(byte[], int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -395,7 +398,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt die gegebene Anzahl an {@code byte}s des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getIntBE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -423,7 +426,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt die gegebene Anzahl an {@code byte}s des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code int} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getIntLE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -451,7 +454,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 5 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong5BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -462,7 +465,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 5 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong5BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -473,7 +476,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 6 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong6BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -484,7 +487,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 6 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong6BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -495,7 +498,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 7 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong7BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -506,7 +509,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 7 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong7BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -517,7 +520,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 8 byte} des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong8BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -528,7 +531,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt {@code 8 byte} des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getLong8BE(byte[], int)
 	 * @param array {@code long}-Array.
 	 * @param index Index.
@@ -539,7 +542,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt die gegebene Anzahl an {@code byte}s des gegebenen {@link ByteOrder#BIG_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getIntBE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -579,7 +582,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode schreibt die gegebene Anzahl an {@code byte}s des gegebenen {@link ByteOrder#LITTLE_ENDIAN} {@code long} in das gegebene {@code byte}-Array.
-	 * 
+	 *
 	 * @see #getIntBE(byte[], int, int)
 	 * @param array {@code byte}-Array.
 	 * @param index Index.
@@ -619,7 +622,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
-	 * 
+	 *
 	 * @param value positiver Wert.
 	 * @return Länge (0..4). */
 	public static int lengthOf(final int value) {
@@ -627,7 +630,7 @@ public final class Bytes {
 	}
 
 	/** Diese Methode gibt die Anzahl der Byte zurück, um den gegebenen positiven Wert abzubilden.
-	 * 
+	 *
 	 * @param value positiver Wert.
 	 * @return Länge (0..8). */
 	public static int lengthOf(final long value) {

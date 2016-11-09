@@ -11,13 +11,13 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Algorithmen zur Dekodierung der {@code Binary Encoded XML} Datenstrukturen.
- * 
+ *
  * @see BEXFileLoader
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class BEXLoader {
 
 	/** Diese Klasse implementiert ein {@link BEXFile}, das seine Daten aus dem {@link IAMIndex} bezieht.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXFileLoader extends BEXFile {
 
@@ -103,7 +103,7 @@ public final class BEXLoader {
 		}
 
 		/** Dieser Kontrukteur initialisiert das {@link BEXFile} als Sicht auf den gegebenen {@link IAMIndex}.
-		 * 
+		 *
 		 * @param index {@link IAMIndex}.
 		 * @throws IAMException Wenn {@code index} strukturell oder referenzienn ungültig ist.
 		 * @throws NullPointerException Wenn {@code index} {@code null} ist. */
@@ -205,42 +205,42 @@ public final class BEXLoader {
 		{}
 
 		/** Diese Methode gibt die Verwaltung der URI der Attributknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der URI der Attributknoten. */
 		public final BEXStringLoader attrUriCache() {
 			return this._attrUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Attributknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der Namen der Attributknoten. */
 		public final BEXStringLoader attrNameCache() {
 			return this._attrNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Attributknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der Werte der Attributknoten. */
 		public final BEXStringLoader attrValueCache() {
 			return this._attrValueText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der URI der Elementknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der URI der Elementknoten. */
 		public final BEXStringLoader chldUriCache() {
 			return this._chldUriText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Namen der Elementknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der Namen der Elementknoten. */
 		public final BEXStringLoader chldNameCache() {
 			return this._chldNameText_;
 		}
 
 		/** Diese Methode gibt die Verwaltung der Werte der Textknoten zurück.
-		 * 
+		 *
 		 * @return Verwaltung der Werte der Textknoten. */
 		public final BEXStringLoader chldValueCache() {
 			return this._chldValueText_;
@@ -300,7 +300,7 @@ public final class BEXLoader {
 	}
 
 	/** Diese Klasse implementiert eine {@link BEXList}, die ihre Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXListLoader extends BEXList {
 
@@ -313,7 +313,7 @@ public final class BEXLoader {
 		final int _key_;
 
 		/** Dieses Feld speichert die Referenz.
-		 * 
+		 *
 		 * @see BEXFileLoader#_attrListRange_
 		 * @see BEXFileLoader#_chldListRange_ */
 		final int _ref_;
@@ -322,14 +322,14 @@ public final class BEXLoader {
 		final BEXFileLoader _owner_;
 
 		/** Dieser Konstruktor initialisiert die undefinierte Knotenliste.
-		 * 
+		 *
 		 * @param owner Besitzer. */
 		BEXListLoader(final BEXFileLoader owner) {
 			this(BEXLoader._keyOf_(BEXLoader.BEX_VOID_TYPE, 0), 0, owner);
 		}
 
 		/** Dieser Konstruktor initialisiert Schlüssel, Index und Besitzer.
-		 * 
+		 *
 		 * @param key Schlüssel mit dem Index des Elternknoten.
 		 * @param ref Referenz auf die Knotenliste.
 		 * @param owner Besitzer. */
@@ -506,7 +506,7 @@ public final class BEXLoader {
 	}
 
 	/** Diese Klasse implementiert einen {@link BEXNode}, der seine Daten aus dem {@link IAMIndex} seines Besitzers bezieht.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXNodeLoader extends BEXNode {
 
@@ -522,14 +522,14 @@ public final class BEXLoader {
 		final BEXFileLoader _owner_;
 
 		/** Dieser Konstruktor initialisiert den undefinierten Knoten.
-		 * 
+		 *
 		 * @param owner Besitzer. */
 		BEXNodeLoader(final BEXFileLoader owner) {
 			this(BEXLoader._keyOf_(BEXLoader.BEX_VOID_TYPE, 0), owner);
 		}
 
 		/** Dieser Konstruktor initialisiert Schlüssel und Besitzer.
-		 * 
+		 *
 		 * @param key Schlüssel.
 		 * @param owner Besitzer. */
 		BEXNodeLoader(final int key, final BEXFileLoader owner) {
@@ -736,7 +736,7 @@ public final class BEXLoader {
 
 	/** Diese Klasse implementiert eine Verwaltung von gepufferten Zeichenketten, die über {@link BEXFile#stringFrom(IAMArray)} aus den Elementen eines
 	 * {@link IAMListing} ermittelt werden.
-	 * 
+	 *
 	 * @see #getEnabled()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXStringLoader implements Items<String> {
@@ -753,7 +753,7 @@ public final class BEXLoader {
 		String[] _cache_;
 
 		/** Dieser Konstruktor initialisiert die Elemente, deren Zeichenketten verwaltet werden.
-		 * 
+		 *
 		 * @param items Elemente. */
 		BEXStringLoader(final IAMListing items) {
 			this._items_ = items;
@@ -762,7 +762,7 @@ public final class BEXLoader {
 		{}
 
 		/** Diese Methode gibt das {@code index}-te Element zurück.
-		 * 
+		 *
 		 * @see IAMListing#item(int)
 		 * @param index Index.
 		 * @return {@code index}-tes Element. */
@@ -772,7 +772,7 @@ public final class BEXLoader {
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die von {@link #get(int)} gelieferten Zeichenkette gepuffert werden. Andernfalls werden diese
 		 * Zeichenketten bei jedem Aufruf von {@link #get(int)} erneut über {@link BEXFile#stringFrom(IAMArray)} aud dem {@code index}-ten Element abgeleitet.
-		 * 
+		 *
 		 * @see #get(int)
 		 * @return {@code true}, wenn die Pufferung aktiviert ist. */
 		public final boolean getEnabled() {
@@ -780,7 +780,7 @@ public final class BEXLoader {
 		}
 
 		/** Diese Methode aktiviert bzw. deaktiviert die Pufferung der von {@link #get(int)} gelieferten Zeichenketten.
-		 * 
+		 *
 		 * @see #get(int)
 		 * @param value {@code true}, wenn die Pufferung aktiviert ist. */
 		public final void setEnabled(final boolean value) {
@@ -796,7 +796,7 @@ public final class BEXLoader {
 		{}
 
 		/** Diese Methode gibt die Zeichenkette zum {@code index}-ten Element zurück. Wenn der Index ungültig ist, wird {@code ""} geliefert.
-		 * 
+		 *
 		 * @param index Index.
 		 * @return {@code index}-te Zeichenkette oder {@code ""}. */
 		@Override
@@ -851,7 +851,7 @@ public final class BEXLoader {
 	{}
 
 	/** Diese Methode gibt die Referenz des gegebenen Schlüssels zurück.
-	 * 
+	 *
 	 * @see #_keyOf_(int, int)
 	 * @param key Schlüssel.
 	 * @return Referenz. */
@@ -860,7 +860,7 @@ public final class BEXLoader {
 	}
 
 	/** Diese Methode gibt einen Schlüssel mit den gegebenen Eigenschaften zurück.
-	 * 
+	 *
 	 * @see BEXNode#key()
 	 * @see BEXList#key()
 	 * @param type Typkennung (0..7).
@@ -871,7 +871,7 @@ public final class BEXLoader {
 	}
 
 	/** Diese Methode gibt die Typkennung des gegebenen Schlüssels zurück.
-	 * 
+	 *
 	 * @see #_keyOf_(int, int)
 	 * @param key Schlüssel.
 	 * @return Typkennung. */

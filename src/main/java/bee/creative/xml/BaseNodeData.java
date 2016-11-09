@@ -12,25 +12,25 @@ import bee.creative.util.Builders.BaseBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Node}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBuilder<Node, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für einen Attributknoten.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class AttrData<GOwner extends BaseNodeData<?>> extends BaseNodeData<AttrData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeAttr();
 
 		/** Diese Methode entfernt den {@link #getNode() aktuelen Attributknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
 		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
-		 * 
+		 *
 		 * @see #closeAttr()
 		 * @see Element#removeAttributeNode(Attr)
 		 * @return Besitzer.
@@ -59,20 +59,21 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für einen Kindknoten.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ChldData<GOwner extends BaseNodeData<?>> extends BaseNodeData<ChldData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeChld();
 
-		/** Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer zurück.<br>
-		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten usw.
-		 * Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
-		 * 
+		/** Diese Methode fügt den {@link #getNode() aktuellen Kindknoten} an der gegebenen Position im Elementknoten des Besitzers ein und gibt den Besitzer
+		 * zurück.<br>
+		 * Negative Positionen zählen vom Ende der Kindknotenliste, sodass der Kindknoten für die Positionen {@code -1}, {@code -2} usw. zum letzten, vorletzten
+		 * usw. Kindknoten wird. Wenn die effektive Position außerhalb der Kindknotenliste liegt, wird der Kindknoten am Beginn bzw. am Ende der Liste eingefügt.
+		 *
 		 * @see #closeChld()
 		 * @see Node#insertBefore(Node, Node)
 		 * @param index Position.
@@ -101,7 +102,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 		/** Diese Methode entfernt den {@link #getNode() aktuelen Kindknoten} aus dem Elementknoten des Besitzers und gibt den Besitzer zurück.<br>
 		 * Wenn der aktuelle Knoten {@code null} ist, erfolgt keine Änderung.
-		 * 
+		 *
 		 * @see #closeChld()
 		 * @see Element#removeAttributeNode(Attr)
 		 * @return Besitzer.
@@ -198,7 +199,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	{}
 
 	/** Diese Methode gibt einen neuen Konfigurator für einen Attributknoten zurück.
-	 * 
+	 *
 	 * @return Konfigurator. */
 	protected final AttrData<GThis> newAttrData() {
 		return new AttrData<GThis>() {
@@ -212,7 +213,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt einen neuen Konfigurator für einen Kindnoten zurück.
-	 * 
+	 *
 	 * @return Konfigurator. */
 	protected final ChldData<GThis> newChldData() {
 		return new ChldData<GThis>() {
@@ -226,7 +227,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	protected GThis use(final BaseNodeData<?> data) {
@@ -236,7 +237,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich dem gegebenen ist.
-	 * 
+	 *
 	 * @see #getType()
 	 * @param nodeType Knotentyp.
 	 * @return {@code true}, wenn der {@link #getNode() aktuelle Knoten} den gegebenen Knotentyp hat. */
@@ -245,7 +246,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#TEXT_NODE} ist.
-	 * 
+	 *
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Textknoten. */
 	public final boolean hasType_TEXT() {
@@ -253,7 +254,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ELEMENT_NODE} ist.
-	 * 
+	 *
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Elementknoten. */
 	public final boolean hasType_ELEM() {
@@ -261,7 +262,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#ATTRIBUTE_NODE} ist.
-	 * 
+	 *
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Attributknoten. */
 	public final boolean hasType_ATTR() {
@@ -269,7 +270,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der {@link #getType() aktuelle Knotentyp} gleich {@link Node#DOCUMENT_NODE} ist.
-	 * 
+	 *
 	 * @see #hasType(int)
 	 * @return {@code true} bei einem Dokumentknoten. */
 	public final boolean hasType_DOCU() {
@@ -278,7 +279,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt den Knotentyp des {@link #getNode() aktuellen Knote} zurück.<br>
 	 * Wenn es {@link #hasNode() keinen solchen Knoten gibt}, wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @return Knotentyp oder {@code 0}. */
 	public final int getType() {
 		final Node node = this.getNode();
@@ -287,7 +288,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den aktuellen Knote oder {@code null} zurück.
-	 * 
+	 *
 	 * @see #useNode(Node)
 	 * @return Knoten oder {@code null}. */
 	public final Node getNode() {
@@ -295,7 +296,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode setzt den {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param node Knoten oder {@code null}.
 	 * @return {@code this}. */
 	protected GThis useNode(final Node node) {
@@ -304,7 +305,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück zurück.
-	 * 
+	 *
 	 * @see #getValue(String)
 	 * @return Wert bzw. Inhalt oder {@code null}. */
 	public final String getValue() {
@@ -314,7 +315,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	/** Diese Methode gibt den Wert bzw. Inhalt des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn der Knoten ein {@link #hasType_ELEM() Elementknoten} ist, wird dessen {@link Node#getTextContent() Inhalt} geliefert. Wenn es {@link #hasNode() keinen
 	 * aktuellen Knoten gibt}, wird der gegebene Vorgabewert geliefert. Andernfalls wird der {@link Node#getNodeValue() Wert} des Knoten geliefert.
-	 * 
+	 *
 	 * @see #hasType_ELEM()
 	 * @see Node#getNodeValue()
 	 * @see Node#getTextContent()
@@ -328,7 +329,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode setzt den Wert des {@link #getNode() aktuellen Knoten} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see Node#setNodeValue(String)
 	 * @see Node#setTextContent(String)
 	 * @param value Wert.
@@ -348,7 +349,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt den Elternknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keinen Elternknoten hat, wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see Attr#getOwnerElement()
 	 * @see Node#getParentNode()
 	 * @return Elternknoten oder {@code null}. */
@@ -361,7 +362,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt das {@link Document} zum {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn der der aktuelle Knoten {@code null} ist, wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see Node#getOwnerDocument()
 	 * @return {@link Document} oder {@code null}. */
 	public final Document getDocument() {
@@ -373,7 +374,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt die Attributknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Attribute hat, wird {@link #EMPTY_ATTR_MAP} geliefert.
-	 * 
+	 *
 	 * @see Node#getAttributes()
 	 * @return Attributknoten oder {@link #EMPTY_ATTR_MAP}. */
 	public final NamedNodeMap getAttrMap() {
@@ -385,7 +386,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt die Anzahl der Attributknoten des {@link #getNode() aktuellen Knoten} zurück.
-	 * 
+	 *
 	 * @see #getAttrMap()
 	 * @return Attributknotenanzahl. */
 	public final int getAttrCount() {
@@ -394,7 +395,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt die Kindknoten des {@link #getNode() aktuellen Knoten} zurück.<br>
 	 * Wenn aktuell {@link #hasNode() kein Knoten} gewählt ist oder dieser keine Kindknoten hat, wird {@link #EMPTY_CHLD_LIST} geliefert.
-	 * 
+	 *
 	 * @see Node#getChildNodes()
 	 * @return Kindknoten oder {@link #EMPTY_CHLD_LIST}. */
 	public final NodeList getChldList() {
@@ -406,7 +407,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt die Anzahl der Kindknoten des {@link #getNode() aktuellen Knoten} zurück.
-	 * 
+	 *
 	 * @see #getChldList()
 	 * @return Kindknotenanzahl. */
 	public final int getChldCount() {
@@ -414,7 +415,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn es einen {@link #getNode() aktuelle Knoten} gibt, d.h. dieser nicht {@code null} ist.
-	 * 
+	 *
 	 * @return {@code true}, wenn {@link #getNode()} nicht {@code null} liefert. */
 	public final boolean hasNode() {
 		return this.getNode() != null;
@@ -422,7 +423,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen Namen in die Attributknotenliste ein und gibt den Konfigurator dieses Knoten
 	 * zurück.
-	 * 
+	 *
 	 * @see Document#createAttribute(String)
 	 * @see NamedNodeMap#setNamedItem(Node)
 	 * @param name Name.
@@ -439,7 +440,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode fügt einen neuen {@link Attr Attributknoten} mit dem gegebenen URI und Namen in die Attributknotenliste ein und gibt den Konfigurator dieses
 	 * Knoten zurück.
-	 * 
+	 *
 	 * @see Document#createAttributeNS(String, String)
 	 * @see NamedNodeMap#setNamedItemNS(Node)
 	 * @param uri URI.
@@ -457,7 +458,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode fügt einen neuen {@link Text Textknoten} an die Kindknotenliste an und gibt den Konfigurator dieses Knoten zurück.
-	 * 
+	 *
 	 * @return Konfigurator des Textknoten.
 	 * @throws DOMException Wenn {@link Node#appendChild(Node)} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalStateException Wenn es {@link #hasNode() keinen aktuellen Knoten} gibt. */
@@ -471,7 +472,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode fügt einen neuen {@link Text Textknoten} mit dem gegebenen Wert an die Kindknotenliste an und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #newText()
 	 * @see #useValue(String)
 	 * @param text Wert.
@@ -484,7 +485,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen Namen an die Kindknotenliste an und gibt den Konfigurator dieses Knoten
 	 * zurück.
-	 * 
+	 *
 	 * @see Document#createElement(String)
 	 * @param name Name.
 	 * @return Konfigurator des Elementknoten.
@@ -501,7 +502,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode fügt einen neuen {@link Element Elementknoten} mit dem gegebenen URI und Namen an die Kindknotenliste an und gibt den Konfigurator dieses
 	 * Knoten zurück.
-	 * 
+	 *
 	 * @see Document#createElementNS(String, String)
 	 * @param uri URI.
 	 * @param name Name.
@@ -519,7 +520,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt den Konfigurator für den Attributknoten mit der gegebenen Position zurück.<br>
 	 * Negative Positionen zählen vom Ende der Attributknotenliste.
-	 * 
+	 *
 	 * @see #getAttrMap()
 	 * @param index Position.
 	 * @return Konfigurator. */
@@ -530,7 +531,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen Namen zurück.
-	 * 
+	 *
 	 * @see NamedNodeMap#getNamedItem(String)
 	 * @param name Name.
 	 * @return Konfigurator. */
@@ -541,7 +542,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den Konfigurator für den Attributknoten mit dem gegebenen URI und Namen zurück.
-	 * 
+	 *
 	 * @see NamedNodeMap#getNamedItemNS(String, String)
 	 * @param uri URI.
 	 * @param name Name.
@@ -554,7 +555,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 
 	/** Diese Methode gibt den Konfigurator für den Elementknoten mit der gegebenen Position zurück.<br>
 	 * Negative Positionen zählen vom Ende der Kindknotenliste.
-	 * 
+	 *
 	 * @see #getChldList()
 	 * @param index Position.
 	 * @return Konfigurator. */
@@ -565,7 +566,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen Namen zurück.
-	 * 
+	 *
 	 * @see #getChldList()
 	 * @see Node#getNodeType()
 	 * @see Node#getNodeName()
@@ -582,7 +583,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	}
 
 	/** Diese Methode gibt den Konfigurator für den Elementknoten mit dem gegebenen URI und Namen zurück.
-	 * 
+	 *
 	 * @see #getChldList()
 	 * @see Node#getNodeType()
 	 * @see Node#getLocalName()
@@ -607,7 +608,7 @@ public abstract class BaseNodeData<GThis extends BaseNodeData<?>> extends BaseBu
 	protected abstract GThis _this_();
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getNode() */
 	@Override
 	public final Node build() throws IllegalStateException {

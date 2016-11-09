@@ -15,14 +15,14 @@ import bee.creative.util.Objects;
  * Eine Kommentar besteht aus dem Zeichen {@code ';'} und dem maskierten Text des Kommentars.<br>
  * Die Maskierung der Zeichen {@code '\t'}, {@code '\r'}, {@code '\n'}, {@code '\\'}, {@code '='}, {@code ';'}, {@code '['} und {@code ']'} erfolgt durch das
  * Voranstellen des Zeichens {@code '\\'}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class INIReader implements Closeable {
 
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link INIReader} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link INIReader} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Reader} {@link IO#inputReaderFrom(Object)
 	 * überführt}.
-	 * 
+	 *
 	 * @see IO#inputReaderFrom(Object)
 	 * @see INIReader#INIReader(Reader)
 	 * @param data Objekt.
@@ -42,7 +42,7 @@ public final class INIReader implements Closeable {
 	final StringBuilder _builder_;
 
 	/** Dieser Konstruktor initialisiert den {@link Reader} mit der {@code INI}-Datenstruktur.
-	 * 
+	 *
 	 * @param reader {@link Reader}.
 	 * @throws NullPointerException Wenn {@code reader} {@code null} ist. */
 	public INIReader(final Reader reader) throws NullPointerException {
@@ -55,7 +55,7 @@ public final class INIReader implements Closeable {
 
 	/** Diese Methode ließt das nächste Element der {@code INI}-Datenstruktur und gibt es zurück. Wenn kein weiteres Element mehr existiert, wird {@code null}
 	 * geliefert.
-	 * 
+	 *
 	 * @return nächstes Element oder {@code null}.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst. */
 	public final INIToken read() throws IOException {
@@ -82,7 +82,7 @@ public final class INIReader implements Closeable {
 
 	/** Diese Methode ließt den Schlüssel einer Eigenschaft und gibt diesen zurück.<br>
 	 * Der Schlüssel beginnt mit dem gegebenen Zeichen und Endet vor dem Zeichen {@code '='}.
-	 * 
+	 *
 	 * @param symbol erstes Zeichen des Schlüssels.
 	 * @return Schlüssel einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
@@ -108,7 +108,7 @@ public final class INIReader implements Closeable {
 	}
 
 	/** Diese Methode ließt den Wert einer Eigenschaft und gibt diesen zurück.
-	 * 
+	 *
 	 * @return Wert einer Eigenschaft.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -131,7 +131,7 @@ public final class INIReader implements Closeable {
 	}
 
 	/** Diese Methode ließt den Namen eines Abschnitts und gibt diesen zurück.
-	 * 
+	 *
 	 * @return Name eines Abschnitts.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -164,7 +164,7 @@ public final class INIReader implements Closeable {
 	}
 
 	/** Diese Methode gibt das Zeiche zurück, durch die Verkettung von {@code '\'} und dem gegebenen Zeichen maskiert wurde.
-	 * 
+	 *
 	 * @param symbol Zeichen nach dem {@code '\'}.
 	 * @return unmaskiertes Zeichen.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -187,7 +187,7 @@ public final class INIReader implements Closeable {
 	}
 
 	/** Diese Methode ließt den Text eines Kommentars und gibt diesen zurück.
-	 * 
+	 *
 	 * @return Text eines Kommentars.
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */

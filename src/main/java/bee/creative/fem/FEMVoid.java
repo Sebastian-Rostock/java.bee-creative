@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
 /** Diese Klasse implementiert den unveränderlichen Leerwert.
- * 
+ *
  * @author Sebastian Rostock 2015. */
 public final class FEMVoid extends FEMValue {
 
@@ -17,7 +17,7 @@ public final class FEMVoid extends FEMValue {
 	{}
 
 	/** Diese Methode gibt den Leerwert nur dann zurück, wenn die gegebenen Zeichenkette gleich {@code "void"} ist.
-	 * 
+	 *
 	 * @param value Zeichenkette.
 	 * @return Leerwert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
@@ -28,7 +28,7 @@ public final class FEMVoid extends FEMValue {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVoid.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Leerwert.

@@ -1,7 +1,7 @@
 package bee.creative.iam;
 
 /** Diese Klasse implementiert die {@link RuntimeException}, die bei Dekodierungsfehlern ausgelöst wird.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class IAMException extends RuntimeException {
 
@@ -26,7 +26,7 @@ public final class IAMException extends RuntimeException {
 	final int _code_;
 
 	/** Dieser Konstrukteur initialisiert die Kennungen der Fehlerursachen.
-	 * 
+	 *
 	 * @see #INVALID_VALUE
 	 * @see #INVALID_OFFSET
 	 * @see #INVALID_LENGTH
@@ -39,7 +39,7 @@ public final class IAMException extends RuntimeException {
 	{}
 
 	/** Diese Methode gibt die Kennungen der Fehlerursachen zurück.
-	 * 
+	 *
 	 * @return Kennungen der Fehlerursachen. */
 	public final int code() {
 		return this._code_;

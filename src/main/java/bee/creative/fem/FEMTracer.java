@@ -2,9 +2,9 @@ package bee.creative.fem;
 
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert ein Überwachungsobjekt zur Verwaltung der Zustandsdaten bei der Verfolgung und Überwachung der Verarbeitung von Funktionen. Dieses
- * Objekt wird dazu das Argument für die Methoden des {@link Listener} genutzt, welcher auf die Ereignisse der Überwachung reagieren kann.
- * 
+/** Diese Klasse implementiert ein Überwachungsobjekt zur Verwaltung der Zustandsdaten bei der Verfolgung und Überwachung der Verarbeitung von Funktionen.
+ * Dieses Objekt wird dazu das Argument für die Methoden des {@link Listener} genutzt, welcher auf die Ereignisse der Überwachung reagieren kann.
+ *
  * @see Listener
  * @see FEMFunction#withTracer(FEMTracer)
  * @see FEMFunction#withoutTracer()
@@ -12,7 +12,7 @@ import bee.creative.util.Objects;
 public final class FEMTracer {
 
 	/** Diese Schnittstelle definiert die Überwachungsmethoden zur Verfolgung der Verarbeitung von Funktionen.
-	 * 
+	 *
 	 * @see FEMTracer
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static interface Listener {
@@ -41,21 +41,21 @@ public final class FEMTracer {
 
 		/** Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code throw} aufgerufen. Das Feld
 		 * {@link FEMTracer#getException()} kann hierbei angepasst werden.
-		 * 
+		 *
 		 * @see FEMTracer#useException(RuntimeException)
 		 * @param tracer {@link FEMTracer}. */
 		public void onThrow(FEMTracer tracer);
 
 		/** Diese Methode wird nach dem Verlassen der {@link FEMFunction#invoke(FEMFrame) Berechnungsmethode} einer Funktion via {@code return} aufgerufen. Das Feld
 		 * {@link FEMTracer#getResult()} kann hierbei angepasst werden.
-		 * 
+		 *
 		 * @see FEMTracer#useResult(FEMValue)
 		 * @param tracer {@link FEMTracer}. */
 		public void onReturn(FEMTracer tracer);
 
 		/** Diese Methode wird vor dem Aufruf einer Funktion aufgerufen. Die Felder {@link FEMTracer#getFrame()} und {@link FEMTracer#getFunction()} können hierbei
 		 * angepasst werden, um den Aufruf auf eine andere Funktion umzulenken bzw. mit einem anderen Stapelrahmen durchzuführen.
-		 * 
+		 *
 		 * @see FEMTracer#useFrame(FEMFrame)
 		 * @see FEMTracer#useFunction(FEMFunction)
 		 * @param tracer {@link FEMTracer}. */
@@ -84,42 +84,42 @@ public final class FEMTracer {
 	{}
 
 	/** Diese Methode gibt die Überwachungsmethoden zurück.
-	 * 
+	 *
 	 * @return Überwachungsmethoden. */
 	public final Listener getListener() {
 		return this._listener_;
 	}
 
 	/** Diese Methode gibt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} zurück.
-	 * 
+	 *
 	 * @return Ergebniswert oder {@code null}. */
 	public final FEMValue getResult() {
 		return this._result_;
 	}
 
 	/** Diese Methode gibt den aktuellen Stapelrahmen zurück, der zur Auswertung der {@link #getFunction() aktuellen Funktion} verwendet wird.
-	 * 
+	 *
 	 * @return Stapelrahmen oder {@code null}. */
 	public final FEMFrame getFrame() {
 		return this._frame_;
 	}
 
 	/** Diese Methode gibt die aktuelle Funktion zurück, die mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet wird.
-	 * 
+	 *
 	 * @return Funktion oder {@code null}. */
 	public final FEMFunction getFunction() {
 		return this._function_;
 	}
 
 	/** Diese Methode gibt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} zurück.
-	 * 
+	 *
 	 * @return Ausnahme oder {@code null}. */
 	public final RuntimeException getException() {
 		return this._exception_;
 	}
 
 	/** Diese Methode setzt die Überwachungsmethoden und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Überwachungsmethoden.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -131,7 +131,7 @@ public final class FEMTracer {
 
 	/** Diese Methode setzt den aktuellen Ergebniswert der {@link #getFunction() aktuellen Funktion} und gibt {@code this} zurück. Die {@link #getException()
 	 * aktuelle Ausnahme} wird damit auf {@code null} gesetzt.
-	 * 
+	 *
 	 * @param value Ergebniswert.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -144,7 +144,7 @@ public final class FEMTracer {
 
 	/** Diese Methode setzt den aktuellen Stapelrahmen und gibt {@code this} zurück. Dieser wird zur Auswertung der {@link #getFunction() aktuellen Funktion}
 	 * verwendet.
-	 * 
+	 *
 	 * @param value Stapelrahmen.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -155,7 +155,7 @@ public final class FEMTracer {
 	}
 
 	/** Diese Methode setzt die aktuelle Funktion und gibt {@code this} zurück. Diese wird mit dem {@link #getFrame() aktuellen Stapelrahmen} ausgewertet.
-	 * 
+	 *
 	 * @param value Funktion.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -167,7 +167,7 @@ public final class FEMTracer {
 
 	/** Diese Methode setzt die aktuelle Ausnahme der {@link #getFunction() aktuellen Funktion} und gibt {@code this} zurück. Der {@link #getResult() aktuelle
 	 * Ergebniswert} wird damit auf {@code null} gesetzt.
-	 * 
+	 *
 	 * @param value Ausnahme.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -179,7 +179,7 @@ public final class FEMTracer {
 	}
 
 	/** Diese Methode setzt alle aktuellen Einstellungen auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getFrame()
 	 * @see #getFunction()
 	 * @see #getResult()

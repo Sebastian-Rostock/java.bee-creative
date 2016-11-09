@@ -1,25 +1,25 @@
 package bee.creative.array;
 
 /** Diese Klasse implementiert ein {@link IntegerArray} als {@link CompactArray}.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactIntegerArray extends CompactArray<int[], Integer> implements IntegerArray {
 
 	/** Diese Klasse implementiert ein {@link IntegerArray} als modifizierbare Sicht auf einen Teil eines {@link CompactIntegerArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerSubArray extends CompactSubArray<CompactIntegerArray, int[], Integer> implements IntegerArray {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
 		 *         {@code startIndex > finalIndex}). */
-		public CompactIntegerSubArray(final CompactIntegerArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public CompactIntegerSubArray(final CompactIntegerArray owner, final int startIndex, final int finalIndex)
+			throws NullPointerException, IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
 
@@ -89,7 +89,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	}
 
 	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerArraySection extends IntegerArraySection {
 
@@ -97,7 +97,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		protected final CompactIntegerArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactIntegerArraySection(final CompactIntegerArray owner) throws NullPointerException {
@@ -135,7 +135,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	}
 
 	/** Diese Klasse implementiert die live {@link IntegerArraySection} eines {@link CompactIntegerSubArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactIntegerSubArraySection extends IntegerArraySection {
 
@@ -143,7 +143,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 		protected final CompactIntegerSubArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactIntegerSubArraySection(final CompactIntegerSubArray owner) throws NullPointerException {
@@ -190,7 +190,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 	}
 
 	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -200,7 +200,7 @@ public class CompactIntegerArray extends CompactArray<int[], Integer> implements
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.

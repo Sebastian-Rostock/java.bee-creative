@@ -2,9 +2,9 @@ package bee.creative.ini;
 
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert ein abstraktes Element, welches über einen {@link INIReader} aus einer {@code INI}-Datenstruktur gelesene und für einen Abschnitt,
- * eine Eigenschaft oder einen Kommentar stehen kann.
- * 
+/** Diese Klasse implementiert ein abstraktes Element, welches über einen {@link INIReader} aus einer {@code INI}-Datenstruktur gelesene und für einen
+ * Abschnitt, eine Eigenschaft oder einen Kommentar stehen kann.
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class INIToken {
 
@@ -103,20 +103,20 @@ public abstract class INIToken {
 	{}
 
 	/** Dieses Feld speichert die Typkennung eines Abschnitts.
-	 * 
+	 *
 	 * @see #section()
 	 * @see #fromSection(String) */
 	public static final int SECTION = 1;
 
 	/** Dieses Feld speichert die Typkennung einer Eigenschaft.
-	 * 
+	 *
 	 * @see #key()
 	 * @see #value()
 	 * @see #fromProperty(String, String) */
 	public static final int PROPERTY = 2;
 
 	/** Dieses Feld speichert die Typkennung eines Kommentars.
-	 * 
+	 *
 	 * @see #comment()
 	 * @see #fromComment(String) */
 	public static final int COMMENT = 4;
@@ -124,7 +124,7 @@ public abstract class INIToken {
 	{}
 
 	/** Diese Methode gibt einen Abschnitt mit dem gegebenen Namen als {@link INIToken} zurück.
-	 * 
+	 *
 	 * @see #section()
 	 * @param section Name des Abschnitts.
 	 * @return Abschnitt.
@@ -134,7 +134,7 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt einen Kommentar mit dem gegebenen Schlüssel und dem gegebenen Wert als {@link INIToken} zurück.
-	 * 
+	 *
 	 * @see #key()
 	 * @see #value()
 	 * @param key Schlüssel der Eigenschaft.
@@ -146,7 +146,7 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt einen Kommentar mit dem gegebenen Text als {@link INIToken} zurück.
-	 * 
+	 *
 	 * @see #comment()
 	 * @param comment Text des Kommentar.
 	 * @return Kommentar.
@@ -164,7 +164,7 @@ public abstract class INIToken {
 	{}
 
 	/** Diese Methode gibt die Typkennung des Elements zurück.
-	 * 
+	 *
 	 * @see #SECTION
 	 * @see #PROPERTY
 	 * @see #COMMENT
@@ -172,7 +172,7 @@ public abstract class INIToken {
 	public abstract int type();
 
 	/** Diese Methode gibt den Schlüssel der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see #fromProperty(String, String)
 	 * @return Schlüssel der Eigenschaft oder {@code null}. */
 	public String key() {
@@ -180,7 +180,7 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt den Wert der Eigenschaft zurück, wenn dieses Element ein {@link #PROPERTY} ist. Andernfalls wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see #fromProperty(String, String)
 	 * @return Wert der Eigenschaft oder {@code null}. */
 	public String value() {
@@ -188,7 +188,7 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt den Namen des Abschnitts zurück, wenn dieses Element eine {@link #SECTION} ist. Andernfalls wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see #fromSection(String)
 	 * @return Namen des Abschnitts oder {@code null}. */
 	public String section() {
@@ -196,7 +196,7 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt den Text des Kommentars zurück, wenn dieses Element ein {@link #COMMENT} ist. Andernfalls wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see #fromComment(String)
 	 * @return Text des Kommentars oder {@code null}. */
 	public String comment() {
@@ -204,21 +204,21 @@ public abstract class INIToken {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #SECTION Anschnitt} {@link #type() ist}.
-	 * 
+	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #SECTION}. */
 	public boolean isSection() {
 		return false;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element eine {@link #PROPERTY Eigenschaft} {@link #type() ist}.
-	 * 
+	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #PROPERTY}. */
 	public boolean isProperty() {
 		return false;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Element ein {@link #COMMENT Kommentar} {@link #type() ist}.
-	 * 
+	 *
 	 * @return {@code true}, wenn {@link #type()} {@code ==} {@link #COMMENT}. */
 	public boolean isComment() {
 		return false;

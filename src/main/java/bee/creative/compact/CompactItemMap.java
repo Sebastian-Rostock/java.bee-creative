@@ -4,7 +4,7 @@ import java.util.Map;
 
 /** Diese Klasse implementiert eine abstrakte {@link CompactMap}, deren Werte in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren. Diese
  * Implementation erlaubt deshalb {@code null} nicht als Wert.
- * 
+ *
  * @see CompactItemMap#getKey(Object)
  * @see CompactItemMap#setKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -18,7 +18,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -27,7 +27,7 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */
@@ -38,13 +38,13 @@ public abstract class CompactItemMap<GKey, GValue> extends CompactMap<GKey, GVal
 	{}
 
 	/** Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Schlüssel. */
 	protected abstract GKey getKey(final GValue value);
 
 	/** Diese Methode setzt den Schlüssel des gegebenen Werts.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Wert. */
 	protected abstract void setKey(GKey key, final GValue value);

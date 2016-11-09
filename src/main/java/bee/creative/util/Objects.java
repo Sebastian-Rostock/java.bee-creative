@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 /** Diese Klasse implementiert Hilfsmethoden und Hilfsklassen zur Berechnung von {@link Object#hashCode() Streuwerten}, {@link Object#equals(Object)
  * Äquivalenzen} und {@link Object#toString() Textdarstelungen}.
- * 
+ *
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @see Object#toString()
@@ -18,7 +18,7 @@ public class Objects {
 	/** Diese Schnittstelle definiert eine Markierung für die Methode {@link Objects#toString(boolean, Object)}. Sie ist nur sinnvoll für eigene Implementationen
 	 * von {@link Map}, {@link Iterable} und {@link CharSequence}, für welche nicht die in {@link Objects#toString(boolean, Object)} realisierten, gesonderten
 	 * Textdarstellungen verwendet werden sollen.
-	 * 
+	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static interface UseToString {
 
@@ -27,7 +27,7 @@ public class Objects {
 	{}
 
 	/** Diese Methode gibt die gegebenen Zeichenkette mit erhöhtem Einzug zurück. Dazu wird jedes Vorkommen von {@code "\n"} durch {@code "\n  "} ersetzt.
-	 * 
+	 *
 	 * @param value Zeichenkette.
 	 * @return Zeichenkette mit erhöhtem Einzug. */
 	static String _indent_(final String value) {
@@ -46,7 +46,7 @@ public class Objects {
 	 * {@link CharSequence} und {@link Iterable} je eine eigene Darstellungsform verwendet. Für eine bessere Lesbarkeit der Zeichenkette können deren
 	 * hierarchische Formatierung sowie die Erhöhung des Einzugs aktiviert werden. Sollte das Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis
 	 * der {@link Object#toString()}-Methode geliefert.
-	 * 
+	 *
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param indent Aktivierung der Erhöhung des Einzugs.
@@ -82,7 +82,7 @@ public class Objects {
 
 	/** Diese Methode gibt das gegebene {@link Map} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
 	 * hierarchische Formatierung aktiviert werden.
-	 * 
+	 *
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Map} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
@@ -100,7 +100,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den gegebenen {@link Character} als {@link Object#toString() Textdarstelung} zurück.
-	 * 
+	 *
 	 * @param object {@link Character} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
 	public static String formatChar(final Character object) {
@@ -127,7 +127,7 @@ public class Objects {
 
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann deren
 	 * hierarchische Formatierung aktiviert werden.
-	 * 
+	 *
 	 * @param object Objekt oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}.
@@ -148,7 +148,7 @@ public class Objects {
 
 	/** Diese Methode gibt den gegebenen {@link String} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann
 	 * deren hierarchische Formatierung aktiviert werden.
-	 * 
+	 *
 	 * @param object {@link String} oder {@code null}.
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @return {@link Object#toString() Textdarstelung}. */
@@ -180,7 +180,7 @@ public class Objects {
 
 	/** Diese Methode gibt das gegebene {@link Iterable} als {@link Object#toString() Textdarstelung} zurück. Für eine bessere Lesbarkeit der Zeichenkette kann
 	 * deren hierarchische Formatierung aktiviert werden.
-	 * 
+	 *
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object {@link Iterable} oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
@@ -199,7 +199,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück.
-	 * 
+	 *
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
 	public static int hash(final Object object) {
@@ -207,7 +207,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
-	 * 
+	 *
 	 * @see Objects#hash(Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
@@ -221,7 +221,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
-	 * 
+	 *
 	 * @see Objects#hash(Object)
 	 * @see Objects#hash(Object...)
 	 * @param object1 Objekt oder {@code null}.
@@ -232,7 +232,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück.
-	 * 
+	 *
 	 * @see Objects#hash(Object)
 	 * @see Objects#hash(Object...)
 	 * @param object1 Objekt oder {@code null}.
@@ -244,7 +244,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt den Startwert für die Streuwertberechnung in {@link #hash(Object...)} zurück.
-	 * 
+	 *
 	 * @see #hash(Object...)
 	 * @see #hash(Object, Object)
 	 * @see #hash(Object, Object, Object)
@@ -254,7 +254,7 @@ public class Objects {
 	}
 
 	/** Diese Methode verbindet die gegebenen Streuwerte in der gegebenen Reihenfolge und gibt deren Kombination zurück.
-	 * 
+	 *
 	 * @see #hash(Object...)
 	 * @see #hash(Object, Object)
 	 * @see #hash(Object, Object, Object)
@@ -268,7 +268,7 @@ public class Objects {
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben.
 	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
 	 * {@link Objects#equals(Object, Object)}. Die Eingabe {@code null} wird als leere Objektliste interpretiert.
-	 * 
+	 *
 	 * @see Objects#equals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
@@ -281,12 +281,10 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben. Der Rückgabewert
-	 * entspricht:
-	 * 
-	 * <pre>
+	 * entspricht: <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equals(object2))
 	 * </pre>
-	 * 
+	 *
 	 * @param object1 Objekt 1 oder {@code null}.
 	 * @param object2 Objekt 2 oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte. */
@@ -296,7 +294,7 @@ public class Objects {
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
 	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#equals(Object, Object)} ermittelt.
-	 * 
+	 *
 	 * @see Objects#equals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
 	 * @param objects2 Array 2 oder {@code null}.
@@ -314,7 +312,7 @@ public class Objects {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Objekts oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
 	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
+	 *
 	 * @see Arrays#hashCode(int[])
 	 * @see Arrays#hashCode(long[])
 	 * @see Arrays#hashCode(byte[])
@@ -343,7 +341,7 @@ public class Objects {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
 	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
+	 *
 	 * @see Objects#deepHash(Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#hashCode() Streuwert} oder {@code 0}. */
@@ -358,7 +356,7 @@ public class Objects {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
 	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
+	 *
 	 * @see Objects#deepHash(Object)
 	 * @see Objects#deepHash(Object...)
 	 * @param object1 Objekt oder {@code null}.
@@ -370,7 +368,7 @@ public class Objects {
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} der gegebenen Objekte oder {@code 0} zurück. Für Arrays werden die entsprechenden Hilfsmethoden
 	 * aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
+	 *
 	 * @see Objects#deepHash(Object)
 	 * @see Objects#deepHash(Object...)
 	 * @param object1 Objekt oder {@code null}.
@@ -385,7 +383,7 @@ public class Objects {
 	 * Verglichen werden jeweils die Objekte {@code objects[i]} und {@code objects[i+1]} der geraden Positionen {@code i} via
 	 * {@link Objects#deepEquals(Object, Object)}. Für Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Die Eingabe
 	 * {@code null} wird als leere Objektliste interpretiert.
-	 * 
+	 *
 	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects Objekte oder {@code null}.
 	 * @return {@link Object#equals(Object) Äquivalenz} der in Paaren gegebenen Objekte. */
@@ -399,12 +397,10 @@ public class Objects {
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück und tolleriert dabei {@code null}-Eingaben und Arrays. Für
 	 * Arrays werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet. Wenn beide Objekte keine Arrays sind, entspricht der
-	 * Rückgabewert:
-	 * 
-	 * <pre>
+	 * Rückgabewert: <pre>
 	 * (object1 == object2) || ((object1 != null) &amp;&amp; (object2 != null) &amp;&amp; object1.equalsEx(object2))
 	 * </pre>
-	 * 
+	 *
 	 * @see Arrays#equals(int[], int[])
 	 * @see Arrays#equals(long[], long[])
 	 * @see Arrays#equals(byte[], byte[])
@@ -438,7 +434,7 @@ public class Objects {
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Arrays zurück und tolleriert dabei {@code null}-Eingaben. Die
 	 * {@link Object#equals(Object) Äquivalenz} der Elemente der {@link Array Arrays} wird via {@link Objects#deepEquals(Object, Object)} ermittelt. Für Arrays
 	 * werden die entsprechenden Hilfsmethoden aus der Hilfsklasse {@link Arrays} verwendet.
-	 * 
+	 *
 	 * @see Objects#deepEquals(Object, Object)
 	 * @param objects1 Array 1 oder {@code null}.
 	 * @param objects2 Array 2 oder {@code null}.
@@ -456,7 +452,7 @@ public class Objects {
 
 	/** Diese Methode gibt das gegebene Objekt als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toString(false, object)}.
-	 * 
+	 *
 	 * @see Objects#toString(boolean, Object)
 	 * @param object Objekt oder {@code null}.
 	 * @return {@link Object#toString() Textdarstelung}. */
@@ -469,7 +465,7 @@ public class Objects {
 	 * aktiviert werden.
 	 * <p>
 	 * Sollte das gegebene Objekt eine Instanz von {@link UseToString} sein, wird das Ergebnis seiner {@link Object#toString() toString()}-Methode geliefert.
-	 * 
+	 *
 	 * @see Objects#_format_(boolean, boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
@@ -479,7 +475,7 @@ public class Objects {
 	}
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der gegebene Zeichenkette entspricht.
-	 * 
+	 *
 	 * @param string Textdarstelung oder {@code null}.
 	 * @return Textdarstelung-Objekt. */
 	public static Object toStringObject(final String string) {
@@ -496,7 +492,7 @@ public class Objects {
 
 	/** Diese Methode gibt ein Objekt zurück, dessen {@link Object#toString() Textdarstelung} der via {@link Objects#toString(boolean, Object)} ermittelten
 	 * Textdarstelung des gegebenen Objekts entspricht.
-	 * 
+	 *
 	 * @see Objects#toString(boolean, Object)
 	 * @param format Aktivierung der hierarchische Formatierung.
 	 * @param object Objekt oder {@code null}.
@@ -515,7 +511,7 @@ public class Objects {
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, name, args)}.
-	 * 
+	 *
 	 * @see Objects#toFormatString(boolean, boolean, String, Object...)
 	 * @param name Funktionsname.
 	 * @param args Argumente.
@@ -527,7 +523,7 @@ public class Objects {
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(false, false, object.getClass().getSimpleName(), args)}.
-	 * 
+	 *
 	 * @see #toFormatString(boolean, boolean, String, Object...)
 	 * @param object {@link Object}.
 	 * @param args Argumente bzw. Parameter.
@@ -541,7 +537,7 @@ public class Objects {
 	 * hierarchische Formatierung aktiviert werden. Wenn die Argumentbeschriftung aktiviert wird, werden die Argumente als beschriftete Parameter interpretiert.
 	 * Ein beschrifteter Parameter besteht hierbei aus einem Namen {@code args[i]} und dem darauf folgenden Wert {@code args[i+1]} für jede gerade Position
 	 * {@code i}.
-	 * 
+	 *
 	 * @param name Funktionsname.
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.
@@ -574,7 +570,7 @@ public class Objects {
 
 	/** Diese Methode gibt einen Funktionsaufruf als {@link Object#toString() Textdarstelung} zurück. Der Rückgabewert entspricht
 	 * {@code Objects.toStringCall(format, label, object.getClass().getSimpleName(), args)}.
-	 * 
+	 *
 	 * @see #toFormatString(boolean, boolean, String, Object...)
 	 * @param format Formatiermodus.
 	 * @param label Aktivierung der Argumentbeschriftung.

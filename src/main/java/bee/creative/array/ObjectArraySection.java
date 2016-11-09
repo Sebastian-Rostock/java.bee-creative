@@ -5,16 +5,15 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@link Object}-Arrays.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GValue> Typ der {@link Object}s.
  * @see ArraySection */
 public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> {
 
 	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * 
 	 * <pre>ComparableArraySection.from(array, 0, array.length)</pre>
-	 * 
+	 *
 	 * @param <GValue> Typ der {@link Comparable}s.
 	 * @param array Array.
 	 * @return {@link ObjectArraySection}.
@@ -47,9 +46,8 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	}
 
 	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * 
 	 * <pre>ObjectArraySection.from(comparator, array, 0, array.length)</pre>
-	 * 
+	 *
 	 * @param <GValue> Typ der {@link Object}s.
 	 * @param comparator {@link Comparator}.
 	 * @param array Array.
@@ -84,7 +82,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	}
 
 	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
-	 * 
+	 *
 	 * @param <GValue> Typ der {@link Object}s.
 	 * @param array Array.
 	 * @param startIndex Index des ersten Werts im Abschnitt.
@@ -122,7 +120,7 @@ public abstract class ObjectArraySection<GValue> extends ArraySection<GValue[]> 
 	}
 
 	/** Diese Methode erzeugt eine neue {@link ObjectArraySection} und gibt sie zurück.
-	 * 
+	 *
 	 * @param <GValue> Typ der {@link Object}s.
 	 * @param comparator {@link Comparator}.
 	 * @param array Array.

@@ -9,9 +9,7 @@ import java.util.List;
  * {@link Conversion}s erzeugt. Diese {@link Conversion}s werden anschließend bezüglich ihrer Ausgabe ({@link Conversion#output()}) gemäß dem {@link Comparator}
  * {@code comparator} sortiert. Abschließend werden je ein {@link Iterable} für die Eingabe ({@link Conversion#input()}) und die Ausgabe (
  * {@link Conversion#output()}) der {@link Conversion}s erzeugt. Wenn die Berechnung der Eigenschaft (Ausgabe), auf der die Sortierung erfolgt, sehr Aufwändig
- * ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen.
- * 
- * <pre>{@literal 
+ * ist, kann diese Form des Pufferns zu einer verringerung der Rechenzeit führen. <pre>{@literal
  * Iterable<I> entries = // ...
  * Converter<I, O> converter = // ...
  * Comparator<O> comparator = // ...
@@ -21,7 +19,7 @@ import java.util.List;
  * Iterable<I> inputs = Iterables.convertedIterable(Conversions.<I>conversionInput(), conversions);
  * Iterable<O> outputs = Iterables.convertedIterable(Conversions.<O>conversionOutput(), conversions);}
  * </pre>
- * 
+ *
  * @see Converter
  * @see Converters
  * @see Conversions
@@ -31,12 +29,12 @@ import java.util.List;
 public interface Conversion<GInput, GOutput> {
 
 	/** Diese Methode gibt die Eingabe eines {@link Converter}s zurück.
-	 * 
+	 *
 	 * @return Eingabe. */
 	public GInput input();
 
 	/** Diese Methode gibt die Ausgabe eines {@link Converter}s zurück.
-	 * 
+	 *
 	 * @return Ausgabe. */
 	public GOutput output();
 

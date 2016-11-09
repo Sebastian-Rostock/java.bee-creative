@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Diese Klasse stellt einige statische Methoden bzur Verarbeitung von regulären Ausdrücken mit Zeichenketten zur Verfügung.
- * 
+ *
  * @see Pattern
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Strings {
@@ -19,9 +19,9 @@ public class Strings {
 	{}
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
-	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette in
-	 * diese Liste eingetragen werden sollen.
-	 * 
+	 * Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen Zeichenkette
+	 * in diese Liste eingetragen werden sollen.
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param index Index.
@@ -41,7 +41,7 @@ public class Strings {
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den
 	 * beiden Schaltern kann dazu entschieden werden, ob die von der {@code index} -ten Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
 	 * Zeichenkette in diese Liste eingetragen werden sollen.
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param index Index.
@@ -81,7 +81,7 @@ public class Strings {
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten zurück. Mit den
 	 * beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. der nicht getroffenen
 	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
-	 * 
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
@@ -97,7 +97,7 @@ public class Strings {
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Listen von Zeichenketten
 	 * zurück. Mit den beiden Schaltern kann dazu entschieden werden, ob die Listen der von den Gruppen des regulären Ausdrucks getroffenen bzw. nicht getroffenen
 	 * Zeichenketten in die Ergebnisliste eingetragen werden sollen.
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @param split {@code true}, wenn die nicht getroffenen Zeichenkette eingetragen werden sollen.
@@ -149,7 +149,7 @@ public class Strings {
 
 	/** Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte zurück. Der Rückgabewert entspricht
 	 * {@code Strings.join("", items)}.
-	 * 
+	 *
 	 * @see Strings#join(String, Object...)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
@@ -161,7 +161,7 @@ public class Strings {
 
 	/** Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte mit dem gegebenen Trennzeichen zurück. Das
 	 * Trennzeichen wird zwischen die {@link Object#toString() Textdarstelungen} aufeinanderfolgender Objekte platziert.
-	 * 
+	 *
 	 * @see Strings#join(String, Iterable)
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
@@ -175,7 +175,7 @@ public class Strings {
 
 	/** Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte zurück. Der Rückgabewert entspricht
 	 * {@code Strings.join("", items)}.
-	 * 
+	 *
 	 * @see Strings#join(String, Iterable)
 	 * @param items Objekte.
 	 * @return Verkettungstext.
@@ -187,7 +187,7 @@ public class Strings {
 
 	/** Diese Methode gibt die Verkettung der {@link Object#toString() Textdarstelungen} der gegebenen Objekte mit dem gegebenen Trennzeichen zurück. Das
 	 * Trennzeichen wird hierbei zwischen die {@link Object#toString() Textdarstelungen} aufeinanderfolgender Objekte platziert.
-	 * 
+	 *
 	 * @param space Trennzeichen.
 	 * @param items Objekte.
 	 * @return Verkettungstext.
@@ -212,7 +212,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom regulären
 	 * Ausdruck nicht getroffen wurden. Der Rückgabewert entspricht {@code Strings.split(regex, string, 0)}.
-	 * 
+	 *
 	 * @see Strings#split(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -224,12 +224,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von der
 	 * {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am
-	 * Komma hinter einer Ziffer:
-	 * 
-	 * <pre>
+	 * Komma hinter einer Ziffer: <pre>
 	 * Strings.split("\\d(,)", "12,3x,56", 1); // [ "12", "3x,56" ]
 	 * </pre>
-	 * 
+	 *
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
 	 * @param index Index.
@@ -243,7 +241,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom
 	 * regulären Ausdruck nicht getroffen wurden. Der Rückgabewert entspricht {@code Strings.split(pattern, string, 0)}.
-	 * 
+	 *
 	 * @see Strings#split(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -254,13 +252,11 @@ public class Strings {
 	}
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von
-	 * der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette am
-	 * Komma hinter einer Ziffer:
-	 * 
-	 * <pre>
+	 * der {@code index}-ten Gruppen des regulären Ausdrucks nicht getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Spalten einer Zeichenkette
+	 * am Komma hinter einer Ziffer: <pre>
 	 * Strings.split(Pattern.compile("\\d(,)"), "12,3x,56", 1); // [ "12", "3x,56" ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @param string Zeichenkette.
@@ -273,12 +269,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück, die von den
 	 * Gruppen des regulären Ausdrucks nicht getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel
-	 * zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	 * zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splitAll("(\\d+)-(\\d+)?", "x12-3, x4-yz"); // [ [ "x", "x", "x12-" ], [ ", x", "-3, x" ], [ "yz", "-yz", ", x4-yz" ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
@@ -287,14 +281,12 @@ public class Strings {
 		return Strings._applyAll_(regex, string, true, false);
 	}
 
-	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück,
-	 * die von den Gruppen des regulären Ausdrucks nicht getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das
-	 * folgende Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten
+	 * zurück, die von den Gruppen des regulären Ausdrucks nicht getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen.
+	 * Das folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splitAll(Pattern.compile("(\\d+)-(\\d+)?"), "x12-3, x4-yz"); // [ [ "x", "x", "x12-" ], [ ", x", "-3, x" ], [ "yz", "-yz", ", x4-yz" ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der nicht getroffenen Zeichenketten.
@@ -305,7 +297,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom regulären
 	 * Ausdruck getroffen wurden. Der Rückgabewert entspricht {@code Strings.match(regex, string, 0)}.
-	 * 
+	 *
 	 * @see Strings#match(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -317,11 +309,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von der
 	 * {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem Euro:
-	 * 
 	 * <pre>
 	 * Strings.match("(\\d+)€", "..nur 12€!", 1); // [ "12" ]
 	 * </pre>
-	 * 
+	 *
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
 	 * @param index Index.
@@ -335,7 +326,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom regulären
 	 * Ausdruck getroffen wurden. Der Rückgabewert entspricht: {@code Strings.match(pattern, string, 0)}
-	 * 
+	 *
 	 * @see Strings#match(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -347,12 +338,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von
 	 * der {@code index}-ten Gruppen des regulären Ausdrucks getroffen wurden. Das folgende Beispiel zeigt das kontextsensitive Extrahieren einer Zahl vor einem
-	 * Euro:
-	 * 
-	 * <pre>
+	 * Euro: <pre>
 	 * Strings.match(Pattern.compile("(\\d+)€"), "..nur 12€!", 1); // [ "12" ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @param string Zeichenkette.
@@ -365,12 +354,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück, die von den
 	 * Gruppen des regulären Ausdrucks getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende Beispiel zeigt
-	 * die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	 * die Analyse einer Zeichenkette: <pre>
 	 * Strings.matchAll("(\\d+)-(\\d+)?", "x12-3, x4-yz"); // [ [ "x12-3", "12", "3"  ], [ "4-", "4", null ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
@@ -379,14 +366,12 @@ public class Strings {
 		return Strings._applyAll_(regex, string, false, true);
 	}
 
-	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück,
-	 * die von den Gruppen des regulären Ausdrucks getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das folgende
-	 * Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten
+	 * zurück, die von den Gruppen des regulären Ausdrucks getroffen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das
+	 * folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.matchAll(Pattern.compile("(\\d+)-(\\d+)?"), "x12-3, x4-yz"); // [ [ "x12-3", "12", "3"  ], [ "4-", "4", null ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der getroffenen Zeichenketten.
@@ -397,7 +382,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom regulären
 	 * Ausdrucks getroffen bzw. nicht getroffenen wurden. Der Rückgabewert entspricht {@code Strings.splatch(regex, string, 0)}.
-	 * 
+	 *
 	 * @see Strings#splatch(String, CharSequence, int)
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -409,12 +394,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von der
 	 * {@code index}-ten Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste
-	 * eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	 * eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splatch("\\d(,)", "12,3x,56", 1); // [ "12", ",", "3x,56" ]
 	 * </pre>
-	 * 
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param index Index.
 	 * @param string Zeichenkette.
@@ -427,7 +410,7 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die vom
 	 * regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Der Rückgabewert entspricht: {@code Strings.splatch(pattern, string, 0)}.
-	 * 
+	 *
 	 * @see Strings#splatch(Pattern, CharSequence, int)
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
@@ -439,12 +422,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Zeichenketten zurück, die von
 	 * der {@code index}-ten Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die
-	 * Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	 * Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splatch(Pattern.compile("\\d(,)"), "12,3x,56", 1); // [ "12", ",", "3x,56" ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param index Index.
 	 * @param string Zeichenkette.
@@ -457,12 +438,10 @@ public class Strings {
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück, die von den
 	 * Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste eingetragen. Das
-	 * folgende Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	 * folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splatchAll("(\\d+)-(\\d+)?", "x12-3, x4-yz"); // [ [ "x", "x", "x12-" ], [ "12-3", "12", "3" ], [ ", x", "-3, x" ], [ "4-", "4", null ], [ "yz", "-yz", ", x4-yz" ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param regex regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
@@ -471,14 +450,12 @@ public class Strings {
 		return Strings._applyAll_(regex, string, true, true);
 	}
 
-	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten zurück,
-	 * die von den Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die Liste
-	 * eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette:
-	 * 
-	 * <pre>
+	/** Diese Methode wendet den gegebenen kompilierten regulären Ausdruck auf die gegebene Zeichenkette an und gibt die Liste der Listen von Zeichenketten
+	 * zurück, die von den Gruppen des regulären Ausdrucks getroffen bzw. nicht getroffenen wurden. Für eine Guppe ohne Treffer wird dabei {@code null} in die
+	 * Liste eingetragen. Das folgende Beispiel zeigt die Analyse einer Zeichenkette: <pre>
 	 * Strings.splatchAll(Pattern.compile("(\\d+)-(\\d+)?"), "x12-3, x4-yz"); // [ [ "x", "x", "x12-" ], [ "12-3", "12", "3" ], [ ", x", "-3, x" ], [ "4-", "4", null ], [ "yz", "-yz", ", x4-yz" ] ]
 	 * </pre>
-	 * 
+	 *
 	 * @param pattern kompilierter regulärer Ausdruck.
 	 * @param string Zeichenkette.
 	 * @return Liste der Listen der Zeichenketten.
@@ -489,7 +466,7 @@ public class Strings {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe via {@link Pattern#compile(String, int)} in einen kompilierten regulären Ausdruck
 	 * umwandelt.
-	 * 
+	 *
 	 * @see Pattern#compile(String, int)
 	 * @param flags Flags ({@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE},
 	 *        {@link Pattern#CANON_EQ}, {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL}, {@link Pattern#COMMENTS})

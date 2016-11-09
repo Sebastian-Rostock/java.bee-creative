@@ -11,7 +11,7 @@ import bee.creative.util.Comparators;
  * Objektschlüssel könnte hierbei der Position eines Objekts in solch einer Liste entsprechen. Alternativ zur Besitzerkennung könnte hierbei auch die Typkennung
  * genutzt werden.<br>
  * Die Wertebereiche für Objektschlüssel, Typkennungen und Besitzerkennungen sind {@code 0..2147483647}, {@code 0..65535} bzw. {@code 0..65535}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
@@ -31,7 +31,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** Diese Methode gibt eine neue Referenz mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
-	 * 
+	 *
 	 * @see #toString()
 	 * @param string Zeichenkette.
 	 * @return Referenz.
@@ -51,7 +51,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt eine neue Referenz mit den gegebenen Eigenschaften zurück.
-	 * 
+	 *
 	 * @param ref Objektschlüssel ({@code 0..2147483647}).
 	 * @param type Typkennung ({@code 0..65535}).
 	 * @param owner Besitzerkennung ({@code 0..65535}).
@@ -65,7 +65,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Referenz.
@@ -102,7 +102,8 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <ul>
 	 * <li>0 - 1 Bit</li>
 	 * <li>refValue - 31 Bit</li>
-	 * </ul> */
+	 * </ul>
+	*/
 	final int _valueL_;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Referenz.
@@ -111,11 +112,12 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <ul>
 	 * <li>typeValue - 16 Bit</li>
 	 * <li>ownerValue - 16 Bit</li>
-	 * </ul> */
+	 * </ul>
+	*/
 	final int _valueH_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Referenz.
-	 * 
+	 *
 	 * @see #value()
 	 * @param value interne Darstellung der Referenz.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
@@ -143,21 +145,21 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <li>ownerValue - 16 Bit</li>
 	 * <li>typeValue - 16 Bit</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return interne Darstellung der Referenz. */
 	public final long value() {
 		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
 	}
 
 	/** Diese Methode gibt den Objektschlüssel zurück.
-	 * 
+	 *
 	 * @return Objektschlüssel ({@code 0..2147483647}). */
 	public final int refValue() {
 		return this._valueL_;
 	}
 
 	/** Diese Methode gibt die Typkennung zurück.
-	 * 
+	 *
 	 * @see #withType(int)
 	 * @return Typkennung ({@code 0..65535}). */
 	public final int typeValue() {
@@ -165,7 +167,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt die Besitzerkennung zurück.
-	 * 
+	 *
 	 * @see #withOwner(int)
 	 * @return Besitzerkennung ({@code 0..65535}). */
 	public final int ownerValue() {
@@ -173,7 +175,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
-	 * 
+	 *
 	 * @see #typeValue()
 	 * @param ref Objektschlüssel ({@code 0..2147483647}).
 	 * @return Referenz mit Objektschlüssel.
@@ -184,7 +186,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Typkennung zurück.
-	 * 
+	 *
 	 * @see #typeValue()
 	 * @param type Typkennung ({@code 0..65535}).
 	 * @return Referenz mit Typkennung.
@@ -195,7 +197,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Besitzerkennung zurück.
-	 * 
+	 *
 	 * @see #ownerValue()
 	 * @param owner Besitzerkennung ({@code 0..65535}).
 	 * @return Referenz mit Besitzerkennung.
@@ -206,14 +208,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		return this._valueH_ ^ this._valueL_;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Referenz.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -223,7 +225,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen
 	 * Referenz ist.
-	 * 
+	 *
 	 * @param that Referenz.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -293,7 +295,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
 	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #type() TYPE}{@code :}{@link #ownerValue() OWNER}.
-	 * 
+	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {

@@ -16,7 +16,7 @@ import java.util.Set;
  * {@link #getKeyHash(Object)} muss zu einem gegebenen Schlüssel den {@link Object#hashCode() Streuwert} berechnen, und die Methode {@link #getIndex(int, int)}
  * muss zu einem gegebenen {@link Object#hashCode() Streuwert} den Index des Eintrags in der Tabelle berechnen, in dessen einfach verketteter Liste sich der
  * Eintrag mit dem gegebenen Schlüssen bzw. {@link Object#hashCode() Streuwert} befindet.
- * 
+ *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte.
@@ -24,7 +24,7 @@ import java.util.Set;
 public abstract class Hash<GKey, GValue, GEntry> {
 
 	/** Diese Klasse implementiert einen einfachen Eintrag eines {@link Hash}-{@link Set}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ des Werts. */
 	public static final class SetEntry<GValue> {
@@ -49,7 +49,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Klasse implementiert einen einfachen Eintrag einer {@link Hash}-{@link Map}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe. */
@@ -78,7 +78,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Klasse implementiert den {@link Iterator} über die Einträge der Abbildung.
-	 * 
+	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GEntry> Typ der Einträge. */
@@ -97,7 +97,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		int _index_ = 0;
 
 		/** Dieser Konstruktor initialisiert die Abbildung und sucht den ersten Eintrag.
-		 * 
+		 *
 		 * @param hash Abbildung.
 		 * @throws NullPointerException Wenn {@code hash} {@code null} ist. */
 		public HashIterator(final Hash<GKey, ?, GEntry> hash) throws NullPointerException {
@@ -174,7 +174,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	{}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen Schlüssels zurück.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @return {@link Object#hashCode() Streuwert} des Schlüssels. */
 	protected int getKeyHash(final GKey key) {
@@ -184,13 +184,13 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt den Schlüssel des gegebenen Eintrags zurück.
-	 * 
+	 *
 	 * @param entry Eintrag.
 	 * @return Schlüssel des Eintrags. */
 	protected abstract GKey getEntryKey(GEntry entry);
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des Schlüssels des gegebenen Eintrags zurück.
-	 * 
+	 *
 	 * @see #getKeyHash(Object)
 	 * @see #getEntryKey(Object)
 	 * @param entry Eintrag.
@@ -200,25 +200,25 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt den nächsten Eintrag des gegebenen Eintrags zurück.
-	 * 
+	 *
 	 * @param entry Eintrag.
 	 * @return nächster Eintrag des Eintrags oder {@code null}. */
 	protected abstract GEntry getEntryNext(GEntry entry);
 
 	/** Diese Methode setzt den nächsten Eintrag des gegebenen Eintrags.
-	 * 
+	 *
 	 * @param entry Eintrag.
 	 * @param next nächster Eintrag. */
 	protected abstract void setEntryNext(GEntry entry, GEntry next);
 
 	/** Diese Methode gibt den Wert des gegebenen Eintrags zurück.
-	 * 
+	 *
 	 * @param entry Eintrag.
 	 * @return Wert des Eintrags. */
 	protected abstract GValue getEntryValue(GEntry entry);
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der Schlüssel des gegebenen Eintrags gleich dem gegebenen Schlüssel ist.
-	 * 
+	 *
 	 * @see #getEntryKey(Object)
 	 * @param entry Eintrag.
 	 * @param key Schlüssel.
@@ -229,7 +229,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück.
-	 * 
+	 *
 	 * @return Anzahl der Einträge. */
 	protected final int getSize() {
 		return this._size_;
@@ -237,7 +237,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/** Diese Methode soll den Index des gegebenen {@link Object#hashCode() Streuwert} eines Schlüssels zurück geben. Der Index gibt die Position in der Tabelle
 	 * an, unter der eine einfach verkettete Liste verwaltet wird, deren Einträge einen Schlüssel mit diesem {@link Object#hashCode() Streuwert} besitzen können.
-	 * 
+	 *
 	 * @see Hash#getLength(int, int)
 	 * @param hash {@link Object#hashCode() Streuwert} eines Schlüssels.
 	 * @param length Größe der Tabelle.
@@ -247,14 +247,14 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt die Größe der Tabelle zurück, in der die Kopfelemente der einfach verketteten Listen der Einträge hinterlegt werden.
-	 * 
+	 *
 	 * @return Größe der Tabelle. */
 	protected final int getLength() {
 		return this._table_.length;
 	}
 
 	/** Diese Methode soll die neue Größe der Tabelle zurück geben, in der die Kopfelemente der einfach verketteten Listen der Einträge hinterlegt werden.
-	 * 
+	 *
 	 * @see Hash#getIndex(int, int)
 	 * @param size Anzahl der Einträge
 	 * @param length aktuelle Größe der Tabelle.
@@ -275,7 +275,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} über die Einträge zurück.
-	 * 
+	 *
 	 * @return {@link Iterator} über die Einträge. */
 	protected final Iterator<GEntry> getEntries() {
 		if (this._size_ == 0) return Iterators.emptyIterator();
@@ -283,7 +283,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode gibt den Eintrag mit dem gegebenen Schlüssel oder {@code null} zurück.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @return Eintrag mit dem gegebenen Schlüssel oder {@code null}. */
 	@SuppressWarnings ("unchecked")
@@ -299,7 +299,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	}
 
 	/** Diese Methode aktualisiert die Größe der Tabelle mit der via {@link Hash#getLength(int, int)} berechneten.
-	 * 
+	 *
 	 * @see Hash#verifyLength(int) */
 	protected final void verifyLength() {
 		this.verifyLength(this.getLength(this._size_, this._table_.length));
@@ -307,7 +307,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/** Diese Methode aktualisiert die Größe der Tabelle, sofern die gegebene Größe ungleich der Größe der bisherigen Tabelle ist. Bei der Aktialisierung werden
 	 * alle Schlüssel-Wert-Paare der bisherigen Tabelle in eine neue Tabelle der gegebenen Größe einfügt und die bisherige Tabelle mit der neuen ersetzt.
-	 * 
+	 *
 	 * @param newLength neue Größe der Tabelle. */
 	@SuppressWarnings ("unchecked")
 	protected final void verifyLength(final int newLength) {
@@ -334,7 +334,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 
 	/** Diese Methode soll einen neuen Eintrag mit dem gegebenen Schlüssel, Wert, nächstem Eintrag sowie {@link Object#hashCode() Streuwert} des Schlüssels
 	 * erzeugen und zurück geben.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Wert.
 	 * @param next nächster Eintrag.
@@ -346,7 +346,7 @@ public abstract class Hash<GKey, GValue, GEntry> {
 	 * hinterlegten Eintrag oder {@code null} zurück. Wenn die Größe der Tabelle {@code 0} ist, wird die Methode {@link Hash#verifyLength()} vor dem Einfügen
 	 * aufgerufen. Wenn die Tabellgrößenenprüfung {@code true} und unter dem gegebenen Schlüssel kein Eintrag registriert sind, wird die Methode
 	 * {@link Hash#verifyLength()} nach dem einfügen des neuen Eintrag aufgerufen.
-	 * 
+	 *
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
 	 * @param value Wert.
@@ -383,9 +383,9 @@ public abstract class Hash<GKey, GValue, GEntry> {
 		return null;
 	}
 
-	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die Tabellgrößenenprüfung {@code true} und unter
-	 * dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode {@link Hash#verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
-	 * 
+	/** Diese Methode entfernt den Eintrag mit dem gegebenen Schlüssel aus der Abbildung und gibt ihn zurück. Wenn die Tabellgrößenenprüfung {@code true} und
+	 * unter dem gegebenen Schlüssel ein Eintrag registriert sind, wird die Methode {@link Hash#verifyLength()} nach dem Entfernen des Eintrags aufgerufen.
+	 *
 	 * @see Hash#verifyLength()
 	 * @param key Schlüssel.
 	 * @param verifyLength Tabellgrößenenprüfung.

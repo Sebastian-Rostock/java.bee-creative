@@ -6,7 +6,7 @@ import java.io.IOException;
 import bee.creative.util.Bytes;
 
 /** Diese Klasse implementiert einen abstrakten {@link DataSource}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BaseDataSource implements DataSource {
 

@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 /** Diese Klasse implementiert einen unveränderlichen Wahrheitswert.<br>
  * Intern wird der Wahrheitswert als {@code boolean} dargestellt.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean> {
 
@@ -21,7 +21,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	{}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param data Wert.
 	 * @return Wahrheitswert. */
 	public static FEMBoolean from(final boolean data) {
@@ -29,7 +29,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @see #from(boolean)
 	 * @see Boolean#booleanValue()
 	 * @param data Wert.
@@ -40,7 +40,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	}
 
 	/** Diese Methode gibt einen neuen Wahrheitswert mit dem in der gegebenen Zeichenkette kodierten Wert zurück.
-	 * 
+	 *
 	 * @param value Zeichenkette ({@code "true"} oder {@code "false"}).
 	 * @return Wahrheitswert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
@@ -52,7 +52,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBoolean.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Wahrheitswert.
@@ -67,7 +67,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	final boolean _value_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung des Wahrheitswerts.
-	 * 
+	 *
 	 * @param value interne Darstellung des Wahrheitswerts. */
 	FEMBoolean(final boolean value) {
 		this._value_ = value;
@@ -76,21 +76,21 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	{}
 
 	/** Diese Methode gibt die interne Darstellung des Wahrheitswerts zurück. Diese ist ein {@code boolean}.
-	 * 
+	 *
 	 * @return interne Darstellung des Wahrheitswerts. */
 	public final boolean value() {
 		return this._value_;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		return this._value_ ? 1231 : 1237;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wahrheitswert gleich dem gegebenen ist.
-	 * 
+	 *
 	 * @param that Wahrheitswert.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -99,7 +99,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Wahrheitswert kleiner, gleich oder größer als der gegebene Wahrheitswert ist.
-	 * 
+	 *
 	 * @param that Wahrheitswert.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -108,7 +108,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 	}
 
 	/** Diese Methode gibt diesen Wahrheitswert als {@link Boolean} zurück.
-	 * 
+	 *
 	 * @return {@link Boolean}. */
 	public final Boolean toBoolean() {
 		return Boolean.valueOf(this._value_);
@@ -166,7 +166,7 @@ public final class FEMBoolean extends FEMValue implements Comparable<FEMBoolean>
 
 	/** Diese Methode gibt die Textdarstellung dieses Wahrheitswerts zurück.<br>
 	 * Für die Wahrheitswerte {@code true} und {@code false} sind die Textdarstellungen {@code "true"} und {@code "false"}.
-	 * 
+	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {

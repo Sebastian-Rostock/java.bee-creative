@@ -11,32 +11,30 @@ import bee.creative.util.Pointers.SoftPointer;
 /** Diese Klasse implementiert grundlegende {@link Converter}.
  * <p>
  * Im nachfolgenden Beispiel wird ein gepufferter {@link Converter} zur realisierung eines statischen Caches für Instanzen der exemplarischen Klasse
- * {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread} erzeugt wird:
- * 
- * <pre>
+ * {@code Helper} verwendet, wobei maximal eine Instanz pro {@link Thread} erzeugt wird: <pre>
  * public final class Helper {
- * 
+ *
  *   static final {@literal Converter<Thread, Helper> CACHE = Converters.synchronizedConverter(Converters.bufferedConverter(new Converter<Thread, Helper>()} {
- *   
+ *
  *     public Helper convert(Thread value) {
  *       return new Helper(value);
  *     }
- *     
+ *
  *   }));
- *   
+ *
  *   public static Helper get() {
  *     return Helper.CACHE.convert(Thread.currentThread());
  *   }
- *   
+ *
  *   protected Helper(Thread value) {
  *     ...
  *   }
- *   
+ *
  *   ...
- *   
+ *
  * }
  * </pre>
- * 
+ *
  * @see Converter
  * @see Conversion
  * @see Conversions
@@ -62,7 +60,7 @@ public class Converters {
 
 	/** Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Field} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code field.get(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GValue> Typ des Werts.
 	 * @param field {@link Field}.
@@ -87,7 +85,7 @@ public class Converters {
 
 	/** Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Filter} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(input))}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@link Filter}-Adapter.
@@ -110,7 +108,7 @@ public class Converters {
 	}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, welcher stats die gegebene Ausgabe liefert.
-	 * 
+	 *
 	 * @param <GValue> Typ der Ausgabe.
 	 * @param value Ausgabe.
 	 * @return {@code value}-{@link Converter}. */
@@ -130,10 +128,29 @@ public class Converters {
 		};
 	}
 
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parse(memberText))}.
+	 *
+	 * @see #nativeConverter(java.lang.reflect.Method)
+	 * @see #nativeConverter(java.lang.reflect.Constructor)
+	 * @see Natives#parse(String)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param memberText Methoden- oder Konstruktortext.
+	 * @return {@code native}-{@link Field}.
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws ReflectiveOperationException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final String memberText)
+		throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+		final Object object = Natives.parse(memberText);
+		if (object instanceof java.lang.reflect.Method) return Converters.nativeConverter((java.lang.reflect.Method)object);
+		return Converters.nativeConverter((java.lang.reflect.Constructor<?>)object);
+	}
+
 	/** Diese Methode gibt einen {@link Converter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
 	 * Für eine Eingabe {@code input} entsprich die Ausgabe des gelieferten {@link Converter} für Klassenmethoden {@code method.invoke(null, input)} und für
 	 * Objektmethoden {@code method.invoke(input)}.
-	 * 
+	 *
 	 * @see java.lang.reflect.Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -141,13 +158,7 @@ public class Converters {
 	 * @return {@code native}-{@link Converter}.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
 	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final java.lang.reflect.Method method) throws NullPointerException {
-		if (Modifier.isStatic(method.getModifiers())) return Converters._nativeConverterStatic_(method);
-		return Converters._nativeConverterObject_(method);
-	}
-
-	@SuppressWarnings ("javadoc")
-	static <GInput, GOutput> Converter<GInput, GOutput> _nativeConverterStatic_(final java.lang.reflect.Method method) {
-		return new Converter<GInput, GOutput>() {
+		if (Modifier.isStatic(method.getModifiers())) return new Converter<GInput, GOutput>() {
 
 			@Override
 			public GOutput convert(final GInput input) {
@@ -162,14 +173,10 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeMethod", method);
+				return Objects.toInvokeString("nativeConverter", Natives.formatMethod(method));
 			}
 
 		};
-	}
-
-	@SuppressWarnings ("javadoc")
-	static <GInput, GOutput> Converter<GInput, GOutput> _nativeConverterObject_(final java.lang.reflect.Method method) {
 		return new Converter<GInput, GOutput>() {
 
 			@Override
@@ -185,14 +192,46 @@ public class Converters {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeMethod", method);
+				return Objects.toInvokeString("nativeConverter", Natives.formatMethod(method));
+			}
+
+		};
+	}
+
+	/** Diese Methode gibt einen {@link Converter} zum gegebenen {@link java.lang.reflect.Constructor nativen Kontruktor} zurück.<br>
+	 * Für eine Eingabe {@code input} entsprich die Ausgabe des gelieferten {@link Converter} {@code constructor.newInstance(input)}.
+	 *
+	 * @see java.lang.reflect.Constructor#newInstance(Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GOutput> Typ der Ausgabe.
+	 * @param constructor Nativer Kontruktor.
+	 * @return {@code native}-{@link Converter}.
+	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
+	public static <GInput, GOutput> Converter<GInput, GOutput> nativeConverter(final java.lang.reflect.Constructor<?> constructor) throws NullPointerException {
+		if (constructor == null) throw new NullPointerException("constructor = null");
+		return new Converter<GInput, GOutput>() {
+
+			@Override
+			public GOutput convert(final GInput input) {
+				try {
+					@SuppressWarnings ("unchecked")
+					final GOutput result = (GOutput)constructor.newInstance(input);
+					return result;
+				} catch (final IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+					throw new IllegalArgumentException(cause);
+				}
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("nativeConverter", Natives.formatConstructor(constructor));
 			}
 
 		};
 	}
 
 	/** Diese Methode gibt den neutralen {@link Converter} zurück, dessen Ausgabe gleich seiner Eingabe ist.
-	 * 
+	 *
 	 * @param <GInput> Typ der Ein-/Ausgabe.
 	 * @return {@link #NEUTRAL_CONVERTER}. */
 	@SuppressWarnings ("unchecked")
@@ -202,7 +241,7 @@ public class Converters {
 
 	/** Diese Methode gibt einen verketteten {@link Converter} zurück, der seine Eingabe durch den ersten und zweiten {@link Converter} umgewandelt wird.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code converter2.convert(converter1.convert(input))}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe des erzeugten sowie der Eingabe des ersten {@link Converter}.
 	 * @param <GValue> Typ der Ausgabe des ersten sowie der Eingabe des zweiten {@link Converter}.
 	 * @param <GOutput> Typ der Ausgabe des zweiten sowie der Ausgabe des erzeugten {@link Converter}.
@@ -232,7 +271,7 @@ public class Converters {
 	/** Diese Methode gibt einen gepufferten {@link Converter} zurück, der die zu seinen Eingaben über den gegebenen {@link Converter} ermittelten Ausgaben intern
 	 * in einer {@link Map} (genauer {@link LinkedHashMap}) zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf
 	 * Eingaben und die Werte als {@link SoftPointer} auf die Ausgaben bestückt.
-	 * 
+	 *
 	 * @see #bufferedConverter(int, int, int, Converter)
 	 * @param <GInput> Typ der Eingabe sowie der Datensätze in den Schlüsseln der internen {@link Map}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Datensätze in den Werten der internen {@link Map}.
@@ -247,7 +286,7 @@ public class Converters {
 	/** Diese Methode gibt einen gepufferten {@link Converter} zurück, der die zu seinen Eingaben über den gegebenen {@link Converter} ermittelten Ausgaben intern
 	 * in einer {@link Map} (genauer {@link LinkedHashMap}) zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf
 	 * Eingaben und die Werte als {@link Pointer} auf die Ausgaben bestückt.
-	 * 
+	 *
 	 * @see Pointers#pointer(int, Object)
 	 * @param <GInput> Typ der Eingabe sowie der Datensätze in den Schlüsseln der internen {@link Map}.
 	 * @param <GOutput> Typ der Ausgabe sowie der Datensätze in den Werten der internen {@link Map}.
@@ -318,7 +357,7 @@ public class Converters {
 	 * eines {@link Filter}s entscheiden. Wenn der {@link Filter} eine Eingabe akzeptiert, liefert der erzeugte {@link Converter} dafür die Ausgabe des
 	 * {@code acceptConverter}. Die Ausgabe des gegebenen {@code rejectConverter} liefert er dagegen für die vom {@link Filter} abgelehnten Eingaben.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code (condition.accept(input) ? acceptConverter : rejectConverter).convert(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param condition {@link Filter} als Bedingung.
@@ -346,7 +385,7 @@ public class Converters {
 	}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der den gegebenen {@link Converter} via {@code synchronized(this)} synchronisiert.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.

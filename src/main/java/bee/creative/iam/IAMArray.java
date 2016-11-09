@@ -5,9 +5,9 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Iterables;
 import bee.creative.util.Objects;
 
-/** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Liste ({@link IAMListing}) für die Elemente sowie einer Abbildung ({@link IAMMapping})
- * für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
- * 
+/** Diese Klasse implementiert eine abstrakte Zahlenfolge, welche in einer Liste ({@link IAMListing}) für die Elemente sowie einer Abbildung
+ * ({@link IAMMapping}) für die Schlüssel und Werte der Einträge ({@code IAMEntry}) verwendet wird.
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray> {
 
@@ -132,7 +132,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
 	 * {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -143,7 +143,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
 	 * {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -154,7 +154,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
 	 * {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -165,7 +165,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt ein neues {@link IAMArray} als Sicht auf die gegebenen Zahlen zurück. Änderungen am Inhalt von {@code array} werden auf das gelieferte
 	 * {@link IAMArray} übertragen!
-	 * 
+	 *
 	 * @param array Zahlen.
 	 * @return {@link IAMArray}-Sicht auf {@code array}.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -175,7 +175,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code byte[]} zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @param array Zahlenfolge.
@@ -191,7 +191,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code char[]} zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @param array Zahlenfolge.
@@ -207,7 +207,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code short[]} zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @param array Zahlenfolge.
@@ -228,7 +228,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	protected final int _length_;
 
 	/** Dieser Konstruktor initialisiert die Länge.
-	 * 
+	 *
 	 * @param length Länge. */
 	protected IAMArray(final int length) {
 		this._length_ = length;
@@ -237,7 +237,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	{}
 
 	/** Diese Methode implementiert {@link #get(int)} ohne Parameterprüfung.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-te Zahl. */
 	protected int _get_(final int index) {
@@ -245,7 +245,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode implementiert {@link #section(int, int)} ohne Parameterprüfung.
-	 * 
+	 *
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt. */
@@ -255,7 +255,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt die {@code index}-te Zahl zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see #length()
 	 * @param index Index.
 	 * @return {@code index}-te Zahl. */
@@ -265,22 +265,20 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt die Länge der Zahlenfolge zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @see #get(int)
 	 * @return Länge. */
 	public final int length() {
 		return this._length_;
 	}
 
-	/** Diese Methode gibt den Streuwert zurück.
-	 * 
-	 * <pre>
+	/** Diese Methode gibt den Streuwert zurück. <pre>
 	 * int result = 0x811C9DC5;
 	 * for (int i = 0; i < length(); i++)
 	 *   result = (result * 0x01000193) ^ get(i);
 	 * return result;
 	 * </pre>
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		int hash = 0x811C9DC5;
@@ -290,15 +288,13 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		return hash;
 	}
 
-	/** Diese Methode gibt nur dann true zurück, wenn diese Zahlenfolge gleich der gegebenen Zahlenfolge ist.
-	 * 
-	 * <pre>
+	/** Diese Methode gibt nur dann true zurück, wenn diese Zahlenfolge gleich der gegebenen Zahlenfolge ist. <pre>
 	 * if (length() != that.length()) return false;
 	 * for (int i = 0; i < length(); i++)
 	 *   if (get(i) != that.get(i)) return false;
 	 * return true;
 	 * </pre>
-	 * 
+	 *
 	 * @param that Zahlenfolge.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -311,14 +307,12 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung dieser Zahlenfolge lexikografisch kleiner, gleich bzw.
-	 * größer als die der gegebenen Zahlenfolge ist.
-	 * 
-	 * <pre>
+	 * größer als die der gegebenen Zahlenfolge ist. <pre>
 	 * for (int i = 0, result; i < min(length(), that.length()); i++)
 	 *   if ((result = get(i) – that.get(i)) != 0) return result;
 	 * return length() – that.length();
 	 * </pre>
-	 * 
+	 *
 	 * @param that Zahlenfolge.
 	 * @return Vergleichswert der Ordnungen.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -331,7 +325,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 
 	/** Diese Methode gibt einen Abschnitt dieser Zahlenfolge ab der gegebenen Position und mit der gegebenen Länge zurück.<br>
 	 * Wenn der Abschnitt nicht innerhalb der Zahlenfolge liegt oder die Länge kleiner als {@code 1} ist, wird eine leere Zahlenfolge geliefert.
-	 * 
+	 *
 	 * @param offset Beginn des Abschnitts.
 	 * @param length Länge des Abschnitts.
 	 * @return Abschnitt. */
@@ -341,7 +335,7 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	}
 
 	/** Diese Methode gibt eine Kopie der Zahlenfolge als {@code int[]} zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @return Kopie der Zahlenfolge. */

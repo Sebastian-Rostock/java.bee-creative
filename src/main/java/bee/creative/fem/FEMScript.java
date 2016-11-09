@@ -12,13 +12,13 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen aufbereiteten Quelltext als Zeichenkette mit typisierten Bereichen.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMScript implements Items<Range>, Iterable<Range> {
 
-	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)} erfolgt
-	 * gemäß ihrer Startposition.
-	 * 
+	/** Diese Klasse implementiert ein Objekt, das einen typisierten Bereich einer Zeichenkette. Die Sortierung von Bereichen via {@link #compareTo(Range)}
+	 * erfolgt gemäß ihrer Startposition.
+	 *
 	 * @see FEMScript
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class Range implements Comparable<Range> {
@@ -31,7 +31,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren Grenzen mit der gegebenen Position vergleicht. Der Rückhabewert der
 		 * {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, größer oder gleich {@code 0}, wenn die gegebene Position kleiner der
 		 * {@link Range#start() Startposition} ist, größer der {@link Range#end() Endposition} ist bzw. innerhalb der oder gleich den Grenzen des Bereichs liegt.
-		 * 
+		 *
 		 * @see Range#end()
 		 * @see Range#start()
 		 * @see Comparables
@@ -50,10 +50,10 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 			};
 		}
 
-		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht. Der
-		 * Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position kleiner,
-		 * gleich bzw. größer der {@link Range#end() Endposition} eines gegebenen Bereichs ist.
-		 * 
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#end() Endposition}en mit der gegebenen Position vergleicht.
+		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
+		 * kleiner, gleich bzw. größer der {@link Range#end() Endposition} eines gegebenen Bereichs ist.
+		 *
 		 * @see Range#end()
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
@@ -70,10 +70,10 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 			};
 		}
 
-		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position vergleicht.
-		 * Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene Position
-		 * kleiner, gleich bzw. größer der {@link Range#start() Startposition} eines gegebenen Bereichs ist.
-		 * 
+		/** Diese Methode gibt ein {@link Comparable} für Bereiche zurück, welches deren {@link Range#start() Startposition}en mit der gegebenen Position
+		 * vergleicht. Der Rückhabewert der {@link Comparable#compareTo(Object) Navigationsmethode} ist kleiner, gleich oder größer {@code 0}, wenn die gegebene
+		 * Position kleiner, gleich bzw. größer der {@link Range#start() Startposition} eines gegebenen Bereichs ist.
+		 *
 		 * @see Range#start()
 		 * @see Comparables
 		 * @see Comparators#compare(int, int)
@@ -102,7 +102,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		final int _length_;
 
 		/** Dieser Konstruktor initialisiert Typ, Startposition und Länge.
-		 * 
+		 *
 		 * @param type Typ.
 		 * @param offset Startposition.
 		 * @param length Länge.
@@ -118,7 +118,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		{}
 
 		/** Diese Methode gibt den Typ des Bereichs zurück.
-		 * 
+		 *
 		 * @see FEMScript
 		 * @return Bereichstyp. */
 		public final char type() {
@@ -126,28 +126,28 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 		}
 
 		/** Diese Methode gibt die Position zurück, vor der dieser Bereich endet.
-		 * 
+		 *
 		 * @return Endposition. */
 		public final int end() {
 			return this._offset_ + this._length_;
 		}
 
 		/** Diese Methode gibt die Position zurück, an der dieser Bereich beginnt.
-		 * 
+		 *
 		 * @return Startposition. */
 		public final int start() {
 			return this._offset_;
 		}
 
 		/** Diese Methode gibt die Länge des die Position zurück, an der dieser Bereich beginnt.
-		 * 
+		 *
 		 * @return Startposition. */
 		public final int length() {
 			return this._length_;
 		}
 
 		/** Diese Methode gibt den durch diesen Bereich beschriebenen Abschnitt der gegebenen Zeichenkette zurück.
-		 * 
+		 *
 		 * @param source Zeichenkette.
 		 * @return Abschnitt.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist. */
@@ -201,12 +201,13 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	final Range[] _ranges_;
 
 	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-	 * 
+	 *
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen. */
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
 	public FEMScript(final String source, final Range[] ranges) throws NullPointerException, IllegalArgumentException {
 		int offset = 0;
 		final int length = source.length();
@@ -221,12 +222,13 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	}
 
 	/** Dieser Konstruktor initialisiert die Zeichenkette sowie die Bereiche.
-	 * 
+	 *
 	 * @see Range
 	 * @param source Zeichenkette.
 	 * @param ranges Bereiche.
 	 * @throws NullPointerException Wenn {@code source} {@code null} ist bzw. {@code ranges} {@code null} ist oder enthält.
-	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus gehen. */
+	 * @throws IllegalArgumentException Wenn die gegebenen Bereiche einander überlagern, nicht aufsteigend sortiert sind oder über die Zeichenkette hinaus
+	 *         gehen. */
 	public FEMScript(final String source, final Collection<Range> ranges) throws NullPointerException, IllegalArgumentException {
 		this(source, ranges.toArray(new Range[ranges.size()]));
 	}
@@ -234,14 +236,14 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	{}
 
 	/** Diese Methode gibt die Zeichenkette zurück.
-	 * 
+	 *
 	 * @return Zeichenkette. */
 	public final String source() {
 		return this._source_;
 	}
 
 	/** Diese Methode gibt die Verkettung der {@link Range#type() Typen} der {@link #ranges() Bereiche} als Zeichenkette zurück.
-	 * 
+	 *
 	 * @see Range#type()
 	 * @see #ranges()
 	 * @return Bereichstypen als Zeichenkette. */
@@ -255,7 +257,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	}
 
 	/** Diese Methode gibt eine Kopie der Bereiche zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #length()
 	 * @see #iterator()
@@ -265,7 +267,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Bereiche zurück.
-	 * 
+	 *
 	 * @see #get(int)
 	 * @see #ranges()
 	 * @see #iterator()
@@ -276,7 +278,7 @@ public final class FEMScript implements Items<Range>, Iterable<Range> {
 
 	/** Diese Methode gibt diesen Quelltext in normalisierter Form zurück. In dieser gibt es keinen Abschnitt der {@link #source() Zeichenkette}, der nicht in
 	 * einem der {@link #ranges() Bereiche} enthalten ist.
-	 * 
+	 *
 	 * @return normalisierter Quelltext. */
 	public final FEMScript normalize() {
 		final List<Range> normalRanges = new ArrayList<>(this._ranges_.length);

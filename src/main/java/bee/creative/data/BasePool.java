@@ -7,14 +7,14 @@ import bee.creative.util.Iterators;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen {@link Pool}. Die Datensätze müssen Nachfahren von {@link BaseItem} sein.
- * 
+ *
  * @author Sebastian Rostock 2011.
  * @param <GItem> Typ der Datensätze. */
 public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 
 	/** Diese Methode implementiert {@link BaseItem#delete()}. Sie sollte vom {@link Iterator} ({@link #iterator()}) bzw. der {@link Collection} (
 	 * {@link #items(int)}) zum Entfernen eines {@link Item}s verwendet werden.
-	 * 
+	 *
 	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist. */
@@ -34,7 +34,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** Diese Methode implementiert {@link BaseItem#append()}.
-	 * 
+	 *
 	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalArgumentException Wenn das {@link BaseItem} nicht zu diesem {@link BasePool} gehört oder {@link Item#state()} unbekannt ist. */
@@ -54,7 +54,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** Diese Methode implementiert {@link BaseItem#remove()}.
-	 * 
+	 *
 	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link Item#CREATE_STATE} befindet.
@@ -76,7 +76,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** Diese Methode implementiert {@link BaseItem#remove()}.
-	 * 
+	 *
 	 * @param item {@link BaseItem}.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist.
 	 * @throws IllegalStateException Wenn sich das {@link Item} im Status {@link Item#APPEND_STATE} befindet.
@@ -98,36 +98,36 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** Diese Methode erstellt ein neues {@link Item} im {@link Item#CREATE_STATE} und gibt dieses zurück. Sie wird bei {@link Pool#create()} aufgerufen.
-	 * 
+	 *
 	 * @see Item#state()
 	 * @see Pool#create()
 	 * @return neues {@link Item}. */
 	protected abstract GItem doCreate();
 
 	/** Diese Methode wird bei {@link #delete(BaseItem)} zur Überführung des Zustands zu {@link Item#CREATE_STATE} aufgerufen.
-	 * 
+	 *
 	 * @param item {@link Item}. */
 	protected abstract void doDelete(final GItem item);
 
 	/** Diese Methode wird bei {@link Item#append()} zur Überführung des Zustands zu {@link Item#APPEND_STATE} aufgerufen.
-	 * 
+	 *
 	 * @param item {@link Item}. */
 	protected abstract void doAppend(final GItem item);
 
 	/** Diese Methode wird bei {@link Item#remove()} zur Überführung des Zustands zu {@link Item#REMOVE_STATE} aufgerufen.
-	 * 
+	 *
 	 * @param item {@link Item}. */
 	protected abstract void doRemove(final GItem item);
 
 	/** Diese Methode wird bei {@link Item#update()} zur Überführung des Zustands zu {@link Item#UPDATE_STATE} aufgerufen.
-	 * 
+	 *
 	 * @param item {@link Item}. */
 	protected abstract void doUpdate(final GItem item);
 
 	{}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #find(Field, Object, int) */
 	@Override
 	public <GValue> GItem find(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
@@ -135,7 +135,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #items()
 	 * @see FilteredSelection */
 	@Override
@@ -144,7 +144,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #findAll(Field, Object, int) */
 	@Override
 	public <GValue> Selection<GItem> findAll(final Field<? super GItem, ? extends GValue> field, final GValue value) throws NullPointerException {
@@ -152,7 +152,7 @@ public abstract class BasePool<GItem extends Item> implements Pool<GItem> {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #items()
 	 * @see FilteredSelection */
 	@Override

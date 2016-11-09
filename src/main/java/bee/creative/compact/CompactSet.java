@@ -7,13 +7,13 @@ import java.util.Set;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert ein abstraktes {@link Set}, dessen Daten in einem Array verwaltet werden.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 public abstract class CompactSet<GItem> extends CompactCollection<GItem> implements Set<GItem> {
 
 	/** Diese Klasse implementiert das {@link AbstractSet} eines {@link Set}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ den Elemente. */
 	protected static final class CompactSetItems<GItem> extends AbstractSet<GItem> {
@@ -22,7 +22,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 		protected final Set<GItem> set;
 
 		/** Dieser Konstruktor initialisiert das {@link Set}.
-		 * 
+		 *
 		 * @param set {@link Set}.
 		 * @throws NullPointerException Wennd as gegebene {@link Set} {@code null} ist. */
 		public CompactSetItems(final Set<GItem> set) throws NullPointerException {
@@ -53,7 +53,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität. */
 	public CompactSet(final int capacity) {
@@ -61,7 +61,7 @@ public abstract class CompactSet<GItem> extends CompactCollection<GItem> impleme
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Set#addAll(Collection)
 	 * @see CompactData#allocate(int)
 	 * @param collection Elemente.

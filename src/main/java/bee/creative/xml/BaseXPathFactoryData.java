@@ -10,14 +10,14 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link XPathFactory}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFactory, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für das Objektmodel einer {@link XPathFactory}.<br>
 	 * Initialisiert wird dieses via {@link #useDEFAULT_OBJECT_MODEL_URI()}.
-	 * 
+	 *
 	 * @see XPathFactory#newInstance(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
@@ -31,7 +31,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		{}
 
 		/** Diese Methode setzt den Wert auf {@link XPathFactory#DEFAULT_OBJECT_MODEL_URI} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #use(BaseValueBuilder)
 		 * @return {@code this}. */
 		public final ModelData<GOwner> useDEFAULT_OBJECT_MODEL_URI() {
@@ -39,7 +39,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 		}
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeModelData();
 
@@ -54,14 +54,14 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link XPathFactory}.
-	 * 
+	 *
 	 * @see XPathFactory#setFeature(String, boolean)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
@@ -76,14 +76,14 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link XPathVariableResolver}.
-	 * 
+	 *
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class VariableData<GOwner> extends BaseValueBuilder<XPathVariableResolver, VariableData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeVariableData();
 
@@ -98,14 +98,14 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link XPathFunctionResolver}.
-	 * 
+	 *
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FunctionData<GOwner> extends BaseValueBuilder<XPathFunctionResolver, FunctionData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeFunctionData();
 
@@ -167,7 +167,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseXPathFactoryData<?> data) {
@@ -184,10 +184,11 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	 * Wenn über {@link #useFactory(XPathFactory)} noch keine {@link XPathFactory} gesetzt wurde, wird über {@link XPathFactory#newInstance(String)} eine neue
 	 * erstellt, über {@link #useFactory(XPathFactory)} gesetzt und über {@link #updateFactory()} aktualisiert. Das zur Erstellung verwendete Objektmodell kann
 	 * über {@link #openModelData()} konfiguriert werden.
-	 * 
+	 *
 	 * @see #useFactory(XPathFactory)
 	 * @return {@link XPathFactory}.
-	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#newInstance(String)} bzw. {@link #updateFactory()} eine entsprechende Ausnahme auslöst. */
+	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#newInstance(String)} bzw. {@link #updateFactory()} eine entsprechende Ausnahme
+	 *         auslöst. */
 	public final XPathFactory getFactory() throws XPathFactoryConfigurationException {
 		XPathFactory result = this._factory_;
 		if (result != null) return result;
@@ -198,7 +199,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode setzt die {@link XPathFactory} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param factory {@link XPathFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final XPathFactory factory) {
@@ -207,7 +208,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode setzt die {@link XPathFactory} auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useFactory(XPathFactory)
 	 * @return {@code this}. */
 	public final GThis resetFactory() {
@@ -217,7 +218,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	/** Diese Methode aktualisiert die Einstellungen der {@link XPathFactory} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link XPathFactory} die Einstellungen übertragen, die in
 	 * {@link #openVariableData()}, {@link #openFunctionData()} und {@link #openFeatureData()} konfiguriert sind.
-	 * 
+	 *
 	 * @return {@code this}.
 	 * @throws XPathFactoryConfigurationException Wenn {@link XPathFactory#setFeature(String, boolean)} bzw. {@link #getFactory()} eine entsprechende Ausnahme
 	 *         auslöst. */
@@ -236,7 +237,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das Objektmodel und gibt ihn zurück.
-	 * 
+	 *
 	 * @see XPathFactory#newInstance(String)
 	 * @return Konfigurator. */
 	public final ModelData<GThis> openModelData() {
@@ -244,7 +245,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
-	 * 
+	 *
 	 * @see XPathFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
@@ -252,7 +253,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link XPathVariableResolver} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see XPathFactory#setXPathVariableResolver(XPathVariableResolver)
 	 * @return Konfigurator. */
 	public final VariableData<GThis> openVariableData() {
@@ -260,7 +261,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link XPathFunctionResolver} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see XPathFactory#setXPathFunctionResolver(XPathFunctionResolver)
 	 * @return Konfigurator. */
 	public final FunctionData<GThis> openFunctionData() {
@@ -274,7 +275,7 @@ public abstract class BaseXPathFactoryData<GThis> extends BaseBuilder<XPathFacto
 	protected abstract GThis _this_();
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getFactory() */
 	@Override
 	public final XPathFactory build() throws IllegalStateException {

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 /** Diese Schnittstelle definiert domänenspezifische Kompilations- und Formatierungsmethoden, die von einem {@link FEMCompiler} zur Übersetzung von Quelltexten
  * in Werte, Funktionen und Parameternamen bzw. von einem {@link FEMFormatter} Übersetzung von Werten und Funktionen in Quelltexte genutzt werden können.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMDomain {
 
@@ -21,7 +21,8 @@ public class FEMDomain {
 	 * {@link BigDecimal} geliefert.<br>
 	 * Andernfalls wird der gelieferten Parameter über {@link FEMReflection#from(String)} ermittelt bzw. ein {@link FEMCompiler#proxy(String) Platzhalter}
 	 * geliefert.</dd>
-	 * </dl> */
+	 * </dl>
+	*/
 	public static final FEMDomain NATIVE = new FEMDomain() {
 
 		@Override
@@ -69,13 +70,14 @@ public class FEMDomain {
 	 * <dd>Soweit möglich wird eine Instanz von {@link FEMString}, {@link FEMVoid}, {@link FEMBoolean}, {@link FEMInteger}, {@link FEMDecimal},
 	 * {@link FEMDatetime}, {@link FEMDuration} oder {@link FEMBinary} geliefert.<br>
 	 * Andernfalls wird ein {@link FEMCompiler#proxy(String) Platzhalter} geliefert.</dd>
-	 * </dl> */
+	 * </dl>
+	*/
 	public static final FEMDomain NORMAL = new FEMDomain();
 
 	{}
 
 	/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-	 * 
+	 *
 	 * @param target {@link FEMFormatter}.
 	 * @param data Objekt.
 	 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
@@ -92,7 +94,7 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.
-	 * 
+	 *
 	 * @param target {@link FEMFormatter}.
 	 * @param function Funktion.
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
@@ -101,7 +103,7 @@ public class FEMDomain {
 	}
 
 	/** Diese Methode gibt den im {@link FEMCompiler#section() aktuellen Bereich} des gegebenen Kompilers angegebenen Funktions- bzw. Parameternamen zurück.
-	 * 
+	 *
 	 * @see FEMCompiler#range()
 	 * @see FEMCompiler#script()
 	 * @param compiler Kompiler mit Bereich und Quelltext.
@@ -115,7 +117,7 @@ public class FEMDomain {
 	 * Der Wert des Parameters entspricht dabei dem Ergebniswert der gelieferten Funktion.<br>
 	 * Konstante Parameterwerte können als {@link FEMValue} oder {@link FEMProxy} geliefert werden. Funktion als Parameterwert können über
 	 * {@link FEMFunction#toValue()} oder {@link FEMFunction#toClosure()} geliefert werden.
-	 * 
+	 *
 	 * @see FEMCompiler#proxy(String)
 	 * @see FEMCompiler#range()
 	 * @see FEMCompiler#script()

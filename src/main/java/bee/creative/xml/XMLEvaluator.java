@@ -12,17 +12,17 @@ import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #compile(String) Kompilieren} sowie {@link #evaluate(QName) Auswerten} von {@link XPathExpression}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLEvaluator {
 
 	/** Diese Klasse implementiert den Konfigurator für einen {@link XPath}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class XPathData extends BaseXPathData<XPathData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public final XMLEvaluator closeXPathData() {
 			return XMLEvaluator.this;
@@ -39,7 +39,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Klasse implementiert den Puffer für die erzeugten {@link XPathExpression}.
-	 * 
+	 *
 	 * @see XMLEvaluator#compile(String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class CacheData extends UniqueMap<String, XPathExpression> {
@@ -74,7 +74,7 @@ public final class XMLEvaluator {
 	{}
 
 	/** Diese Methode gibt den Basisknoten zurück, auf den sich die Pfadangaben beziehen.
-	 * 
+	 *
 	 * @see #useBase(Node)
 	 * @return Basisknoten. */
 	public final Node getBase() {
@@ -82,7 +82,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode setzt den Basisknoten und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getBase()
 	 * @param base Basisknoten, auf den sich die Pfadangaben beziehen.
 	 * @return {@code this}. */
@@ -92,21 +92,21 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode gibt den Puffer zurück, in dem die {@link #compile(String) kompilierten} Ausdrücke zur Wiederverwendung vorgehalten werden.
-	 * 
+	 *
 	 * @return Puffer der Ausdrücke. */
 	public final CacheData getCache() {
 		return this._cacheData_;
 	}
 
 	/** Diese Methode gibt den aktuellen Ausdruck zurück.
-	 * 
+	 *
 	 * @return Ausdruck oder {@code null}. */
 	public final XPathExpression getExpression() {
 		return this._expression_;
 	}
 
 	/** Diese Methode setzt den {@link #getExpression() aktuellen Ausdruck} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #compile(String)
 	 * @see #useExpression(XPathExpression)
 	 * @param expression Ausdruck oder {@code null}.
@@ -118,7 +118,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode setzt den {@link #getExpression() aktuellen Ausdruck} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param expression Ausdruck oder {@code null}.
 	 * @return {@code this}. */
 	public final XMLEvaluator useExpression(final XPathExpression expression) {
@@ -127,7 +127,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode leert den Puffer der {@link #compile(String) kompilierten} Ausdrücke und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @return {@code this}. */
 	public final XMLEvaluator resetCache() {
 		this._cacheData_.entryMap().clear();
@@ -135,7 +135,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode setzt den {@link #getExpression() aktuellen Ausdruck} auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useExpression(XPathExpression)
 	 * @return {@code this}. */
 	public final XMLEvaluator resetExpression() {
@@ -144,7 +144,7 @@ public final class XMLEvaluator {
 
 	/** Diese Methode kompiliert den gegebenen Ausdruck und gibt ihn als {@link XPathExpression} zurück.<br>
 	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert. Die kompilierten Ausdrücke werden {@link #getCache() gepuffert}.
-	 * 
+	 *
 	 * @param expression Ausdruck oder {@code null}.
 	 * @return {@link XPathExpression} oder {@code null}.
 	 * @throws XPathExpressionException Wenn {@link XPath#compile(String)} eine entsprechende Ausnahme auslöst.
@@ -164,7 +164,7 @@ public final class XMLEvaluator {
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in den gegebenen Ergebnistyp und gibt das Ergebnis zurück.<br>
 	 * Wenn der Ausdruck {@code null} ist, wird {@code null} geliefert.
-	 * 
+	 *
 	 * @see XPathConstants
 	 * @param resultType Ergebnistyp.
 	 * @return Ergebnis oser {@code null}.
@@ -176,7 +176,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Knoten und diesen zurück.
-	 * 
+	 *
 	 * @see #evaluate(QName)
 	 * @see XPathConstants#NODE
 	 * @return Knoten oder {@code null}.
@@ -187,7 +187,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in eine Zeichenkette und diese zurück.
-	 * 
+	 *
 	 * @see #evaluate(QName)
 	 * @see XPathConstants#STRING
 	 * @return Zeichenkette oder {@code null}.
@@ -198,7 +198,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Wahrheitswert und diesen zurück.
-	 * 
+	 *
 	 * @see #evaluate(QName)
 	 * @see XPathConstants#BOOLEAN
 	 * @return Wahrheitswert oder {@code null}.
@@ -209,7 +209,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in einen Zahlenwert und diesen zurück.
-	 * 
+	 *
 	 * @see #evaluate(QName)
 	 * @see XPathConstants#NUMBER
 	 * @return Zahlenwert oder {@code null}.
@@ -220,7 +220,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode evaluiert den {@link #getExpression() aktuellen Ausdruck} in eine Knotenliste und diesen zurück.
-	 * 
+	 *
 	 * @see #evaluate(QName)
 	 * @see XPathConstants#NODESET
 	 * @return Knotenliste oder {@code null}.
@@ -231,7 +231,7 @@ public final class XMLEvaluator {
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link XPath} und gibt ihn zurück.
-	 * 
+	 *
 	 * @return Konfigurator. */
 	public final XPathData openXpathData() {
 		return this._xpathData_;

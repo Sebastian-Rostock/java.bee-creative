@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Berechnungen extrahiert werden. Der Zustand des Kontextobjekts kann auch modifiziert werden.
  * <p>
  * Die {@link #toString() Textdarstellung} der Funktion wird über {@link #toScript(FEMFormatter)} ermittelt.
- * 
+ *
  * @see FEMValue
  * @see FEMFrame
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -119,7 +119,7 @@ public abstract class FEMFunction {
 
 		@Override
 		public final FEMValue invoke(final FEMFrame frame) {
-			return toFuture(frame);
+			return this.toFuture(frame);
 		}
 
 		@Override
@@ -282,7 +282,7 @@ public abstract class FEMFunction {
 	{}
 
 	/** Diese Methode führt Berechnungen mit dem gegebenen Stapelrahmen durch und gibt den ermittelten Ergebniswert zurück.
-	 * 
+	 *
 	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
@@ -291,7 +291,7 @@ public abstract class FEMFunction {
 	/** Diese Methode gibt eine verkette Funktion zurück, welche den Ergebniswert dieser Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert
 	 * der gelieferten Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht
 	 * {@code FEMHandler.from(this.invoke(frame), frame.context()).value().invoke(frame.newFrame(this.params())}.
-	 * 
+	 *
 	 * @param params Parameterfunktionen.
 	 * @return verkette Funktion.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
@@ -301,7 +301,7 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt eine komponierte Funktion zurück, welche diese Funktion mit den gegebenen Parameterfunktionen aufruft. Der Ergebniswert der gelieferten
 	 * Funktion zu einem gegebenen {@link FEMFrame Stapelrahmen} {@code frame} entspricht {@code this.invoke(frame.newFrame(params)}.
-	 * 
+	 *
 	 * @see FEMFrame#withParams(FEMFunction[])
 	 * @param params Parameterfunktionen.
 	 * @return komponierte Funktion.
@@ -324,11 +324,11 @@ public abstract class FEMFunction {
 	 * Abschließend wird {@link FEMTracer.Listener#onReturn(FEMTracer) tracer.getListener().onReturn(tracer)} aufgerufen und der {@link FEMTracer#getResult()
 	 * aktuelle Ergebniswert} geliefert.<br>
 	 * Wenn eine {@link RuntimeException} auftritt, wird diese im Überwachungsobjekt {@link FEMTracer#useException(RuntimeException) gespeichert},
-	 * {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen und die {@link FEMTracer#getException() aktuelle Ausnahme} des
-	 * Überwachungsobjekts ausgelöst.<br>
+	 * {@link FEMTracer.Listener#onThrow(FEMTracer) tracer.getListener().onThrow(tracer)} aufgerufen und die {@link FEMTracer#getException() aktuelle Ausnahme}
+	 * des Überwachungsobjekts ausgelöst.<br>
 	 * In jedem Fall wird der Zustand des Überwachungsobjekts beim Verlassen dieser Methode {@link FEMTracer#clear() bereinigt}.<br>
 	 * Der verwendete {@link FEMTracer.Listener} wird nur einmalig zu Beginn der Auswertung ermittelt.
-	 * 
+	 *
 	 * @see #withoutTracer()
 	 * @param tracer {@link FEMTracer}.
 	 * @return Funktion.
@@ -338,7 +338,7 @@ public abstract class FEMFunction {
 	}
 
 	/** Diese Methode gibt diese Funktion ohne das über {@link #withTracer(FEMTracer)} gebundene {@link FEMTracer Überwachungsobjekt} zurück.
-	 * 
+	 *
 	 * @see #withTracer(FEMTracer)
 	 * @return Funktion ohne {@link FEMTracer Überwachungsobjekt}. */
 	public FEMFunction withoutTracer() {
@@ -348,7 +348,7 @@ public abstract class FEMFunction {
 	/** Diese Methode gibt einen Funktionszeiger auf diese Funktion als {@link FEMValue Wert} zurück.<br>
 	 * Ein Wert liefert hierbei sich selbst. Jede andere Funktion liefert einen {@link FEMHandler}, sodass die über {@code this.toValue().toFunction()} ermittelte
 	 * Funktion gleich zu dieser ist.
-	 * 
+	 *
 	 * @see FEMHandler
 	 * @return Funktionszeiger. */
 	public FEMValue toValue() {
@@ -357,7 +357,7 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt diese Funktion mit {@code return-by-reference}-Semantik zurück. Der Ergebniswert der gelieferten Funktion wird über
 	 * {@link #toFuture(FEMFrame)} ermittelt.
-	 * 
+	 *
 	 * @return {@link FEMFuture}-Funktion. */
 	public FEMFunction toFuture() {
 		return new FutureFunction(this);
@@ -365,7 +365,7 @@ public abstract class FEMFunction {
 
 	/** Diese Methode gibt das Ergebnis dieser Funktion als {@link FEMFuture} zurück, wenn der Ergebniswert dieser Funktion vom gegebenen Stapelrahmen abhängt.
 	 * Andernfalls wird der Ergebniswert direkt geliefert.
-	 * 
+	 *
 	 * @param frame Stapelrahmen.
 	 * @return Ergebniswert ggf. als {@link FEMFuture}.
 	 * @throws NullPointerException Wenn {@code frame} {@code null} ist. */
@@ -374,10 +374,10 @@ public abstract class FEMFunction {
 		return new FEMFuture(frame, this);
 	}
 
-	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen} {@code frame}
-	 * einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
+	/** Diese Methode gibt eine Parameterfunktion zurück, welche bei der {@link #invoke(FEMFrame) Auswertung} mit einem {@link FEMFrame Stapelrahmen}
+	 * {@code frame} einen Funktionszeiger auf diese Funktion liefert, welcher dieser Funktion mit Bindung an den Stapelrahmen entspricht, d.h.
 	 * {@code this.toClosure(frame).toHandler()}.
-	 * 
+	 *
 	 * @return Funktionszeiger mit Stapalrahmenbindung. */
 	public final FEMFunction toClosure() {
 		return new ClosureFunction(this);
@@ -388,7 +388,7 @@ public abstract class FEMFunction {
 	 * Die zugesicherten Parameterwerte sowie das Kontextobjekt für den {@link #invoke(FEMFrame) Aufruf} der gelieferten Funktion entsprechen hierbei denen des in
 	 * der Methode {@link #invoke(FEMFrame)} übergeben Stapelrahmen {@code frame}. Die zusätzlichen Parameterwerte stammen dagegen aus dem gegebenen Stapelrahmen
 	 * {@code params}, d.h. {@code this.invoke(params.withParams(frame.params()))}.
-	 * 
+	 *
 	 * @param params {@link FEMFrame Stapelrahmen} mit den zugesicherten Parameterwerten.
 	 * @return {@link FEMFunction} mit gebundenem {@link FEMFrame}.
 	 * @throws NullPointerException Wenn {@code params} {@code null} ist. */
@@ -401,7 +401,7 @@ public abstract class FEMFunction {
 	/** Diese Methode formatiert diese Funktion in einen Quelltext und fügt diesen an den gegebenen {@link FEMFormatter} an.<br>
 	 * Sie kann von einer {@link FEMDomain} im Rahmen der Methoden {@link FEMDomain#formatData(FEMFormatter, Object)} bzw.
 	 * {@link FEMDomain#formatFunction(FEMFormatter, FEMFunction)} eingesetzt werden.
-	 * 
+	 *
 	 * @param target {@link FEMFormatter}.
 	 * @throws IllegalArgumentException Wenn das Objekt nicht formatiert werden kann. */
 	public void toScript(final FEMFormatter target) throws IllegalArgumentException {

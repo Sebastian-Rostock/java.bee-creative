@@ -10,9 +10,9 @@ import bee.creative.util.Parser;
  * <p>
  * Die Erzeugung von {@link Range Bereichen} erfolgt gemäß dieser Regeln:
  * <ul>
- * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem Zeichen
- * beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an
- * der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
+ * <li>Die Zeichen {@code '/'}, {@code '\''} und {@code '\"'} erzeugen je einen Bereich, der das entsprechende Zeichen als Bereichstyp verwendet, mit dem
+ * Zeichen beginnt und endet sowie das Zeichen zwischen dem ersten und letzten nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der
+ * Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.</li>
  * <li>Das Zeichen <code>'&lt;'</code> erzeugen einen Bereich, der mit dem Zeichen <code>'&gt;'</code> endet und beide Zeichen zwischen dem ersten und letzten
  * jeweils nur in Paaren enthalten darf. Wenn eine dieser Regeln verletzt wird, endet der Bereich an der Stelle des Fehlers und hat den Bereichstyp {@code '?'}.
  * Andernfalls hat er den Bereichstyp {@code '!'}.</li>
@@ -23,13 +23,13 @@ import bee.creative.util.Parser;
  * </ul>
  * <p>
  * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
- * 
+ *
  * @see #parseRanges()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMParser extends Parser {
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).parseValue()}.
-	 * 
+	 *
 	 * @see #parseValue()
 	 * @param source Eingabe.
 	 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
@@ -40,7 +40,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).parseString()}.
-	 * 
+	 *
 	 * @see #parseString()
 	 * @param source Eingabe.
 	 * @return Eingabe ohne Maskierung mit {@code '\''} bzw. {@code '\"'}.
@@ -51,7 +51,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).parseComment()}.
-	 * 
+	 *
 	 * @see #parseComment()
 	 * @param source Eingabe.
 	 * @return Eingabe ohne Maskierung mit {@code '/'}.
@@ -62,7 +62,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).formatValue()}.
-	 * 
+	 *
 	 * @see #formatValue()
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
@@ -72,7 +72,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).formatString()}.
-	 * 
+	 *
 	 * @see #formatString()
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
@@ -82,7 +82,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code new FEMParser().useSource(source).formatComment()}.
-	 * 
+	 *
 	 * @see #formatComment()
 	 * @param source Eingabe.
 	 * @return Eingabe mit Maskierung.
@@ -105,7 +105,7 @@ public final class FEMParser extends Parser {
 	{}
 
 	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
-	 * 
+	 *
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	synchronized final void _start_() throws IllegalStateException {
 		this._check_();
@@ -125,7 +125,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode fügt eine neue Bereich mit den gegebenen Parametern hinzu, der bei {@link #index()} endet.
-	 * 
+	 *
 	 * @param type Typ des Bereichs.
 	 * @param start Start des Bereichs. */
 	final void _put_(final int type, final int start) {
@@ -149,7 +149,7 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode parst einen Bereich, der mit dem gegebenen Zeichen beginnt, endet, in dem das Zeichen durch Verdopplung maskiert werden kann und welcher das
 	 * Zeichen als Typ verwendet.
-	 * 
+	 *
 	 * @param type Zeichen als Bereichstyp. */
 	final void _parseMask_(final int type) {
 		final int start = this.index();
@@ -192,7 +192,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode erzeugt zum gegebenen Zeichen einen Bereich der Länge 1 und navigiert zum nächsten Zeichen.
-	 * 
+	 *
 	 * @see #skip()
 	 * @see #_put_(int, int)
 	 * @param type Zeichen als Bereichstyp. */
@@ -251,7 +251,7 @@ public final class FEMParser extends Parser {
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #source() Eingabe} keines der in {@link #_parseSource_()} erkannten Zeichen enthält, d.h.
 	 * wenn das Parsen der Eingabe via {@link #parseRanges()} genau einen Bereich mit dem Typ {@code '.'} ergibt, welcher über {@link #_openValue_()} und
 	 * {@link #_closeValue_()} entstand.
-	 * 
+	 *
 	 * @return {@code true}, wenn die Eingabe nur einen Wert enthält. */
 	final boolean _checkSource_() {
 		if (this.isParsed()) return false;
@@ -281,7 +281,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die in Anführungszeichen eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #_parseMask_(int)
 	 * @param type Anführungszeichen.
 	 * @return Eingabe mit Maskierung. */
@@ -298,7 +298,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die in spitze Klammern eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #_parseName_()
 	 * @return Eingabe mit Maskierung. */
 	final String _encodeValue_() {
@@ -314,7 +314,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Anführungszeichen und deren Maskierungen zurück.
-	 * 
+	 *
 	 * @param type Anführungszeichen.
 	 * @return Eingabe ohne Maskierung.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
@@ -333,7 +333,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.
-	 * 
+	 *
 	 * @see #_parseName_()
 	 * @return Eingabe ohne Maskierung.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
@@ -354,7 +354,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode setzt die Eingabe, ruft {@link #reset()} auf und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Eingabe.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
@@ -366,7 +366,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode parst die {@link #source() Eingabe} in einen aufbereiteten Quelltext und gibt diesen zurück.
-	 * 
+	 *
 	 * @see FEMScript
 	 * @see #parseRanges()
 	 * @return aufbereiteter Quelltext.
@@ -376,7 +376,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode parst die {@link #source() Eingabe} und gibt die Liste der ermittelten Bereiche zurück.
-	 * 
+	 *
 	 * @see Range
 	 * @return Bereiche.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -394,7 +394,7 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Anführungszeichen und deren Maskierungen zurück.<br>
 	 * Die Eingabe beginnt und endet hierbei mit einem der Anführungszeichen {@code '\''} oder {@code '\"'} und enthält dieses Zeichen nur gedoppelt.
-	 * 
+	 *
 	 * @see #formatString()
 	 * @return Eingabe ohne Maskierung mit {@code '\''} bzw. {@code '\"'}.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
@@ -412,7 +412,7 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden Schrägstrichen und deren Maskierungen zurück.<br>
 	 * Die Eingabe beginnt und endet hierbei mit {@code '/'} und enthält dieses Zeichen nur gedoppelt.
-	 * 
+	 *
 	 * @see #formatComment()
 	 * @return Eingabe ohne Maskierung mit {@code '/'}.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
@@ -430,7 +430,7 @@ public final class FEMParser extends Parser {
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.<br>
 	 * Die Eingabe beginnt und endet hierbei mit <code>'&lt;'</code> bzw. <code>'&gt;'</code> und enthält diese Zeichen nur gedoppelt. Wenn die Eingabe nicht
 	 * derart beginnt, wird sie unverändert zurück gegeben.
-	 * 
+	 *
 	 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
 	 * @throws IllegalArgumentException Wenn die Eingabe ungültig ist. */
@@ -446,7 +446,7 @@ public final class FEMParser extends Parser {
 
 	/** Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.<br>
 	 * Wenn die Eingabe keine von diesem Parser besonders behandelten Zeichen enthält, wird sie unverändert zurück gegeben.
-	 * 
+	 *
 	 * @see #parseValue()
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -462,7 +462,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die in {@code '\''} eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #parseString()
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -476,7 +476,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die in {@code '/'} eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #parseComment()
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */

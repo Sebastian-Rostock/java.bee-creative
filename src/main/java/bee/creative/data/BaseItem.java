@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
  * bzw. {@link BasePool#update(BaseItem)}. <br>
  * Der {@link #hashCode() Streuwert} basiert auf dem {@link #key() Schlüssel}, die {@link #equals(Object) Äquivalenz} basiert auf der von {@link #key()
  * Schlüssel} und {@link #pool() Pool}.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BaseItem implements Item {
 
@@ -38,7 +38,7 @@ public abstract class BaseItem implements Item {
 	 * Die Implementation in {@link BaseItem} verwndet hierfür die am {@link #type()} dieses bzw. des gegebenen {@link Item}s definierten {@link Field}s, die die
 	 * {@link Assigner}-Schnittstelle implementieren. Die genutzten {@link Field}s ergeben sich aus:
 	 * {@code this.type().is(value.type()) ? value.type().fields() : value.type().is(this.type()) ? this.type().fields() : Iterables.voidIterable())}.
-	 * 
+	 *
 	 * @see #FIELD_ASSIGNER_CONVERTER
 	 * @param assignment {@link Item} als Quellobjekt des in {@link #assign(Assignment)} gegebenen {@link Assignment}s.
 	 * @return {@link Assigner}s. */
@@ -68,7 +68,7 @@ public abstract class BaseItem implements Item {
 
 	/** {@inheritDoc} Hierbei werden die {@link Assigner} verwendet, die über die Methode {@link #assigners(Assignment)} aus dem {@link Item} des gegebenen
 	 * {@link Assignment}s ({@link Assignment#value() Quellobjekt}) ermittelt werden.
-	 * 
+	 *
 	 * @see #assigners(Assignment)
 	 * @see Assignment#assign(Object, Object, Assigner) */
 	@Override
@@ -82,7 +82,7 @@ public abstract class BaseItem implements Item {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see BasePool#delete(BaseItem)
 	 * @see BasePool#doDelete(Item) */
 	@Override
@@ -91,7 +91,7 @@ public abstract class BaseItem implements Item {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see BasePool#append(BaseItem)
 	 * @see BasePool#doAppend(Item) */
 	@Override
@@ -100,7 +100,7 @@ public abstract class BaseItem implements Item {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see BasePool#remove(BaseItem)
 	 * @see BasePool#doRemove(Item) */
 	@Override
@@ -109,7 +109,7 @@ public abstract class BaseItem implements Item {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see BasePool#update(BaseItem)
 	 * @see BasePool#doUpdate(Item) */
 	@Override

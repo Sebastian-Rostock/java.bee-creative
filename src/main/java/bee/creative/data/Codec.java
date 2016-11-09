@@ -2,7 +2,7 @@ package bee.creative.data;
 
 /** Diese Schnittstelle definiert die Kombination eines {@link Encoder}s und eines {@link Decoder}s als ein Objekt, dass einen gegebenen Wert in ein
  * {@link CodecTarget} schreiben sowie einen solchen Wert wieder aus einer {@link CodecSource} einlesen kann.
- * 
+ *
  * @see CodecData#context()
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GContext> Typ des Kontextobjekts.

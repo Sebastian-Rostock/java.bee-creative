@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
 /** Diese Klasse implementiert eine Variable als veränderlichen Verweis auf einen Wert.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMVariable extends FEMValue {
 
@@ -14,7 +14,7 @@ public final class FEMVariable extends FEMValue {
 	{}
 
 	/** Diese Methode gibt eine neue Variable mit dem gegebenen Initialwert zurück.
-	 * 
+	 *
 	 * @param value Initialwert.
 	 * @return {@link FEMVariable}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -23,7 +23,7 @@ public final class FEMVariable extends FEMValue {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMVariable.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalzahl.
@@ -38,7 +38,7 @@ public final class FEMVariable extends FEMValue {
 	FEMValue _value_;
 
 	/** Dieser Konstruktor initialisiert den Wert dieser Variablen.
-	 * 
+	 *
 	 * @param value initialier Wert, der z.B. als {@link FEMFuture} gegeben sein kann.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public FEMVariable(final FEMValue value) throws NullPointerException {
@@ -48,7 +48,7 @@ public final class FEMVariable extends FEMValue {
 	{}
 
 	/** Diese Methode gibt den aktuellen Wert der Variable zurück, der über {@link #update(FEMValue)} geändert werden kann.
-	 * 
+	 *
 	 * @see #update(FEMValue)
 	 * @return aktueller Wert. */
 	public final synchronized FEMValue value() {
@@ -56,7 +56,7 @@ public final class FEMVariable extends FEMValue {
 	}
 
 	/** Diese Methode setzt den aktuellen Wert der Variable, der über {@link #value()} gelesen werden kann.
-	 * 
+	 *
 	 * @param value aktuellen Wert.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final synchronized void update(final FEMValue value) throws NullPointerException {

@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Klasse implementiert ein Objekt zum Parsen einer Zeichenkette.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Parser {
 
@@ -29,7 +29,7 @@ public class Parser {
 	}
 
 	/** Dieser Konstruktor initialisiert die Eingabe.
-	 * 
+	 *
 	 * @see #source(String)
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
@@ -38,7 +38,7 @@ public class Parser {
 	}
 
 	/** Dieser Konstruktor initialisiert die Eingabe.
-	 * 
+	 *
 	 * @see #source(char[])
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
@@ -49,7 +49,7 @@ public class Parser {
 	{}
 
 	/** Diese Methode setzt die {@link #index() aktuelle Position} und gibt das {@link #symbol() aktuelle Zeichen} zurück.
-	 * 
+	 *
 	 * @see #index()
 	 * @see #symbol()
 	 * @param index Position.
@@ -63,7 +63,7 @@ public class Parser {
 	}
 
 	/** Diese Methode überspring das {@link #symbol() aktuelle Zeichen}, navigiert zum nächsten Zeichen und gibt dieses zurück.
-	 * 
+	 *
 	 * @see #take()
 	 * @see #index()
 	 * @see #symbol()
@@ -77,14 +77,14 @@ public class Parser {
 	}
 
 	/** Diese Methode setzt die {@link #index() aktuelle Position} auf {@code 0} zurück.
-	 * 
+	 *
 	 * @see #seek(int) */
 	public final void reset() {
 		this.seek(0);
 	}
 
 	/** Diese Methode gibt die aktuelle Position zurück.
-	 * 
+	 *
 	 * @see #skip()
 	 * @see #take()
 	 * @see #symbol()
@@ -95,7 +95,7 @@ public class Parser {
 
 	/** Diese Methode gibt die Nummer des aktuellen Zeichens ({@code char}) oder {@code -1} zurück. Der Rückgabewert ist nur dann {@code -1}, wenn das Ende der
 	 * {@link #source() Eingabe} erreicht wurde.
-	 * 
+	 *
 	 * @see #skip()
 	 * @see #take()
 	 * @see #index()
@@ -106,7 +106,7 @@ public class Parser {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #index() aktuelle Position} gleich {@code 0} und damit am Anfang der {@link #source()
 	 * Eingabe} ist.
-	 * 
+	 *
 	 * @see #seek(int)
 	 * @see #reset()
 	 * @see #index()
@@ -117,7 +117,7 @@ public class Parser {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das {@link #symbol() aktuelle Zeichen} kleiner {@code 0} und damit die {@link #index() aktuelle
 	 * Position} am Ende der {@link #source() Eingabe} ist.
-	 * 
+	 *
 	 * @see #seek(int)
 	 * @see #index()
 	 * @see #length()
@@ -131,7 +131,7 @@ public class Parser {
 
 	/** Diese Methode übernimmt das {@link #symbol() aktuelle Zeichen} in die {@link #target() Ausgabe}, navigiert zum nächsten Zeichen und gibt dieses zurück.
 	 * Wenn sich die {@link #index() aktuelle Position} bereits am Ende der {@link #source() Eingabe} befindet, wird kein Zeichen in die Ausgabe übernommen.
-	 * 
+	 *
 	 * @see #take(int)
 	 * @see #skip()
 	 * @see #index()
@@ -144,7 +144,7 @@ public class Parser {
 	}
 
 	/** Diese Methode übernimmt das gegebene Zeichen in die {@link #target() Ausgabe}, sofern diese nicht negativ ist.
-	 * 
+	 *
 	 * @see #take()
 	 * @see #target()
 	 * @param symbol Zeichen. */
@@ -154,7 +154,7 @@ public class Parser {
 	}
 
 	/** Diese Methode übernimmt die gegebene Zeichenkette in die {@link #target() Ausgabe}.
-	 * 
+	 *
 	 * @param symbols Zeichenkette.
 	 * @see #take()
 	 * @see #target()
@@ -165,7 +165,7 @@ public class Parser {
 	}
 
 	/** Diese Methode leert die {@link #target() Ausgabe}.
-	 * 
+	 *
 	 * @see #take()
 	 * @see #take(int)
 	 * @see #take(String)
@@ -175,7 +175,7 @@ public class Parser {
 	}
 
 	/** Diese Methode gibt die via {@link #take()}, {@link #take(int)} bzw. {@link #take(String)} gesammelten Zeichen als {@link String} zurück.
-	 * 
+	 *
 	 * @see #skip()
 	 * @see #take()
 	 * @see #take(int)
@@ -188,7 +188,7 @@ public class Parser {
 	}
 
 	/** Diese Methode setzt die Ausgabe.
-	 * 
+	 *
 	 * @param value Ausgabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void target(final String value) throws NullPointerException {
@@ -200,7 +200,7 @@ public class Parser {
 	{}
 
 	/** Diese Methode gibt die Länge der {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #seek(int)
 	 * @see #index()
 	 * @see #source()
@@ -210,14 +210,14 @@ public class Parser {
 	}
 
 	/** Diese Methode gibt die Eingabe zurück.
-	 * 
+	 *
 	 * @return Eingabe. */
 	public final String source() {
 		return this._source_;
 	}
 
 	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
-	 * 
+	 *
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final String source) throws NullPointerException {
@@ -228,7 +228,7 @@ public class Parser {
 	}
 
 	/** Diese Methode setzt die Eingabe und ruft {@link #reset()} auf.
-	 * 
+	 *
 	 * @param source Eingabe.
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
 	protected void source(final char[] source) throws NullPointerException {

@@ -4,7 +4,7 @@ import java.util.Map;
 import bee.creative.array.Array;
 
 /** Diese Klasse implementiert eine abstrakte {@link Map}, deren Schlüssel und Werte in je einem Array verwaltet werden.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -20,7 +20,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -30,7 +30,7 @@ public abstract class CompactEntryMap<GKey, GValue> extends CompactMap<GKey, GVa
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */

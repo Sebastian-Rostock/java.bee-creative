@@ -11,7 +11,7 @@ import java.util.Set;
 import bee.creative.fem.FEMArray;
 
 /** Diese Klasse implementiert eine abstrakte {@link Map}, deren Daten in einem {@link FEMArray} verwaltet werden.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -19,7 +19,7 @@ import bee.creative.fem.FEMArray;
 public abstract class CompactMap<GKey, GValue> extends CompactData implements Map<GKey, GValue> {
 
 	/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Schlüssel einer {@link CompactMap} delegiert.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactMapKeys<GKey> extends AbstractSet<GKey> {
@@ -28,7 +28,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, ?> data;
 
 		/** Dieser Konstruktor initialisiert die {@link CompactMap}.
-		 * 
+		 *
 		 * @param data {@link CompactMap}. */
 		public CompactMapKeys(final CompactMap<GKey, ?> data) {
 			this.data = data;
@@ -57,13 +57,13 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} der Schlüssel.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactMapKeyAscendingIterator<GKey> extends CompactDataAscendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
-		 * 
+		 *
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -82,13 +82,13 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert den absteigenden {@link Iterator} der Schlüssel.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactMapKeyDescendingIterator<GKey> extends CompactDataDescendingIterator<GKey, CompactMap<GKey, ?>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
-		 * 
+		 *
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -107,7 +107,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert eine {@link AbstractMap}, die ihre Schnittstelle an eine gegebene {@link Map} delegiert.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
@@ -117,7 +117,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final Map<GKey, GValue> map;
 
 		/** Dieser Konstruktor initialisiert die {@link Map}.
-		 * 
+		 *
 		 * @param data {@link Map}. */
 		public CompactMapItems(final Map<GKey, GValue> data) {
 			this.map = data;
@@ -134,7 +134,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactMap} delegiert.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte. */
 	protected static final class CompactMapValues<GValue> extends AbstractCollection<GValue> {
@@ -143,7 +143,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<?, GValue> data;
 
 		/** Dieser Konstruktor initialisiert die {@link CompactMap}.
-		 * 
+		 *
 		 * @param data {@link CompactMap}. */
 		public CompactMapValues(final CompactMap<?, GValue> data) {
 			this.data = data;
@@ -172,13 +172,13 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} der Werte.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <V> Typ der Werte. */
 	protected static final class CompactMapValueIterator<V> extends CompactDataAscendingIterator<V, CompactMap<?, V>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
-		 * 
+		 *
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -197,7 +197,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert das {@link SimpleEntry} einer {@link CompactMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
@@ -212,7 +212,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, GValue> data;
 
 		/** Dieser Konstruktor initialisiert die {@link CompactMap} und den Index.
-		 * 
+		 *
 		 * @param data {@link CompactMap}.
 		 * @param index Index. */
 		public CompactMapEntry(final CompactMap<GKey, GValue> data, final int index) {
@@ -236,7 +236,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactMap} delegiert.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
@@ -246,7 +246,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 		protected final CompactMap<GKey, GValue> data;
 
 		/** Dieser Konstruktor initialisiert die {@link CompactMap}.
-		 * 
+		 *
 		 * @param data {@link CompactMap}. */
 		public CompactMapEntries(final CompactMap<GKey, GValue> data) {
 			this.data = data;
@@ -275,14 +275,14 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} der {@link CompactMapEntry}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <V> Typ der Werte. */
 	protected static final class CompactMapEntryIterator<GKey, V> extends CompactDataAscendingIterator<Entry<GKey, V>, CompactMap<GKey, V>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactMap} und Indizes.
-		 * 
+		 *
 		 * @param map {@link CompactMap}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -308,7 +308,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -318,7 +318,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
@@ -333,19 +333,19 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	{}
 
 	/** Diese Methode gibt den Schlüssel des {@code index}-ten Elements zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return Schlüssel des {@code index}-ten Elements. */
 	protected abstract GKey getKey(int index);
 
 	/** Diese Methode gibt den Wert des {@code index}-ten Elements zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return Wert des {@code index}-ten Elements. */
 	protected abstract GValue getValue(int index);
 
 	/** Diese Methode gibt das {@code index}-te Element zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element */
 	protected final Entry<GKey, GValue> getEntry(final int index) {
@@ -353,7 +353,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 	}
 
 	/** Diese Methode setzt Schlüssel und Wert des {@code index}-ten Elements.
-	 * 
+	 *
 	 * @param index Index.
 	 * @param key Schlüssel.
 	 * @param value Wert. */
@@ -363,7 +363,7 @@ public abstract class CompactMap<GKey, GValue> extends CompactData implements Ma
 
 	/** Diese Methode sucht zuerst nach einem Eintrag, dessen Schlüssel gleich dem gegebenen Schlüssel ist und gibt den Index dieses Elements oder
 	 * <code>(-(<em>Einfügeposition</em>) - 1)</code> zurück. Die <em>Einfügeposition</em> ist der Index, bei dem der Eintrag eingefügt werden müsste.
-	 * 
+	 *
 	 * @see CompactData#_itemIndexEquals_(Object, int)
 	 * @see CompactData#_itemIndexCompare_(Object, int)
 	 * @param key Syhlüssel.

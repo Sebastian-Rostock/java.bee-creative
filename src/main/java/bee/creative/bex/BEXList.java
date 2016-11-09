@@ -7,7 +7,7 @@ import bee.creative.util.Objects;
 
 /** Diese Schnittstelle definiert die homogene Sicht auf Kind- und Attributknotenlisten. Die aufsteigende Navigation von einer Knotenliste zu deren Elternknoten
  * ist optional.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 
@@ -63,18 +63,18 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	{}
 
 	/** Diese Methode gibt den Identifikator dieser Knotenliste zurück.
-	 * 
+	 *
 	 * @return Identifikator. */
 	public abstract int key();
 
 	/** Diese Methode gibt die Typkennung dieser Knotenliste zurück. Die Typkennung ist bei einer Attributknotenliste 1, bei einer allgemeinen Kindknotenliste 2
 	 * und bei einer undefinierten Knotenliste 0.
-	 * 
+	 *
 	 * @return Typkennung. */
 	public abstract int type();
 
 	/** Diese Methode gibt das diese Knotenliste verwaltende {@link BEXFile} zurück.
-	 * 
+	 *
 	 * @return Besitzer. */
 	public abstract BEXFile owner();
 
@@ -83,10 +83,10 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	public abstract BEXNode get(int index);
 
 	/** Diese Methode sucht linear ab der gegebenen {@code start}-Position den ersten Element- bzw. Attribut-knoten mit der gegebenen {@code uri} sowie dem
-	 * gegebenen {@code name} und gibt dessen Position zurück. Bei einer erfolglosen Suche wird {@code -1} geliefert. Ein leerer {@code uri} bzw. {@code name} wird
-	 * bei der Suche ignoriert, d.h. der gesuchte Knoten hat einen beliebigen URI bzw. Namen. Bei einer negativen {@code start}-Position wird immer {@code -1}
-	 * geliefert.
-	 * 
+	 * gegebenen {@code name} und gibt dessen Position zurück. Bei einer erfolglosen Suche wird {@code -1} geliefert. Ein leerer {@code uri} bzw. {@code name}
+	 * wird bei der Suche ignoriert, d.h. der gesuchte Knoten hat einen beliebigen URI bzw. Namen. Bei einer negativen {@code start}-Position wird immer
+	 * {@code -1} geliefert.
+	 *
 	 * @param uri URI.
 	 * @param name Name.
 	 * @param start Position, ab der die Suche beginnt.
@@ -109,13 +109,13 @@ public abstract class BEXList implements Items<BEXNode>, Iterable<BEXNode> {
 	}
 
 	/** Diese Methode gibt die Länge dieser Knotenliste zurück. Die Länge ist bei einer undefinierten Knotenliste {@code 0}.
-	 * 
+	 *
 	 * @return Länge. */
 	public abstract int length();
 
 	/** Diese Methode gibt den Elternknoten dieser Knotenliste zurück (optional). Der Elternknoten ist bei einer undefinierten Knotenliste ein undefinierter
 	 * Knoten. Wenn die Navigation zum Elternknoten deaktiviert ist, ist der Elternknoten jeder Knotenliste ein undefinierter Knoten.
-	 * 
+	 *
 	 * @return Elternknoten. */
 	public abstract BEXNode parent();
 

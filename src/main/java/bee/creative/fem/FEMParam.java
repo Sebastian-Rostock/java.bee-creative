@@ -1,7 +1,7 @@
 package bee.creative.fem;
 
 /** Diese Klasse implementiert eine projizierende Funktion, deren Ergebniswert einem der Parameterwerte des Stapelrahmens entspricht.
- * 
+ *
  * @see #index()
  * @see #invoke(FEMFrame)
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -33,7 +33,7 @@ public final class FEMParam extends FEMFunction {
 
 	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Kopie der Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
 	 * {@code frame.params().result(true)}.
-	 * 
+	 *
 	 * @see FEMArray#from(FEMValue...)
 	 * @see FEMFrame#params() */
 	public static final FEMFunction COPY = new FEMFunction() {
@@ -52,7 +52,7 @@ public final class FEMParam extends FEMFunction {
 
 	/** Dieses Feld speichert eine Funktion, deren Ergebniswert einer Sicht auf die Parameterwerte des Stapelrahmens {@code frame} entspricht, d.h.
 	 * {@code frame.params()}.
-	 * 
+	 *
 	 * @see FEMFrame#params() */
 	public static final FEMFunction VIEW = new FEMFunction() {
 
@@ -71,7 +71,7 @@ public final class FEMParam extends FEMFunction {
 	{}
 
 	/** Diese Methode gibt eine Funktion zurück, welche den {@code index}-ten Parameterwert des Stapelrahmens als Ergebniswert liefert.
-	 * 
+	 *
 	 * @param index Index des Parameterwerts.
 	 * @return {@link FEMParam}.
 	 * @throws IndexOutOfBoundsException Wenn {@code index < 0} ist. */
@@ -94,7 +94,7 @@ public final class FEMParam extends FEMFunction {
 	{}
 
 	/** Diese Methode gibt den Index des Parameterwerts zurück.
-	 * 
+	 *
 	 * @return Index des Parameterwerts.
 	 * @see #invoke(FEMFrame) */
 	public final int index() {
@@ -106,7 +106,7 @@ public final class FEMParam extends FEMFunction {
 	/** {@inheritDoc}
 	 * <p>
 	 * Der Ergebniswert entspricht {@code frame.get(this.index())}.
-	 * 
+	 *
 	 * @see #index() */
 	@Override
 	public final FEMValue invoke(final FEMFrame frame) {

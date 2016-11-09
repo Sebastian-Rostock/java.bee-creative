@@ -25,7 +25,7 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator einer {@link Source} oder {@link InputSource}, die für die Eingabedaten eines {@link Schema},
  * {@link Validator}, {@link DocumentBuilder} bzw. {@link Transformer} genutzt wird.
- * 
+ *
  * @see DocumentBuilder#parse(InputSource)
  * @see SchemaFactory#newSchema(Source)
  * @see Transformer#transform(Source, Result)
@@ -43,7 +43,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseSourceData<?> data) {
@@ -54,7 +54,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URI} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useUrl(URL)
 	 * @see URI#toURL()
 	 * @param uri {@link URI}.
@@ -65,7 +65,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen URI und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useUri(URI)
 	 * @see URI#URI(String)
 	 * @param uri URI.
@@ -77,7 +77,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link URL} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see URL#toExternalForm()
 	 * @see StreamSource#StreamSource(String)
@@ -88,7 +88,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen URL und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useUrl(URL)
 	 * @see URL#URL(String)
 	 * @param url URL.
@@ -99,7 +99,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link File} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(File)
 	 * @param file {@link File}.
@@ -109,7 +109,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit der gegebenen Datei und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useFile(File)
 	 * @see File#File(String)
 	 * @param file Datei.
@@ -119,7 +119,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten über {@link StringReader} mit dem gegebenen Text auf eine {@link StreamSource} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useReader(Reader)
 	 * @see StringReader#StringReader(String)
 	 * @param text Text.
@@ -129,7 +129,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link DOMSource} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see DOMSource#DOMSource(Node)
 	 * @param node {@link Node}.
@@ -139,7 +139,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link Reader} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(Reader)
 	 * @param reader {@link Reader}.
@@ -149,7 +149,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten auf eine {@link StreamSource} mit dem gegebenen {@link InputStream} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see StreamSource#StreamSource(InputStream)
 	 * @param stream {@link InputStream}.
@@ -159,7 +159,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see Source#setSystemId(String)
 	 * @param systemID System-Identifikator oder {@code null}.
 	 * @return {@code this}. */
@@ -171,7 +171,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
-	 * 
+	 *
 	 * @see #getSource()
 	 * @see #useSystemID(String)
 	 * @param source Quelldaten oder {@code null}.
@@ -183,7 +183,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode gibt die aktuell konfigurierten Quelldaten zurück.
-	 * 
+	 *
 	 * @see #useFile(File)
 	 * @see #useNode(Node)
 	 * @see #useReader(Reader)
@@ -199,7 +199,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 
 	/** Diese Methode gibt die aktuell konfigurierten Quelldaten als {@link InputSource} zurück.<br>
 	 * Der Rückgabewert ist {@code null}, wenn die Quelldaten keine {@link StreamSource} sind.
-	 * 
+	 *
 	 * @return Quelldaten oder {@code null}. */
 	public final InputSource getInputSource() {
 		final Source source = this.getSource();
@@ -213,7 +213,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	}
 
 	/** Diese Methode setzt die Quelldaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useSource(Source)
 	 * @see #useSystemID(String)
 	 * @return {@code this}. */
@@ -225,7 +225,7 @@ public abstract class BaseSourceData<GThis> extends BaseBuilder<Source, GThis> {
 	{}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getSource() */
 	@Override
 	public final Source build() throws IllegalStateException {

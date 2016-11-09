@@ -2,14 +2,14 @@ package bee.creative.fem;
 
 /** Diese Klasse implementiert den benannten Platzhalter einer Funktion, dessen {@link #invoke(FEMFrame)}-Methode an eine {@link #set(FEMFunction) gegebene
  * Funktion} delegiert.
- * 
+ *
  * @see FEMCompiler#proxy(String)
  * @see FEMCompiler#proxies()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMProxy extends FEMFunction {
 
 	/** Diese Methode gibt eine neue {@link FEMProxy} mit dem gegebenen Namen zurück.
-	 * 
+	 *
 	 * @param name Name.
 	 * @return {@link FEMProxy}.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
@@ -26,7 +26,7 @@ public final class FEMProxy extends FEMFunction {
 	FEMFunction _function_;
 
 	/** Dieser Konstruktor initialisiert den Namen.
-	 * 
+	 *
 	 * @param name Name.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
 	public FEMProxy(final String name) throws NullPointerException {
@@ -38,21 +38,21 @@ public final class FEMProxy extends FEMFunction {
 
 	/** Diese Methode gibt die Funktion zurück, die in {@link #invoke(FEMFrame)} aufgerufen wird.<br>
 	 * Diese ist {@code null}, wenn {@link #set(FEMFunction)} noch nicht aufgerufen wurde.
-	 * 
+	 *
 	 * @return Funktion oder {@code null}. */
 	public final FEMFunction get() {
 		return this._function_;
 	}
 
 	/** Diese Methode setzt die in {@link #invoke(FEMFrame)} aufzurufende Funktion.
-	 * 
+	 *
 	 * @param function Funktion oder {@code null}. */
 	public final void set(final FEMFunction function) {
 		this._function_ = function;
 	}
 
 	/** Diese Methode gibt den Namen des Platzhalters zurück.
-	 * 
+	 *
 	 * @return Name. */
 	public final String name() {
 		return this._name_;

@@ -14,13 +14,13 @@ import bee.creative.array.CompactArray;
  * <p>
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und liegen bei einer mittigen Ausrichtung im Mittel
  * bei {@code 50%} der Rechenzeit, die eine {@link ArrayList} dazu benötigen würde.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 public class CompactList<GItem> extends CompactCollection<GItem> implements List<GItem>, RandomAccess {
 
 	/** Diese Klasse implementiert eine {@link List} als modifizierbare Sicht auf die Werte.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @see Array#values()
 	 * @param <GItem> Typ der Werte ( {@link Byte}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link Float}, {@link Double} oder
@@ -31,7 +31,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 		protected final CompactList<GItem> owner;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactListItems(final CompactList<GItem> owner) throws NullPointerException {
@@ -87,7 +87,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link List} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität. */
 	public CompactList(final int capacity) {
@@ -95,7 +95,7 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link List} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Collection#addAll(Collection)
 	 * @see CompactData#allocate(int)
 	 * @param collection Elemente.
@@ -110,18 +110,18 @@ public class CompactList<GItem> extends CompactCollection<GItem> implements List
 	 * Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition
 	 * {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
 	 * beschleunigt wird.
-	 * 
+	 *
 	 * @see CompactArray#getAlignment()
 	 * @return relative Ausrichtungsposition ({@code 0..1}). */
 	public final float getAlignment() {
 		return this._items_.getAlignment();
 	}
 
-	/** Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am Anfang
-	 * des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition {@code 1}
-	 * gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
+	/** Diese Methode setzt die relative Ausrichtungsposition der Elemente im Array. Bei der relativen Ausrichtungsposition {@code 0} werden die Elemente am
+	 * Anfang des Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des Arrays beschleunigt wird. Für die relative Ausrichtungsposition
+	 * {@code 1} gilt das gegenteil, da hier die Elemente am Ende des Arrays ausgerichtet werden, wodurch das häufige Einfügen von Elementen am Anfang des Arrays
 	 * beschleunigt wird.
-	 * 
+	 *
 	 * @see CompactArray#setAlignment(float)
 	 * @param alignment relative Ausrichtungsposition ({@code 0..1}).
 	 * @throws IllegalArgumentException Wenn die gegebene relative Ausrichtungsposition kleiner {@code 0}, größer {@code 1} ist oder {@link Float#NaN}. */

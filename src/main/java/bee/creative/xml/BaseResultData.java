@@ -15,7 +15,7 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator eines {@link Result}, das für die Ausgabedaten eines {@link Transformer} oder {@link Validator}
  * genutzt wird.
- * 
+ *
  * @see Validator#validate(Source, Result)
  * @see Transformer#transform(Source, Result)
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -31,7 +31,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseResultData<?> data) {
@@ -42,7 +42,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit dem gegebenen {@link File} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see StreamResult#StreamResult(File)
 	 * @param file {@link File}.
@@ -52,7 +52,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit der gegebenen Datei und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useFile(File)
 	 * @see File#File(String)
 	 * @param file Datei.
@@ -62,7 +62,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link DOMResult} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see DOMResult#DOMResult()
 	 * @return {@code this}. */
@@ -71,7 +71,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link DOMResult} mit dem gegebenen {@link Node} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see DOMResult#DOMResult(Node)
 	 * @param node {@link Node}.
@@ -81,7 +81,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit dem gegebenen {@link Writer} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see StreamResult#StreamResult(Writer)
 	 * @param writer {@link Writer}.
@@ -91,7 +91,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten auf ein {@link StreamResult} mit dem gegebenen {@link OutputStream} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see StreamResult#StreamResult(OutputStream)
 	 * @param stream {@link OutputStream}.
@@ -101,7 +101,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt den System-Identifikator und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see Result#setSystemId(String)
 	 * @param systemId System-Identifikator oder {@code null}.
 	 * @return {@code this}. */
@@ -113,7 +113,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten und gibt {@code this} zurück. Der aktuelle System-Identifikator wird beibehalten, sofern er nicht {@code null} ist.
-	 * 
+	 *
 	 * @see #getResult()
 	 * @see #useSystemId(String)
 	 * @param result Ergebnisdaten oder {@code null}.
@@ -125,7 +125,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode gibt die aktuell konfigurierten Ergebnisdaten zurück.
-	 * 
+	 *
 	 * @see #useFile(File)
 	 * @see #useNode()
 	 * @see #useNode(Node)
@@ -141,7 +141,7 @@ public abstract class BaseResultData<GThis> extends BaseBuilder<Result, GThis> {
 	}
 
 	/** Diese Methode setzt die Ergebnisdaten sowie den System-Identifikator auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useResult(Result)
 	 * @see #useSystemId(String)
 	 * @return {@code this}. */

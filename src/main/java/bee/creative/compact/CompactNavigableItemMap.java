@@ -5,7 +5,7 @@ import java.util.Map;
 
 /** Diese Klasse implementiert eine abstrakte {@link CompactNavigableMap}, deren Daten in einem Array verwaltet werden und ihren Schlüssel selbst referenzieren.
  * Diese Implementation erlaubt deshalb {@code null} nicht als Wert.
- * 
+ *
  * @see CompactNavigableItemMap#getKey(Object)
  * @see CompactNavigableItemMap#setKey(Object, Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavigableMap<GKey, GValue> {
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableItemMap(final Comparator<? super GKey> comparator) throws NullPointerException {
@@ -22,7 +22,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
@@ -33,7 +33,7 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
@@ -46,13 +46,13 @@ public abstract class CompactNavigableItemMap<GKey, GValue> extends CompactNavig
 	{}
 
 	/** Diese Methode gibt den Schlüssel des gegebenen Werts zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Schlüssel. */
 	protected abstract GKey getKey(final GValue value);
 
 	/** Diese Methode setzt den Schlüssel des gegebenen Werts.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Wert. */
 	protected abstract void setKey(GKey key, final GValue value);

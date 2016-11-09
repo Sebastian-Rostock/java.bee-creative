@@ -19,7 +19,7 @@ import bee.creative.util.Objects;
  * Die Methode {@link #entry(int)} liefert einen {@link IAMEntry} mit den von {@link #key(int)} und {@link #value(int)} gelieferten Zahlenfolgen, welcher über
  * {@link IAMEntry#from(IAMArray, IAMArray)} erzeugt wird.<br>
  * Die von {@link #entries()} gelieferte {@link List} delegiert an {@link #entry(int)} und {@link #entryCount()}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMMapping implements Iterable<IAMEntry> {
 
@@ -84,19 +84,19 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	public static final IAMMapping EMPTY = new EmptyMapping();
 
 	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge über den Streuwert ihrer Schlüssel gesucht werden.
-	 * 
+	 *
 	 * @see #mode() */
 	public static final boolean MODE_HASHED = true;
 
 	/** Dieses Feld speichert den Mods einer Abbildung, deren Einträge binär über die Ordnung ihrer Schlüssel gesucht werden.
-	 * 
+	 *
 	 * @see #mode() */
 	public static final boolean MODE_SORTED = false;
 
 	{}
 
 	/** Diese Methode ist eine Abkürzung für {@code new IAMMappingLoader(MMFArray.from(object))}.
-	 * 
+	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMMappingLoader#IAMMappingLoader(MMFArray)
 	 * @param object Objekt.
@@ -111,7 +111,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Diese Methode gibt nur dann {@link #MODE_HASHED} zurück, wenn Einträge über den Streuwert ihrer Schlüssel gesucht werden.<br>
 	 * Wenn sie {@link #MODE_SORTED} liefert, werden Einträge binär über die Ordnung ihrer Schlüssel gesucht.
-	 * 
+	 *
 	 * @see #find(IAMArray)
 	 * @see #MODE_HASHED
 	 * @see #MODE_SORTED
@@ -121,14 +121,14 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Diese Methode gibt den Schlüssel des {@code entryIndex}-ten Eintrags als Zahlenfolge zurück. Bei einem ungültigen {@code entryIndex} wird eine leere
 	 * Zahlenfolge geliefert.
-	 * 
+	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Schlüssel des {@code entryIndex}-ten Eintrags. */
 	public abstract IAMArray key(final int entryIndex);
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Schlüssels des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} oder
 	 * {@code entryIndex} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see #keyLength(int)
 	 * @see #entryCount()
 	 * @param entryIndex Index des Eintrags.
@@ -140,23 +140,23 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Schlüssels des {@code entryIndex}-ten Eintrags zurück ({@code 0..1073741823}). Bei einem ungültigen
 	 * {@code entryIndex} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Länge eines Schlüssel. */
 	public final int keyLength(final int entryIndex) {
 		return this.key(entryIndex).length();
 	}
 
-	/** Diese Methode gibt den Wert des {@code entryIndex}-ten Eintrags als Zahlenfolge zurück. Bei einem ungültigen {@code entryIndex} wird eine leere Zahlenfolge
-	 * geliefert.
-	 * 
+	/** Diese Methode gibt den Wert des {@code entryIndex}-ten Eintrags als Zahlenfolge zurück. Bei einem ungültigen {@code entryIndex} wird eine leere
+	 * Zahlenfolge geliefert.
+	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Wert des {@code entryIndex}-ten Eintrags. */
 	public abstract IAMArray value(final int entryIndex);
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Werts des {@code entryIndex}-ten Eintrags zurück. Bei einem ungültigen {@code index} oder
 	 * {@code entryIndex} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see #valueLength(int)
 	 * @see #entryCount()
 	 * @param entryIndex Index des Eintrags.
@@ -168,7 +168,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Werts des {@code entryIndex}-ten Eintrags zurück ({@code 0..1073741823}). Bei einem ungültigen
 	 * {@code entryIndex} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @param entryIndex Index des Eintrags.
 	 * @return Länge eines Werts. */
 	public final int valueLength(final int entryIndex) {
@@ -176,7 +176,7 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	}
 
 	/** Diese Methode gibt den {@code entryIndex}-ten Eintrag zurück. Bei einem ungültigen {@code entryIndex} wird ein leerer Eintrag geliefert.
-	 * 
+	 *
 	 * @see #entryCount()
 	 * @param entryIndex Index des Eintrags.
 	 * @return {@code entryIndex}-ter Eintrag. */
@@ -186,12 +186,12 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Einträge zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @return Anzahl der Einträge. */
 	public abstract int entryCount();
 
 	/** Diese Methode gibt {@link List}-Sicht auf die Einträge zurück.
-	 * 
+	 *
 	 * @see #entry(int)
 	 * @see #entryCount()
 	 * @return Einträge. */
@@ -201,21 +201,21 @@ public abstract class IAMMapping implements Iterable<IAMEntry> {
 
 	/** Diese Methode gibt den Index des Eintrags zurück, dessen Schlüssel äquivalenten zum gegebenen Schlüssel ist. Die Suche erfolgt ordnungs- oder
 	 * streuwertbasiert, d.h. indiziert. Bei erfolgloser Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @return Index des Entrags.
 	 * @throws NullPointerException Wenn {@code key} {@code null} ist. */
 	public abstract int find(final IAMArray key) throws NullPointerException;
 
 	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
-	 * 
+	 *
 	 * @return Binärdatenformat {@code IAM_LISTING}. */
 	public final byte[] toBytes() {
 		return this.toBytes(ByteOrder.nativeOrder());
 	}
 
 	/** Diese Methode kodiert dieses {@link IAMMapping} in das binäre optimierte Datenformat {@code IAM_MAPPING} und gibt dieses als Bytefolge zurück.
-	 * 
+	 *
 	 * @param order Bytereihenfolge.
 	 * @return {@code IAM_MAPPING}. */
 	public final byte[] toBytes(final ByteOrder order) {

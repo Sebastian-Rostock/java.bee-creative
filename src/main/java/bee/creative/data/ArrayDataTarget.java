@@ -4,7 +4,7 @@ import java.io.IOException;
 import bee.creative.array.CompactByteArray;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link CompactByteArray}.
- * 
+ *
  * @see CompactByteArray
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ArrayDataTarget extends BaseDataTarget {
@@ -21,7 +21,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten mit der gegebenen Größe.
-	 * 
+	 *
 	 * @see CompactByteArray#CompactByteArray(int)
 	 * @param size Größe. */
 	public ArrayDataTarget(final int size) {
@@ -30,7 +30,7 @@ public class ArrayDataTarget extends BaseDataTarget {
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
-	 * 
+	 *
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die Nutzdaten {@code null} sind. */
 	public ArrayDataTarget(final CompactByteArray data) throws NullPointerException {

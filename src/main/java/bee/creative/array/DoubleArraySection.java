@@ -1,15 +1,14 @@
 package bee.creative.array;
 
 /** Diese Klasse implementiert eine {@link ArraySection} für {@code double}-Arrays.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @see ArraySection */
 public abstract class DoubleArraySection extends ArraySection<double[]> {
 
 	/** Diese Methode erzeugt eine neue {@link DoubleArraySection} und gibt sie zurück. Der Rückgabewert entspricht:
-	 * 
 	 * <pre>DoubleArraySection.from(array, 0, array.length)</pre>
-	 * 
+	 *
 	 * @param array Array.
 	 * @return {@link DoubleArraySection}.
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist. */
@@ -35,7 +34,7 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	}
 
 	/** Diese Methode erzeugt eine neue {@link DoubleArraySection} und gibt sie zurück.
-	 * 
+	 *
 	 * @param array Array.
 	 * @param startIndex Index des ersten Werts im Abschnitt.
 	 * @param finalIndex Index des ersten Werts nach dem Abschnitt.
@@ -43,8 +42,8 @@ public abstract class DoubleArraySection extends ArraySection<double[]> {
 	 * @throws NullPointerException Wenn das gegebene Array {@code null} ist.
 	 * @throws IndexOutOfBoundsException Wenn {@code startIndex < 0} oder {@code finalIndex > array.length}.
 	 * @throws IllegalArgumentException Wenn {@code finalIndex < startIndex}. */
-	public static DoubleArraySection from(final double[] array, final int startIndex, final int finalIndex) throws NullPointerException,
-		IndexOutOfBoundsException, IllegalArgumentException {
+	public static DoubleArraySection from(final double[] array, final int startIndex, final int finalIndex)
+		throws NullPointerException, IndexOutOfBoundsException, IllegalArgumentException {
 		return ArraySection.validate(new DoubleArraySection() {
 
 			@Override

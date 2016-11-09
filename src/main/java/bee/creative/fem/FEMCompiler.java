@@ -16,7 +16,8 @@ import bee.creative.util.Parser;
  * <p>
  * Die Bereichestypen der Quelltexte haben folgende Bedeutung:
  * <ul>
- * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) sind bedeutungslos, dürfen an jeder Position vorkommen und werden ignoriert.</li>
+ * <li>Bereiche mit den Typen {@code '_'} (Leerraum) und {@code '/'} (Kommentar) sind bedeutungslos, dürfen an jeder Position vorkommen und werden
+ * ignoriert.</li>
  * <li>Bereiche mit den Typen {@code '['} und {@code ']'} zeigen den Beginn bzw. das Ende eines {@link FEMArray}s an, dessen Elemente mit Bereichen vom Typ
  * {@code ';'} separiert werden müssen. Funktionsaufrufe sind als Elemente nur dann zulässig, wenn das {@link FEMArray} als Funktion bzw. Parameterwert
  * kompiliert wird.</li>
@@ -33,7 +34,7 @@ import bee.creative.util.Parser;
  * </ul>
  * <p>
  * Die von {@link Parser} geerbten Methoden sollte nicht während der öffentlichen Methoden dieser Klasse aufgerufen werden.
- * 
+ *
  * @see #formatScript(FEMFormatter)
  * @see #compileValue()
  * @see #compileFunction()
@@ -75,7 +76,7 @@ public final class FEMCompiler extends Parser {
 	{}
 
 	/** Diese Methode markiert den Beginn der Verarbeitung und muss in Verbindung mit {@link #_stop_()} verwendet werden.
-	 * 
+	 *
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	final synchronized void _start_() throws IllegalStateException {
 		this._check_();
@@ -108,8 +109,10 @@ public final class FEMCompiler extends Parser {
 			pos = source.lastIndexOf('\n', pos - 1);
 			row++;
 		}
-		return new IllegalArgumentException(String.format("Unerwartete Zeichenkette «%s» an Position %s:%s (%s%%) bei Textstelle «%s».%s", //
-			this.section(), row, col, (100 * offset) / Math.max(length, 0), source.substring(Math.max(offset - 10, 0), Math.min(offset + 10, length)), hint), cause);
+		return new IllegalArgumentException(
+			String.format("Unerwartete Zeichenkette «%s» an Position %s:%s (%s%%) bei Textstelle «%s».%s", //
+				this.section(), row, col, (100 * offset) / Math.max(length, 0), source.substring(Math.max(offset - 10, 0), Math.min(offset + 10, length)), hint),
+			cause);
 	}
 
 	/** Diese Methode formatiert den aktuellen Quelltext als Sequenz von Werten und Stoppzeichen. */
@@ -165,7 +168,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert die aktuelle Wertsequenz, die bei einer schließenden Klammer oder Doppelpunkt endet.
-	 * 
+	 *
 	 * @param space {@code true}, wenn hinter Kommentaren und Semikola ein Leerzeichen statt eines bedingten Umbruchs eingefügt werden soll. */
 	final void _formatSequence_(final boolean space) {
 		final FEMFormatter formatter = this._formatter_;
@@ -230,7 +233,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode überspringt bedeutungslose Bereiche (Typen {@code '_'} und {@code '/'}) und gibt den Typ des ersten bedeutsamen Bereichs oder {@code -1}
 	 * zurück. Der {@link #range() aktuelle Bereich} wird durch diese Methode verändert.
-	 * 
+	 *
 	 * @see #skip()
 	 * @return aktueller Bereichstyp. */
 	final int _compileType_() {
@@ -242,7 +245,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode interpretiert die gegebene Zeichenkette als positive Zahl und gibt diese oder {@code -1} zurück.
-	 * 
+	 *
 	 * @param string Zeichenkette.
 	 * @return Zahl. */
 	final int _compileIndex_(final String string) {
@@ -257,7 +260,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMValue} und gibt diesen zurück.
-	 * 
+	 *
 	 * @return Wertliste als {@link FEMValue}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final FEMValue _compileArrayAsValue_() throws IllegalArgumentException {
@@ -289,7 +292,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Wertliste in eine {@link FEMFunction} und gibt diesen zurück.
-	 * 
+	 *
 	 * @see FEMFunction#concat(FEMFunction...)
 	 * @see FEMFunction#compose(FEMFunction...)
 	 * @see FEMParam#VIEW
@@ -336,7 +339,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode kompiliert via {@code this.domain().compileParam(this, this.section())} die beim aktuellen Bereich beginnende Parameterfunktion und gibt
 	 * diese zurück.
-	 * 
+	 *
 	 * @see FEMDomain#compileFunction(FEMCompiler)
 	 * @return Parameterfunktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
@@ -354,7 +357,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert denF beim aktuellen Bereich beginnende Wert und gibt diese zurück.
-	 * 
+	 *
 	 * @return Wert.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final FEMValue _compileParamAsValue_() throws IllegalArgumentException {
@@ -387,7 +390,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Funktion und gibt diese zurück.
-	 * 
+	 *
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final FEMFunction _compileParamAsFunction_() throws IllegalArgumentException {
@@ -460,7 +463,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert die beim aktuellen Bereich beginnende Parameterfunktion und gibt diese zurück.
-	 * 
+	 *
 	 * @return Parameterfunktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final FEMProxy _compileProxy_() throws IllegalArgumentException {
@@ -474,7 +477,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode kompiliert den aktuellen, bedeutsamen Bereich zu einen Funktionsnamen, Parameternamen oder Parameterindex und gibt diesen zurück.<br>
 	 * Der Rückgabewert ist {@code null}, wenn der Bereich vom Typ {@code ':'}, {@code ';'}, {@code ')'}, <code>'}'</code>, {@code ']'} oder {@code 0} ist.
-	 * 
+	 *
 	 * @return Funktions- oder Parametername oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final String _compileName_() throws IllegalArgumentException {
@@ -507,7 +510,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode kompiliert die beim aktuellen Bereich (<code>'{'</code>) beginnende, parametrisierte Funktion und gibt diese zurück.
-	 * 
+	 *
 	 * @return Funktion.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist. */
 	final FEMFunction _compileFrame_() throws IllegalArgumentException {
@@ -542,7 +545,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode gibt den Ergebniswert der gegebenen Funktion zurück, sofer diese ein {@link FEMValue} ist. Andernfalls wird {@code null} geliefert.
-	 * 
+	 *
 	 * @param function Funktion.
 	 * @return Ergebniswert oder {@code null}. */
 	final FEMValue _functionToValue(final FEMFunction function) {
@@ -551,7 +554,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode gibt den Platzhalter der Funktion mit dem gegebenen Namen zurück.
-	 * 
+	 *
 	 * @param name Name des Platzhalters.
 	 * @return Platzhalterfunktion.
 	 * @throws NullPointerException Wenn {@code name} {@code null} ist. */
@@ -565,21 +568,21 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode gibt den aktuellen Bereich zurück.
-	 * 
+	 *
 	 * @return aktueller Bereich. */
 	public final Range range() {
 		return this.isParsed() ? Range.EMPTY : this._script_.get(this.index());
 	}
 
 	/** Diese Methode gibt den zu kompilierenden Quelltext zurück.
-	 * 
+	 *
 	 * @return Quelltext. */
 	public final FEMScript script() {
 		return this._script_;
 	}
 
 	/** Diese Methode gibt die genutzten Kompilationsmethoden zurück.
-	 * 
+	 *
 	 * @return Kompilationsmethoden. */
 	public final FEMDomain domain() {
 		return this._domain_;
@@ -587,21 +590,21 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode gibt die über {@link #proxy(String)} erzeugten Platzhalter zurück.<br>
 	 * Die gelieferte Abbildung wird vor jeder Kompilation geleert.
-	 * 
+	 *
 	 * @return Abbildung von Namen auf Platzhalter. */
 	public final Map<String, FEMProxy> proxies() {
 		return this._proxies_;
 	}
 
 	/** Diese Methode gibt die Liste der aktellen Parameternamen zurück.
-	 * 
+	 *
 	 * @return Parameternamen. */
 	public final List<String> params() {
 		return Collections.unmodifiableList(this._params_);
 	}
 
 	/** Diese Methode gibt die Zeichenkette im {@link #range() aktuellen Abschnitt} des {@link #script() Quelltexts} zurück.
-	 * 
+	 *
 	 * @see Range#extract(String)
 	 * @return Aktuelle Zeichenkette. */
 	public final String section() {
@@ -609,7 +612,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn Wertlisten zulässig sind (z.B. {@code [1;2]}).
-	 * 
+	 *
 	 * @see #compileFunction()
 	 * @return Zulässigkeit von Wertlisten. */
 	public final boolean isArrayEnabled() {
@@ -618,7 +621,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die Verkettung von Funktionen zulässig ist, d.h. ob die Funktion, die von einem Funktionsaufruf
 	 * geliefert wird, direkt wieder aufgerufen werden darf (z.B. {@code FUN(1)(2)}).
-	 * 
+	 *
 	 * @see #compileFunction()
 	 * @see FEMFunction#concat(FEMFunction...)
 	 * @return Zulässigkeit der Verkettung von Funktionen. */
@@ -628,7 +631,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn Funktionen als Parameter nicht über {@link FEMFunction#toValue()} sondern über
 	 * {@link FEMFunction#toClosure()} kompiliert werden.
-	 * 
+	 *
 	 * @see #compileFunction()
 	 * @return Zulässigkeit der Bindung des Stapelrahmens. */
 	public final boolean isClosureEnabled() {
@@ -636,7 +639,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt den zu kompilierenden Quelltext und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Quelltext.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code vslue} {@code null} ist.
@@ -649,7 +652,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die zu nutzenden Kompilationsmethoden und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Kompilationsmethoden.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist.
@@ -662,7 +665,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Parameternamen.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
@@ -672,7 +675,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die initialen Parameternamen und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param value Parameternamen.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist oder enthält.
@@ -686,7 +689,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die Zulässigkeit von Wertlisten.
-	 * 
+	 *
 	 * @see #isArrayEnabled()
 	 * @param value Zulässigkeit von Wertlisten.
 	 * @return {@code this}.
@@ -698,7 +701,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die Zulässigkeit der Verkettung von Funktionen.
-	 * 
+	 *
 	 * @see #isConcatEnabled()
 	 * @param value Zulässigkeit der Verkettung von Funktionen.
 	 * @return {@code this}.
@@ -710,7 +713,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode setzt die Zulässigkeit der Bindung des Stapelrahmens.
-	 * 
+	 *
 	 * @see #isClosureEnabled()
 	 * @param value Zulässigkeit der Bindung des Stapelrahmens.
 	 * @return {@code this}.
@@ -722,7 +725,7 @@ public final class FEMCompiler extends Parser {
 	}
 
 	/** Diese Methode formatiert den Quelltext im Rahmen des gegebenen Formatierers.
-	 * 
+	 *
 	 * @param target Formatierer.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -740,7 +743,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode kompiliert den Quelltext in einen Wert und gibt diesen zurück.<br>
 	 * Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird {@code null} geliefert.
-	 * 
+	 *
 	 * @return Wert oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -759,7 +762,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode kompiliert den Quelltext in eine Liste von Werten und gibt diese zurück.<br>
 	 * Die Werte müssen durch Bereiche vom Typ {@code ';'} separiert sein. Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Wertliste
 	 * geliefert.
-	 * 
+	 *
 	 * @return Werte.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -789,7 +792,7 @@ public final class FEMCompiler extends Parser {
 	 * {@link FEMDomain#compileName(FEMCompiler) Namen} und endet dann mit einer in geschweifte Klammern eingeschlossenen parametrisierten Funktion. Wenn der
 	 * Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert. Nach dem Aufruf dieser Methode ist Abbildung {@link #proxies()}
 	 * entsprechend bestückt.
-	 * 
+	 *
 	 * @return Funktionen.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -816,7 +819,7 @@ public final class FEMCompiler extends Parser {
 
 	/** Diese Methode kompiliert den Quelltext in eine Funktion und gibt diese zurück.<br>
 	 * Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird {@code null} geliefert.
-	 * 
+	 *
 	 * @return Funktion oder {@code null}.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
@@ -835,7 +838,7 @@ public final class FEMCompiler extends Parser {
 	/** Diese Methode kompiliert den Quelltext in eine Liste von Funktionen und gibt diese zurück. Die Funktionen müssen durch Bereiche vom Typ {@code ';'}
 	 * separiert sein.<br>
 	 * Wenn der Quelltext nur Bedeutungslose Bereiche enthält, wird eine leere Funktionsliste geliefert.
-	 * 
+	 *
 	 * @return Funktionen.
 	 * @throws IllegalArgumentException Wenn der Quelltext ungültig ist.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */

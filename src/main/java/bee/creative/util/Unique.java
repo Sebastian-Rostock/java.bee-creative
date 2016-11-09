@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene Eingaben
- * über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer gegebenen
- * Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #compile(Object) erzeugt} wurde, wird deren Wiederverwendung via
- * {@link #reuse(Object, Object)} signalisiert.
- * 
+/** Diese Klasse implementiert ein abstraktes Objekt zur Ermittlung und Verwaltung einzigartiger Ausgaben zu gegebenen Eingaben. Hierfür werden gegebene
+ * Eingaben über eine interne {@link Data Abbildung} mit {@link #compile(Object) berechneten} Ausgaben assoziiert. Wenn via {@link #get(Object)} die mit einer
+ * gegebenen Eingabe assoziierte Ausgabe ermittelt werden soll und diese Ausgabe zuvor bereits {@link #compile(Object) erzeugt} wurde, wird deren
+ * Wiederverwendung via {@link #reuse(Object, Object)} signalisiert.
+ *
  * @see Unique#get(Object)
  * @see Unique#reuse(Object, Object)
  * @see Unique#compile(Object)
@@ -28,14 +28,14 @@ import java.util.Set;
 public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Converter<GInput, GOutput>, Comparator<GInput>, Iterable<GOutput> {
 
 	/** Diese Schnittstelle definiert die Verwaltung der Einträge eines {@link Unique} als Abbildung von Eingaben auf Ausgaben, analog zu einer {@link Map}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe. */
 	public static interface Data<GInput, GOutput> extends Iterable<Entry<GInput, GOutput>> {
 
 		/** Diese Methode wählt die gegebene Eingabe.
-		 * 
+		 *
 		 * @param input Eingabe.
 		 * @throws RuntimeException Wenn {@code input} ungültig ist, z.B. {@code null}. */
 		public void forInput(GInput input) throws RuntimeException;
@@ -44,7 +44,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public void clearInput();
 
 		/** Diese Methode gibt die Ausgabe zur gewählten Eingabe zurück.
-		 * 
+		 *
 		 * @see #forInput(Object)
 		 * @see #hasOutput()
 		 * @return Ausgabe.
@@ -52,25 +52,25 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		public GOutput getOutput() throws RuntimeException;
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn zur {@link #forInput(Object) gewählten} Eingabe eine Ausgabe existiert.
-		 * 
+		 *
 		 * @see #forInput(Object)
 		 * @return {@code true}, wenn eine Ausgabe existiert. */
 		public boolean hasOutput();
 
 		/** Diese Methode ordnet der {@link #forInput(Object) gewählten} Eingabe die gegebene Ausgabe zu.
-		 * 
+		 *
 		 * @see #forInput(Object)
 		 * @param output Ausgabe.
 		 * @throws RuntimeException Wenn {@code output} ungültig ist, z.B. {@code null}. */
 		public void setOutput(GOutput output) throws RuntimeException;
 
 		/** Diese Methode entfernt die Zuordnung der {@link #forInput(Object) gewählten} Eingabe zu ihrer Ausgabe.
-		 * 
+		 *
 		 * @see #forInput(Object) */
 		public void popOutput();
 
 		/** Diese Methode gibt die Anzahl der Einträge zurück.
-		 * 
+		 *
 		 * @return Anzahl der Einträge. */
 		public int size();
 
@@ -81,7 +81,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in sortierten Listen mit Zugriff über eine binäre Suche.
-	 * 
+	 *
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -105,7 +105,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		protected int _index_;
 
 		/** Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param inputs Eingaben.
 		 * @param outputs Ausgaben.
@@ -122,14 +122,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		{}
 
 		/** Diese Methode fügt die gegebene Ein- und Ausgabe an der gegebenen Position in {@link #_inputs_} bzw. {@link #_outputs_} ein.
-		 * 
+		 *
 		 * @param index Position.
 		 * @param key Eingabe.
 		 * @param value Ausgebe. */
 		protected abstract void insert(final int index, final GInput key, final GOutput value);
 
 		/** Diese Methode entfernt den Eintrag an der gegebenen Position aus {@link #_inputs_} und {@link #_outputs_}.
-		 * 
+		 *
 		 * @param index Position. */
 		protected abstract void remove(final int index);
 
@@ -230,15 +230,15 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert eine abstrakte Verwaltung der Einträge eines {@link Unique} in einem {@link Hash}.
-	 * 
+	 *
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param <GEntry> Typ der Einträge. */
-	public static abstract class BaseHashData<GInput, GOutput, GEntry> extends Hash<GInput, GOutput, GEntry> implements Data<GInput, GOutput>,
-		Converter<GEntry, Entry<GInput, GOutput>> {
+	public static abstract class BaseHashData<GInput, GOutput, GEntry> extends Hash<GInput, GOutput, GEntry>
+		implements Data<GInput, GOutput>, Converter<GEntry, Entry<GInput, GOutput>> {
 
 		/** Dieses Feld speichert den Besitzer. */
 		protected final Unique<GInput, GOutput> _owner_;
@@ -250,7 +250,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		protected GEntry _entry_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public BaseHashData(final Unique<GInput, GOutput> owner) throws NullPointerException {
@@ -339,7 +339,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} Listen mit Zugriff über eine binäre Suche.
-	 * 
+	 *
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -347,7 +347,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	public static final class ListSetData<GValue> extends BaseListData<GValue, GValue> {
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public ListSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
@@ -355,7 +355,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert Besitzer und Werte.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param values Werte.
 		 * @throws NullPointerException Wenn {@code owner} bzw. {@code values} {@code null} ist. */
@@ -380,7 +380,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in Listen mit Zugriff über eine binäre Suche.
-	 * 
+	 *
 	 * @see Unique#compare(Object, Object)
 	 * @see Comparables#binarySearch(List, Comparable)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -389,7 +389,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	public static final class ListMapData<GInput, GOutput> extends BaseListData<GInput, GOutput> {
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public ListMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
@@ -397,7 +397,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert Besitzer, Eingaben und Ausgaben.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param inputs Eingaben.
 		 * @param outputs Ausgaben.
@@ -425,7 +425,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert eine Verwaltung der Einträge eines {@link Unique.UniqueSet} in einem {@link Hash}.
-	 * 
+	 *
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -433,7 +433,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	public static final class HashSetData<GValue> extends BaseHashData<GValue, GValue, Hash.SetEntry<GValue>> {
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public HashSetData(final Unique<GValue, GValue> owner) throws NullPointerException {
@@ -491,7 +491,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert die Verwaltung der Einträge einer {@link Unique.UniqueMap} in einem {@link Hash}.
-	 * 
+	 *
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -500,7 +500,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	public static final class HashMapData<GInput, GOutput> extends BaseHashData<GInput, GOutput, Hash.MapEntry<GInput, GOutput>> {
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn {@code owner} {@code null} ist. */
 		public HashMapData(final Unique<GInput, GOutput> owner) throws NullPointerException {
@@ -559,20 +559,20 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert ein {@link Unique} mit gleichem Typ für Ein- und Ausgabe.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GValue> Typ der Werte. */
 	public static class UniqueSet<GValue> extends Unique<GValue, GValue> {
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashSetData}.
-		 * 
+		 *
 		 * @see Unique.HashSetData */
 		public UniqueSet() {
 			this(Unique.HASH);
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashSetData} oder {@link Unique.ListSetData}.
-		 * 
+		 *
 		 * @see Unique#LIST
 		 * @see Unique#HASH
 		 * @see Unique.HashSetData
@@ -583,7 +583,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.ListSetData} und den gegebenen Werten.
-		 * 
+		 *
 		 * @see Unique.ListSetData
 		 * @param values Werte.
 		 * @throws NullPointerException Wenn {@code values} {@code null} sind. */
@@ -593,7 +593,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
-		 * 
+		 *
 		 * @param data Nutzdaten.
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 		public UniqueSet(final Data<GValue, GValue> data) throws NullPointerException {
@@ -612,21 +612,21 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Klasse implementiert ein {@link Unique} mit unterschiedlichen Typen für Ein- und Ausgabe.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ der Eingabe.
 	 * @param <GOutput> Typ der Ausgabe. */
 	public static abstract class UniqueMap<GInput, GOutput> extends Unique<GInput, GOutput> {
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashMapData}.
-		 * 
+		 *
 		 * @see Unique.HashMapData */
 		public UniqueMap() {
 			this(Unique.HASH);
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.HashMapData} oder {@link Unique.ListMapData}.
-		 * 
+		 *
 		 * @see Unique#LIST
 		 * @see Unique#HASH
 		 * @see Unique.HashMapData
@@ -637,7 +637,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit {@link Unique.ListMapData} und den gegebenen Eingaben und Ausgaben.
-		 * 
+		 *
 		 * @see Unique.ListMapData
 		 * @param inputs Eingaben.
 		 * @param outputs Ausgaben.
@@ -647,7 +647,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 		}
 
 		/** Dieser Konstruktor initialisiert die Nutzdaten mit den gegebenen {@link Unique.Data}.
-		 * 
+		 *
 		 * @param data {@link Unique.Data}.
 		 * @throws NullPointerException Wenn {@code data} {@code null} ist. */
 		public UniqueMap(final Data<GInput, GOutput> data) throws NullPointerException {
@@ -661,14 +661,14 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code List}-{@link Data}.<br>
 	 * Derartige Nutzdaten basieren auf {@link #compare(Object, Object)}.
-	 * 
+	 *
 	 * @see ListSetData
 	 * @see ListMapData */
 	public static final boolean LIST = true;
 
 	/** Dieses Feld speichert den Modus zur Erzeugung eines {@link Unique} mit interner {@code Hash}-{@link Data}.<br>
 	 * Derartige Nutzdaten basieren auf {@link #hash(Object)} und {@link #equals(Object, Object)}.
-	 * 
+	 *
 	 * @see HashSetData
 	 * @see HashMapData */
 	public static final boolean HASH = false;
@@ -749,7 +749,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn ein {@code cast} des gegebenen {@link Object} nach {@code GInput} zulässig ist. Sie wird von der
 	 * {@link Map}-Sich {@link #entryMap()} verwendet.
-	 * 
+	 *
 	 * @param input {@link Object}.
 	 * @return {@code true}, wenn {@code input instanceOf GInput}. */
 	protected boolean check(final Object input) {
@@ -757,7 +757,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Methode wird bei der Wiederverwendung der gegebenen Ausgabe für die gegebene Eingabe von aufgerufen. Ein- und Ausgabe sind nie {@code null}.
-	 * 
+	 *
 	 * @see Unique#get(Object)
 	 * @param input Eingabe
 	 * @param output Ausgabe. */
@@ -765,7 +765,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	}
 
 	/** Diese Methode kompiliert die gegebene Eingabe in die zugeordnete Ausgabe und gibt diese zurück. Die Eingabe ist nie {@code null}.
-	 * 
+	 *
 	 * @see Unique#get(Object)
 	 * @param input Eingabe.
 	 * @return Ausgabe. */
@@ -774,7 +774,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	/** Diese Methode gibt die mit der gegebenen Eingabe assoziierte Ausgabe zurück. Wenn der gegebenen Eingabe bereits eine Ausgabe zugeordnet
 	 * {@link Data#hasOutput() ist}, wird deren Wiederverwendung via {@link Unique#reuse(Object, Object)} signalisiert. Sollte der Eingabe noch keine Ausgabe
 	 * zugeordnet sein, wird diese via {@link Unique#compile(Object)} erzeugt und mit der Eingabe {@link Data#setOutput(Object) assoziiert}.
-	 * 
+	 *
 	 * @see Unique#hash(Object)
 	 * @see Unique#equals(Object, Object)
 	 * @see Unique#compare(Object, Object)
@@ -802,7 +802,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 
 	/** Diese Methode gibt eine {@link Map} als Sicht auf die internen Einträge zurück, aus welcher zwar Einträge entfernt, aber in welche keine neuen Einträge
 	 * eingefügt werden können.
-	 * 
+	 *
 	 * @return {@link Map} der Einträge. */
 	public final Map<GInput, GOutput> entryMap() {
 		return this._entryMap_;
@@ -813,7 +813,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	/** Der berechnete {@link Object#hashCode() Streuwert} wird von den Schlüsseln der {@link Map} verwendet.
 	 * <p>
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @see HashSetData
 	 * @see HashMapData
 	 * @throws NullPointerException Wenn die Eingabe {@code null} ist. */
@@ -825,7 +825,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	/** Die berechnete {@link Object#equals(Object) Äquivalenz} wird von den Schlüsseln der {@link Map} verwendet.
 	 * <p>
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @see HashSetData
 	 * @see HashMapData
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */
@@ -845,7 +845,7 @@ public abstract class Unique<GInput, GOutput> implements Hasher<GInput>, Convert
 	/** Der berechnete {@link Comparator#compare(Object, Object) Vergleichswert} wird von den Schlüsseln der {@link Map} verwendet.
 	 * <p>
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @see ListSetData
 	 * @see ListMapData
 	 * @throws NullPointerException Wenn eine der Eingaben {@code null} ist. */

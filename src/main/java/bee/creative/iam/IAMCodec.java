@@ -16,12 +16,12 @@ import bee.creative.util.IO;
 /** Diese Klasse implementiert den Konfigurator, mit welchem ein {@link IAMIndex} aus bzw. in unterschiedliche Datenformate gelesen bzw. geschieben werden kann.
  * Dabei können {@link #getSourceData() Eingabedaten} unterschiedlicher {@link #getSourceFormat() Eingabeformate} direkt in {@link #getTargetData()
  * Ausgabedaten} unterschiedlicher {@link #getTargetFormat() Ausgabeformate} überführt werden.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class IAMCodec {
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten Ein- und Ausgabedatenformate eines {@link IAMCodec}.
-	 * 
+	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMDataType {
 
@@ -116,7 +116,7 @@ public final class IAMCodec {
 
 		/** Diese Methode liest die {@link IAMCodec#getSourceData() Eingabedaten} des gegebenen {@link IAMCodec} ein und gibt den daraus erstellten {@link IAMIndex}
 		 * zurück.
-		 * 
+		 *
 		 * @param codec {@link IAMCodec}.
 		 * @return {@link IAMIndex}.
 		 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
@@ -124,7 +124,7 @@ public final class IAMCodec {
 		public abstract IAMIndex decode(final IAMCodec codec) throws IOException, IllegalArgumentException;
 
 		/** Diese Methode schreibt den gegebenen {@link IAMIndex} in die {@link IAMCodec#getTargetData() Ausgabedaten} des gegebenen {@link IAMCodec}.
-		 * 
+		 *
 		 * @param codec {@link IAMCodec}.
 		 * @param index {@link IAMIndex}.
 		 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.
@@ -134,7 +134,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten {@link IAMMapping#mode() Suchmodus} eines {@link IAMMapping}.
-	 * 
+	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMFindMode {
 
@@ -188,7 +188,7 @@ public final class IAMCodec {
 		 * <dt>{@link IAMMapping#MODE_SORTED}, {@code "S"}, {@code "SORTED"}</dt>
 		 * <dd>{@link #SORTED}</dd>
 		 * </dl>
-		 * 
+		 *
 		 * @param object {@link Object} oder {@code null}.
 		 * @return {@link IAMFindMode}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
@@ -201,7 +201,7 @@ public final class IAMCodec {
 		{}
 
 		/** Diese Methode gibt den {@link IAMMapping#mode() Suchmodus} dieses {@link IAMFindMode} zurück.
-		 * 
+		 *
 		 * @param entryCount Anzahl der Einträge eines {@link IAMMapping}.
 		 * @return {@link IAMMapping#MODE_HASHED} oder {@link IAMMapping#MODE_SORTED}. */
 		public abstract boolean toMode(int entryCount);
@@ -209,7 +209,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten Bytereigenfolgen eines {@link IAMCodec}.
-	 * 
+	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMByteOrder {
 
@@ -267,7 +267,7 @@ public final class IAMCodec {
 		 * <dt>{@link ByteOrder#LITTLE_ENDIAN}, {@code "L"}, {@code "LITTLEENDIAN"}</dt>
 		 * <dd>{@link #LITTLEENDIAN}</dd>
 		 * </dl>
-		 * 
+		 *
 		 * @param object {@link Object} oder {@code null}.
 		 * @return {@link IAMByteOrder}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
@@ -280,14 +280,14 @@ public final class IAMCodec {
 		{}
 
 		/** Diese Methode gibt die Bytereihenfolge dieser {@link IAMByteOrder} zurück.
-		 * 
+		 *
 		 * @return Bytereihenfolge. */
 		public abstract ByteOrder toOrder();
 
 	}
 
 	/** Diese Klasse implementiert die Aufzählung der unterstützten Zahlenfolgenformaten eines {@link IAMCodec}.
-	 * 
+	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static enum IAMArrayFormat {
 
@@ -391,8 +391,8 @@ public final class IAMCodec {
 
 		},
 
-		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des
-		 * <em>32-Bit UCS Transformation Format</em> stehen. */
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die Codepoints des <em>32-Bit UCS Transformation
+		 * Format</em> stehen. */
 		STRING_UTF_32 {
 
 			@Override
@@ -507,7 +507,7 @@ public final class IAMCodec {
 		 * <dt>{@code "ISO-8859-15"}</dt>
 		 * <dd>{@link #STRING_ISO_8859_15}</dd>
 		 * </dl>
-		 * 
+		 *
 		 * @param object {@link Object} oder {@code null}.
 		 * @return {@link IAMByteOrder}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
@@ -520,7 +520,7 @@ public final class IAMCodec {
 		{}
 
 		/** Diese Methode parst die gegebene Zeichenkette in eine Zahlenfolge und gibt diese zurück.
-		 * 
+		 *
 		 * @param source Zeichenkette.
 		 * @return Zahlenfolge.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -528,7 +528,7 @@ public final class IAMCodec {
 		public abstract int[] parse(final String source) throws NullPointerException, IllegalArgumentException;
 
 		/** Diese Methode formatiert die gegebene Zahlenfolge in eine Zeichenkette und gibt diese zurück.
-		 * 
+		 *
 		 * @param source Zahlenfolge.
 		 * @return Zeichenkette.
 		 * @throws NullPointerException Wenn {@code source} {@code null} ist.
@@ -617,7 +617,7 @@ public final class IAMCodec {
 	{}
 
 	/** Diese Methode gibt die Bytereihenfolge zurück.
-	 * 
+	 *
 	 * @see #useByteOrder(IAMByteOrder)
 	 * @return Bytereihenfolge. */
 	public final synchronized IAMByteOrder getByteOrder() {
@@ -625,7 +625,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode gibt die Eingabedaten zurück.
-	 * 
+	 *
 	 * @see #useSourceData(Object)
 	 * @see #getSourceFormat()
 	 * @return Eingabedaten. */
@@ -635,21 +635,21 @@ public final class IAMCodec {
 
 	/** Diese Methode gibt das Format der Eingabedaten zurück.
 	 * <dl>
-	 * <dt> {@link IAMDataType#IAM}</dt>
-	 * <dd> {@link MMFArray#from(Object)}</dd>
-	 * <dt> {@link IAMDataType#INI}</dt>
-	 * <dd> {@link INIReader#from(Object)}</dd>
-	 * <dt> {@link IAMDataType#XML}</dt>
-	 * <dd> {@link IO#inputReaderFrom(Object)}</dd>
+	 * <dt>{@link IAMDataType#IAM}</dt>
+	 * <dd>{@link MMFArray#from(Object)}</dd>
+	 * <dt>{@link IAMDataType#INI}</dt>
+	 * <dd>{@link INIReader#from(Object)}</dd>
+	 * <dt>{@link IAMDataType#XML}</dt>
+	 * <dd>{@link IO#inputReaderFrom(Object)}</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @return Eingabeformat. */
 	public final synchronized IAMDataType getSourceFormat() {
 		return this._sourceFormat_;
 	}
 
 	/** Diese Methode gibt die Ausgabedaten zurück.
-	 * 
+	 *
 	 * @see #useTargetData(Object)
 	 * @see #getTargetFormat()
 	 * @return Ausgabedaten. */
@@ -659,21 +659,21 @@ public final class IAMCodec {
 
 	/** Diese Methode gibt das Format der Ausgabedaten zurück.
 	 * <dl>
-	 * <dt> {@link IAMDataType#IAM}</dt>
-	 * <dd> {@link IO#outputDataFrom(Object)}</dd>
-	 * <dt> {@link IAMDataType#INI}</dt>
-	 * <dd> {@link INIWriter#from(Object)}</dd>
-	 * <dt> {@link IAMDataType#XML}</dt>
-	 * <dd> {@link IO#outputWriterFrom(Object)}</dd>
+	 * <dt>{@link IAMDataType#IAM}</dt>
+	 * <dd>{@link IO#outputDataFrom(Object)}</dd>
+	 * <dt>{@link IAMDataType#INI}</dt>
+	 * <dd>{@link INIWriter#from(Object)}</dd>
+	 * <dt>{@link IAMDataType#XML}</dt>
+	 * <dd>{@link IO#outputWriterFrom(Object)}</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @return Ausgabeformat. */
 	public final synchronized IAMDataType getTargetFormat() {
 		return this._targetFormat_;
 	}
 
 	/** Diese Methode setzt die Bytereihenfolge und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param order Bytereihenfolge.
 	 * @return {@code this}. */
 	public final synchronized IAMCodec useByteOrder(final IAMByteOrder order) {
@@ -682,7 +682,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode setzt die Eingabedaten und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getSourceData()
 	 * @see #getSourceFormat()
 	 * @param data Eingabedaten.
@@ -693,7 +693,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode setzt das Eingabeformat und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getSourceData()
 	 * @see #getSourceFormat()
 	 * @param format Eingabeformat.
@@ -704,7 +704,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode setzt die Ausgabedaten und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getTargetData()
 	 * @see #getTargetFormat()
 	 * @param data Ausgabedaten.
@@ -715,7 +715,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode setzt das Ausgabeformat und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #getTargetData()
 	 * @see #getTargetFormat()
 	 * @param format Ausgabeformat.
@@ -727,7 +727,7 @@ public final class IAMCodec {
 
 	/** Diese Methode liest die {@link #getSourceData() Eingabedaten}, erstellt daraus einen {@link IAMIndex} und schreibt diesen in die {@link #getTargetData()
 	 * Ausgabedaten}.
-	 * 
+	 *
 	 * @see #decodeSource()
 	 * @see #encodeTarget(IAMIndex)
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen bzw. die Ausgabedaten nicht geschrieben werden können.
@@ -738,7 +738,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode liest die {@link #getSourceData() Eingabedaten} und gibt den daraus erstellten {@link IAMIndex} zurück.
-	 * 
+	 *
 	 * @see IAMDataType#decode(IAMCodec)
 	 * @return {@link IAMIndex}.
 	 * @throws IOException Wenn die Eingabedaten nicht gelesen werden können.
@@ -751,7 +751,7 @@ public final class IAMCodec {
 	}
 
 	/** Diese Methode schreibt den gegebenen {@link IAMIndex} in die {@link #getTargetData() Ausgabedaten}.
-	 * 
+	 *
 	 * @see IAMDataType#encode(IAMCodec, IAMIndex)
 	 * @param index {@link IAMIndex}.
 	 * @throws IOException Wenn die Ausgabedaten nicht geschrieben werden können.

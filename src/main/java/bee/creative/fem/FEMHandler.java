@@ -1,8 +1,9 @@
 package bee.creative.fem;
 
-/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction Funktion}.<br>
+/** Diese Klasse implementiert einen unveränderlichen Funktionszeiger, d.h. ein als {@link FEMValue} verpackter Verweis auf eine {@link FEMFunction
+ * Funktion}.<br>
  * Intern wird der Funktionszeiger als {@link FEMFunction} dargestellt.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMHandler extends FEMValue {
 
@@ -15,7 +16,7 @@ public final class FEMHandler extends FEMValue {
 	{}
 
 	/** Diese Methode gibt die gegebene Funktion als Funktionszeiger zurück.
-	 * 
+	 *
 	 * @see FEMFunction#toValue()
 	 * @param function Funktion.
 	 * @return Funktionszeiger.
@@ -26,7 +27,7 @@ public final class FEMHandler extends FEMValue {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMMethod.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Funktionszeiger.
@@ -48,21 +49,21 @@ public final class FEMHandler extends FEMValue {
 	{}
 
 	/** Diese Methode gibt die Funktion zurück.
-	 * 
+	 *
 	 * @return Funktion. */
 	public final FEMFunction value() {
 		return this._value_;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		return this._value_.hashCode();
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Funktionszeiger gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Methode.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */

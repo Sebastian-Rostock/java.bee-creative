@@ -9,11 +9,12 @@ import bee.creative.util.Comparators;
  * <p>
  * Die Rechenzeiten beim Hinzufügen und Entfernen von Elementen sind von der Anzahl der Elemente abhängig und erhöhen sich bei einer Verdoppelung dieser Anzahl
  * im Mittel auf ca. {@code 150%}. Bei der erhöhung der Anzahl der Elemente auf das {@code 32}-fache ({@code 5} Verdopplungen) steigt die Rechenzeit beim
- * Hinzufügen und Entfernen von Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür benötigen würde.
+ * Hinzufügen und Entfernen von Elementen in einer {@link CompactEntryHashMap} auf {@code 760%} der Rechenzeit, die eine {@link HashMap} hierfür benötigen
+ * würde.
  * <p>
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen Rechenzeiten, unabhängig von der Anzahl der
  * Elemente.
- * 
+ *
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -27,7 +28,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -36,7 +37,7 @@ public class CompactEntryHashMap<GKey, GValue> extends CompactEntryMap<GKey, GVa
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */

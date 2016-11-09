@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /** Diese Klasse implementiert grundlegende {@link Assignment} und {@link Assignable}.
- * 
+ *
  * @see Assignment
  * @see Assignable
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
@@ -16,7 +16,7 @@ public class Assignments {
 
 	/** Diese Klasse implementiert einen {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte durch einen gegebenen {@link Assignment}
 	 * verwalten lässt.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GSource> Typ des Quellobjekt. */
 	public static final class ChildAssignment<GSource> implements Assignment<GSource> {
@@ -28,7 +28,7 @@ public class Assignments {
 		final GSource _source_;
 
 		/** Dieser Konstruktor initialisiert {@link Assignment} und Quellobjekt.
-		 * 
+		 *
 		 * @param parent {@link Assignment}, das die Abbildung der Quellobjekte auf die Zielobjekte verwaltet.
 		 * @param source Quellobjekt.
 		 * @throws NullPointerException Wenn {@code parent} {@code null} ist. */
@@ -66,8 +66,8 @@ public class Assignments {
 
 		/** {@inheritDoc} */
 		@Override
-		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
-			IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit)
+			throws NullPointerException, IllegalArgumentException {
 			this._parent_.assign(source, target, commit);
 		}
 
@@ -107,7 +107,7 @@ public class Assignments {
 
 	/** Diese Klasse implementiert ein {@link Assignment}, der zur Abbildung der Quellobjekte auf die Zielobjekte eine {@link Map} verwendet. Das Quellobjekt
 	 * dieses {@link Assignment}s ist {@code null}.
-	 * 
+	 *
 	 * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class ParentAssignment implements Assignment<Object> {
 
@@ -154,8 +154,8 @@ public class Assignments {
 
 		/** {@inheritDoc} */
 		@Override
-		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit) throws NullPointerException,
-			IllegalArgumentException {
+		public final <GObject> void assign(final GObject source, final Assignable<? super GObject> target, final boolean commit)
+			throws NullPointerException, IllegalArgumentException {
 			if ((source == null) || (target == null)) throw new NullPointerException();
 			this.set(source, target);
 			if (commit) {
@@ -235,21 +235,19 @@ public class Assignments {
 	}
 
 	/** Diese Methode gibt ein neues {@link Assignment} ohne Quellobjekt zurück.
-	 * 
+	 *
 	 * @see ParentAssignment
 	 * @return {@link ParentAssignment}. */
 	public static ParentAssignment assignment() {
 		return new ParentAssignment();
 	}
 
-	/** Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge der
-	 * gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht:
-	 * 
-	 * <pre>
+	/** Diese Methode leert die gegebenen Zielabbildung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Schlüsseln und Werten der Einträge
+	 * der gegebenen Quellabbildung ermittelten Schlüssel-Wert-Paare in die Zielabbildung ein. Die Implementation entspricht: <pre>
 	 * target.clear();
 	 * for(Entry<GKey, GValue> entry: source.entrySet())target.put(assigner.get(entry.getKey()), assigner.get(entry.getValue()));
 	 * </pre>
-	 * 
+	 *
 	 * @see Assignment
 	 * @see Map
 	 * @param <GInput> Typ der Eingabe.
@@ -269,13 +267,11 @@ public class Assignments {
 	}
 
 	/** Diese Methode leert die gegebenen Zielsammlung und fügt anschließend alle via {@link Assignment#get(Object)} zu den Elemente der gegebenen Quellsammlung
-	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht:
-	 * 
-	 * <pre>
+	 * ermittelten Zielobjekte in die Zielsammlung ein. Die Implementation entspricht: <pre>
 	 * target.clear();
 	 * for(GValue value: source)target.add(assigner.get(value));
 	 * </pre>
-	 * 
+	 *
 	 * @see Assignment
 	 * @see Collection
 	 * @param <GValue> Typ der Elemente.

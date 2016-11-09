@@ -10,12 +10,12 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Formatierer, der Daten, Werten und Funktionen in eine Zeichenkette überführen kann.<br>
  * Er realisiert damit die entgegengesetzte Operation zur Kombination von {@link FEMParser} und {@link FEMCompiler}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFormatter {
 
 	/** Diese Klasse implementiert eine Markierung, mit welcher die Tiefe und Aktivierung der Einrückung definiert werden kann.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class Mark {
 
@@ -28,7 +28,7 @@ public final class FEMFormatter {
 		int _data_;
 
 		/** Dieser Konstruktor initialisiert die Markierung.
-		 * 
+		 *
 		 * @param level Einrücktiefe ({@link #level()}).
 		 * @param last Endmarkierung ({@link #isLast()}).
 		 * @param space Leerzeichen ({@link #isSpace()}).
@@ -40,7 +40,7 @@ public final class FEMFormatter {
 		{}
 
 		/** Diese Methode gibt die Tiefe der Einrückung zurück.
-		 * 
+		 *
 		 * @return Tiefe der Einrückung. */
 		public final int level() {
 			return this._data_ >> 3;
@@ -52,21 +52,21 @@ public final class FEMFormatter {
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt das Ende einer Einrückungsebene markiert.
-		 * 
+		 *
 		 * @return {@code true} bei einer Endmarkierung. */
 		public final boolean isLast() {
 			return (this._data_ & 1) != 0;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn dieses Objekt ein bedingtes Leerzeichen markiert.
-		 * 
+		 *
 		 * @return {@code true} bei einem bedingten Leerzeichen. */
 		public final boolean isSpace() {
 			return (this._data_ & 4) != 0;
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Einrückung aktiviert ist.
-		 * 
+		 *
 		 * @return Aktivierung. */
 		public final boolean isEnabled() {
 			return (this._data_ & 2) != 0;
@@ -108,7 +108,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode setzt den Formatieren zurück und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @return {@code this}. */
 	public synchronized final FEMFormatter reset() {
 		this._items_.clear();
@@ -119,7 +119,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode fügt die gegebenen Markierung an und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param object Markierung.
 	 * @return {@code this}. */
 	final FEMFormatter _putMark_(final FEMFormatter.Mark object) {
@@ -130,7 +130,7 @@ public final class FEMFormatter {
 	/** Diese Methode markiert den Beginn einer neuen Hierarchieebene, erhöht die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
 	 * {@link #putIndent()} die Einrückung für diese Hierarchieebene aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung
 	 * angefügt.
-	 * 
+	 *
 	 * @see #putBreakDec()
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
@@ -144,7 +144,7 @@ public final class FEMFormatter {
 	/** Diese Methode markiert das Ende der aktuellen Hierarchieebene, reduziert die Tiefe der Einrückung um eins und gibt {@code this} zurück. Wenn über
 	 * {@link #putIndent()} die Einrückung für eine der tieferen Hierarchieebenen aktiviert wurde, wird ein Zeilenumbruch gefolgt von der zur aktuellen Ebene
 	 * passenden Einrückung angefügt.
-	 * 
+	 *
 	 * @see #putBreakInc()
 	 * @see #putBreakSpace()
 	 * @see #putIndent()
@@ -159,7 +159,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode fügt ein bedingtes Leerzeichen an und gibt {@code this} zurück. Wenn über {@link #putIndent()} die Einrückung für die aktuelle
 	 * Hierarchieebene aktiviert wurde, wird statt eines Leerzeichens ein Zeilenumbruch gefolgt von der zur Ebene passenden Einrückung angefügt.
-	 * 
+	 *
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
 	 * @see #putIndent()
@@ -171,7 +171,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode markiert die aktuelle sowie alle übergeordneten Hierarchieebenen als einzurücken und gibt {@code this} zurück. Beginn und Ende einer
 	 * Hierarchieebene werden über {@link #putBreakInc()} und {@link #putBreakDec()} markiert.
-	 * 
+	 *
 	 * @see #putBreakSpace()
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
@@ -199,7 +199,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-	 * 
+	 *
 	 * @see Object#toString()
 	 * @param part Objekt.
 	 * @return {@code this}.
@@ -210,7 +210,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode fügt die Zeichenkette des gegebenen Objekts an und gibt {@code this} zurück.<br>
-	 * 
+	 *
 	 * @see FEMDomain#formatData(FEMFormatter, Object)
 	 * @param data Objekt.
 	 * @return {@code this}.
@@ -227,7 +227,7 @@ public final class FEMFormatter {
 	 * separiert über {@link #putFunction(FEMFunction)} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die
 	 * vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 	 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 * 
+	 *
 	 * @see #putFunction(FEMFunction)
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
@@ -263,7 +263,7 @@ public final class FEMFormatter {
 	 * {@code "$i: "} angefügt. Nach der öffnenden Klammer {@link #putBreakInc() beginnt} dabei eine neue Hierarchieebene, die vor der schließenden Klammer
 	 * {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes Leerzeichen} eingefügt.<br>
 	 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Wertliste mehr als ein Element enthält.
-	 * 
+	 *
 	 * @see #putFunction(FEMFunction)
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
@@ -301,7 +301,7 @@ public final class FEMFormatter {
 	 * Hierarchieebene, die vor der schließenden Klammer {@link #putBreakDec() endet}. Nach jedem Trennzeichen wird ein {@link #putBreakSpace() bedingtes
 	 * Leerzeichen} eingefügt.<br>
 	 * Die aktuelle Hierarchieebene wird als einzurücken {@link #putIndent() markiert}, wenn die Funktionsliste mehr als ein Element enthält.
-	 * 
+	 *
 	 * @see #putFunction(FEMFunction)
 	 * @see #putBreakInc()
 	 * @see #putBreakDec()
@@ -333,7 +333,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode fügt die gegebenen, parametrisierte Funktion an und gibt {@code this} zurück.<br>
 	 * Die parametrisierte Funktion wird dabei in <code>"{: "</code> und <code>"}"</code> eingeschlossen und über {@link #putFunction(FEMFunction)} angefügt.
-	 * 
+	 *
 	 * @see #putFunction(FEMFunction)
 	 * @param function parametrisierte Funktion.
 	 * @return {@code this}.
@@ -345,7 +345,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode fügt den Quelltext der gegebenen Funktion an und gibt {@code this} zurück.<br>
-	 * 
+	 *
 	 * @see FEMDomain#formatFunction(FEMFormatter, FEMFunction)
 	 * @param function Funktion.
 	 * @return {@code this}.
@@ -358,14 +358,14 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurück. Diese ist {@code null}, wenn nicht eingerückt wird.
-	 * 
+	 *
 	 * @return Zeichenkette zur Einrückung oder {@code null}. */
 	public final String getIndent() {
 		return this._indent_;
 	}
 
 	/** Diese Methode gibt die genutzten Formatierungsmethoden zurück.
-	 * 
+	 *
 	 * @return Formatierungsmethoden. */
 	public final FEMDomain getHelper() {
 		return this._helper_;
@@ -373,7 +373,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
 	 * Wenn diese {@code null} ist, wird nicht eingerückt.
-	 * 
+	 *
 	 * @param indent Zeichenkette zur Einrückung (z.B. {@code null}, {@code "\t"} oder {@code "  "}).
 	 * @return {@code this}. */
 	public synchronized final FEMFormatter useIndent(final String indent) {
@@ -382,7 +382,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param helper Formatierungsmethoden.
 	 * @return {@code this}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -393,7 +393,7 @@ public final class FEMFormatter {
 	}
 
 	/** Diese Methode gibt die Verkettung der bisher gesammelten Zeichenketten als Quelltext zurück.
-	 * 
+	 *
 	 * @see #put(Object)
 	 * @return Quelltext. */
 	public final String format() {
@@ -423,7 +423,7 @@ public final class FEMFormatter {
 	/** Diese Methode formatiert die gegebenen Elemente in einen Quelltext und gibt diesen zurück.<br>
 	 * Die Elemente werden über den gegebenen {@link Converter} angefügt und mit {@code ';'} separiert. In der Methode {@link Converter#convert(Object)} sollten
 	 * hierfür {@link #putData(Object)} bzw. {@link #putFunction(FEMFunction)} aufgerufen werden.
-	 * 
+	 *
 	 * @see #formatDatas(Iterable)
 	 * @see #formatFunctions(Iterable)
 	 * @param <GItem> Typ der Elemente.
@@ -432,8 +432,8 @@ public final class FEMFormatter {
 	 * @return formatierter Quelltext.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist oder enthält.
 	 * @throws IllegalArgumentException Wenn ein Element nicht formatiert werden kann. */
-	final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter) throws NullPointerException,
-		IllegalArgumentException {
+	final <GItem> String _format_(final Iterable<? extends GItem> items, final Converter<GItem, ?> formatter)
+		throws NullPointerException, IllegalArgumentException {
 		final Iterator<? extends GItem> iter = items.iterator();
 		if (!iter.hasNext()) return "";
 		GItem item = iter.next();
@@ -453,7 +453,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode formatiert das gegebene Objekt in einen Quelltext und gibt diesen zurück.<br>
 	 * Der Rückgabewert entspricht {@code this.formatDatas(Iterables.itemIterable(object))}.
-	 * 
+	 *
 	 * @see #formatDatas(Iterable)
 	 * @param object Objekt.
 	 * @return formatierter Quelltext.
@@ -465,7 +465,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode formatiert die gegebenen Objekt in einen Quelltext und gibt diesen zurück.<br>
 	 * Die Objekt werden über {@link #putData(Object)} angefügt und mit {@code ';'} separiert.
-	 * 
+	 *
 	 * @see #putData(Object)
 	 * @param objects Objekte.
 	 * @return formatierter Quelltext.
@@ -484,7 +484,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode formatiert die gegebene Funktion in einen Quelltext und gibt diesen zurück.<br>
 	 * Der Rückgabewert entspricht {@code this.formatFunction(Iterables.itemIterable(function))}.
-	 * 
+	 *
 	 * @see #formatFunctions(Iterable)
 	 * @param function Funktion.
 	 * @return formatierter Quelltext.
@@ -496,7 +496,7 @@ public final class FEMFormatter {
 
 	/** Diese Methode formatiert die gegebenen Funktionen in einen Quelltext und gibt diesen zurück.<br>
 	 * Die Funktionen werden über {@link #putFunction(FEMFunction)} angefügt und mit {@code ';'} separiert.
-	 * 
+	 *
 	 * @see #putFunction(FEMFunction)
 	 * @param functions Funktionen.
 	 * @return formatierter Quelltext.

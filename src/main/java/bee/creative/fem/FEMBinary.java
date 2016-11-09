@@ -6,7 +6,7 @@ import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine unveränderliche Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen
  * realisiert sind.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
@@ -14,7 +14,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Bytewert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammlen fortgeführt werden soll.
-		 * 
+		 *
 		 * @param value Byte.
 		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(byte value);
@@ -322,7 +322,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Bytes zurück.<br>
 	 * Das gegebene Array wird hierbei kopiert.
-	 * 
+	 *
 	 * @param items Bytes.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
@@ -333,7 +333,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt eine uniforme Bytefolge mit der gegebenen Länge zurück, deren Bytes alle gleich dem gegebenen sind.
-	 * 
+	 *
 	 * @param item Byte.
 	 * @param length Länge.
 	 * @return Bytefolge.
@@ -345,7 +345,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
-	 * 
+	 *
 	 * @see #toString()
 	 * @param string Zeichenkette.
 	 * @return Bytefolge.
@@ -358,14 +358,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		final byte[] bytes = new byte[count];
 		for (int i = 0; i < count; i++) {
 			bytes[i] = (byte)( //
-				(FEMBinary.toDigit(string.charAt((i << 1) + 0)) << 4) | //
+			(FEMBinary.toDigit(string.charAt((i << 1) + 0)) << 4) | //
 				(FEMBinary.toDigit(string.charAt((i << 1) + 1)) << 0));
 		}
 		return new CompactBinary(bytes);
 	}
 
 	/** Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @return Bytefolge.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
@@ -377,7 +377,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMBinary.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Bytefolge.
@@ -387,7 +387,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt das Zeichen zur gegebenen hexadezimalen Ziffer zurück.
-	 * 
+	 *
 	 * @param hexDigit hexadezimale Ziffer ({@code 0..15}).
 	 * @return Zeichen ({@code '0'..'9', 'A'..'F'}).
 	 * @throws IllegalArgumentException Wenn {@code hexDigit} ungültig ist. */
@@ -400,7 +400,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt die hexadezimale Ziffer zum gegebenen Zeichen zurück.
-	 * 
+	 *
 	 * @param hexChar Zeichen ({@code '0'..'9', 'A'..'F'}).
 	 * @return hexadezimale Ziffer ({@code 0..15}).
 	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
@@ -423,7 +423,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	protected final int _length_;
 
 	/** Dieser Konstruktor initialisiert die Länge.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMBinary(final int length) throws IllegalArgumentException {
@@ -434,7 +434,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	{}
 
 	/** Diese Methode gibt das {@code index}-te Byte zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Byte. */
 	protected byte _get_(final int index) {
@@ -443,7 +443,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode fügt alle Bytes im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
@@ -463,7 +463,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode konvertiert diese Bytefolge in ein {@code byte[]} und gibt dieses zurück.
-	 * 
+	 *
 	 * @return Array mit den Bytes dieser Bytefolge. */
 	public byte[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
@@ -472,7 +472,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt das {@code index}-te Byte zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Byte.
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
@@ -482,14 +482,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Bytes in der Bytefolge zurück.
-	 * 
+	 *
 	 * @return Länge der Bytefolge. */
 	public final int length() {
 		return this._length_;
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Bytefolge mit der gegebenen Bytefolge zurück.
-	 * 
+	 *
 	 * @param that Bytefolge.
 	 * @return {@link FEMBinary}-Sicht auf die Verkettung dieser mit der gegebenen Bytefolge.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -500,7 +500,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Bytefolge zurück.
-	 * 
+	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Bytes im Abschnitt.
 	 * @return {@link FEMBinary}-Sicht auf einen Abschnitt dieser Bytefolge.
@@ -513,14 +513,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Bytefolge zurück.
-	 * 
+	 *
 	 * @return rückwärts geordnete {@link FEMBinary}-Sicht auf diese Bytefolge. */
 	public FEMBinary reverse() {
 		return new ReverseBinary(this);
 	}
 
 	/** Diese Methode gibt die {@link #value() Bytes dieser Bytefolge} in einer performanteren oder zumindest gleichwertigen Bytefolge zurück.
-	 * 
+	 *
 	 * @see #from(byte[])
 	 * @see #value()
 	 * @return performanteren Bytefolge oder {@code this}. */
@@ -532,7 +532,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Bytewerts innerhalb dieser Bytefolge zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchter Bytewert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens des gegebenen Bytewerts ({@code offset..this.length()-1}) oder {@code -1}.
@@ -547,7 +547,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Bytefolge innerhalb dieser Bytefolge zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchte Bytefolge.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Bytefolge ({@code offset..this.length()-that.length()}) oder {@code -1}.
@@ -573,7 +573,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 	/** Diese Methode fügt alle Bytes dieser Bytefolge vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(byte)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Bytes geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
@@ -584,7 +584,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		int result = this._hash_;
@@ -597,7 +597,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Bytefolge gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Bytefolge.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -611,9 +611,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		return true;
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die der
-	 * gegebenen Bytefolge ist. Die Bytewerte werden als {@code UINT8} verglichen.
-	 * 
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Bytefolge kleiner, gleich oder größer als die
+	 * der gegebenen Bytefolge ist. Die Bytewerte werden als {@code UINT8} verglichen.
+	 *
 	 * @param that Bytefolge.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -699,7 +699,7 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
 	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h.
 	 * {@code 0123456789ABCDEF}.
-	 * 
+	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {

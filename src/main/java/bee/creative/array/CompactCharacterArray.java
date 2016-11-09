@@ -1,25 +1,25 @@
 package bee.creative.array;
 
 /** Diese Klasse implementiert ein {@link CharacterArray} als {@link CompactArray}.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactCharacterArray extends CompactArray<char[], Character> implements CharacterArray {
 
 	/** Diese Klasse implementiert ein {@link CharacterArray} als modifizierbare Sicht auf einen Teil eines {@link CompactCharacterArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArray extends CompactSubArray<CompactCharacterArray, char[], Character> implements CharacterArray {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
 		 *         {@code startIndex > finalIndex}). */
-		public CompactCharacterSubArray(final CompactCharacterArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public CompactCharacterSubArray(final CompactCharacterArray owner, final int startIndex, final int finalIndex)
+			throws NullPointerException, IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
 
@@ -89,7 +89,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	}
 
 	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterArraySection extends CharacterArraySection {
 
@@ -97,7 +97,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		protected final CompactCharacterArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterArraySection(final CompactCharacterArray owner) throws NullPointerException {
@@ -135,7 +135,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	}
 
 	/** Diese Klasse implementiert die live {@link CharacterArraySection} eines {@link CompactCharacterSubArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactCharacterSubArraySection extends CharacterArraySection {
 
@@ -143,7 +143,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 		protected final CompactCharacterSubArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactCharacterSubArraySection(final CompactCharacterSubArray owner) throws NullPointerException {
@@ -190,7 +190,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 	}
 
 	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -200,7 +200,7 @@ public class CompactCharacterArray extends CompactArray<char[], Character> imple
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.

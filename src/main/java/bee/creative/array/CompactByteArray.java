@@ -1,24 +1,25 @@
 package bee.creative.array;
 
 /** Diese Klasse implementiert ein {@link ByteArray} als {@link CompactArray}.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactByteArray extends CompactArray<byte[], Byte> implements ByteArray {
 
 	/** Diese Klasse implementiert ein {@link ByteArray} als modifizierbare Sicht auf einen Teil eines {@link CompactByteArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteSubArray extends CompactSubArray<CompactByteArray, byte[], Byte> implements ByteArray {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
 		 *         {@code startIndex > finalIndex}). */
-		public CompactByteSubArray(final CompactByteArray owner, final int startIndex, final int finalIndex) throws NullPointerException, IndexOutOfBoundsException {
+		public CompactByteSubArray(final CompactByteArray owner, final int startIndex, final int finalIndex)
+			throws NullPointerException, IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
 
@@ -88,7 +89,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	}
 
 	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteArraySection extends ByteArraySection {
 
@@ -96,7 +97,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		protected final CompactByteArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactByteArraySection(final CompactByteArray owner) throws NullPointerException {
@@ -134,7 +135,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	}
 
 	/** Diese Klasse implementiert die live {@link ByteArraySection} eines {@link CompactByteSubArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactByteSubArraySection extends ByteArraySection {
 
@@ -142,7 +143,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 		protected final CompactByteSubArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactByteSubArraySection(final CompactByteSubArray owner) throws NullPointerException {
@@ -189,7 +190,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 	}
 
 	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -199,7 +200,7 @@ public class CompactByteArray extends CompactArray<byte[], Byte> implements Byte
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.

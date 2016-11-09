@@ -5,7 +5,7 @@ package bee.creative.iam;
  * <p>
  * Die Methoden {@link #key(int)} und {@link #keyLength()} delegieren an {@link #key()}. Die Methoden {@link #value(int)} und {@link #valueLength()} delegieren
  * an {@link #value()}.
- * 
+ *
  * @see IAMMapping#entry(int)
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMEntry {
@@ -59,7 +59,7 @@ public abstract class IAMEntry {
 	{}
 
 	/** Diese Methode ein neues {@link IAMEntry} als Sicht auf den gegebenen Schlüssel sowie dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param key Schlüssel.
 	 * @param value Wert.
 	 * @return {@link IAMEntry}-Sicht auf {@code key} und {@code value}.
@@ -72,13 +72,13 @@ public abstract class IAMEntry {
 	{}
 
 	/** Diese Methode gibt den Schlüssel als Zahlenfolge zurück.
-	 * 
+	 *
 	 * @see IAMMapping#key(int)
 	 * @return Schlüssel. */
 	public abstract IAMArray key();
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Schlüssels zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see IAMMapping#key(int, int)
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Schlüssels. */
@@ -87,7 +87,7 @@ public abstract class IAMEntry {
 	}
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Schlüssels zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @see IAMMapping#keyLength(int)
 	 * @return Größe der Schlüssel. */
 	public final int keyLength() {
@@ -95,13 +95,13 @@ public abstract class IAMEntry {
 	}
 
 	/** Diese Methode gibt den Wert als Zahlenfolge zurück.
-	 * 
+	 *
 	 * @see IAMMapping#value(int)
 	 * @return Wert. */
 	public abstract IAMArray value();
 
 	/** Diese Methode gibt die {@code index}-te Zahl des Werts zurück. Bei einem ungültigen {@code index} wird {@code 0} geliefert.
-	 * 
+	 *
 	 * @see IAMMapping#value(int, int)
 	 * @param index Index der Zahl.
 	 * @return {@code index}-te Zahl des Werts. */
@@ -110,7 +110,7 @@ public abstract class IAMEntry {
 	}
 
 	/** Diese Methode gibt die Länge der Zahlenfolge des Werts zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @see IAMMapping#valueLength(int)
 	 * @return Größe der Werte. */
 	public final int valueLength() {

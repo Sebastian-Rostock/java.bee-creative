@@ -86,7 +86,7 @@ import bee.creative.util.Comparators;
  * Der Zahlenwert für die {@link #zoneValue() Zeitzone} entspricht der Zeitzonenverschiebung gegenüber UTC in Minuten. Unterstützte Zahlenwerte für die Zeitzone
  * sind {@code -840..840}.
  * </p>
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetime> {
 
@@ -100,13 +100,13 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _pattern_ = Pattern
-		.compile("^(?:(\\d{4})-(\\d{2})-(\\d{2}))?(T)?(?:(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{3}))?)?(?:(Z)|(?:([\\+\\-]\\d{2}):(\\d{2})))?$");
+	static final Pattern _pattern_ =
+		Pattern.compile("^(?:(\\d{4})-(\\d{2})-(\\d{2}))?(T)?(?:(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{3}))?)?(?:(Z)|(?:([\\+\\-]\\d{2}):(\\d{2})))?$");
 
 	{}
 
 	/** Diese Methode gibt den aktuellen Zeitpunkt zurück.
-	 * 
+	 *
 	 * @return aktueller Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime now() throws IllegalArgumentException {
@@ -114,7 +114,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt einen Zeitpunkt zurück, der die gegebene Anzahl an Millisekunden nach dem Zeitpunkt {@code 1970-01-01T00:00:00Z} liegt.
-	 * 
+	 *
 	 * @see Calendar#setTimeInMillis(long)
 	 * @param millis Anzahl der Millisekunden.
 	 * @return Zeitpunkt.
@@ -127,7 +127,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
-	 * 
+	 *
 	 * @see #withDate(int, int, int)
 	 * @see #withTime(int, int, int, int)
 	 * @see #withZone(int, int)
@@ -174,7 +174,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withDate(calendar).withTime(calendar).withZone(calendar)}.
-	 * 
+	 *
 	 * @see #withDate(Calendar)
 	 * @see #withTime(Calendar)
 	 * @see #withZone(Calendar)
@@ -188,7 +188,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDatetime.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Zeitangabe.
@@ -199,7 +199,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum zum gegebenen Kalendertag zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withDate(calendarday)}.
-	 * 
+	 *
 	 * @see #withDate(int)
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Zeitangabe mit Datum.
@@ -209,7 +209,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit dem gegebenen Datum zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withDate(year, month, date)}.
-	 * 
+	 *
 	 * @see #withDate(int, int, int)
 	 * @param year Jahr ({@code 1582..9999}).
 	 * @param month Monat ({@code 1..12}).
@@ -222,7 +222,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit der Uhrzeit zu den gegebenen Tagesmillis zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withTime(daymillis)}.
-	 * 
+	 *
 	 * @see #withTime(int)
 	 * @see #daymillisOf(int, int, int, int)
 	 * @param daymillis Tagesmillis ({@code 0..86400000}).
@@ -234,7 +234,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Uhrzeit zurück und ist eine Abkürzung für
 	 * {@code FEE_Datetime.EMPTY.withTime(hour, minute, second, millisecond)}.
-	 * 
+	 *
 	 * @see #withTime(int, int, int, int)
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
@@ -294,7 +294,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Zeitzone zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withZone(zone)}.
-	 * 
+	 *
 	 * @see #withZone(int)
 	 * @param zone Zeitzone ({@code -840..840})
 	 * @return Zeitangabe mit Zeitzone.
@@ -304,7 +304,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit der gegebenen Zeitzone zurück und ist eine Abkürzung für {@code FEE_Datetime.EMPTY.withZone(zoneHour, zoneMinute)}.
-	 * 
+	 *
 	 * @see #withZone(int, int)
 	 * @param zoneHour Stunde der Zeitzone ({@code -14..14}).
 	 * @param zoneMinute Minute der Zeitzone ({@code 0..59}).
@@ -316,7 +316,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn das gegebene Jahr ein Schaltjahr im Gregorianischen Kalender ist.<br>
 	 * Ein Schaltjahr hat 366 Tage, ein reguläres hat dagegen 365 Tage.
-	 * 
+	 *
 	 * @param year Jahr ({@code 1582..9999}).
 	 * @return {@code true} bei einem Schaltjahr.
 	 * @throws IllegalArgumentException Wenn {@code year} ungültig ist. */
@@ -339,7 +339,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>Month - 5 Bit</li>
 	 * <li>Date - 5 Bit</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param calendarday Kalendertag.
 	 * @return Jahr, Monat und Tag. */
 	static int _dateOf_(final int calendarday) {
@@ -359,7 +359,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Länge des gegebenen Monats im gegebenen Jahr zurück, d.h. die Anzahl der Tage im Monat.
-	 * 
+	 *
 	 * @see #leapOf(int)
 	 * @see #lengthOf(int, boolean)
 	 * @param month Monat ({@code 1..12}).
@@ -378,7 +378,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Länge des gegebenen Monats zurück, d.h. die Anzahl der Tage im Monat.
-	 * 
+	 *
 	 * @see #leapOf(int)
 	 * @param month Monat ({@code 1..12}).
 	 * @param leap {@code true} in einem Schaltjahr mit 366 Tagen.
@@ -395,7 +395,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Jahrestag zum gegebenen {@link #calendardayOf(int, int, int) Kalendertag} zurück.
-	 * 
+	 *
 	 * @see #calendardayOf(int, int, int)
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Jahrestag ({@code 1..366}).
@@ -415,7 +415,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Wochentag zum gegebenen {@link #calendardayOf(int, int, int) Kalendertag} zurück.
-	 * 
+	 *
 	 * @see #calendardayOf(int, int, int)
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
 	 * @return Wochentag ({@code 1..7}).
@@ -431,7 +431,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Tagesmillis zur gegebenen Uhrzeit zurück.
-	 * 
+	 *
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
 	 * @param second Sekunde ({@code 0..59}).
@@ -449,7 +449,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Kalendertag zum gegebenen Datum zurück.
-	 * 
+	 *
 	 * @param year Jahr des Datums ({@code 1582..9999}).
 	 * @param month Monat des Jahres ({@code 1..12}).
 	 * @param date Tag des Monats ({@code 1..31}).
@@ -478,7 +478,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>dateValue - 5 Bit</li>
 	 * <li>hourValue - 5 Bit</li>
 	 * <li>millisecondValue - 10 Bit</li>
-	 * </ul> */
+	 * </ul>
+	*/
 	final int _valueL_;
 
 	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Zeitangabe.
@@ -491,11 +492,12 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>secondValue - 6 Bit</li>
 	 * <li>hasDate - 1 Bit</li>
 	 * <li>hasTime - 1 Bit</li>
-	 * </ul> */
+	 * </ul>
+	*/
 	final int _valueH_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung.
-	 * 
+	 *
 	 * @see #value()
 	 * @param value interne Darstellung.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
@@ -544,14 +546,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>hourValue - 5 Bit</li>
 	 * <li>millisecondValue - 10 Bit</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return interne Darstellung der Zeitangabe. */
 	public final long value() {
 		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
 	}
 
 	/** Diese Methode gibt das Jahr zurück.
-	 * 
+	 *
 	 * @return Jahr ({@code 1582..9999}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int yearValue() throws IllegalStateException {
@@ -565,7 +567,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Tag zurück.
-	 * 
+	 *
 	 * @return Tag ({@code 1..31}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int dateValue() throws IllegalStateException {
@@ -579,7 +581,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Monat zurück.
-	 * 
+	 *
 	 * @return Monat ({@code 1..12}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
 	public final int monthValue() throws IllegalStateException {
@@ -593,7 +595,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Stunde zurück.
-	 * 
+	 *
 	 * @return Stunde ({@code 0..24}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int hourValue() throws IllegalStateException {
@@ -607,7 +609,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Minute zurück.
-	 * 
+	 *
 	 * @return Minute ({@code 0..59}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int minuteValue() throws IllegalStateException {
@@ -621,7 +623,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Sekunde zurück.
-	 * 
+	 *
 	 * @return Sekunde ({@code 0..59}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int secondValue() throws IllegalStateException {
@@ -635,7 +637,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Millisekunde zurück.
-	 * 
+	 *
 	 * @return Millisekunde ({@code 0..999}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasTime() keine Uhrzeit} besitzt. */
 	public final int millisecondValue() throws IllegalStateException {
@@ -649,7 +651,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Zeitzonenverschiebung zur UTC in Minuten zurück.
-	 * 
+	 *
 	 * @return Zeitzonenverschiebung in Minuten ({@code -840..840}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() keine Zeitzone} besitzt. */
 	public final int zoneValue() throws IllegalStateException {
@@ -663,28 +665,28 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe ein Datum besitzt.
-	 * 
+	 *
 	 * @return {@code true}, wenn diese Zeitangabe ein Datum besitzt. */
 	public final boolean hasDate() {
 		return (this._valueH_ & 0x02) != 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe eine Uhrzeit besitzt.
-	 * 
+	 *
 	 * @return {@code true}, wenn diese Zeitangabe eine Uhrzeit besitzt. */
 	public final boolean hasTime() {
 		return (this._valueH_ & 0x01) != 0;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe eine Zeitzone besitzt.
-	 * 
+	 *
 	 * @return {@code true}, wenn diese Zeitangabe eine Zeitzone besitzt. */
 	public final boolean hasZone() {
 		return (this._valueL_ & 0x80000000) != 0;
 	}
 
 	/** Diese Methode gibt den Jahrestag zurück.
-	 * 
+	 *
 	 * @see #yeardayOf(int)
 	 * @return Jahrestag ({@code 1..366}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
@@ -693,7 +695,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Wochentag zurück.
-	 * 
+	 *
 	 * @see #weekdayOf(int)
 	 * @return Wochentag ({@code 1..7}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
@@ -702,7 +704,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Tagesmillis zurück.
-	 * 
+	 *
 	 * @see #daymillisOf(int, int, int, int)
 	 * @return Tagesmillis ({@code 0..86400000}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
@@ -717,7 +719,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Kalendertag zurück.
-	 * 
+	 *
 	 * @see #calendardayOf(int, int, int)
 	 * @return Kalendertag ({@code 0..3074323}).
 	 * @throws IllegalStateException Wenn diese Zeitangabe {@link #hasDate() kein Datum} besitzt. */
@@ -732,7 +734,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit dem Datum zum gegebenen Kalendertag zurück.
-	 * 
+	 *
 	 * @see #calendardayOf(int, int, int)
 	 * @see #withoutDate()
 	 * @param calendarday Kalendertag ({@code 0..3074323}).
@@ -745,7 +747,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit dem gegebenen Datum zurück.
-	 * 
+	 *
 	 * @see #withoutDate()
 	 * @param year Jahr ({@code 1582..9999}).
 	 * @param month Monat ({@code 1..12}).
@@ -760,7 +762,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Diese Methode gibt diese Zeitangabe mit dem Datum des gegebenen {@link Calendar} zurück.<br>
 	 * Die gelieferte Zeitangabe {@link #hasDate() besitzt} nur dann ein Datum, wenn am gegebenen {@link Calendar} die Felder {@link Calendar#YEAR},
 	 * {@link Calendar#MONTH} und {@link Calendar#DATE} definiert sind. Andernfalls hat die gelieferte Zeitangabe kein Datum.
-	 * 
+	 *
 	 * @see #withoutDate()
 	 * @param calendar Datum.
 	 * @return Zeitangabe mit oder ohne Datum.
@@ -773,7 +775,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit dem Datum der gegebenen Zeitangabe zurück.<br>
 	 * Wenn die gegebene Zeitangabe kein Datum {@link #hasDate() besitzt}, hat die gelieferte Zeitangabe auch kein Datum.
-	 * 
+	 *
 	 * @see #withoutDate()
 	 * @param datetime Datum.
 	 * @return Zeitangabe mit oder ohne Datum.
@@ -791,7 +793,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit zu den gegebenen Tagesmillis zurück.
-	 * 
+	 *
 	 * @see #daymillisOf(int, int, int, int)
 	 * @see #withoutTime()
 	 * @param daymillis Tagesmillis ({@code 0..86400000}).
@@ -803,7 +805,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Uhrzeit zurück.
-	 * 
+	 *
 	 * @see #withoutTime()
 	 * @param hour Stunde ({@code 0..24}).
 	 * @param minute Minute ({@code 0..59}).
@@ -819,7 +821,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit des gegebenen {@link Calendar} zurück.<br>
 	 * Die gelieferte Zeitangabe {@link #hasTime() besitzt} nur dann eine Uhrzeit, wenn am gegebenen {@link Calendar} die Felder {@link Calendar#HOUR_OF_DAY},
 	 * {@link Calendar#MINUTE} und {@link Calendar#SECOND} definiert sind. Andernfalls hat die gelieferte Zeitangabe keine Uhrzeit.
-	 * 
+	 *
 	 * @see #withoutTime()
 	 * @param calendar Uhrzeit.
 	 * @return Zeitangabe mit oder ohne Datum.
@@ -832,7 +834,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit der Uhrzeit der gegebenen Zeitangabe zurück.<br>
 	 * Wenn die gegebene Zeitangabe keine Uhrzeit {@link #hasTime() besitzt}, hat die gelieferte Zeitangabe auch keine Uhrzeit.
-	 * 
+	 *
 	 * @see #withoutTime()
 	 * @param datetime Uhrzeit.
 	 * @return Zeitangabe mit oder ohne Uhrzeit.
@@ -859,7 +861,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
 	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
-	 * 
+	 *
 	 * @see #moveZone(int, int)
 	 * @see #withoutZone()
 	 * @param zone Zeitzone ({@code -840..840})
@@ -873,7 +875,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit der gegebenen Zeitzone zurück.<br>
 	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.
-	 * 
+	 *
 	 * @see #withoutZone()
 	 * @param zoneHour Stunde der Zeitzone ({@code -14..14}).
 	 * @param zoneMinute Minute der Zeitzone ({@code 0..59}).
@@ -894,7 +896,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone des gegebenen {@link Calendar} zurück.<br>
 	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.<br>
 	 * Wenn am gegebenen {@link Calendar} das Feld {@link Calendar#ZONE_OFFSET} undefiniert ist, hat die gelieferte Zeitangabe keine Zeitzone.
-	 * 
+	 *
 	 * @see #withoutZone()
 	 * @param calendar Zeitzone.
 	 * @return Zeitangabe mit oder ohne Zeitzone.
@@ -909,7 +911,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Diese Methode gibt diese Zeitangabe mit der Zeitzone der gegebenen Zeitangabe zurück.<br>
 	 * Wenn diese Zeitangabe bereits eine Zeitzone besitzt, werden Uhrzeit und Datum sofern vorhanden entsprechend angepasst.<br>
 	 * Wenn die gegebene Zeitangabe keine Zeitzone {@link #hasZone() besitzt}, hat die gelieferte Zeitangabe auch keine Zeitzone.
-	 * 
+	 *
 	 * @see #withoutZone()
 	 * @param datetime Zeitzone.
 	 * @return Zeitangabe mit oder ohne Zeitzone.
@@ -927,7 +929,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Datum zurück.
-	 * 
+	 *
 	 * @see #withDate(int)
 	 * @see #withDate(int, int, int)
 	 * @see #withDate(Calendar)
@@ -939,7 +941,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Uhrzeit zurück.
-	 * 
+	 *
 	 * @see #withTime(int)
 	 * @see #withTime(int, int, int, int)
 	 * @see #withTime(Calendar)
@@ -951,7 +953,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe ohne Zeitzone zurück.
-	 * 
+	 *
 	 * @see #withZone(int)
 	 * @see #withZone(int, int)
 	 * @see #withZone(Calendar)
@@ -964,7 +966,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobenem Zeitpunkt zurück.<br>
 	 * Sie ist eine Abkürzung für {@code this.moveDate(duration).moveTime(duration)}.
-	 * 
+	 *
 	 * @see #moveDate(FEMDuration)
 	 * @see #moveTime(FEMDuration)
 	 * @param duration Zeitspanne.
@@ -987,7 +989,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>Der Tag wird gemäß der gegebenen Anzahl an Tagen ({@code days}) verschoben. Dadurch können sich Jahr und Monat nochmals ändern.</li>
 	 * </ul>
 	 * </p>
-	 * 
+	 *
 	 * @param years Anzahl der Jahre ({@code -8417..8417}).
 	 * @param months Anzahl der Monate ({@code -101015..101015}).
 	 * @param days Anzahl der Tage ({@code -3074323..3074323}).
@@ -1004,7 +1006,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobenem Datum zurück.
-	 * 
+	 *
 	 * @see #moveDate(int, int, int)
 	 * @param duration Zeitspanne.
 	 * @return Zeitangabe mit verschobenem Datum.
@@ -1034,7 +1036,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
 	 * durations to dateTimes</a>.
 	 * </p>
-	 * 
+	 *
 	 * @see #moveDate(int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
 	 * @param minutes Anzahl der Minuten.
@@ -1043,8 +1045,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe mit verschobener Uhrzeit.
 	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveTime(final int hours, final int minutes, final int seconds, final int milliseconds) throws IllegalStateException,
-		IllegalArgumentException {
+	public final FEMDatetime moveTime(final int hours, final int minutes, final int seconds, final int milliseconds)
+		throws IllegalStateException, IllegalArgumentException {
 		if (!this.hasTime()) throw new IllegalStateException();
 		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
 		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
@@ -1057,7 +1059,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * Die Verschiebung erfolgt gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#adding-durations-to-dateTimes">XML Schema Part 2: §E Adding
 	 * durations to dateTimes</a>.
 	 * </p>
-	 * 
+	 *
 	 * @see #moveDate(int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -73783776..73783775}).
 	 * @param minutes Anzahl der Minuten ({@code -4427026560..4427026559}).
@@ -1066,8 +1068,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitangabe mit verschobener Uhrzeit.
 	 * @throws IllegalStateException Wenn diese Zeitangabe keine Uhrzeit besitzt.
 	 * @throws IllegalArgumentException Wenn die Verschiebung zu einer ungültigen Zeitangabe führen würde. */
-	public final FEMDatetime moveTime(final int hours, final long minutes, final long seconds, final long milliseconds) throws IllegalStateException,
-		IllegalArgumentException {
+	public final FEMDatetime moveTime(final int hours, final long minutes, final long seconds, final long milliseconds)
+		throws IllegalStateException, IllegalArgumentException {
 		if (!this.hasTime()) throw new IllegalStateException();
 		if ((hours == 0) && (minutes == 0) && (seconds == 0) && (milliseconds == 0)) return this;
 		if ((hours < -73783776) || (hours > 73783775)) throw new IllegalArgumentException();
@@ -1078,7 +1080,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Uhrzeit zurück.
-	 * 
+	 *
 	 * @see #moveTime(int, int, int, int)
 	 * @param duration Zeitspanne.
 	 * @return verschobener Zeitpunkt.
@@ -1104,7 +1106,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe mit verschobener Zeitzone zurück.<br>
 	 * Wenn die Zeitangabe eine Uhrzeit {@link #hasTime() besitzt}, wird diese falls nötig ebenfalls verschoben.
-	 * 
+	 *
 	 * @see #moveTime(int, int, int, int)
 	 * @param hours Anzahl der Stunden ({@code -28..28}).
 	 * @param minutes Anzahl der Minuten ({@code -1680..1680}).
@@ -1132,14 +1134,14 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		return this._valueH_ ^ this._valueL_;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeitangabe effektiv gleich der gegebenen ist.
-	 * 
+	 *
 	 * @see #compare(FEMDatetime, int)
 	 * @param that Zeitangabe.
 	 * @return Gleichheit.
@@ -1148,8 +1150,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		return ((this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_)) || (this.compare(that, 1) == 0);
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitangabe früher, gleich bzw. später als die gegebene Zeitangabe ist. Wenn die
-	 * Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn diese Zeitangabe früher, gleich bzw. später als die gegebene Zeitangabe ist. Wenn
+	 * die Zeitangaben nicht vergleichbar sind, wird {@code undefined} geliefert.
 	 * <p>
 	 * Der Vergleich erfolgt für Zeitangaben mit Datum und/oder Uhrzeit gemäß <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#dateTime-order">XML
 	 * Schema Part 2: 3.2.7.3 Order relation on dateTime</a>:
@@ -1157,7 +1159,8 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>Verschieben beider Zeitangaben auf Zeitzone {@code 00:00}. Zeitangaben mit Datum und ohne Uhrzeit werden hierbei so behandelt, als hätten sie die
 	 * Uhrzeit {@code 00:00:00}. Damit sinkt der {@link #calendardayValue()} nur dann um {@code 1}, wenn der {@link #zoneValue()} größer als {@code 0} ist.</li>
 	 * <li>Wenn nur eine der Zeitangaben ein Datum besitzt, wird {@code undefined} geliefert.</li>
-	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird das Vorzeichen dieser Differenz geliefert.</li>
+	 * <li>Wenn beide ein Datum besitzen und die Differenz von {@link #calendardayValue()} ungleich {@code 0} ist, wird das Vorzeichen dieser Differenz
+	 * geliefert.</li>
 	 * <li>Wenn nur eine der Zeitangaben eine Uhrzeit besitzt, wird {@code undefined} geliefert.</li>
 	 * <li>Wenn beide eine Uhrzeit besitzen, wird das Vorzeichen der Differenz von {@link #daymillisValue()} geliefert.</li>
 	 * <li>Andernfalls wird {@code 0} geliefert.</li>
@@ -1171,7 +1174,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * <li>Andernfalls wird {@code 0} geliefert.</li>
 	 * </ul>
 	 * </p>
-	 * 
+	 *
 	 * @param that Zeitangabe.
 	 * @param undefined Rückgabewert für nicht vergleichbare Zeitangaben.
 	 * @return Vergleichswert oder {@code undefined}.
@@ -1242,7 +1245,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt diese Zeitangabe als {@link Calendar} zurück.
-	 * 
+	 *
 	 * @return {@link Calendar}. */
 	public final GregorianCalendar toCalendar() {
 		final GregorianCalendar result = new GregorianCalendar();
@@ -1321,9 +1324,9 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Zeitangabe zurück.<br>
-	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#dateTime-lexical-representation">xsd:dateTime</a> aus <a
-	 * href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
-	 * 
+	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#dateTime-lexical-representation">xsd:dateTime</a> aus
+	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
+	 *
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {

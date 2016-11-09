@@ -14,7 +14,7 @@ import bee.creative.util.IO;
  * Die Methoden {@link #get(int)}, {@link #length()} und {@link #section(int, int)} liefern in dieser Basisklasse immer {@code 0} bzw. {@code this}.<br>
  * Zur Interpretation des Speicherbereichs muss eine entsprechende, über {@link #toINT8()}, {@link #toUINT8()}, {@link #toINT16()}, {@link #toUINT16()} oder
  * {@link #toINT32()} erzeugte Sicht verwendet werden.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class MMFArray extends IAMArray {
 
@@ -26,7 +26,7 @@ public class MMFArray extends IAMArray {
 	/** Diese Methode erzeugt aus dem gegebenen Objekt ein {@link MMFArray} und gibt dieses zurück.<br>
 	 * Wenn das Objekt ein {@link MMFArray} ist, wird dieses geliefert. Andernfalls wird das Objekt in einen {@link ByteBuffer} {@link IO#inputBufferFrom(Object)
 	 * überführt}.
-	 * 
+	 *
 	 * @see IO#inputBufferFrom(Object)
 	 * @see MMFArray#MMFArray(ByteBuffer)
 	 * @param object Objekt.
@@ -61,7 +61,7 @@ public class MMFArray extends IAMArray {
 	protected final int _byteLength_;
 
 	/** Dieser Konstruktor initialisiert den Speicherbereich.
-	 * 
+	 *
 	 * @param buffer Speicherbereich.
 	 * @throws NullPointerException Wenn {@code buffer} {@code null} ist. */
 	public MMFArray(final ByteBuffer buffer) throws NullPointerException {
@@ -70,7 +70,7 @@ public class MMFArray extends IAMArray {
 
 	/** Dieser Konstruktor initialisiert den Speicherbereich mit dem aus der gegebene Datei und der gegebenen Bytereihenfolge erzeugten {@link MappedByteBuffer}.
 	 * Wenn die Bytereihenfolge {@code null} ist, wird die native Bytereihenfolge verwendet.
-	 * 
+	 *
 	 * @param file Datei.
 	 * @param order Bytereihenfolge oder {@code null} für {@link ByteOrder#nativeOrder()}.
 	 * @throws IOException Wenn die Datei nicht geöffnet werden kann.
@@ -81,7 +81,7 @@ public class MMFArray extends IAMArray {
 
 	/** Dieser Konstruktor initialisiert den Speicherbereich mit dem aus den gegebenen Bytes erzeugten {@link ByteBuffer}. Wenn die Bytereihenfolge {@code null}
 	 * ist, wird die native Bytereihenfolge verwendet.
-	 * 
+	 *
 	 * @param bytes Bytes.
 	 * @param order Bytereihenfolge oder {@code null} für {@link ByteOrder#nativeOrder()}.
 	 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
@@ -90,8 +90,8 @@ public class MMFArray extends IAMArray {
 	}
 
 	@SuppressWarnings ("javadoc")
-	protected MMFArray(final int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength) throws NullPointerException,
-		IllegalArgumentException {
+	protected MMFArray(final int length, final ByteBuffer byteBuffer, final int byteOffset, final int byteLength)
+		throws NullPointerException, IllegalArgumentException {
 		super(length);
 		this._byteBuffer_ = byteBuffer;
 		this._byteOffset_ = byteOffset;
@@ -101,16 +101,16 @@ public class MMFArray extends IAMArray {
 	{}
 
 	/** Diese Methode gibt Anzahl der Byte je Zahl der Folge zurück.<br>
-	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie
-	 * {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
-	 * 
+	 * Diese Anzahl ist {@code 0} für eine unspezifische Interpretation, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}-
+	 * sowie {@code UINT16}-Zahlen und {@code 4} für {@code UINT32}-Zahlen.
+	 *
 	 * @return Anzahl der Byte je Zahl der Folge (0..4). */
 	public int mode() {
 		return 0;
 	}
 
 	/** Diese Methode gibt die Bytereihenfolge des internen {@link ByteBuffer} zurück.
-	 * 
+	 *
 	 * @see #withOrder(ByteOrder)
 	 * @see ByteBuffer#order()
 	 * @return Bytereihenfolge. */
@@ -119,7 +119,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt eine Kopie des Speicherbereichs als {@code byte[]} zurück.
-	 * 
+	 *
 	 * @return Kopie des Speicherbereichs. */
 	public final byte[] toBytes() {
 		final int length = this._byteLength_;
@@ -137,7 +137,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT8}-Zahlen ({@code byte}) interpretiert zurück.
-	 * 
+	 *
 	 * @see ByteBuffer#get(int)
 	 * @return {@link MMFINT8Array}. */
 	public final MMFArray toINT8() {
@@ -145,7 +145,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT16}-Zahlen ({@code short}) interpretiert zurück.
-	 * 
+	 *
 	 * @see ByteBuffer#getShort()
 	 * @return {@link MMFINT16Array}. */
 	public final MMFArray toINT16() {
@@ -153,7 +153,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code INT32}-Zahlen ({@code int}) interpretiert zurück.
-	 * 
+	 *
 	 * @see ByteBuffer#getInt()
 	 * @return {@link MMFINT32Array}. */
 	public final MMFArray toINT32() {
@@ -161,7 +161,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT8}-Zahlen ({@code unsigned byte}) interpretiert zurück.
-	 * 
+	 *
 	 * @see ByteBuffer#get()
 	 * @return {@link MMFUINT8Array}. */
 	public final MMFArray toUINT8() {
@@ -169,7 +169,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt den Speicherbereich dieser Zahlenfolge als Folge von {@code UINT16}-Zahlen ({@code unsigned short}) interpretiert zurück.
-	 * 
+	 *
 	 * @see ByteBuffer#getShort()
 	 * @return {@link MMFUINT16Array}. */
 	public final MMFArray toUINT16() {
@@ -177,7 +177,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt eine Kopie dieses {@link MMFArray} mit der gegebenen Bytereihenfolge zurück.
-	 * 
+	 *
 	 * @see #order()
 	 * @see ByteBuffer#order()
 	 * @param order Bytereihenfolge.
@@ -187,7 +187,7 @@ public class MMFArray extends IAMArray {
 	}
 
 	/** Diese Methode gibt eine Kopie dieses {@link MMFArray} mit umgekehrter Bytereihenfolge zurück.
-	 * 
+	 *
 	 * @see #order()
 	 * @see #withOrder(ByteOrder)
 	 * @return {@link MMFArray}. */

@@ -7,7 +7,7 @@ import bee.creative.util.Comparators;
 import bee.creative.util.Unique.UniqueMap;
 
 /** Diese Klasse implementiert Klassen und Methoden zur erzeugung der {code Integer Array Model} Datenstrukturen.
- * 
+ *
  * @see IAMIndexBuilder
  * @see IAMListingBuilder
  * @see IAMMappingBuilder
@@ -15,7 +15,7 @@ import bee.creative.util.Unique.UniqueMap;
 public class IAMBuilder {
 
 	/** Diese Klasse implementiert ein Element einer {@link UniqueItemPool} eines {@link IAMListingBuilder}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class ItemData {
 
@@ -28,7 +28,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert ein Element einer {@link UniqueEntryPool} eines {@link IAMMappingBuilder}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class EntryData {
 
@@ -44,7 +44,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert eine abstrakte {@link UniqueMap} mit Zahlenlisten als Eingabe.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Nutzdaten (Ausgabe). */
 	static abstract class UniquePool<GData> extends UniqueMap<int[], GData> {
@@ -55,7 +55,7 @@ public class IAMBuilder {
 		{}
 
 		/** Diese Methode erzeugt einen neuen Nutzdatensatz und gibt diesen zurück.
-		 * 
+		 *
 		 * @param index Index, unter dem der Nutzdatensatz in {@link #datas} verwaltet wird.
 		 * @param array Zahlenliste.
 		 * @return Nutzdatensatz. */
@@ -63,7 +63,7 @@ public class IAMBuilder {
 
 		/** Diese Methode nimmt einen neuen Nutzdatensatz mit der gegebenen Zahlenliste in die Verwaltung auf und gibt den Index zurück, unter dem diese in
 		 * {@link #datas} verwaltet werden.
-		 * 
+		 *
 		 * @param array Zahlenliste.
 		 * @return Nutzdatensatz.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -142,7 +142,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert einen modifizierbaren {@link IAMIndex}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMIndexBuilder extends IAMIndex {
 
@@ -159,7 +159,7 @@ public class IAMBuilder {
 		{}
 
 		/** Diese Methode fügt das gegebene {@link IAMMapping} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
-		 * 
+		 *
 		 * @param mapping {@link IAMMapping}.
 		 * @return Index des {@link IAMMapping}.
 		 * @throws NullPointerException Wenn {@code mapping} {@code null} ist. */
@@ -171,7 +171,7 @@ public class IAMBuilder {
 		}
 
 		/** Diese Methode fügt das gegebene {@link IAMListing} hinzu und gibt den Index zurück, unter dem dieses verwaltet wird.
-		 * 
+		 *
 		 * @param listing {@link IAMListingBuilder}.
 		 * @return Index des {@link IAMListing}.
 		 * @throws NullPointerException Wenn {@code listing} {@code null} ist. */
@@ -219,7 +219,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert ein modifizierbares {@link IAMListing}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMListingBuilder extends IAMListing {
 
@@ -234,7 +234,7 @@ public class IAMBuilder {
 
 		/** Diese Methode gibt das modifizierbare {@code int}-Array des {@code itemIndex}-te Elements zurück.<br>
 		 * Dieses Array sollte nur dann verändert werden, wenn es über {@link #put(int[], boolean)} ohne Wiederverwendung hunzugefügt wurde.
-		 * 
+		 *
 		 * @see #put(int[], boolean)
 		 * @see #itemCount()
 		 * @param itemIndex Index des Elements.
@@ -248,7 +248,7 @@ public class IAMBuilder {
 		 * Daten existiert, wird dessen Index zurück gegeben.
 		 * <p>
 		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
-		 * 
+		 *
 		 * @see #put(int[], boolean)
 		 * @param value Element.
 		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
@@ -261,7 +261,7 @@ public class IAMBuilder {
 		 * und bereits ein Element mit dem gleichen Daten existiert, wird dessen Index zurück gegeben.
 		 * <p>
 		 * <u>Achtung:</u> Der Index ist garantiert der gleiche, der im {@link IAMListingLoader} verwerden wird.
-		 * 
+		 *
 		 * @param value Element.
 		 * @param reuse {@code true}, wenn die Wiederverwendung aktiviert ist.
 		 * @return Index, unter dem die Zahlenliste in der optimierten Datenstruktur registriert ist.
@@ -295,7 +295,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Klasse implementiert ein modifizierbares {@link IAMMapping}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMMappingBuilder extends IAMMapping {
 
@@ -312,7 +312,7 @@ public class IAMBuilder {
 		{}
 
 		/** Diese Methode gibt das modifizierbare {@code int}-Array des Werts des {@code entryIndex}-ten Eintrags zurück.
-		 * 
+		 *
 		 * @see #entryCount()
 		 * @param entryIndex Index des Eintrags.
 		 * @return {@code int}-Array des Werts des {@code entryIndex}-ten Eintrags.
@@ -323,7 +323,7 @@ public class IAMBuilder {
 
 		/** Diese Methode fügt einen Eintrag mit dem gegebenen Schlüssel sowie dem gegebenen Wert hinzu. Wenn bereits ein Eintrag mit diesem Schlüssel existiert,
 		 * wird dessen Wert ersetzt.
-		 * 
+		 *
 		 * @param key Schlüssel.
 		 * @param value Wert.
 		 * @throws NullPointerException Wenn {@code key} bzw. {@code value} {@code null} ist. */
@@ -340,7 +340,7 @@ public class IAMBuilder {
 		}
 
 		/** Diese Methode setzt den Modus.
-		 * 
+		 *
 		 * @see #MODE_HASHED
 		 * @see #MODE_SORTED
 		 * @param mode Modus. */
@@ -389,7 +389,7 @@ public class IAMBuilder {
 	{}
 
 	/** Diese Methode gibt den Streuwert der gegebenen Zahlenfolge zurück.
-	 * 
+	 *
 	 * @see IAMArray#hash()
 	 * @param array Zahlenfolge.
 	 * @return Streuwert.
@@ -403,7 +403,7 @@ public class IAMBuilder {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Zahlenfolgen gleich sind.
-	 * 
+	 *
 	 * @see IAMArray#equals(IAMArray)
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.
@@ -419,7 +419,7 @@ public class IAMBuilder {
 
 	/** Diese Methode gibt eine Zahl kleiner, gleich oder größer als {@code 0} zurück, wenn die Ordnung der ersten Zahlenfolge lexikografisch kleiner, gleich bzw.
 	 * größer als die der zweiten Zahlenfolge ist.
-	 * 
+	 *
 	 * @see IAMArray#compare(IAMArray)
 	 * @param array1 erste Zahlenfolge.
 	 * @param array2 zweite Zahlenfolge.

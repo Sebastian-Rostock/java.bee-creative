@@ -15,7 +15,7 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link TransformerFactory} zur Erzeugung von {@link Templates} oder eines
  * {@link Transformer}.
- * 
+ *
  * @see TransformerFactory#newTemplates(Source)
  * @see TransformerFactory#newTransformer()
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -23,14 +23,14 @@ import bee.creative.util.Objects;
 public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<TransformerFactory, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link TransformerFactory}.
-	 * 
+	 *
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
@@ -45,14 +45,14 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Attribute einer {@link TransformerFactory}.
-	 * 
+	 *
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, String, AttributeData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
 
@@ -67,14 +67,14 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link ErrorListener}.
-	 * 
+	 *
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ListenerData<GOwner> extends BaseValueBuilder<ErrorListener, ListenerData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeListenerData();
 
@@ -89,14 +89,14 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link URIResolver}.
-	 * 
+	 *
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ResolverData<GOwner> extends BaseValueBuilder<URIResolver, ResolverData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeResolverData();
 
@@ -158,7 +158,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerFactoryData<?> data) {
@@ -174,7 +174,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	/** Diese Methode gibt die {@link TransformerFactory} zurück.<br>
 	 * Wenn über {@link #useFactory(TransformerFactory)} noch keine {@link TransformerFactory} gesetzt wurde, wird über {@link TransformerFactory#newInstance()}
 	 * eine neue erstellt, über {@link #useFactory(TransformerFactory)} gesetzt und über {@link #updateFactory()} aktualisiert.
-	 * 
+	 *
 	 * @see #useFactory(TransformerFactory)
 	 * @see #updateFactory()
 	 * @return {@link TransformerFactory}.
@@ -189,7 +189,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode setzt die {@link TransformerFactory} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param factory {@link TransformerFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final TransformerFactory factory) {
@@ -198,7 +198,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode setzt die {@link TransformerFactory} auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useFactory(TransformerFactory)
 	 * @return {@code this}. */
 	public final GThis resetFactory() {
@@ -208,7 +208,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	/** Diese Methode aktualisiert die Einstellungen der {@link TransformerFactory} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link TransformerFactory} die Einstellungen übertragen, die in
 	 * {@link #openListenerData()}, {@link #openResolverData()}, {@link #openFeatureData()} und {@link #openAttributeData()} konfiguriert sind.
-	 * 
+	 *
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link TransformerFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateFactory() throws TransformerConfigurationException {
@@ -229,7 +229,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
-	 * 
+	 *
 	 * @see TransformerFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
@@ -237,7 +237,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Attribute der und gibt ihn zurück.
-	 * 
+	 *
 	 * @see TransformerFactory#setAttribute(String, Object)
 	 * @return Konfigurator. */
 	public final AttributeData<GThis> openAttributeData() {
@@ -245,7 +245,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link ErrorListener} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see TransformerFactory#setErrorListener(ErrorListener)
 	 * @return Konfigurator. */
 	public final ListenerData<GThis> openListenerData() {
@@ -253,7 +253,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link URIResolver} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see TransformerFactory#setURIResolver(URIResolver)
 	 * @return Konfigurator. */
 	public final ResolverData<GThis> openResolverData() {
@@ -267,7 +267,7 @@ public abstract class BaseTransformerFactoryData<GThis> extends BaseBuilder<Tran
 	protected abstract GThis _this_();
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getFactory() */
 	@Override
 	public final TransformerFactory build() throws IllegalStateException {

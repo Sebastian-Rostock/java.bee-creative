@@ -15,7 +15,7 @@ import bee.creative.array.Array;
  * <p>
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt beide {@link Map}s in etwa die gleichen Rechenzeiten, unabhängig von der Anzahl der
  * Elemente.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -25,7 +25,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	protected final CompactDataArray values;
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} bzw. die gegebene {@link Map} {@code null} ist. */
 	public CompactNavigableEntryMap(final Comparator<? super GKey> comparator) throws NullPointerException {
@@ -34,7 +34,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
@@ -46,7 +46,7 @@ public class CompactNavigableEntryMap<GKey, GValue> extends CompactNavigableMap<
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.

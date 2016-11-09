@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /** Diese Klasse implementiert die {@link DataSource}-Schnittstelle zu einem {@link RandomAccessFile}.
- * 
+ *
  * @see RandomAccessFile
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FileDataSource extends BaseDataSource {
@@ -15,7 +15,7 @@ public class FileDataSource extends BaseDataSource {
 	final RandomAccessFile _data_;
 
 	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen {@link File} im Modus {@code "r"}.
-	 * 
+	 *
 	 * @see RandomAccessFile#RandomAccessFile(File, String)
 	 * @param file {@link File}.
 	 * @throws FileNotFoundException Wenn der Dateiname ungültig ist. */
@@ -24,7 +24,7 @@ public class FileDataSource extends BaseDataSource {
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile} mit dem gegebenen Dateinamen im Modus {@code "r"}.
-	 * 
+	 *
 	 * @see RandomAccessFile#RandomAccessFile(String, String)
 	 * @param name Dateiname.
 	 * @throws FileNotFoundException Wenn der Dateiname ungültig ist. */
@@ -33,7 +33,7 @@ public class FileDataSource extends BaseDataSource {
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link RandomAccessFile}.
-	 * 
+	 *
 	 * @param file {@link RandomAccessFile}.
 	 * @throws NullPointerException Wenn das {@link RandomAccessFile} {@code null} ist. */
 	public FileDataSource(final RandomAccessFile file) throws NullPointerException {

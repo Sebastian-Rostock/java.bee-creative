@@ -15,7 +15,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /** Diese Klasse implementiert eine abstrakte {@link NavigableMap}, deren Daten in einem Array verwaltet werden.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GKey> Typ der Schlüssel.
  * @param <GValue> Typ der Werte. */
@@ -23,7 +23,7 @@ import java.util.SortedSet;
 public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey, GValue> implements NavigableMap<GKey, GValue> {
 
 	/** Diese Klasse implementiert die anstrakte Menge der Schlüssel einer {@link NavigableMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GData> Typ der {@link NavigableMap}. */
@@ -33,7 +33,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		protected final GData data;
 
 		/** Dieser Konstruktor initialisiert die {@link NavigableMap}.
-		 * 
+		 *
 		 * @param data {@link NavigableMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link NavigableMap} {@code null} ist. */
 		public AbstractNavigableKeySet(final GData data) throws NullPointerException {
@@ -44,7 +44,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		{}
 
 		/** Diese Methode gibt den Schlüssel des gegebenen {@link ItemEntry}s oder {@code null} zurück.
-		 * 
+		 *
 		 * @param entry {@link ItemEntry}.
 		 * @return Schlüssel oder {@code null}. */
 		protected final GKey getKeyOrNull(final Entry<GKey, ?> entry) {
@@ -191,13 +191,13 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactNavigableMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
 	protected static final class CompactNavigableKeySet<GKey> extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap<GKey, ?>> {
 
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap}.
-		 * 
+		 *
 		 * @param data {@link CompactNavigableMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link CompactNavigableMap} {@code null} ist. */
 		public CompactNavigableKeySet(final CompactNavigableMap<GKey, ?> data) throws NullPointerException {
@@ -215,14 +215,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert die aufsteigende Menge der Schlüssel einer {@link CompactAscendingSubMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
-	protected static final class CompactAscendingKeySet<GKey> extends
-		CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactAscendingSubMap<GKey, ?>> {
+	protected static final class CompactAscendingKeySet<GKey>
+		extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactAscendingSubMap<GKey, ?>> {
 
 		/** Dieser Konstruktor initialisiert die {@link CompactAscendingSubMap}.
-		 * 
+		 *
 		 * @param data {@link CompactAscendingSubMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link CompactAscendingSubMap} {@code null} ist. */
 		public CompactAscendingKeySet(final CompactNavigableMap.CompactAscendingSubMap<GKey, ?> data) throws NullPointerException {
@@ -240,14 +240,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert die abfsteigende Menge der Schlüssel einer {@link CompactDescendingSubMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel. */
-	protected static final class CompactDescendingKeySet<GKey> extends
-		CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactDescendingSubMap<GKey, ?>> {
+	protected static final class CompactDescendingKeySet<GKey>
+		extends CompactNavigableMap.AbstractNavigableKeySet<GKey, CompactNavigableMap.CompactDescendingSubMap<GKey, ?>> {
 
 		/** Dieser Konstruktor initialisiert die {@link CompactDescendingSubMap}.
-		 * 
+		 *
 		 * @param data {@link CompactDescendingSubMap}.
 		 * @throws NullPointerException Wenn die gegebene {@link CompactDescendingSubMap} {@code null} ist. */
 		public CompactDescendingKeySet(final CompactNavigableMap.CompactDescendingSubMap<GKey, ?> data) throws NullPointerException {
@@ -265,15 +265,15 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert eine abstrakte Teilmenge einer {@link CompactNavigableMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
-	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends CompactSubData<CompactNavigableMap<GKey, GValue>> implements
-		NavigableMap<GKey, GValue> {
+	protected static abstract class CompactNavigableSubMap<GKey, GValue> extends CompactSubData<CompactNavigableMap<GKey, GValue>>
+		implements NavigableMap<GKey, GValue> {
 
 		/** Diese Klasse implementiert ein {@link AbstractSet}, das seine Schnittstelle an die Einträge einer {@link CompactNavigableSubMap} delegiert.
-		 * 
+		 *
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GKey> Typ der Schlüssel.
 		 * @param <GValue> Typ der Werte. */
@@ -283,7 +283,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			protected final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data;
 
 			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
-			 * 
+			 *
 			 * @param data {@link CompactNavigableSubMap}. */
 			public EntrySet(final CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> data) {
 				this.data = data;
@@ -311,7 +311,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		}
 
 		/** Diese Klasse implementiert ein {@link AbstractCollection}, das seine Schnittstelle an die Werte einer {@link CompactNavigableSubMap} delegiert.
-		 * 
+		 *
 		 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 		 * @param <GValue> Typ der Werte. */
 		protected static final class ValueCollection<GValue> extends AbstractCollection<GValue> {
@@ -320,7 +320,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 			protected final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data;
 
 			/** Dieser Konstruktor initialisiert die {@link CompactNavigableSubMap}.
-			 * 
+			 *
 			 * @param data {@link CompactNavigableSubMap}. */
 			public ValueCollection(final CompactNavigableMap.CompactNavigableSubMap<?, GValue> data) {
 				this.data = data;
@@ -351,7 +351,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 		{}
 
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param map {@link CompactNavigableMap}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -489,14 +489,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert die aufsteigende Teilmenge einer {@link CompactNavigableMap} .
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
 	protected static final class CompactAscendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
 		/** Dieser Konstruktor initialisiert die {@link CompactNavigableMap} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param map {@link CompactNavigableMap}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -638,14 +638,14 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Klasse implementiert die absteigende Teilmenge einer {@link CompactNavigableMap}.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GKey> Typ der Schlüssel.
 	 * @param <GValue> Typ der Werte. */
 	protected static final class CompactDescendingSubMap<GKey, GValue> extends CompactNavigableMap.CompactNavigableSubMap<GKey, GValue> {
 
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param map {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -794,7 +794,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	protected final Comparator<? super GKey> comparator;
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableMap(final Comparator<? super GKey> comparator) throws NullPointerException {
@@ -803,7 +803,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
@@ -815,7 +815,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
@@ -831,7 +831,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	{}
 
 	/** Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-te Element oder {@code null}. */
 	protected final Entry<GKey, GValue> poll(final int index) {
@@ -842,7 +842,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Schlüssel oder {@code null} zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Schlüssel oder {@code null}. */
 	protected final GKey getKeyOrNull(final int index) {
@@ -851,7 +851,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Methode gibt das {@code index}-te Element oder {@code null} zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element oder {@code null}. */
 	protected final Entry<GKey, GValue> getEntryOrNull(final int index) {
@@ -860,7 +860,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Methode gibt den {@code index}-ten Schlüssel zurück oder wirft eine {@link NoSuchElementException}.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Schlüssel.
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist. */
@@ -870,7 +870,7 @@ public abstract class CompactNavigableMap<GKey, GValue> extends CompactMap<GKey,
 	}
 
 	/** Diese Methode gibt das {@code index}-te Element zurück oder wirft eine {@link NoSuchElementException}.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element.
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist. */

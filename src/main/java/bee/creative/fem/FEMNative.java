@@ -3,7 +3,7 @@ package bee.creative.fem;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Wert mit einem beliebigen nativen Objekt als {@link #data() Nutzdaten}.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMNative extends FEMValue {
 
@@ -26,7 +26,7 @@ public final class FEMNative extends FEMValue {
 
 	/** Diese Methode gibt das native Objekt als Wert zurück.<br>
 	 * Wenn das Objekt bereits ein {@link FEMNative} ist, wird dieses geliefert.
-	 * 
+	 *
 	 * @param data Objekt oder {@code null}.
 	 * @return Wert. */
 	public static FEMNative from(final Object data) {
@@ -43,14 +43,14 @@ public final class FEMNative extends FEMValue {
 	final Object _data_;
 
 	/** Dieser Konstruktor initialisiert das native Objekt.
-	 * 
+	 *
 	 * @param data Objekt. */
 	public FEMNative(final Object data) {
 		this._data_ = data;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		return Objects.hash(this._data_);
@@ -58,7 +58,7 @@ public final class FEMNative extends FEMValue {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Wert gleich dem gegebenen ist.<br>
 	 * Dies ist nur dann der Fall, wenn die {@link #data() Nutzdaten} einander gleichen, d.h. {@code Objects.equals(this.data(), that.data())}.
-	 * 
+	 *
 	 * @param that Wert.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */

@@ -28,12 +28,12 @@ import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert die Adapter zur Überführung von {@link BEXFile}, {@link BEXNode} und {@link BEXList} in {@link Document}, {@link Text},
  * {@link Attr}, {@link Element}, {@link NodeList} und {@link NamedNodeMap}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BEXAdapter {
 
 	/** Diese Klasse implementiert ein {@link Attr} als {@link BEXNodeAdapter}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXAttrAdapter extends BEXNodeAdapter implements Attr {
 
@@ -41,7 +41,7 @@ public class BEXAdapter {
 		protected final Element parent;
 
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
-		 * 
+		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -175,12 +175,12 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert ein {@link Text}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXTextAdapter extends BEXChldAdapter implements Text {
 
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
-		 * 
+		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -334,12 +334,12 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert ein {@link Element}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXElemAdapter extends BEXChldAdapter implements Element {
 
 		/** Diese Methode implementeirt {@link #getTextContent()}.
-		 * 
+		 *
 		 * @param content {@link StringBuffer} mit dem bisher gesammelten Texten.
 		 * @param children {@link BEXList} der rekursiv analysierten Kindknoten.
 		 * @throws NullPointerException Wenn eine der Eingabe {@code null} ist. */
@@ -356,7 +356,7 @@ public class BEXAdapter {
 		{}
 
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
-		 * 
+		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -608,7 +608,7 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert ein {@link Document}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXDocuAdapter extends BEXNodeAdapter implements Document {
 
@@ -700,7 +700,7 @@ public class BEXAdapter {
 		};
 
 		/** Dieses Feld speichert die {@link DOMStringList} der leeren {@link DOMConfiguration}.
-		 * 
+		 *
 		 * @see DOMConfiguration#getParameterNames() */
 		static final DOMStringList _defaultParameterList_ = new DOMStringList() {
 
@@ -724,13 +724,13 @@ public class BEXAdapter {
 		};
 
 		/** Dieses Feld speichert die {@code true-Parameter} der leeren {@link DOMConfiguration}.
-		 * 
+		 *
 		 * @see DOMConfiguration#getParameter(String) */
-		static final List<String> _defaultParameterListTrue_ = Collections.unmodifiableList(Arrays.asList("comments", "datatype-normalization", "well-formed",
-			"namespaces", "namespace-declarations", "element-content-whitespace"));
+		static final List<String> _defaultParameterListTrue_ = Collections.unmodifiableList(
+			Arrays.asList("comments", "datatype-normalization", "well-formed", "namespaces", "namespace-declarations", "element-content-whitespace"));
 
 		/** Dieses Feld speichert die {@code false-Parameter} der leeren {@link DOMConfiguration}.
-		 * 
+		 *
 		 * @see DOMConfiguration#getParameter(String) */
 		static final List<String> _defaultParameterListFalse_ = Collections.unmodifiableList(Arrays.asList("cdata-sections", "entities", "split-cdata-sections",
 			"validate", "infoset", "normalize-characters", "canonical-form", "validate-if-schema", "check-character-normalization"));
@@ -738,7 +738,7 @@ public class BEXAdapter {
 		{}
 
 		/** Dieser Konstruktor initialisiert das {@link BEXFile}.
-		 * 
+		 *
 		 * @param file {@link BEXFile}.
 		 * @throws NullPointerException Wenn {@code file} {@code null} ist. */
 		public BEXDocuAdapter(final BEXFile file) throws NullPointerException {
@@ -1071,7 +1071,7 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert einen abstrakten {@link Node}, dessen Methoden keine Modifikation zulassen.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXNodeAdapter implements Node {
 
@@ -1079,7 +1079,7 @@ public class BEXAdapter {
 		protected final BEXNode node;
 
 		/** Dieser Konstruktor initialisiert den {@link BEXNode}.
-		 * 
+		 *
 		 * @param node {@link BEXNode}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist. */
 		public BEXNodeAdapter(final BEXNode node) throws NullPointerException {
@@ -1272,7 +1272,7 @@ public class BEXAdapter {
 
 	/** Diese Klasse implementiert erweitert den {@link BEXNodeAdapter} und die Methoden {@link #getParentNode()}, {@link #getNextSibling()} und
 	 * {@link #getPreviousSibling()} als Basis des {@link BEXTextAdapter}s sowie des {@link BEXElemAdapter}s.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static abstract class BEXChldAdapter extends BEXNodeAdapter {
 
@@ -1280,7 +1280,7 @@ public class BEXAdapter {
 		protected final Node parent;
 
 		/** Dieser Konstruktor initialisiert {@link BEXNode} und Elternknoten.
-		 * 
+		 *
 		 * @param node {@link BEXNode}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -1320,7 +1320,7 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert die {@link NamedNodeMap} für {@link Element#getAttributes()}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXAttrListAdapter implements NamedNodeMap {
 
@@ -1331,7 +1331,7 @@ public class BEXAdapter {
 		protected final Element parent;
 
 		/** Dieser Konstruktor initialisiert {@link BEXList} und Elternknoten.
-		 * 
+		 *
 		 * @param list {@link BEXList}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -1411,7 +1411,7 @@ public class BEXAdapter {
 	}
 
 	/** Diese Klasse implementiert die {@link NodeList} für {@link Element#getChildNodes()}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXChldListAdapter implements NodeList {
 
@@ -1422,7 +1422,7 @@ public class BEXAdapter {
 		protected final Node parent;
 
 		/** Dieser Konstruktor initialisiert {@link BEXList} und Elternknoten.
-		 * 
+		 *
 		 * @param list {@link BEXList}.
 		 * @param parent Elternknoten.
 		 * @throws NullPointerException Wenn {@code node} bzw. {@code parent} {@code null} ist. */
@@ -1467,12 +1467,12 @@ public class BEXAdapter {
 	/** Diese Klasse implementiert die {@link NodeList} für {@link Element#getElementsByTagName(String)}, {@link Element#getElementsByTagNameNS(String, String)},
 	 * {@link Document#getElementsByTagName(String)} und {@link Document#getElementsByTagNameNS(String, String)} mit der entsprechenden Sematik beim
 	 * Zusammenstellen der Elementknoten.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static class BEXElemCollector implements NodeList {
 
 		/** Diese Methode sammelt alle Elementknoten.
-		 * 
+		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
 		final void _collectElements_(final BEXNodeAdapter node, final boolean self) {
@@ -1488,7 +1488,7 @@ public class BEXAdapter {
 		}
 
 		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri}.
-		 * 
+		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
 		final void _collectElementsByUri_(final BEXNodeAdapter node, final boolean self) {
@@ -1504,7 +1504,7 @@ public class BEXAdapter {
 		}
 
 		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #name}.
-		 * 
+		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
 		final void _collectElementsByName_(final BEXNodeAdapter node, final boolean self) {
@@ -1520,7 +1520,7 @@ public class BEXAdapter {
 		}
 
 		/** Diese Methode sammelt alle Elementknoten mit passendem {@link #uri} und {@link #name}.
-		 * 
+		 *
 		 * @param node Elementknoten.
 		 * @param self {@code true}, wenn der gegebene Elementknoten selbst analysiert werden soll. */
 		final void _collectElementsByLabel_(final BEXNodeAdapter node, final boolean self) {
@@ -1550,7 +1550,7 @@ public class BEXAdapter {
 		protected final int size;
 
 		/** Dieser Konstruktor initialisiert die Parameter zur Zusammenstellung der {@link BEXNodeAdapter}s.
-		 * 
+		 *
 		 * @param node Elementknoten, dessen Kindknoten rekursiv analysiert werden.
 		 * @param uri Uri oder {@code "*"}.
 		 * @param name Name oder {@code "*"}.
@@ -1599,7 +1599,7 @@ public class BEXAdapter {
 	{}
 
 	/** Diese Methode gibt das gegebene {@link BEXFile} als {@link Document} zurück.
-	 * 
+	 *
 	 * @param file {@link BEXFile}.
 	 * @return {@link Document}.
 	 * @throws NullPointerException Wenn {@code file} {@code null} ist. */

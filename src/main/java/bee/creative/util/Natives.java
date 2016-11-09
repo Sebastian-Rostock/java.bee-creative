@@ -10,7 +10,7 @@ import java.util.Map;
 
 /** Diese Klasse implementiert Methoden zum Parsen von {@link Class Klassen}, {@link Field Datenfeldern}, {@link Method Methoden} und {@link Constructor
  * Konstruktoren} aus deren Textdarstellung sowie zur Erzeugung dieser Textdarstellungen.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Natives {
 
@@ -34,17 +34,50 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #formatField(Field) Textdarstellung} zurück.
-	 * 
+	/** Diese Methode gibt das native Objekt zur gegebenen Pfadangabe zurück.<br>
+	 * Die Pfadangabe kodiert hierbei eine Klasse, eine Methode, einen Konstruktor oder ein Datenfeld. Die folgenden Pfadangaben werden unterstützt:
+	 * <dl>
+	 * <dt>{@code "CLASS_PATH.class"}</dt>
+	 * <dd>Dieser Pfad wird über {@link #parseClass(String)} aufgelöst.</dd>
+	 * <dt>{@code "CLASS_PATH.FIELD_NAME"}</dt>
+	 * <dd>Dieser Pfad wird über {@link #parseField(String)} aufgelöst.</dd>
+	 * <dt>{@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"}</dt>
+	 * <dd>Dieser Pfad wird über {@link #parseConstructor(String)} aufgeföst.</dd>
+	 * <dt>{@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"}</dt>
+	 * <dd>Dieser Pfad wird über {@link #parseMethod(String)} aufgeföst.</dd>
+	 * </dl>
+	 *
+	 * @see #parseClass(String)
+	 * @see #parseField(String)
+	 * @see #parseMethod(String)
+	 * @see #parseConstructor(String)
+	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
+	 * @return Objekt zur Pfadangabe.
+	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn {@link #parseMethod(String)} bzw. {@link #parseConstructor(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws ReflectiveOperationException Wenn {@link #parseField(String)}, {@link #parseMethod(String)}, {@link #parseConstructor(String)} bzw.
+	 *         {@link #parseClass(String)} eine entsprechende Ausnahme auslöst. */
+	public static Object parse(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
+		if (memberPath.endsWith(".class")) return Natives.parseClass(memberPath.substring(0, memberPath.length() - 6));
+		if (memberPath.contains(".new(")) return Natives.parseConstructor(memberPath);
+		if (memberPath.contains("(")) return Natives.parseMethod(memberPath);
+		return Natives.parseField(memberPath);
+	}
+
+	/** Diese Methode gibt das {@link Field Datenfeld} mit der gegebenen {@link #formatField(Field) Textdarstellung} zurück.<br>
+	 * Das gelieferte Datenfeld entspricht {@code parseField(parseClass("CLASS_PATH"), "FIELD_NAME")}.
+	 *
+	 * @see #parseClass(String)
 	 * @see #formatField(Field)
-	 * @param fieldPath Datenfeldtext.
+	 * @see Class#getDeclaredField(String)
+	 * @param fieldText Datenfeldtext.
 	 * @return Datenfeld.
 	 * @throws NullPointerException Wenn {@code fieldPath} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fieldPath} ungültig ist bzw. das Datenfeld nicht gefunden wurde. */
-	public static Field parseField(final String fieldPath) throws NullPointerException, IllegalArgumentException {
+	public static Field parseField(final String fieldText) throws NullPointerException, IllegalArgumentException {
 		try {
-			final int i = fieldPath.lastIndexOf('.');
-			return Natives.parseField(Natives.parseClass(fieldPath.substring(0, i)), fieldPath.substring(i + 1));
+			final int offset = fieldText.lastIndexOf('.');
+			return Natives.parseField(Natives.parseClass(fieldText.substring(0, offset)), fieldText.substring(offset + 1));
 		} catch (NullPointerException | IllegalArgumentException cause) {
 			throw cause;
 		} catch (final Exception cause) {
@@ -53,7 +86,7 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt das an der gegebenen {@link Class Klasse} definierte {@link Field Datenfeld} mit dem gegebenen Signatur zurück.
-	 * 
+	 *
 	 * @see Class#getDeclaredField(String)
 	 * @param fieldOwner Klasse, an der das Datenfeld definiert ist.
 	 * @param fieldName Name des Datenfeldes.
@@ -72,7 +105,7 @@ public class Natives {
 
 	/** Diese Methode gibt die {@link Class Klasse} mit der gegebenen {@link #formatClass(Class) Textdarstellung} zurück.<br>
 	 * Die Klassentexte {@code "java.lang.Object"} und {@code "int[]"} liefert beispielsweise die Klassen {@code Object.class} bzw. {@code int[].class}.
-	 * 
+	 *
 	 * @see #formatClass(Class)
 	 * @param classText Klassentext.
 	 * @return Klasse.
@@ -93,7 +126,7 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt die {@link Class Parametertypen} mit der gegebenen {@link #formatParams(Class...) Textdarstellung} zurück.
-	 * 
+	 *
 	 * @see #formatParams(Class...)
 	 * @param paramsText Parametertypentext.
 	 * @return Parametertypen.
@@ -118,8 +151,9 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #formatMethod(Method) Textdarstellung} zurück.
-	 * 
+	/** Diese Methode gibt die {@link Method Methode} mit der gegebenen {@link #formatMethod(Method) Textdarstellung} zurück.<br>
+	 * Das gelieferte Datenfeld entspricht {@code parseMethod(parseClass(CLASS_PATH), "METHOD_NAME", parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
+	 *
 	 * @see #formatMethod(Method)
 	 * @param methodText Methodentext.
 	 * @return Methoden.
@@ -137,7 +171,7 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt die an der gegebenen {@link Class Klasse} definierte {@link Method Methode} mit der gegebenen Signatur zurück.
-	 * 
+	 *
 	 * @see Class#getDeclaredField(String)
 	 * @param methodOwner Klasse, an der die Methode definiert ist.
 	 * @param methodName Name der Methode.
@@ -145,8 +179,8 @@ public class Natives {
 	 * @return Methode.
 	 * @throws NullPointerException Wenn {@code methodOwner} bzw. {@code methodName} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Methode nicht gefunden wurde. */
-	public static Method parseMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams) throws NullPointerException,
-		IllegalArgumentException {
+	public static Method parseMethod(final Class<?> methodOwner, final String methodName, final Class<?>... methodParams)
+		throws NullPointerException, IllegalArgumentException {
 		try {
 			return methodOwner.getDeclaredMethod(methodName, methodParams);
 		} catch (NullPointerException | IllegalArgumentException cause) {
@@ -156,8 +190,9 @@ public class Natives {
 		}
 	}
 
-	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #formatConstructor(Constructor) Textdarstellung} zurück.
-	 * 
+	/** Diese Methode gibt den {@link Constructor Konstruktor} mit der gegebenen {@link #formatConstructor(Constructor) Textdarstellung} zurück.<br>
+	 * Das gelieferte Datenfeld entspricht {@code parseConstructor(parseClass(CLASS_PATH), parseParams("PARAM_TYPE_1,...,PARAM_TYPE_N"))}.
+	 *
 	 * @see #formatConstructor(Constructor)
 	 * @param constructorText Konstruktortext.
 	 * @return Konstruktor.
@@ -175,15 +210,15 @@ public class Natives {
 	}
 
 	/** Diese Methode gibt den an der gegebenen {@link Class Klasse} definierte {@link Constructor Konstruktor} mit der gegebenen Signatur zurück.
-	 * 
+	 *
 	 * @see Class#getDeclaredConstructor(Class...)
 	 * @param constructorOwner Klasse, an der der Konstruktor definiert ist.
 	 * @param constructorParams Parametertypen des Konstruktors.
 	 * @return Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructorOwner} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn der Konstruktor nicht gefunden wurde. */
-	public static Constructor<?> parseConstructor(final Class<?> constructorOwner, final Class<?>... constructorParams) throws NullPointerException,
-		IllegalArgumentException {
+	public static Constructor<?> parseConstructor(final Class<?> constructorOwner, final Class<?>... constructorParams)
+		throws NullPointerException, IllegalArgumentException {
 		try {
 			return constructorOwner.getDeclaredConstructor(constructorParams);
 		} catch (NullPointerException | IllegalArgumentException cause) {
@@ -195,7 +230,7 @@ public class Natives {
 
 	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Field Datenfelds} zurück.<br>
 	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Field#getName() FIELD_NAME}{@code "}.
-	 * 
+	 *
 	 * @see Field#getName()
 	 * @see #formatClass(Class)
 	 * @param field Datenfeld.
@@ -208,7 +243,7 @@ public class Natives {
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Klasse} zurück.<br>
 	 * Diese wird via {@link Class#getCanonicalName()} ermittelt. Die Klassen {@code Object.class} und {@code int[].class} liefert beispielsweise
 	 * {@code "java.lang.Object"} bzw. {@code "int[]"}.
-	 * 
+	 *
 	 * @see Class#getCanonicalName()
 	 * @param clazz Klasse.
 	 * @return Klassentext.
@@ -219,7 +254,7 @@ public class Natives {
 
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Class Parametertypen} zurück.<br>
 	 * Das Format der Textdarstellung ist {@code "(}{@link #formatClass(Class) PARAM_TYPE_1}{@code ,...,}{@link #formatClass(Class) PARAM_TYPE_N}{@code )"}.
-	 * 
+	 *
 	 * @see Method#getParameterTypes()
 	 * @see Constructor#getParameterTypes()
 	 * @param types Parametertypen.
@@ -232,7 +267,7 @@ public class Natives {
 	/** Diese Methode gibt die Textdarstellung der gegebenen {@link Method Methode} zurück.<br>
 	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .}{@link Method#getName() METHOD_NAME}
 	 * {@link #formatParams(Class...) (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
-	 * 
+	 *
 	 * @see Method#getName()
 	 * @see #formatClass(Class)
 	 * @see #formatParams(Class...)
@@ -246,7 +281,7 @@ public class Natives {
 	/** Diese Methode gibt die Textdarstellung des gegebenen {@link Constructor Konstruktors} zurück.<br>
 	 * Das Format der Textdarstellung ist {@code "}{@link #formatClass(Class) CLASS_PATH}{@code .new}{@link #formatParams(Class...)
 	 * (PARAM_TYPE_1,...,PARAM_TYPE_N)}{@code "}.
-	 * 
+	 *
 	 * @param constructor Konstruktor.
 	 * @return Konstruktortext.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */

@@ -12,13 +12,13 @@ import bee.creative.util.Objects;
  * Die Methode {@link #invoke(FEMFrame)} des Werts liefert {@code this}, sodass ein Wert direkt als Parameterfunktion eingesetzt werden kann.<br>
  * Die {@link #toString() Textdarstellung} des Werts wird über {@link #toScript(FEMFormatter)} ermittelt. Diese Methode delegiert selbst an {@link #toString()},
  * sodass mindestens eine dieser Methoden überschrieben werden muss.
- * 
+ *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMValue extends FEMFunction {
 
 	/** Diese Methode gibt die in den gegebenen Datentyp ({@code GData}) kontextsensitiv konvertierten {@link #data() Nutzdaten} dieses Werts zurück.<br>
 	 * Der Rückgabewert entspricht {@code context.dataFrom(this, type)}.
-	 * 
+	 *
 	 * @see FEMContext#dataFrom(FEMValue, FEMType)
 	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten dieses Werts konvertiert werden.
 	 * @param type Datentyp.
@@ -28,23 +28,23 @@ public abstract class FEMValue extends FEMFunction {
 	 * @throws ClassCastException Wenn bei der Konvertierung ein unzulässiger {@code cast} vorkommt.
 	 * @throws IllegalArgumentException Wenn die Nutzdaten dieses Werts nicht konvertiert werden können. */
 
-	public final <GData> GData data(final FEMType<GData> type, final FEMContext context) throws NullPointerException, ClassCastException,
-		IllegalArgumentException {
+	public final <GData> GData data(final FEMType<GData> type, final FEMContext context)
+		throws NullPointerException, ClassCastException, IllegalArgumentException {
 		return context.dataFrom(this, type);
 	}
 
 	/** Diese Methode gibt den Datentyp zurück.
-	 * 
+	 *
 	 * @return Datentyp. */
 	public abstract FEMType<?> type();
 
 	/** Diese Methode gibt die Nutzdaten zurück.
-	 * 
+	 *
 	 * @return Nutzdaten. */
 	public abstract Object data();
 
 	/** Diese Methode ist eine Abkürzung für {@code result(false)}.
-	 * 
+	 *
 	 * @see #result(boolean)
 	 * @return ausgewerteter Ergebniswert. */
 	public FEMValue result() {
@@ -52,7 +52,7 @@ public abstract class FEMValue extends FEMFunction {
 	}
 
 	/** Diese Methode gibt diesen Wert als ausgewerteten und optimierten Ergebniswert zurück.
-	 * 
+	 *
 	 * @see FEMArray#result(boolean)
 	 * @see FEMFuture#result(boolean)
 	 * @param recursive {@code true}, wenn die in diesem Wert enthaltenen Werte ebenfalls ausgewertet werden sollen, z.B. bei {@link FEMArray}.<br>
@@ -66,7 +66,7 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #type() Datentyp} und {@link #data() Nutzdaten} dieses Werts
 	 * {@link Objects#equals(Object, Object) äquivalent} zu denen des gegebenen Werts sind.
-	 * 
+	 *
 	 * @see #type()
 	 * @see #data()
 	 * @see Objects#equals(Object, Object)
@@ -85,7 +85,7 @@ public abstract class FEMValue extends FEMFunction {
 
 	/** Diese Methode gibt die {@link FEMFunction Funktion} dieses Werts zurück.<br>
 	 * Bei einem {@link FEMHandler Funktionszeiger} ist dies dessen {@link FEMHandler#value() Funktion}. Jeder andere Wert liefert sich selbst.
-	 * 
+	 *
 	 * @see FEMHandler
 	 * @return Funktion des Werts. */
 	public FEMFunction toFunction() {

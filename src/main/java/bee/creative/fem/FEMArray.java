@@ -12,7 +12,7 @@ import bee.creative.util.Iterables;
 import bee.creative.util.Iterators;
 
 /** Diese Klasse implementiert eine unveränderliche Liste von Werten sowie Methoden zur Erzeugung solcher Wertlisten aus nativen Arrays und {@link Iterable}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iterable<FEMValue> {
 
@@ -20,7 +20,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Wert an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammeln fortgeführt werden soll.
-		 * 
+		 *
 		 * @param value Wert.
 		 * @return {@code true}, wenn das Sammeln fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(FEMValue value);
@@ -339,7 +339,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.<br>
 	 * Das gegebene Array wird Kopiert, sodass spätere Anderungen am gegebenen Array nicht auf die erzeugte Wertliste übertragen werden.
-	 * 
+	 *
 	 * @param items Werte.
 	 * @return Wertliste.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
@@ -350,7 +350,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt eine uniforme Wertliste mit der gegebenen Länge zurück, deren Werte alle gleich dem gegebenen sind.
-	 * 
+	 *
 	 * @param item Wert.
 	 * @param length Länge.
 	 * @return Wertliste.
@@ -363,7 +363,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 * 
+	 *
 	 * @see #from(Collection)
 	 * @param items Werte.
 	 * @return Wertliste.
@@ -375,7 +375,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode konvertiert die gegebenen Werte in eine Wertliste und gibt diese zurück.
-	 * 
+	 *
 	 * @see Collection#toArray(Object[])
 	 * @see #from(FEMValue...)
 	 * @param items Werte.
@@ -387,7 +387,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMArray.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Wertliste.
@@ -405,7 +405,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	protected final int _length_;
 
 	/** Dieser Konstruktor initialisiert die Länge.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMArray(final int length) throws IllegalArgumentException {
@@ -416,7 +416,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	{}
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Wert. */
 	protected FEMValue _get_(final int index) {
@@ -425,7 +425,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode fügt alle Werte im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
@@ -445,7 +445,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode konvertiert diese Wertliste in ein {@code FEMValue[]} und gibt dieses zurück.
-	 * 
+	 *
 	 * @return Array mit den Werten dieser Wertliste. */
 	public FEMValue[] value() {
 		final ValueCollector target = new ValueCollector(this._length_);
@@ -454,14 +454,14 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Werte in der Wertliste zurück.
-	 * 
+	 *
 	 * @return Länge der Wertliste. */
 	public final int length() {
 		return this._length_;
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste zurück.
-	 * 
+	 *
 	 * @param that Wertliste.
 	 * @return {@link FEMArray}-Sicht auf die Verkettung dieser Wertliste mit der gegebenen Wertliste.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -472,7 +472,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Wertliste zurück.
-	 * 
+	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
 	 * @return {@link FEMArray}-Sicht auf einen Abschnitt dieser Wertliste.
@@ -485,14 +485,14 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Wertliste zurück.
-	 * 
+	 *
 	 * @return rückwärts geordnete {@link FEMArray}-Sicht auf diese Wertliste. */
 	public FEMArray reverse() {
 		return new ReverseArray(this);
 	}
 
 	/** Diese Methode gibt die {@link #value() Werte dieser Wertliste} in einer performanteren oder zumindest gleichwertigen Wertliste zurück.
-	 * 
+	 *
 	 * @see #from(FEMValue...)
 	 * @see #value()
 	 * @return performanteren Wertliste oder {@code this}. */
@@ -504,7 +504,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Werts innerhalb dieser Wertliste zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchter Wert.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens des gegebenen Werts ({@code offset..this.length()-1}) oder {@code -1}.
@@ -519,7 +519,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Wertliste innerhalb dieser Wertliste zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchte Wertliste.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Wertliste ({@code offset..this.length()-that.length()}) oder {@code -1}.
@@ -546,7 +546,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 
 	/** Diese Methode fügt alle Werte dieser Wertliste vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(FEMValue)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Werte geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
@@ -557,7 +557,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		int result = this._hash_;
@@ -570,7 +570,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Wertliste gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Wertliste.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -584,9 +584,9 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		return true;
 	}
 
-	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die der
-	 * gegebenen Wertliste ist. Die Werte werden über den gegebenen {@link Comparator} verglichen.
-	 * 
+	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Wertliste kleiner, gleich oder größer als die
+	 * der gegebenen Wertliste ist. Die Werte werden über den gegebenen {@link Comparator} verglichen.
+	 *
 	 * @param that Wertliste.
 	 * @param order {@link Comparator} zum Vergleichen der Werte.
 	 * @return Vergleichswert.
@@ -602,7 +602,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 	}
 
 	/** Diese Methode gibt diese Wertliste als {@link List} zurück.
-	 * 
+	 *
 	 * @see Arrays#asList(Object...)
 	 * @return {@link List}. */
 	public final List<FEMValue> toList() {

@@ -17,7 +17,7 @@ import bee.creative.util.Objects;
  * <p>
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactHashSet} im Mittel nur noch {@code 75%} der Rechenzeit des
  * {@link HashSet}s, unabhängig von der Anzahl der Elemente.
- * 
+ *
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -30,7 +30,7 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität. */
 	public CompactHashSet(final int capacity) {
@@ -38,7 +38,7 @@ public class CompactHashSet<GItem> extends CompactSet<GItem> {
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @see Set#addAll(Collection)
 	 * @param collection Elemente. */

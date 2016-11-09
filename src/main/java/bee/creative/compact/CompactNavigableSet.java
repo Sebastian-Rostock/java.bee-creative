@@ -22,20 +22,20 @@ import bee.creative.util.Iterables;
  * <p>
  * Für das Finden von Elementen und das Iterieren über die Elemente benötigt das {@link CompactNavigableSet} im Mittel nur noch {@code 25%} bzw. {@code 75%} der
  * Rechenzeit des {@link TreeSet}s, unabhängig von der Anzahl der Elemente.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 @SuppressWarnings ("javadoc")
 public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements NavigableSet<GItem> {
 
 	/** Diese Klasse implementiert eine abstrakte Teilmenge eines {@link CompactNavigableSet}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	protected static abstract class CompactNavigableSubSet<GItem> extends CompactSubData<CompactNavigableSet<GItem>> implements NavigableSet<GItem> {
 
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param set {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -164,13 +164,13 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Diese Klasse implementiert die aufsteigende Teilmenge eines {@link CompactNavigableSet}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactAscendingSubSet<GItem> extends CompactNavigableSubSet<GItem> {
 
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param array {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -281,13 +281,13 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Diese Klasse implementiert die absteigende Teilmenge eines {@link CompactNavigableSet}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactDescendingSubSet<GItem> extends CompactNavigableSet.CompactNavigableSubSet<GItem> {
 
 		/** Dieser Konstruktor initialisiert das {@link CompactNavigableSet} und die Grenzen und deren Inklusion.
-		 * 
+		 *
 		 * @param array {@link CompactNavigableSet}.
 		 * @param fromItem erstes Element oder {@link CompactSubData#_open_}.
 		 * @param fromInclusive Inklusivität des ersten Elements.
@@ -403,7 +403,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	protected final Comparator<? super GItem> comparator;
 
 	/** Dieser Konstruktor initialisiert den {@link Comparator}.
-	 * 
+	 *
 	 * @param comparator {@link Comparator}.
 	 * @throws NullPointerException Wenn der gegebene {@link Comparator} {@code null} ist. */
 	public CompactNavigableSet(final Comparator<? super GItem> comparator) throws NullPointerException {
@@ -413,7 +413,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit der gegebenen Kapazität und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @param comparator {@link Comparator}.
@@ -424,7 +424,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Dieser Konstruktor initialisiert das {@link Set} mit den gegebenen Elementen und dem gegebenen {@link Comparator}.
-	 * 
+	 *
 	 * @see Set#addAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param comparator {@link Comparator}.
@@ -439,7 +439,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	{}
 
 	/** Diese Methode löscht das {@code index}-te Element und gibt es oder {@code null} zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-te Element oder {@code null}. */
 	protected final GItem poll(final int index) {
@@ -450,7 +450,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Diese Methode gibt das {@code index}-te Element oder {@code null} zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element oder {@code null}. */
 	protected final GItem getItemOrNull(final int index) {
@@ -459,7 +459,7 @@ public class CompactNavigableSet<GItem> extends CompactSet<GItem> implements Nav
 	}
 
 	/** Diese Methode gibt das {@code index}-te Element zurück oder wirft eine {@link NoSuchElementException}.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element.
 	 * @throws NoSuchElementException Wenn der gegebene Index ungültig ist. */

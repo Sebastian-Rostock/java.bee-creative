@@ -7,13 +7,13 @@ import java.util.Map;
 
 /** Diese Klasse implementiert mit {@link #INSTANCES} eine statische Abbildung zur Verwaltung benannter Funktionen sowie einige generische Funktionen zur
  * Steuerung von Kontrollfluss und Variablen.
- * 
+ *
  * @see FEMFunction
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMUtil {
 
-	/** Dieses Feld bildet von Namen auf Funktionen ab, die auch bequem über {@link #put(FEMFunction, String...)} modifiziert und über {@link #get(String)} gelesen
-	 * werden können. */
+	/** Dieses Feld bildet von Namen auf Funktionen ab, die auch bequem über {@link #put(FEMFunction, String...)} modifiziert und über {@link #get(String)}
+	 * gelesen werden können. */
 	public static final Map<String, FEMFunction> INSTANCES = Collections.synchronizedMap(new HashMap<String, FEMFunction>());
 
 	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (condition: FEMBoolean; trueResult: FEMValue; falseResult: FEMValue): FEMValue}, deren
@@ -123,9 +123,9 @@ public abstract class FEMUtil {
 
 	}, "apply", "APPLY");
 
-	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMHandler): FEMInteger}, deren Ergebniswert der Anzahl der parameterlosen Aufrufe der
-	 * gegebenen Methode entspricht. Die Methode wird mindestens ein Mal aufgerufen und muss immer einen {@link FEMBoolean} liefern. Sie wird nur dann wiederholt
-	 * aufgerufen, wenn sie {@link FEMBoolean#TRUE} liefert. Die Ermittlung des Ergebniswerts {@code result} entspricht damit in etwa
+	/** Dieses Feld speichert eine Funktion mit der Signatur {@code (method: FEMHandler): FEMInteger}, deren Ergebniswert der Anzahl der parameterlosen Aufrufe
+	 * der gegebenen Methode entspricht. Die Methode wird mindestens ein Mal aufgerufen und muss immer einen {@link FEMBoolean} liefern. Sie wird nur dann
+	 * wiederholt aufgerufen, wenn sie {@link FEMBoolean#TRUE} liefert. Die Ermittlung des Ergebniswerts {@code result} entspricht damit in etwa
 	 * {@code for(result = 1; method(); result++);} */
 	public static final FEMFunction REPEAT = FEMUtil.put(new FEMFunction() {
 
@@ -146,7 +146,7 @@ public abstract class FEMUtil {
 
 	/** Diese Methode gibt die via {@link #put(FEMFunction, String...)} unter dem gegebenen Namen registrierte Funktion bzw. {@code null} zurück.<br>
 	 * Sie ist eine Abkürzung für {@code INSTANCES.get(name)}.
-	 * 
+	 *
 	 * @param name Name.
 	 * @return Funktion oder {@code null}. */
 	public static FEMFunction get(final String name) {
@@ -154,7 +154,7 @@ public abstract class FEMUtil {
 	}
 
 	/** Diese Methode registriert die gegebene Funktion unter den gegebenen Namen in {@link #INSTANCES} und gibt die Funktion zurück.
-	 * 
+	 *
 	 * @param function Funktion.
 	 * @param names Namen.
 	 * @return {@code function}.
@@ -169,7 +169,7 @@ public abstract class FEMUtil {
 	/** Diese Methode setzt die {@link FEMProxy#set(FEMFunction) aufzurufende Funktion} des gegebenen {@link FEMProxy}, wenn diesem noch keinen zugeordnet ist,
 	 * d.h. wenn {@link FEMProxy#get()} {@code null} liefert. Die aufzurufende Funktion des {@link FEMProxy} wird dazu über dessen {@link FEMProxy#name() Namen}
 	 * ermittelt, d.h. {@link #get(String) FEMUtil.get(proxy.name())}.
-	 * 
+	 *
 	 * @see #get(String)
 	 * @see FEMProxy#get()
 	 * @see FEMProxy#set(FEMFunction)
@@ -181,7 +181,7 @@ public abstract class FEMUtil {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code updateAll(Arrays.asList(proxies))}.
-	 * 
+	 *
 	 * @see #updateAll(Iterable)
 	 * @param proxies Platzhalter.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist. */
@@ -190,7 +190,7 @@ public abstract class FEMUtil {
 	}
 
 	/** Diese Methode setzt über {@link #update(FEMProxy)} die {@link FEMProxy#set(FEMFunction) aufzurufende Funktionen} der gegebenen {@link FEMProxy}.
-	 * 
+	 *
 	 * @see #update(FEMProxy)
 	 * @param proxies Platzhalter.
 	 * @throws NullPointerException Wenn {@code proxies} {@code null} ist. */
@@ -201,7 +201,7 @@ public abstract class FEMUtil {
 	}
 
 	/** Diese Methode prüft die Anzahl der {@link FEMFrame#size() zugesicherten Parameter} des gegebenen {@link FEMFrame Stapelrahmen}.
-	 * 
+	 *
 	 * @param frame Stapelrahmen.
 	 * @param minSize minimale zulässige Anzahl.
 	 * @param maxSize maximale zulässige Anzahl.

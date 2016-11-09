@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Klasse implementiert grundlegende {@link Conversion}.
- * 
+ *
  * @see Converter
  * @see Converters
  * @see Conversion
@@ -9,7 +9,7 @@ package bee.creative.util;
 public class Conversions {
 
 	/** Diese Klasse implementiert {@link #hashCode()} und {@link #equals(Object)} einer abstracten {@link Conversion}.
-	 * 
+	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe. */
@@ -35,7 +35,7 @@ public class Conversions {
 	{}
 
 	/** Dieses Feld speichert den {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
-	 * 
+	 *
 	 * @see #inverseConversion(Conversion) */
 	public static final Converter<?, ?> INVERSE_CONVERSION = new Converter<Conversion<?, ?>, Object>() {
 
@@ -84,7 +84,7 @@ public class Conversions {
 	{}
 
 	/** Diese Methode gibt eine statische {@link Conversion} zurück, deren Eingabe und Ausgabe konstant sind.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
@@ -113,7 +113,7 @@ public class Conversions {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe in mit dem gegebenen {@link Converter} umwandelt und das Paar dieser beiden Objekte
 	 * als {@link Conversion} liefert.
-	 * 
+	 *
 	 * @see #staticConversion(Object, Object)
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -139,7 +139,7 @@ public class Conversions {
 	}
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der eine gegebene {@link Conversion} umkehrt.
-	 * 
+	 *
 	 * @see #inverseConversion(Conversion)
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
@@ -151,7 +151,7 @@ public class Conversions {
 
 	/** Diese Methode gibt eine inverse {@link Conversion} zurück, deren Ein- und Ausgabe aus der Aus- bzw. Eingabe der gegebenen {@link Conversion} ermittelt
 	 * werden.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param conversion {@link Conversion}.
@@ -181,15 +181,15 @@ public class Conversions {
 
 	/** Diese Methode gibt eine dynamische {@link Conversion} zurück, deren Ausgabe stats mit Hilfe des gegebenen {@link Converter} aus der gegebenen Eingabe
 	 * ermittelt wird.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param input Eingabe.
 	 * @param converter {@link Converter}.
 	 * @return {@code dynamic}-{@link Conversion}.
 	 * @throws NullPointerException Wenn {@code converter} {@code null} ist. */
-	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input, final Converter<? super GInput, ? extends GOutput> converter)
-		throws NullPointerException {
+	public static <GInput, GOutput> Conversion<GInput, GOutput> dynamicConversion(final GInput input,
+		final Converter<? super GInput, ? extends GOutput> converter) throws NullPointerException {
 		if (converter == null) throw new NullPointerException("converter = null");
 		return new Conversion<GInput, GOutput>() {
 
@@ -213,7 +213,7 @@ public class Conversions {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe mit dem gegebenen {@link Converter} via {@link #dynamicConversion(Object, Converter)}
 	 * in seine Ausgabe überführt.
-	 * 
+	 *
 	 * @param <GInput> Typ des Eingabe.
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @param converter {@link Converter}.
@@ -238,7 +238,7 @@ public class Conversions {
 	}
 
 	/** Diese Methode gibt den {@link Converter} zurück, der die Eingabe einer {@link Conversion} ermittelt.
-	 * 
+	 *
 	 * @see Conversion#input()
 	 * @param <GInput> Typ des Eingabe.
 	 * @return {@link Converter} zu {@link Conversion#input()}. */
@@ -248,7 +248,7 @@ public class Conversions {
 	}
 
 	/** Diese Methode gibt den {@link Converter} zurück, der die Ausgabe einer {@link Conversion} ermittelt.
-	 * 
+	 *
 	 * @see Conversion#output()
 	 * @param <GOutput> Typ der Ausgabe.
 	 * @return {@link Converter} zu {@link Conversion#output()}. */

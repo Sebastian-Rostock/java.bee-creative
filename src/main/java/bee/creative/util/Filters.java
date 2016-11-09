@@ -8,7 +8,7 @@ import java.util.Map;
 import bee.creative.util.Pointers.SoftPointer;
 
 /** Diese Klasse implementiert grundlegende {@link Filter}.
- * 
+ *
  * @see Filter
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Filters {
@@ -62,7 +62,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} als Adapter zu einem {@link Converter} zurück.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code Boolean.TRUE.equals(converter.convert(input))}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param converter {@link Converter}.
 	 * @return {@link Converter}-Adapter.
@@ -87,7 +87,7 @@ public class Filters {
 
 	/** Diese Methode gibt den {@link Filter} zurück, der alle Eingaben akzeptiert, die nicht {@code null} sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code input != null}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link #NULL_FILTER}. */
 	@SuppressWarnings ("unchecked")
@@ -97,7 +97,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der nur die Eingaben akzeptiert, die Instanzen der gegebenen {@link Class} oder ihrer Nachfahren sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code inputType.isInstance(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param inputType {@link Class} der akzeptierten Eingaben.
 	 * @return {@code type}-{@link Filter}.
@@ -121,7 +121,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe ablehnt.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code false}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link #REJECT_FILTER}. */
 	@SuppressWarnings ("unchecked")
@@ -131,7 +131,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der jede Eingabe akzeptiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code true}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @return {@link #ACCEPT_FILTER}. */
 	@SuppressWarnings ("unchecked")
@@ -141,7 +141,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link SoftPointer} auf Eingaben bestückt.
-	 * 
+	 *
 	 * @see #bufferedFilter(Filter)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
@@ -153,7 +153,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen gepufferten {@link Filter} zurück, der die zu seinen Eingaben über den gegebenen {@link Filter} ermittelten Akzeptanzen intern in
 	 * einer {@link Map} zur Wiederverwendung vorhält. Die Schlüssel der {@link Map} werden dabei als {@link Pointer} auf Eingaben bestückt.
-	 * 
+	 *
 	 * @see #converterAdapter(Converter)
 	 * @see Converters#filterAdapter(Filter)
 	 * @see Converters#bufferedConverter(int, int, int, Converter)
@@ -165,14 +165,14 @@ public class Filters {
 	 * @return {@code buffered}-{@link Filter}.
 	 * @throws NullPointerException Wenn {@code filter} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@link Converters#bufferedConverter(int, int, int, Converter)} eine entsprechende Ausnahme auslöst. */
-	public static <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter) throws NullPointerException,
-		IllegalArgumentException {
+	public static <GInput> Filter<GInput> bufferedFilter(final int limit, final int mode, final Filter<? super GInput> filter)
+		throws NullPointerException, IllegalArgumentException {
 		if (filter == null) throw new NullPointerException("filter = null");
 		return Filters.converterAdapter(Converters.bufferedConverter(limit, mode, Pointers.HARD, Converters.filterAdapter(filter)));
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die gegebenen Eingaben akzeptiert.
-	 * 
+	 *
 	 * @see #containsFilter(Collection)
 	 * @param <GInput> Typ der Eingabe.
 	 * @param items akzeptierte Eingaben.
@@ -187,7 +187,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die in der gegebenen {@link Collection} enthalten sind.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code collection.contains(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param collection {@link Collection} der akzeptierten Eingaben.
 	 * @return {@code contains}-{@link Filter}.
@@ -212,7 +212,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung gleich der des gegebenen {@link Comparable} ist.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) == 0}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code equal}-{@link Filter}.
@@ -236,7 +236,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung kleiner der des gegebenen {@link Comparable} ist.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) >= 0}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code lower}-{@link Filter}.
@@ -260,7 +260,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, deren Ordnung größer der des gegebenen {@link Comparable} ist.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code comparable.compareTo(input) <= 0}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param comparable {@link Comparable} zur Ermittlung des Vergleichswerts.
 	 * @return {@code higher}-{@link Filter}.
@@ -285,7 +285,7 @@ public class Filters {
 	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Field} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(field.get(input))}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
 	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie des Werts des {@link Field}.
 	 * @param field {@link Field} zur Navigation.
@@ -314,7 +314,7 @@ public class Filters {
 	/** Diese Methode gibt einen navigierenden {@link Filter} zurück, welcher von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
 	 * {@link Filter} navigiert.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter.accept(converter.convert(input))}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe des gelieferten {@link Filter} sowie der Eingabe des {@link Field}.
 	 * @param <GOutput> Typ der Eingabe des gegebenen {@link Filter} sowie der Ausgabe des {@link Converter}.
 	 * @param converter {@link Converter} zur Navigation.
@@ -342,7 +342,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von dem gegebenen Filter abgelehnt werden.<br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code !filter.accept(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@code negation}-{@link Filter}.
@@ -366,7 +366,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von einem der gegebenen {@link Filter} akzeptiert werden <br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) || filter2.accept(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 erster {@link Filter}.
 	 * @param filter2 zweiter {@link Filter}.
@@ -393,7 +393,7 @@ public class Filters {
 
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert werden <br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) && filter2.accept(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 erster {@link Filter}.
 	 * @param filter2 zweiter {@link Filter}.
@@ -421,7 +421,7 @@ public class Filters {
 	/** Diese Methode gibt einen {@link Filter} zurück, welcher nur die Eingaben akzeptiert, die von beiden der gegebenen {@link Filter} akzeptiert bzw. abgelehnt
 	 * werden <br>
 	 * Die Akzeptanz einer Eingabe {@code input} ist {@code filter1.accept(input) == filter2.accept(input)}.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter1 erster {@link Filter}.
 	 * @param filter2 zweiter {@link Filter}.
@@ -447,7 +447,7 @@ public class Filters {
 	}
 
 	/** Diese Methode gibt einen {@link Filter} zurück, der den gegebenen {@link Filter} über {@code synchronized(filter)} synchronisiert.
-	 * 
+	 *
 	 * @param <GInput> Typ der Eingabe.
 	 * @param filter {@link Filter}.
 	 * @return {@code synchronized}-{@link Filter}.

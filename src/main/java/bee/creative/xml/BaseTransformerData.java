@@ -13,20 +13,20 @@ import bee.creative.util.Objects;
 import bee.creative.xml.BaseTemplatesData.FactoryData;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für einen {@link Transformer}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für die Ausgabeeigenschaften eines {@link Transformer}.
-	 * 
+	 *
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, String, PropertyData<GOwner>> {
 
 		/** Diese Methode wählt {@link OutputKeys#INDENT} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forINDENT() {
@@ -34,7 +34,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#VERSION} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forVERSION() {
@@ -42,7 +42,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#METHOD} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forMETHOD() {
@@ -50,7 +50,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#ENCODING} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forENCODING() {
@@ -58,7 +58,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#MEDIA_TYPE} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forMEDIA_TYPE() {
@@ -66,7 +66,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#STANDALONE} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forSTANDALONE() {
@@ -74,7 +74,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#OMIT_XML_DECLARATION} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forOMIT_XML_DECLARATION() {
@@ -82,7 +82,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode wählt {@link OutputKeys#CDATA_SECTION_ELEMENTS} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @return {@code this}. */
 		public final PropertyData<GOwner> forCDATA_SECTION_ELEMENTS() {
@@ -90,7 +90,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 		}
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
@@ -105,14 +105,14 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Parameter eines {@link Transformer}.
-	 * 
+	 *
 	 * @see Transformer#setParameter(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class ParameterData<GOwner> extends BaseMapBuilder<String, Object, ParameterData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeParameterData();
 
@@ -127,14 +127,14 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die {@link Templates}.
-	 * 
+	 *
 	 * @see Templates#newTransformer()
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class TemplatesData<GOwner> extends BaseTemplatesData<TemplatesData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeTemplatesData();
 
@@ -186,7 +186,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseTransformerData<?> data) {
@@ -203,7 +203,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	 * {@link TransformerFactory#newTransformer()} ein neuer erstellt, über {@link #useTransformer(Transformer)} gesetzt und über {@link #updateTransformer()}
 	 * aktualisiert. Für die Erstellung werden entweder die {@link Templates} oder die {@link TransformerFactoryConfigurationError} genutzt, die in
 	 * {@link #openTemplatesData()} konfiguriert sind. Die {@link TransformerFactory} wird nur dann verwendet, wenn die {@link Templates} {@code null} sind.
-	 * 
+	 *
 	 * @see #useTransformer(Transformer)
 	 * @see #updateTransformer()
 	 * @return {@link Transformer}.
@@ -221,7 +221,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Methode setzt den {@link Transformer} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param transformer {@link Transformer} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useTransformer(final Transformer transformer) {
@@ -230,7 +230,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Methode setzt den {@link Transformer} auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @return {@code this}. */
 	public final GThis resetTemplates() {
 		return this.useTransformer(null);
@@ -239,7 +239,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	/** Diese Methode aktualisiert die Einstellungen des {@link Transformer} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf den über {@link #getTransformer()} ermittelten {@link Transformer} die Einstellungen übertragen, die in
 	 * {@link #openPropertyData()} und {@link #openParameterData()} konfiguriert sind.
-	 * 
+	 *
 	 * @return {@code this}.
 	 * @throws TransformerConfigurationException Wenn {@link #getTransformer()} eine entsprechende Ausnahme auslöst. */
 	public final GThis updateTransformer() throws TransformerConfigurationException {
@@ -254,7 +254,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabeeigenschaften und gibt ihn zurück.
-	 * 
+	 *
 	 * @see Transformer#setOutputProperty(String, String)
 	 * @return Konfigurator. */
 	public final PropertyData<GThis> openPropertyData() {
@@ -262,7 +262,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Parameter und gibt ihn zurück.
-	 * 
+	 *
 	 * @see Transformer#setParameter(String, Object)
 	 * @return Konfigurator. */
 	public final ParameterData<GThis> openParameterData() {
@@ -270,7 +270,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die {@link Templates} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see Templates#newTransformer()
 	 * @see TransformerFactory#newTransformer()
 	 * @return Konfigurator. */
@@ -285,7 +285,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	protected abstract GThis _this_();
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getTransformer() */
 	@Override
 	public final Transformer build() throws IllegalStateException {

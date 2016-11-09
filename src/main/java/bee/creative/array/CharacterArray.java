@@ -3,7 +3,7 @@ package bee.creative.array;
 import java.util.List;
 
 /** Diese Schnittstelle definiert ein modifizierbares {@code char}-{@link Array}.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public interface CharacterArray extends Array<char[], Character> {
 
@@ -28,14 +28,14 @@ public interface CharacterArray extends Array<char[], Character> {
 	public CharacterArraySection section();
 
 	/** Diese Methode gibt den {@code index}-ten Wert zurück.
-	 * 
+	 *
 	 * @param index Position.
 	 * @return {@code index}-ter Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
 	public char get(int index) throws IndexOutOfBoundsException;
 
 	/** Diese Methode füllt das gegebene {@code char}-Array mit den Werten ab der gegebenen Position.
-	 * 
+	 *
 	 * @see CharacterArray#get(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.
@@ -53,14 +53,14 @@ public interface CharacterArray extends Array<char[], Character> {
 	public void get(int index, ArraySection<char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode setzt den {@code index}-ten Wert.
-	 * 
+	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index >= size()}). */
 	public void set(int index, char value) throws IndexOutOfBoundsException;
 
 	/** Diese Methode kopiert die Werte des gegebenen {@code char}-Arrays an die gegebene Position.
-	 * 
+	 *
 	 * @see CharacterArray#set(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.
@@ -78,12 +78,12 @@ public interface CharacterArray extends Array<char[], Character> {
 	public void set(int index, ArraySection<char[]> values) throws NullPointerException, IndexOutOfBoundsException;
 
 	/** Diese Methode fügt den gegebenen Werte am Ende ein.
-	 * 
+	 *
 	 * @param value Wert. */
 	public void add(char value);
 
 	/** Diese Methode fügt die Werte des gegebenen {@code char}-Arrays am Ende ein.
-	 * 
+	 *
 	 * @see CharacterArray#add(ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param values {@code char}-Array.
@@ -99,14 +99,14 @@ public interface CharacterArray extends Array<char[], Character> {
 	public void add(ArraySection<char[]> values) throws NullPointerException;
 
 	/** Diese Methode fügt den gegebenen Wert an der gegebenen Position ein.
-	 * 
+	 *
 	 * @param index Position.
 	 * @param value Wert.
 	 * @throws IndexOutOfBoundsException Wenn die gegebene Position ungültig ist ({@code index < 0} oder {@code index > size()}). */
 	public void add(int index, char value) throws IndexOutOfBoundsException;
 
 	/** Diese Methode fügt die Werte des gegebenen {@code char}-Arrays an der gegebenen Position ein.
-	 * 
+	 *
 	 * @see CharacterArray#add(int, ArraySection)
 	 * @see CharacterArraySection#from(char[])
 	 * @param index Position.

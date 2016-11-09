@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert ein abstraktes Kontextobjekt, das über einen {@link FEMFrame Stapelrahmen} der Auswertung von Funktionen bereitgestellt wird und
  * in Funktionen zur Umwandlung von Werten genutzt werden kann. Nachfahren sollten die Methoden {@link #dataFrom(FEMValue, FEMType)}, {@link #arrayFrom(Object)}
  * , {@link #valueFrom(Object)} und {@link #objectFrom(FEMValue)}.
- * 
+ *
  * @see FEMFrame#context()
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class FEMContext {
@@ -40,7 +40,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #dataFrom(FEMValue, FEMType) dataFrom(input, type)} in seine
 	 * Ausgabe überführt.
-	 * 
+	 *
 	 * @param <GData> Typ der Nutzdaten des gegebenen Datentyps sowie der Ausgebe des erzeugten {@link Converter}.
 	 * @param type Datentyp.
 	 * @return {@code dataFrom}-{@link Converter}.
@@ -64,7 +64,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt die in {@link FEMValue#data() Nutzdaten} des gegebenen Werts im gegebenen Datentyp ({@code GData}) zurück.<br>
 	 * Hierbei werden die Nutzdaten {@link FEMValue#data() value.data()} in den geforderten Datentyp konvertiert.
-	 * 
+	 *
 	 * @param <GData> Typ der gelieferten Nutzdaten, in welchen die Nutzdaten des gegebenen Werts konvertiert werden.
 	 * @param value gegebener Wert.
 	 * @param type gegebener Datentyp.
@@ -81,7 +81,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #arrayFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
-	 * 
+	 *
 	 * @return {@code arrayFrom}-{@link Converter}. */
 	public final Converter<Object, FEMArray> arrayFrom() {
 		return new Converter<Object, FEMArray>() {
@@ -108,7 +108,7 @@ public class FEMContext {
 	 * <li>Wenn es ein {@link Iterable} ist, wird dieses in eine {@link Collection} überführt, welche anschließend in eine Wertliste umgewandelt wird.</li>
 	 * <li>Andernfalls wird eine Ausnahme ausgelöst.</li>
 	 * </ol>
-	 * 
+	 *
 	 * @see Array#get(Object, int)
 	 * @see Array#getLength(Object)
 	 * @see Collection#toArray()
@@ -155,7 +155,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #valueFrom(Object) valueFrom(input)} in seine Ausgabe
 	 * überführt.
-	 * 
+	 *
 	 * @return {@code valueFrom}-{@link Converter}. */
 	public final Converter<Object, FEMValue> valueFrom() {
 		return new Converter<Object, FEMValue>() {
@@ -175,7 +175,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt einen {@link FEMValue Wert} mit den gegebenen {@link FEMValue#data() Nutzdaten} zurück.<br>
 	 * Welcher Wert- und Datentyp hierfür verwendet wird, ist der Implementation überlassen.
-	 * 
+	 *
 	 * @param object Nutzdaten.
 	 * @return Wert mit den gegebenen Nutzdaten.
 	 * @throws IllegalArgumentException Wenn kein Wert mit den gegebenen Nutzdaten erzeugt werden kann. */
@@ -197,7 +197,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt einen {@link Converter} zurück, der seine Eingabe {@code input} via {@link #objectFrom(FEMValue) objectFrom(input)} in seine Ausgabe
 	 * überführt.
-	 * 
+	 *
 	 * @return {@code objectFrom}-{@link Converter}. */
 	public final Converter<FEMValue, Object> objectFrom() {
 		return new Converter<FEMValue, Object>() {
@@ -217,7 +217,7 @@ public class FEMContext {
 
 	/** Diese Methode gibt ein {@link Object} zurück, welches via {@link #valueFrom(Object)} in einen Wert überführt werden kann, der zum gegebenen Wert
 	 * äquivalenten ist.
-	 * 
+	 *
 	 * @see #valueFrom(Object)
 	 * @param value Wert.
 	 * @return Objekt

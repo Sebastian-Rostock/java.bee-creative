@@ -13,7 +13,7 @@ import bee.creative.util.Objects;
  * <p>
  * Die Methoden {@link #mappings()} und {@link #listings()} delegieren an {@link #mapping(int)} und {@link #mappingCount()} bzw. {@link #listing(int)} und
  * {@link #listingCount()}.
- * 
+ *
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class IAMIndex {
 
@@ -43,13 +43,13 @@ public abstract class IAMIndex {
 	}
 
 	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Längen gegebener Zahlenlisten.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class SizeStats {
 
 		/** Diese Methode füht die Startpositionen der gegebenen Zahlenfolgen an den gegebenen {@link ByteBuffer} an.<br>
 		 * Die Zahlenfolgen repräsentieren die von {@link IAMListing#toBytes(ByteOrder)} bzw. {@link IAMMapping#toBytes(ByteOrder)} kodierten Datenstrukturen.
-		 * 
+		 *
 		 * @param buffer {@link ByteBuffer}.
 		 * @param source Zahlenfolgen. */
 		public static void putSize(final ByteBuffer buffer, final byte[][] source) {
@@ -63,7 +63,7 @@ public abstract class IAMIndex {
 
 		/** Diese Methode gibt den Datentyp für die gegebene Größe zurück.<br>
 		 * Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code UINT8}, {@code UINT16} und {@code UINT32}.
-		 * 
+		 *
 		 * @param value Größe.
 		 * @return Datentyp ({@code 1..3}). */
 		public static int computeSizeType(final int value) {
@@ -78,7 +78,7 @@ public abstract class IAMIndex {
 		 * Der Wert {@code 0} legt fest, dass alle Zahlenfolgen die gleiche Länge {@link #dataLength} besitzen.<br>
 		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die kummulierten Längen der Zahlenlisten als {@code UINT8}, {@code UINT16} bzw.
 		 * {@code UINT32} in {@link #dataOffset} gespeichert sind.
-		 * 
+		 *
 		 * @see SizeStats#computeSizeType(int) */
 		public final int type;
 
@@ -92,7 +92,7 @@ public abstract class IAMIndex {
 		public final int[] dataOffset;
 
 		/** Dieser Konstruktor analysiert die gegebene Zahlenliste und initialisiert die Felder.
-		 * 
+		 *
 		 * @param arrays Zahlenliste. */
 		public SizeStats(final List<int[]> arrays) {
 			final int count = arrays.size();
@@ -125,7 +125,7 @@ public abstract class IAMIndex {
 		{}
 
 		/** Diese Methode schreibt die {@link #dataLength} bzw. das {@link #dataOffset} gemäß {@link #type} in den gegebenen Puffer.
-		 * 
+		 *
 		 * @param buffer Puffer. */
 		public final void putSize(final ByteBuffer buffer) {
 			if (this.type == 0) {
@@ -138,13 +138,13 @@ public abstract class IAMIndex {
 	}
 
 	/** Diese Klasse implementiert ein Objekt zur Ermittlung der Kodierung gegebener Zahlenlisten.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class DataStats {
 
 		/** Diese Methode speichert die gegebene Zahlenfolge an den gegebenen {@link ByteBuffer} an.<br>
 		 * Der geschriebene Speicherbereich wird mit Nullwerten ergänzt, um eine restlos durch vier teilbare Größe zu erreichen.
-		 * 
+		 *
 		 * @see ByteBuffer#put(byte)
 		 * @see ByteBuffer#putInt(int)
 		 * @see ByteBuffer#putShort(short)
@@ -185,7 +185,7 @@ public abstract class IAMIndex {
 
 		/** Diese Methode gibt den Datentyp für den gegebenen Wert zurück.<br>
 		 * Die Datentypen {@code 1}, {@code 2} und {@code 3} stehen für {@code INT8}, {@code INT16} und {@code INT32}.
-		 * 
+		 *
 		 * @param value Wert.
 		 * @return Datengrößentyps ({@code 1..3}). */
 		public static int computeDataType(final int value) {
@@ -199,7 +199,7 @@ public abstract class IAMIndex {
 		/** Dieses Feld speichert den Datentyp.<br>
 		 * Die Werte {@code 1}, {@code 2} und {@code 2} legen fest, dass die Werte der Zahlenlisten als {@code INT8}, {@code INT16} bzw. {@code INT32} in
 		 * {@link #dataValue} gespeichert sind.
-		 * 
+		 *
 		 * @see DataStats#computeDataType(int) */
 		public final int type;
 
@@ -213,7 +213,7 @@ public abstract class IAMIndex {
 		public final int[] dataValue;
 
 		/** Dieser Konstruktor analysiert die gegebene Zahlenliste und initialisiert die Felder.
-		 * 
+		 *
 		 * @param arrays Zahlenliste. */
 		public DataStats(final List<int[]> arrays) {
 			this.dataSize = new SizeStats(arrays);
@@ -241,7 +241,7 @@ public abstract class IAMIndex {
 		{}
 
 		/** Diese Methode schreibt die {@link #dataValue} gemäß {@link #type} in den gegebenen Puffer.
-		 * 
+		 *
 		 * @param buffer Puffer. */
 		public final void putData(final ByteBuffer buffer) {
 			DataStats.putData(buffer, this.type, this.dataValue);
@@ -305,7 +305,7 @@ public abstract class IAMIndex {
 	{}
 
 	/** Diese Methode ist eine Abkürzung für {@code new IAMIndexLoader(MMFArray.from(object))}.
-	 * 
+	 *
 	 * @see MMFArray#from(Object)
 	 * @see IAMIndexLoader#IAMIndexLoader(MMFArray)
 	 * @param object Objekt.
@@ -319,20 +319,20 @@ public abstract class IAMIndex {
 	{}
 
 	/** Diese Methode gibt die {@code index}-te Abbildung zurück. Bei einem ungültigen {@code index} wird eine leere Abbildung geliefert.
-	 * 
+	 *
 	 * @see #mappingCount()
 	 * @param index Index.
 	 * @return {@code index}-te Abbildung. */
 	public abstract IAMMapping mapping(final int index);
 
 	/** Diese Methode gibt die Anzahl der Abbildungen zurück ({@code 0..1073741823}).
-	 * 
+	 *
 	 * @see #mapping(int)
 	 * @return Anzahl der Abbildungen. */
 	public abstract int mappingCount();
 
 	/** Diese Methode gibt eine {@link List}-Sicht auf die Abbildungen zurück.
-	 * 
+	 *
 	 * @see #mapping(int)
 	 * @see #mappingCount()
 	 * @return Abbildungen. */
@@ -341,20 +341,20 @@ public abstract class IAMIndex {
 	}
 
 	/** Diese Methode gibt die {@code index}-te Liste zurück. Bei einem ungültigen {@code index} wird eine leere Liste geliefert.
-	 * 
+	 *
 	 * @see #listingCount()
 	 * @param index Index.
 	 * @return {@code index}-te Liste. */
 	public abstract IAMListing listing(final int index);
 
 	/** Diese Methode gibt die Anzahl der Listen zurück.
-	 * 
+	 *
 	 * @see #listing(int)
 	 * @return Anzahl der Listen. */
 	public abstract int listingCount();
 
 	/** Diese Methode gibt {@link List}-Sicht auf die Listen zurück.
-	 * 
+	 *
 	 * @see #listing(int)
 	 * @see #listingCount()
 	 * @return Listen. */
@@ -363,14 +363,14 @@ public abstract class IAMIndex {
 	}
 
 	/** Diese Methode ist eine Ankürzung für {@code this.toBytes(ByteOrder.nativeOrder())}.
-	 * 
+	 *
 	 * @return Binärdatenformat {@code IAM_INDEX}. */
 	public final byte[] toBytes() {
 		return this.toBytes(ByteOrder.nativeOrder());
 	}
 
 	/** Diese Methode kodiert diesen {@link IAMIndex} in das binäre optimierte Datenformat {@code IAM_INDEX} und gibt dieses als Bytefolge zurück.
-	 * 
+	 *
 	 * @param order Bytereihenfolge.
 	 * @return {@code IAM_INDEX}. */
 	public final byte[] toBytes(final ByteOrder order) {

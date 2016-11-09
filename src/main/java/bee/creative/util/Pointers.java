@@ -4,13 +4,13 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 /** Diese Klasse implementiert grundlegende {@link Pointer}.
- * 
+ *
  * @see Pointer
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Pointers {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Pointer}.
-	 * 
+	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes. */
 	public static abstract class BasePointer<GData> implements Pointer<GData> {
@@ -37,7 +37,7 @@ public class Pointers {
 
 	/** Diese Klasse implementiert einen harten {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nicht
 	 * automatisch aufgelöst.
-	 * 
+	 *
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes. */
 	public static final class HardPointer<GData> extends BasePointer<GData> {
@@ -46,7 +46,7 @@ public class Pointers {
 		final GData _data_;
 
 		/** Dieser Konstruktor initialisiert den Datensatz.
-		 * 
+		 *
 		 * @param data Datensatz. */
 		public HardPointer(final GData data) {
 			this._data_ = data;
@@ -62,16 +62,16 @@ public class Pointers {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link WeakReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}
-	 * wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
-	 * 
+	/** Diese Klasse implementiert eine {@link WeakReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher
+	 * {@link Pointer} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
+	 *
 	 * @see WeakReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes. */
 	public static final class WeakPointer<GData> extends WeakReference<GData> implements Pointer<GData> {
 
 		/** Dieser Konstruktor initialisiert den Datensatz.
-		 * 
+		 *
 		 * @param data Datensatz. */
 		public WeakPointer(final GData data) {
 			super(data);
@@ -105,16 +105,17 @@ public class Pointers {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link SoftReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher {@link Pointer}
-	 * wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies entscheidet.
-	 * 
+	/** Diese Klasse implementiert eine {@link SoftReference} als {@link Pointer} auf einen Datensatz. Die Referenz auf den Datensatz eines solcher
+	 * {@link Pointer} wird nur dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies
+	 * entscheidet.
+	 *
 	 * @see SoftReference
 	 * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ des Datensatzes. */
 	public static final class SoftPointer<GData> extends SoftReference<GData> implements Pointer<GData> {
 
 		/** Dieser Konstruktor initialisiert den Datensatz.
-		 * 
+		 *
 		 * @param data Datensatz. */
 		public SoftPointer(final GData data) {
 			super(data);
@@ -169,7 +170,7 @@ public class Pointers {
 	{}
 
 	/** Diese Methode gibt den {@link Object#hashCode() Streuwert} des gegebenen {@link Pointer} zurück.
-	 * 
+	 *
 	 * @see Pointer#hashCode()
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Object#hashCode() Streuwert}. */
@@ -178,7 +179,7 @@ public class Pointers {
 	}
 
 	/** Diese Methode gibt die {@link Object#equals(Object) Äquivalenz} der gegebenen Objekte zurück.
-	 * 
+	 *
 	 * @see Pointer#equals(Object)
 	 * @param pointer {@link Pointer}.
 	 * @param object Objekt.
@@ -191,7 +192,7 @@ public class Pointers {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene {@link Pointer} gleich {@link #_null_} oder sein Datensatz nicht {@code null} ist.
-	 * 
+	 *
 	 * @param pointer {@link Pointer}.
 	 * @return {@link Pointer}-Validität.
 	 * @throws NullPointerException Wenn {@code pointer} {@code null} ist. */
@@ -201,7 +202,7 @@ public class Pointers {
 	}
 
 	/** Diese Methode gibt den gegebenen {@link Pointer} oder {@link #_null_} zurück.
-	 * 
+	 *
 	 * @see #nullPointer()
 	 * @param <GData> Typ des Datensatzes.
 	 * @param pointer {@link Pointer} oder {@code null}.
@@ -212,7 +213,7 @@ public class Pointers {
 	}
 
 	/** Diese Methode gibt einen {@link Pointer} auf den gegebenen Datensatz im gegebenen Modus zurück.
-	 * 
+	 *
 	 * @see #hardPointer(Object)
 	 * @see #weakPointer(Object)
 	 * @see #softPointer(Object)
@@ -234,7 +235,7 @@ public class Pointers {
 	}
 
 	/** Diese Methode gibt den {@link Pointer} auf {@code null} zurück.
-	 * 
+	 *
 	 * @param <GData> Typ des Datensatzes.
 	 * @return {@link #_null_}. */
 	@SuppressWarnings ("unchecked")
@@ -242,9 +243,9 @@ public class Pointers {
 		return (Pointer<GData>)Pointers._null_;
 	}
 
-	/** Diese Methode gibt einen harten {@link Pointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nicht
-	 * automatisch aufgelöst.
-	 * 
+	/** Diese Methode gibt einen harten {@link Pointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird
+	 * nicht automatisch aufgelöst.
+	 *
 	 * @see HardPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -254,9 +255,9 @@ public class Pointers {
 		return new HardPointer<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link WeakPointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nur dann
-	 * automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
-	 * 
+	/** Diese Methode gibt einen {@link WeakPointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nur
+	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link WeakReference} erreichbar ist.
+	 *
 	 * @see WeakPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -266,9 +267,9 @@ public class Pointers {
 		return new WeakPointer<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link SoftPointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nur dann
-	 * automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies entscheidet.
-	 * 
+	/** Diese Methode gibt einen {@link SoftPointer} auf den gegebenen Datensatz zurück. Die Referenz auf den Datensatz eines solcher {@link Pointer} wird nur
+	 * dann automatisch aufgelöst, wenn der Datensatz nur noch über {@link SoftReference} erreichbar ist und der Garbage Collector dies entscheidet.
+	 *
 	 * @see SoftPointer
 	 * @param <GData> Typ des Datensatzes.
 	 * @param data Datensatz.
@@ -278,9 +279,9 @@ public class Pointers {
 		return new SoftPointer<>(data);
 	}
 
-	/** Diese Methode gibt einen {@link Pointer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem des gegebenen {@link Pointer} ermittelt
-	 * wird.
-	 * 
+	/** Diese Methode gibt einen {@link Pointer} zurück, dessen Datensatz mit Hilfe des gegebenen {@link Converter} aus dem des gegebenen {@link Pointer}
+	 * ermittelt wird.
+	 *
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie des Datensatzes des gegebenen {@link Pointer}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie des Datensatzes.
 	 * @param converter {@link Converter}.

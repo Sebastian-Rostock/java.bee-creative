@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 /** Diese Klasse implementiert grundlegende {@link Comparator}.
- * 
+ *
  * @see Comparator
  * @author Sebastian Rostock 2011. */
 public class Comparators {
@@ -153,7 +153,7 @@ public class Comparators {
 	};
 
 	/** Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#longValue()} vergleicht.
-	 * 
+	 *
 	 * @see Comparators#compare(long, long) */
 	public static final Comparator<Number> LONG_COMPARATOR = new Comparator<Number>() {
 
@@ -170,7 +170,7 @@ public class Comparators {
 	};
 
 	/** Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#floatValue()} vergleicht.
-	 * 
+	 *
 	 * @see Comparators#compare(float, float) */
 	public static final Comparator<Number> FLOAT_COMPARATOR = new Comparator<Number>() {
 
@@ -187,7 +187,7 @@ public class Comparators {
 	};
 
 	/** Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#doubleValue()} vergleicht.
-	 * 
+	 *
 	 * @see Comparators#compare(double, double) */
 	public static final Comparator<Number> DOUBLE_COMPARATOR = new Comparator<Number>() {
 
@@ -204,7 +204,7 @@ public class Comparators {
 	};
 
 	/** Dieses Feld speichert den {@link Number}-{@link Comparator}, der Zahlen über ihren {@link Number#intValue()} vergleicht.
-	 * 
+	 *
 	 * @see Comparators#compare(int, int) */
 	public static final Comparator<Number> INTEGER_COMPARATOR = new Comparator<Number>() {
 
@@ -223,10 +223,8 @@ public class Comparators {
 	{}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
-	 * berechnete Vergleichswert entspricht:
-	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
-	 * 
+	 * berechnete Vergleichswert entspricht: <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
+	 *
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
@@ -235,10 +233,8 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
-	 * berechnete Vergleichswert entspricht:
-	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
-	 * 
+	 * berechnete Vergleichswert entspricht: <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
+	 *
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
@@ -247,10 +243,8 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert ist. Der
-	 * berechnete Vergleichswert entspricht:
-	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
-	 * 
+	 * berechnete Vergleichswert entspricht: <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
+	 *
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
@@ -259,10 +253,8 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn der erste Wert kleienr als, gleich bzw. größer als der zweite Wert
-	 * ist. Der berechnete Vergleichswert entspricht:
-	 * 
-	 * <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
-	 * 
+	 * ist. Der berechnete Vergleichswert entspricht: <pre>(item1 < item2 ? -1 : (item1 > item2 ? 1 : 0))</pre>
+	 *
 	 * @param item1 erster Wert.
 	 * @param item2 zweiter Wert.
 	 * @return Vergleichswert. */
@@ -272,7 +264,7 @@ public class Comparators {
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
 	 * Objekt ist.
-	 * 
+	 *
 	 * @see #compare(Object, Object, Comparator)
 	 * @see #naturalComparator()
 	 * @param <GItem> Typ der Objekte.
@@ -284,12 +276,10 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste Objekt kleienr als, gleich bzw. größer als das zweite
-	 * Objekt ist. Der berechnete Vergleichswert entspricht:
-	 * 
-	 * <pre>
+	 * Objekt ist. Der berechnete Vergleichswert entspricht: <pre>
 	 * ((item1 == null) ? ((item2 == null) ? 0 : -1) : ((item2 == null) ? 1 : comparator.compare(item1, item2)))
 	 * </pre>
-	 * 
+	 *
 	 * @param <GItem> Typ der Objekte.
 	 * @param item1 erstes Objekt.
 	 * @param item2 zweites Objekt.
@@ -303,7 +293,7 @@ public class Comparators {
 
 	/** Diese Methode gibt eine Zahl kleiner als, gleich oder größer als {@code 0} zurück, wenn das erste {@link Iterable} kleienr als, gleich bzw. größer als das
 	 * zweite {@link Iterable} ist.
-	 * 
+	 *
 	 * @see #compare(Iterable, Iterable, Comparator)
 	 * @see #naturalComparator()
 	 * @param <GItem> Typ der Elemente der {@link Iterable}.
@@ -320,7 +310,7 @@ public class Comparators {
 	 * nächstes Element liefern können, werden diese mit dem gegebenen {@link Comparator} verglichen. Wenn der so berechnete Vergleichswert unglich {@code 0} ist,
 	 * wird er zurück gegeben. Anderenfalls läuft die Iteration weiter. Wenn der erste {@link Iterator} ein nächstes Element besitzt, der zweite {@link Iterator}
 	 * jedoch kein nächstes Element liefern kann, wird {@code 1} zurück gegeben.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente der {@link Iterable}.
 	 * @param item1 erster {@link Iterable}.
 	 * @param item2 zweiter {@link Iterable}.
@@ -341,7 +331,7 @@ public class Comparators {
 
 	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der {@code null}-Eingaben vergleicht sowie alle anderen Eingaben an einen gegebenen
 	 * {@link Comparator} weiterleitet
-	 * 
+	 *
 	 * @see #compare(Object, Object, Comparator)
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
@@ -365,7 +355,7 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt den {@link Comparator} für die natürliche Ordnung zurück.
-	 * 
+	 *
 	 * @see Comparable
 	 * @param <GEntry> Typ der Elemente.
 	 * @return {@link #NATURAL_COMPARATOR}. */
@@ -375,7 +365,7 @@ public class Comparators {
 	}
 
 	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der den Vergleichswert des gegebenen {@link Comparator} umkehrt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparator {@link Comparator}.
 	 * @return {@code reverse}-{@link Comparator}.
@@ -399,7 +389,7 @@ public class Comparators {
 
 	/** Diese Methode gibt einen neuen {@link Comparator} zurück, der zwei {@link Iterable} mit Hilfe des gegebenen {@link Comparator} analog zu Zeichenketten
 	 * (d.h. lexikographisch) vergleicht.
-	 * 
+	 *
 	 * @see #compare(Iterable, Iterable, Comparator)
 	 * @param <GItem> Typ der in den {@link Iterable} enthaltenen sowie vom gegebenen {@link Comparator} zu vergleichenden Elemente.
 	 * @param comparator {@link Comparator}.
@@ -424,7 +414,7 @@ public class Comparators {
 
 	/** Diese Methode gibt einen verketteten {@link Comparator} zurück, der seine Eingaben zuerst über den ersten {@link Comparator} vergleich und den zweiten
 	 * {@link Comparator} nur dann verwenet, wenn der erste {@link Comparator} mit dem Vergleichswert {@code 0} die Gleichheit der Eingaben anzeigt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param comparator1 erster {@link Comparator}.
 	 * @param comparator2 zweiter {@link Comparator}.
@@ -454,7 +444,7 @@ public class Comparators {
 	/** Diese Methode gibt einen navigierten {@link Comparator} zurück, der von seinen Eingaben mit dem gegebenen {@link Converter} zu den Eingaben des gegebenen
 	 * {@link Comparator} navigiert. Der Vergleichswert zweier Elemente {@code item1} und {@code item2} ergibt sich aus
 	 * {@code comparator.compare(converter.convert(item1), converter.convert(item2))}.
-	 * 
+	 *
 	 * @see Converter
 	 * @param <GItem> Typ der Eingabe des {@link Converter} sowie der Elemente des erzeugten {@link Comparator}.
 	 * @param <GItem2> Typ der Ausgabe des {@link Converter} sowie der Elemente des gegebenen {@link Comparator}.

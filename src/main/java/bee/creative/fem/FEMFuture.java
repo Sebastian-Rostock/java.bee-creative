@@ -7,7 +7,7 @@ package bee.creative.fem;
  * Aufruf von {@link #result(boolean)}.<br>
  * Der von der Funktion berechnete Ergebniswert wird zur Wiederverwendung zwischengespeichert.<br>
  * Nach der einmaligen Auswertung der Funktion werden die Verweise auf Stapelrahmen und Funktion aufgelöst.
- * 
+ *
  * @author [cc-by] 2011 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMFuture extends FEMValue {
 
@@ -15,7 +15,7 @@ public final class FEMFuture extends FEMValue {
 	 * <em>call-by-reference</em>-Semantik zurück.<br>
 	 * Der gelieferte Ergebniswert verzögert die Auswertung der Funktion bis zum ersten {@link #result(boolean) Zugriff} auf seinen {@link #type() Datentyp} bzw.
 	 * seine {@link #data() Nutzdaten}.
-	 * 
+	 *
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion.
 	 * @return Ergebniswert.
@@ -29,22 +29,22 @@ public final class FEMFuture extends FEMValue {
 	{}
 
 	/** Dieses Feld speichert das von der Funktion berechnete Ergebnis oder {@code null}.
-	 * 
+	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
 	FEMValue _result_;
 
 	/** Dieses Feld speichert die Stapelrahmen zur Auswertung der Funktion oder {@code null}.
-	 * 
+	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
 	FEMFrame _frame_;
 
 	/** Dieses Feld speichert die Funktion oder {@code null}.
-	 * 
+	 *
 	 * @see FEMFunction#invoke(FEMFrame) */
 	FEMFunction _function_;
 
 	/** Dieser Konstruktor initialisiert Stapelrahmen und Funktion.
-	 * 
+	 *
 	 * @param frame Stapelrahmen.
 	 * @param function Funktion. */
 	FEMFuture(final FEMFrame frame, final FEMFunction function) {
@@ -56,7 +56,7 @@ public final class FEMFuture extends FEMValue {
 
 	/** Diese Methode gibt die Stapelrahmen oder {@code null} zurück.<br>
 	 * Der erste Aufruf von {@link #result(boolean)} setzt die Stapelrahmen auf {@code null}.
-	 * 
+	 *
 	 * @return Stapelrahmen oder {@code null}. */
 	public final synchronized FEMFrame frame() {
 		return this._frame_;
@@ -64,14 +64,12 @@ public final class FEMFuture extends FEMValue {
 
 	/** Diese Methode gibt die Funktion oder {@code null} zurück.<br>
 	 * Der erste Aufruf von {@link #result(boolean)} setzt die Funktion auf {@code null}.
-	 * 
+	 *
 	 * @return Funktion oder {@code null}. */
 	public final synchronized FEMFunction function() {
 		return this._function_;
 	}
 
-	
-	
 	{}
 
 	/** Diese Methode gibt {@code this.result().data()} zurück. */
@@ -90,7 +88,7 @@ public final class FEMFuture extends FEMValue {
 	 * zurück.<br>
 	 * Dieser Ergebniswert wird nur beim ersten Aufruf dieser Methode ermittelt und zur Wiederverwendung zwischengespeichert. Dabei werden die Verweise auf
 	 * Stapelrahmen und Funktion aufgelöst.
-	 * 
+	 *
 	 * @see FEMFuture
 	 * @see #frame()
 	 * @see #function()

@@ -6,13 +6,13 @@ import bee.creative.mmf.MMFArray;
 import bee.creative.util.Bytes;
 
 /** Diese Klasse implementiert die Klassen und Methoden zur Dekodierung der {@code Integer Array Model} Datenstrukturen.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IAMLoader {
 
 	/** Diese Klasse implementiert ein Objekt zur Analyse und Prüfung der Kennung einer Datenstruktur in den Kopfdaten von {@code IAM_MAP}, {@code IAM_LIST} oder
 	 * {@code IAM_INDEX}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMHeader {
 
@@ -23,7 +23,7 @@ public class IAMLoader {
 		final int _value_;
 
 		/** Dieser Konstruktor initialisiert Bitmaske und Vergleichswert.
-		 * 
+		 *
 		 * @param mask Bitmaske.
 		 * @param value Vergleichswert. */
 		public IAMHeader(final int mask, final int value) {
@@ -34,7 +34,7 @@ public class IAMLoader {
 		{}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die gegebenen Kopfdaten eine gültige Datenstrukturkennung enthalten.
-		 * 
+		 *
 		 * @param header Kopfdaten.
 		 * @return {@code true}, wenn die Kopfdaten eine gültige Kennunge enthalten. */
 		public final boolean isValid(final int header) {
@@ -44,7 +44,7 @@ public class IAMLoader {
 		/** Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
 		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
 		 * geliefert.
-		 * 
+		 *
 		 * @param bytes Quelldaten.
 		 * @return Bytereihenfolge oder {@code null}.
 		 * @throws NullPointerException Wenn {@code bytes} {@code null} ist. */
@@ -58,7 +58,7 @@ public class IAMLoader {
 		/** Diese Methode gibt die Bytereihenfolge zur Interpretation der gegebenen Quelldaten zurück, für welche die Kopfdaten in den ersten vier Byte der
 		 * Quelldaten die {@link #isValid(int) gültige} Datenstrukturkennung enthalten. Wenn die Kopfdaten {@link #isValid(int) ungültig} sind, wird {@code null}
 		 * geliefert.
-		 * 
+		 *
 		 * @see #orderOf(byte[])
 		 * @see MMFArray#from(Object)
 		 * @param object Quelldaten.
@@ -80,7 +80,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Klasse implementiert einen {@link IAMIndex}, der seine Daten aus einem {@link MMFArray} dekodiert.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMIndexLoader extends IAMIndex {
 
@@ -105,7 +105,7 @@ public class IAMLoader {
 		}
 
 		/** Dieser Kontrukteur initialisiert diesen {@link IAMIndex} als Sicht auf den gegebenen Speicherbereich.
-		 * 
+		 *
 		 * @param array Speicherbereich.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -195,7 +195,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Klasse implementiert eine {@link IAMListing}, die ihre Daten aus einem {@link MMFArray} dekodiert.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMListingLoader extends IAMListing {
 
@@ -228,7 +228,7 @@ public class IAMLoader {
 		}
 
 		/** Dieser Kontrukteur initialisiert diese {@link IAMListing} als Sicht auf den gegebenen Speicherbereich.
-		 * 
+		 *
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -314,7 +314,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Klasse implementiert eine {@link IAMMapping}, die ihre Daten aus einem {@link MMFArray} dekodiert.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMMappingLoader extends IAMMapping {
 
@@ -367,7 +367,7 @@ public class IAMLoader {
 		}
 
 		/** Dieser Kontrukteur initialisiert diese {@link IAMMapping} als Sicht auf den gegebenen Speicherbereich.
-		 * 
+		 *
 		 * @param array Speicherbereich mit {@code INT32} Zahlen.
 		 * @throws IAMException Wenn beim dekodieren des Speicherbereichs ein Fehler erkannt wird.
 		 * @throws NullPointerException Wenn {@code array} {@code null} ist. */
@@ -575,7 +575,7 @@ public class IAMLoader {
 	{}
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code UINT8}, {@code UINT16} bzw. {@code INT32} Zahlen zurück.
-	 * 
+	 *
 	 * @see MMFArray#toUINT8()
 	 * @see MMFArray#toUINT16()
 	 * @see MMFArray#toINT32()
@@ -596,7 +596,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Methode gibt den Speicherbereich der gegebenen Zahlenfolge als {@link MMFArray} mit {@code INT8}, {@code INT16} bzw. {@code INT32} Zahlen zurück.
-	 * 
+	 *
 	 * @see MMFArray#toINT8()
 	 * @see MMFArray#toINT16()
 	 * @see MMFArray#toINT32()
@@ -617,7 +617,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Methode prüft die Monotonität der gegebenen Zahlenfolge.
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @throws IAMException Wenn die erste Zahl nicht {@code 0} ist oder die Zahlen nicht monoton steigen. */
 	static void _checkArray_(final IAMArray array) throws IAMException {
@@ -631,7 +631,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Methode gibt die kleinste Länge eines {@code INT32} Arrays zurück, in dessen Speicherbereich ein {@code INT8} Array mit der gegebenen Länge passen.
-	 * 
+	 *
 	 * @param byteCount Länge eines {@code INT8} Arrays.
 	 * @return Länge des {@code INT32} Arrays. */
 	static int _byteAlign_(final int byteCount) {
@@ -639,7 +639,7 @@ public class IAMLoader {
 	}
 
 	/** Diese Methode gibt die Byteanzahl des gegebenen Datengrößentyps zurück.
-	 * 
+	 *
 	 * @param dataType Datengrößentyps ({@code 1}, {@code 2} oder {@code 3}).
 	 * @return Byteanzahl ({@code 1}, {@code 2} oder {@code 4}). */
 	static int _byteCount_(final int dataType) {

@@ -2,7 +2,7 @@ package bee.creative.fem;
 
 /** Diese Klasse implementiert einen unveränderlichen Dezimalbruch.<br>
  * Intern wird der Dezimalbruch als {@code double} dargestellt.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal> {
 
@@ -18,7 +18,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	{}
 
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Dezimalbruch. */
 	public static FEMDecimal from(final double value) {
@@ -26,7 +26,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	}
 
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem gegebenen Wert zurück.
-	 * 
+	 *
 	 * @param value Wert.
 	 * @return Dezimalbruch.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
@@ -36,7 +36,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 
 	/** Diese Methode gibt einen neuen Dezimalbruch mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
 	 * Das Format der Zeichenkette entspricht dem der {@link #toString() Textdarstellung}.
-	 * 
+	 *
 	 * @see #toString()
 	 * @see Double#parseDouble(String)
 	 * @param value Zeichenkette.
@@ -52,7 +52,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMDecimal.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Dezimalbruch.
@@ -67,7 +67,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	final double _value_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung des Dezimalbruchs.
-	 * 
+	 *
 	 * @param value interne Darstellung des Dezimalbruchs. */
 	public FEMDecimal(final double value) {
 		this._value_ = value;
@@ -76,14 +76,14 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	{}
 
 	/** Diese Methode gibt die interne Darstellung des Dezimalbruchs zurück.
-	 * 
+	 *
 	 * @return interne Darstellung des Dezimalbruchs. */
 	public final double value() {
 		return this._value_;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		final long value = Double.doubleToLongBits(this._value_);
@@ -91,7 +91,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn dieser Dezimalbruch gleich dem gegebenen ist.
-	 * 
+	 *
 	 * @param that Dezimalbruch.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -102,7 +102,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn dieser Dezimalbruch kleiner, gleich oder größer als der gegebene Dezimalbruch ist.
 	 * Wenn die Dezimalbrüche nicht vergleichbar sind, wird {@code undefined} geliefert.
-	 * 
+	 *
 	 * @param that Dezimalbruch.
 	 * @param undefined Rückgabewert für nicht vergleichbare Dezimalbrüche.
 	 * @return Vergleichswert oder {@code undefined}.
@@ -115,7 +115,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	}
 
 	/** Diese Methode gibt diesen Dezimalbruch als {@link Number} zurück.
-	 * 
+	 *
 	 * @return {@link Number}. */
 	public final Number toNumber() {
 		return new Double(this._value_);
@@ -172,7 +172,7 @@ public final class FEMDecimal extends FEMValue implements Comparable<FEMDecimal>
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieses Dezimalbruchs zurück.
-	 * 
+	 *
 	 * @see Double#toString(double)
 	 * @return Textdarstellung. */
 	@Override

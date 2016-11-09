@@ -4,7 +4,7 @@ import java.util.Map;
 import bee.creative.util.Comparators;
 
 /** Diese Klasse implementiert eine {@link Object#hashCode() Streuwert} basiertes {@link CompactItemMap}.
- * 
+ *
  * @see Object#hashCode()
  * @see Object#equals(Object)
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
@@ -18,7 +18,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -27,7 +27,7 @@ public abstract class CompactItemHashMap<GKey, GValue> extends CompactItemMap<GK
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Map} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Map#putAll(Map)
 	 * @param map Elemente.
 	 * @throws NullPointerException Wenn die gegebene {@link Map} {@code null} ist. */

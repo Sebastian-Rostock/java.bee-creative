@@ -27,13 +27,13 @@ import bee.creative.util.Objects;
 import bee.creative.util.Unique.UniqueMap;
 
 /** Diese Klasse implementiert die Algorithmen zur Kodierung der {@code Binary Encoded XML} Datenstrukturen.
- * 
+ *
  * @see BEXFileBuilder
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class BEXBuilder {
 
 	/** Diese Klasse implementiert einen Datensatz, dem ein identifizierender {@link #key()} zugeordnet werden kann.
-	 * 
+	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static abstract class BEXItem {
 
@@ -43,7 +43,7 @@ public final class BEXBuilder {
 		{}
 
 		/** Diese Methode gibt den Schlüssel zur Referenzierung zurück.
-		 * 
+		 *
 		 * @return Schlüssel. */
 		public int key() {
 			return this.key;
@@ -60,7 +60,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert ein einen Datensatz, der zur Verwaltung einzigartiger Zeichenketten eingesetzt wird.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXTextItem extends BEXItem {
 
@@ -83,7 +83,7 @@ public final class BEXBuilder {
 		public String text;
 
 		/** Dieser Konstruktor initialisiert die Zeichenkette.
-		 * 
+		 *
 		 * @param text Zeichenkette. */
 		public BEXTextItem(final String text) {
 			this.text = text;
@@ -100,7 +100,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert ein einen Datensatz, der zur Verwaltung einzigartiger Kind- und Attributknotenlisten eingesetzt wird.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXGroupItem extends BEXItem {
 
@@ -132,7 +132,7 @@ public final class BEXBuilder {
 		}
 
 		/** Dieser Konstruktor initialisiert die Gruppe mit den gegebenen Kind- bzw. Attributknoten.
-		 * 
+		 *
 		 * @param items Kind- bzw. Attributknoten. */
 		public BEXGroupItem(final List<BEXItem> items) {
 			this.items = items;
@@ -141,7 +141,7 @@ public final class BEXBuilder {
 		{}
 
 		/** Diese Methode fügt den gegebenen Datensatz an {@link #items} an und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @param item Datensatz oder {@code null}.
 		 * @return {@code this}. */
 		public final BEXGroupItem put(final BEXItem item) {
@@ -160,7 +160,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert einen Datensatz, der das Elternelement eines Kind- bzw- Attributknoten eingesetzt wird.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXParentItem extends BEXItem {
 
@@ -171,7 +171,7 @@ public final class BEXBuilder {
 		public int index;
 
 		/** Dieser Konstruktor initialisiert Kindknotenliste und Position.
-		 * 
+		 *
 		 * @see #group
 		 * @see #index
 		 * @param group Kindknotenliste.
@@ -192,7 +192,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert eine abstrakte {@link UniqueMap} zur Verwaltung einzigartiger Datensätze.
-	 * 
+	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GData> Typ der Eingabedaten.
 	 * @param <GItem> Typ der Datensätze. */
@@ -209,7 +209,7 @@ public final class BEXBuilder {
 		{}
 
 		/** Diese Methode fügt den gegebenen Datensatz an {@link #items} an und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @param item Datensatz.
 		 * @return {@code this}. */
 		public final GItem put(final GItem item) {
@@ -243,7 +243,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert den {@link BEXPool} zur Verwaltung einzigartiger Zeichenketten.
-	 * 
+	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXTextPool extends BEXPool<String, BEXTextItem> {
 
@@ -269,7 +269,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert den {@link BEXPool} zur Verwaltung einzigartiger Kind- bzw. Attributknotenlisten.
-	 * 
+	 *
 	 * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXGroupPool extends BEXPool<List<BEXItem>, BEXGroupItem> {
 
@@ -300,7 +300,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert die allgemeinen Zustandsdaten, die während der Bestückung von Knoten eingesetzt werden.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	static final class BEXStack {
 
@@ -348,7 +348,7 @@ public final class BEXBuilder {
 	}
 
 	/** Diese Klasse implementiert ein Objekt zur Zusammenstellung und Kodierung der Daten für einen {@link BEXFileLoader}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class BEXFileBuilder {
 
@@ -403,7 +403,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode beendet die Bestückung des aktuellen Attributknoten und gibt {@code this} zurück.<br>
 		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Attributknoten bestückt wird oder dessen Name unbestimmt ist. */
 		public final BEXFileBuilder putAttr() throws IllegalStateException {
@@ -422,7 +422,7 @@ public final class BEXBuilder {
 		 * Die Bestückung des neuen, aktuellen Attributknoten kann anschließend über {@link #useUri(String)}, {@link #useName(String)} und {@link #useValue(String)}
 		 * erfolgen und muss mit {@link #putAttr()} abgeschlossen werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von
 		 * {@link #putAttr()} fortgesetzt werden.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newAttr() throws IllegalStateException {
@@ -437,7 +437,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode beendet die Bestückung des aktuellen Textknoten und gibt {@code this} zurück.<br>
 		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
 		public final BEXFileBuilder putText() throws IllegalStateException {
@@ -453,7 +453,7 @@ public final class BEXBuilder {
 		/** Diese Methode beginnt die Bestückung eines neuen Textknoten und gibt {@code this} zurück.<br>
 		 * Die Bestückung des neuen, aktuellen Textknoten kann anschließend über {@link #useValue(String)} erfolgen und muss mit {@link #putText()} abgeschlossen
 		 * werden. Die Bestückung des Elternknoten (Elementknoten) kann erst nach dem Aufruf von {@link #putText()} fortgesetzt werden.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newText() throws IllegalStateException {
@@ -466,7 +466,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode beendet die Bestückung des aktuellen Elementknoten und gibt {@code this} zurück.<br>
 		 * Anschließend wird die Bestückung des Elternknoten (Elementknoten) fortgesetzt.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell kein Textknoten bestückt wird. */
 		public final BEXFileBuilder putElem() throws IllegalStateException {
@@ -482,7 +482,8 @@ public final class BEXBuilder {
 				chldItems.get(2) : //
 				(stack.children = this._chldParentEnabled_ && !chldItems.isEmpty() ? this._chldTablePart_.put(stack.children) : this._chldTablePart_.get(chldItems));
 			final BEXItem attributes = //
-				(stack.attributes = this._attrParentEnabled_ && !attrItems.isEmpty() ? this._attrTablePart_.put(stack.attributes) : this._attrTablePart_.get(attrItems));
+				(stack.attributes =
+					this._attrParentEnabled_ && !attrItems.isEmpty() ? this._attrTablePart_.put(stack.attributes) : this._attrTablePart_.get(attrItems));
 			if (parent == null) return this;
 			this._stack_ = parent;
 			parent.children.put(uri).put(name).put(content).put(attributes).put(this._chldParentEnabled_ ? parent.item : null);
@@ -497,7 +498,7 @@ public final class BEXBuilder {
 		 * Die Bestückung des neuen, aktuellen Elementknoten kann anschließend über {@link #useUri(String)}, {@link #useName(String)}, {@link #newAttr()},
 		 * {@link #newText()} und {@link #newElem()} erfolgen und muss mit {@link #putElem()} abgeschlossen werden. Die Bestückung des Elternknoten (Elementknoten)
 		 * kann erst nach dem Aufruf von {@link #putElem()} fortgesetzt werden.
-		 * 
+		 *
 		 * @return {@code this}.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
 		public final BEXFileBuilder newElem() throws IllegalStateException {
@@ -515,7 +516,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode fügt die in {@link #_text_} gesammelte Zeichenkette als Textknoten an den gegebenen Elternknoten an.
-		 * 
+		 *
 		 * @param parent Elternknoten. */
 		final void _putText_(final BEXStack parent) {
 			final StringBuilder text = this._text_;
@@ -526,7 +527,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode ließt die gegebene {@code XML} Datei ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #putNode(InputSource, XMLReader)
 		 * @param file Datei.
 		 * @return {@code this}.
@@ -551,7 +552,7 @@ public final class BEXBuilder {
 		 * <li>Wenn der Knotentyp {@link Node#DOCUMENT_NODE} ist, wird analog zu {@link #putNode(Node)} das Wurzelelement erzeugt.</li>
 		 * <li>Wenn der Knotentyp keiner der oben ganennten ist, wird der Knoten ignoriert.</li>
 		 * </ul>
-		 * 
+		 *
 		 * @param node Knoten.
 		 * @return {@code this}.
 		 * @throws NullPointerException Wenn {@code node} {@code null} ist.
@@ -591,7 +592,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode ließt die gegebene Datenquelle mit dem gegebenen Parser ein, fügt das darin beschriebenen Wurzelelement an und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @param source Datenquelle.
 		 * @param reader Parser.
 		 * @return {@code this}.
@@ -599,8 +600,8 @@ public final class BEXBuilder {
 		 * @throws SAXException Wenn die Datenquelle nicht geparst werden kann.
 		 * @throws NullPointerException Wenn {@code source} bzw. {@code reader} {@code null} ist.
 		 * @throws IllegalStateException Wenn aktuell nicht das Wurzelement oder kein Elementknoten bestückt wird. */
-		public final BEXFileBuilder putNode(final InputSource source, final XMLReader reader) throws IOException, SAXException, NullPointerException,
-			IllegalStateException {
+		public final BEXFileBuilder putNode(final InputSource source, final XMLReader reader)
+			throws IOException, SAXException, NullPointerException, IllegalStateException {
 			reader.setContentHandler(new DefaultHandler() {
 
 				@Override
@@ -633,7 +634,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode setzt den URI des aktuellen Element- bzw. Attributknoten gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #newAttr()
 		 * @see #newElem()
 		 * @see BEXNode#uri()
@@ -648,7 +649,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode setzt den Namen des aktuellen Element- bzw. Attributknoten gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #newAttr()
 		 * @see #newElem()
 		 * @see BEXNode#name()
@@ -667,7 +668,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode setzt den Namen des aktuellen Text- bzw. Attributknoten gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #newAttr()
 		 * @see #newText()
 		 * @see BEXNode#value()
@@ -682,7 +683,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die URI von Attributknoten erfasst werden. Andernfalls werden diese ignoriert.
-		 * 
+		 *
 		 * @see #useUri(String)
 		 * @see #useAttrUriEnabled(boolean)
 		 * @return {@code true}, wenn die URI von Attributknoten erfasst werden. */
@@ -691,7 +692,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Elternknoten von Attributknoten erfasst werden. Andernfalls werden diese ignoriert.
-		 * 
+		 *
 		 * @see #useAttrParentEnabled(boolean)
 		 * @return {@code true}, wenn die Elternknoten von Attributknoten erfasst werden. */
 		public final boolean isAttrParentEnabled() {
@@ -699,7 +700,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die URI von Elementknoten erfasst werden. Andernfalls werden diese ignoriert.
-		 * 
+		 *
 		 * @see #useUri(String)
 		 * @see #useChldUriEnabled(boolean)
 		 * @return {@code true}, wenn die URI von Elementknoten erfasst werden. */
@@ -708,7 +709,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn die Elternknoten von Kindknoten erfasst werden. Andernfalls werden diese ignoriert.
-		 * 
+		 *
 		 * @see #useChldParentEnabled(boolean)
 		 * @return {@code true}, wenn die Elternknoten von Kindknoten erfasst werden. */
 		public final boolean isChldParentEnabled() {
@@ -716,7 +717,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode setzt die Aktivierung der URI an Attributknoten und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #useUri(String)
 		 * @see #newAttr()
 		 * @see #newElem()
@@ -733,7 +734,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode setzt die Aktivierung der Elternknoten an Attributknoten und gibt {@code this} zurück.<br>
 		 * Wenn die Elternknoten an Attributknoten erfasst werden, werden auch die der Kindknoten erfasst.
-		 * 
+		 *
 		 * @see #isAttrParentEnabled()
 		 * @param value {@code true}, wenn die Elternknoten von Attributknoten erfasst werden.
 		 * @return {@code this}.
@@ -747,7 +748,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode setzt die Aktivierung der URI an Elementknoten und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #useUri(String)
 		 * @see #newAttr()
 		 * @see #newElem()
@@ -764,7 +765,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode setzt die Aktivierung der Elternknoten an Kindknoten und gibt {@code this} zurück.<br>
 		 * Wenn die Elternknoten an Kindknoten ignoriert werden, werden auch die der Attributknoten ignoriert.
-		 * 
+		 *
 		 * @see #isAttrParentEnabled()
 		 * @param value {@code true}, wenn die Elternknoten von Kindknoten erfasst werden.
 		 * @return {@code this}.
@@ -796,7 +797,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode kodiert die gesammelten Daten in einen {@link IAMIndex} und gibt diesen zurück.
-		 * 
+		 *
 		 * @return {@link IAMIndex}.
 		 * @throws IllegalStateException Wenn der aktuelle Knoten nicht das Wurzelelement ist. */
 		public final IAMIndexBuilder toIndex() throws IllegalStateException {
@@ -827,7 +828,7 @@ public final class BEXBuilder {
 
 		/** Diese Methode aktualisiert die Ordnung der zusammengestellten Datensätze, die Anzahl der Zeilen der durch diese Datensätze beschriebenen Tabelle sowie
 		 * die Schlüssel und Startpositionen der Datensätze.
-		 * 
+		 *
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param step Inkrement für den Zähler der Schlüssel (-1=Kindknoten, +1=Attributknoten). */
 		final void _updatePART_(final BEXGroupPool pool, final int step) {
@@ -844,7 +845,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode kodiert die Längen der gegebenen Tabellenabschnitte in eine Zahlenfolge und gibt diese in einer Auflistung zurück.
-		 * 
+		 *
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @return Auflistung mit einer Zahlenfolge. */
 		final IAMListingBuilder _encodePART_(final BEXGroupPool pool) {
@@ -861,7 +862,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode kodiert eine Spalte der gegebenen Tabellenabschnitte in eine Zahlenfolge und gibt diese in einer Auflistung zurück.
-		 * 
+		 *
 		 * @param pool Auflistung von Tabellenabschnitten (Knotenlisten).
 		 * @param prop Spaltenindex (0..4).
 		 * @return Auflistung mit einer Zahlenfolge. */
@@ -886,7 +887,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode kodiert die gegebenen Zeichenketten in eine Liste von Zahlenfolgen und gibt diese zurück.
-		 * 
+		 *
 		 * @see BEXFile#valueFrom(String)
 		 * @param pool Auflistung von Zeichenketten.
 		 * @return Auflistung von Zahlenfolgen. */
@@ -901,7 +902,7 @@ public final class BEXBuilder {
 		}
 
 		/** Diese Methode kodiert die Datentypkennung sowie den Verweis auf das Wurzelelement in eine Auflistung von Zahlenfolgen und gibt diese zurück.
-		 * 
+		 *
 		 * @return Auflistung von Zahlenfolgen. */
 		final IAMListing _encodeHEAD_() {
 			final IAMListingBuilder header = new IAMListingBuilder();

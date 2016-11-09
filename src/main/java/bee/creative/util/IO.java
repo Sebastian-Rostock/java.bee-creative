@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.Arrays;
 import bee.creative.array.ByteArray;
 import bee.creative.array.ByteArraySection;
 import bee.creative.array.CharacterArray;
@@ -36,7 +37,7 @@ import bee.creative.data.FileDataSource;
 import bee.creative.data.FileDataTarget;
 
 /** Diese Klasse implementiert Methoden zur Erzeugung von Ein- und Ausgabe.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class IO {
 
@@ -53,10 +54,10 @@ public class IO {
 	 * <dd>Es wird eine den gegebenen {@link DataInput} lesende {@link DataSource} geliefert, welche keine Navigation bzw. Größenänderung unterstützt.</dd>
 	 * <dt>{@link InputStream}</dt>
 	 * <dd>Es wird eine den gegebenen {@link InputStream} lesende {@link DataSource} geliefert, welche keine Navigation bzw. Größenänderung unterstützt.</dd>
-	 * <dt> {@link ByteBuffer}</dt>
+	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Es wird eine den gegebenen {@link ByteBuffer} lesende {@link DataSource} geliefert, welche keine Größenänderung unterstützt.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link DataSource}.
 	 * @throws IOException Wenn der {@link DataSource} nicht erzeugt werden kann. */
@@ -192,7 +193,7 @@ public class IO {
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link ByteBuffer}.
 	 * @throws IOException Wenn der {@link ByteBuffer} nicht erzeugt werden kann. */
@@ -249,7 +250,7 @@ public class IO {
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein das gegebene Array lesender {@link InputStream} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link InputStream}.
 	 * @throws IOException Wenn der {@link InputStream} nicht erzeugt werden kann. */
@@ -296,7 +297,7 @@ public class IO {
 	 * <dt>{@link String}</dt>
 	 * <dd>Es wird ein zur gegebenen Zeichenkette erzeugter {@link StringReader} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link Reader}.
 	 * @throws IOException Wenn der {@link Reader} nicht erzeugt werden kann. */
@@ -353,13 +354,15 @@ public class IO {
 	 * <dt>{@link ByteArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibendes {@link DataTarget} geliefert, welches keine Navigation unterstützt.</dd>
 	 * <dt>{@link DataOutput}</dt>
-	 * <dd>Es wird ein in den gegebenen {@link DataOutput} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
+	 * <dd>Es wird ein in den gegebenen {@link DataOutput} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung
+	 * unterstützt.</dd>
 	 * <dt>{@link OutputStream}</dt>
-	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung unterstützt.</dd>
-	 * <dt> {@link ByteBuffer}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibendes {@link DataTarget} geliefert, welches keine Navigation bzw. Größenänderung
+	 * unterstützt.</dd>
+	 * <dt>{@link ByteBuffer}</dt>
 	 * <dd>Es wird ein in den gegebenen {@link ByteBuffer} schreibendes {@link DataTarget} geliefert, welches keine Größenänderung unterstützt.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link DataTarget}.
 	 * @throws IOException Wenn der {@link DataTarget} nicht erzeugt werden kann. */
@@ -492,7 +495,7 @@ public class IO {
 	 * <dt>{@code byte[]}, {@link ByteArray}, {@link ByteArraySection}</dt>
 	 * <dd>Es wird ein zum gegebenen Array {@link ByteBuffer#wrap(byte[], int, int) erzeugter} {@link ByteBuffer} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link ByteBuffer}.
 	 * @throws IOException Wenn der {@link ByteBuffer} nicht erzeugt werden kann. */
@@ -549,7 +552,7 @@ public class IO {
 	 * <dt>{@link ByteArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link ByteArray} schreibender {@link OutputStream} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link OutputStream}.
 	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
@@ -594,7 +597,7 @@ public class IO {
 	 * <dt>{@link CharacterArray}</dt>
 	 * <dd>Es wird ein in das gegebenen {@link CharacterArray} schreibender {@link OutputStream} geliefert.</dd>
 	 * </dl>
-	 * 
+	 *
 	 * @param object Objekt.
 	 * @return {@link OutputStream}.
 	 * @throws IOException Wenn der {@link OutputStream} nicht erzeugt werden kann. */
@@ -634,6 +637,42 @@ public class IO {
 			}
 
 		};
+	}
+
+	/** Diese Methode gibt ein {@link Iterable} über die gegebenen Dateien und Verzeichnisse sowie ggf. derer in {@link File#listFiles() Unterverzeichnissen}
+	 * zurück.
+	 *
+	 * @see File#listFiles()
+	 * @param maxDepth Maximale Tiefe für die rekursive Iteration über {@link File#listFiles() Unterverzeichnisse}.<br>
+	 *        Wenn diese {@code 0} ist, wird nur über die gegebenen Dateien und Verzeichnise iteriert. Andernfalls wird in den gegebenen Verzeichnissen rekursiv
+	 *        mit maximaler Tiefe {@code maxDepth-1} rekursiv weiter iteriert.
+	 * @param files Dateien und Verzeichnisse oder {@code null}.
+	 * @return {@link Iterable} über {@link File}. */
+	public static Iterable<File> listFiles(final int maxDepth, final File... files) {
+		if (files == null) return Iterables.emptyIterable();
+		return IO.listFiles(maxDepth, Arrays.asList(files));
+	}
+
+	/** Diese Methode gibt ein {@link Iterable} über die gegebenen Dateien und Verzeichnisse sowie ggf. derer in {@link File#listFiles() Unterverzeichnissen}
+	 * zurück.
+	 *
+	 * @see #listFiles(int, File...)
+	 * @param maxDepth Maximale Tiefe für die rekursive Iteration (siehe {@link #listFiles(int, File...)}).
+	 * @param files Dateien und Verzeichnisse oder {@code null}.
+	 * @return {@link Iterable} über {@link File}. */
+	public static Iterable<File> listFiles(final int maxDepth, final Iterable<File> files) {
+		if (files == null) return Iterables.emptyIterable();
+		if (maxDepth == 0) return files;
+		return Iterables.chainedIterable(Iterables.convertedIterable(new Converter<File, Iterable<File>>() {
+
+			@Override
+			public Iterable<File> convert(final File file) {
+				final File[] list = file.listFiles();
+				if (list == null) return Iterables.itemIterable(file);
+				return Iterables.chainedIterable(Iterables.itemIterable(file), IO.listFiles(maxDepth - 1, list));
+			}
+
+		}, files));
 	}
 
 }

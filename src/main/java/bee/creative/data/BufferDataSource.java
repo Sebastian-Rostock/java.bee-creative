@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 import bee.creative.util.Bytes;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einem {@link ByteBuffer}.
- * 
+ *
  * @see ByteBuffer
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class BufferDataSource extends BaseDataSource {
@@ -17,7 +17,7 @@ public class BufferDataSource extends BaseDataSource {
 	final ByteBuffer _data_;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
-	 * 
+	 *
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final byte... data) throws NullPointerException {
@@ -25,7 +25,7 @@ public class BufferDataSource extends BaseDataSource {
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
-	 * 
+	 *
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public BufferDataSource(final ByteBuffer data) throws NullPointerException {

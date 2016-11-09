@@ -8,7 +8,7 @@ import bee.creative.util.Bytes;
 
 /** Diese Klasse implementiert die {@link DataTarget}-Schnittstelle zu einer {@link ByteArraySection}. Die Dekidierung der Zahlen erfolgt via {@link Bytes} und
  * damit in {@link ByteOrder#BIG_ENDIAN}.
- * 
+ *
  * @see ByteArraySection
  * @author [cc-by] 2014 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class ArrayDataSource extends BaseDataSource {
@@ -20,7 +20,7 @@ public class ArrayDataSource extends BaseDataSource {
 	int _index_;
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
-	 * 
+	 *
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final byte... data) throws NullPointerException {
@@ -28,7 +28,7 @@ public class ArrayDataSource extends BaseDataSource {
 	}
 
 	/** Dieser Konstruktor initialisiert die Nutzdaten.
-	 * 
+	 *
 	 * @param data Nutzdaten.
 	 * @throws NullPointerException Wenn die gegebenen Nutzdaten {@code null} ist. */
 	public ArrayDataSource(final ByteArraySection data) throws NullPointerException {

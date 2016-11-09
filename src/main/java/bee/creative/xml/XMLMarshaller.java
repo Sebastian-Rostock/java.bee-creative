@@ -16,18 +16,18 @@ import bee.creative.util.Builders.BaseValueBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen Konfigurator zum {@link #marshal() Ausgeben/Formatieren} eines Objekts mit Hilfe eines {@link Marshaller}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public final class XMLMarshaller {
 
 	/** Diese Klasse implementiert den Konfigurator für die Eingabedaten eines {@link Marshaller}.
-	 * 
+	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class SourceData extends BaseValueBuilder<Object, SourceData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public final XMLMarshaller closeSourceData() {
 			return XMLMarshaller.this;
@@ -44,13 +44,13 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Ausgabedaten eines {@link Marshaller}.
-	 * 
+	 *
 	 * @see Transformer#transform(Source, Result)
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class ResultData extends BaseResultData<ResultData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public final XMLMarshaller closeResultData() {
 			return XMLMarshaller.this;
@@ -67,12 +67,12 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für den {@link Marshaller}.
-	 * 
+	 *
 	 * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public final class MarshallerData extends BaseMarshallerData<MarshallerData> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public final XMLMarshaller closeMarshallerData() {
 			return XMLMarshaller.this;
@@ -91,7 +91,7 @@ public final class XMLMarshaller {
 	{}
 
 	/** Diese Methode gibt einen neuen {@link XMLMarshaller} zurück, dessen {@link JAXBContext} die gegebenen Klassen nutzt.
-	 * 
+	 *
 	 * @param classes Klasse.
 	 * @return {@link XMLMarshaller}. */
 	public static XMLMarshaller from(final Class<?>... classes) {
@@ -115,7 +115,7 @@ public final class XMLMarshaller {
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final XMLMarshaller use(final XMLMarshaller data) {
@@ -127,7 +127,7 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode führt die Formatierung aus und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #openSourceData()
 	 * @see #openResultData()
 	 * @see Marshaller#marshal(Object, Result)
@@ -146,7 +146,7 @@ public final class XMLMarshaller {
 
 	/** Diese Methode formatiert die {@link #openSourceData() Eingabedaten} in einen Dokumentknoten und gibt diesen zurück.<br>
 	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neues {@link DOMResult} eingesetzt.
-	 * 
+	 *
 	 * @see ResultData#useNode()
 	 * @see #openResultData()
 	 * @return Dokumentknoten.
@@ -160,7 +160,7 @@ public final class XMLMarshaller {
 
 	/** Diese Methode formatiert die {@link #openSourceData() Eingabedaten} in eine Zeichenkette und gibt diese zurück.<br>
 	 * Dazu wird als {@link #openResultData() Ausgabedaten} ein neuer {@link StringWriter} eingesetzt.
-	 * 
+	 *
 	 * @see StringWriter
 	 * @see ResultData#useWriter(Writer)
 	 * @see #openResultData()
@@ -174,7 +174,7 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eingabedaten und gibt ihn zurück.
-	 * 
+	 *
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
 	public final SourceData openSourceData() {
@@ -182,7 +182,7 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Ausgabedaten und gibt ihn zurück.
-	 * 
+	 *
 	 * @see Marshaller#marshal(Object, Result)
 	 * @return Konfigurator. */
 	public final ResultData openResultData() {
@@ -190,7 +190,7 @@ public final class XMLMarshaller {
 	}
 
 	/** Diese Methode öffnet den Konfigurator für den {@link Marshaller} und gibt ihn zurück.
-	 * 
+	 *
 	 * @return Konfigurator. */
 	public final MarshallerData openMarshallerData() {
 		return this._marshallerData_;

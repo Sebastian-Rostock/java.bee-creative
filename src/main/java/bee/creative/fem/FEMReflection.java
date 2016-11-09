@@ -31,8 +31,7 @@ import bee.creative.util.Natives;
  * Native Funktionen zu Konstruktoren haben die Signatur {@code (param1, ..., paramN: FEMNative): FEMNative} und liefern den Ergebniswert
  * {@code new FEMNative(this.member().newInstance(param1.data(), ..., paramN.data()))}.
  * <p>
- * Diese Klasse stellt {@link FEMFunction Funktionen} zum Lesen und Schreiben von sowie zum Aufrufen von und bereit.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMReflection extends FEMFunction {
 
@@ -227,38 +226,27 @@ public abstract class FEMReflection extends FEMFunction {
 
 	/** Diese Methode gibt die native Funktion zur gegebenen Pfadangabe zurück.<br>
 	 * Die Pfadangabe kodiert hierbei eine Funktion, die eine Klasse liefert, an eine Methode bzw. einen Konstruktor delegiert oder ein Datenfeld liest bzw.
-	 * schreibt. Die folgenden Pfadangaben werden unterstützt:
-	 * <p>
-	 * <h4>{@code "CLASS_PATH.class"}</h4> Dieser Pfad ergibt {@link FEMNative#from(Object) from(CLASS_PATH.class)}.
-	 * <p>
-	 * <h4>{@code "CLASS_PATH.FIELD_NAME"}</h4> Dieser Pfad ergibt {@link #from(Field) from(CLASS_PATH.class.getDeclaredField("FIELD_NAME"))}.
-	 * <p>
-	 * <h4>{@code "CLASS_PATH.new(TYPE_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #from(Constructor)
-	 * from(CLASS_PATH.class.getDeclaredConstructor(TYPE_1.class, ..., TYPE_N.class))}.
-	 * <p>
-	 * <h4>{@code "CLASS_PATH.METHOD_NAME(TYPE1_1,...,TYPE_N)"}</h4> Dieser Pfad ergibt {@link #from(Method)
-	 * from(CLASS_PATH.class.getDeclaredMethod("METHOD_NAME", TYPE_1.class, ..., TYPE_N.class))}.
-	 * <p>
-	 * 
+	 * schreibt. Die unterstützten Pfadangaben sind bei {@link Natives#parse(String)} beschrieben.
+	 *
+	 * @see Natives#parse(String)
 	 * @see #from(Field)
 	 * @see #from(Method)
 	 * @see #from(Constructor)
 	 * @param memberPath Pfad einer Klasse, einer Methode, eines Konstruktord oder eines Datenfelds.
 	 * @return {@link FEMReflection}.
-	 * @throws NullPointerException Wenn {@code memberPath} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} oder {@link Natives#parseConstructor(String)} eine entsprechende Ausnahme
-	 *         auslöst.
-	 * @throws ReflectiveOperationException Wenn {@link Natives#parseField(String)}, {@link Natives#parseMethod(String)}, {@link Natives#parseConstructor(String)}
-	 *         oder {@link Natives#parseClass(String)} eine entsprechende Ausnahme auslöst. */
+	 * @throws NullPointerException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws ReflectiveOperationException Wenn {@link Natives#parse(String)} eine entsprechende Ausnahme auslöst. */
 	public static FEMFunction from(final String memberPath) throws NullPointerException, IllegalArgumentException, ReflectiveOperationException {
-		if (memberPath.endsWith(".class")) return new FEMNative(Natives.parseClass(memberPath.substring(0, memberPath.length() - 6)));
-		if (memberPath.contains(".new(")) return FEMReflection.from(Natives.parseConstructor(memberPath));
-		if (memberPath.contains("(")) return FEMReflection.from(Natives.parseMethod(memberPath));
-		return FEMReflection.from(Natives.parseField(memberPath));
+		final Object object = Natives.parse(memberPath);
+		if (object instanceof Class<?>) return new FEMNative(object);
+		if (object instanceof Constructor<?>) return FEMReflection.from((Constructor<?>)object);
+		if (object instanceof Method) return FEMReflection.from((Method)object);
+		return FEMReflection.from((Field)object);
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, mit welcher der Wert des gegebenen Datenfelds gelesen sowie geschrieben werden kann.
-	 * 
+	 *
 	 * @param field Datenfeld.
 	 * @return Funktion zum gegebenen Datenfeld.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
@@ -267,7 +255,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, die an die gegebene Methode delegiert.
-	 * 
+	 *
 	 * @param method Methode.
 	 * @return Funktion zur gegebenen Methode.
 	 * @throws NullPointerException Wenn {@code method} {@code null} ist. */
@@ -276,7 +264,7 @@ public abstract class FEMReflection extends FEMFunction {
 	}
 
 	/** Diese Methode gibt eine Funktion zurück, die an den gegebenen Konstruktor delegiert.
-	 * 
+	 *
 	 * @param constructor Konstruktor.
 	 * @return Funktion zum gegebenen Konstruktor.
 	 * @throws NullPointerException Wenn {@code constructor} {@code null} ist. */
@@ -298,33 +286,33 @@ public abstract class FEMReflection extends FEMFunction {
 	{}
 
 	/** Diese Methode gibt den {@link Member} zurück, auf den sich die Methode {@link #invoke(FEMFrame)} bezieht.
-	 * 
+	 *
 	 * @return {@link Member}. */
 	public abstract Member member();
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} {@code static} ist.
-	 * 
+	 *
 	 * @return Bezugskennzeichnung. */
 	public final boolean isStatic() {
 		return Modifier.isStatic(this.member().getModifiers());
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} ein {@link Field} ist.
-	 * 
+	 *
 	 * @return Feldkennzeichnung. */
 	public final boolean isField() {
 		return this.member() instanceof Field;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} eine {@link Method} ist.
-	 * 
+	 *
 	 * @return Methodenkennzeichung. */
 	public final boolean isMethod() {
 		return this.member() instanceof Method;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn {@link #member()} ein {@link Constructor} ist.
-	 * 
+	 *
 	 * @return Konstruktorkennzeichung. */
 	public final boolean isConstructor() {
 		return this.member() instanceof Constructor<?>;

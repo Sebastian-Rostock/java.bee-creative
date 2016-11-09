@@ -6,7 +6,7 @@ import bee.creative.util.Filters;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert eine {@link Selection}, die auf einem {@link Iterable} aufsetzt.
- * 
+ *
  * @author [cc-by] 2013 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Datensätze. */
 public final class FilteredSelection<GItem> implements Selection<GItem> {
@@ -15,7 +15,7 @@ public final class FilteredSelection<GItem> implements Selection<GItem> {
 	final Iterable<? extends GItem> _items_;
 
 	/** Dieser Konstruktor initialisiert das {@link Iterable}.
-	 * 
+	 *
 	 * @param items {@link Iterable} der {@link Item}s.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
 	public FilteredSelection(final Iterable<? extends GItem> items) throws NullPointerException {

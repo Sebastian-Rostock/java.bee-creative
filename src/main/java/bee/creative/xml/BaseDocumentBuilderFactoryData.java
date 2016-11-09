@@ -10,20 +10,20 @@ import bee.creative.util.Builders.BaseMapBuilder;
 import bee.creative.util.Objects;
 
 /** Diese Klasse implementiert einen abstrakten Konfigurator für eine {@link DocumentBuilderFactory}.
- * 
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GThis> Typ des konkreten Nachfahren dieser Klasse. */
 public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<DocumentBuilderFactory, GThis> {
 
 	/** Diese Klasse implementiert den Konfigurator für die Fähigkeiten einer {@link DocumentBuilderFactory}.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class FeatureData<GOwner> extends BaseFeatureData<FeatureData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeFeatureData();
 
@@ -38,14 +38,14 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für das {@link Schema} einer {@link DocumentBuilderFactory}.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class SchemaData<GOwner> extends BaseSchemaData<SchemaData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeSchemaData();
 
@@ -60,13 +60,13 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Eigenschaften einer {@link DocumentBuilderFactory}.
-	 * 
+	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class PropertyData<GOwner> extends BaseMapBuilder<String, Boolean, PropertyData<GOwner>> {
 
 		/** Diese Methode wählt {@code "Coalescing"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setCoalescing(boolean)
 		 * @return {@code this}. */
@@ -75,7 +75,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "ExpandEntityReferences"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 		 * @return {@code this}. */
@@ -84,7 +84,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "IgnoringComments"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
 		 * @return {@code this}. */
@@ -93,7 +93,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "IgnoringElementContentWhitespace"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setIgnoringElementContentWhitespace(boolean)
 		 * @return {@code this}. */
@@ -102,7 +102,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "NamespaceAware"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setNamespaceAware(boolean)
 		 * @return {@code this}. */
@@ -111,7 +111,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "Validating"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setValidating(boolean)
 		 * @return {@code this}. */
@@ -120,7 +120,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode wählt {@code "XIncludeAware"} und gibt {@code this} zurück.
-		 * 
+		 *
 		 * @see #forKey(Object)
 		 * @see DocumentBuilderFactory#setXIncludeAware(boolean)
 		 * @return {@code this}. */
@@ -129,7 +129,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode gibt nur dann {@code true} zurück, wenn der Wert zum {@link #forKey(Object) gewählten Schlüssel} gleich {@link Boolean#TRUE} ist.
-		 * 
+		 *
 		 * @see #getValue()
 		 * @return Wahrheitswert. */
 		public final boolean getBoolean() {
@@ -137,7 +137,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 		}
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closePropertyData();
 
@@ -152,14 +152,14 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Klasse implementiert den Konfigurator für die Attribute einer {@link DocumentBuilderFactory}.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GOwner> Typ des Besitzers. */
 	public static abstract class AttributeData<GOwner> extends BaseMapBuilder<String, Object, AttributeData<GOwner>> {
 
 		/** Diese Methode schließt die Konfiguration ab und gibt den Besitzer zurück.
-		 * 
+		 *
 		 * @return Besitzer. */
 		public abstract GOwner closeAttributeData();
 
@@ -221,7 +221,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	{}
 
 	/** Diese Methode übernimmt die Einstellungen des gegebenen Konfigurators und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param data Konfigurator oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis use(final BaseDocumentBuilderFactoryData<?> data) {
@@ -237,7 +237,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	 * Wenn über {@link #useFactory(DocumentBuilderFactory)} noch keine {@link DocumentBuilderFactory} gesetzt wurde, wird über
 	 * {@link DocumentBuilderFactory#newInstance()} eine neue erstellt, über {@link #useFactory(DocumentBuilderFactory)} gesetzt und über {@link #updateFactory()}
 	 * aktualisiert.
-	 * 
+	 *
 	 * @see #useFactory(DocumentBuilderFactory)
 	 * @see #updateFactory()
 	 * @return {@link DocumentBuilderFactory}.
@@ -253,7 +253,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode setzt die {@link DocumentBuilderFactory} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param factory {@link DocumentBuilderFactory} oder {@code null}.
 	 * @return {@code this}. */
 	public final GThis useFactory(final DocumentBuilderFactory factory) {
@@ -262,7 +262,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode setzt die {@link DocumentBuilderFactory} auf {@code null} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @see #useFactory(DocumentBuilderFactory)
 	 * @return {@code this}. */
 	public final GThis resetFactory() {
@@ -272,7 +272,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	/** Diese Methode aktualisiert die Einstellungen der {@link DocumentBuilderFactory} und gibt {@code this} zurück.<br>
 	 * Bei dieser Aktualisierung werden auf die über {@link #getFactory()} ermittelte {@link DocumentBuilderFactory} die Einstellungen übertragen, die in
 	 * {@link #openSchemaData()}, {@link #openFeatureData()}, {@link #openPropertyData()} und {@link #openAttributeData()} konfiguriert sind.
-	 * 
+	 *
 	 * @return {@code this}.
 	 * @throws SAXException Wenn {@link SchemaData#getSchema()} eine entsprechende Ausnahme auslöst.
 	 * @throws ParserConfigurationException Wenn {@link DocumentBuilderFactory#setFeature(String, boolean)} eine entsprechende Ausnahme auslöst. */
@@ -297,7 +297,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Fähigkeiten und gibt ihn zurück.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setFeature(String, boolean)
 	 * @return Konfigurator. */
 	public final FeatureData<GThis> openFeatureData() {
@@ -305,7 +305,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode öffnet den Konfigurator für das {@link Schema} und gibt ihn zurück.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setSchema(Schema)
 	 * @return Konfigurator. */
 	public final SchemaData<GThis> openSchemaData() {
@@ -313,7 +313,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Eigenschaften und gibt ihn zurück.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setCoalescing(boolean)
 	 * @see DocumentBuilderFactory#setExpandEntityReferences(boolean)
 	 * @see DocumentBuilderFactory#setIgnoringComments(boolean)
@@ -327,7 +327,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	}
 
 	/** Diese Methode öffnet den Konfigurator für die Attribute und gibt ihn zurück.
-	 * 
+	 *
 	 * @see DocumentBuilderFactory#setAttribute(String, Object)
 	 * @return Konfigurator. */
 	public final AttributeData<GThis> openAttributeData() {
@@ -341,7 +341,7 @@ public abstract class BaseDocumentBuilderFactoryData<GThis> extends BaseBuilder<
 	protected abstract GThis _this_();
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 * @see #getFactory() */
 	@Override
 	public final DocumentBuilderFactory build() throws IllegalStateException {

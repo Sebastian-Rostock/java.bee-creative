@@ -9,7 +9,7 @@ import bee.creative.util.Objects;
 /** Diese Klasse implementiert einen Formatter für Daten im {@code CSV}-Format.<br>
  * {@link #getQuote() Maskierungszeichen} und {@link #getComma() Trennzeichen} können eingestellt werden.<br>
  * Als Zeilenende wird die Zeichekette {@code "\r\n"} genutzt.
- * 
+ *
  * @see CSVReader
  * @author Sebastian Rostock 2014. */
 public final class CSVWriter implements Closeable {
@@ -17,7 +17,7 @@ public final class CSVWriter implements Closeable {
 	/** Diese Methode erzeugt aus dem gegebenen Objekt einen {@link CSVWriter} und gibt diesen zurück.<br>
 	 * Wenn das Objekt ein {@link CSVWriter} ist, wird dieser geliefert. Andernfalls wird das Objekt in einen {@link Writer} {@link IO#outputWriterFrom(Object)
 	 * überführt}.
-	 * 
+	 *
 	 * @see IO#outputWriterFrom(Object)
 	 * @see CSVWriter#CSVWriter(Writer)
 	 * @param data Objekt.
@@ -51,7 +51,7 @@ public final class CSVWriter implements Closeable {
 	 * Maskierungszwang} ist aktiviert.<br>
 	 * Die Methoden {@link #useForce(boolean)}, {@link #useQuote(char)}, {@link #useComma(char)}, {@link #writeValue(String)}, {@link #writeEntry(String...)} und
 	 * {@link #writeTable(String[][])} synchronisieren auf den gegebenen {@link Writer}.
-	 * 
+	 *
 	 * @param writer Ausgabe.
 	 * @throws IOException Wenn {@link Writer#flush()} eine entsprechende Ausnahme auslöst.
 	 * @throws NullPointerException Wenn {@code writer} {@code null} ist. */
@@ -65,7 +65,7 @@ public final class CSVWriter implements Closeable {
 	/** Diese Methode gibt den Maskierungszwang zurück.<br>
 	 * Wenn dieser {@code true} ist, gelten alle {@link #writeValue(String) Werte} als zu maskieren. Andernfalls gelten nur die {@link #writeValue(String) Werte}
 	 * als zu maskieren, in denen ein {@link #getComma() Trennzeichen}, ein {@link #getQuote() Maskierungszeichen} oder ein Zeilenumbruch vorkommt.
-	 * 
+	 *
 	 * @return Maskierungszwang. */
 	public final boolean getForce() {
 		return this._force_;
@@ -75,7 +75,7 @@ public final class CSVWriter implements Closeable {
 	 * Maskierte {@link #writeValue(String) Werte} werden in diese Zeichen eingeschlossen und enthalten dieses Zeichen nur gedoppelt.<br>
 	 * Wenn das Zeichen {@code '\0'} ist, werden die {@link #writeValue(String) Werte} nicht maskiert. Diese Einstellung aht Vorrang gegebnüber dem
 	 * {@link #getForce() Maskierungszwang}.
-	 * 
+	 *
 	 * @see #getForce()
 	 * @return Maskierungszeichen. */
 	public final char getQuote() {
@@ -84,14 +84,14 @@ public final class CSVWriter implements Closeable {
 
 	/** Diese Methode gibt das Trennzeichen zurück.<br>
 	 * Dieses Zeichen steht zwischen den {@link #writeValue(String) Werten} eines {@link #writeEntry(String...) Eintrags}.
-	 * 
+	 *
 	 * @return Trennzeichen. */
 	public final char getComma() {
 		return this._comma_;
 	}
 
 	/** Diese Methode setzt den {@link #getQuote() Maskierungszwang} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param force Maskierungszwang.
 	 * @return {@code this}. */
 	public final CSVWriter useForce(final boolean force) {
@@ -102,7 +102,7 @@ public final class CSVWriter implements Closeable {
 	}
 
 	/** Diese Methode setzt das {@link #getQuote() Maskierungszeichen} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param quote Maskierungszeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Maskierungszeichen einem Zeilenumbruch gleicht. */
@@ -115,7 +115,7 @@ public final class CSVWriter implements Closeable {
 	}
 
 	/** Diese Methode setzt das {@link #getComma() Trennzeichen} und gibt {@code this} zurück.
-	 * 
+	 *
 	 * @param comma Trennzeichen.
 	 * @return {@code this}.
 	 * @throws IllegalArgumentException Wenn das Trennzeichen einem Zeilenumbruch gleicht. */
@@ -129,7 +129,7 @@ public final class CSVWriter implements Closeable {
 
 	/** Diese Methode schreibt die gegebene Tabelle und gibt this zurück.<br>
 	 * Dabei werden die gegebenen {@link #writeEntry(String...) Einträge} in der gegebenen Reihenfolge ausgegeben.
-	 * 
+	 *
 	 * @see #writeEntry(String...)
 	 * @param entries Tabelle (Liste von Einträgen).
 	 * @return {@code this}.
@@ -152,7 +152,7 @@ public final class CSVWriter implements Closeable {
 	/** Diese Methode schreibt den gegebenen Eintrag und gibt this zurück.<br>
 	 * Dabei werden zuerst die gegebenen {@link #writeValue(String) Werte} in der gegebenen Reihenfolge und anschließend ein Zeilenumbruch ({@code "\r\n"})
 	 * ausgegeben.
-	 * 
+	 *
 	 * @see #writeValue(String)
 	 * @param values Eintrag (Liste von Werten).
 	 * @return {@code this}.
@@ -178,7 +178,7 @@ public final class CSVWriter implements Closeable {
 	 * Die Maskierung des Werts erfolgt nur dann, wenn das {@link #getQuote() Maskierungszeichen} nicht {@code '\0'} ist und der Wert aufgrund seines Inhalts oder
 	 * des {@link #getForce() Maskierungszwangs} als zu maskieren gilt.<br>
 	 * Das {@link #getComma() Trennzeichen} wird außer beim ersten vor jedem Wert einer Zeile ausgegeben.
-	 * 
+	 *
 	 * @see #getForce()
 	 * @see #getQuote()
 	 * @see #getComma()

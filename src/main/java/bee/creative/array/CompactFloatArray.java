@@ -1,25 +1,25 @@
 package bee.creative.array;
 
 /** Diese Klasse implementiert ein {@link FloatArray} als {@link CompactArray}.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class CompactFloatArray extends CompactArray<float[], Float> implements FloatArray {
 
 	/** Diese Klasse implementiert ein {@link FloatArray} als modifizierbare Sicht auf einen Teil eines {@link CompactFloatArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatSubArray extends CompactSubArray<CompactFloatArray, float[], Float> implements FloatArray {
 
 		/** Dieser Konstruktor initialisiert Besitzer und Indices.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @param startIndex Index des ersten Werts im Teil-{@link Array}.
 		 * @param finalIndex Index des ersten Werts nach dem Teil-{@link Array}.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist.
 		 * @throws IndexOutOfBoundsException Wenn die gegebenen Indices ungültig sind ({@code startIndex < 0} oder {@code finalIndex > owner.size()} oder
 		 *         {@code startIndex > finalIndex}). */
-		public CompactFloatSubArray(final CompactFloatArray owner, final int startIndex, final int finalIndex) throws NullPointerException,
-			IndexOutOfBoundsException {
+		public CompactFloatSubArray(final CompactFloatArray owner, final int startIndex, final int finalIndex)
+			throws NullPointerException, IndexOutOfBoundsException {
 			super(owner, startIndex, finalIndex);
 		}
 
@@ -89,7 +89,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	}
 
 	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatArraySection extends FloatArraySection {
 
@@ -97,7 +97,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		protected final CompactFloatArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatArraySection(final CompactFloatArray owner) throws NullPointerException {
@@ -135,7 +135,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	}
 
 	/** Diese Klasse implementiert die live {@link FloatArraySection} eines {@link CompactFloatSubArray}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	protected static class CompactFloatSubArraySection extends FloatArraySection {
 
@@ -143,7 +143,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 		protected final CompactFloatSubArray _owner_;
 
 		/** Dieser Konstruktor initialisiert den Besitzer.
-		 * 
+		 *
 		 * @param owner Besitzer.
 		 * @throws NullPointerException Wenn der gegebene Besitzer {@code null} ist. */
 		public CompactFloatSubArraySection(final CompactFloatSubArray owner) throws NullPointerException {
@@ -190,7 +190,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 	}
 
 	/** Dieser Konstruktor initialisiert das Array mit der gegebenen Kapazität und der relativen Ausrichtungsposition {@code 0.5}.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @param capacity Kapazität.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
@@ -200,7 +200,7 @@ public class CompactFloatArray extends CompactArray<float[], Float> implements F
 
 	/** Dieser Konstruktor initialisiert Array und Ausrichtung mit den Daten der gegebenen {@link ArraySection}. Als internes Array wird das der gegebenen
 	 * {@link ArraySection} verwendet. Als relative Ausrichtungsposition wird {@code 0.5} verwendet.
-	 * 
+	 *
 	 * @see ArrayData#allocate(int)
 	 * @see ArraySection#validate(ArraySection)
 	 * @param section {@link ArraySection}.

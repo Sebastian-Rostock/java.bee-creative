@@ -5,19 +5,19 @@ import java.util.Iterator;
 import bee.creative.util.Iterables;
 
 /** Diese Klasse implementiert eine abstrakte {@link Collection}, deren Elemente in einem Array verwaltet werden.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GItem> Typ der Elemente. */
 public abstract class CompactCollection<GItem> extends CompactData implements Collection<GItem> {
 
 	/** Diese Klasse implementiert den aufsteigenden {@link Iterator} für {@link CompactCollection}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactCollectionAscendingIterator<GItem> extends CompactDataAscendingIterator<GItem, CompactCollection<GItem>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
-		 * 
+		 *
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -36,13 +36,13 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/** Diese Klasse implementiert den absteigenden {@link Iterator} für {@link CompactCollection}s.
-	 * 
+	 *
 	 * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ der Elemente. */
 	protected static final class CompactCollectionDescendingIterator<GItem> extends CompactDataDescendingIterator<GItem, CompactCollection<GItem>> {
 
 		/** Dieser Konstruktor initialisiert {@link CompactCollection} und Indizes.
-		 * 
+		 *
 		 * @param data {@link CompactCollection}.
 		 * @param from Index des ersten Elements (inklusiv).
 		 * @param last Index des letzten Elements (exklusiv). */
@@ -68,7 +68,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Collection} mit der gegebenen Kapazität.
-	 * 
+	 *
 	 * @see CompactData#allocate(int)
 	 * @param capacity Kapazität. */
 	public CompactCollection(final int capacity) {
@@ -77,7 +77,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/** Dieser Konstruktor initialisiert die {@link Collection} mit den gegebenen Elementen.
-	 * 
+	 *
 	 * @see Collection#addAll(Collection)
 	 * @see CompactData#allocate(int)
 	 * @param collection Elemente.
@@ -92,7 +92,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	{}
 
 	/** Diese Methode gibt das {@code index}-te Element zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Element. */
 	@SuppressWarnings ("unchecked")
@@ -101,7 +101,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/** Diese Methode setzt das {@code index}-te Element.
-	 * 
+	 *
 	 * @param index Index.
 	 * @param item {@code index}-tes Element. */
 	protected final void setItem(final int index, final GItem item) {
@@ -109,7 +109,7 @@ public abstract class CompactCollection<GItem> extends CompactData implements Co
 	}
 
 	/** Diese Methode kopiert die Werte des gegebenen Arrays an die gegebene Position.
-	 * 
+	 *
 	 * @param index Index.
 	 * @param items {@code index}-tes Elemente. */
 	protected final void setItems(final int index, final Object[] items) {

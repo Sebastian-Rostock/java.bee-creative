@@ -11,7 +11,7 @@ import bee.creative.util.Comparables.Items;
 import bee.creative.util.Objects.UseToString;
 
 /** Diese Klasse implementiert grundlegende {@link Iterator}.
- * 
+ *
  * @see Iterator
  * @see Iterable
  * @see Iterables
@@ -19,7 +19,7 @@ import bee.creative.util.Objects.UseToString;
 public class Iterators {
 
 	/** Diese Klasse implementiert einen abstrakten {@link Iterator}.
-	 * 
+	 *
 	 * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
 	 * @param <GItem> Typ des Elementes. */
 	public static abstract class BaseIterator<GItem> implements Iterator<GItem>, UseToString {
@@ -56,7 +56,7 @@ public class Iterators {
 	{}
 
 	/** Diese Methode gibt das {@code index}-te Elemente des gegebenen {@link Iterator} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ des Elements.
 	 * @see Iterators#skip(Iterator, int)
 	 * @param iterator {@link Iterator}.
@@ -74,7 +74,7 @@ public class Iterators {
 	 * Elemente zurück. Diese Anzahl ist dann größer als {@code 0}, wenn der gegebene {@link Iterator} via {@link Iterator#hasNext()} anzeigt, dass er keine
 	 * weiteren Elemente mehr liefern kann. Wenn die gegebene Anzahl kleiner {@code 0} ist, wird diese Anzahl vermindert um die Anzahl der Elemente des gegebenen
 	 * {@link Iterator} zurück gegeben. Damit bestimmt {@code (-Iterators.skip(iterator, -1) - 1)} die Anzahl der Elemente des gegebenen {@link Iterator}.
-	 * 
+	 *
 	 * @see Iterator#hasNext()
 	 * @param iterator {@link Iterator}.
 	 * @param count Anzahl der zu überspringenden Elemente.
@@ -91,7 +91,7 @@ public class Iterators {
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}, die nicht in der gegebenen {@link Collection} vorkommen, und gibt nur dann
 	 * {@code true} zurück, wenn Elemente entfernt wurden.
-	 * 
+	 *
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
 	 * @param collection {@link Collection}.
@@ -112,7 +112,7 @@ public class Iterators {
 
 	/** Diese Methode entfernt alle Elemente der gegebenen {@link Collection}, die nicht im gegebenen {@link Iterator} vorkommen, und gibt nur dann {@code true}
 	 * zurück, wenn Elemente entfernt wurden.
-	 * 
+	 *
 	 * @see Collection#retainAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
@@ -126,9 +126,9 @@ public class Iterators {
 		return collection.retainAll(list);
 	}
 
-	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterator} in die gegebene {@link Collection} ein und gibt nur dann {@code true} zurück, wenn Elemente
-	 * eingefügt wurden.
-	 * 
+	/** Diese Methode fügt alle Elemente des gegebenen {@link Iterator} in die gegebene {@link Collection} ein und gibt nur dann {@code true} zurück, wenn
+	 * Elemente eingefügt wurden.
+	 *
 	 * @see Collection#addAll(Collection)
 	 * @param <GItem> Typ der Elemente.
 	 * @param collection {@link Collection}.
@@ -148,7 +148,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} und gibt nur dann {@code true} zurück, wenn Elemente entfernt wurden.
-	 * 
+	 *
 	 * @see Iterator#remove()
 	 * @param iterator {@link Iterator}.
 	 * @return {@code true} bei Veränderungen am {@link Iterator}.
@@ -166,7 +166,7 @@ public class Iterators {
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator}, die in der gegebenen {@link Collection} vorkommen, und gibt nur dann {@code true}
 	 * zurück, wenn Elemente entfernt wurden.
-	 * 
+	 *
 	 * @see Collection#retainAll(Collection)
 	 * @param iterator {@link Iterator}.
 	 * @param collection {@link Collection}.
@@ -187,7 +187,7 @@ public class Iterators {
 
 	/** Diese Methode entfernt alle Elemente des gegebenen {@link Iterator} aus der gegebenen {@link Collection} und gibt nur dann {@code true} zurück, wenn
 	 * Elemente entfernt wurden.
-	 * 
+	 *
 	 * @see Collection#removeAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
@@ -206,7 +206,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn alle Elemente des gegebenen {@link Iterator} in der gegebenen {@link Collection} enthalten sind.
-	 * 
+	 *
 	 * @see Collection#containsAll(Collection)
 	 * @param collection {@link Collection}.
 	 * @param iterator {@link Iterator}.
@@ -220,9 +220,9 @@ public class Iterators {
 		return true;
 	}
 
-	/** Diese Methode gibt den gegebenen {@link Iterator} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterator} {@code null} ist, wird {@link #EMPTY_ITERATOR}
-	 * geliefert.
-	 * 
+	/** Diese Methode gibt den gegebenen {@link Iterator} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterator} {@code null} ist, wird
+	 * {@link #EMPTY_ITERATOR} geliefert.
+	 *
 	 * @see Iterators#emptyIterator()
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator} oder {@code null}.
@@ -235,7 +235,7 @@ public class Iterators {
 
 	/** Diese Methode gibt den {@link Iterator} des gegebenen {@link Iterable} oder {@link #EMPTY_ITERATOR} zurück. Wenn {@code iterable} {@code null} ist, wird
 	 * {@link #EMPTY_ITERATOR} geliefert.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable} oder {@code null}.
 	 * @return {@link Iterable#iterator()} oder {@link #EMPTY_ITERATOR}. */
@@ -245,7 +245,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der einmalig das gegebenen Element liefert.
-	 * 
+	 *
 	 * @see #itemIterator(Object, int)
 	 * @param <GItem> Typ des Elements.
 	 * @param item Element.
@@ -255,7 +255,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der das gegebenen Element die gegebene Anzahl mal liefert.
-	 * 
+	 *
 	 * @param <GItem> Typ des Elements.
 	 * @param item Element.
 	 * @param count Anzahl der iterierbaren Elemente.
@@ -294,7 +294,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} über die Elemente eines Abschnitts der gegebenen {@link Items} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param items {@link Items}.
 	 * @param fromIndex Index des ersten Elements, dass vom erzeugten {@link Iterator} geliefert wird.
@@ -302,8 +302,8 @@ public class Iterators {
 	 * @return {@link Items}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code fromIndex > toIndex}. */
-	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex) throws NullPointerException,
-		IllegalArgumentException {
+	public static <GItem> Iterator<GItem> itemsIterator(final Items<? extends GItem> items, final int fromIndex, final int toIndex)
+		throws NullPointerException, IllegalArgumentException {
 		if (items == null) throw new NullPointerException("items = null");
 		Comparables._check_(fromIndex, toIndex);
 		return new BaseIterator<GItem>() {
@@ -336,7 +336,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt den leeren {@link Iterator} zurück.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @return {@link #EMPTY_ITERATOR}. */
 	@SuppressWarnings ("unchecked")
@@ -346,7 +346,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der die gegebene Anzahl an {@link Integer} ab dem Wert {@code 0} liefert, d.h {@code 0}, {@code 1}, ...,
 	 * {@code count-1}.
-	 * 
+	 *
 	 * @param count Anzahl.
 	 * @return {@link Integer}-{@link Iterator}.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
@@ -380,15 +380,15 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der die gegebene maximale Anzahl an Elementen des gegebenen {@link Iterator} liefert.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param count Maximale Anzahl der vom gegebenen {@link Iterator} gelieferten Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code limited}-{@link Iterator}.
 	 * @throws NullPointerException Wenn {@code iterator} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn {@code count < 0} ist. */
-	public static <GItem> Iterator<GItem> limitedIterator(final int count, final Iterator<? extends GItem> iterator) throws NullPointerException,
-		IllegalArgumentException {
+	public static <GItem> Iterator<GItem> limitedIterator(final int count, final Iterator<? extends GItem> iterator)
+		throws NullPointerException, IllegalArgumentException {
 		if (count < 0) throw new IllegalArgumentException("count < 0");
 		if (iterator == null) throw new NullPointerException("iterator = null");
 		if (count == 0) return Iterators.emptyIterator();
@@ -424,7 +424,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen filternden {@link Iterator} zurück, der nur die vom gegebenen {@link Filter} akzeptierten Elemente des gegebenen {@link Iterator}
 	 * liefert.
-	 * 
+	 *
 	 * @see Filter#accept(Object)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
@@ -477,7 +477,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
 	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in ein {@link HashSet} eingefügt.
-	 * 
+	 *
 	 * @see #uniqueIterator(Collection, Iterator)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
@@ -490,7 +490,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen {@link Iterator} zurück, der kein Element des gegebenen {@link Iterator} mehrfach liefert. Die vom erzeugten {@link Iterator}
 	 * gelieferten Elemente werden zur Erkennung von Mehrfachvorkommen in die gegebenen {@link Collection} eingefügt.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param collection {@link Collection} zum Ausschluss von Mehrfachvorkommen.
 	 * @param iterator {@link Iterator}.
@@ -529,7 +529,7 @@ public class Iterators {
 	}
 
 	/** Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert.
-	 * 
+	 *
 	 * @see #chainedIterator(Iterable)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator1 erster {@link Iterator} oder {@code null}.
@@ -541,7 +541,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert. Das
 	 * gegebene {@link Iterable} darf {@code null} liefern.
-	 * 
+	 *
 	 * @see #chainedIterator(Iterator)
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterable {@link Iterable} über die {@link Iterator}.
@@ -554,7 +554,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen verketteten {@link Iterator} zurück, der alle Elemente der gegebenen {@link Iterator} in der gegebenen Reihenfolge liefert. Der
 	 * gegebene {@link Iterator} darf {@code null} liefern.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterators {@link Iterator}, dessen Elemente ({@link Iterator}) verkettet werden.
 	 * @return {@code chained}-{@link Iterator}.
@@ -599,7 +599,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen umgewandelten {@link Iterator} zurück, der die vom gegebenen {@link Converter} konvertierten Elemente des gegebenen
 	 * {@link Iterator} liefert.
-	 * 
+	 *
 	 * @see Converter#convert(Object)
 	 * @param <GInput> Typ der Eingabe des gegebenen {@link Converter} sowie der Elemente des gegebenen {@link Iterator}.
 	 * @param <GOutput> Typ der Ausgabe des gegebenen {@link Converter} sowie der Elemente des erzeugten {@link Iterator}.
@@ -638,7 +638,7 @@ public class Iterators {
 
 	/** Diese Methode gibt einen unveränderlichen {@link Iterator} zurück, der die Elemente des gegebenen {@link Iterator} liefert und dessen
 	 * {@link Iterator#remove()}-Methode immer eine {@link UnsupportedOperationException} auslöst.
-	 * 
+	 *
 	 * @param <GItem> Typ der Elemente.
 	 * @param iterator {@link Iterator}.
 	 * @return {@code unmodifiable}-{@link Iterator}.

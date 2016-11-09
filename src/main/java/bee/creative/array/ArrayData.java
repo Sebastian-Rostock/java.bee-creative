@@ -11,7 +11,7 @@ package bee.creative.array;
  * <p>
  * Jenachdem, ob der Nutzdatenbereich am Anfang, in der Mitte oder am Ende des internen Arrays ausgerichtet wird, wird das häufige Einfügen von Elementen am
  * Ende, in der Mitte bzw. am Anfang beschleunigt. Die Änderung der Größe des internen Arrays führ in jedem Fall zu einer erneuten Ausrichtung.
- * 
+ *
  * @author [cc-by] 2012 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/]
  * @param <GArray> Typ des internen Arrays ({@code byte[]}, {@code char[]}, {@code short[]}, {@code int[]}, {@code long[]}, {@code float[]}, {@code double[]}
  *        oder {@code boolean[]}). */
@@ -26,30 +26,30 @@ public abstract class ArrayData<GArray> {
 	{}
 
 	/** Diese Methode gibt das interne Array zurück.
-	 * 
+	 *
 	 * @return internes Array. */
 	protected abstract GArray _array_();
 
 	/** Diese Methode setzt das interne Array.
-	 * 
+	 *
 	 * @param array Array. */
 	protected abstract void _array_(GArray array);
 
 	/** Diese Methode gibt ein neues Array mit der gegebenen Länge zurück.
-	 * 
+	 *
 	 * @param length Länge des neuen Arrays.
 	 * @return neues Array. */
 	protected abstract GArray _allocArray_(int length);
 
 	/** Diese Methode leert den gegebenen Bereich im internen Array. Dies ist sinnvoll für Arrays von Objekten.
-	 * 
+	 *
 	 * @param startIndex Index des ersten Elements im Bereich.
 	 * @param finalIndex Index des ersten Elements nach dem Bereich. */
 	protected void _clearArray_(final int startIndex, final int finalIndex) {
 	}
 
 	/** Diese Methode gibt die Länge des Arrays zurück.
-	 * 
+	 *
 	 * @return Länge des Arrays. */
 	protected abstract int _capacity_();
 
@@ -57,7 +57,7 @@ public abstract class ArrayData<GArray> {
 	 * Elemente am Anfang des internen Arrays ausgerichtet, wodurch das häufige Einfügen von Elementen am Ende des internen Arrays beschleunigt wird. Für die
 	 * relative Ausrichtung {@code space} gilt das gegenteil, da hier die Elemente am Ende des internen Arrays ausgerichtet werden, wodurch das häufige Einfügen
 	 * von Elementen am Anfang des internen Arrays beschleunigt wird. Diese ergibt sich aus {@code space / 2}.
-	 * 
+	 *
 	 * @see ArrayData#_insert_(int, int)
 	 * @see ArrayData#_remove_(int, int)
 	 * @see ArrayData#_resize_(int)
@@ -68,7 +68,7 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/** Diese Methode gibt die neue Kapazität für das interne Array zurück, um darin die gegebene Anzahl an Elementen verwalten zu können.
-	 * 
+	 *
 	 * @param count Anzahl.
 	 * @return Länge. */
 	protected int _calcLength_(final int count) {
@@ -81,7 +81,7 @@ public abstract class ArrayData<GArray> {
 
 	/** Diese Methode setzt die Größe des internen Arrays. Wenn die Größe des Arrays von der gegebenen Größe abweicht, werden ein neues Array mit passender Größe
 	 * erzeugt, die Elemente der Ausrichtung entsprechend in das neue Array kopiert und das neue Array als internes genutzt.
-	 * 
+	 *
 	 * @see ArrayData#_calcAlign_(int)
 	 * @param length neue Größe.
 	 * @throws IllegalArgumentException Wenn die Eingaben zu einem Zugriff außerhalb des Arrays führen würden. */
@@ -103,7 +103,7 @@ public abstract class ArrayData<GArray> {
 	 * Verschieben dieser wenigen Elemente nicht aus, so werden alle Elemente verschoben und der Ausrichtung entsprechend im internen Array ausgerichtet. Wenn die
 	 * Größe des internen Arrays dagegen angepasst werden muss, werden ein neues Array mit passender Größe erzeugt und die Elemente des internen Arrays der
 	 * Ausrichtung entsprechend in das neue Array kopiert. Die benötigte Größe wird via {@link ArrayData#_calcLength_(int)} ermittelt.
-	 * 
+	 *
 	 * @see ArrayData#_calcAlign_(int)
 	 * @see ArrayData#_calcLength_(int)
 	 * @param index Index des ersten neuen Elements.
@@ -164,7 +164,7 @@ public abstract class ArrayData<GArray> {
 
 	/** Diese Methode entfernt die gegebene Anzahl an Elementen ab der gegebenen Position im internen Array. Es wird versucht, die wenigen Elemente vor bzw. nach
 	 * dem zu entfernenden Bereich um die gegebene Anzahl zu verschieben.
-	 * 
+	 *
 	 * @see ArrayData#_calcAlign_(int)
 	 * @param index Index des ersten entfallenden Elements.
 	 * @param count Anzahl der entfallende Elemente.
@@ -196,14 +196,14 @@ public abstract class ArrayData<GArray> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Elementen zurück, die ohne erneuter Speicherreervierung verwaltet werden kann.
-	 * 
+	 *
 	 * @return Kapazität. */
 	public final int capacity() {
 		return this._capacity_();
 	}
 
 	/** Diese Methode vergrößert die Kapazität, sodass dieses die gegebene Anzahl an Elementen verwaltet werden kann.
-	 * 
+	 *
 	 * @param capacity Anzahl.
 	 * @throws IllegalArgumentException Wenn die gegebene Kapazität kleiner als {@code 0} ist. */
 	public final void allocate(final int capacity) throws IllegalArgumentException {

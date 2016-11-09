@@ -6,8 +6,9 @@ import bee.creative.iam.IAMArray;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine Zeichenkette, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Zeichenketten realisiert sind.
- * 
+/** Diese Klasse implementiert eine Zeichenkette, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Zeichenketten realisiert
+ * sind.
+ *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
@@ -15,7 +16,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	public static interface Collector {
 
 		/** Diese Methode fügt den gegebenen Codepoint an das Ende der Sammlung an und gibt nur dann {@code true} zurück, wenn das Sammeln fortgeführt werden soll.
-		 * 
+		 *
 		 * @param value Codepoints.
 		 * @return {@code true}, wenn das Sammlen fortgeführt werden soll, bzw. {@code false}, wenn es abgebrochen werden soll. */
 		public boolean push(int value);
@@ -655,7 +656,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	{}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF32-kodierten Codepoints zurück.
-	 * 
+	 *
 	 * @param items UTF32-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist. */
@@ -665,7 +666,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF8-kodierten Codepoints zurück.
-	 * 
+	 *
 	 * @param items UTF8-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
@@ -676,7 +677,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen UTF16-kodierten Codepoints zurück.
-	 * 
+	 *
 	 * @param items UTF16-kodierte Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code items} {@code null} ist.
@@ -687,7 +688,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode eine Zeichenkette mit den gegebenen Codepoints zurück.
-	 * 
+	 *
 	 * @param string Codepoints.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist. */
@@ -697,7 +698,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt eine uniforme Zeichenkette mit der gegebenen Länge zurück, deren Codepoints alle gleich dem gegebenen sind.
-	 * 
+	 *
 	 * @param item Codepoint.
 	 * @param length Länge.
 	 * @return Zeichenkette.
@@ -710,7 +711,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	/** Diese Methode gibt eine Zeichenkette mit den gegebenen Zahlen zurück.<br>
 	 * Abhängig davon, ob die Zahlenliste aus {@link MMFArray#mode() INT8/UINT8}-, {@link MMFArray#mode() INT16/UINT16)} oder {@link MMFArray#mode() INT32}-Zahlen
 	 * besteht, werden diese als UTF8-, UTF16- bzw. UTF32-kodierte Codepoints interpretiert.
-	 * 
+	 *
 	 * @param array Zahlenfolge.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
@@ -732,7 +733,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMString.TYPE)}.
-	 * 
+	 *
 	 * @param value {@link FEMValue}.
 	 * @param context {@link FEMContext}.
 	 * @return Zeichenkette.
@@ -742,7 +743,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der am gegebenen Token beginnt.
-	 * 
+	 *
 	 * @param token Token, an dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
@@ -769,7 +770,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF8-kodierten Codepoints ist.
-	 * 
+	 *
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
 	static boolean _utf8Start_(final int token) {
@@ -777,7 +778,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt den UTF8-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
@@ -805,7 +806,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt den UTF8-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
@@ -833,7 +834,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -849,7 +850,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF8-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -865,7 +866,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl der Token für den UTF16-kodierten Codepoint zurück, der am gegebenen Token beginnt.
-	 * 
+	 *
 	 * @param token Token, an dem ein UTF16-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
@@ -877,7 +878,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF16-kodierten Codepoints ist.
-	 * 
+	 *
 	 * @param token Token.
 	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
 	static boolean _utf16Start_(final int token) {
@@ -885,7 +886,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
 	 * @return Codepoint.
@@ -898,7 +899,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
 	 * @return Codepoint.
@@ -911,7 +912,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -927,7 +928,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 * 
+	 *
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
@@ -951,7 +952,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	protected final int _length_;
 
 	/** Dieser Konstruktor initialisiert die Länge.
-	 * 
+	 *
 	 * @param length Länge.
 	 * @throws IllegalArgumentException Wenn {@code length < 0} ist. */
 	protected FEMString(final int length) throws IllegalArgumentException {
@@ -962,7 +963,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	{}
 
 	/** Diese Methode gibt den {@code index}-ten Codepoint zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-ter Codepoint. */
 	protected int _get_(final int index) {
@@ -971,7 +972,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode fügt alle Codepoints im gegebenen Abschnitt in der gegebenen Reigenfolge geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(int)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Codepoints geordnet angefügt werden.
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Werte im Abschnitt.
@@ -991,7 +992,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF32-Kodierung zurück.
-	 * 
+	 *
 	 * @return Array mit den Codepoints in UTF32-Kodierung. */
 	public int[] value() {
 		final UTF32Collector target = new UTF32Collector(this._length_);
@@ -1000,7 +1001,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt das {@code index}-te Zeichen als Codepoint zurück.
-	 * 
+	 *
 	 * @param index Index.
 	 * @return {@code index}-tes Zeichen.
 	 * @throws IndexOutOfBoundsException Wenn {@code index} ungültig ist. */
@@ -1010,14 +1011,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Länge, d.h. die Anzahl der Zeichen in der Zeichenkette zurück.
-	 * 
+	 *
 	 * @return Länge der Zeichenkette. */
 	public final int length() {
 		return this._length_;
 	}
 
 	/** Diese Methode gibt eine Sicht auf die Verkettung dieser Zeichenkette mit der gegebenen Zeichenkette zurück.
-	 * 
+	 *
 	 * @param that Zeichenkette.
 	 * @return {@link FEMString}-Sicht auf die Verkettung dieser mit der gegebenen Zeichenkette.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -1028,7 +1029,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt eine Sicht auf einen Abschnitt dieser Zeichenkette zurück.
-	 * 
+	 *
 	 * @param offset Position, an welcher der Abschnitt beginnt.
 	 * @param length Anzahl der Bytes im Abschnitt.
 	 * @return {@link FEMString}-Sicht auf einen Abschnitt dieser Zeichenkette.
@@ -1041,14 +1042,14 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt eine rückwärts geordnete Sicht auf diese Zeichenkette zurück.
-	 * 
+	 *
 	 * @return rückwärts geordnete {@link FEMString}-Sicht auf diese Zeichenkette. */
 	public FEMString reverse() {
 		return new ReverseString(this);
 	}
 
 	/** Diese Methode gibt die {@link #value() Codepoints dieser Zeichenkette} in einer performanteren oder zumindest gleichwertigen Zeichenkette zurück.
-	 * 
+	 *
 	 * @see #from(byte[])
 	 * @see #value()
 	 * @return performanteren Zeichenkette oder {@code this}. */
@@ -1060,7 +1061,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt die Position des ersten Vorkommens des gegebenen Zeichens innerhalb dieser Zeichenkette zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchtes Zeichen.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens des gegebenen Zeichens ({@code offset..this.length()-1}) oder {@code -1}.
@@ -1075,7 +1076,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt die Position des ersten Vorkommens der gegebenen Zeichenkette innerhalb dieser Zeichenkette zurück.<br>
 	 * Die Suche beginnt an der gegebenen Position. Bei einer erfolglosen Suche wird {@code -1} geliefert.
-	 * 
+	 *
 	 * @param that gesuchte Zeichenkette.
 	 * @param offset Position, an der die Suche beginnt ({@code 0..this.length()}).
 	 * @return Position des ersten Vorkommens der gegebene Zeichenkette ({@code offset..this.length()-that.length()}) oder {@code -1}.
@@ -1101,7 +1102,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode fügt alle Codepoints dieser Zeichenkette vom ersten zum letzten geordnet an den gegebenen {@link Collector} an.<br>
 	 * Das Anfügen wird vorzeitig abgebrochen, wenn {@link Collector#push(int)} {@code false} liefert.
-	 * 
+	 *
 	 * @param target {@link Collector}, an den die Codepoints geordnet angefügt werden.
 	 * @return {@code false}, wenn das Anfügen vorzeitig abgebrochen wurde.
 	 * @throws NullPointerException Wenn {@code target} {@code null} ist. */
@@ -1112,7 +1113,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
-	 * 
+	 *
 	 * @return Streuwert. */
 	public final int hash() {
 		int result = this._hash_;
@@ -1125,7 +1126,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Zeichenkette gleich der gegebenen ist.
-	 * 
+	 *
 	 * @param that Zeichenkette.
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -1141,7 +1142,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die lexikographische Ordnung dieser Zeichenkette kleiner, gleich oder größer als die
 	 * der gegebenen Zeichenkette ist.
-	 * 
+	 *
 	 * @param that Zeichenkette.
 	 * @return Vergleichswert.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
@@ -1155,7 +1156,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF8-Kodierung zurück.
-	 * 
+	 *
 	 * @return Array mit den Codepoints in UTF8-Kodierung. */
 	public byte[] toBytes() {
 		final UTF8Collector target = new UTF8Collector(this._length_);
@@ -1165,7 +1166,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt die Codepoint in UTF16-Kodierung zurück.
-	 * 
+	 *
 	 * @return Array mit den Codepoints in UTF16-Kodierung. */
 	public char[] toChars() {
 		final UTF16Collector target = new UTF16Collector(this._length_);
@@ -1251,7 +1252,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt diesen Zeichenkette als {@link String} zurück.
-	 * 
+	 *
 	 * @return {@link String}. */
 	@Override
 	public final String toString() {
