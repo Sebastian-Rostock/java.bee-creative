@@ -12,10 +12,21 @@ import java.util.regex.Pattern;
  * @author [cc-by] 2010 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Strings {
 
+	/** Dieses Feld speichert die Zehnerstelle der ersten 100 positiven Dezimanzahlen. */
+	final static char[] _digitTenArray_ = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '2', '2', '2', '2',
+		'2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5',
+		'5', '5', '5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7', '7', '7', '8', '8', '8', '8', '8', '8',
+		'8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'};
+
+	/** Dieses Feld speichert die Einerstelle der ersten 100 positiven Dezimanzahlen. */
+	final static char[] _digitOneArray_ = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3',
+		'4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
+		'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
+		'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
 	/** Dieses Feld speichert einen synchronisierten, gepufferten {@link #patternCompiler(int)} mit Flag {@code 0}. Dieser wird von den Methoden in
 	 * {@link #Strings()} genutzt, die einen regulärer Ausdruck kompilieren müssen. */
 	public static final Converter<String, Pattern> PATTERN_COMPILER = Converters.synchronizedConverter(Converters.bufferedConverter(Strings.patternCompiler(0)));
-
 	{}
 
 	/** Diese Methode wendet den gegebenen regulären Ausdruck auf die gegebene Zeichenkette an und gibt eine Liste von Zeichenketten zurück. Mit den beiden
@@ -485,6 +496,107 @@ public class Strings {
 			}
 
 		};
+	}
+
+	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl vor der gegebenen Position in den gegebenen Puffer.
+	 *
+	 * @param value positiven Dezimalzahl.
+	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl.
+	 * @param buffer Puffer für die Zeichenkette. */
+	public static void toString(int value, int offset, final char[] buffer) {
+		int div, mod;
+		while (true) {
+			div = value / 100;
+			mod = value % 100;
+			if (div != 0) {
+				buffer[--offset] = Strings._digitOneArray_[mod];
+				buffer[--offset] = Strings._digitTenArray_[mod];
+				value = div;
+			} else {
+				buffer[--offset] = Strings._digitOneArray_[mod];
+				if (mod < 10) return;
+				buffer[--offset] = Strings._digitTenArray_[mod];
+				return;
+			}
+		}
+	}
+
+	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl mit der gegebenen Länge um führenden Nullen ergänzt an die gegebenen Position
+	 * in den gegebenen Puffer.
+	 *
+	 * @param value positiven Dezimalzahl.
+	 * @param offset Position des ersten zu schreibenden Zeichens.
+	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss.
+	 * @param buffer Puffer für die Zeichenkette. */
+	public static void toString(final int value, final int offset, final int length, final char[] buffer) {
+		int fill = length - Strings.stringSize(value);
+		while (--fill >= 0) {
+			buffer[offset + fill] = '0';
+		}
+		Strings.toString(value, offset + length, buffer);
+	}
+
+	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl vor der gegebenen Position in den gegebenen Puffer.
+	 *
+	 * @param value positiven Dezimalzahl.
+	 * @param offset Position des ersten Zeichens hinter der geschriebenen Dezimalzahl.
+	 * @param buffer Puffer für die Zeichenkette. */
+	public static void toString(long value, int offset, final char[] buffer) {
+		long div, mod;
+		while (true) {
+			div = value / 1000000000;
+			mod = value % 1000000000;
+			if (div != 0) {
+				Strings.toString((int)mod, offset, 9, buffer);
+				value = div;
+				offset -= 9;
+			} else {
+				Strings.toString((int)mod, offset, buffer);
+				return;
+			}
+		}
+	}
+
+	/** Diese Methode schreibt die Zeichenkette der gegebene positiven Dezimalzahl mit der gegebenen Länge um führenden Nullen ergänzt an die gegebenen Position
+	 * in den gegebenen Puffer.
+	 *
+	 * @param value positiven Dezimalzahl.
+	 * @param offset Position des ersten zu schreibenden Zeichens.
+	 * @param length Anzahl der zu schreibenden Zeichen, welche mindestend der für die gegebene Dezimalzahl neötigten Anzahl an Zeichen entsprechen muss.
+	 * @param buffer Puffer für die Zeichenkette. */
+	public static void toString(final long value, final int offset, final int length, final char[] buffer) {
+		int fill = length - Strings.stringSize(value);
+		while (--fill >= 0) {
+			buffer[offset + fill] = '0';
+		}
+		Strings.toString(value, offset + length, buffer);
+	}
+
+	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
+	 *
+	 * @param value positive Dezimalzahl.
+	 * @return Zeichenanzahl. */
+	public static int stringSize(final int value) {
+		return (value > 99999 //
+			? (value > 9999999 //
+				? (value > 999999999//
+					? 10 //
+					: (value > 99999999 ? 9 : 8)) //
+				: (value > 999999 ? 7 : 6)) //
+			: (value > 99 //
+				? (value > 9999 //
+					? 5 //
+					: (value > 999 ? 4 : 3)) //
+				: (value > 9 ? 2 : 1)));
+	}
+
+	/** Diese Methode gibt die Anzahl an Zeichen zurück, die zur Darstellung der gegebenen positiven Dezimalzahl nötig sind.
+	 *
+	 * @param value positive Dezimalzahl.
+	 * @return Zeichenanzahl. */
+	public static int stringSize(final long value) {
+		final long div = value / 1000000000, mod = value % 1000000000;
+		return div != 0 ? Strings.stringSize(div) + 9 : Strings.stringSize((int)mod);
 	}
 
 }
