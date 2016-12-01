@@ -248,38 +248,6 @@ public final class FEMParser extends Parser {
 		}
 	}
 
-	/** Diese Methode gibt nur dann {@code true} zurück, wenn die {@link #source() Eingabe} keines der in {@link #_parseSource_()} erkannten Zeichen enthält, d.h.
-	 * wenn das Parsen der Eingabe via {@link #parseRanges()} genau einen Bereich mit dem Typ {@code '.'} ergibt, welcher über {@link #_openValue_()} und
-	 * {@link #_closeValue_()} entstand.
-	 *
-	 * @return {@code true}, wenn die Eingabe nur einen Wert enthält. */
-	final boolean _checkSource_() {
-		if (this.isParsed()) return false;
-		for (int symbol = this.symbol(); symbol >= 0; symbol = this.skip()) {
-			switch (symbol) {
-				case '\'':
-				case '\"':
-				case '/':
-				case '<':
-				case '>':
-				case '$':
-				case ':':
-				case ';':
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '{':
-				case '}':
-					return false;
-				default: {
-					if (symbol <= ' ') return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	/** Diese Methode gibt die in Anführungszeichen eingeschlossene und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
 	 *
 	 * @see #_parseMask_(int)
@@ -428,8 +396,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die {@link #source() Eingabe} ohne den einschließenden spitzen Klammern und deren Maskierungen zurück.<br>
-	 * Die Eingabe beginnt und endet hierbei mit <code>'&lt;'</code> bzw. <code>'&gt;'</code> und enthält diese Zeichen nur gedoppelt. Wenn die Eingabe nicht
-	 * derart beginnt, wird sie unverändert zurück gegeben.
+	 * Die Eingabe beginnt und endet hierbei mit <code>'&lt;'</code> bzw. <code>'&gt;'</code> und enthält diese Zeichen nur gedoppelt.
 	 *
 	 * @return Eingabe ohne Maskierung mit <code>'&lt;'</code> und <code>'&gt;'</code>.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft.
@@ -437,24 +404,20 @@ public final class FEMParser extends Parser {
 	public final String parseValue() throws IllegalStateException, IllegalArgumentException {
 		this._start_();
 		try {
-			if (this.symbol() == '<') return this._decodeValue_();
-			return this.source();
+			return this._decodeValue_();
 		} finally {
 			this._stop_();
 		}
 	}
 
-	/** Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.<br>
-	 * Wenn die Eingabe keine von diesem Parser besonders behandelten Zeichen enthält, wird sie unverändert zurück gegeben.
-	 *
+	/** Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
+	 * 
 	 * @see #parseValue()
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
 	public final String formatValue() throws IllegalStateException {
 		this._start_();
 		try {
-			if (this._checkSource_()) return this.source();
-			this.reset();
 			return this._encodeValue_();
 		} finally {
 			this._stop_();
