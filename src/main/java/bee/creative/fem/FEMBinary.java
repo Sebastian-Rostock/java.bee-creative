@@ -59,6 +59,30 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	}
 
 	@SuppressWarnings ("javadoc")
+	static final class StringCollector implements Collector {
+
+		public final char[] array;
+
+		public int index = 2;
+
+		StringCollector(final int length) {
+			this.array = new char[length];
+			this.array[0] = '0';
+			this.array[1] = 'x';
+		}
+
+		{}
+
+		@Override
+		public final boolean push(final byte value) {
+			this.array[this.index++] = FEMBinary.toChar((value >> 4) & 0xF);
+			this.array[this.index++] = FEMBinary.toChar((value >> 0) & 0xF);
+			return true;
+		}
+
+	}
+
+	@SuppressWarnings ("javadoc")
 	static final class ValueCollector implements Collector {
 
 		public final byte[] array;
@@ -703,14 +727,9 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		final int length = this._length_;
-		final StringBuilder result = new StringBuilder(2 + (length * 2));
-		result.append("0x");
-		for (int i = 0; i < length; i++) {
-			final int value = this._get_(i);
-			result.append(FEMBinary.toChar((value >> 4) & 0xF)).append(FEMBinary.toChar((value >> 0) & 0xF));
-		}
-		return result.toString();
+		final StringCollector target = new StringCollector(this._length_);
+		this.extract(target);
+		return new String(target.array, 0, target.array.length);
 	}
 
 }
