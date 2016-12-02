@@ -107,9 +107,9 @@ public class Integers {
 			div = value / 1000000000;
 			mod = value % 1000000000;
 			if (div != 0) {
+				offset -= 9;
 				Integers.formatInt((int)mod, buffer, offset, 9);
 				value = div;
-				offset -= 9;
 			} else {
 				Integers.formatInt((int)mod, buffer, offset);
 				return;
