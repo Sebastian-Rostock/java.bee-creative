@@ -2,9 +2,11 @@ package bee.creative.fem;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.util.Comparators;
+import bee.creative.util.Strings;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein {@code long} dargestellt.
@@ -99,9 +101,18 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	/** Dieses Feld speichert die leere Zeitangabe ohne Datum, ohne Uhrzeit und ohne Zeitzone. */
 	public static final FEMDatetime EMPTY = new FEMDatetime(0x00, 0x40000000);
 
+	/** Dieses Feld speichert die früheste darstellbare Zeitangabe. */
+	public static final FEMDatetime MINIMUM = FEMDatetime.fromDate(1582, 10, 15).withTime(0, 0, 0, 0).withZone(14, 0);
+
+	/** Dieses Feld speichert die späteste darstellbare Zeitangabe. */
+	public static final FEMDatetime MAXIMUM = FEMDatetime.fromDate(9999, 12, 31).withTime(24, 0, 0, 0).withZone(-14, 0);
+
 	@SuppressWarnings ("javadoc")
 	static final Pattern _pattern_ =
 		Pattern.compile("^(?:(\\d{4})-(\\d{2})-(\\d{2}))?(T)?(?:(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{3}))?)?(?:(Z)|(?:([\\+\\-]\\d{2}):(\\d{2})))?$");
+
+	@SuppressWarnings ("javadoc")
+	static final FEMDatetime _utcbase_ = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0).withZone(TimeZone.getDefault().getRawOffset() / 60000);
 
 	{}
 
@@ -110,7 +121,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return aktueller Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime now() throws IllegalArgumentException {
-		return FEMDatetime.from(new GregorianCalendar());
+		return FEMDatetime._utcbase_._moveTime_(System.currentTimeMillis());
 	}
 
 	/** Diese Methode gibt einen Zeitpunkt zurück, der die gegebene Anzahl an Millisekunden nach dem Zeitpunkt {@code 1970-01-01T00:00:00Z} liegt.
@@ -1126,11 +1137,21 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		if (zoneAdd == 0) return this;
 		final int zoneNew = zoneAdd + this._zoneValue_();
 		FEMDatetime._checkZone_(zoneNew);
-		if (this.hasTime()) return this._moveTime_(zoneAdd * -60000)._withZone_(zoneNew);
+		if (this.hasTime()) return this._moveTime_(zoneAdd * 60000)._withZone_(zoneNew);
 		if (!this.hasDate()) return this._withZone_(zoneNew);
 		final int daysAdd = (zoneAdd - 1439) / 1440;
 		if (daysAdd != 0) return this._moveDate_(0, daysAdd)._withZone_(zoneNew);
 		return this._withZone_(zoneNew);
+	}
+
+	/** Diese Methode gibt diese Zeitangabe normalisiert zurück.<br>
+	 * Hierbei werden Zeitpunkte mit der Uhrzeit {@code 24:00:00.000} auf {@code 00:00:00.000} des Folgetages normalisiert, sofern dies möglich ist.
+	 * 
+	 * @return normalisierte Zeitangabe. */
+	public final FEMDatetime normalize() {
+		if (!this.hasDate() || !this.hasTime()) return this;
+		if ((this._hourValue_() == 24) && (this._yearValue_() == 9999) && (this._monthValue_() == 12) && (this._dateValue_() == 31)) return this;
+		return this._moveDate_(0, 1)._withTime_(0, 0, 0, 0);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
@@ -1330,31 +1351,63 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		final StringBuilder result = new StringBuilder();
+		final char[] buffer = new char[29];
 		final boolean hasDate = this.hasDate();
+		int offset = 0;
 		if (hasDate) {
-			result.append(String.format("%04d-%02d-%02d", this._yearValue_(), this._monthValue_(), this._dateValue_()));
+			Strings.toString(this._yearValue_(), offset, 4, buffer);
+			offset += 4;
+			buffer[offset] = '-';
+			offset += 1;
+			Strings.toString(this._monthValue_(), offset, 2, buffer);
+			offset += 2;
+			buffer[offset] = '-';
+			offset += 1;
+			Strings.toString(this._dateValue_(), offset, 2, buffer);
+			offset += 2;
 		}
 		if (this.hasTime()) {
 			if (hasDate) {
-				result.append('T');
+				buffer[offset] = 'T';
+				offset += 1;
 			}
-			result.append(String.format("%02d:%02d:%02d", this._hourValue_(), this._minuteValue_(), this._secondValue_()));
+			buffer[7] = '-';
+			Strings.toString(this._hourValue_(), offset, 2, buffer);
+			offset += 2;
+			buffer[offset] = ':';
+			offset += 1;
+			Strings.toString(this._minuteValue_(), offset, 2, buffer);
+			offset += 2;
+			buffer[offset] = ':';
+			offset += 1;
+			Strings.toString(this._secondValue_(), offset, 2, buffer);
+			offset += 2;
 			final int millisecond = this._millisecondValue_();
 			if (millisecond != 0) {
-				result.append(String.format(".%03d", millisecond));
+				buffer[offset] = '.';
+				offset += 1;
+				Strings.toString(millisecond, offset, 3, buffer);
+				offset += 3;
 			}
 		}
 		if (this.hasZone()) {
 			final int zone = this._zoneValue_();
 			if (zone == 0) {
-				result.append('Z');
+				buffer[offset] = 'Z';
+				offset += 1;
 			} else {
 				final int zoneAbs = Math.abs(zone);
-				result.append(zone < 0 ? '-' : '+').append(String.format("%02d:%02d", zoneAbs / 60, zoneAbs % 60));
+				buffer[offset] = zone < 0 ? '-' : '+';
+				offset += 1;
+				Strings.toString(zoneAbs / 60, offset, 2, buffer);
+				offset += 2;
+				buffer[offset] = ':';
+				offset += 1;
+				Strings.toString(zoneAbs % 60, offset, 2, buffer);
+				offset += 2;
 			}
 		}
-		return result.toString();
+		return new String(buffer, 0, offset);
 	}
 
 }
