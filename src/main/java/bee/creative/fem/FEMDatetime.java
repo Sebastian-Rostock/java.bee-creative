@@ -3,10 +3,8 @@ package bee.creative.fem;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import bee.creative.util.Comparators;
-import bee.creative.util.Strings;
+import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine Zeitangabe mit Datum, Uhrzeit und/oder Zeitzone im Gregorianischen Kalender.<br>
  * Intern wird die Zeitangabe als ein {@code long} dargestellt.
@@ -108,10 +106,6 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static final FEMDatetime MAXIMUM = FEMDatetime.fromDate(9999, 12, 31).withTime(24, 0, 0, 0).withZone(-14, 0);
 
 	@SuppressWarnings ("javadoc")
-	static final Pattern _pattern_ =
-		Pattern.compile("^(?:(\\d{4})-(\\d{2})-(\\d{2}))?(T)?(?:(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{3}))?)?(?:(Z)|(?:([\\+\\-]\\d{2}):(\\d{2})))?$");
-
-	@SuppressWarnings ("javadoc")
 	static final FEMDatetime _utcbase_ = FEMDatetime.EMPTY.withDate(1970, 1, 1).withTime(0).withZone(0).withZone(TimeZone.getDefault().getRawOffset() / 60000);
 
 	{}
@@ -148,39 +142,97 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
-		try {
-			final Matcher matcher = FEMDatetime._pattern_.matcher(string);
-			if (!matcher.find()) throw new IllegalArgumentException();
-			FEMDatetime result = FEMDatetime.EMPTY;
-			if (matcher.start(1) >= 0) {
-				result = result.withDate( //
-					Integer.parseInt(matcher.group(1)), //
-					Integer.parseInt(matcher.group(2)), //
-					Integer.parseInt(matcher.group(3)));
-			}
-			if (matcher.start(5) >= 0) {
-				result = result.withTime( //
-					Integer.parseInt(matcher.group(5)), //
-					Integer.parseInt(matcher.group(6)), //
-					Integer.parseInt(matcher.group(7)), //
-					matcher.start(8) >= 0 ? Integer.parseInt(matcher.group(8)) : 0);
-			}
-			if (matcher.start(4) >= 0) {
-				if (!result.hasDate() || !result.hasTime()) throw new IllegalArgumentException();
-			} else {
-				if (result.hasDate() && result.hasTime()) throw new IllegalArgumentException();
-			}
-			if (matcher.start(9) >= 0) {
-				result = result.withZone(0);
-			} else if (matcher.start(10) >= 0) {
-				result = result.withZone( //
-					Integer.parseInt(matcher.group(10)), //
-					Integer.parseInt(matcher.group(11)));
-			}
-			return result;
-		} catch (final NumberFormatException cause) {
-			throw new IllegalArgumentException(cause);
+		if (string.length() > 29) throw new IllegalArgumentException();
+		final char[] buffer = string.toCharArray();
+		final FEMDatetime result = FEMDatetime.EMPTY;
+		switch (buffer.length) {
+			case 0: //
+				return result;
+			case 1: // Z
+				return FEMDatetime._fromZ1_(result, buffer, 0);
+			case 6: // +00:01
+				return FEMDatetime._fromZ6_(result, buffer, 0);
+			case 8: // 00:00:01
+				return FEMDatetime._fromT8_(result, buffer, 0);
+			case 9: // 00:00:01Z
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT8_(result, buffer, 0), buffer, 8);
+			case 10: // 1582-10-16
+				return FEMDatetime._fromD10_(result, buffer, 0);
+			case 11: // 1582-10-16Z
+				return FEMDatetime._fromZ1_(FEMDatetime._fromD10_(result, buffer, 0), buffer, 10);
+			case 12: // 00:00:00.001
+				return FEMDatetime._fromT12_(result, buffer, 0);
+			case 13: // 00:00:00.001Z
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(result, buffer, 0), buffer, 12);
+			case 14: // 00:00:01+00:01
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT8_(result, buffer, 0), buffer, 8);
+			case 16: // 1582-10-16+00:01
+				return FEMDatetime._fromZ6_(FEMDatetime._fromD10_(result, buffer, 0), buffer, 10);
+			case 18: // 00:00:00.001+00:01
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(result, buffer, 0), buffer, 12);
+			case 19: // 1582-10-16T00:00:01
+				return FEMDatetime._fromT8_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11);
+			case 23: // 1582-10-16T00:00:00.001
+				return FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11);
+			case 24: // 1582-10-16T00:00:00.001Z
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11), buffer, 23);
+			case 29: // 1582-10-16T00:00:00.001+00:01
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11), buffer, 23);
+			default:
+				throw new IllegalArgumentException();
 		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	static int _fromI2_(final char[] buffer, final int offset) {
+		if (Integers.integerSize(buffer, offset, 2) != 2) throw new IllegalArgumentException();
+		return Integers.parseInt(buffer, offset, 2);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromZ1_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if (buffer[offset] != 'Z') throw new IllegalArgumentException();
+		return result.withZone(0);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromZ6_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if (buffer[offset + 3] != ':') throw new IllegalArgumentException();
+		final int sign = buffer[offset], hour = FEMDatetime._fromI2_(buffer, offset + 1), minute = FEMDatetime._fromI2_(buffer, offset + 4);
+		if (sign == '-') return result.withZone(-hour, minute);
+		if (sign == '+') return result.withZone(+hour, minute);
+		throw new IllegalArgumentException();
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromT8_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':')) throw new IllegalArgumentException();
+		final int hour = FEMDatetime._fromI2_(buffer, offset + 0), minute = FEMDatetime._fromI2_(buffer, offset + 3),
+			second = FEMDatetime._fromI2_(buffer, offset + 6);
+		return result.withTime(hour, minute, second, 0);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromT12_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if ((buffer[offset + 2] != ':') || (buffer[offset + 5] != ':') || (buffer[offset + 8] != '.')) throw new IllegalArgumentException();
+		if (Integers.integerSize(buffer, offset + 9, 3) != 3) throw new IllegalArgumentException();
+		final int hour = FEMDatetime._fromI2_(buffer, offset + 0), minute = FEMDatetime._fromI2_(buffer, offset + 3),
+			second = FEMDatetime._fromI2_(buffer, offset + 6), millisecond = Integers.parseInt(buffer, offset + 9, 3);
+		return result.withTime(hour, minute, second, millisecond);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromD10_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if ((buffer[offset + 4] != '-') || (buffer[offset + 7] != '-')) throw new IllegalArgumentException();
+		if (Integers.integerSize(buffer, offset, 4) != 4) throw new IllegalArgumentException();
+		final int year = Integers.parseInt(buffer, offset, 4), month = FEMDatetime._fromI2_(buffer, offset + 5), date = FEMDatetime._fromI2_(buffer, offset + 8);
+		return result.withDate(year, month, date);
+	}
+
+	@SuppressWarnings ("javadoc")
+	static FEMDatetime _fromD11_(final FEMDatetime result, final char[] buffer, final int offset) {
+		if (buffer[offset + 10] != 'T') throw new IllegalArgumentException();
+		return FEMDatetime._fromD10_(result, buffer, offset);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit dem Datum, der Uhrzeit und der Zeitzone des gegebenen {@link Calendar} zurück und ist eine Abkürzung für
@@ -1146,7 +1198,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt diese Zeitangabe normalisiert zurück.<br>
 	 * Hierbei werden Zeitpunkte mit der Uhrzeit {@code 24:00:00.000} auf {@code 00:00:00.000} des Folgetages normalisiert, sofern dies möglich ist.
-	 * 
+	 *
 	 * @return normalisierte Zeitangabe. */
 	public final FEMDatetime normalize() {
 		if (!this.hasDate() || !this.hasTime()) return this;
@@ -1355,15 +1407,15 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 		final boolean hasDate = this.hasDate();
 		int offset = 0;
 		if (hasDate) {
-			Strings.toString(this._yearValue_(), offset, 4, buffer);
+			Integers.formatInt(this._yearValue_(), buffer, offset, 4);
 			offset += 4;
 			buffer[offset] = '-';
 			offset += 1;
-			Strings.toString(this._monthValue_(), offset, 2, buffer);
+			Integers.formatInt(this._monthValue_(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = '-';
 			offset += 1;
-			Strings.toString(this._dateValue_(), offset, 2, buffer);
+			Integers.formatInt(this._dateValue_(), buffer, offset, 2);
 			offset += 2;
 		}
 		if (this.hasTime()) {
@@ -1372,21 +1424,21 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				offset += 1;
 			}
 			buffer[7] = '-';
-			Strings.toString(this._hourValue_(), offset, 2, buffer);
+			Integers.formatInt(this._hourValue_(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Strings.toString(this._minuteValue_(), offset, 2, buffer);
+			Integers.formatInt(this._minuteValue_(), buffer, offset, 2);
 			offset += 2;
 			buffer[offset] = ':';
 			offset += 1;
-			Strings.toString(this._secondValue_(), offset, 2, buffer);
+			Integers.formatInt(this._secondValue_(), buffer, offset, 2);
 			offset += 2;
 			final int millisecond = this._millisecondValue_();
 			if (millisecond != 0) {
 				buffer[offset] = '.';
 				offset += 1;
-				Strings.toString(millisecond, offset, 3, buffer);
+				Integers.formatInt(millisecond, buffer, offset, 3);
 				offset += 3;
 			}
 		}
@@ -1399,11 +1451,11 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 				final int zoneAbs = Math.abs(zone);
 				buffer[offset] = zone < 0 ? '-' : '+';
 				offset += 1;
-				Strings.toString(zoneAbs / 60, offset, 2, buffer);
+				Integers.formatInt(zoneAbs / 60, buffer, offset, 2);
 				offset += 2;
 				buffer[offset] = ':';
 				offset += 1;
-				Strings.toString(zoneAbs % 60, offset, 2, buffer);
+				Integers.formatInt(zoneAbs % 60, buffer, offset, 2);
 				offset += 2;
 			}
 		}

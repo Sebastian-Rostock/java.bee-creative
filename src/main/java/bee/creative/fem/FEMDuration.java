@@ -3,7 +3,7 @@ package bee.creative.fem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import bee.creative.util.Comparators;
-import bee.creative.util.Strings;
+import bee.creative.util.Integers;
 
 /** Diese Klasse implementiert eine unveränderliche Zeitspanne aus Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Millisekunden.<br>
  * Intern wird die Zeitspanne als ein {@code long} dargestellt.<br>
@@ -769,22 +769,22 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		offset += 1;
 		final int years = this.yearsValue();
 		if (years != 0) {
-			offset += Strings.stringSize(years);
-			Strings.toString(years, offset, buffer);
+			offset += Integers.stringSize(years);
+			Integers.formatInt(years, buffer, offset);
 			buffer[offset] = 'Y';
 			offset += 1;
 		}
 		final int months = this.monthsValue();
 		if (months != 0) {
-			offset += Strings.stringSize(months);
-			Strings.toString(months, offset, buffer);
+			offset += Integers.stringSize(months);
+			Integers.formatInt(months, buffer, offset);
 			buffer[offset] = 'M';
 			offset += 1;
 		}
 		final int days = this.daysValue();
 		if (days != 0) {
-			offset += Strings.stringSize(days);
-			Strings.toString(days, offset, buffer);
+			offset += Integers.stringSize(days);
+			Integers.formatInt(days, buffer, offset);
 			buffer[offset] = 'D';
 			offset += 1;
 		}
@@ -794,28 +794,28 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 			offset += 1;
 		}
 		if (hours != 0) {
-			offset += Strings.stringSize(hours);
-			Strings.toString(hours, offset, buffer);
+			offset += Integers.stringSize(hours);
+			Integers.formatInt(hours, buffer, offset);
 			buffer[offset] = 'H';
 			offset += 1;
 		}
 		if (minutes != 0) {
-			offset += Strings.stringSize(minutes);
-			Strings.toString(minutes, offset, buffer);
+			offset += Integers.stringSize(minutes);
+			Integers.formatInt(minutes, buffer, offset);
 			buffer[offset] = 'M';
 			offset += 1;
 		}
 		if (milliseconds != 0) {
-			offset += Strings.stringSize(seconds);
-			Strings.toString(seconds, offset, buffer);
+			offset += Integers.stringSize(seconds);
+			Integers.formatInt(seconds, buffer, offset);
 			offset += 4;
-			Strings.toString(milliseconds + 1000, offset, buffer);
+			Integers.formatInt(milliseconds + 1000, buffer, offset);
 			buffer[offset - 4] = '.';
 			buffer[offset] = 'S';
 			offset += 1;
 		} else if (seconds != 0) {
-			offset += Strings.stringSize(seconds);
-			Strings.toString(seconds, offset, buffer);
+			offset += Integers.stringSize(seconds);
+			Integers.formatInt(seconds, buffer, offset);
 			buffer[offset] = 'S';
 			offset += 1;
 		}
