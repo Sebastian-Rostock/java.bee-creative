@@ -115,7 +115,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return aktueller Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime now() throws IllegalArgumentException {
-		return FEMDatetime._utcbase_._moveTime_(System.currentTimeMillis());
+		return FEMDatetime.from(System.currentTimeMillis());
 	}
 
 	/** Diese Methode gibt einen Zeitpunkt zurück, der die gegebene Anzahl an Millisekunden nach dem Zeitpunkt {@code 1970-01-01T00:00:00Z} liegt.
@@ -125,9 +125,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @return Zeitpunkt.
 	 * @throws IllegalArgumentException Wenn {@link #from(Calendar)} eine entsprechende Ausnahme auslöst. */
 	public static FEMDatetime from(final long millis) throws IllegalArgumentException {
-		final GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTimeInMillis(millis);
-		return FEMDatetime.from(calendar);
+		return FEMDatetime._utcbase_._moveTime_(millis);
 	}
 
 	/** Diese Methode gibt eine Zeitangabe mit den in der gegebenen Zeitangabe kodierten Komponenten zurück.<br>
@@ -144,40 +142,39 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	public static FEMDatetime from(final String string) throws NullPointerException, IllegalArgumentException {
 		if (string.length() > 29) throw new IllegalArgumentException();
 		final char[] buffer = string.toCharArray();
-		final FEMDatetime result = FEMDatetime.EMPTY;
 		switch (buffer.length) {
 			case 0: //
-				return result;
+				return FEMDatetime.EMPTY;
 			case 1: // Z
-				return FEMDatetime._fromZ1_(result, buffer, 0);
+				return FEMDatetime._fromZ1_(FEMDatetime.EMPTY, buffer, 0);
 			case 6: // +00:01
-				return FEMDatetime._fromZ6_(result, buffer, 0);
+				return FEMDatetime._fromZ6_(FEMDatetime.EMPTY, buffer, 0);
 			case 8: // 00:00:01
-				return FEMDatetime._fromT8_(result, buffer, 0);
+				return FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0);
 			case 9: // 00:00:01Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT8_(result, buffer, 0), buffer, 8);
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
 			case 10: // 1582-10-16
-				return FEMDatetime._fromD10_(result, buffer, 0);
+				return FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0);
 			case 11: // 1582-10-16Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromD10_(result, buffer, 0), buffer, 10);
+				return FEMDatetime._fromZ1_(FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
 			case 12: // 00:00:00.001
-				return FEMDatetime._fromT12_(result, buffer, 0);
+				return FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0);
 			case 13: // 00:00:00.001Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(result, buffer, 0), buffer, 12);
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
 			case 14: // 00:00:01+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT8_(result, buffer, 0), buffer, 8);
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT8_(FEMDatetime.EMPTY, buffer, 0), buffer, 8);
 			case 16: // 1582-10-16+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromD10_(result, buffer, 0), buffer, 10);
+				return FEMDatetime._fromZ6_(FEMDatetime._fromD10_(FEMDatetime.EMPTY, buffer, 0), buffer, 10);
 			case 18: // 00:00:00.001+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(result, buffer, 0), buffer, 12);
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime.EMPTY, buffer, 0), buffer, 12);
 			case 19: // 1582-10-16T00:00:01
-				return FEMDatetime._fromT8_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11);
+				return FEMDatetime._fromT8_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
 			case 23: // 1582-10-16T00:00:00.001
-				return FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11);
+				return FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11);
 			case 24: // 1582-10-16T00:00:00.001Z
-				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11), buffer, 23);
+				return FEMDatetime._fromZ1_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
 			case 29: // 1582-10-16T00:00:00.001+00:01
-				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(result, buffer, 0), buffer, 11), buffer, 23);
+				return FEMDatetime._fromZ6_(FEMDatetime._fromT12_(FEMDatetime._fromD11_(FEMDatetime.EMPTY, buffer, 0), buffer, 11), buffer, 23);
 			default:
 				throw new IllegalArgumentException();
 		}
