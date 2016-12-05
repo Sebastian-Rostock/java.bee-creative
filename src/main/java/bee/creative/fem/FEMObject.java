@@ -39,7 +39,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMObject from(final String string) throws NullPointerException, IllegalArgumentException {
 		try {
-			final Matcher matcher = FEMDuration._pattern_.matcher(string);
+			final Matcher matcher = FEMObject._pattern_.matcher(string);
 			if (!matcher.find()) throw new IllegalArgumentException();
 			final int ref = Integer.parseInt(matcher.group(1));
 			final int type = Integer.parseInt(matcher.group(3));
