@@ -1395,7 +1395,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 
 	/** Diese Methode gibt die Textdarstellung dieser Zeitangabe zurück.<br>
 	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#dateTime-lexical-representation">xsd:dateTime</a> aus
-	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
+	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.
 	 *
 	 * @return Textdarstellung. */
 	@Override
