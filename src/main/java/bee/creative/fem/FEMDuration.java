@@ -1,7 +1,5 @@
 package bee.creative.fem;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import bee.creative.util.Comparators;
 import bee.creative.util.Integers;
 
@@ -166,9 +164,6 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		64, 16, 34, 49, 34, 49, 34, 49, 49, 49, 64, 49, 64, 16, 34, 34, 34, 34, 34, 49, 49, 49, 49, 49, 49, 16, 34, 34, 34, 34, 34, 34, 49, 34, 49, 49, 49, 16, 18,
 		33, 18, 33, 33, 33, 48, 33, 48, 33, 48};
 
-	@SuppressWarnings ("javadoc")
-	static final Pattern _pattern_ = Pattern.compile("^(\\-)?P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(T)?(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)(?:\\.(\\d{0,3}))S)?$");
-
 	{}
 
 	/** Diese Methode gibt eine neue Zeitspanne mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
@@ -180,25 +175,141 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMDuration from(final String string) throws NullPointerException, IllegalArgumentException {
-		try {// TODO faster
-			final Matcher matcher = FEMDuration._pattern_.matcher(string);
-			if (!matcher.find()) throw new IllegalArgumentException();
-			if (((matcher.start(6) > 0) || (matcher.start(8) > 0)) && (matcher.start(5) < 0)) throw new IllegalArgumentException();
-			FEMDuration result = FEMDuration.EMPTY;
-			final int years = matcher.start(2) > 0 ? Integer.parseInt(matcher.group(2)) : 0;
-			final int months = matcher.start(3) > 0 ? Integer.parseInt(matcher.group(3)) : 0;
-			final int days = matcher.start(4) > 0 ? Integer.parseInt(matcher.group(4)) : 0;
-			final int hours = matcher.start(6) > 0 ? Integer.parseInt(matcher.group(6)) : 0;
-			final long minutes = matcher.start(7) > 0 ? Long.parseLong(matcher.group(7)) : 0;
-			final long seconds = matcher.start(8) > 0 ? Long.parseLong(matcher.group(8)) : 0;
-			final long milliseconds = matcher.start(9) > 0 ? Long.parseLong(matcher.group(9)) : 0;
-			result = result.move(years, months, days, hours, minutes, seconds, milliseconds);
-			if (matcher.start(1) < 0) return result;
-			result = result.negate();
-			return result;
-		} catch (final NumberFormatException cause) {
-			throw new IllegalArgumentException(cause);
+		int size, offset, symbol;
+
+		final int length;
+		final char[] buffer;
+		{
+			length = string.length() - 1;
+			if ((length < 2) || (length > 45)) throw new IllegalArgumentException();
+			buffer = string.toCharArray();
+			symbol = buffer[0];
 		}
+
+		final boolean negate;
+		if (symbol == '-') {
+			symbol = buffer[1];
+			negate = true;
+			offset = 2;
+		} else {
+			negate = false;
+			offset = 1;
+		}
+
+		{
+			if (symbol != 'P') throw new IllegalArgumentException();
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		}
+
+		final int years;
+		if (symbol == 'Y') {
+			if ((size < 1) || (size > 4)) throw new IllegalArgumentException();
+			years = Integers.parseInt(buffer, offset - size - 1, size);
+			if (offset > length) return negate //
+				? FEMDuration.from(-years, 0, 0, 0, 0, 0, 0) //
+				: FEMDuration.from(years, 0, 0, 0, 0, 0, 0);
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		} else {
+			years = 0;
+		}
+
+		final int months;
+		if (symbol == 'M') {
+			if ((size < 1) || (size > 6)) throw new IllegalArgumentException();
+			months = Integers.parseInt(buffer, offset - size - 1, size);
+			if (offset > length) return negate //
+				? FEMDuration.from(-years, -months, 0, 0, 0, 0, 0) //
+				: FEMDuration.from(years, months, 0, 0, 0, 0, 0);
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		} else {
+			months = 0;
+		}
+
+		final int days;
+		if (symbol == 'D') {
+			if ((size < 1) || (size > 7)) throw new IllegalArgumentException();
+			days = Integers.parseInt(buffer, offset - size - 1, size);
+			if (offset > length) return negate //
+				? FEMDuration.from(-years, -months, -days, 0, 0, 0, 0) //
+				: FEMDuration.from(years, months, days, 0, 0, 0, 0);
+			size = 0;
+			symbol = buffer[offset];
+			offset += 1;
+		} else {
+			days = 0;
+		}
+
+		{
+			if ((symbol != 'T') || (size != 0) || (offset > length)) throw new IllegalArgumentException();
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		}
+
+		final int hours;
+		if (symbol == 'H') {
+			if ((size < 1) || (size > 8)) throw new IllegalArgumentException();
+			hours = Integers.parseInt(buffer, offset - size - 1, size);
+			if (offset > length) return negate //
+				? FEMDuration.from(-years, -months, -days, -hours, 0, 0, 0) //
+				: FEMDuration.from(years, months, days, hours, 0, 0, 0);
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		} else {
+			hours = 0;
+		}
+
+		final long minutes;
+		if (symbol == 'M') {
+			if ((size < 1) || (size > 10)) throw new IllegalArgumentException();
+			minutes = Integers.parseLong(buffer, offset - size - 1, size);
+			if (offset > length) return negate //
+				? FEMDuration.from(-years, -months, -days, -hours, -minutes, 0, 0) //
+				: FEMDuration.from(years, months, days, hours, minutes, 0, 0);
+			size = Integers.integerSize(buffer, offset, length - offset);
+			offset += size;
+			symbol = buffer[offset];
+			offset += 1;
+		} else {
+			minutes = 0;
+		}
+
+		final long seconds;
+		{
+			if ((size < 1) || (size > 12)) throw new IllegalArgumentException();
+			seconds = Integers.parseLong(buffer, offset - size - 1, size);
+		}
+
+		final int milliseconds;
+		if (symbol == '.') {
+			size = Integers.integerSize(buffer, offset, length - offset);
+			if (size != 3) throw new IllegalArgumentException();
+			milliseconds = Integers.parseInt(buffer, offset, 3);
+			symbol = buffer[offset + 3];
+			offset += 4;
+		} else {
+			milliseconds = 0;
+		}
+
+		{
+			if ((symbol != 'S') || (offset <= length)) throw new IllegalArgumentException();
+			return negate //
+				? FEMDuration.from(-years, -months, -days, -hours, -minutes, -seconds, -milliseconds) //
+				: FEMDuration.from(years, months, days, hours, minutes, seconds, milliseconds);
+		}
+
 	}
 
 	/** Diese Methode gibt eine Zeitspanne mit den gegebenen Gesamtanzahlen an Monaten und Millisekunden zurück.
@@ -672,9 +783,10 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 	 * @return Vergleichswert oder {@code undefined}.
 	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
 	public final int compare(final FEMDuration that, final int undefined) {
-		final int sign = this.signValue(), result = sign - that.signValue();
-		if (result != 0) return result;
-		return sign < 0 ? that._compare_(this, undefined) : this._compare_(that, undefined);
+		final int thisSign = this.signValue(), thatSign = that.signValue();
+		if (thatSign > 0) return thisSign > 0 ? this._compare_(that, undefined) : -1;
+		if (thatSign < 0) return thisSign < 0 ? that._compare_(this, undefined) : +1;
+		return thisSign;
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -687,10 +799,12 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 		final int length = thisLength - thatLength;
 		final long millis = thisMillis - thatMillis;
 		long result;
-		result = millis + (((length + ((thisRange >> 4) & 0xF)) - ((thatRange >> 4) & 0xF)) * 86400000L); // TODO prüfen
-		if (result < 0) return -1;
-		result = millis + (((length - ((thisRange >> 0) & 0xF)) + ((thatRange >> 0) & 0xF)) * 86400000L);
+		// 864e5 x thisMinLength + thisMillis > 864e5 x thatMaxLength + thatMillis => +1
+		result = millis + ((length - ((thisRange >> 0) & 0xF) - ((thatRange >> 4) & 0xF)) * 86400000L);
 		if (result > 0) return +1;
+		// 864e5 x thisMaxLength + thisMillis < 864e5 x thatMinLength + thatMillis => -1
+		result = millis + ((length + ((thisRange >> 4) & 0xF) + ((thatRange >> 0) & 0xF)) * 86400000L);
+		if (result < 0) return -1;
 		return undefined;
 	}
 
@@ -752,7 +866,7 @@ public final class FEMDuration extends FEMValue implements Comparable<FEMDuratio
 
 	/** Diese Methode gibt die Textdarstellung dieser Zeitspanne zurück.<br>
 	 * Diese Textdarstellung entspricht der des Datentyps <a href="http://www.w3.org/TR/xmlschema-2/#duration-lexical-repr">xsd:duration</a> aus
-	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf maximal drei Nachkommastellen für die Sekunden.
+	 * <a href="www.w3.org/TR/xmlschema-2">XML Schema Part 2: Datatypes Second Edition</a>, beschränkt auf genau drei optionale Nachkommastellen für die Sekunden.
 	 *
 	 * @return Textdarstellung. */
 	@Override
