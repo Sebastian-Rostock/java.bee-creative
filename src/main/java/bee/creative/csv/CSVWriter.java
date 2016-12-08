@@ -204,7 +204,6 @@ public final class CSVWriter implements Closeable {
 			target.write(comma);
 		}
 		final int length = value.length();
-		if (length == 0) return;
 		boolean mask = false;
 		if (quote == 0) {
 			mask = false;
