@@ -68,7 +68,9 @@ public final class CSVWriter implements Closeable {
 	 *
 	 * @return Maskierungszwang. */
 	public final boolean getForce() {
-		return this._force_;
+		synchronized (this._writer_) {
+			return this._force_;
+		}
 	}
 
 	/** Diese Methode gibt das Maskierungszeichen zurück.<br>
@@ -79,7 +81,9 @@ public final class CSVWriter implements Closeable {
 	 * @see #getForce()
 	 * @return Maskierungszeichen. */
 	public final char getQuote() {
-		return this._quote_;
+		synchronized (this._writer_) {
+			return this._quote_;
+		}
 	}
 
 	/** Diese Methode gibt das Trennzeichen zurück.<br>
@@ -87,7 +91,9 @@ public final class CSVWriter implements Closeable {
 	 *
 	 * @return Trennzeichen. */
 	public final char getComma() {
-		return this._comma_;
+		synchronized (this._writer_) {
+			return this._comma_;
+		}
 	}
 
 	/** Diese Methode setzt den {@link #getQuote() Maskierungszwang} und gibt {@code this} zurück.
@@ -238,13 +244,17 @@ public final class CSVWriter implements Closeable {
 	/** {@inheritDoc} */
 	@Override
 	public final void close() throws IOException {
-		this._writer_.close();
+		synchronized (this._writer_) {
+			this._writer_.close();
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this._force_, this._quote_, this._comma_, this._writer_);
+		synchronized (this._writer_) {
+			return Objects.toInvokeString(this, this._force_, this._quote_, this._comma_, this._writer_);
+		}
 	}
 
 }

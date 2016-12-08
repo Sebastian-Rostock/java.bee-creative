@@ -80,7 +80,9 @@ public final class CSVReader implements Closeable {
 	 * @see #readValue()
 	 * @return Maskierungszeichen. */
 	public final char getQuote() {
-		return this._quote_;
+		synchronized (this._reader_) {
+			return this._quote_;
+		}
 	}
 
 	/** Diese Methode gibt das Trennzeichen zurück.<br>
@@ -89,7 +91,9 @@ public final class CSVReader implements Closeable {
 	 * @see #readValue()
 	 * @return Trennzeichen. */
 	public final char getComma() {
-		return this._comma_;
+		synchronized (this._reader_) {
+			return this._comma_;
+		}
 	}
 
 	/** Diese Methode setzt das {@link #getQuote() Maskierungszeichen} und gibt {@code this} zurück.
@@ -194,7 +198,7 @@ public final class CSVReader implements Closeable {
 	 * @throws IOException Wenn {@link Reader#read()} eine entsprechende Ausnahme auslöst.
 	 * @throws IllegalArgumentException Wenn die Maskierung des Werts nicth vor der Eingabe endet. */
 	public final String readValue() throws IOException, IllegalArgumentException {
-		synchronized (this._value_) {
+		synchronized (this._reader_) {
 			return this._readValue_();
 		}
 	}
@@ -238,13 +242,17 @@ public final class CSVReader implements Closeable {
 	/** {@inheritDoc} */
 	@Override
 	public final void close() throws IOException {
-		this._reader_.close();
+		synchronized (this._reader_) {
+			this._reader_.close();
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return Objects.toInvokeString(this, this._quote_, this._comma_, this._reader_);
+		synchronized (this._reader_) {
+			return Objects.toInvokeString(this, this._quote_, this._comma_, this._reader_);
+		}
 	}
 
 }
