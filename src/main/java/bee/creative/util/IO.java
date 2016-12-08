@@ -595,7 +595,9 @@ public class IO {
 	 * <dt>{@link OutputStream}</dt>
 	 * <dd>Es wird ein in den gegebenen {@link OutputStream} schreibender {@link OutputStreamWriter} geliefert.</dd>
 	 * <dt>{@link CharacterArray}</dt>
-	 * <dd>Es wird ein in das gegebenen {@link CharacterArray} schreibender {@link OutputStream} geliefert.</dd>
+	 * <dd>Es wird ein in das gegebenen {@link CharacterArray} schreibender {@link Writer} geliefert.</dd>
+	 * <dt>{@link StringBuilder}</dt>
+	 * <dd>Es wird ein in den gegebenen {@link StringBuilder} schreibender {@link Writer} geliefert.</dd>
 	 * </dl>
 	 *
 	 * @param object Objekt.
@@ -606,6 +608,7 @@ public class IO {
 		if (object instanceof File) return IO._outputWriterFrom_((File)object);
 		if (object instanceof OutputStream) return IO._outputWriterFrom_((OutputStream)object);
 		if (object instanceof CharacterArray) return IO._outputWriterFrom_((CharacterArray)object);
+		if (object instanceof StringBuilder) return IO._outputWriterFrom_((StringBuilder)object);
 		throw new IOException();
 	}
 
@@ -626,6 +629,26 @@ public class IO {
 			@Override
 			public void write(final char[] cbuf, final int off, final int len) throws IOException {
 				object.add(CharacterArraySection.from(cbuf, off, len));
+			}
+
+			@Override
+			public void flush() throws IOException {
+			}
+
+			@Override
+			public void close() throws IOException {
+			}
+
+		};
+	}
+
+	@SuppressWarnings ("javadoc")
+	static Writer _outputWriterFrom_(final StringBuilder object) {
+		return new Writer() {
+
+			@Override
+			public void write(final char[] cbuf, final int off, final int len) throws IOException {
+				object.append(CharacterArraySection.from(cbuf, off, len));
 			}
 
 			@Override
