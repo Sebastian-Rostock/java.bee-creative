@@ -232,7 +232,7 @@ public abstract class BaseTransformerData<GThis> extends BaseBuilder<Transformer
 	/** Diese Methode setzt den {@link Transformer} auf {@code null} und gibt {@code this} zurück.
 	 *
 	 * @return {@code this}. */
-	public final GThis resetTemplates() {
+	public final GThis resetTransformer() {
 		return this.useTransformer(null);
 	}
 

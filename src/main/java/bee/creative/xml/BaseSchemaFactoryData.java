@@ -122,7 +122,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** Diese Methode setzt den Wert auf {@link XMLConstants#RELAXNG_NS_URI} und gibt {@code this} zurück.
 		 *
-		 * @see #use(BaseValueBuilder)
+		 * @see #use(Object)
 		 * @return {@code this}. */
 		public final LanguageData<GOwner> useRELAXNG_NS_URI() {
 			return super.use(XMLConstants.RELAXNG_NS_URI);
@@ -130,7 +130,7 @@ public abstract class BaseSchemaFactoryData<GThis> extends BaseBuilder<SchemaFac
 
 		/** Diese Methode setzt den Wert auf {@link XMLConstants#W3C_XML_SCHEMA_NS_URI} und gibt {@code this} zurück.
 		 *
-		 * @see #use(BaseValueBuilder)
+		 * @see #use(Object)
 		 * @return {@code this}. */
 		public final LanguageData<GOwner> useW3C_XML_SCHEMA_NS_URI() {
 			return super.use(XMLConstants.W3C_XML_SCHEMA_NS_URI);

@@ -2,7 +2,6 @@ package bee.creative.iam;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -50,7 +49,7 @@ final class IAMCodec_XML {
 	public static final class IAMINDEXTYPE {
 
 		@XmlElements ({@XmlElement (name = "mapping", type = IAMMAPPINGTYPE.class), @XmlElement (name = "listing", type = IAMLISTINGTYPE.class)})
-		public List<Object> mappingOrListing = new ArrayList<>();
+		public ArrayList<Object> mappingOrListing = new ArrayList<>();
 
 		@XmlAttribute (name = "byteOrder", required = false)
 		public String byteOrder;
@@ -68,7 +67,7 @@ final class IAMCodec_XML {
 	public static final class IAMLISTINGTYPE {
 
 		@XmlElement (required = true)
-		public List<IAMITEMTYPE> item = new ArrayList<>();
+		public ArrayList<IAMITEMTYPE> item = new ArrayList<>();
 
 		@XmlAttribute (name = "index", required = true)
 		public String index;
@@ -83,7 +82,7 @@ final class IAMCodec_XML {
 	public static final class IAMMAPPINGTYPE {
 
 		@XmlElement (required = true)
-		public List<IAMENTRYTYPE> entry = new ArrayList<>();
+		public ArrayList<IAMENTRYTYPE> entry = new ArrayList<>();
 
 		@XmlAttribute (name = "index", required = true)
 		public String index;

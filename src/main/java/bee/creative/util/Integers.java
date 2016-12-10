@@ -1,7 +1,7 @@
 package bee.creative.util;
 
 /** Diese Klasse implementiert stellt Methoden zum Parsen und Formatieren von Tezimalzahlen zur Verfügung.
- * 
+ *
  * @author [cc-by] 2016 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public class Integers {
 

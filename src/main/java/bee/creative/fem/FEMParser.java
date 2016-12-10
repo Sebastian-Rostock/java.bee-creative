@@ -411,7 +411,7 @@ public final class FEMParser extends Parser {
 	}
 
 	/** Diese Methode gibt die in spitze Klammern eingeschlossenen und mit entsprechenden Maskierungen versehene {@link #source() Eingabe} zurück.
-	 * 
+	 *
 	 * @see #parseValue()
 	 * @return Eingabe mit Maskierung.
 	 * @throws IllegalStateException Wenn bereits eine Verarbeitung läuft. */
