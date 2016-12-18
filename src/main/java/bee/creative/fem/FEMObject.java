@@ -22,7 +22,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	public static final FEMType<FEMObject> TYPE = FEMType.from(FEMObject.ID);
 
 	/** Dieses Feld speichert die Referenz, deren Komponenten alle {@code 0} sind. */
-	public static final FEMObject EMPTY = new FEMObject(0, 0);
+	public static final FEMObject EMPTY = new FEMObject(0, (short)0, (short)0);
 
 	@SuppressWarnings ("javadoc")
 	static final Pattern _pattern_ = Pattern.compile("^#(\\d+)\\.(\\d+):(\\d+)$");
@@ -58,10 +58,10 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz.
 	 * @throws IllegalArgumentException Wenn {@code ref}, {@code type} bzw. {@code owner} ungültig ist. */
 	public static FEMObject from(final int ref, final int type, final int owner) throws IllegalArgumentException {
-		FEMObject._checkRef_(ref);
-		FEMObject._checkType_(type);
-		FEMObject._checkOwner_(owner);
-		return FEMObject._from_(ref, type, owner);
+		if (ref < 0) throw new IllegalArgumentException();
+		if ((type < 0) || (type > 65535)) throw new IllegalArgumentException();
+		if ((owner < 0) || (owner > 65535)) throw new IllegalArgumentException();
+		return new FEMObject(ref, (short)type, (short)owner);
 	}
 
 	/** Diese Methode ist eine Abkürzung für {@code context.dataFrom(value, FEMObject.TYPE)}.
@@ -74,47 +74,16 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 		return context.dataFrom(value, FEMObject.TYPE);
 	}
 
-	@SuppressWarnings ("javadoc")
-	static FEMObject _from_(final int ref, final int type, final int owner) throws IllegalArgumentException {
-		return new FEMObject(ref, (type << 16) | (owner << 0));
-	}
-
-	@SuppressWarnings ("javadoc")
-	static void _checkRef_(final int ref) throws IllegalArgumentException {
-		if (ref < 0) throw new IllegalArgumentException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static void _checkType_(final int type) throws IllegalArgumentException {
-		if ((type < 0) || (type > 65535)) throw new IllegalArgumentException();
-	}
-
-	@SuppressWarnings ("javadoc")
-	static void _checkOwner_(final int owner) throws IllegalArgumentException {
-		if ((owner < 0) || (owner > 65535)) throw new IllegalArgumentException();
-	}
-
 	{}
 
-	/** Dieses Feld speichert die 32 LSB der internen 64 Bit Darstellung dieser Referenz.
-	 * <p>
-	 * Die 32 Bit von MBS zum LSB sind:
-	 * <ul>
-	 * <li>0 - 1 Bit</li>
-	 * <li>refValue - 31 Bit</li>
-	 * </ul>
-	*/
-	final int _valueL_;
+	@SuppressWarnings ("javadoc")
+	final int _refValue_;
 
-	/** Dieses Feld speichert die 32 MSB der internen 64 Bit Darstellung dieser Referenz.
-	 * <p>
-	 * Die 32 Bit von MBS zum LSB sind:
-	 * <ul>
-	 * <li>typeValue - 16 Bit</li>
-	 * <li>ownerValue - 16 Bit</li>
-	 * </ul>
-	*/
-	final int _valueH_;
+	@SuppressWarnings ("javadoc")
+	final short _typeValue_;
+
+	@SuppressWarnings ("javadoc")
+	final short _ownerValue_;
 
 	/** Dieser Konstruktor initialisiert die interne Darstellung der Referenz.
 	 *
@@ -122,16 +91,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @param value interne Darstellung der Referenz.
 	 * @throws IllegalArgumentException Wenn {@code value} ungültig ist. */
 	public FEMObject(final long value) throws IllegalArgumentException {
-		this((int)(value >> 32), (int)(value >> 0));
-		FEMObject._checkRef_(this.refValue());
-		FEMObject._checkType_(this.typeValue());
-		FEMObject._checkOwner_(this.ownerValue());
+		this((int)(value >> 32), (short)(value >> 0), (short)(value >> 16));
 	}
 
 	@SuppressWarnings ("javadoc")
-	FEMObject(final int valueH, final int valueL) {
-		this._valueH_ = valueH;
-		this._valueL_ = valueL;
+	FEMObject(final int refValue, final short typeValue, final short ownerValue) {
+		this._refValue_ = refValue;
+		this._typeValue_ = typeValue;
+		this._ownerValue_ = ownerValue;
 	}
 
 	{}
@@ -140,22 +107,21 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * <p>
 	 * Die 64 Bit von MBS zum LSB sind:
 	 * <ul>
-	 * <li>0 - 1 Bit</li>
-	 * <li>refValue - 31 Bit</li>
+	 * <li>refValue - 32 Bit</li>
 	 * <li>ownerValue - 16 Bit</li>
 	 * <li>typeValue - 16 Bit</li>
 	 * </ul>
 	 *
 	 * @return interne Darstellung der Referenz. */
 	public final long value() {
-		return (((long)this._valueH_) << 32) | (((long)this._valueL_) << 0);
+		return (((long)this._refValue_) << 32) | (this._ownerValue_ << 16) | (this._typeValue_ << 0);
 	}
 
 	/** Diese Methode gibt den Objektschlüssel zurück.
 	 *
 	 * @return Objektschlüssel ({@code 0..2147483647}). */
 	public final int refValue() {
-		return this._valueL_;
+		return this._refValue_;
 	}
 
 	/** Diese Methode gibt die Typkennung zurück.
@@ -163,7 +129,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withType(int)
 	 * @return Typkennung ({@code 0..65535}). */
 	public final int typeValue() {
-		return (this._valueH_ >> 16) & 0xFFFF;
+		return this._typeValue_ & 0xFFFF;
 	}
 
 	/** Diese Methode gibt die Besitzerkennung zurück.
@@ -171,7 +137,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @see #withOwner(int)
 	 * @return Besitzerkennung ({@code 0..65535}). */
 	public final int ownerValue() {
-		return (this._valueH_ >> 0) & 0xFFFF;
+		return this._ownerValue_ & 0xFFFF;
 	}
 
 	/** Diese Methode gibt diese Referenz mit dem gegebenen Objektschlüssel zurück.
@@ -181,8 +147,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Objektschlüssel.
 	 * @throws IllegalArgumentException Wenn {@code ref} ungültig ist. */
 	public final FEMObject withRef(final int ref) throws IllegalArgumentException {
-		FEMObject._checkRef_(ref);
-		return FEMObject._from_(ref, this.typeValue(), this.ownerValue());
+		return new FEMObject(ref, this._typeValue_, this._ownerValue_);
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Typkennung zurück.
@@ -192,8 +157,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Typkennung.
 	 * @throws IllegalArgumentException Wenn {@code type} ungültig ist. */
 	public final FEMObject withType(final int type) throws IllegalArgumentException {
-		FEMObject._checkType_(type);
-		return FEMObject._from_(this.refValue(), type, this.ownerValue());
+		return new FEMObject(this._refValue_, (short)type, this._ownerValue_);
 	}
 
 	/** Diese Methode gibt diese Referenz mit der gegebenen Besitzerkennung zurück.
@@ -203,15 +167,14 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Referenz mit Besitzerkennung.
 	 * @throws IllegalArgumentException Wenn {@code owner} ungültig ist. */
 	public final FEMObject withOwner(final int owner) throws IllegalArgumentException {
-		FEMObject._checkOwner_(owner);
-		return FEMObject._from_(this.refValue(), this.typeValue(), owner);
+		return new FEMObject(this._refValue_, this._typeValue_, (short)owner);
 	}
 
 	/** Diese Methode gibt den Streuwert zurück.
 	 *
 	 * @return Streuwert. */
 	public final int hash() {
-		return this._valueH_ ^ this._valueL_;
+		return this._refValue_ ^ this._typeValue_ ^ this._ownerValue_;
 	}
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn diese Referenz gleich der gegebenen ist.
@@ -220,7 +183,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	 * @return Gleichheit.
 	 * @throws NullPointerException Wenn {@code that} {@code null} ist. */
 	public final boolean equals(final FEMObject that) throws NullPointerException {
-		return (this._valueL_ == that._valueL_) && (this._valueH_ == that._valueH_);
+		return (this._refValue_ == that._refValue_) && (this._typeValue_ == that._typeValue_) && (this._ownerValue_ == that._ownerValue_);
 	}
 
 	/** Diese Methode gibt {@code -1}, {@code 0} bzw. {@code +1} zurück, wenn die Ordnung dieser Referenz kleiner, gleich bzw. größer als die der gegebenen
