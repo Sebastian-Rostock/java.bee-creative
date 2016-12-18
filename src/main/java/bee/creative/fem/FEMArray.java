@@ -535,7 +535,7 @@ public abstract class FEMArray extends FEMValue implements Items<FEMValue>, Iter
 		FIND: for (int i = offset; i < length; i++) {
 			if (value.equals(this._get_(i))) {
 				for (int i2 = 1; i2 < count; i2++) {
-					if (this._get_(i + i2) != that._get_(i2)) {
+					if (!this._get_(i + i2).equals(that._get_(i2))) {
 						continue FIND;
 					}
 				}
