@@ -177,8 +177,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		public final MMFArray array;
 
-		UTF8ArrayString(final MMFArray array) {
-			super(FEMString._utf8Count_(array));
+		UTF8ArrayString(final int length, final MMFArray array) {
+			super(length);
 			this.array = array;
 		}
 
@@ -240,8 +240,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		public final MMFArray array;
 
-		UTF16ArrayString(final MMFArray array) {
-			super(FEMString._utf16Count_(array));
+		UTF16ArrayString(final int length, final MMFArray array) {
+			super(length);
 			this.array = array;
 		}
 
@@ -293,8 +293,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		public final MMFArray array;
 
-		UTF32ArrayString(final MMFArray array) {
-			super(array.length());
+		UTF32ArrayString(final int length, final MMFArray array) {
+			super(length);
 			this.array = array;
 		}
 
@@ -709,25 +709,68 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	}
 
 	/** Diese Methode gibt eine Zeichenkette mit den gegebenen Zahlen zurück.<br>
-	 * Abhängig davon, ob die Zahlenliste aus {@link MMFArray#mode() INT8/UINT8}-, {@link MMFArray#mode() INT16/UINT16)} oder {@link MMFArray#mode() INT32}-Zahlen
-	 * besteht, werden diese als UTF8-, UTF16- bzw. UTF32-kodierte Codepoints interpretiert.
+	 * Wenn die gegebene Zahlenliste aus {@link MMFArray#mode() UINT8}-, {@link MMFArray#mode() UINT16)} oder {@link MMFArray#mode() INT32}-Zahlen besteht, werden
+	 * diese als UTF8-, UTF16- bzw. UTF32-kodierte Codepoints interpretiert. Wenn die Zahlenfolge ohne Kopfdaten angegeben ist, wird die Anzahl der Codepoints
+	 * automatisch ermittelt. Andernfalls muss die Zahlenfolge mit dieser Anzahl (in vier Byte) beginnen und mit {@code 0} enden.
+	 * <p>
+	 * Die Länge der Zeichenkette wird in den Kopfdaten kodiert:<br>
+	 * UTF8: {@code length = (array.get(0) << 0) | (array.get(1) << 8) | (array.get(2) << 16) | (array.get(3) << 24)}.<br>
+	 * UTF16: {@code length = (array.get(0) << 0) | (array.get(1) << 16)}.<br>
+	 * UTF32: {@code length = (array.get(0) << 0)}.<br>
 	 *
 	 * @param array Zahlenfolge.
+	 * @param headless {@code true}, wenn die Zahlenfolge ohne Kopfdaten angegeben ist.<br>
+	 *        {@code false}, wenn die ersten viwe Byte der Zahlenfolge die Kopfdaten enthalten, d.h. die Länge der Zeichenkette.
 	 * @return Zeichenkette.
 	 * @throws NullPointerException Wenn {@code array} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	public static FEMString from(final MMFArray array) throws NullPointerException, IllegalArgumentException {
-		final int mode = array.mode(), length = array.length();
+	public static FEMString from(final MMFArray array, final boolean headless) throws NullPointerException, IllegalArgumentException {
+		final int mode = array.mode();
 		if (mode == 0) throw new IllegalArgumentException();
-		if (length == 0) return FEMString.EMPTY;
-		if (length == 1) return FEMString.from(array.get(0), 1);
-		switch (mode) {
-			case 1:
-				return new UTF8ArrayString(array);
-			case 2:
-				return new UTF16ArrayString(array);
-			case 4:
-				return new UTF32ArrayString(array);
+		final int count = array.length(), length;
+		if (headless) {
+			if (count == 0) return FEMString.EMPTY;
+			if (count == 1) return FEMString.from(array.get(0), 1);
+			switch (mode) {
+				case 1: {
+					length = FEMString._utf8Count_(array);
+					return new UTF8ArrayString(length, array);
+				}
+				case 2: {
+					length = FEMString._utf16Count_(array);
+					return new UTF16ArrayString(length, array);
+				}
+				case 4: {
+					length = count;
+					return new UTF32ArrayString(length, array);
+				}
+			}
+		} else {
+			switch (mode) {
+				case 1: {
+					if (count < 5) throw new IllegalArgumentException();
+					length = (array.get(0) << 0) | (array.get(1) << 8) | (array.get(2) << 16) | (array.get(3) << 24);
+					if (length < 0) throw new IllegalArgumentException();
+					if (length == 0) return FEMString.EMPTY;
+					if (length == 1) return FEMString.from(FEMString._utf8Value_(array, 4), 1);
+					return new UTF8ArrayString(length, array.section(4, count - 5));
+				}
+				case 2: {
+					if (count < 3) throw new IllegalArgumentException();
+					length = (array.get(0) << 0) | (array.get(1) << 16);
+					if (length == 0) return FEMString.EMPTY;
+					if (length == 1) return FEMString.from(FEMString._utf16Value_(array, 2), 1);
+					return new UTF16ArrayString(length, array.section(2, count - 3));
+				}
+				case 4: {
+					if (count < 2) throw new IllegalArgumentException();
+					length = array.get(0);
+					if (length < 0) throw new IllegalArgumentException();
+					if (length == 0) return FEMString.EMPTY;
+					if (length == 1) return FEMString.from(array.get(0), 1);
+					return new UTF32ArrayString(length, array.section(1, count - 2));
+				}
+			}
 		}
 		throw new IllegalArgumentException();
 	}
