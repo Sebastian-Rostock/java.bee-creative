@@ -125,7 +125,7 @@ public final class FEMHandler extends FEMValue {
 	/** {@inheritDoc} */
 	@Override
 	public final void toScript(final FEMFormatter target) throws IllegalArgumentException {
-		target.putFunction(this._value_);
+		target.putHandler(this._value_);
 	}
 
 	/** {@inheritDoc} */
