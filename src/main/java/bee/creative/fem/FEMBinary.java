@@ -4,8 +4,7 @@ import java.util.Iterator;
 import bee.creative.mmf.MMFArray;
 import bee.creative.util.Comparators;
 
-/** Diese Klasse implementiert eine unveränderliche Bytefolge, deren Verkettungen, Anschnitte und Umkehrungen als Sichten auf die grundlegenden Bytefolgen
- * realisiert sind.
+/** Diese Klasse implementiert eine unveränderliche Bytefolge sowie Methoden zur Erzeugung solcher Bytefolgen aus nativen Arrays.
  *
  * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
