@@ -28,6 +28,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return this._array_[index];
 		}
 
+		@Override
+		public final int mode() {
+			return 4;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -45,6 +50,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		@Override
 		protected final int _get_(final int index) {
 			return this._array_[index];
+		}
+
+		@Override
+		public final int mode() {
+			return 1;
 		}
 
 	}
@@ -66,6 +76,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 			return this._array_[index];
 		}
 
+		@Override
+		public final int mode() {
+			return 2;
+		}
+
 	}
 
 	@SuppressWarnings ("javadoc")
@@ -83,6 +98,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		@Override
 		protected final int _get_(final int index) {
 			return this._array_[index];
+		}
+
+		@Override
+		public final int mode() {
+			return 2;
 		}
 
 	}
@@ -119,6 +139,11 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 		@Override
 		protected final IAMArray _section_(final int offset, final int length) {
 			return this._array_._section_(this._offset_ + offset, length);
+		}
+
+		@Override
+		public final int mode() {
+			return this._array_.mode();
 		}
 
 	}
@@ -270,6 +295,15 @@ public abstract class IAMArray implements Iterable<Integer>, Comparable<IAMArray
 	 * @return Länge. */
 	public final int length() {
 		return this._length_;
+	}
+
+	/** Diese Methode gibt die Größe jeder Zahl dieser Zahlenfolge zurück.<br>
+	 * Diese Größe ist {@code 0} für eine unspezifische Zahlenfolgen, {@code 1} für {@code INT8}- sowie {@code UINT8}-Zahlen, {@code 2} für {@code INT16}- sowie
+	 * {@code UINT16}-Zahlen und {@code 4} für {@code INT32}-Zahlen.
+	 *
+	 * @return Größe jeder Zahl dieser Zahlenfolge (0..4). */
+	public int mode() {
+		return 0;
 	}
 
 	/** Diese Methode gibt den Streuwert zurück. <pre>
