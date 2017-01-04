@@ -211,7 +211,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 				index--;
 				offset += FEMString._utf8Size_(this.array.get(offset));
 			}
-			return FEMString._utf8Value_(this.array, offset);
+			return FEMString._utf8Codepoint_(this.array, offset);
 		}
 
 		@Override
@@ -223,7 +223,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf8Size_(this.array.get(index));
 				}
 				while (length > 0) {
-					if (!target.push(FEMString._utf8Value_(this.array, index))) return false;
+					if (!target.push(FEMString._utf8Codepoint_(this.array, index))) return false;
 					length--;
 					index += FEMString._utf8Size_(this.array.get(index));
 				}
@@ -235,8 +235,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf8Size_(this.array.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString._utf8Start_(this.array.get(--index))) {}
-					if (!target.push(FEMString._utf8Value_(this.array, index))) return false;
+					while (!FEMString._utf8Header_(this.array.get(--index))) {}
+					if (!target.push(FEMString._utf8Codepoint_(this.array, index))) return false;
 					length--;
 				}
 			}
@@ -269,7 +269,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 				index--;
 				offset += FEMString._utf16Size_(this.array.get(offset));
 			}
-			return FEMString._utf16Value_(this.array, offset);
+			return FEMString._utf16Codepoint_(this.array, offset);
 		}
 
 		@Override
@@ -281,7 +281,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf16Size_(this.array.get(index));
 				}
 				while (length > 0) {
-					if (!target.push(FEMString._utf16Value_(this.array, index))) return false;
+					if (!target.push(FEMString._utf16Codepoint_(this.array, index))) return false;
 					length--;
 					index += FEMString._utf16Size_(this.array.get(index));
 				}
@@ -293,8 +293,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf16Size_(this.array.get(index));
 				}
 				while (length > 0) {
-					while (!FEMString._utf16Start_(this.array.get(--index))) {}
-					if (!target.push(FEMString._utf16Value_(this.array, index))) return false;
+					while (!FEMString._utf16Header_(this.array.get(--index))) {}
+					if (!target.push(FEMString._utf16Codepoint_(this.array, index))) return false;
 					length--;
 				}
 			}
@@ -328,7 +328,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		public final byte[] items;
 
 		UTF8CompactString(final byte[] items) throws IllegalArgumentException {
-			super(FEMString._utf8Count_(items));
+			super(FEMString._utf8Length_(items));
 			this.items = items;
 		}
 
@@ -341,7 +341,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 				index--;
 				offset += FEMString._utf8Size_(this.items[offset]);
 			}
-			return FEMString._utf8Value_(this.items, offset);
+			return FEMString._utf8Codepoint_(this.items, offset);
 		}
 
 		@Override
@@ -353,7 +353,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf8Size_(this.items[index]);
 				}
 				while (length > 0) {
-					if (!target.push(FEMString._utf8Value_(this.items, index))) return false;
+					if (!target.push(FEMString._utf8Codepoint_(this.items, index))) return false;
 					length--;
 					index += FEMString._utf8Size_(this.items[index]);
 				}
@@ -365,8 +365,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf8Size_(this.items[index]);
 				}
 				while (length > 0) {
-					while (!FEMString._utf8Start_(this.items[--index])) {}
-					if (!target.push(FEMString._utf8Value_(this.items, index))) return false;
+					while (!FEMString._utf8Header_(this.items[--index])) {}
+					if (!target.push(FEMString._utf8Codepoint_(this.items, index))) return false;
 					length--;
 				}
 			}
@@ -386,7 +386,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		public final char[] items;
 
 		UTF16CompactString(final char[] items) throws IllegalArgumentException {
-			super(FEMString._utf16Count_(items));
+			super(FEMString._utf16Length_(items));
 			this.items = items;
 		}
 
@@ -399,7 +399,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 				index--;
 				offset += FEMString._utf16Size_(this.items[offset]);
 			}
-			return FEMString._utf16Value_(this.items, offset);
+			return FEMString._utf16Codepoint_(this.items, offset);
 		}
 
 		@Override
@@ -411,7 +411,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf16Size_(this.items[index]);
 				}
 				while (length > 0) {
-					if (!target.push(FEMString._utf16Value_(this.items, index))) return false;
+					if (!target.push(FEMString._utf16Codepoint_(this.items, index))) return false;
 					length--;
 					index += FEMString._utf16Size_(this.items[index]);
 				}
@@ -423,8 +423,8 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 					index += FEMString._utf16Size_(this.items[index]);
 				}
 				while (length > 0) {
-					while (!FEMString._utf16Start_(this.items[--index])) {}
-					if (!target.push(FEMString._utf16Value_(this.items, index))) return false;
+					while (!FEMString._utf16Header_(this.items[--index])) {}
+					if (!target.push(FEMString._utf16Codepoint_(this.items, index))) return false;
 					length--;
 				}
 			}
@@ -716,9 +716,9 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		if (length == 1) return FEMString.from(array.get(0), 1);
 		switch (array.mode()) {
 			case 1:
-				return new UTF8ArrayString(FEMString._utf8Count_(array), array);
+				return new UTF8ArrayString(FEMString._utf8Length_(array), array);
 			case 2:
-				return new UTF16ArrayString(FEMString._utf16Count_(array), array);
+				return new UTF16ArrayString(FEMString._utf16Length_(array), array);
 			case 4:
 				return new UTF32ArrayString(length, array);
 		}
@@ -747,13 +747,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 				length = (array.get(0) << 0) | (array.get(1) << 8) | (array.get(2) << 16) | (array.get(3) << 24);
 				if (length < 0) throw new IllegalArgumentException();
 				if (length == 0) return FEMString.EMPTY;
-				if (length == 1) return FEMString.from(FEMString._utf8Value_(array, 4), 1);
+				if (length == 1) return FEMString.from(FEMString._utf8Codepoint_(array, 4), 1);
 				return new UTF8ArrayString(length, array.section(4, count - 5));
 			case 2:
 				if (count < 3) throw new IllegalArgumentException();
 				length = (array.get(0) << 0) | (array.get(1) << 16);
 				if (length == 0) return FEMString.EMPTY;
-				if (length == 1) return FEMString.from(FEMString._utf16Value_(array, 2), 1);
+				if (length == 1) return FEMString.from(FEMString._utf16Codepoint_(array, 2), 1);
 				return new UTF16ArrayString(length, array.section(2, count - 3));
 			case 4:
 				if (count < 2) throw new IllegalArgumentException();
@@ -778,11 +778,11 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt die Anzahl der Token für den UTF8-kodierten Codepoint zurück, der am gegebenen Token beginnt.
 	 *
-	 * @param token Token, an dem ein UTF8-kodierter Codepoint beginnt.
+	 * @param item Token, an dem ein UTF8-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF8-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static int _utf8Size_(final int token) throws IllegalArgumentException {
-		switch ((token >> 4) & 15) {
+	static int _utf8Size_(final int item) throws IllegalArgumentException {
+		switch ((item >> 4) & 15) {
 			case 0:
 			case 1:
 			case 2:
@@ -805,10 +805,42 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF8-kodierten Codepoints ist.
 	 *
-	 * @param token Token.
+	 * @param item Token.
 	 * @return {@code true}, wenn ein UTF8-kodierter Codepoint am Token beginnt. */
-	static boolean _utf8Start_(final int token) {
-		return (token & 192) != 128;
+	static boolean _utf8Header_(final int item) {
+		return (item & 192) != 128;
+	}
+
+	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
+	 *
+	 * @param array Tokenliste.
+	 * @return Anzahl an UTF8-kodierten Codepoints.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int _utf8Length_(final byte[] array) throws IllegalArgumentException {
+		int index = 0, result = 0;
+		final int length = array.length;
+		while (index < length) {
+			result++;
+			index += FEMString._utf8Size_(array[index]);
+		}
+		if (index != length) throw new IllegalArgumentException();
+		return result;
+	}
+
+	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
+	 *
+	 * @param array Tokenliste.
+	 * @return Anzahl an UTF8-kodierten Codepoints.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int _utf8Length_(final IAMArray array) throws IllegalArgumentException {
+		int index = 0, result = 0;
+		final int length = array.length();
+		while (index < length) {
+			result++;
+			index += FEMString._utf8Size_(array.get(index));
+		}
+		if (index != length) throw new IllegalArgumentException();
+		return result;
 	}
 
 	/** Diese Methode gibt den UTF8-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
@@ -817,7 +849,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf8Value_(final byte[] array, final int offset) throws IllegalArgumentException {
+	static int _utf8Codepoint_(final byte[] array, final int offset) throws IllegalArgumentException {
 		switch ((array[offset] >> 4) & 15) {
 			case 0:
 			case 1:
@@ -845,7 +877,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 * @param offset Position des Tokens, an dem der UTF8-kodierte Codepoint beginnt..
 	 * @return Codepoint.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf8Value_(final IAMArray array, final int offset) throws IllegalArgumentException {
+	static int _utf8Codepoint_(final IAMArray array, final int offset) throws IllegalArgumentException {
 		switch ((array.get(offset) >> 4) & 15) {
 			case 0:
 			case 1:
@@ -867,45 +899,13 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		throw new IllegalArgumentException();
 	}
 
-	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF8-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf8Count_(final byte[] array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length;
-		while (index < length) {
-			result++;
-			index += FEMString._utf8Size_(array[index]);
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
-	/** Diese Methode gibt die Anzahl an UTF8-kodierten Codepoints in der gegebenen Tokenliste zurück.
-	 *
-	 * @param array Tokenliste.
-	 * @return Anzahl an UTF8-kodierten Codepoints.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf8Count_(final IAMArray array) throws IllegalArgumentException {
-		int index = 0, result = 0;
-		final int length = array.length();
-		while (index < length) {
-			result++;
-			index += FEMString._utf8Size_(array.get(index));
-		}
-		if (index != length) throw new IllegalArgumentException();
-		return result;
-	}
-
 	/** Diese Methode gibt die Anzahl der Token für den UTF16-kodierten Codepoint zurück, der am gegebenen Token beginnt.
 	 *
-	 * @param token Token, an dem ein UTF16-kodierter Codepoint beginnt.
+	 * @param item Token, an dem ein UTF16-kodierter Codepoint beginnt.
 	 * @return Anzahl der Token für den UTF16-kodierten Codepoint.
 	 * @throws IllegalArgumentException Wenn {@code token} ungültig ist. */
-	static int _utf16Size_(final int token) throws IllegalArgumentException {
-		final int value = token & 64512;
+	static int _utf16Size_(final int item) throws IllegalArgumentException {
+		final int value = item & 64512;
 		if (value == 55296) return 2;
 		if (value != 56320) return 1;
 		throw new IllegalArgumentException();
@@ -913,36 +913,10 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 	/** Diese Methode gibt nur dann {@code true} zurück, wenn der gegebene Token den Beginn eines UTF16-kodierten Codepoints ist.
 	 *
-	 * @param token Token.
+	 * @param item Token.
 	 * @return {@code true}, wenn ein UTF16-kodierter Codepoint am Token beginnt. */
-	static boolean _utf16Start_(final int token) {
-		return (token & 64512) != 56320;
-	}
-
-	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
-	 * @return Codepoint.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf16Value_(final char[] array, final int offset) throws IllegalArgumentException {
-		final int token = array[offset], value = token & 64512;
-		if (value == 55296) return (((token & 1023) << 10) | (array[offset + 1] & 1023)) + 65536;
-		if (value != 56320) return token;
-		throw new IllegalArgumentException();
-	}
-
-	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
-	 *
-	 * @param array Tokenliste.
-	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
-	 * @return Codepoint.
-	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf16Value_(final IAMArray array, final int offset) throws IllegalArgumentException {
-		final int token = array.get(offset), value = token & 64512;
-		if (value == 55296) return (((token & 1023) << 10) | (array.get(offset + 1) & 1023)) + 65536;
-		if (value != 56320) return token;
-		throw new IllegalArgumentException();
+	static boolean _utf16Header_(final int item) {
+		return (item & 64512) != 56320;
 	}
 
 	/** Diese Methode gibt die Anzahl an UTF16-kodierten Codepoints in der gegebenen Tokenliste zurück.
@@ -950,7 +924,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf16Count_(final char[] array) throws IllegalArgumentException {
+	static int _utf16Length_(final char[] array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length;
 		while (index < length) {
@@ -966,7 +940,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 	 * @param array Tokenliste.
 	 * @return Anzahl an UTF16-kodierten Codepoints.
 	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
-	static int _utf16Count_(final IAMArray array) throws IllegalArgumentException {
+	static int _utf16Length_(final IAMArray array) throws IllegalArgumentException {
 		int index = 0, result = 0;
 		final int length = array.length();
 		while (index < length) {
@@ -975,6 +949,32 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 		}
 		if (index != length) throw new IllegalArgumentException();
 		return result;
+	}
+
+	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
+	 *
+	 * @param array Tokenliste.
+	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
+	 * @return Codepoint.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int _utf16Codepoint_(final char[] array, final int offset) throws IllegalArgumentException {
+		final int token = array[offset], value = token & 64512;
+		if (value == 55296) return (((token & 1023) << 10) | (array[offset + 1] & 1023)) + 65536;
+		if (value != 56320) return token;
+		throw new IllegalArgumentException();
+	}
+
+	/** Diese Methode gibt den UTF16-kodierten Codepoint zurück, der an der gegebenen Position beginnt.
+	 *
+	 * @param array Tokenliste.
+	 * @param offset Position des Tokens, an dem der UTF16-kodierte Codepoint beginnt..
+	 * @return Codepoint.
+	 * @throws IllegalArgumentException Wenn die Kodierung ungültig ist. */
+	static int _utf16Codepoint_(final IAMArray array, final int offset) throws IllegalArgumentException {
+		final int token = array.get(offset), value = token & 64512;
+		if (value == 55296) return (((token & 1023) << 10) | (array.get(offset + 1) & 1023)) + 65536;
+		if (value != 56320) return token;
+		throw new IllegalArgumentException();
 	}
 
 	{}
