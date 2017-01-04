@@ -842,7 +842,7 @@ public final class FEMDatetime extends FEMValue implements Comparable<FEMDatetim
 	 * @throws NullPointerException Wenn {@code datetime} {@code null} ist. */
 	public final FEMDatetime withDate(final FEMDatetime datetime) throws NullPointerException {
 		if (!datetime.hasDate()) return this.withoutDate();
-		return this._withDate_(this._yearValue_(), this._monthValue_(), this._dateValue_());
+		return this._withDate_(datetime._yearValue_(), datetime._monthValue_(), datetime._dateValue_());
 	}
 
 	@SuppressWarnings ("javadoc")
