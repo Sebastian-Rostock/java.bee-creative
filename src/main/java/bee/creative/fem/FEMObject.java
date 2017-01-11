@@ -257,7 +257,7 @@ public final class FEMObject extends FEMValue implements Comparable<FEMObject> {
 	}
 
 	/** Diese Methode gibt die Textdarstellung dieser Referenz zurück.<br>
-	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #type() TYPE}{@code :}{@link #ownerValue() OWNER}.
+	 * Das Format der Textdarstellung ist {@code #}{@link #refValue() REF}{@code .}{@link #ownerValue() OWNER}{@code :}{@link #typeValue() TYPE}.
 	 *
 	 * @return Textdarstellung. */
 	@Override
