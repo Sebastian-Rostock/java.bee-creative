@@ -62,26 +62,20 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 
 		public final char[] array;
 
-		public int index;
+		public int index = 2;
 
-		StringCollector(final boolean header, final int length) {
-			if (header) {
-				this.array = new char[length + 2];
-				this.array[0] = '0';
-				this.array[1] = 'x';
-				this.index = 2;
-			} else {
-				this.array = new char[length];
-			}
+		StringCollector(final int length) {
+			this.array = new char[length];
+			this.array[0] = '0';
+			this.array[1] = 'x';
 		}
 
 		{}
 
 		@Override
 		public final boolean push(final byte value) {
-			this.array[this.index + 0] = FEMBinary.toChar((value >> 4) & 0xF);
-			this.array[this.index + 1] = FEMBinary.toChar((value >> 0) & 0xF);
-			this.index += 2;
+			this.array[this.index++] = FEMBinary.toChar((value >> 4) & 0xF);
+			this.array[this.index++] = FEMBinary.toChar((value >> 0) & 0xF);
 			return true;
 		}
 
@@ -381,30 +375,14 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
 	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
 	public static FEMBinary from(final String string) throws NullPointerException, IllegalArgumentException {
-		return FEMBinary.from(string, true);
-	}
-
-	/** Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
-	 * Das Format der Zeichenkette entspricht dem der {@link #toString(boolean) Textdarstellung}.
-	 *
-	 * @see #toString()
-	 * @param string Zeichenkette.
-	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnt.
-	 * @return Bytefolge.
-	 * @throws NullPointerException Wenn {@code string} {@code null} ist.
-	 * @throws IllegalArgumentException Wenn die Zeichenkette ungültig ist. */
-	public static FEMBinary from(final String string, final boolean header) throws NullPointerException, IllegalArgumentException {
-		int count = string.length(), index = 0;
-		if ((count & 1) != 0) throw new IllegalArgumentException();
-		if (header) {
-			if ((count < 2) || (string.charAt(0) != '0') || (string.charAt(1) != 'x')) throw new IllegalArgumentException();
-			index += 2;
-			count -= 2;
-		}
-		count >>= 1;
+		final int length = string.length();
+		if ((length < 2) || ((length & 1) != 0) || (string.charAt(0) != '0') || (string.charAt(1) != 'x')) throw new IllegalArgumentException();
+		final int count = (length >> 1) - 1;
 		final byte[] bytes = new byte[count];
-		for (int i = 0; i < count; i++, index += 2) {
-			bytes[i] = (byte)((FEMBinary.toDigit(string.charAt(index + 0)) << 4) | (FEMBinary.toDigit(string.charAt(index + 1)) << 0));
+		for (int i = 0; i < count; i++) {
+			bytes[i] = (byte)( //
+			(FEMBinary.toDigit(string.charAt((i << 1) + 0)) << 4) | //
+				(FEMBinary.toDigit(string.charAt((i << 1) + 1)) << 0));
 		}
 		return new CompactBinary(bytes);
 	}
@@ -450,16 +428,13 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 	 * @return hexadezimale Ziffer ({@code 0..15}).
 	 * @throws IllegalArgumentException Wenn {@code hexChar} ungültig ist. */
 	public static int toDigit(final int hexChar) throws IllegalArgumentException {
-		final int digit = hexChar - '0';
-		if (digit < 0) throw new IllegalArgumentException("hexChar < '0'");
-		if (digit <= 9) return digit;
-		final int lower = hexChar - 'a';
-		if (lower > 5) throw new IllegalArgumentException("hexChar > 'f'");
-		if (lower >= 0) return lower + 10;
-		final int upper = hexChar - 'A';
-		if (upper < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
-		if (upper <= 5) return upper + 10;
-		throw new IllegalArgumentException("'F' < hexChar < 'a'");
+		final int number = hexChar - '0';
+		if (number < 0) throw new IllegalArgumentException("hexChar < '0'");
+		if (number <= 9) return number;
+		final int letter = hexChar - 'A';
+		if (letter < 0) throw new IllegalArgumentException("'9' < hexChar < 'A'");
+		if (letter <= 5) return letter + 10;
+		throw new IllegalArgumentException("hexChar > 'F'");
 	}
 
 	{}
@@ -674,18 +649,6 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		return Comparators.compare(this._length_, that._length_);
 	}
 
-	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
-	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} (header) und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen
-	 * Ziffern, d.h. {@code 0123456789ABCDEF}.
-	 *
-	 * @param header {@code true}, wenn die Zeichenkette mit {@code "0x"} beginnen soll.
-	 * @return Textdarstellung. */
-	public final String toString(final boolean header) {
-		final StringCollector target = new StringCollector(header, this._length_);
-		this.extract(target);
-		return new String(target.array, 0, target.array.length);
-	}
-
 	{}
 
 	/** Diese Methode gibt {@code this} zurück. */
@@ -756,10 +719,16 @@ public abstract class FEMBinary extends FEMValue implements Iterable<Byte> {
 		};
 	}
 
-	/** {@inheritDoc} */
+	/** Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
+	 * Die Textdarstellung besteht aus der Zeichenkette {@code "0x"} und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h.
+	 * {@code 0123456789ABCDEF}.
+	 *
+	 * @return Textdarstellung. */
 	@Override
 	public final String toString() {
-		return this.toString(true);
+		final StringCollector target = new StringCollector(this._length_);
+		this.extract(target);
+		return new String(target.array, 0, target.array.length);
 	}
 
 }

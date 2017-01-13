@@ -9746,30 +9746,6 @@ Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kod
 <dd></dd>
 </dl>
 </div>
-<h3 class='ST AF'>+ <a name='bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary'><a href='#bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary'>from</a>(<a href='#bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary-string'>string</a>: <a>String</a>, <a href='#bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary-header'>header</a>: boolean): <a href='#bee.creative.fem.FEMBinary'>FEMBinary</a></a></h3>
-<div>
-Diese Methode gibt eine neue Bytefolge mit dem in der gegebenen Zeichenkette kodierten Wert zurück.<br>
- Das Format der Zeichenkette entspricht dem der <a href='#bee.creative.fem.FEMBinary.toString(boolean):String'>Textdarstellung</a>.
-<dl class='PARAMS'>
-<dt><a name='bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary-string'>string</a></dt>
-<dd>Zeichenkette.</dd>
-<dt><a name='bee.creative.fem.FEMBinary.from(String,boolean):FEMBinary-header'>header</a></dt>
-<dd><code>true</code>, wenn die Zeichenkette mit <code>"0x"</code> beginnt.</dd>
-</dl>
-<dl class='RETURN'>
-<dd>Bytefolge.</dd>
-</dl>
-<dl class='THROWS'>
-<dt><a>NullPointerException</a></dt>
-<dd>Wenn <code>string</code> <code>null</code> ist.</dd>
-<dt><a>IllegalArgumentException</a></dt>
-<dd>Wenn die Zeichenkette ungültig ist.</dd>
-</dl>
-<dl class='SEEALSO'>
-<dt><a href='#bee.creative.fem.FEMBinary.toString():String'>FEMBinary.toString()</a></dt>
-<dd></dd>
-</dl>
-</div>
 <h3 class='ST AF'>+ <a name='bee.creative.fem.FEMBinary.from(MMFArray):FEMBinary'><a href='#bee.creative.fem.FEMBinary.from(MMFArray):FEMBinary'>from</a>(<a href='#bee.creative.fem.FEMBinary.from(MMFArray):FEMBinary-array'>array</a>: <a href='#bee.creative.mmf.MMFArray'>MMFArray</a>): <a href='#bee.creative.fem.FEMBinary'>FEMBinary</a></a></h3>
 <div>
 Diese Methode gibt eine Bytefolge mit den gegebenen Zahlen zurück.
@@ -10007,19 +9983,6 @@ Diese Methode gibt <code>-1</code>, <code>0</code> bzw. <code>+1</code> zurück,
 <dd>Wenn <code>that</code> <code>null</code> ist.</dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMBinary.toString(boolean):String'><a href='#bee.creative.fem.FEMBinary.toString(boolean):String'>toString</a>(<a href='#bee.creative.fem.FEMBinary.toString(boolean):String-header'>header</a>: boolean): <a>String</a></a></h3>
-<div>
-Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
- Die Textdarstellung besteht aus der Zeichenkette <code>"0x"</code> (header) und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen
- Ziffern, d.h. <code>0123456789ABCDEF</code>.
-<dl class='PARAMS'>
-<dt><a name='bee.creative.fem.FEMBinary.toString(boolean):String-header'>header</a></dt>
-<dd><code>true</code>, wenn die Zeichenkette mit <code>"0x"</code> beginnen soll.</dd>
-</dl>
-<dl class='RETURN'>
-<dd>Textdarstellung.</dd>
-</dl>
-</div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMBinary.data():FEMBinary'><a href='#bee.creative.fem.FEMBinary.data():FEMBinary'>data</a>(): <a href='#bee.creative.fem.FEMBinary'>FEMBinary</a></a></h3>
 <div>
 Diese Methode gibt <code>this</code> zurück.
@@ -10050,7 +10013,12 @@ Diese Methode gibt <a href='#bee.creative.fem.FEMBinary.TYPE:FEMType'>FEMBinary.
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMBinary.toString():String'><a href='#bee.creative.fem.FEMBinary.toString():String'>toString</a>(): <a>String</a></a></h3>
 <div>
-
+Diese Methode gibt die Textdarstellung dieser Bytefolge zurück.<br>
+ Die Textdarstellung besteht aus der Zeichenkette <code>"0x"</code> und den Bytes dieser Bytefolge vom ersten zum letzten geordnet in hexadezimalen Ziffern, d.h.
+ <code>0123456789ABCDEF</code>.
+<dl class='RETURN'>
+<dd>Textdarstellung.</dd>
+</dl>
 </div>
 
 </div>
@@ -13387,7 +13355,7 @@ Diese Methode gibt die Zeichenkette zur Einrückung einer Hierarchieebene zurüc
 <dd>Zeichenkette zur Einrückung oder <code>null</code>.</dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFormatter.getDomain():FEMDomain'><a href='#bee.creative.fem.FEMFormatter.getDomain():FEMDomain'>getDomain</a>(): <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFormatter.getHelper():FEMDomain'><a href='#bee.creative.fem.FEMFormatter.getHelper():FEMDomain'>getHelper</a>(): <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a></a></h3>
 <div>
 Diese Methode gibt die genutzten Formatierungsmethoden zurück.
 <dl class='RETURN'>
@@ -13406,11 +13374,11 @@ Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und g
 <dd><code>this</code>.</dd>
 </dl>
 </div>
-<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFormatter.useDomain(FEMDomain):FEMFormatter'><a href='#bee.creative.fem.FEMFormatter.useDomain(FEMDomain):FEMFormatter'>useDomain</a>(<a href='#bee.creative.fem.FEMFormatter.useDomain(FEMDomain):FEMFormatter-domain'>domain</a>: <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a>): <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a></a></h3>
+<h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFormatter.useHelper(FEMDomain):FEMFormatter'><a href='#bee.creative.fem.FEMFormatter.useHelper(FEMDomain):FEMFormatter'>useHelper</a>(<a href='#bee.creative.fem.FEMFormatter.useHelper(FEMDomain):FEMFormatter-helper'>helper</a>: <a href='#bee.creative.fem.FEMDomain'>FEMDomain</a>): <a href='#bee.creative.fem.FEMFormatter'>FEMFormatter</a></a></h3>
 <div>
 Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt <code>this</code> zurück.
 <dl class='PARAMS'>
-<dt><a name='bee.creative.fem.FEMFormatter.useDomain(FEMDomain):FEMFormatter-domain'>domain</a></dt>
+<dt><a name='bee.creative.fem.FEMFormatter.useHelper(FEMDomain):FEMFormatter-helper'>helper</a></dt>
 <dd>Formatierungsmethoden.</dd>
 </dl>
 <dl class='RETURN'>
@@ -13418,7 +13386,7 @@ Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt <code>t
 </dl>
 <dl class='THROWS'>
 <dt><a>NullPointerException</a></dt>
-<dd>Wenn <code>domain</code> <code>null</code> ist.</dd>
+<dd>Wenn <code>value</code> <code>null</code> ist.</dd>
 </dl>
 </div>
 <h3 class='SF AF'>+ <a name='bee.creative.fem.FEMFormatter.format():String'><a href='#bee.creative.fem.FEMFormatter.format():String'>format</a>(): <a>String</a></a></h3>

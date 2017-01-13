@@ -97,7 +97,7 @@ public final class FEMFormatter {
 	String _indent_;
 
 	/** Dieses Feld speichert die Formatierungsmethoden. */
-	FEMDomain _domain_ = FEMDomain.NORMAL;
+	FEMDomain _helper_ = FEMDomain.NORMAL;
 
 	{}
 
@@ -218,7 +218,7 @@ public final class FEMFormatter {
 	 * @throws IllegalArgumentException Wenn {@code data} nicht formatiert werden kann. */
 	public final FEMFormatter putData(final Object data) throws NullPointerException, IllegalArgumentException {
 		if (data == null) throw new NullPointerException("data = null");
-		this._domain_.formatData(this, data);
+		this._helper_.formatData(this, data);
 		return this;
 	}
 
@@ -353,7 +353,7 @@ public final class FEMFormatter {
 	 * @throws IllegalArgumentException Wenn {@code function} nicht formatiert werden kann. */
 	public final FEMFormatter putFunction(final FEMFunction function) throws NullPointerException, IllegalArgumentException {
 		if (function == null) throw new NullPointerException("function = null");
-		this._domain_.formatFunction(this, function);
+		this._helper_.formatFunction(this, function);
 		return this;
 	}
 
@@ -367,8 +367,8 @@ public final class FEMFormatter {
 	/** Diese Methode gibt die genutzten Formatierungsmethoden zurück.
 	 *
 	 * @return Formatierungsmethoden. */
-	public final FEMDomain getDomain() {
-		return this._domain_;
+	public final FEMDomain getHelper() {
+		return this._helper_;
 	}
 
 	/** Diese Methode setzt die Zeichenkette zur Einrückung einer Hierarchieebene und gibt {@code this} zurück.<br>
@@ -383,12 +383,12 @@ public final class FEMFormatter {
 
 	/** Diese Methode gibt setzt die zu nutzenden Formatierungsmethoden und gibt {@code this} zurück.
 	 *
-	 * @param domain Formatierungsmethoden.
+	 * @param helper Formatierungsmethoden.
 	 * @return {@code this}.
-	 * @throws NullPointerException Wenn {@code domain} {@code null} ist. */
-	public synchronized final FEMFormatter useDomain(final FEMDomain domain) throws NullPointerException {
-		if (domain == null) throw new NullPointerException("domain = null");
-		this._domain_ = domain;
+	 * @throws NullPointerException Wenn {@code value} {@code null} ist. */
+	public synchronized final FEMFormatter useHelper(final FEMDomain helper) throws NullPointerException {
+		if (helper == null) throw new NullPointerException("helper = null");
+		this._helper_ = helper;
 		return this;
 	}
 
@@ -518,7 +518,7 @@ public final class FEMFormatter {
 	/** {@inheritDoc} */
 	@Override
 	public final String toString() {
-		return Objects.toInvokeString(this, this._domain_, this._indent_, this._items_);
+		return Objects.toInvokeString(this, this._helper_, this._indent_, this._items_);
 	}
 
 }
