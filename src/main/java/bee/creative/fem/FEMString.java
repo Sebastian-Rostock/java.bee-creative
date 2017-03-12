@@ -199,6 +199,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		UTF8ArrayString(final int length, final IAMArray array) {
 			super(length);
+			if (length > array.length()) throw new IllegalStateException();
 			this.array = array;
 		}
 
@@ -257,6 +258,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		UTF16ArrayString(final int length, final IAMArray array) {
 			super(length);
+			if (length > array.length()) throw new IllegalStateException();
 			this.array = array;
 		}
 
@@ -310,6 +312,7 @@ public abstract class FEMString extends FEMValue implements Iterable<Integer> {
 
 		UTF32ArrayString(final int length, final IAMArray array) {
 			super(length);
+			if (length > array.length()) throw new IllegalStateException();
 			this.array = array;
 		}
 
