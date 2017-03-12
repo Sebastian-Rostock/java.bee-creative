@@ -194,7 +194,7 @@ public class IAMLoader {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link IAMListing}, die ihre Daten aus einem {@link MMFArray} dekodiert.
+	/** Diese Klasse implementiert ein {@link IAMListing}, das seine Daten aus einem {@link MMFArray} dekodiert.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMListingLoader extends IAMListing {
@@ -313,7 +313,7 @@ public class IAMLoader {
 
 	}
 
-	/** Diese Klasse implementiert eine {@link IAMMapping}, die ihre Daten aus einem {@link MMFArray} dekodiert.
+	/** Diese Klasse implementiert ein {@link IAMMapping}, das seine Daten aus einem {@link MMFArray} dekodiert.
 	 *
 	 * @author [cc-by] 2015 Sebastian Rostock [http://creativecommons.org/licenses/by/3.0/de/] */
 	public static final class IAMMappingLoader extends IAMMapping {
@@ -558,13 +558,13 @@ public class IAMLoader {
 			} else {
 				int l = 0, r = this._entryCount_;
 				while (l < r) {
-					i = (l + r) >> 1;
-					i = key.compare(this.key(i));
+					final int c = (l + r) >> 1;
+					i = key.compare(this.key(c));
 					if (i < 0) {
-						r = i;
+						r = c;
 					} else if (i > 0) {
-						l = i + 1;
-					} else return i;
+						l = c + 1;
+					} else return c;
 				}
 			}
 			return -1;
