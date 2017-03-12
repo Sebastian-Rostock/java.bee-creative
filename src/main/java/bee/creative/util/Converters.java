@@ -58,31 +58,6 @@ public class Converters {
 
 	{}
 
-	/** Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Field} zurück.<br>
-	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code field.get(input)}.
-	 *
-	 * @param <GInput> Typ der Eingabe.
-	 * @param <GValue> Typ des Werts.
-	 * @param field {@link Field}.
-	 * @return {@link Field}-Adapter.
-	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
-	public static <GInput, GValue> Converter<GInput, GValue> fieldAdapter(final Field<? super GInput, ? extends GValue> field) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
-		return new Converter<GInput, GValue>() {
-
-			@Override
-			public GValue convert(final GInput input) {
-				return field.get(input);
-			}
-
-			@Override
-			public String toString() {
-				return Objects.toInvokeString("fieldAdapter", field);
-			}
-
-		};
-	}
-
 	/** Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Filter} zurück.<br>
 	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code Boolean.valueOf(filter.accept(input))}.
 	 *
@@ -104,6 +79,31 @@ public class Converters {
 				return Objects.toInvokeString("filterAdapter", filter);
 			}
 
+		};
+	}
+
+	/** Diese Methode gibt einen {@link Converter} als Adapter zu einem {@link Field} zurück.<br>
+	 * Für eine Eingabe {@code input} liefert er die Ausgabe {@code field.get(input)}.
+	 *
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts.
+	 * @param getter {@link Field}.
+	 * @return {@link Field}-Adapter.
+	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
+	public static <GInput, GValue> Converter<GInput, GValue> getterAdapter(final Getter<? super GInput, ? extends GValue> getter) throws NullPointerException {
+		if (getter == null) throw new NullPointerException("getter = null");
+		return new Converter<GInput, GValue>() {
+	
+			@Override
+			public GValue convert(final GInput input) {
+				return getter.get(input);
+			}
+	
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("getterAdapter", getter);
+			}
+	
 		};
 	}
 

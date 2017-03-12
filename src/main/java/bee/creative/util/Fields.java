@@ -471,6 +471,61 @@ public final class Fields {
 
 	{}
 
+	public static <GInput, GValue> Field<GInput, GValue> setupField(final Field<? super GInput, GValue> field, final Getter<? super GInput, GValue> getter)
+		throws NullPointerException {
+		if ((field == null) || (getter == null)) throw new NullPointerException();
+		return new Field<GInput, GValue>() {
+
+			@Override
+			public GValue get(final GInput input) {
+				GValue result = field.get(input);
+				if (result != null) return result;
+				result = getter.get(input);
+				field.set(input, result);
+				return result;
+			}
+
+			@Override
+			public void set(final GInput input, final GValue value) {
+				field.set(input, value);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("setupField", field, getter);
+			}
+
+		};
+	}
+
+	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field) throws NullPointerException {
+		return Fields.defaultField(field, null);
+	}
+
+	public static <GInput, GValue> Field<GInput, GValue> defaultField(final Field<? super GInput, GValue> field, final GValue value) throws NullPointerException {
+		if (field == null) throw new NullPointerException();
+		return new Field<GInput, GValue>() {
+
+			@Override
+			public GValue get(final GInput input) {
+				if (input == null) return value;
+				return field.get(input);
+			}
+
+			@Override
+			public void set(final GInput input, final GValue value) {
+				if (input == null) return;
+				field.set(input, value);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("defaultField", field, value);
+			}
+
+		};
+	}
+
 	/** Diese Methode gibt ein {@link Field} zurück, welches beim Lesen den gegebenen Wert liefert und das Schreiben ignoriert.
 	 *
 	 * @param <GValue> Typ des Werts.
@@ -518,7 +573,8 @@ public final class Fields {
 	 * @return {@code native}-{@link Field}.
 	 * @throws NullPointerException Wenn {@code field} {@code null} ist. */
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Field field) throws NullPointerException {
-		if (field == null) throw new NullPointerException("field = null");
+		// if (field == null) throw new NullPointerException("field = null");
+		field.setAccessible(true);
 		return new Field<GInput, GValue>() {
 
 			@Override
@@ -549,7 +605,7 @@ public final class Fields {
 		};
 	}
 
-	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeField(Natives.parseMethod(getMethodText), Natives.parseMethod(setMethodText))}.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.nativeGetter(getMethodText), Fields.nativeSetter(setMethodText))}.
 	 *
 	 * @see #nativeField(java.lang.reflect.Method, java.lang.reflect.Method)
 	 * @see Natives#parseMethod(String)
@@ -562,12 +618,10 @@ public final class Fields {
 	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final String getMethodText, final String setMethodText)
 		throws NullPointerException, IllegalArgumentException {
-		return Fields.nativeField(Natives.parseMethod(getMethodText), Natives.parseMethod(setMethodText));
+		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(getMethodText), Fields.<GInput, GValue>nativeSetter(setMethodText));
 	}
 
-	/** Diese Methode gibt ein {@link Field} zu den gegebenen {@link java.lang.reflect.Method nativen Methoden} zurück.<br>
-	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Field} über {@code getMethod.invoke(input)}. Das Schreiben des Werts {@code value}
-	 * erfolgt hierbei für Klassenmethoden über {@code setMethod.invoke(input, value)}. Bei Klassenmethoden wird die Eingabe ignoriert.
+	/** Diese Methode ist eine Abkürzung für {@code Fields.compositeField(Fields.nativeGetter(getMethod), Fields.nativeSetter(setMethod))}.
 	 *
 	 * @see java.lang.reflect.Method#invoke(Object, Object...)
 	 * @param <GInput> Typ der Eingabe.
@@ -579,22 +633,72 @@ public final class Fields {
 	 * @throws IllegalArgumentException Wenn die Methoden keine passende Parameteranzahl besitzen. */
 	public static <GInput, GValue> Field<GInput, GValue> nativeField(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod)
 		throws NullPointerException, IllegalArgumentException {
-		final int getSize = getMethod.getParameterTypes().length, setSize = setMethod.getParameterTypes().length;
-		if ((getSize != 0) || (setSize != 1)) throw new IllegalArgumentException();
-		return Fields._nativeField_(getMethod, setMethod);
+		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(getMethod), Fields.<GInput, GValue>nativeSetter(setMethod));
+	}
+
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputClass, final String fieldName)
+		throws NullPointerException, IllegalArgumentException {
+		try {
+			return Fields.nativeField(inputClass.getDeclaredField(fieldName));
+		} catch (NoSuchFieldException | SecurityException cause) {
+			throw new IllegalArgumentException(cause);
+		}
+	}
+
+	public static <GInput, GValue> Field<GInput, GValue> nativeField(final Class<GInput> inputClass, final Class<GValue> valueClass, final String getterName,
+		final String setterName) throws NullPointerException, IllegalArgumentException {
+		return Fields.compositeField(Fields.<GInput, GValue>nativeGetter(inputClass, getterName), Fields.nativeSetter(inputClass, valueClass, setterName));
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeGetter(Natives.parseMethod(methodText))}.
+	 *
+	 * @see #nativeGetter(java.lang.reflect.Method)
+	 * @see Natives#parseMethod(String)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param methodText Methodentext der Methode zum Lesen der Eigenschaft.
+	 * @return {@code native}-{@link Getter}.
+	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final String methodText) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeGetter(Natives.parseMethod(methodText));
+	}
+
+	/** Diese Methode gibt einen {@link Getter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
+	 * Für eine Eingabe {@code input} erfolgt das Lesen des gelieferten {@link Getter} über {@code method.invoke(input)}.
+	 *
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param method Methode zum Lesen der Eigenschaft.
+	 * @return {@code native}-{@link Getter}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzt. */
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final java.lang.reflect.Method method)
+		throws NullPointerException, IllegalArgumentException {
+		if (method.getParameterTypes().length != 0) throw new IllegalArgumentException();
+		return Fields._nativeGetter_(method);
+	}
+
+	public static <GInput, GValue> Getter<GInput, GValue> nativeGetter(final Class<GInput> inputClass, final String getterName)
+		throws NullPointerException, IllegalArgumentException {
+		try {
+			return Fields.nativeGetter(inputClass.getDeclaredMethod(getterName));
+		} catch (NoSuchMethodException | SecurityException cause) {
+			throw new IllegalArgumentException(cause);
+		}
 	}
 
 	@SuppressWarnings ("javadoc")
-	static <GInput, GValue> Field<GInput, GValue> _nativeField_(final java.lang.reflect.Method getMethod, final java.lang.reflect.Method setMethod) {
-		if (getMethod == null) throw new NullPointerException("getMethod = null");
-		if (setMethod == null) throw new NullPointerException("setMethod = null");
-		return new Field<GInput, GValue>() {
+	static <GInput, GValue> Getter<GInput, GValue> _nativeGetter_(final java.lang.reflect.Method method) {
+		method.setAccessible(true);
+		return new Getter<GInput, GValue>() {
 
 			@Override
 			public GValue get(final GInput input) {
 				try {
 					@SuppressWarnings ("unchecked")
-					final GValue result = (GValue)getMethod.invoke(input);
+					final GValue result = (GValue)method.invoke(input);
 					return result;
 				} catch (IllegalAccessException | InvocationTargetException cause) {
 					throw new IllegalArgumentException(cause);
@@ -602,9 +706,61 @@ public final class Fields {
 			}
 
 			@Override
+			public String toString() {
+				return Objects.toInvokeString("nativeGetter", Natives.formatMethod(method));
+			}
+
+		};
+	}
+
+	/** Diese Methode ist eine Abkürzung für {@code Fields.nativeSetter(Natives.parseMethod(methodText))}.
+	 *
+	 * @see #nativeSetter(java.lang.reflect.Method)
+	 * @see Natives#parseMethod(String)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param methodText Methodentext der Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Setter}.
+	 * @throws NullPointerException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst.
+	 * @throws IllegalArgumentException Wenn {@link Natives#parseMethod(String)} eine entsprechende Ausnahme auslöst. */
+	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final String methodText) throws NullPointerException, IllegalArgumentException {
+		return Fields.nativeSetter(Natives.parseMethod(methodText));
+	}
+
+	/** Diese Methode gibt einen {@link Setter} zur gegebenen {@link java.lang.reflect.Method nativen Methode} zurück.<br>
+	 * Für eine Eingabe {@code input} erfolgt das Schreiben des Werts {@code value} über {@code method.invoke(input, value)}.
+	 *
+	 * @see java.lang.reflect.Method#invoke(Object, Object...)
+	 * @param <GInput> Typ der Eingabe.
+	 * @param <GValue> Typ des Werts der Eigenschaft.
+	 * @param method Methode zum Schreiben der Eigenschaft.
+	 * @return {@code native}-{@link Setter}.
+	 * @throws NullPointerException Wenn {@code method} {@code null} ist.
+	 * @throws IllegalArgumentException Wenn die Methode keine passende Parameteranzahl besitzen. */
+	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final java.lang.reflect.Method method)
+		throws NullPointerException, IllegalArgumentException {
+		if (method.getParameterTypes().length != 1) throw new IllegalArgumentException();
+		return Fields._nativeSetter_(method);
+	}
+
+	public static <GInput, GValue> Setter<GInput, GValue> nativeSetter(final Class<GInput> inputClass, final Class<GValue> valueClass, final String setterName)
+		throws NullPointerException, IllegalArgumentException {
+		try {
+			return Fields.nativeSetter(inputClass.getDeclaredMethod(setterName, valueClass));
+		} catch (NoSuchMethodException | SecurityException cause) {
+			throw new IllegalArgumentException(cause);
+		}
+	}
+
+	@SuppressWarnings ("javadoc")
+	static <GInput, GValue> Setter<GInput, GValue> _nativeSetter_(final java.lang.reflect.Method method) {
+		method.setAccessible(true);
+		return new Setter<GInput, GValue>() {
+
+			@Override
 			public void set(final GInput input, final GValue value) {
 				try {
-					setMethod.invoke(input, value);
+					method.invoke(input, value);
 				} catch (IllegalAccessException | InvocationTargetException cause) {
 					throw new IllegalArgumentException(cause);
 				}
@@ -612,10 +768,15 @@ public final class Fields {
 
 			@Override
 			public String toString() {
-				return Objects.toInvokeString("nativeField", Natives.formatMethod(getMethod), Natives.formatMethod(setMethod));
+				return Objects.toInvokeString("nativeSetter", Natives.formatMethod(method));
 			}
 
 		};
+	}
+
+	public static <GInput, GOutput, GValue> Field<GInput, GValue> navigatedField(final Getter<? super GInput, ? extends GOutput> getter,
+		final Field<? super GOutput, GValue> field) throws NullPointerException {
+		return Fields.navigatedField(Converters.getterAdapter(getter), field);
 	}
 
 	/** Diese Methode gibt ein navigiertes {@link Field} zurück, dass von seiner Eingabe mit dem gegebenen {@link Converter} zur Eingabe des gegebenen
@@ -648,6 +809,30 @@ public final class Fields {
 			@Override
 			public String toString() {
 				return Objects.toInvokeString("navigatedField", converter, field);
+			}
+
+		};
+	}
+
+	public static <GInput, GValue> Field<GInput, GValue> compositeField(final Getter<? super GInput, ? extends GValue> getter,
+		final Setter<? super GInput, ? super GValue> setter) {
+		if (getter == null) throw new NullPointerException("getter = null");
+		if (setter == null) throw new NullPointerException("setter = null");
+		return new Field<GInput, GValue>() {
+
+			@Override
+			public GValue get(final GInput input) {
+				return getter.get(input);
+			}
+
+			@Override
+			public void set(final GInput input, final GValue value) {
+				setter.set(input, value);
+			}
+
+			@Override
+			public String toString() {
+				return Objects.toInvokeString("compositeField", getter, setter);
 			}
 
 		};
