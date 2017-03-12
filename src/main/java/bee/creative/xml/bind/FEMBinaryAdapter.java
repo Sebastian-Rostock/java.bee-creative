@@ -1,6 +1,5 @@
 package bee.creative.xml.bind;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import bee.creative.fem.FEMBinary;
 
@@ -14,14 +13,14 @@ public final class FEMBinaryAdapter extends XmlAdapter<String, FEMBinary> {
 	@Override
 	public String marshal(final FEMBinary value) throws Exception {
 		if (value == null) return null;
-		return DatatypeConverter.printHexBinary(value.value());
+		return value.toString(false);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public FEMBinary unmarshal(final String value) throws Exception {
 		if (value == null) return null;
-		return FEMBinary.from(DatatypeConverter.parseHexBinary(value));
+		return FEMBinary.from(value, false);
 	}
 
 }
