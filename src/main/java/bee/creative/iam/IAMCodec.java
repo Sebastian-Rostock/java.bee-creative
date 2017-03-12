@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Map;
 import bee.creative.fem.FEMBinary;
+import bee.creative.fem.FEMString;
 import bee.creative.iam.IAMLoader.IAMIndexLoader;
 import bee.creative.ini.INIReader;
 import bee.creative.ini.INIWriter;
@@ -193,6 +194,7 @@ public final class IAMCodec {
 		 * @return {@link IAMFindMode}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMFindMode from(final Object object) throws IllegalArgumentException {
+			if (object instanceof IAMFindMode) return (IAMFindMode)object;
 			final IAMFindMode result = IAMFindMode._values_.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal find-mode: " + object);
 			return result;
@@ -272,6 +274,7 @@ public final class IAMCodec {
 		 * @return {@link IAMByteOrder}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMByteOrder from(final Object object) throws IllegalArgumentException {
+			if (object instanceof IAMByteOrder) return (IAMByteOrder)object;
 			final IAMByteOrder result = IAMByteOrder._values_.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal byte-order: " + object);
 			return result;
@@ -298,7 +301,7 @@ public final class IAMCodec {
 			@Override
 			public int[] parse(final String string) throws NullPointerException, IllegalArgumentException {
 				if (string.length() == 0) return new int[0];
-				final String[] source = string.split(" ", -1);
+				final String[] source = string.trim().split("\\s+", -1);
 				final int length = source.length;
 				final int[] result = new int[length];
 				for (int i = 0; i < length; i++) {
@@ -345,7 +348,7 @@ public final class IAMCodec {
 
 			@Override
 			public String format(final int[] array) throws NullPointerException, IllegalArgumentException {
-				final int length = array.length + 1;
+				final int length = array.length << 1;
 				final char[] result = new char[length];
 				for (int i = 0; i < length;) {
 					final int value = array[i >> 1];
@@ -465,6 +468,54 @@ public final class IAMCodec {
 				return new String(IAMCodec._formatBytes_(array), this.charset);
 			}
 
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 8-Bit-Kodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_8 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(1, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toBytes(IAMArray.from(source))), true).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 16-Bit-Kodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_16 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(2, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(IAMArray.toChars(IAMArray.from(source))), true).toString();
+			}
+
+		},
+
+		/** Dieses Feld identifiziert das Format zur Angabe einer Zahlenfolge, bei welcher die Zahlen für die strukturierte {@link FEMString#toArray(int, boolean)
+		 * 32-Bit-Kodierung} eines {@link FEMString} stehen. */
+		STRING_FEM_32 {
+
+			@Override
+			public int[] parse(final String source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(source).toArray(4, true).toArray();
+			}
+
+			@Override
+			public String format(final int[] source) throws NullPointerException, IllegalArgumentException {
+				return FEMString.from(IAMArray.from(source), true).toString();
+			}
+
 		};
 
 		@SuppressWarnings ("javadoc")
@@ -474,6 +525,7 @@ public final class IAMCodec {
 			.useEntry("UTF-8", STRING_UTF_8).useEntry("UTF-16", STRING_UTF_16).useEntry("UTF-32", STRING_UTF_32) //
 			.useEntry("CP-1252", STRING_CP_1252) //
 			.useEntry("ISO-8859-1", STRING_ISO_8859_1).useEntry("ISO-8859-15", STRING_ISO_8859_15)//
+			.useEntry("FEM-8", STRING_FEM_8).useEntry("FEM-16", STRING_FEM_16).useEntry("FEM-32", STRING_FEM_32) //
 			.build();
 
 		@SuppressWarnings ("javadoc")
@@ -483,6 +535,7 @@ public final class IAMCodec {
 			.useEntry(STRING_UTF_8, "UTF-8").useEntry(STRING_UTF_16, "UTF-16").useEntry(STRING_UTF_32, "UTF-32") //
 			.useEntry(STRING_CP_1252, "CP-1252") //
 			.useEntry(STRING_ISO_8859_1, "ISO-8859-1").useEntry(STRING_ISO_8859_15, "ISO-8859-15") //
+			.useEntry(STRING_FEM_8, "FEM-8").useEntry(STRING_FEM_16, "FEM-16").useEntry(STRING_FEM_32, "FEM-32") //
 			.build();
 
 		{}
@@ -506,12 +559,19 @@ public final class IAMCodec {
 		 * <dd>{@link #STRING_ISO_8859_1}</dd>
 		 * <dt>{@code "ISO-8859-15"}</dt>
 		 * <dd>{@link #STRING_ISO_8859_15}</dd>
+		 * <dt>{@code "FEM-8"}</dt>
+		 * <dd>{@link #STRING_FEM_8}</dd>
+		 * <dt>{@code "FEM-16"}</dt>
+		 * <dd>{@link #STRING_FEM_16}</dd>
+		 * <dt>{@code "FEM-32"}</dt>
+		 * <dd>{@link #STRING_FEM_32}</dd>
 		 * </dl>
 		 *
 		 * @param object {@link Object} oder {@code null}.
 		 * @return {@link IAMByteOrder}.
 		 * @throws IllegalArgumentException Wenn {@code object} ungültig ist. */
 		public static IAMArrayFormat from(final Object object) throws IllegalArgumentException {
+			if (object instanceof IAMArrayFormat) return (IAMArrayFormat)object;
 			final IAMArrayFormat result = IAMArrayFormat._values_.get(object);
 			if (result == null) throw new IllegalArgumentException("illegal array-format: " + object);
 			return result;
